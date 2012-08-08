@@ -1,0 +1,36 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+   <!--  <parent>
+        <groupId>com.photon.phresco</groupId>
+        <artifactId>phresco-parent</artifactId>
+        <version>2.0.0.10001-SNAPSHOT</version>
+        <relativePath>../</relativePath>
+    </parent> -->
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.photon.phresco.service</groupId>
+    <artifactId>phresco-service-root</artifactId>
+	<version>2.0.0.10001-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>Phresco Service Root</name>
+	<url>http://www.phresco.org</url>
+
+    <distributionManagement>
+        <site>
+            <id>phresco.service.root</id>
+            <name>Phresco Service Root</name>
+            <url>scp://phresco.org/home/projects/service/</url>
+        </site>
+    </distributionManagement>
+
+    <modules>
+		<module>phresco-ldap</module>
+        <module>phresco-service</module>
+        <module>phresco-service-impl</module>
+        <module>phresco-service-web</module>
+        <module>phresco-service-auth</module>
+        <!-- <module>phresco-service-tools</module> -->
+    </modules>
+
+</project>
