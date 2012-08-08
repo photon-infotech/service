@@ -39,8 +39,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 import java.util.Properties;
 
+import com.photon.phresco.configuration.ConfigReader;
+import com.photon.phresco.configuration.Configuration;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.util.Utility;
 
@@ -266,7 +269,27 @@ public class ServerConfiguration {
 	}
 
 	public String getAuthServiceURL() {
-		return authenticateurl;
+		InputStream stream = null;
+		stream = this.getClass().getClassLoader().getResourceAsStream("phresco-env-config.xml");
+		try {
+			ConfigReader configReader = new ConfigReader(stream);
+			String environment = System.getProperty("SERVER_ENVIRONMENT");
+			if (environment == null || environment.isEmpty() ) {
+				environment = configReader.getDefaultEnvName();
+			}
+			List<Configuration> configurations = configReader.getConfigurations(environment,"WebService");
+			for (Configuration configuration : configurations) {
+				String protocol = configuration.getProperties().getProperty("protocol");
+				String host = configuration.getProperties().getProperty("host");
+				String port = configuration.getProperties().getProperty("port");
+				String context = configuration.getProperties().getProperty("context");
+				authenticateurl = protocol + "://" + host + ":" +  port + "/" + context;
+			}
+			return authenticateurl;
+		} catch (Exception e) {
+				e.printStackTrace();
+		}
+		return "";
 	}
 
 	public String getEmailExtFile() {
