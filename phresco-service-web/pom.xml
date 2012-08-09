@@ -320,7 +320,7 @@
     
     <build>
 		<directory>do_not_checkin/target</directory>
-        <finalName>service-web</finalName>
+        <finalName>service</finalName>
         <resources>
           <resource>
             <directory>src/main/resources</directory>
