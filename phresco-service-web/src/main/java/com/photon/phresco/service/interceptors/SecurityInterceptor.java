@@ -35,12 +35,13 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 	private static final Logger LOGGER = Logger.getLogger(SecurityInterceptor.class); 
 	
 	public ContainerRequest filter(ContainerRequest request) {
-		URI absolutePath = request.getAbsolutePath();
+
+	    URI absolutePath = request.getAbsolutePath();
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug(absolutePath);
 		}
 		
-		if(absolutePath.getPath().equals(ServiceConstants.REST_LOGIN_PATH)) {
+		if(request.getPath().equals("login")) {
 			return request;
 		}
 		
