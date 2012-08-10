@@ -31,9 +31,7 @@ import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.DownloadInfo;
 import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
-import com.photon.phresco.service.client.impl.RestClient;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.GenericType;
 
 public class Downloads extends ServiceBaseAction { 
 
@@ -69,11 +67,12 @@ public class Downloads extends ServiceBaseAction {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Downloads.list()");
 		}
+		
 		try {
 			List<DownloadInfo> downloadInfo = getServiceManager().getDownloads(customerId);
 			getHttpRequest().setAttribute(REQ_DOWNLOAD_INFO, downloadInfo);
 			getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
-		} catch(Exception e){
+		} catch(Exception e) {
 			throw new PhrescoException(e);
 		}
 
@@ -84,11 +83,10 @@ public class Downloads extends ServiceBaseAction {
 		if (isDebugEnabled) {	
 			S_LOGGER.debug("Entering Method Downloads.add()");
 		}
+		
 		try {
-			RestClient<Technology> technology = getServiceManager().getRestClient(REST_API_COMPONENT + REST_API_TECHNOLOGIES);
-			GenericType<List<Technology>> genericType = new GenericType<List<Technology>>(){};
-			List<Technology> technologys = technology.get(genericType);
-			getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologys);
+			List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
+			getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
 		} catch(Exception e) {
 			throw new PhrescoException(e);
 		}
@@ -118,8 +116,9 @@ public class Downloads extends ServiceBaseAction {
 			download.setName(name);
 			download.setDescription(description);
 			download.setVersion(version);
+			download.setCustomerId(customerId);
 			downloadInfo.add(download);
-			ClientResponse clientResponse = getServiceManager().createDownload(downloadInfo);
+			ClientResponse clientResponse = getServiceManager().createDownloads(downloadInfo, customerId);
 			if(clientResponse.getStatus() != 200){
 				addActionError(getText(DOWNLOAD_NOT_ADDED, Collections.singletonList(name)));
 			} else {
@@ -137,7 +136,7 @@ public class Downloads extends ServiceBaseAction {
 		}
 
 		try {
-			DownloadInfo downloadInfo = getServiceManager().getDownload(id);
+			DownloadInfo downloadInfo = getServiceManager().getDownload(id, customerId);
 			getHttpRequest().setAttribute(REQ_DOWNLOAD_INFO, downloadInfo);
 			getHttpRequest().setAttribute(REQ_FROM_PAGE, fromPage);
 		} catch (Exception e) {
@@ -159,7 +158,8 @@ public class Downloads extends ServiceBaseAction {
 			download.setName(name);
 			download.setDescription(description);
 			download.setVersion(version);
-			getServiceManager().updateDownload(download, id);
+			download.setCustomerId(customerId);
+			getServiceManager().updateDownload(download, id, customerId);
 		} catch(Exception e) {
 			throw new PhrescoException(e);
 		}
@@ -176,7 +176,7 @@ public class Downloads extends ServiceBaseAction {
 			String[] downloadIds = getHttpRequest().getParameterValues(REQ_DOWNLOAD_ID);
 			if (downloadIds != null) {
 				for (String downloadId : downloadIds) {
-					ClientResponse clientResponse =getServiceManager().deleteDownloadInfo(downloadId);
+					ClientResponse clientResponse =getServiceManager().deleteDownloadInfo(downloadId, customerId);
 					if (clientResponse.getStatus() != 200) {
 						addActionError(getText(DOWNLOAD_NOT_DELETED));
 					}
@@ -383,6 +383,4 @@ public class Downloads extends ServiceBaseAction {
 	public void setCustomerId(String customerId) {
 		this.customerId = customerId;
 	}
-
-
 }

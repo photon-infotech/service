@@ -26,7 +26,7 @@
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
 
 <%
-	Customer customer = (Customer)request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER);
+	Customer customer = (Customer) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER);
 	String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
 %>
 

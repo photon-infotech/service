@@ -77,7 +77,7 @@ public class ApplicationTypes extends ServiceBaseAction {
 	    }
 		
 		try {
-		    ApplicationType appType = getServiceManager().getApplicationType(appTypeId);
+		    ApplicationType appType = getServiceManager().getApplicationType(appTypeId, customerId);
 			getHttpRequest().setAttribute(REQ_APP_TYPE, appType);
 			getHttpRequest().setAttribute(REQ_FROM_PAGE, fromPage);
 		} catch (Exception e) {
@@ -119,7 +119,7 @@ public class ApplicationTypes extends ServiceBaseAction {
 			ApplicationType appType = new ApplicationType(name, description);
 			appType.setId(appTypeId);
 			appType.setCustomerId(customerId);
-			getServiceManager().updateApplicationTypes(appType, appTypeId, customerId);
+			getServiceManager().updateApplicationType(appType, appTypeId, customerId);
 		} catch(Exception e)  {
 			throw new PhrescoException(e);
 		}

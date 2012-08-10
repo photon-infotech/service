@@ -19,16 +19,15 @@
  */
 package com.photon.phresco.service.admin.actions.admin;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+
 import com.photon.phresco.commons.model.Role;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.ApplicationType;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.sun.jersey.api.client.ClientResponse;
 
@@ -51,6 +50,7 @@ public class RoleList extends ServiceBaseAction {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method RolesList.list()");
 		}
+		
 		try {
 			List<Role> roleList = getServiceManager().getRoles();
 			getHttpRequest().setAttribute(REQ_ROLE_LIST, roleList);
@@ -65,6 +65,7 @@ public class RoleList extends ServiceBaseAction {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method RolesList.add()");
 		}
+		
 		return ADMIN_ROLE_ADD;	
 	}
 	
@@ -88,6 +89,7 @@ public class RoleList extends ServiceBaseAction {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method RolesList.save()");
 		}
+		
 		try  {
 			List<Role> roleList = new ArrayList<Role>();
 			Role role = new Role();
@@ -103,6 +105,7 @@ public class RoleList extends ServiceBaseAction {
 		} catch (Exception e) {
 
 		}
+		
 		return  list();
 	}
 	
@@ -164,17 +167,26 @@ public class RoleList extends ServiceBaseAction {
 	}
 	
 	public String assign() {
-		S_LOGGER.debug("Entering Method RolesList.assign()");
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method RolesList.assign()");
+		}
+		
 		return ADMIN_ROLE_ASSIGN;	
 	}
 	
 	public String assignSave() {
-		S_LOGGER.debug("Entering Method RolesList.assignSave()");
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method RolesList.assignSave()");
+		}
+		
 		return ADMIN_ROLE_ASSIGN_SAVE;	
 	}
 	
 	public String assignCancel() {
-		S_LOGGER.debug("Entering Method RolesList.assignCancel()");
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method RolesList.assignCancel()");
+		}
+		
 		return ADMIN_ROLE_ASSIGN_CANCEL;	
 	}
 	
@@ -193,7 +205,6 @@ public class RoleList extends ServiceBaseAction {
 	public void setNameError(String nameError) {
 		this.nameError = nameError;
 	}
-	
 
 	public boolean isErrorFound() {
 		return errorFound;
