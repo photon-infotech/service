@@ -262,9 +262,30 @@
 			<result name="roleList">/admin/pages/admin/role/list.jsp</result>
 			<result type="json" />
         </action>
+        
+        <action name="roleUpdate" class="com.photon.phresco.service.admin.actions.admin.RoleList" method="update">
+            <result name="roleList">/admin/pages/admin/role/list.jsp</result>
+            <result type="json" />
+        </action>
+        
+        <action name="roleEdit" class="com.photon.phresco.service.admin.actions.admin.RoleList" method="edit">
+            <result name="roleAdd">/admin/pages/admin/role/add.jsp</result>
+        </action>
 
 		<action name="roleCancel" class="com.photon.phresco.service.admin.actions.admin.RoleList" method="cancel">
 			<result name="roleCancel">/admin/pages/admin/role/list.jsp</result>
+        </action>
+        
+        <action name="roleDelete" class="com.photon.phresco.service.admin.actions.admin.RoleList" method="delete">
+            <result name="roleList">/admin/pages/admin/role/list.jsp</result>
+        </action>
+        
+         <action name="roleSaveValidate" class="com.photon.phresco.service.admin.actions.admin.RoleList" method="validateForm">
+            <result type="json" />
+        </action>
+        
+        <action name="roleUpdateValidate" class="com.photon.phresco.service.admin.actions.admin.RoleList" method="validateForm">
+            <result type="json" />
         </action>
 		
 		<action name="assignPermission" class="com.photon.phresco.service.admin.actions.admin.RoleList" method="assign">

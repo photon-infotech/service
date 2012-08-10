@@ -42,6 +42,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
@@ -70,6 +72,8 @@ import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.MultiPart;
 import com.sun.jersey.multipart.MultiPartMediaTypes;
+
+
 
 @Component
 @Path(ServiceConstants.REST_API_COMPONENT)
@@ -443,42 +447,42 @@ public class ComponentService extends DbService implements ServiceConstants {
 	@GET
 	@Path (REST_API_MODULES)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findModules(@QueryParam(REST_QUERY_TECHID) String techId, @QueryParam(REST_QUERY_TYPE) String type, 
+	public Response findModules(@QueryParam(REST_QUERY_TYPE) String type, 
 	        @QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.findModules()" + techId + type);
+	        S_LOGGER.debug("Entered into ComponentService.findModules()" +customerId);
 	    }
 		
-		List<ModuleGroup> foundModules = new ArrayList<ModuleGroup>();
 		try {
-			
-			if (techId != null && type != null && customerId != null && type.equals(REST_QUERY_TYPE_MODULE)) {
-			    Criteria criteria = Criteria.where(REST_QUERY_TECHID).is(techId).and(REST_QUERY_TYPE).is(REST_QUERY_TYPE_MODULE)
-		        .and(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME);
-			    foundModules = mongoOperation.find(MODULES_COLLECTION_NAME, new Query(criteria), ModuleGroup.class);
-			    if(!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
-    		        Criteria customerCriteria = Criteria.where(REST_QUERY_TECHID).is(techId).and(REST_QUERY_TYPE).is(REST_QUERY_TYPE_MODULE)
-    		        .and(REST_QUERY_CUSTOMERID).is(customerId);
-    		        foundModules.addAll(mongoOperation.find(MODULES_COLLECTION_NAME, new Query(customerCriteria), ModuleGroup.class));
-			    }
+			List<ModuleGroup> foundModules = new ArrayList<ModuleGroup>();
+			if(StringUtils.isEmpty(type)) {
+				if(!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
+					foundModules = mongoOperation.find(MODULES_COLLECTION_NAME, 
+							new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)), ModuleGroup.class);
+				}
+				foundModules.addAll(mongoOperation.find(MODULES_COLLECTION_NAME, 
+						new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)), ModuleGroup.class));
+				
 				return Response.status(Response.Status.OK).entity(foundModules).build();
 			}
 			
-			if (techId != null && type != null && customerId != null && type.equals(REST_QUERY_TYPE_JS)) {
-			    Criteria criteria = Criteria.where(REST_QUERY_TECHID).is(techId).and(REST_QUERY_TYPE).is(REST_QUERY_TYPE_JS)
-                .and(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME);
-			    foundModules = mongoOperation.find(MODULES_COLLECTION_NAME, new Query(criteria), ModuleGroup.class);
-			    if(!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
-			        Criteria customerCriteria = Criteria.where(REST_QUERY_TECHID).is(techId).and(REST_QUERY_TYPE).is(REST_QUERY_TYPE_JS)
-	                .and(REST_QUERY_CUSTOMERID).is(customerId);
-			        foundModules.addAll(mongoOperation.find(MODULES_COLLECTION_NAME, new Query(customerCriteria), ModuleGroup.class));
-			    }
+			if(StringUtils.isNotEmpty(customerId) && type.equals(REST_QUERY_TYPE_MODULE)) {
+				if (!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
+					foundModules = mongoOperation.find(MODULES_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)
+							.and(REST_QUERY_TYPE).is(type)), ModuleGroup.class);
+				}
+				foundModules.addAll(mongoOperation.find(MODULES_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)
+						.and(REST_QUERY_TYPE).is(type)), ModuleGroup.class));
 				return Response.status(Response.Status.OK).entity(foundModules).build();
 			}
 			
-			if (techId != null && type != null) {
-				foundModules = mongoOperation.find(MODULES_COLLECTION_NAME , 
-				        new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)), ModuleGroup.class);
+			if(StringUtils.isNotEmpty(customerId) && type.equals(REST_QUERY_TYPE_JS)) {
+				if (!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
+					foundModules = mongoOperation.find(MODULES_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)
+							.and(REST_QUERY_TYPE).is(type)), ModuleGroup.class);
+				}
+				foundModules.addAll(mongoOperation.find(MODULES_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)
+						.and(REST_QUERY_TYPE).is(type)), ModuleGroup.class));
 				return Response.status(Response.Status.OK).entity(foundModules).build();
 			}
 		} catch(Exception e) {

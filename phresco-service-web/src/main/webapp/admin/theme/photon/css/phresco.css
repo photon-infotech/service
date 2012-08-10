@@ -1039,7 +1039,7 @@ legend {
 	height:120px;
     border: 1px solid #6B0C0C;
 	height: auto;
-    max-height: 280px;
+    /* max-height: 280px; */
 	margin-left:4px;
 }
 
@@ -1596,7 +1596,7 @@ h3 label {
 
 .popopimage {
 	float: right; 
-	margin-right: 125px;
+	margin-right: 97px;
 }
 
 .datealign {
