@@ -93,6 +93,13 @@ public interface ServiceUIConstants {
      *****************************/ 
     String REQ_MODULE_GROUP = "moduleGroup";
     
+    /*****************************
+     * Role Request Constants
+     * String REQ_ROLE_XXX
+     *****************************/ 
+    String REQ_ROLE_ROLE = "role";
+    String REQ_ROLE_LIST = "roleList";
+    String REQ_ROLE_ID = "roleId";
     
 	/*****************************
      * I18N Keys Constants
@@ -127,6 +134,8 @@ public interface ServiceUIConstants {
     
     String FEATURE_ADDED = "succ.feature.add";
     String FEATURE_NOT_ADDED = "fail.feature.add";
+    String FEATURE_DELETED = "succ.feature.delete";
+    String FEATURE_NOT_DELETED = "fail.feature.delete" ;
     
     String APPLNTYPES_ADDED = "succ.appType.add";
     String APPLNTYPES_NOT_ADDED = "fail.appType.add";
@@ -160,6 +169,8 @@ public interface ServiceUIConstants {
     
     String ROLE_ADDED = "succ.role.add";
     String ROLE_NOT_ADDED = "fail.role.add";
+    String ROLE_DELETED = "succ.role.delete";
+    String ROLE_NOT_DELETED = "fail.role.delete" ;
     
     String URL_ADDED = "succ.url.add";
     String URL_NOT_ADDED = "fail.url.add";

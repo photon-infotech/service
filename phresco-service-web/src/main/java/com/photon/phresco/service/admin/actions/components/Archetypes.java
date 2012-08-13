@@ -74,8 +74,8 @@ public class Archetypes extends ServiceBaseAction {
 		}
 
 		try {
-			List<Technology> technologys = getServiceManager().getArcheTypes(customerId);
-			getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologys);
+			List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
+			getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
 			getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
 		} catch (Exception e) {
 			throw new PhrescoException(e);
@@ -93,7 +93,6 @@ public class Archetypes extends ServiceBaseAction {
 			List<ApplicationType> appTypes = getServiceManager().getApplicationTypes(customerId);
 			getHttpRequest().setAttribute(REQ_APP_TYPES, appTypes);
 		} catch (PhrescoException e) {
-			e.printStackTrace();
 			throw new PhrescoException(e);
 		}
 
@@ -106,7 +105,7 @@ public class Archetypes extends ServiceBaseAction {
 		}
 
 		try {
-			Technology technology = getServiceManager().getArcheType(techId);
+			Technology technology = getServiceManager().getArcheType(techId, customerId);
 			getHttpRequest().setAttribute(REQ_ARCHE_TYPE,  technology);
 			getHttpRequest().setAttribute(REQ_FROM_PAGE, fromPage);
 			List<ApplicationType> appTypes = getServiceManager().getApplicationTypes(customerId);
@@ -165,7 +164,7 @@ public class Archetypes extends ServiceBaseAction {
 		try {
 			Technology technology = new Technology(name, description, versionList, appType);
 			technology.setId(techId);
-			getServiceManager().updateArcheTypes(technology, techId);
+			getServiceManager().updateArcheType(technology, techId, customerId);
 		} catch(Exception e) {
 			throw new PhrescoException(e);
 		}
@@ -182,7 +181,7 @@ public class Archetypes extends ServiceBaseAction {
 			String[] techTypeIds = getHttpRequest().getParameterValues(REQ_ARCHE_TECHID);
 			if (techTypeIds != null) {
 				for (String techId : techTypeIds) {
-					ClientResponse clientResponse = getServiceManager().deleteArcheType(techId);
+					ClientResponse clientResponse = getServiceManager().deleteArcheType(techId, customerId);
 					if (clientResponse.getStatus() != 200) {
 						addActionError(getText(ARCHETYPE_NOT_DELETED));
 					}

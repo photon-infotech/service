@@ -17,9 +17,11 @@
   limitations under the License.
   ###
   --%>
+
 <%@ taglib uri="/struts-tags" prefix="s"%>
 
 <%@ page import="org.apache.commons.lang.StringUtils"%>
+<%@ page import="org.apache.commons.collections.CollectionUtils"%>
 <%@ page import="java.util.List"%>
 
 <%@ page import="com.photon.phresco.model.ApplicationType"%>
@@ -31,6 +33,20 @@
 	String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
 	List<ApplicationType> appTypes = (List<ApplicationType>)request.getAttribute(ServiceUIConstants.REQ_APP_TYPES);
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
+	
+	//For edit
+	String name = "";
+	String desc = "";
+	List<String> versions = null;
+	String versionComment = "";
+	boolean isSystem = false;
+	if (technology != null) {
+		name = technology.getName();
+		desc = technology.getDescription();
+		versions = technology.getVersions();
+		versionComment = technology.getVersionComment();
+		isSystem = technology.isSystem();
+	}
 %>
 
 <form id="formArcheTypeAdd" class="form-horizontal customer_list">
@@ -38,13 +54,11 @@
 		<%
 			if (StringUtils.isNotEmpty(fromPage)) {
 		%>
-		<s:label key="lbl.hdr.comp.arhtyp.edit.title"
-			theme="simple" />
+			<s:label key="lbl.hdr.comp.arhtyp.edit.title"/>
 		<%
 			} else {
 		%>
-		<s:label key="lbl.hdr.comp.arhtyp.title"
-			theme="simple" />
+			<s:label key="lbl.hdr.comp.arhtyp.title"/>
 		<%
 			}
 		%>
@@ -55,7 +69,8 @@
 				class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.name' />
 			</label>
 			<div class="controls">
-				<input id="name" placeholder='<s:text name="place.hldr.archetype.add.name"/>' class="input-xlarge" type="text" name="name" value="<%=technology != null ? technology.getName() : ""%>" maxlength="30" title="30 Characters only">
+				<input id="name" placeholder='<s:text name="place.hldr.archetype.add.name"/>' class="input-xlarge" type="text" 
+					name="name" value="<%= StringUtils.isNotEmpty(name) ? name : "" %>" maxlength="30" title="30 Characters only">
 				<span class="help-inline" id="nameError"></span>
 			</div>
 		</div>
@@ -64,7 +79,8 @@
 			<label class="control-label labelbold"> <s:text
 					name='lbl.hdr.comp.desc' /> </label>
 			<div class="controls">
-				<textarea id="description" class="input-xlarge" placeholder='<s:text name="place.hldr.archetype.add.desc"/>' rows="3" name="description" maxlength="150" title="150 Characters only"><%=technology != null ? technology.getDescription() : ""%></textarea>
+				<textarea id="description" class="input-xlarge" placeholder='<s:text name="place.hldr.archetype.add.desc"/>' 
+					rows="3" name="description" maxlength="150" title="150 Characters only"><%= StringUtils.isNotEmpty(desc) ? desc : "" %></textarea>
 			</div>
 		</div>
 
@@ -73,7 +89,8 @@
 				class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.version' />
 			</label>
 			<div class="controls">
-				<input id="version" placeholder='<s:text name="place.hldr.archetype.add.version"/>' class="input-xlarge" type="text" name="version" value="<%=technology != null ? technology.getVersions() : ""%>" maxlength="30" title="30 Characters only">
+				<input id="version" placeholder='<s:text name="place.hldr.archetype.add.version"/>' class="input-xlarge" 
+					type="text" name="version" value="<%= CollectionUtils.isNotEmpty(versions) ? versions : "" %>" maxlength="30" title="30 Characters only">
 				<span class="help-inline" id="verError"></span>
 			</div>
 		</div>
@@ -82,7 +99,8 @@
 			<label class="control-label labelbold"> <s:text
 					name='lbl.hdr.com.vercmnt' /> </label>
 			<div class="controls">
-				<textarea name="versionComment" placeholder='<s:text name="place.hldr.archetype.add.ver.comment"/>' class="input-xlarge" rows="2" cols="10" maxlength="150" title="150 Characters only"><%=technology != null ? technology.getVersionComment() : ""%></textarea>
+				<textarea name="versionComment" placeholder='<s:text name="place.hldr.archetype.add.ver.comment"/>' class="input-xlarge" 
+					rows="2" cols="10" maxlength="150" title="150 Characters only"><%= StringUtils.isNotEmpty(versionComment) ? versionComment : "" %></textarea>
 			</div>
 		</div>
 
@@ -94,14 +112,15 @@
 				<select id="select01" name="apptype">
 					<%
 						if (appTypes != null)  {
-						               for(ApplicationType appType : appTypes){
+							for (ApplicationType appType : appTypes) {
 					%>
-					<option value="<%=appType.getName()%>"><%=appType.getName()%></option>
+							<option value="<%= appType.getName() %>"><%= appType.getName() %></option>
 					<%
-						} }
+							}
+						}
 					%>
-
-				</select> <span class="help-inline" id="appError"></span>
+				</select> 
+				<span class="help-inline" id="appError"></span>
 			</div>
 		</div>
 
@@ -141,7 +160,7 @@
 		<%
 			String disabledClass = "btn-primary";
 			String disabled = "";
-			if (technology.isSystem()) {
+			if (isSystem) {
 				disabledClass = "btn-disabled";
 				disabled = "disabled";
 			}
@@ -151,6 +170,7 @@
 			<%-- <input type="button" id="archetypeUpdate" class="btn btn-primary"
 						onclick="formSubmitFileUpload('archetypeUpdate', 'applnArc,pluginArc', $('#subcontainer'), 'Updating Archetype');"
 						value="<s:text name='lbl.hdr.comp.update'/>" /> --%>
+						
 				<input type="button" id="archetypeUpdate" class="btn <%= disabledClass %>" <%= disabled %>
 					onclick="validate('archetypeUpdate', $('#formArcheTypeAdd'), $('#subcontainer'), '<s:text name='lbl.prog.arche.update'/>');"
 					value="<s:text name='lbl.hdr.comp.update'/>" />
@@ -160,12 +180,13 @@
 						onclick="formSubmitFileUpload('archetypeSave', 'applnArc,pluginArc', $('#subcontainer'), 'Creating Archetype');"
 						value="<s:text name='lbl.hdr.comp.save'/>" /> --%>
 	
-			<input type="button" id="archetypeSave" class="btn btn-primary"
-				onclick="validate('archetypeSave', $('#formArcheTypeAdd'), $('#subcontainer'), '<s:text name='lbl.prog.arche.save'/>');"
-				value="<s:text name='lbl.hdr.comp.save'/>" />
+				<input type="button" id="archetypeSave" class="btn btn-primary"
+					onclick="validate('archetypeSave', $('#formArcheTypeAdd'), $('#subcontainer'), '<s:text name='lbl.prog.arche.save'/>');"
+					value="<s:text name='lbl.hdr.comp.save'/>" />
 		<% } %>
+		
 		<input type="button" id="archetypeCancel" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.cancel'/>" 
-            onclick="loadContent('archetypesList', '', $('#subcontainer'));"/>
+            onclick="loadContent('archetypesList', $('#formArcheTypeAdd'), $('#subcontainer'));"/>
 	</div>
 	
 	<!-- Hidden Fields -->

@@ -19,18 +19,16 @@
   --%>
 <%@ taglib uri="/struts-tags" prefix="s" %>
 
-<script type="text/javascript">
-function findError(data) {
-	if(data.nameError != undefined) {
-		showError($("#nameControl"), $("#nameError"), data.nameError);
-	} else {
-		hideError($("#nameControl"), $("#nameError"));
-	}
+<%@ page import="org.apache.commons.lang.StringUtils"%>
 
-}
-</script>
+<%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
+<%@ page import="com.photon.phresco.commons.model.Role" %>
+<% 
+   Role role = (Role)request.getAttribute(ServiceUIConstants.REQ_ROLE_ROLE);  
+   String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE); 
+%>
 
-<form class="form-horizontal customer_list">
+<form id="formRoleAdd" class="form-horizontal customer_list">
 	<h4><s:label key="lbl.hdr.adm.rle.add" theme="simple"/></h4>
 	<div class="content_adder">
 		<div class="control-group" id="nameControl">
@@ -38,7 +36,7 @@ function findError(data) {
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.name'/>
 			</label>
 			<div class="controls">
-				<input id="input01" placeholder="<s:text name='place.hldr.role.add.name'/>" class="input-xlarge" type="text" name="name">
+				<input id="input01" placeholder="<s:text name='place.hldr.role.add.name'/>" class="input-xlarge" type="text" name="name" value="<%= role != null ? role.getName() : "" %>">
 				<span class="help-inline" id="nameError"></span>
 			</div>
 		</div>
@@ -48,13 +46,35 @@ function findError(data) {
 				<s:text name='lbl.hdr.adm.desc'/>
 			</label>
 			<div class="controls">
-				<input id="input01" placeholder="<s:text name='place.hldr.role.add.desc'/>" class="input-xlarge" type="text">
+				<input id="input01" placeholder="<s:text name='place.hldr.role.add.desc'/>" class="input-xlarge" type="text" name="description" value="<%= role != null ? role.getDescription() : "" %>" >
 			</div>
 		</div>
 	</div>
 	
 	<div class="bottom_button">
-		<input type="button" id="roleSave" class="btn btn-primary" onclick="clickSave('roleSave', $('#subcontainer'), 'Creating Role');" value="<s:text name='lbl.hdr.comp.save'/>"/>
-		<input type="button" id="roleCancel" class="btn btn-primary" onclick="loadContent('roleCancel', '', $('#subcontainer'));" value="<s:text name='lbl.hdr.comp.cancel'/>"/>
+		<%-- <input type="button" id="roleSave" class="btn btn-primary" onclick="clickSave('roleSave','', $('#subcontainer'), 'Creating Role');" value="<s:text name='lbl.hdr.comp.save'/>"/> --%>
+		<% if(StringUtils.isNotEmpty(fromPage)) { %>
+		 <input type="button" id="roleUpdate" class="btn btn-primary" onclick="validate('roleUpdate',$('#formRoleAdd'),$('#subcontainer'), '<s:text name='lbl.prog.role.update'/>');" value="<s:text name='lbl.hdr.comp.update'/>"/>
+		 <% } else { %> 
+		<input type="button" id="roleSave" class="btn btn-primary" onclick="validate('roleSave',$('#formRoleAdd'),$('#subcontainer'), '<s:text name='lbl.prog.role.save'/>');" value="<s:text name='lbl.hdr.comp.save'/>"/>
+		<% } %>
+		<input type="button" id="roleCancel" class="btn btn-primary" onclick="loadContent('roleList', $('#formRoleAdd'), $('#subcontainer'));" value="<s:text name='lbl.hdr.comp.cancel'/>"/>
 	</div>
+	
+	<!-- Hidden Fields -->
+    <input type="hidden" name="fromPage" value="<%= StringUtils.isNotEmpty(fromPage) ? fromPage : "" %>"/>
+    <input type="hidden" name="roleId" value="<%= role != null ? role.getId() : "" %>"/>
+    <input type="hidden" name="oldName" value="<%= role != null ? role.getName() : "" %>"/>
 </form>
+
+<script type="text/javascript">
+
+function findError(data) {
+    if(data.nameError != undefined) {
+        showError($("#nameControl"), $("#nameError"), data.nameError);
+    } else {
+        hideError($("#nameControl"), $("#nameError"));
+    }
+
+}
+</script>

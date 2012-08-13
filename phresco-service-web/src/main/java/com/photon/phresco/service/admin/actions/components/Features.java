@@ -20,24 +20,24 @@
 package com.photon.phresco.service.admin.actions.components;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import com.itextpdf.text.pdf.codec.Base64.OutputStream;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.model.Module;
+import com.photon.phresco.model.ModuleGroup;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
+import com.sun.jersey.api.client.ClientResponse;
 
 public class Features extends ServiceBaseAction {
 
 	private static final long serialVersionUID = 6801037145464060759L;
 	private static final Logger S_LOGGER = Logger.getLogger(Features.class);
+	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
 	private String name = null;
 	private String version = null;
@@ -49,61 +49,157 @@ public class Features extends ServiceBaseAction {
 	private File featureArc;
 	private String featureArcFileName;
 	private String featureArcContentType;
-
-	public String list() {
-		S_LOGGER.debug("Entering Method  Features.list()");
-		
-		return COMP_FEATURES_LIST;
-	}
+    private String customerId = null;
+    private String fromPage = null;
+    private String techId = null;
+    private String type = null;
+    
+	private String description = null;
+    private List<Module> versions = null;
+	
+    public String list() throws PhrescoException {
+    	if (isDebugEnabled) {
+    		S_LOGGER.debug("Entering Method  Features.list()");
+    	}
+    	
+    	try {
+    		List<ModuleGroup> moduleGroup = getServiceManager().getFeatures(customerId);
+    		getHttpRequest().setAttribute(REQ_MODULE_GROUP, moduleGroup);
+    		getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+    	} catch(Exception e){
+    		throw new PhrescoException(e);
+    	}
+    	
+    	return COMP_FEATURES_LIST;
+    }
 	
 	public String add() {
-		S_LOGGER.debug("Entering Method  Features.add()");
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method  Features.add()");
+		}
+		
+		getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
 		
 		return COMP_FEATURES_ADD;
 	}
 	
-	public String save() {
-		S_LOGGER.debug("Entering Method  Features.save()");
-
+	public String edit() throws PhrescoException {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method  Features.edit()");
+		}
+		
 		try {
-			if (validateForm()) {
-				setErrorFound(true);
-				return SUCCESS;
-			}
-			InputStream inputStream = new FileInputStream(featureArc);
+		    ModuleGroup moduleGroup = getServiceManager().getFeature(techId, customerId);
+			getHttpRequest().setAttribute(REQ_MODULE_GROUP, moduleGroup);
+			getHttpRequest().setAttribute(REQ_FROM_PAGE, fromPage);
+			getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+		} catch (Exception e) {
+		    throw new PhrescoException(e);
+		}
+
+		return COMP_FEATURES_ADD;
+	}
+	
+	
+	public String save() throws PhrescoException {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method  Features.save()");
+		}
+		
+		try {
+			//InputStream inputStream = new FileInputStream(featureArc);
 			/*FileOutputStream outputStream = new FileOutputStream(new File("c:/" + featureArcFileName));
 			IOUtils.copy(inputStream, outputStream);*/
+			
+			List<ModuleGroup> moduleGroups = new ArrayList<ModuleGroup>();
+			ModuleGroup moduleGroup = new ModuleGroup();
+			moduleGroup.setName(name);
+			moduleGroup.setDescription(description);
+			moduleGroup.setVersions(versions);
+			moduleGroup.setType(REST_QUERY_TYPE_MODULE);
+			moduleGroup.setCustomerId(customerId);
+			moduleGroups.add(moduleGroup);
+			ClientResponse clientResponse = getServiceManager().createFeatures(moduleGroups, customerId);
+			if(clientResponse.getStatus() != 200 && clientResponse.getStatus() != 201){
+				addActionError(getText(FEATURE_NOT_ADDED, Collections.singletonList(name)));
+			} else {
 			addActionMessage(getText(FEATURE_ADDED, Collections.singletonList(name)));
+			}
 		} catch (Exception e) {
-			addActionError(getText(FEATURE_NOT_ADDED, Collections.singletonList(name)));
+			throw new PhrescoException(e);
 		} 
 
-		return COMP_FEATURES_LIST;
+		return list();
+	}
+	
+
+	public String update() throws PhrescoException {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method  Features.update()");
+		}
+		
+		try {
+			ModuleGroup moduleGroup = new ModuleGroup();
+			moduleGroup.setName(name);
+			moduleGroup.setDescription(description);
+			moduleGroup.setVersions(versions);
+			moduleGroup.setCustomerId(customerId);
+			getServiceManager().updateFeature(moduleGroup, techId, customerId);
+		} catch(Exception e){
+			throw new PhrescoException(e);
+		}
+		
+		return list();	
+	}
+	
+	public String delete() throws PhrescoException {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method  Features.delete()");
+		}
+		
+		try {
+			String[] techIds = getHttpRequest().getParameterValues(REST_QUERY_TECHID);
+			if (techIds != null) {
+				for (String techId : techIds) {
+					ClientResponse clientResponse = getServiceManager().deleteFeature(techId, customerId);
+					if (clientResponse.getStatus() != 200) {
+						addActionError(getText(ROLE_NOT_DELETED));
+					}
+				}
+				addActionMessage(getText(ROLE_DELETED));
+			}
+		} catch (Exception e) {
+			throw new PhrescoException(e);
+		}
+		
+		return list();
 	}
 		
-	private boolean validateForm() {
-		boolean success = false;
+	public String validateForm() {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method  Features.validateForm()");
+		}
+		
+		boolean isError = false;
 		if (StringUtils.isEmpty(name)) {
 			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY));
-			success = true;
+			isError = true;
 		} 
 
 		if (StringUtils.isEmpty(version)) {
 			setVersError(getText(KEY_I18N_ERR_VER_EMPTY));
-			success = true;
+			isError = true;
 		}
 		
-		if (StringUtils.isEmpty(featureArcFileName) || featureArc == null) {
+		/*if (StringUtils.isEmpty(featureArcFileName) || featureArc == null) {
 			setFileError(getText(KEY_I18N_ERR_FILE_EMPTY));
-			success = true;
+			isError = true;
+		}*/
+		
+		if (isError) {
+			setErrorFound(true);
 		}
-		return success;
-	}
-
-	public String cancel() {
-		S_LOGGER.debug("Entering Method  Features.cancel()");
-
-		return COMP_FEATURES_CANCEL;
+		return SUCCESS;
 	}
 
 	public String getName() {
@@ -178,4 +274,51 @@ public class Features extends ServiceBaseAction {
 		this.errorFound = errorFound;
 	}
 	
+	public String getCustomerId() {
+		return customerId;
+	}
+
+	public void setCustomerId(String customerId) {
+		this.customerId = customerId;
+	}
+	
+	public String getFromPage() {
+		return fromPage;
+	}
+
+	public void setFromPage(String fromPage) {
+		this.fromPage = fromPage;
+	}
+	
+	public String getTechId() {
+		return techId;
+	}
+
+	public void setTechId(String techId) {
+		this.techId = techId;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public List<Module> getVersions() {
+		return versions;
+	}
+
+	public void setVersions(List<Module> versions) {
+		this.versions = versions;
+	}
+	
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
 }

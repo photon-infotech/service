@@ -28,23 +28,35 @@
 	ApplicationType apptype = (ApplicationType)request.getAttribute(ServiceUIConstants.REQ_APP_TYPE);
 	String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
+	
+	//For edit
+	String name = "";
+	String desc = "";
+	boolean isSystem = false;
+	if (apptype != null) {
+		name = apptype.getName();
+		desc = apptype.getDescription();
+		isSystem = apptype.isSystem();
+	}
 %>
 
 <form id="formAppTypeAdd" class="form-horizontal customer_list">
-  <h4 class="hdr">
-   <% if (StringUtils.isNotEmpty(fromPage)) { %>
-				<s:label key="lbl.hdr.comp.apln.edit.title" theme="simple" />
-		<% } else { %>
-	            <s:label key="lbl.hdr.comp.apln.title" theme="simple"/>	
-	    <% } %>
-     </h4>       
+	<h4 class="hdr">
+   	<% if (StringUtils.isNotEmpty(fromPage)) { %>
+		<s:label key="lbl.hdr.comp.apln.edit.title" theme="simple" />
+	<% } else { %>
+		<s:label key="lbl.hdr.comp.apln.title" theme="simple"/>	
+    <% } %>
+	</h4>
+	
 	<div class="content_adder">
 		<div class="control-group" id="nameControl">
 			<label class="control-label labelbold">
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.name'/>
 			</label>
 			<div class="controls">
-				<input id="name" class="input-xlarge" placeholder='<s:text name="place.hldr.appType.add.name"/>'  type="text" name="name" value="<%= apptype != null ? apptype.getName() : "" %>" maxlength="30" title="30 Characters only">
+				<input id="name" class="input-xlarge" placeholder='<s:text name="place.hldr.appType.add.name"/>'
+					type="text" name="name" value="<%= StringUtils.isNotEmpty(name) ? name : "" %>" maxlength="30" title="30 Characters only">
 				<span class="help-inline" id="nameError"></span>
 			</div>
 		</div>
@@ -55,7 +67,7 @@
 			</label>
 			<div class="controls">
 				<textarea id="description" class="input-xlarge" placeholder='<s:text name="place.hldr.appType.add.desc"/>' 
-				    rows="3" name="description" maxlength="150" title="150 Characters only"><%= apptype != null ? apptype.getDescription() : "" %></textarea>
+				    rows="3" name="description" maxlength="150" title="150 Characters only"><%= StringUtils.isNotEmpty(desc) ? desc : "" %></textarea>
 			</div>
 		</div>
 	</div>
@@ -64,7 +76,7 @@
         <%
             String disabledClass = "btn-primary";
             String disabled = "";
-            if (apptype.isSystem()) {
+            if (isSystem) {
             	disabledClass = "btn-disabled";
             	disabled = "disabled";
             }

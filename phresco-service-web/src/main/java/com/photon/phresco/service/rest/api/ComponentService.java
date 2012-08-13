@@ -42,6 +42,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
@@ -98,17 +100,25 @@ public class ComponentService extends DbService implements ServiceConstants {
 	        S_LOGGER.debug("Entered into ComponentService.findAppTypes()");
 	    }
 		
-		List<ApplicationType> applicationTypes = new ArrayList<ApplicationType>();
 		try {
-		    List<ApplicationTypeDAO> appDAOList = mongoOperation.find(APPTYPESDAO_COLLECTION_NAME, 
-	                new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)), ApplicationTypeDAO.class);
-	        appDAOList.addAll(mongoOperation.find(APPTYPESDAO_COLLECTION_NAME, 
-	                new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)), ApplicationTypeDAO.class));
+			List<ApplicationType> applicationTypes = new ArrayList<ApplicationType>();
+			List<ApplicationTypeDAO> appDAOList = new ArrayList<ApplicationTypeDAO>();
+			if(!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
+				appDAOList = mongoOperation.find(APPTYPESDAO_COLLECTION_NAME, 
+							new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)), ApplicationTypeDAO.class);
+			}
+			appDAOList.addAll(mongoOperation.find(APPTYPESDAO_COLLECTION_NAME, 
+						new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)), ApplicationTypeDAO.class));
+				
 	        Converter<ApplicationTypeDAO, ApplicationType> converter = 
-	            (Converter<ApplicationTypeDAO, ApplicationType>) ConvertersFactory.getConverter(ApplicationTypeDAO.class);   
-	        for (ApplicationTypeDAO applicationTypeDAO : appDAOList) {
-	            applicationTypes.add(converter.convertDAOToObject(applicationTypeDAO, mongoOperation));
+	            (Converter<ApplicationTypeDAO, ApplicationType>) ConvertersFactory.getConverter(ApplicationTypeDAO.class);
+	        
+	        if (CollectionUtils.isNotEmpty(appDAOList)) {
+		        for (ApplicationTypeDAO applicationTypeDAO : appDAOList) {
+		            applicationTypes.add(converter.convertDAOToObject(applicationTypeDAO, mongoOperation));
+		        }
 	        }
+
 	        return Response.status(Response.Status.OK).entity(applicationTypes).build();
 		}
 		catch (Exception e) {
@@ -443,44 +453,46 @@ public class ComponentService extends DbService implements ServiceConstants {
 	@GET
 	@Path (REST_API_MODULES)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findModules(@QueryParam(REST_QUERY_TECHID) String techId, @QueryParam(REST_QUERY_TYPE) String type, 
-	        @QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
+	public Response findModules(@QueryParam(REST_QUERY_TYPE) String type, @QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.findModules()" + techId + type);
+	        S_LOGGER.debug("Entered into ComponentService.findModules()" + type);
 	    }
 		
-		List<ModuleGroup> foundModules = new ArrayList<ModuleGroup>();
 		try {
-			
-			if (techId != null && type != null && customerId != null && type.equals(REST_QUERY_TYPE_MODULE)) {
-			    Criteria criteria = Criteria.where(REST_QUERY_TECHID).is(techId).and(REST_QUERY_TYPE).is(REST_QUERY_TYPE_MODULE)
-		        .and(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME);
-			    foundModules = mongoOperation.find(MODULES_COLLECTION_NAME, new Query(criteria), ModuleGroup.class);
-			    if(!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
-    		        Criteria customerCriteria = Criteria.where(REST_QUERY_TECHID).is(techId).and(REST_QUERY_TYPE).is(REST_QUERY_TYPE_MODULE)
-    		        .and(REST_QUERY_CUSTOMERID).is(customerId);
-    		        foundModules.addAll(mongoOperation.find(MODULES_COLLECTION_NAME, new Query(customerCriteria), ModuleGroup.class));
-			    }
+			List<ModuleGroup> foundModules = new ArrayList<ModuleGroup>();
+			if(StringUtils.isEmpty(type)) {
+				if(!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
+					foundModules = mongoOperation.find(MODULES_COLLECTION_NAME,
+								new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)), ModuleGroup.class);
+				}
+				foundModules.addAll(mongoOperation.find(MODULES_COLLECTION_NAME,
+							new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)), ModuleGroup.class));
+	
 				return Response.status(Response.Status.OK).entity(foundModules).build();
 			}
-			
-			if (techId != null && type != null && customerId != null && type.equals(REST_QUERY_TYPE_JS)) {
-			    Criteria criteria = Criteria.where(REST_QUERY_TECHID).is(techId).and(REST_QUERY_TYPE).is(REST_QUERY_TYPE_JS)
-                .and(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME);
-			    foundModules = mongoOperation.find(MODULES_COLLECTION_NAME, new Query(criteria), ModuleGroup.class);
-			    if(!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
-			        Criteria customerCriteria = Criteria.where(REST_QUERY_TECHID).is(techId).and(REST_QUERY_TYPE).is(REST_QUERY_TYPE_JS)
-	                .and(REST_QUERY_CUSTOMERID).is(customerId);
-			        foundModules.addAll(mongoOperation.find(MODULES_COLLECTION_NAME, new Query(customerCriteria), ModuleGroup.class));
-			    }
+
+			if(StringUtils.isNotEmpty(customerId) && type.equals(REST_QUERY_TYPE_MODULE)) {
+				if (!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
+					foundModules = mongoOperation.find(MODULES_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)
+								.and(REST_QUERY_TYPE).is(type)), ModuleGroup.class);
+				}
+				foundModules.addAll(mongoOperation.find(MODULES_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)
+							.and(REST_QUERY_TYPE).is(type)), ModuleGroup.class));
+				
 				return Response.status(Response.Status.OK).entity(foundModules).build();
 			}
-			
-			if (techId != null && type != null) {
-				foundModules = mongoOperation.find(MODULES_COLLECTION_NAME , 
-				        new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)), ModuleGroup.class);
+
+			if(StringUtils.isNotEmpty(customerId) && type.equals(REST_QUERY_TYPE_JS)) {
+				if (!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
+					foundModules = mongoOperation.find(MODULES_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)
+								.and(REST_QUERY_TYPE).is(type)), ModuleGroup.class);
+				}
+				foundModules.addAll(mongoOperation.find(MODULES_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)
+							.and(REST_QUERY_TYPE).is(type)), ModuleGroup.class));
+				
 				return Response.status(Response.Status.OK).entity(foundModules).build();
 			}
+
 		} catch(Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, MODULES_COLLECTION_NAME);
 		}
@@ -639,18 +651,18 @@ public class ComponentService extends DbService implements ServiceConstants {
 	@GET
 	@Path (REST_API_PILOTS)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findPilots(@QueryParam(REST_QUERY_TECHID) String techId, @QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
+	public Response findPilots(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.findPilots()" + techId);
+	        S_LOGGER.debug("Entered into ComponentService.findPilots()" + customerId);
 	    }
 	    List<ProjectInfo> pilotsList = new ArrayList<ProjectInfo>();
 		try {
 		    if(!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
     			pilotsList = mongoOperation.find(PILOTS_COLLECTION_NAME ,
-    			        new Query(Criteria.where(REST_QUERY_TECHID).is(techId).and(REST_QUERY_CUSTOMERID).is(customerId)), ProjectInfo.class);
+    			        new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)), ProjectInfo.class);
 		    }
 			pilotsList.addAll(mongoOperation.find(PILOTS_COLLECTION_NAME ,
-                    new Query(Criteria.where(REST_QUERY_TECHID).is(techId).and(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)), ProjectInfo.class));
+                    new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)), ProjectInfo.class));
 			return Response.status(Response.Status.OK).entity(pilotsList).build();
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, PILOTS_COLLECTION_NAME);
@@ -807,25 +819,21 @@ public class ComponentService extends DbService implements ServiceConstants {
 	@GET
 	@Path (REST_API_SERVERS)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findServers(@QueryParam(REST_QUERY_TECHID) String techId, 
-	        @QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
+	public Response findServers(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.findServers()" + techId + customerId);
+	        S_LOGGER.debug("Entered into ComponentService.findServers()" + customerId);
 	    }
 		
 		List<Server> serverList = new ArrayList<Server>();
 		try {
-				if (techId != null && !techId.isEmpty()) {
-					Criteria criteria = Criteria.where(REST_API_FIELD_TECH).in(techId);
-					serverList= mongoOperation.find(SERVERS_COLLECTION_NAME, 
-					        new Query(criteria.and(REST_QUERY_CUSTOMERID).is(customerId)
-					                .and(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)), Server.class);
-					return Response.status(Response.Status.OK).entity(serverList).build();
-				}
-				serverList = mongoOperation.find(SERVERS_COLLECTION_NAME, 
-				        new Query(Criteria.where(REST_QUERY_CUSTOMERID)
-				        .is(DEFAULT_CUSTOMER_NAME)), Server.class);
-			return  Response.status(Response.Status.NO_CONTENT).build();
+			if (!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
+				serverList= mongoOperation.find(SERVERS_COLLECTION_NAME, 
+				        new Query(Criteria.where (REST_QUERY_CUSTOMERID).is(customerId)), Server.class);
+			}
+			serverList.addAll(mongoOperation.find(SERVERS_COLLECTION_NAME, 
+			        new Query(Criteria.where(REST_QUERY_CUSTOMERID)
+			        .is(DEFAULT_CUSTOMER_NAME)), Server.class));
+			return Response.status(Response.Status.OK).entity(serverList).build();
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, SERVERS_COLLECTION_NAME);
 		}
@@ -981,23 +989,21 @@ public class ComponentService extends DbService implements ServiceConstants {
 	@GET
 	@Path (REST_API_DATABASES)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findDatabases(@QueryParam(REST_QUERY_TECHID) String techId, 
-	        @QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
+	public Response findDatabases(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.deleteServer(String id)" + techId);
+	        S_LOGGER.debug("Entered into ComponentService.deleteServer(String id)");
 	    }
 		
 		List<Database> databaseList = new ArrayList<Database>();
 		try {
-			if (techId != null && !techId.isEmpty() && customerId != null) {
-				Criteria criteria = Criteria.where(REST_API_FIELD_TECH).in(techId);
+			if (!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
 				databaseList= mongoOperation.find(DATABASES_COLLECTION_NAME, 
-				        new Query(criteria.and(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)
-				                .and(REST_QUERY_CUSTOMERID).is(customerId)), Database.class);
-				return Response.status(Response.Status.OK).entity(databaseList).build();
+				        new Query(Criteria.where (REST_QUERY_CUSTOMERID).is(customerId)), Database.class);
 			}
-			databaseList = mongoOperation.find(DATABASES_COLLECTION_NAME ,
-			        new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)), Database.class);
+			databaseList.addAll(mongoOperation.find(DATABASES_COLLECTION_NAME, 
+			        new Query(Criteria.where(REST_QUERY_CUSTOMERID)
+			        .is(DEFAULT_CUSTOMER_NAME)), Database.class));
+			
 			return  Response.status(Response.Status.OK).entity(databaseList).build();
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, DATABASES_COLLECTION_NAME);
@@ -1154,28 +1160,26 @@ public class ComponentService extends DbService implements ServiceConstants {
 	@GET
 	@Path (REST_API_WEBSERVICES)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findWebServices(@QueryParam(REST_QUERY_TECHID) String techId, @QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
+	public Response findWebServices(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.findWebServices()" + techId);
+	        S_LOGGER.debug("Entered into ComponentService.findWebServices()");
 	    }
 		
 		List<WebService> webServiceList = new ArrayList<WebService>();
 		try {
-			if (techId != null && !techId.isEmpty()) {
-				Criteria criteria = Criteria.where(REST_API_FIELD_TECH).in(techId);
+			if (!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
 				webServiceList= mongoOperation.find(WEBSERVICES_COLLECTION_NAME, 
-				        new Query(criteria.and(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME).
-				                and(REST_QUERY_CUSTOMERID).is(customerId)), WebService.class);
-				return Response.status(Response.Status.OK).entity(webServiceList).build();
+				        new Query(Criteria.where (REST_QUERY_CUSTOMERID).is(customerId)), WebService.class);
 			}
-			webServiceList = mongoOperation.find(WEBSERVICES_COLLECTION_NAME ,
-			        new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)), WebService.class);
+			webServiceList.addAll(mongoOperation.find(WEBSERVICES_COLLECTION_NAME, 
+			        new Query(Criteria.where(REST_QUERY_CUSTOMERID)
+			        .is(DEFAULT_CUSTOMER_NAME)), WebService.class));
+			
 			return  Response.status(Response.Status.OK).entity(webServiceList).build();
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, WEBSERVICES_COLLECTION_NAME);
 		}
 	}
-	
 	
 	/**
 	 * Creates the list of webservices
@@ -1326,14 +1330,25 @@ public class ComponentService extends DbService implements ServiceConstants {
 	@GET
 	@Path (REST_API_TECHNOLOGIES)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findTechnologies() {
+	public Response findTechnologies(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.findTechnologies()");
 	    }
 		
 		try {
-			List<Technology> techList = mongoOperation.getCollection(TECHNOLOGIES_COLLECTION_NAME , Technology.class);
-			if (techList != null) {
+			List<Technology> techList = new ArrayList<Technology>();
+			if (StringUtils.isEmpty(customerId)) {
+				techList = mongoOperation.getCollection(TECHNOLOGIES_COLLECTION_NAME, Technology.class);
+			} else {
+				if(!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
+					techList = mongoOperation.find(TECHNOLOGIES_COLLECTION_NAME, 
+								new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)), Technology.class);
+				}
+				techList.addAll(mongoOperation.find(TECHNOLOGIES_COLLECTION_NAME, 
+							new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)), Technology.class));
+			}
+			
+			if (CollectionUtils.isNotEmpty(techList)) {
 				return Response.status(Response.Status.OK).entity(techList).build();
 			} 
 		} catch (Exception e) {

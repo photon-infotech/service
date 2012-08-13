@@ -19,73 +19,174 @@
  */
 package com.photon.phresco.service.admin.actions.admin;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import java.util.Collections;
+
+import com.photon.phresco.commons.model.Role;
+import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
+import com.sun.jersey.api.client.ClientResponse;
 
 public class RoleList extends ServiceBaseAction { 
 	
 	private static final long serialVersionUID = 6801037145464060759L;
 	private static final Logger S_LOGGER = Logger.getLogger(RoleList.class);
+	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
 	private String name = null;
 	private String nameError = null;
 	private boolean errorFound = false;
+	private String description = null;
+	private String oldName = null;
+	private String fromPage = null;
+	private String customerId = null;
+	private String roleId = null;
 	
-	public String list() {
-		S_LOGGER.debug("Entering Method RolesList.list()");
+	public String list() throws PhrescoException {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method RolesList.list()");
+		}
+		
+		try {
+			List<Role> roleList = getServiceManager().getRoles();
+			getHttpRequest().setAttribute(REQ_ROLE_LIST, roleList);
+		} catch(Exception e) {
+			throw new PhrescoException(e);
+		}
+
 		return ADMIN_ROLE_LIST;	
 	}
 	
 	public String add() {
-		S_LOGGER.debug("Entering Method RolesList.add()");
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method RolesList.add()");
+		}
+		
 		return ADMIN_ROLE_ADD;	
 	}
 	
-	public String save() {
-		S_LOGGER.debug("Entering Method RolesList.save()");
-	try  {
-		if (validateForm()) {
-			setErrorFound(true);
-			return SUCCESS;
+	public String edit() throws PhrescoException {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entering Method RoleList.edit()");
+	    }
+		
+		try {
+		    Role role = getServiceManager().getRole(roleId);
+			getHttpRequest().setAttribute(REQ_ROLE_ROLE , role);
+			getHttpRequest().setAttribute(REQ_FROM_PAGE, fromPage);
+		} catch (Exception e) {
+		    throw new PhrescoException(e);
 		}
-		addActionMessage(getText(ROLE_ADDED, Collections.singletonList(name)));
 		
-	} catch (Exception e) {
-		    addActionError(getText(ROLE_NOT_ADDED, Collections.singletonList(name)));
+		return ADMIN_ROLE_ADD;
 	}
-	        return  ADMIN_ROLE_LIST;
-	   
+	
+	public String save() throws PhrescoException {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method RolesList.save()");
+		}
+		
+		try  {
+			List<Role> roleList = new ArrayList<Role>();
+			Role role = new Role();
+			role.setName(name);
+			role.setDescription(description);
+			roleList.add(role);
+			ClientResponse clientResponse = getServiceManager().createRoles(roleList);
+			if(clientResponse.getStatus() != 200){
+				addActionError(getText(ROLE_NOT_ADDED, Collections.singletonList(name)));
+			} else {
+				addActionMessage(getText(ROLE_ADDED, Collections.singletonList(name)));
+			}	
+		} catch (Exception e) {
+
+		}
+		
+		return  list();
+	}
+	
+	public String update() throws PhrescoException {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entering Method RoleList.update()");
+	    }
+ 
+		try {
+			Role role = new Role(name, description);
+			role.setId(roleId);
+			getServiceManager().updateRole(role, roleId);
+		} catch(Exception e)  {
+			throw new PhrescoException(e);
+		}
+
+		return list();
+	}
+	
+	public String delete() throws PhrescoException {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entering Method RoleList.delete()");
+	    }
+
+		try {
+			String[] roleIds = getHttpRequest().getParameterValues(REQ_ROLE_ID);
+			if (roleIds != null) {
+				for (String roleId : roleIds) {
+					ClientResponse clientResponse = getServiceManager().deleteRole(roleId);
+					if (clientResponse.getStatus() != 200) {
+						addActionError(getText(ROLE_NOT_DELETED));
+					}
+				}
+				addActionMessage(getText(ROLE_DELETED));
+			}
+		} catch (Exception e) {
+			throw new PhrescoException(e);
+		}
+
+		return list();
 	}
 		
-	private boolean validateForm() {
+	public String validateForm() {
+		if (isDebugEnabled) {
+            S_LOGGER.debug("Entering Method RoleList.validateForm()");
+        }
+		
 		boolean isError = false;
 		if (StringUtils.isEmpty(name)) {
 			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY));
 			isError = true;
 		} 
 		
-		return isError;
-	}
-	
-	public String cancel() {
-		S_LOGGER.debug("Entering Method RolesList.cancel()");
-		return ADMIN_ROLE_CANCEL;	
+		if (isError) {
+            setErrorFound(true);
+        }
+		
+		return SUCCESS;
 	}
 	
 	public String assign() {
-		S_LOGGER.debug("Entering Method RolesList.assign()");
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method RolesList.assign()");
+		}
+		
 		return ADMIN_ROLE_ASSIGN;	
 	}
 	
 	public String assignSave() {
-		S_LOGGER.debug("Entering Method RolesList.assignSave()");
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method RolesList.assignSave()");
+		}
+		
 		return ADMIN_ROLE_ASSIGN_SAVE;	
 	}
 	
 	public String assignCancel() {
-		S_LOGGER.debug("Entering Method RolesList.assignCancel()");
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method RolesList.assignCancel()");
+		}
+		
 		return ADMIN_ROLE_ASSIGN_CANCEL;	
 	}
 	
@@ -104,7 +205,6 @@ public class RoleList extends ServiceBaseAction {
 	public void setNameError(String nameError) {
 		this.nameError = nameError;
 	}
-	
 
 	public boolean isErrorFound() {
 		return errorFound;
@@ -114,5 +214,43 @@ public class RoleList extends ServiceBaseAction {
 		this.errorFound = errorFound;
 	}
 
+	public String getDescription() {
+		return description;
+	}
 
+	public void setDescription(String description) {
+		this.description = description;
+	}
+    
+	public String getCustomerId() {
+		return customerId;
+	}
+
+	public void setCustomerId(String customerId) {
+		this.customerId = customerId;
+	}
+	
+	public String getOldName() {
+		return oldName;
+	}
+
+	public void setOldName(String oldName) {
+		this.oldName = oldName;
+	}
+
+	public String getFromPage() {
+		return fromPage;
+	}
+
+	public void setFromPage(String fromPage) {
+		this.fromPage = fromPage;
+	}
+	
+	public String getRoleId() {
+		return roleId;
+	}
+
+	public void setRoleId(String roleId) {
+		this.roleId = roleId;
+	}
 }

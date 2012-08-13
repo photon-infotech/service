@@ -20,14 +20,10 @@
 package com.photon.phresco.service.admin.actions.components;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -35,9 +31,7 @@ import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.ProjectInfo;
 import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
-import com.photon.phresco.service.client.impl.RestClient;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.GenericType;
 
 public class PilotProjects extends ServiceBaseAction { 
 	
@@ -66,11 +60,9 @@ public class PilotProjects extends ServiceBaseAction {
         }
 
 		try {
-			List<ProjectInfo> pilotProjects = getServiceManager().getPilotProject(techId, customerId);
+			List<ProjectInfo> pilotProjects = getServiceManager().getPilotProjects(customerId);
 			getHttpRequest().setAttribute(REQ_PILOT_PROJECTS, pilotProjects);
 			getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
-			List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
-			getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
 		} catch (Exception e) {
 			throw new PhrescoException(e);
 		}
@@ -84,10 +76,8 @@ public class PilotProjects extends ServiceBaseAction {
     	}
     	
     	try {
-    		RestClient<Technology> technology = getServiceManager().getRestClient(REST_API_COMPONENT + REST_API_TECHNOLOGIES);
-    		GenericType<List<Technology>> genericType = new GenericType<List<Technology>>(){};
-    		List<Technology> technologys = technology.get(genericType);
-    		getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologys);
+    		List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
+    		getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
     	} catch(Exception e) {
     		throw new PhrescoException(e);
     	}
@@ -101,15 +91,16 @@ public class PilotProjects extends ServiceBaseAction {
     	}
 
     	try {
-    		InputStream inputStream = new FileInputStream(projArc);
-    		FileOutputStream outputStream = new FileOutputStream(new File("c:/" + projArcFileName));
-    		IOUtils.copy(inputStream, outputStream);
+//    		InputStream inputStream = new FileInputStream(projArc);
+//    		FileOutputStream outputStream = new FileOutputStream(new File("c:/" + projArcFileName));
+//    		IOUtils.copy(inputStream, outputStream);
     		List<ProjectInfo> pilotProInfo = new ArrayList<ProjectInfo>();
     		ProjectInfo proInfo = new ProjectInfo();
     		proInfo.setName(name);
     		proInfo.setDescription(description);
+    		proInfo.setCustomerId(customerId);
     		pilotProInfo.add(proInfo);
-    		ClientResponse clientResponse = getServiceManager().createPilotProject(pilotProInfo);
+    		ClientResponse clientResponse = getServiceManager().createPilotProjects(pilotProInfo, customerId);
     		if(clientResponse.getStatus() != 200 && clientResponse.getStatus() != 201  ){
     			addActionError(getText(PLTPROJ_NOT_ADDED, Collections.singletonList(name)));
     		} else {
@@ -128,7 +119,7 @@ public class PilotProjects extends ServiceBaseAction {
     	}
 
     	try {
-    		ProjectInfo pilotProjectInfo = getServiceManager().getPilotPro(projectId);
+    		ProjectInfo pilotProjectInfo = getServiceManager().getPilotProject(projectId, customerId);
     		getHttpRequest().setAttribute(REQ_PILOT_PROINFO, pilotProjectInfo);
     		getHttpRequest().setAttribute(REQ_FROM_PAGE, fromPage);
     	} catch (Exception e) {
@@ -148,7 +139,7 @@ public class PilotProjects extends ServiceBaseAction {
     		pilotProInfo.setId(projectId);
     		pilotProInfo.setName(name);
     		pilotProInfo.setDescription(description);
-    		getServiceManager().updatePilotProject(pilotProInfo, projectId);
+    		getServiceManager().updatePilotProject(pilotProInfo, projectId, customerId);
     	} catch(Exception e) {
     		throw new PhrescoException(e);
     	}
@@ -165,7 +156,7 @@ public class PilotProjects extends ServiceBaseAction {
     		String[] projectIds = getHttpRequest().getParameterValues("projectId");
     		if (projectIds != null) {
     			for (String projectID : projectIds) {
-    				ClientResponse clientResponse =getServiceManager().deletePilotProject( projectID);
+    				ClientResponse clientResponse =getServiceManager().deletePilotProject(projectID, customerId);
     				if (clientResponse.getStatus() != 200) {
     					addActionError(getText(PLTPROJ_NOT_DELETED));
     				}
@@ -190,10 +181,10 @@ public class PilotProjects extends ServiceBaseAction {
     		isError = true;
     	}
 
-    	if (StringUtils.isEmpty(projArcFileName) || projArc == null) {
-    		setFileError(getText(KEY_I18N_ERR_PLTPROJ_EMPTY));
-    		isError = true;
-    	}
+//    	if (StringUtils.isEmpty(projArcFileName) || projArc == null) {
+//    		setFileError(getText(KEY_I18N_ERR_PLTPROJ_EMPTY));
+//    		isError = true;
+//    	}
     	
     	if (isError) {
     		setErrorFound(true);

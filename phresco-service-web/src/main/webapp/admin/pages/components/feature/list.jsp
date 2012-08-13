@@ -19,12 +19,25 @@
   --%>
 
 <%@ taglib uri="/struts-tags" prefix="s" %>
+<%@page import="java.util.List" %>
+<%@page import="org.apache.commons.collections.CollectionUtils"%>
+<%@ page import="org.apache.commons.lang.StringUtils"%>
+
+<%@page import="com.photon.phresco.model.ModuleGroup"%>
+<%@page import="com.photon.phresco.model.Module"%>
+<%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
+<% 
+   List<ModuleGroup> moduleGroups = (List<ModuleGroup>)request.getAttribute(ServiceUIConstants.REQ_MODULE_GROUP);
+   String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
+%>
 		
-<form class="form-horizontal customer_list">
+<form id="formFeaturesList" class="form-horizontal customer_list">
 	<div class="operation">
-		<input type="button" id="featuresAdd" class="btn btn-primary" name="features_add" onclick="loadContent('featuresAdd', '', $('#subcontainer'));" value="<s:text name='lbl.hdr.comp.featrs.add'/>"/>
+		<input type="button" id="featuresAdd" class="btn btn-primary" name="features_add" onclick="loadContent('featuresAdd', $('#formFeaturesList'), $('#subcontainer'));" value="<s:text name='lbl.hdr.comp.featrs.add'/>"/>
+		<input type="button" class="btn" id="del" disabled value="<s:text name='lbl.hdr.comp.delete'/>" 
+            onclick="loadContent('featuresDelete', $('#formFeaturesList'), $('#subcontainer'));"/>
 		<s:if test="hasActionMessages()">
-			<div class="alert alert-success"  id="successmsg">
+			<div class="alert alert-success alert-message"  id="successmsg">
 				<s:actionmessage />
 			</div>
 		</s:if>
@@ -34,16 +47,23 @@
 			</div>
 		</s:if>
 	</div>	
+	  <% if (CollectionUtils.isEmpty(moduleGroups)) { %>
+            <div class="alert alert-block">
+                <s:text name='alert.msg.feature.not.available'/>
+            </div>
+    <% } else { %>
 	<div class="content_adder">
 		<div class="control-group">
 			<div class="external_features_wrapper">
 				<div class="theme_accordion_container" id="coremodule_accordion_container">
 					<section class="accordion_panel_wid">
+						<% for(ModuleGroup moduleGroup : moduleGroups) { %>
 						<div class="accordion_panel_inner">
 							<section class="lft_menus_container">
 								<span class="siteaccordion">
 									<span>
-										Login form 
+									   <input type="checkbox" class="check" name="techId" value="<%= moduleGroup.getId() %>" onclick="checkboxEvent();" >
+										<%= moduleGroup.getName()  %>
 									</span>
 								</span>
 								<div class="mfbox siteinnertooltiptxt">
@@ -60,17 +80,36 @@
 												</thead>
 													
 												<tbody>
-													<tr>
+										         <%-- <%
+                                                     if (CollectionUtils.isNotEmpty(moduleGroups)) {
+                                                         for ( ModuleGroup moduleGroup : moduleGroups) {
+                                                 %> --%>
+										              <tr>
 														<td class="editFeatures_td1">
 															<input type="radio" name="" value="">
 														</td>
 														<td class="editFeatures_td2">
 															<div class="accordalign"></div>
-															<a href="#" name="ModuleDesc" class="" id="" >Log In</a>
+															<a href="#" name="ModuleDesc" onclick="editFeature('<%= moduleGroup.getId() %>');" ><%= StringUtils.isNotEmpty(moduleGroup.getName()) ? moduleGroup.getName() : "" %></a>
 														</td>
-														<td class="editFeatures_td4">Authentication</td>
-														<td class="editFeatures_td4">version 2.0</td>
+														<td class="editFeatures_td4"><%= StringUtils.isNotEmpty(moduleGroup.getDescription()) ? moduleGroup.getDescription():"" %></td>
+														<% 
+														   List<Module> versions = moduleGroup.getVersions();
+														     if (CollectionUtils.isNotEmpty(versions)) {
+		                                                           for (Module moduleVersion : versions) {
+														%>
+														
+														<td class="editFeatures_td4"><%= StringUtils.isNotEmpty(moduleVersion.getVersion()) ? moduleVersion.getVersion():"" %></td>
+													     <% 
+                                                           }
+                                                         }
+                                                      %>
+													
 													</tr>
+												<%-- <% 
+                                                         }
+                                                     }
+												%>	 --%>
 												</tbody>
 											</table>
 										</section>
@@ -78,130 +117,24 @@
 								</div>
 							</section>  
 						</div>
-						
-						<div class="accordion_panel_inner">
-							<section class="lft_menus_container">
-								<span class="siteaccordion">
-									<span>
-										Blog
-									</span>
-								</span>
-								<div class="mfbox siteinnertooltiptxt">
-									<div class="scrollpanel">
-										<section class="scrollpanel_inner">
-											<table class="download_tbl">
-												<thead>
-													<tr>
-														<th class="accordiantable"></th>
-														<th class="accordiantable"><s:label key="lbl.hdr.cmp.name" theme="simple"/></th>
-														<th class="accordiantable"><s:label key="lbl.hdr.cmp.desc"  theme="simple"/></th>
-														<th class="accordiantable"><s:label key="lbl.hdr.comp.ver"  theme="simple"/></th>
-													</tr>
-												</thead>
-																									
-												<tbody>
-													<tr>
-														<td class="editFeatures_td1">
-															<input type="radio" name="" value="">
-														</td>
-														<td class="editFeatures_td2">
-															<div class="accordalign"></div>
-															<a href="#" name="ModuleDesc" class="" id="" >Blog</a>
-														</td>
-														<td class="editFeatures_td4">Journal</td>
-														<td class="editFeatures_td4">version 2.0</td>
-													</tr>
-												</tbody>
-											</table>
-										</section>
-									</div>
-								</div>
-							</section>  
-						</div>
-						
-						<div class="accordion_panel_inner">
-							<section class="lft_menus_container">
-								<span class="siteaccordion">
-									<span>
-										Help
-									</span>
-								</span>
-								<div class="mfbox siteinnertooltiptxt">
-									<div class="scrollpanel">
-										<section class="scrollpanel_inner">
-											<table class="download_tbl">
-												<thead>
-													<tr>
-														<th></th>
-														<th class="accordiantable"><s:label key="lbl.hdr.cmp.name" theme="simple"/></th>
-														<th class="accordiantable"><s:label key="lbl.hdr.cmp.desc"  theme="simple"/></th>
-														<th class="accordiantable"><s:label key="lbl.hdr.comp.ver" theme="simple"/></th>
-													</tr>
-												</thead>
-																									
-												<tbody>
-													<tr>
-														<td class="editFeatures_td1">
-															<input type="radio" name="" value="">
-														</td>
-														<td class="editFeatures_td2">
-															<div class="accordalign"></div>
-															<a href="#" name="ModuleDesc" class="" id="" >Help</a>
-														</td>
-														<td class="editFeatures_td4">help</td>
-														<td class="editFeatures_td4">version 2.0</td>
-													</tr>
-												</tbody>
-											</table>
-										</section>
-									</div>
-								</div>
-							</section>   
-						</div>
-						
-						<div class="accordion_panel_inner">
-							<section class="lft_menus_container">
-								<span class="siteaccordion">
-									<span>
-										Forum
-									</span>
-								</span>
-								<div class="mfbox siteinnertooltiptxt">
-									<div class="scrollpanel">
-										<section class="scrollpanel_inner">
-											<table class="download_tbl">
-												<thead>
-													<tr>
-														<th></th>
-														<th class="accordiantable"><s:label key="lbl.hdr.cmp.name" theme="simple"/></th>
-														<th class="accordiantable"><s:label key="lbl.hdr.cmp.desc"  theme="simple"/></th>
-														<th class="accordiantable"><s:label key="lbl.hdr.comp.ver" theme="simple"/></th>
-													</tr>
-												</thead>
-																									
-												<tbody>
-													<tr>
-														<td class="editFeatures_td1">
-															<input type="radio" name="" value="">
-														</td>
-														<td class="editFeatures_td2">
-															<div class="accordalign"></div>
-															<a href="#" name="ModuleDesc" class="" id="" >Forum</a>
-														</td>
-														<td class="editFeatures_td4">Discussion site</td>
-														<td class="editFeatures_td4">version 2.0</td>
-													</tr>
-												</tbody>
-											</table>
-										</section>
-									</div>
-								</div>
-							</section> 
-						</div>
+						<% } %>
 					</section>		
 				</div>
 			</div>
 		</div>
 	</div>	
+	<% } %>
+	<!-- Hidden Fields -->
+    <input type="hidden" name="customerId" value="<%= customerId %>">
+	
 </form>
 
+<script language="JavaScript" type="text/javascript">
+function editFeature(id) {
+    var params = "techId=";
+    params = params.concat(id);
+    params = params.concat("&fromPage=");
+    params = params.concat("edit");
+    loadContentParam("featuresEdit", params, $('#subcontainer'));
+}
+</script>
