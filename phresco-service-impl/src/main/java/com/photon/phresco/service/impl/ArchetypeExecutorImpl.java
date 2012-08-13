@@ -38,47 +38,20 @@ package com.photon.phresco.service.impl;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
-import org.codehaus.plexus.util.cli.CommandLineException;
-import org.codehaus.plexus.util.cli.Commandline;
 
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.ArchetypeInfo;
 import com.photon.phresco.model.ProjectInfo;
-import com.photon.phresco.model.Server;
-import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.api.ArchetypeExecutor;
-import com.photon.phresco.service.api.DbService;
 import com.photon.phresco.service.api.PhrescoServerFactory;
-//import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.model.ServerConfiguration;
 import com.photon.phresco.service.model.ServerConstants;
 import com.photon.phresco.util.Constants;
 import com.photon.phresco.util.ProjectUtils;
-import com.photon.phresco.util.ServiceConstants;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.UUID;
-
-import org.apache.log4j.Logger;
-import org.codehaus.plexus.util.cli.CommandLineException;
-import org.codehaus.plexus.util.cli.Commandline;
-import org.springframework.data.document.mongodb.query.Criteria;
-import org.springframework.data.document.mongodb.query.Query;
-
-import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.ProjectInfo;
-import com.photon.phresco.service.api.ArchetypeExecutor;
-import com.photon.phresco.service.model.ServerConfiguration;
-import com.photon.phresco.util.Constants;
-import com.photon.phresco.util.ProjectUtils;
-import com.sun.jersey.server.impl.container.servlet.PerSessionFactory;
+import com.photon.phresco.util.Utility;
 
 public class ArchetypeExecutorImpl implements ArchetypeExecutor,
         ServerConstants, Constants {
@@ -96,35 +69,32 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
     }
 
     public File execute(ProjectInfo info) throws PhrescoException {
-    	if (isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method ArchetypeExecutorImpl.execute(ProjectInfo info)");
-			S_LOGGER.debug("execute() ProjectCode="+info.getCode());
+			S_LOGGER.debug("execute() ProjectCode=" + info.getCode());
 		}
-    	String commandString = buildCommandString(info);
-
-        Commandline cl = new Commandline(commandString);
-        cl.setWorkingDirectory(getTempFolderPath());
-
-        if (S_LOGGER.isDebugEnabled()) {
-            S_LOGGER.debug("command String " +commandString);
-        }
-
-        try {
-            Process p = cl.execute();
-
-            //the below implementation is required since a new command or shell is forked
-            //from the existing running web server command or shell instance
-            BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            while ( in.readLine() != null) {
-            }
-            createProjectFolders(info, cl.getWorkingDirectory());
-        } catch (CommandLineException e) {
-            throw new PhrescoException(e);
-        } catch (IOException e) {
-            throw new PhrescoException(e);
-        }
-        return cl.getWorkingDirectory();
-    }
+		String tempFolderPath = null;
+		try {
+			String commandString = buildCommandString(info);
+			if (S_LOGGER.isDebugEnabled()) {
+				S_LOGGER.debug("command String " + commandString);
+			}
+			// the below implementation is required since a new command or shell is forked from the 
+			//existing running web server command or shell instance
+			tempFolderPath = getTempFolderPath();
+			BufferedReader bufferedReader = Utility.executeCommand(commandString, tempFolderPath);
+			String line = null;
+			while ((line = bufferedReader.readLine()) != null) {
+				if (S_LOGGER.isDebugEnabled()) {
+					S_LOGGER.debug(line);
+				}
+			}
+			createProjectFolders(info, new File(tempFolderPath));
+		} catch (IOException e) {
+			throw new PhrescoException(e);
+		}
+		return new File(tempFolderPath);
+	}
 
     private void createProjectFolders(ProjectInfo info, File file) throws PhrescoException {
     	if (isDebugEnabled) {
