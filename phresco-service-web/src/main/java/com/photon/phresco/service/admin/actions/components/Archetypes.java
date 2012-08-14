@@ -38,7 +38,6 @@ import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.ApplicationType;
 import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
-import com.photon.phresco.service.util.Content;
 
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.BodyPart;
@@ -84,6 +83,11 @@ public class Archetypes extends ServiceBaseAction {
 		} catch (Exception e) {
 			throw new PhrescoException(e);
 		}
+		
+		/* To clear appln & plugin input streams */
+		pluginMap.clear();
+		applnIs = null;
+		applnJarName = null;
 
 		return COMP_ARCHETYPE_LIST;
 	}
@@ -148,22 +152,14 @@ public class Archetypes extends ServiceBaseAction {
 			    while (iter.hasNext()) {
 				    String key = (String) iter.next();
 				    InputStream pluginJarIs = (InputStream) pluginMap.get(key);
-				   
-				    BodyPart binaryPart = new BodyPart();
-				    binaryPart.setMediaType(MediaType.APPLICATION_OCTET_STREAM_TYPE);
-				    binaryPart.setEntity(pluginJarIs);
-				    Content content = new Content(FILE_FOR_PLUGIN, name, null, null, null, 0);
-					binaryPart.setContentDisposition(content);
+
+				    BodyPart binaryPart = getServiceManager().createBodyPart(name, FILE_FOR_PLUGIN, pluginJarIs);
 				    multiPart.bodyPart(binaryPart);
 			    }
 			}
 
 			if (StringUtils.isNotEmpty(applnJarName)) {
-				BodyPart binaryPart2 = new BodyPart();
-			    binaryPart2.setMediaType(MediaType.APPLICATION_OCTET_STREAM_TYPE);
-			    binaryPart2.setEntity(applnIs);
-			    Content content = new Content(FILE_FOR_APPTYPE, name, null, null, null, 0);
-		        binaryPart2.setContentDisposition(content);
+				BodyPart binaryPart2 = getServiceManager().createBodyPart(name, FILE_FOR_APPTYPE, applnIs);
 		        multiPart.bodyPart(binaryPart2);
 			}
 			
@@ -176,7 +172,7 @@ public class Archetypes extends ServiceBaseAction {
 		} catch (Exception e) {
 			throw new PhrescoException(e);
 		} 
-
+		
 		return list();
 	}
 	
