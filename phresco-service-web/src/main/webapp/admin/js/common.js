@@ -34,48 +34,6 @@ function clickButton(button, tag) {
 	});
 }
 
-function clickButtonFileUpload(button, csvElementIds, tag) {
-	button.click(function() {
-		var selectedMenu = $(this).attr("id");
-		formSubmitFileUpload(selectedMenu, csvElementIds, tag);
-	});
-}
-
-function formSubmitFileUpload(pageUrl, csvElementIds, tag, progressText) {
-	var formDataJson = formSerializeToJson($('form').serializeArray());
-	showProgressBar(progressText);
-	$.ajaxFileUpload ({
-		url: pageUrl,
-		secureuri: true,
-		fileElementId: csvElementIds,
-		dataType: 'json',
-		data: formDataJson,   //{name:'logan', version:'2'}
-		success: function (data, status) {
-			hideProgressBar();
-			if (status == 'success') {
-				loadData(data, tag);
-			}
-		},
-		error: function (data, status, e) {
-		}
-	});
-}
-
-function formSerializeToJson(a) {
-	var o = {};
-    $.each(a, function() {
-        if (o[this.name] !== undefined) {
-            if (!o[this.name].push) {
-                o[this.name] = [o[this.name]];
-            }
-            o[this.name].push(this.value || '');
-        } else {
-            o[this.name] = this.value || '';
-        }
-    });
-    return o;
-}
-
 function loadContent(pageUrl, form, tag) {
 	showLoadingIcon(tag);
 	if (form != undefined && !isBlank(form)) {
@@ -117,8 +75,9 @@ function clickSave(pageUrl, params, tag, progressText) {
 }
 
 function validate(pageUrl, form, tag, progressText) {
+	var params = "";
 	if (form != undefined && !isBlank(form)) {
-		var params = form.serialize();
+		params = form.serialize();
 	}
 	$.ajax({
 		url : pageUrl + "Validate",

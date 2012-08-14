@@ -94,6 +94,14 @@
             <result name="archetypesList">/admin/pages/components/archetype/list.jsp</result>
             <result type="json" />
         </action>
+        
+        <action name="uploadJar" class="com.photon.phresco.service.admin.actions.components.Archetypes" method="uploadJar">
+            <result type="json" />
+        </action>
+        
+        <action name="removeUploadedJar" class="com.photon.phresco.service.admin.actions.components.Archetypes" method="removeUploadedJar">
+            <result type="json" />
+        </action>
 		
         <action name="archetypeEdit" class="com.photon.phresco.service.admin.actions.components.Archetypes" method="edit">
 			<result name="archetypeAdd">/admin/pages/components/archetype/add.jsp</result>

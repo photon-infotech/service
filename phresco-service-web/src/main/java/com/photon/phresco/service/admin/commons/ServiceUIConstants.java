@@ -57,6 +57,22 @@ public interface ServiceUIConstants {
     String REQ_ARCHE_TYPES = "technologies";
     String REQ_ARCHE_TYPE = "technology";
     String REQ_ARCHE_TECHID = "techId";
+    String REQ_JAR_TYPE = "type";
+    String REQ_PLUGIN_JAR = "pluginJar";
+    String REQ_UPLOADED_JAR = "uploadedJar";
+    String REQ_JAR_FILE_EXTENSION = ".jar";
+    String REQ_ZIP_FILE_EXTENSION  = ".zip";
+    String REQ_TAR_GZ_FILE_EXTENSION = ".gz";
+    
+    
+    /*****************************
+     * Archetype Constants
+     *****************************/
+    String FILE_FOR_APPTYPE = "appType";
+	String FILE_FOR_PLUGIN = "plugin";
+    String X_FILE_NAME = "X-File-Name";
+	String SUCCESS_FALSE = "{success: false}";
+	String SUCCESS_TRUE = "{success: true}";
     
     
     /*****************************
@@ -67,11 +83,13 @@ public interface ServiceUIConstants {
     String REQ_CUST_CUSTOMERS = "customers";
     String REQ_CUST_CUSTOMER_ID = "customerId";
     
+    
     /*****************************
      * ConfigTemp Request Constants
      * String REQ_CONFIG_XXX
      *****************************/ 
     String REQ_CONFIG_TEMP = "configTemp";
+    
     
     /*****************************
      * Download Request Constants
@@ -87,11 +105,13 @@ public interface ServiceUIConstants {
     String REQ_PILOT_PROJECTS = "pilotProjects";
     String REQ_PILOT_PROINFO = "pilotProjectInfo";
     
+    
     /*****************************
      * Download Request Constants
      * String REQ_DOWNLOAD_XXX
      *****************************/ 
     String REQ_MODULE_GROUP = "moduleGroup";
+    
     
     /*****************************
      * Role Request Constants
@@ -100,6 +120,7 @@ public interface ServiceUIConstants {
     String REQ_ROLE_ROLE = "role";
     String REQ_ROLE_LIST = "roleList";
     String REQ_ROLE_ID = "roleId";
+    
     
 	/*****************************
      * I18N Keys Constants
@@ -120,6 +141,7 @@ public interface ServiceUIConstants {
     String KEY_I18N_ERR_APPLIES_EMPTY = "err.msg.applies.empty";
     String KEY_I18N_ERR_APPLNJAR_EMPTY = "err.msg.applnjar.empty";
     String KEY_I18N_ERR_PLTPROJ_EMPTY = "err.msg.pltproj.empty";
+    String KEY_I18N_ERR_PLUGINJAR_INVALID = "err.msg.plugin.invalid";
     
     String KEY_I18N_ERR_EMAIL_EMPTY = "err.msg.email.empty";
     String KEY_I18N_ERR_ADDRS_EMPTY	= "err.msg.addrs.empty";
