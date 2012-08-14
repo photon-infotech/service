@@ -286,21 +286,23 @@ public class ComponentService extends DbService implements ServiceConstants {
 	@GET
 	@Path (REST_API_SETTINGS)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findSettings() {
+	public Response findSettings(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.findSettings()");
+	        S_LOGGER.debug("Entered into ComponentService.findSettings()" + customerId);
 	    }
 		
 		try {
-			List<SettingsTemplate> settingsList = mongoOperation.getCollection(SETTINGS_COLLECTION_NAME , SettingsTemplate.class);
-			if (settingsList != null) {
-				return Response.status(Response.Status.OK).entity(settingsList).build();
-			} 
+			List<SettingsTemplate> settingsList = new ArrayList<SettingsTemplate>();
+			settingsList.addAll(mongoOperation.find(SETTINGS_COLLECTION_NAME, 
+                    new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)), SettingsTemplate.class));
+			if(!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
+			    settingsList.addAll(mongoOperation.find(SETTINGS_COLLECTION_NAME, 
+			            new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)), SettingsTemplate.class));
+			}
+			return Response.status(Response.Status.NO_CONTENT).entity(settingsList).build();
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, SETTINGS_COLLECTION_NAME);
 		}
-		
-    	return Response.status(Response.Status.NO_CONTENT).build();
 	}
 	
 	/**
