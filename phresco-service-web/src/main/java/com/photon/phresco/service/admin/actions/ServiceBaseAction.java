@@ -21,6 +21,7 @@ package com.photon.phresco.service.admin.actions;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts2.ServletActionContext;
 
@@ -70,5 +71,9 @@ public class ServiceBaseAction extends ActionSupport implements ServiceActions, 
     
     protected HttpSession getHttpSession() {
         return getHttpRequest().getSession();
+    }
+    
+    protected HttpServletResponse getHttpResponse() {
+        return (HttpServletResponse) ActionContext.getContext().get(ServletActionContext.HTTP_RESPONSE);
     }
 }

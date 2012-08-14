@@ -19,10 +19,17 @@
  */
 package com.photon.phresco.service.admin.actions.components;
 
-import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+
+import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -31,18 +38,27 @@ import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.ApplicationType;
 import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
+import com.photon.phresco.service.util.Content;
+
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.multipart.BodyPart;
+import com.sun.jersey.multipart.MultiPart;
 
 public class Archetypes extends ServiceBaseAction { 
 
 	private static final long serialVersionUID = 6801037145464060759L;
 	private static final Logger S_LOGGER = Logger.getLogger(Archetypes.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
+	
+	/* plugin and appln jar upload*/
+	private static Map<String, InputStream> pluginMap = new HashMap<String, InputStream>();
+	private static InputStream applnIs = null;
+	private static String applnJarName = null;
 
 	private String name = null;
 	private String nameError = null;
 	private String version = null;
-	private List<String> versionList = null;
+	
 	private String verError = null;
 	private String apptype = null;
 	private String appError = null;
@@ -55,18 +71,6 @@ public class Archetypes extends ServiceBaseAction {
     private String customerId = null;
 	
 	private String versionComment = null;
-	private List<String> appType = null;
-	private String appJar = null;
-	private String pluginJar = null;
-
-	private File applnArc;
-	private String applnArcFileName;
-	private String applnArcContentType;
-
-	private File pluginArc;
-	private String pluginArcFileName;
-	private String pluginArcContentType;
-
 
 	public String list() throws PhrescoException {
 		if (isDebugEnabled) {
@@ -123,27 +127,47 @@ public class Archetypes extends ServiceBaseAction {
 	    }
 		
 		try {
-	
+		 	MultiPart multiPart = new MultiPart();
+		 	
+		 	List<String> appTypes = new ArrayList<String>();
+	        appTypes.add(apptype);
+	    	List<String> versions = new ArrayList<String>();
+	    	versions.add(version);
+	        Technology technology = new Technology(name, description, versions, appTypes);
+	        technology.setVersionComment(versionComment);
+	        technology.setCustomerId(customerId);
+	        
+		    BodyPart jsonPart = new BodyPart();
+		    jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
+		    jsonPart.setEntity(technology);
+		    
+		    multiPart.bodyPart(jsonPart);
+			   
+			if (!pluginMap.isEmpty()) {
+				Iterator iter = pluginMap.keySet().iterator();
+			    while (iter.hasNext()) {
+				    String key = (String) iter.next();
+				    InputStream pluginJarIs = (InputStream) pluginMap.get(key);
+				   
+				    BodyPart binaryPart = new BodyPart();
+				    binaryPart.setMediaType(MediaType.APPLICATION_OCTET_STREAM_TYPE);
+				    binaryPart.setEntity(pluginJarIs);
+				    Content content = new Content(FILE_FOR_PLUGIN, name, null, null, null, 0);
+					binaryPart.setContentDisposition(content);
+				    multiPart.bodyPart(binaryPart);
+			    }
+			}
 
-//			InputStream inputStream = null;
-//			FileOutputStream outputStream = null;
-			//			boolean isMultipart = ServletFileUpload.isMultipartContent(getHttpRequest());
-			     //inputStream = new FileInputStream(applnArc);
-			/*outputStream = new FileOutputStream(new File("c:/temp/" + applnArcFileName));
-				IOUtils.copy(inputStream, outputStream);*/
-
-			/*if(pluginArc != null) {
-				inputStream = new FileInputStream(pluginArc);
-				outputStream = new FileOutputStream(new File("c:/temp/" + pluginArcFileName));
-				IOUtils.copy(inputStream, outputStream);
-			}*/
-
-			List<Technology> technologies = new ArrayList<Technology>();
-			Technology technology = new Technology(name, description, versionList, appType);
-			technology.setCustomerId(customerId);
-			technologies.add(technology);
-			ClientResponse clientResponse = getServiceManager().createArcheTypes(technologies, customerId);
-
+			if (StringUtils.isNotEmpty(applnJarName)) {
+				BodyPart binaryPart2 = new BodyPart();
+			    binaryPart2.setMediaType(MediaType.APPLICATION_OCTET_STREAM_TYPE);
+			    binaryPart2.setEntity(applnIs);
+			    Content content = new Content(FILE_FOR_APPTYPE, name, null, null, null, 0);
+		        binaryPart2.setContentDisposition(content);
+		        multiPart.bodyPart(binaryPart2);
+			}
+			
+			ClientResponse clientResponse = getServiceManager().createArcheTypes(multiPart, customerId);
 			if (clientResponse.getStatus() != 200 && clientResponse.getStatus() != 201) {
 				addActionError(getText(ARCHETYPE_NOT_ADDED, Collections.singletonList(name)));
 			} else {
@@ -155,15 +179,99 @@ public class Archetypes extends ServiceBaseAction {
 
 		return list();
 	}
-
+	
+	public String uploadJar() throws PhrescoException {
+		String type = getHttpRequest().getParameter(REQ_JAR_TYPE);
+		if (REQ_PLUGIN_JAR.equals(type)) {
+			uploadPluginJar();
+		} else {
+			uploadApplnJar();
+		}
+		
+		return SUCCESS;
+	}
+	
+	public String uploadApplnJar() throws PhrescoException {
+		PrintWriter writer = null;
+		try {
+            writer = getHttpResponse().getWriter();
+	        applnJarName = getHttpRequest().getHeader(X_FILE_NAME);
+	        if (applnJarName.endsWith(REQ_JAR_FILE_EXTENSION) || applnJarName.endsWith(REQ_ZIP_FILE_EXTENSION) 
+	        		|| applnJarName.endsWith(REQ_TAR_GZ_FILE_EXTENSION)) {
+	        	applnIs = getHttpRequest().getInputStream();
+	            getHttpResponse().setStatus(getHttpResponse().SC_OK);
+	            writer.print(SUCCESS_TRUE);
+		        writer.flush();
+		        writer.close();
+	        } 
+		} catch (Exception e) {
+			getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
+            writer.print(SUCCESS_FALSE);
+			throw new PhrescoException(e);
+		} finally {
+            try {
+                applnIs.close();
+            } catch (IOException e) {
+            	throw new PhrescoException(e);
+            }
+        }
+		
+		return SUCCESS;
+	}
+	
+	public String uploadPluginJar() throws PhrescoException {
+		PrintWriter writer = null;
+        InputStream is = null;
+		try {
+			writer = getHttpResponse().getWriter();
+	        String jarName = getHttpRequest().getHeader(X_FILE_NAME);
+	        if (jarName.endsWith(REQ_JAR_FILE_EXTENSION) || jarName.endsWith(REQ_ZIP_FILE_EXTENSION) 
+	        		|| jarName.endsWith(REQ_TAR_GZ_FILE_EXTENSION)) {
+	        	is = getHttpRequest().getInputStream();
+	            pluginMap.put(jarName, is);
+	            getHttpResponse().setStatus(getHttpResponse().SC_OK);
+	            writer.print(SUCCESS_TRUE);
+		        writer.flush();
+		        writer.close();
+	        } 
+		} catch (Exception e) {
+			getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
+            writer.print(SUCCESS_FALSE);
+			throw new PhrescoException(e);
+		} finally {
+			try {
+				is.close();
+			} catch (IOException e) {
+				throw new PhrescoException(e);
+			}
+		}
+		
+		return SUCCESS;
+	}
+	
+	public void removeUploadedJar() {
+		String type = getHttpRequest().getParameter(REQ_JAR_TYPE);
+		if (REQ_PLUGIN_JAR.equals(type)) {
+			pluginMap.remove(getHttpRequest().getParameter(REQ_UPLOADED_JAR));
+		} else {
+			applnJarName = null;
+			applnIs = null;
+		}
+	}
+	
 	public String update() throws PhrescoException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Archetypes.update()");
 	    }
 
 		try {
-			Technology technology = new Technology(name, description, versionList, appType);
+			List<String> appTypes = new ArrayList<String>();
+	        appTypes.add(apptype);
+	    	List<String> versions = new ArrayList<String>();
+	    	versions.add(version);
+			Technology technology = new Technology(name, description, versions, appTypes);
 			technology.setId(techId);
+			technology.setCustomerId(customerId);
 			getServiceManager().updateArcheType(technology, techId, customerId);
 		} catch(Exception e) {
 			throw new PhrescoException(e);
@@ -216,7 +324,7 @@ public class Archetypes extends ServiceBaseAction {
 			isError = true;
 		}
 
-		if (StringUtils.isEmpty(applnArcFileName) || applnArc == null) {
+		if (StringUtils.isEmpty(applnJarName) || applnJarName == null) {
 			setFileError(getText(KEY_I18N_ERR_APPLNJAR_EMPTY));
 			isError = true;
 		}
@@ -284,54 +392,6 @@ public class Archetypes extends ServiceBaseAction {
 		this.fileError = fileError;
 	} 
 
-	public File getApplnArc() {
-		return applnArc;
-	}
-
-	public void setApplnArc(File applnArc) {
-		this.applnArc = applnArc;
-	}
-
-	public String getApplnArcFileName() {
-		return applnArcFileName;
-	}
-
-	public void setApplnArcFileName(String applnArcFileName) {
-		this.applnArcFileName = applnArcFileName;
-	}
-
-	public String getApplnArcContentType() {
-		return applnArcContentType;
-	}
-
-	public void setApplnArcContentType(String applnArcContentType) {
-		this.applnArcContentType = applnArcContentType;
-	}
-
-	public File getPluginArc() {
-		return pluginArc;
-	}
-
-	public void setPluginArc(File pluginArc) {
-		this.pluginArc = pluginArc;
-	}
-
-	public String getPluginArcFileName() {
-		return pluginArcFileName;
-	}
-
-	public void setPluginArcFileName(String pluginArcFileName) {
-		this.pluginArcFileName = pluginArcFileName;
-	}
-
-	public String getPluginArcContentType() {
-		return pluginArcContentType;
-	}
-
-	public void setPluginArcContentType(String pluginArcContentType) {
-		this.pluginArcContentType = pluginArcContentType;
-	}
-
 	public boolean isErrorFound() {
 		return errorFound;
 	}
@@ -355,14 +415,7 @@ public class Archetypes extends ServiceBaseAction {
 	public void setFromPage(String fromPage) {
 		this.fromPage = fromPage;
 	}
-	public List<String> getVersionList() {
-		return versionList;
-	}
-
-	public void setVersionList(List<String> versionList) {
-		this.versionList = versionList;
-	}
-
+	
 	public String getDescription() {
 		return description;
 	}
@@ -379,30 +432,6 @@ public class Archetypes extends ServiceBaseAction {
 		this.versionComment = versionComment;
 	}
 
-	public List<String> getAppType() {
-		return appType;
-	}
-
-	public void setAppType(List<String> appType) {
-		this.appType = appType;
-	}
-
-	public String getAppJar() {
-		return appJar;
-	}
-
-	public void setAppJar(String appJar) {
-		this.appJar = appJar;
-	}
-
-	public String getPluginJar() {
-		return pluginJar;
-	}
-
-	public void setPluginJar(String pluginJar) {
-		this.pluginJar = pluginJar;
-	}
-	
 	public String getCustomerId() {
 		return customerId;
 	}

@@ -128,32 +128,30 @@
 			<label class="control-label labelbold"> <span
 				class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.applnjar' />
 			</label>
-			<div class="controls">
-				<input class="input-xlarge" type="file" id="applnArc"
-					name="applnArc"> <span class="help-inline" id="fileError"></span>
-			</div>
-		</div>
-
-		<div id="jar">
-			<div class="control-group">
-				<label class="control-label labelbold"> <s:text
-						name='lbl.hdr.comp.pluginjar' /> </label>
-				<div class="controls">
-					<input class="input-xlarge" type="file" id="pluginArc"
-						name="pluginArc"> <a><img src="images/add_icon.png"
-						class="addplugin imagealign" onclick="javascript:addpluginjar();">
-					</a>
+			<div class="controls" style="float: left; margin-left: 3%;">
+				<div id="appln-file-uploader" class="file-uploader">
+					<noscript>
+						<p>Please enable JavaScript to use file uploader.</p>
+						<!-- or put a simple form for upload here -->
+					</noscript>
 				</div>
 			</div>
+			<span class="help-inline fileError" id="fileError"></span>
 		</div>
-		
-		<div id="file-uploader">       
-	        <noscript>          
-	            <p>Please enable JavaScript to use file uploader.</p>
-	            <!-- or put a simple form for upload here -->
-	        </noscript>         
-	    </div>
-    
+
+		<div class="control-group" id="pluginControl">
+			<label class="control-label labelbold"> <s:text
+					name='lbl.hdr.comp.pluginjar' /> </label>
+			<div class="controls" style="float: left; margin-left: 3%;">
+				<div id="plugin-file-uploader" class="file-uploader">
+					<noscript>
+						<p>Please enable JavaScript to use file uploader.</p>
+						<!-- or put a simple form for upload here -->
+					</noscript> 
+				</div>
+			</div>
+			<span class="help-inline pluginError" id="pluginError"></span>
+		</div>
 	</div>
 
 	<div class="bottom_button">
@@ -167,19 +165,11 @@
 
 			if (StringUtils.isNotEmpty(fromPage)) {
 		%>
-			<%-- <input type="button" id="archetypeUpdate" class="btn btn-primary"
-						onclick="formSubmitFileUpload('archetypeUpdate', 'applnArc,pluginArc', $('#subcontainer'), 'Updating Archetype');"
-						value="<s:text name='lbl.hdr.comp.update'/>" /> --%>
-						
 				<input type="button" id="archetypeUpdate" class="btn <%= disabledClass %>" <%= disabled %>
 					onclick="validate('archetypeUpdate', $('#formArcheTypeAdd'), $('#subcontainer'), '<s:text name='lbl.prog.arche.update'/>');"
 					value="<s:text name='lbl.hdr.comp.update'/>" />
 		
 		<% } else { %>
-			<%-- <input type="button" id="archetypeSave" class="btn btn-primary"
-						onclick="formSubmitFileUpload('archetypeSave', 'applnArc,pluginArc', $('#subcontainer'), 'Creating Archetype');"
-						value="<s:text name='lbl.hdr.comp.save'/>" /> --%>
-	
 				<input type="button" id="archetypeSave" class="btn btn-primary"
 					onclick="validate('archetypeSave', $('#formArcheTypeAdd'), $('#subcontainer'), '<s:text name='lbl.prog.arche.save'/>');"
 					value="<s:text name='lbl.hdr.comp.save'/>" />
@@ -248,20 +238,71 @@
         }
     }
     
-    function addpluginjar() {
-        var appendTxt = "<div id='jar'><div id='input1' class='clonedInput'><div class='control-group'>" +
-           "<label class='control-label labelbold' for='input01'>Plugin jar</label><div class='controls'>" + 
-           "<input id='input01' class='input-xlarge' type='file'>&nbsp;" + 
-           "<img src='images/add_icon.png' class='addplugin imagealign' onclick='addpluginjar();'>&nbsp;" + 
-           "<img src='images/minus_icon.png' class='del imagealign'></div></div></div></div>";
-        $("div[id='jar']:last").after(appendTxt);
-    }
+    function pluginJarError(data) {
+		if (data != undefined ) {
+			showError($("#pluginControl"), $("#pluginError"), data);
+		} else {
+			hideError($("#pluginControl"), $("#pluginError"));
+		}
+	}
+	
+	function applnJarError(data) {
+		if (data != undefined) {
+			showError($("#fileControl"), $("#fileError"), data);
+		} else {
+			hideError($("#fileControl"), $("#fileError"));
+		}
+	}
     
-    function createUploader() {
-        var uploader = new qq.FileUploader({
-            element: document.getElementById('file-uploader'),
-            action: 'archetypeSave',
+	function createUploader() {
+		var applnUploader = new qq.FileUploader({
+            element: document.getElementById('appln-file-uploader'),
+            action: 'uploadJar',
+            multiple: false,
+            type: 'applnJar',
+            buttonLabel: '<s:label key="lbl.comp.arhtyp.upload" />',
+            typeError : '<s:text name="err.invalid.file.selection" />',
+            params: {type: 'applnJar'}, 
             debug: true
-        });           
-    }  
+        });
+		 
+		var pluginUploader = new qq.FileUploader({
+           	element: document.getElementById('plugin-file-uploader'),
+           	action: 'uploadJar',
+           	multiple: true,
+           	type: 'pluginJar',
+           	buttonLabel: '<s:text name="lbl.comp.arhtyp.upload" />',
+           	typeError : '<s:text name="err.invalid.file.selection" />',
+			params: {type: 'pluginJar'}, 
+           	debug: true
+		});
+   }
+   
+	function removeUploadedJar(obj) {
+		$(obj).parent().remove();
+		var params = "uploadedJar=";
+		params = params.concat($(obj).attr("id"));
+		params = params.concat("&type=");
+		params = params.concat($(obj).attr("tempattr"));
+		$.ajax({
+			url : "removeUploadedJar",
+			data : params,
+			type : "POST",
+			success : function(data) {
+			}
+		});
+		enableDisableUpload();
+		pluginJarError();
+		applnJarError();
+	}
+	
+	function enableDisableUpload() {
+		if ($('ul[temp="applnJar"] > li').length === 1 ) {
+			$('#appln-file-uploader').find("input[type='file']").attr('disabled','disabled');
+			$('#appln-file-uploader').find($(".qq-upload-button")).removeClass("btn-primary qq-upload-button").addClass("disabled");
+		} else {
+			$('#appln-file-uploader').find("input[type='file']").attr('disabled', false);
+			$('#appln-file-uploader').find($(".btn")).removeClass("disabled").addClass("btn-primary qq-upload-button");
+		}
+	} 
 </script>

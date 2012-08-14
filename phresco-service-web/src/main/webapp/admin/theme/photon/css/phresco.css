@@ -1757,3 +1757,32 @@ input[class*='sample'] {
 .form {
     margin: 0;
 }
+
+
+/* archetypes file upload */
+
+.qq-upload-remove {
+	width: 11px;
+	height: 11px;
+	cursor: pointer;
+	padding-left: 12px;
+	vertical-align: middle;
+}
+
+.file-uploader {
+	margin-right: 10px;
+}
+
+.fileError {
+    float: left;
+    margin-left: 0% !important;
+    position: relative;
+    top: 8px;
+}
+
+.pluginError{
+    float: left;
+    margin-left: 0% !important;
+    position: relative;
+    top: 8px;
+}
