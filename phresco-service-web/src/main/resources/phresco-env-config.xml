@@ -3,7 +3,7 @@
         <WebService name="webservice">
             <port>7070</port>
             <password/>
-            <context>auth</context>
+            <context>auth-2.0</context>
             <host>172.16.18.174</host>
             <protocol>http</protocol>
             <username/>
