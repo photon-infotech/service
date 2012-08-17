@@ -18,31 +18,39 @@
   ###
   --%>
 <%@ taglib uri="/struts-tags" prefix="s" %>
-<script type="text/javascript">
-function findError(data) {
-	if(data.nameError != undefined) {
-		showError($("#nameControl"), $("#nameError"), data.nameError);
-	} else {
-		hideError($("#nameControl"), $("#nameError"));
-	}
-	
-	if(data.applyError != undefined) {
-		showError($("#applyControl"), $("#applyError"), data.applyError);
-	} else {
-		hideError($("#applyControl"), $("#applyError"));
-	}
-}
-</script>
 
-<form name="configForm" class="form-horizontal customer_list">
-	<h4 class="hdr"><s:label key="lbl.hdr.comp.cnfigtmplt.title" theme="simple"/></h4>	
+<%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="org.apache.commons.collections.CollectionUtils" %>
+<%@ page import="java.util.List"%>
+
+<%@ page import="com.photon.phresco.model.SettingsTemplate" %>
+<%@ page import="com.photon.phresco.model.PropertyTemplate" %>
+<%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
+
+<% 
+    SettingsTemplate configTemp = (SettingsTemplate) request.getAttribute(ServiceUIConstants.REQ_CONFIG_TEMP);
+    String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
+    String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID); 
+%>
+
+<form id="formConfigTempAdd" name="configForm" class="form-horizontal customer_list">
+	<h4 class="hdr">
+		<% if (StringUtils.isNotEmpty(fromPage)) { %>
+			<s:label key="lbl.hdr.comp.cnfigtmplt.edit" theme="simple"/>
+		<% } else {%>
+			<s:label key="lbl.hdr.comp.cnfigtmplte.add" theme="simple"/>   
+		<% } %>   
+	 </h4>	
+	
 	<div class="content_adder">
 		<div class="control-group" id="nameControl">
 			<label class="control-label labelbold">
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.name'/>
 			</label>
+			
 			<div class="controls">
-				<input id="configname" placeholder="<s:text name='place.hldr.configTemp.add.name'/>" class="input-xlarge" type="text" name="name">
+				<input id="configname" placeholder="<s:text name='place.hldr.configTemp.add.name'/>" class="input-xlarge" 
+					type="text" name="name" >
 				<span class="help-inline" id="nameError"></span>
 			</div>
 		</div>
@@ -113,6 +121,7 @@ function findError(data) {
 									</tr>
 								</thead>
 							</div>
+							
 							<div id="input1" class="clonedInput">
 								<tbody>
 									<tr class="configdynamiadd">
@@ -186,11 +195,26 @@ function findError(data) {
 			</div>	
 		</fieldset>
 	</div>
-	
+	 
 	<div class="bottom_button">
-		<input type="button" id="configtempSave" class="btn btn-primary" onclick="clickSave('configtempSave', $('#subcontainer'), 'Creating Config Template');" value="<s:text name='lbl.hdr.comp.save'/>"/>
-		<input type="button" id="configtempCancel" class="btn btn-primary" onclick="loadContent('configtempCancel', '', $('#subcontainer'));" value="<s:text name='lbl.hdr.comp.cancel'/>"/>
+	<% if (StringUtils.isNotEmpty(fromPage)) { %>
+		<input type="button" id="configtempUpdate" class="btn btn-primary"
+				onclick="validate('configtempUpdate', $('#formConfigTempAdd'), $('#subcontainer'), 'Updating Config Template');" 
+		        value="<s:text name='lbl.hdr.comp.save'/>"/>
+		
+    <% } else { %>		
+		<input type="button" id="configtempSave" class="btn btn-primary"
+		        onclick="validate('configtempSave', $('#formConfigTempAdd'), $('#subcontainer'), 'Creating Config Template');" 
+		        value="<s:text name='lbl.hdr.comp.save'/>"/>
+	<% } %> 
+		<input type="button" id="configtempCancel" class="btn btn-primary" 
+		      onclick="loadContent('configtempList', $('#formConfigTempAdd'), $('#subcontainer'));" 
+		      value="<s:text name='lbl.hdr.comp.cancel'/>"/>
 	</div>
+	
+	<!-- Hidden Fields -->
+	<input type="hidden" name="fromPage" value="<%= StringUtils.isNotEmpty(fromPage) ? fromPage : "" %>"/>
+	<input type="hidden" name="customerId" value="<%= customerId %>">
 </form>
 
 <script language="javascript">
@@ -237,7 +261,8 @@ $(document).ready(function() {
 		});
 	});
 });
-function addconfig(){
+
+function addconfig() {
 	var appendRow =  '<tr class="configdynamiadd">' + $('.configdynamiadd').html() + '</tr>';
 	$("tr:last").after(appendRow);			
 	$("td:last").append('<img class = "del imagealign" src="images/minus_icon.png" onclick="removeTag(this);">');		
@@ -245,5 +270,19 @@ function addconfig(){
  
 function removeTag(currentTag) {
 	$(currentTag).parent().parent().remove();
+}
+
+function findError(data) {
+	if (data.nameError != undefined) {
+		showError($("#nameControl"), $("#nameError"), data.nameError);
+	} else {
+		hideError($("#nameControl"), $("#nameError"));
+	}
+	
+	if (data.applyError != undefined) {
+		showError($("#applyControl"), $("#applyError"), data.applyError);
+	} else {
+		hideError($("#applyControl"), $("#applyError"));
+	}
 }
 </script>

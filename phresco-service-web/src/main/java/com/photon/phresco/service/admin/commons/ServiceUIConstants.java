@@ -89,7 +89,8 @@ public interface ServiceUIConstants {
      * String REQ_CONFIG_XXX
      *****************************/ 
     String REQ_CONFIG_TEMP = "configTemp";
-    
+    String REQ_CONFIG_TEMPLATES = "configTemplates";
+    String REQ_CONFIG_ID = "configId";
     
     /*****************************
      * Download Request Constants
@@ -166,8 +167,11 @@ public interface ServiceUIConstants {
     String APPLNTYPES_DELETED = "succ.appType.delete";
     String APPLNTYPES_NOT_DELETED = "fail.appType.delete" ;
     
-    String CONFIGTEMPLATE_ADDED = "succ.congiftemplate.add";
-    String CONFIGTEMPLATE_NOT_ADDED = "fail.congiftemplate.add";
+    String CONFIGTEMPLATE_ADDED = "succ.configtemplate.add";
+    String CONFIGTEMPLATE_NOT_ADDED = "fail.configtemplate.add";
+    String CONFIGTEMPLATE_DELETED = "succ.configtemplate.delete";
+    String CONFIGTEMPLATE_NOT_DELETED = "fail.configtemplate.delete" ;
+    
     
     String ARCHETYPE_ADDED = "succ.archetype.add";
     String ARCHETYPE_NOT_ADDED = "fail.archetype.add";

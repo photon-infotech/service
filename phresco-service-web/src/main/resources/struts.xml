@@ -172,9 +172,26 @@
             <result name="configtempList">/admin/pages/components/configTemplate/list.jsp</result>
 			<result type="json" />
         </action>
-		
-		<action name="configtempCancel" class="com.photon.phresco.service.admin.actions.components.ConfigTemplates" method="cancel">
-            <result name="configtempCancel">/admin/pages/components/configTemplate/list.jsp</result>
+        
+        <action name="configtempEdit" class="com.photon.phresco.service.admin.actions.components.ConfigTemplates" method="edit">
+            <result name="configtempAdd">/admin/pages/components/configTemplate/add.jsp</result>
+        </action>
+        
+         <action name="configtempUpdate" class="com.photon.phresco.service.admin.actions.components.ConfigTemplates" method="update">
+            <result name="configtempList">/admin/pages/components/configTemplate/list.jsp</result>
+            <result type="json" />
+        </action>
+        
+        <action name="configtempDelete" class="com.photon.phresco.service.admin.actions.components.ConfigTemplates" method="delete">
+            <result name="configtempList">/admin/pages/components/configTemplate/list.jsp</result>
+        </action>
+        
+         <action name="configtempSaveValidate" class="com.photon.phresco.service.admin.actions.components.ConfigTemplates" method="validateForm">
+            <result type="json" />
+        </action>
+        
+        <action name="configtempUpdateValidate" class="com.photon.phresco.service.admin.actions.components.ConfigTemplates" method="validateForm">
+            <result type="json" />
         </action>
 		<!-- COMPONENT CONFIG TEMPLATE ENDS-->
 			
