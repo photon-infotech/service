@@ -188,6 +188,8 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
+        enableScreen();
+        
         createUploader();
         
         // To focus the name textbox by default
@@ -276,7 +278,7 @@
 			params: {type: 'pluginJar'}, 
            	debug: true
 		});
-   }
+   	}
    
 	function removeUploadedJar(obj) {
 		$(obj).parent().remove();

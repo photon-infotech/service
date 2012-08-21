@@ -113,6 +113,10 @@
 </form>
 
 <script type="text/javascript">
+ 	$(document).ready(function() {
+		enableScreen();
+   	});
+
 	function editAppType(id) {
 		var params = "appTypeId=";
 		params = params.concat(id);

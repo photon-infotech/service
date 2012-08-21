@@ -68,13 +68,15 @@
 </form>
 
 <script type="text/javascript">
+	$(document).ready(function() {
+		enableScreen();
+	});
 
-function findError(data) {
-    if(data.nameError != undefined) {
-        showError($("#nameControl"), $("#nameError"), data.nameError);
-    } else {
-        hideError($("#nameControl"), $("#nameError"));
-    }
-
-}
+	function findError(data) {
+	    if (data.nameError != undefined) {
+	        showError($("#nameControl"), $("#nameError"), data.nameError);
+	    } else {
+	        hideError($("#nameControl"), $("#nameError"));
+	    }
+	}
 </script>

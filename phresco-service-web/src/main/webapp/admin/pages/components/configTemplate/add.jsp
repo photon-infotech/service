@@ -218,71 +218,73 @@
 </form>
 
 <script language="javascript">
-$(document).ready(function() {
-	$("#addValues").click(function() {
-		var val = $("#txtCombo").val();
-		$("#valuesCombo").append($("<option></option>").attr("value", val).text(val));
-		$("#txtCombo").val("");
+	$(document).ready(function() {
+		enableScreen();
+		
+		$("#addValues").click(function() {
+			var val = $("#txtCombo").val();
+			$("#valuesCombo").append($("<option></option>").attr("value", val).text(val));
+			$("#txtCombo").val("");
+		});
+	
+		/* $('.add').live('click', function() {
+			alert("sd");
+			var appendRow =  '<tr class="configdynamiadd">' + $('.configdynamiadd').html() + '</tr>';
+			$("tr:last").after(appendRow);			
+			$("td:last").append('<img class = "del imagealign" src="images/minus_icon.png" onclick="removeTag(this);">');		
+		});  */
+	
+		$('#remove').click(function() {
+			$('#valuesCombo option:selected').each( function() {
+				$(this).remove();
+			});
+		});
+	
+		//To move up the values
+		$('#up').bind('click', function() {
+			$('#valuesCombo option:selected').each( function() {
+				var newPos = $('#valuesCombo  option').index(this) - 1;
+				if (newPos > -1) {
+					$('#valuesCombo  option').eq(newPos).before("<option value='"+$(this).val()+"' selected='selected'>"+$(this).text()+"</option>");
+					$(this).remove();
+				}
+			});
+		});
+	
+		//To move down the values
+		$('#down').bind('click', function() {
+			var countOptions = $('#valuesCombo option').size();
+			$('#valuesCombo option:selected').each( function() {
+				var newPos = $('#valuesCombo  option').index(this) + 1;
+				if (newPos < countOptions) {
+					$('#valuesCombo  option').eq(newPos).after("<option value='"+$(this).val()+"' selected='selected'>"+$(this).text()+"</option>");
+					$(this).remove();
+				}
+			});
+		});
 	});
-
-	/* $('.add').live('click', function() {
-		alert("sd");
+	
+	function addconfig() {
 		var appendRow =  '<tr class="configdynamiadd">' + $('.configdynamiadd').html() + '</tr>';
 		$("tr:last").after(appendRow);			
 		$("td:last").append('<img class = "del imagealign" src="images/minus_icon.png" onclick="removeTag(this);">');		
-	});  */
-
-	$('#remove').click(function() {
-		$('#valuesCombo option:selected').each( function() {
-			$(this).remove();
-		});
-	});
-
-	//To move up the values
-	$('#up').bind('click', function() {
-		$('#valuesCombo option:selected').each( function() {
-			var newPos = $('#valuesCombo  option').index(this) - 1;
-			if (newPos > -1) {
-				$('#valuesCombo  option').eq(newPos).before("<option value='"+$(this).val()+"' selected='selected'>"+$(this).text()+"</option>");
-				$(this).remove();
-			}
-		});
-	});
-
-	//To move down the values
-	$('#down').bind('click', function() {
-		var countOptions = $('#valuesCombo option').size();
-		$('#valuesCombo option:selected').each( function() {
-			var newPos = $('#valuesCombo  option').index(this) + 1;
-			if (newPos < countOptions) {
-				$('#valuesCombo  option').eq(newPos).after("<option value='"+$(this).val()+"' selected='selected'>"+$(this).text()+"</option>");
-				$(this).remove();
-			}
-		});
-	});
-});
-
-function addconfig() {
-	var appendRow =  '<tr class="configdynamiadd">' + $('.configdynamiadd').html() + '</tr>';
-	$("tr:last").after(appendRow);			
-	$("td:last").append('<img class = "del imagealign" src="images/minus_icon.png" onclick="removeTag(this);">');		
-}
- 
-function removeTag(currentTag) {
-	$(currentTag).parent().parent().remove();
-}
-
-function findError(data) {
-	if (data.nameError != undefined) {
-		showError($("#nameControl"), $("#nameError"), data.nameError);
-	} else {
-		hideError($("#nameControl"), $("#nameError"));
+	}
+	 
+	function removeTag(currentTag) {
+		$(currentTag).parent().parent().remove();
 	}
 	
-	if (data.applyError != undefined) {
-		showError($("#applyControl"), $("#applyError"), data.applyError);
-	} else {
-		hideError($("#applyControl"), $("#applyError"));
+	function findError(data) {
+		if (data.nameError != undefined) {
+			showError($("#nameControl"), $("#nameError"), data.nameError);
+		} else {
+			hideError($("#nameControl"), $("#nameError"));
+		}
+		
+		if (data.applyError != undefined) {
+			showError($("#applyControl"), $("#applyError"), data.applyError);
+		} else {
+			hideError($("#applyControl"), $("#applyError"));
+		}
 	}
-}
 </script>

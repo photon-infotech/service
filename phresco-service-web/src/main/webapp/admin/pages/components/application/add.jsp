@@ -102,6 +102,8 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
+		enableScreen();
+		
 		//To focus the name textbox by default
 		$('#name').focus();
 		

@@ -229,8 +229,9 @@
 </div>
 
 <script type="text/javascript">
-
 	$(document).ready(function() {
+		enableScreen();
+		
 		$('#replaceimg1').click(function() {
 			$('.list-slide1').slideToggle();
 			if ($("#list-header-toggle1").is(":hidden")) {

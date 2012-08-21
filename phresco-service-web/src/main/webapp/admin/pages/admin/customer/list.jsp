@@ -117,6 +117,10 @@
 </form>
 
 <script type="text/javascript">
+	$(document).ready(function() {
+		enableScreen();
+	});
+	
 	/** To edit the customer **/
 	function editCustomer(id) {
 		var params = "customerId=";

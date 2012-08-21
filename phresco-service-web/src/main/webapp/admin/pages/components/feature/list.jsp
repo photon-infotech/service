@@ -26,6 +26,7 @@
 <%@page import="com.photon.phresco.model.ModuleGroup"%>
 <%@page import="com.photon.phresco.model.Module"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
+
 <% 
    List<ModuleGroup> moduleGroups = (List<ModuleGroup>)request.getAttribute(ServiceUIConstants.REQ_MODULE_GROUP);
    String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
@@ -130,11 +131,15 @@
 </form>
 
 <script language="JavaScript" type="text/javascript">
-function editFeature(id) {
-    var params = "techId=";
-    params = params.concat(id);
-    params = params.concat("&fromPage=");
-    params = params.concat("edit");
-    loadContentParam("featuresEdit", params, $('#subcontainer'));
-}
+	$(document).ready(function() {
+		enableScreen();
+	});
+	
+	function editFeature(id) {
+	    var params = "techId=";
+	    params = params.concat(id);
+	    params = params.concat("&fromPage=");
+	    params = params.concat("edit");
+	    loadContentParam("featuresEdit", params, $('#subcontainer'));
+	}
 </script>

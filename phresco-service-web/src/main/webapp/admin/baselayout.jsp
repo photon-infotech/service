@@ -69,6 +69,8 @@
 		    changeTheme(); 
 		
 		    $(document).ready(function() {
+		    	enableScreen();
+		    	
 				$(".styles").click(function() {
 					localStorage.clear();
 		             var value = $(this).attr("rel");

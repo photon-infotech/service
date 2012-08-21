@@ -18,9 +18,6 @@
   ###
   --%>
 <%@ taglib uri="/struts-tags" prefix="s" %>
-<script type="text/javascript">
-	clickMenu($("a[name='url_add']"),$("#subcontainer"));
-</script>
 
 <form class="customer_list">
 	<div class="operation" id="operation">
@@ -112,3 +109,11 @@
 		</div>
 	</div>
 </form>	
+
+<script type="text/javascript">
+	clickMenu($("a[name='url_add']"),$("#subcontainer"));
+	
+	$(document).ready(function() {
+		enableScreen();
+	});
+</script>

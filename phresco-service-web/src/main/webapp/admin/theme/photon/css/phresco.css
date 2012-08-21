@@ -1709,6 +1709,7 @@ input[class*='sample'] {
 	left: 48%; 
 	top: 43%; 
 	display: none;
+	z-index: 1041;
 }
 
 .form-horizontal .controls {

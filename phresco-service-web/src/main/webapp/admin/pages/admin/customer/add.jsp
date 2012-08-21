@@ -462,6 +462,8 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
+		enableScreen();
+
 		// Date picker
 		<% if (StringUtils.isEmpty(fromPage)) { %>
 				document.getElementById('fromdate').value = '';

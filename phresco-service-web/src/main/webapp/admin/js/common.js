@@ -186,6 +186,7 @@ function showLoadingIcon(tag) {
     if (theme == undefined || theme == "theme/photon/css/red.css") {
     	src = "theme/photon/images/loading_red.gif";
     }
+    disableScreen();
  	tag.empty();
 	tag.html("<img class='loadingIcon' src='"+ src +"' style='display: block'>");
 }
@@ -232,10 +233,19 @@ function showWelcomeImage() {
 		$('.headerlogoimg').attr("src","theme/photon/images/phresco_header_red.png");
 		$('.phtaccinno').attr("src","theme/photon/images/acc_inov_red.png");
 		$('.welcomeimg').attr("src","theme/photon/images/welcome_photon_red.png");
-
 	}
 }
 
 function isBlank(str) {
     return (!str || /^\s*$/.test(str));
+}
+
+//To disable the screen by showing an overlay
+function disableScreen() {
+	$(".modal-backdrop").show();
+}
+
+//To enable the screen by hiding an overlay
+function enableScreen() {
+	$(".modal-backdrop").hide();
 }

@@ -128,6 +128,10 @@
 </form>
 
 <script type="text/javascript">
+	$(document).ready(function() {
+		enableScreen();
+   	});
+	
     function editConfigTemp(id) {
 		var params = "configId=";
 		params = params.concat(id);

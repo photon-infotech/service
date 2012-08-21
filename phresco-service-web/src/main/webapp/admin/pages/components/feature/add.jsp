@@ -182,6 +182,30 @@
 </form>
 
 <script type="text/javascript">
+	$(document).ready(function() {
+		enableScreen();
+		
+		$("input[type=radio]").change(function() {
+	        var name = $(this).attr('name');
+	        $("input:checkbox[name='" + name + "']").prop("checked", true);
+	        var version = $("input:radio[name='" + name + "']").val();
+	        $("p[id='" + name + "']").html(version);
+	    });
+
+	    $("input[type=checkbox]").change(function() {
+	        var checkboxChecked = $(this).is(":checked");
+	        var name = $(this).attr('name');
+	        if (!checkboxChecked) {
+	            $("input:radio[name='" + name + "']").prop("checked", false);
+	            $("p[id='" + name + "']").empty();
+	        } else {
+	            $("input:radio[name='" + name + "']:first").prop("checked", true);
+	            var version = $("input:radio[name='" + name + "']").val();
+	            $("p[id='" + name + "']").html(version);
+	        }
+	    });
+	});
+
     function findError(data) {
         if (data.nameError != undefined) {
             showError($("#nameControl"), $("#nameError"), data.nameError);
@@ -201,24 +225,4 @@
             hideError($("#fileControl"), $("#fileError"));
         }
     }
-    
-    $("input[type=radio]").change(function() {
-        var name = $(this).attr('name');
-        $("input:checkbox[name='" + name + "']").prop("checked", true);
-        var version = $("input:radio[name='" + name + "']").val();
-        $("p[id='" + name + "']").html(version);
-    });
-
-    $("input[type=checkbox]").change(function() {
-        var checkboxChecked = $(this).is(":checked");
-        var name = $(this).attr('name');
-        if (!checkboxChecked) {
-            $("input:radio[name='" + name + "']").prop("checked", false);
-            $("p[id='" + name + "']").empty();
-        } else {
-            $("input:radio[name='" + name + "']:first").prop("checked", true);
-            var version = $("input:radio[name='" + name + "']").val();
-            $("p[id='" + name + "']").html(version);
-        }
-    });
 </script>
