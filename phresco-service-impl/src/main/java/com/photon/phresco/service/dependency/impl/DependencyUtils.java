@@ -114,12 +114,12 @@ public final class DependencyUtils {
 	 * @param path
 	 * @throws PhrescoException
 	 */
-	public static void extractFiles(String contentURL, File path) throws PhrescoException {
+	public static void extractFiles(String contentURL, File path, String customerId) throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method DependencyUtils.extractFiles(String contentURL, File path)");
 			S_LOGGER.debug("extractFiles() Filepath="+path.getPath());
 		}
-		extractFiles(contentURL, null, path);
+		extractFiles(contentURL, null, path, customerId);
 	}
 	
 	/**
@@ -130,18 +130,19 @@ public final class DependencyUtils {
 	 * @param path
 	 * @throws PhrescoException
 	 */
-	public static void extractFiles(String contentURL, String folderName, File path) throws PhrescoException {
+	public static void extractFiles(String contentURL, String folderName, File path, String customerId) throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method DependencyUtils.extractFiles(String contentURL, String folderName, File path)");
 		}
 		assert !StringUtils.isEmpty(contentURL);
 		
+		PhrescoServerFactory.initialize();
 		String extension = getExtension(contentURL);
 		File archive = new File(Utility.getPhrescoTemp(), UUID.randomUUID().toString()+extension);
 		FileOutputStream fos = null;
 		OutputStream out = null;
 		try {
-			InputStream inputStream = PhrescoServerFactory.getRepositoryManager().getArtifactAsStream(contentURL);
+			InputStream inputStream = PhrescoServerFactory.getRepositoryManager().getArtifactAsStream(contentURL, customerId);
 			fos = new FileOutputStream(archive);
 			out = new BufferedOutputStream(fos);
 			

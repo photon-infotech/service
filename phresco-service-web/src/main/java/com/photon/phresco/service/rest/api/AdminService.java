@@ -33,23 +33,29 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
 import org.springframework.stereotype.Component;
 
 import com.photon.phresco.commons.model.Customer;
+import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.commons.model.Role;
 import com.photon.phresco.commons.model.User;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.exception.PhrescoWebServiceException;
+import com.photon.phresco.model.ApplicationType;
 import com.photon.phresco.model.DownloadInfo;
 import com.photon.phresco.model.GlobalURL;
 import com.photon.phresco.model.VideoInfo;
 import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.api.DbService;
 import com.photon.phresco.service.converters.ConvertersFactory;
+import com.photon.phresco.service.dao.ApplicationTypeDAO;
+import com.photon.phresco.service.dao.CustomerDAO;
 import com.photon.phresco.service.dao.UserDAO;
+import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.ServiceConstants;
 
 
@@ -75,16 +81,20 @@ public class AdminService extends DbService implements ServiceConstants {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.findCustomer()");
         }
-    	
     	try {
-    		List<Customer> customerList = mongoOperation.getCollection(CUSTOMERS_COLLECTION_NAME , Customer.class);
-    		if (customerList != null) {
-    			return Response.status(Response.Status.OK).entity(customerList).build();
-    		} 
+    	    List<Customer> customers = new ArrayList<Customer>();
+    		Converter<CustomerDAO, Customer> converter = 
+                (Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
+    		List<CustomerDAO> customerDAOs = mongoOperation.getCollection(CUSTOMERDAO_COLLECTION_NAME , CustomerDAO.class);
+    		for (CustomerDAO customerDAO : customerDAOs) {
+                customers.add(converter.convertDAOToObject(customerDAO, mongoOperation));
+            }
+    		if(CollectionUtils.isNotEmpty(customers)) {
+    		    return Response.status(Response.Status.OK).entity(customers).build();
+    		}
     	} catch (Exception e) {
     		throw new PhrescoWebServiceException(e, EX_PHEX00005, CUSTOMERS_COLLECTION_NAME);
 		}
-    	
     	return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
     }
 
@@ -96,13 +106,23 @@ public class AdminService extends DbService implements ServiceConstants {
     @POST
     @Consumes (MediaType.APPLICATION_JSON)
     @Path (REST_API_CUSTOMERS)
-    public Response createCustomer(List<Customer> customer) {
+    public Response createCustomer(List<Customer> customers) {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.createCustomer(List<Customer> customer)");
         }
-    	
     	try {
-    		mongoOperation.insertList(CUSTOMERS_COLLECTION_NAME , customer);
+    	    Converter<CustomerDAO, Customer> converter = 
+                (Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
+    	    for (Customer customer : customers) {
+    	        CustomerDAO customerDAO = converter.convertObjectToDAO(customer);
+    	        mongoOperation.save(CUSTOMERDAO_COLLECTION_NAME, customerDAO);
+    	        if(customer.getRepoInfo() != null) {
+    	            RepoInfo repoInfo = customer.getRepoInfo();
+    	            String repoPassword = repoInfo.getRepoPassword();
+    	            repoInfo.setRepoPassword(ServerUtil.encryptString(repoPassword));
+    	            mongoOperation.save(REPOINFO_COLLECTION_NAME, repoInfo);
+    	        }
+            }
     	} catch (Exception e) {
     		throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
 		}

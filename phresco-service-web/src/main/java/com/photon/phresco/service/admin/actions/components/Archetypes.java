@@ -38,6 +38,7 @@ import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.ApplicationType;
 import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
+import com.photon.phresco.service.client.api.Content;
 
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.BodyPart;
@@ -144,7 +145,8 @@ public class Archetypes extends ServiceBaseAction {
 		    BodyPart jsonPart = new BodyPart();
 		    jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
 		    jsonPart.setEntity(technology);
-		    
+		    Content content = new Content("object", name, null, null, null, 0);
+		    jsonPart.setContentDisposition(content);
 		    multiPart.bodyPart(jsonPart);
 			   
 			if (!pluginMap.isEmpty()) {

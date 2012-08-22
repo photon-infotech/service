@@ -58,6 +58,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.maven.repository.internal.MavenRepositorySystemSession;
@@ -77,6 +78,7 @@ import org.sonatype.aether.util.artifact.SubArtifact;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.AdminConfigInfo;
 import com.photon.phresco.model.ApplicationType;
@@ -86,37 +88,35 @@ import com.photon.phresco.model.ProjectInfo;
 import com.photon.phresco.model.SettingsTemplate;
 import com.photon.phresco.model.Technology;
 import com.photon.phresco.model.VideoInfo;
+import com.photon.phresco.service.api.DbManager;
+import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.model.ArtifactInfo;
 import com.photon.phresco.service.model.ServerConfiguration;
 import com.photon.phresco.service.model.ServerConstants;
+import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.FileUtil;
 import com.photon.phresco.util.TechnologyTypes;
 import com.photon.phresco.util.Utility;
+import com.sun.jersey.server.impl.container.servlet.PerSessionFactory;
 
-public class RepositoryManagerImpl implements RepositoryManager {
+public  class RepositoryManagerImpl implements RepositoryManager {
 
 	private static final Logger S_LOGGER= Logger.getLogger(RepositoryManagerImpl.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
-	private static final String XML = ".xml";
 	private static final String DEFAULT = "default";
 //	private static final String JAXB_PACKAGE_NAME = "com.photon.phresco.service.jaxb";
 	private static final int HTTP_NOT_FOUND = 404;
 	private static final String LOCAL_REPO = "../temp/target/local-repo";
 
-	private JAXBContext jaxbContext = null;
-	private Unmarshaller unMarshal = null;
-	private Marshaller marshal = null;
 	private ServerConfiguration config = null;
 	private Gson gson = null;
 
 	// TODO:Add ehcaching
-	private static HashMap<String, ModuleGroup> modulesCache = new HashMap<String, ModuleGroup>(16);
 	private static Map<String, String[]> versionMap = new HashMap<String, String[]>(16);
 
 	private String url;
 	private String username;
-	private String password;
 	
 	private void initMap() {
 		versionMap.put(TechnologyTypes.PHP, new String[]{"5.4.x", "5.3.x", "5.2.x", "5.1.x", "5.0.x"});
@@ -144,13 +144,6 @@ public class RepositoryManagerImpl implements RepositoryManager {
 		}
 		this.config = config;
 		try {
-//			jaxbContext = JAXBContext.newInstance(JAXB_PACKAGE_NAME);
-//			unMarshal = jaxbContext.createUnmarshaller();
-//			// unMarshal.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
-//			// Boolean.TRUE);
-//			marshal = jaxbContext.createMarshaller();
-//			// marshal.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
-			// Boolean.TRUE);
 
 			gson = new Gson();
 			initMap();
@@ -162,148 +155,9 @@ public class RepositoryManagerImpl implements RepositoryManager {
 	public RepositoryManagerImpl(String url, String username, String password) throws PhrescoException {
 		this.url = url;
 		this.username = username;
-		this.password = password;
+	//	this.password = password;
 	}
 	
-	private com.photon.phresco.model.Technology generateTechnology(Technology technology) throws PhrescoException {
-		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method RepositoryManagerImpl.generateTechnology(Technology technology)");
-		}
-
-		String id = technology.getId();		
-		com.photon.phresco.model.Technology tech = new com.photon.phresco.model.Technology(id,
-				technology.getName());
-		
-		List<String> versions = new ArrayList<String>();
-		if(versionMap.get(id) != null) {
-		versions = Arrays.asList(versionMap.get(id));
-		}
-		
-		tech.setVersions(versions);
-		tech.setModules(getModules(id));
-		tech.setJsLibraries(getJSLibraries(id));
-//		tech.setDatabases(getDatabases());
-//		tech.setServers(getServers());
-//		tech.setWebservices(getWebservices());
-		return tech;
-	}
-
-//	private List<Database> getDatabases() {
-//		List<Database> databases = new ArrayList<Database>();
-//		
-//		List<String> versions = new ArrayList<String>(2);
-//		versions.add("5.5.1");
-//		versions.add("5.5");
-//		versions.add("5.1");
-//		versions.add("5.0");
-//		versions.add("4.1");
-//		versions.add("4.0");
-//		databases.add(new Database(1, "MySQL", versions, "My SQL DB"));
-//		
-//		versions = new ArrayList<String>(2);
-//		versions.add("11gR2");
-//		versions.add("11gR1");
-//		versions.add("10gR2");
-//		versions.add("10gR1");
-//		versions.add("9iR2");
-//		versions.add("9iR1");
-//		versions.add("8iR3");
-//		versions.add("8iR2");
-//		versions.add("8iR1");
-//		versions.add("8i");
-//		databases.add(new Database(2, "Oracle", versions, "Oracle DB"));
-//
-//		versions = new ArrayList<String>(2);
-//		versions.add("2.0.4");
-//		versions.add("1.8.5 ");
-//		databases.add(new Database(3, "MongoDB", versions, "Mongo DB"));
-//		
-//		versions = new ArrayList<String>(2);
-//		versions.add("10");
-//		versions.add("9.7");
-//		versions.add("9.5");
-//		versions.add("9");
-//		databases.add(new Database(4, "DB2", versions, "DB2 DB"));
-//		
-//		versions = new ArrayList<String>(2);
-//		versions.add("2012");
-//		versions.add("2008 R2");
-//		versions.add("2008");
-//		versions.add("2005");
-//		databases.add(new Database(5, "MSSQL", versions, "MSSQL DB"));
-//		
-//		return databases;
-//	}
-//
-//	private List<Server> getServers() {
-//		List<Server> servers = new ArrayList<Server>();
-//
-//		List<String> versions = new ArrayList<String>(2);
-//		versions.add("7.0.x");
-//		versions.add("6.0.x");
-//		versions.add("5.5.x");
-//		
-//		servers.add(new Server(1, "Apache Tomcat", versions, "Apache Tomcat Server"));
-//		versions = new ArrayList<String>(2);
-//		versions.add("7.1.x");
-//		versions.add("7.0.x");
-//		versions.add("6.1.x");
-//		versions.add("6.0.x");
-//		versions.add("5.1.x");
-//		versions.add("5.0.x");
-//		versions.add("4.2.x");
-//		versions.add("4.0.x");
-//		servers.add(new Server(2, "JBoss", versions, "JBoss application server"));
-//
-//		versions = new ArrayList<String>(2);
-//		versions.add("7.5");
-//		versions.add("7.0");
-//		versions.add("6.0");
-//		versions.add("5.1");
-//		versions.add("5.0");
-//		servers.add(new Server(3, "IIS", versions, "IIS Server"));
-//
-//		versions = new ArrayList<String>(2);
-//		versions.add("12c(12.1.1)");
-//		versions.add("11gR1(10.3.6)");
-//		versions.add("11g(10.3.1)");
-//		versions.add("10.3");
-//		versions.add("10.0");
-//		versions.add("9.2");
-//		versions.add("9.1");
-//		servers.add(new Server(4, "WebLogic", versions, "Web Logic"));
-//		
-//		versions = new ArrayList<String>(2);
-//		versions.add("2.3");
-//		versions.add("2.2");
-//		versions.add("2.0");
-//        versions.add("1.3");
-//        servers.add(new Server(5, "Apache", versions, "Apache"));
-//        
-//        versions = new ArrayList<String>(2);
-//        versions.add("0.6.x");
-//        servers.add(new Server(6, "NodeJS", versions, "NodeJS"));
-//        
-//        versions = new ArrayList<String>(2);
-//        versions.add("8.x");
-//        versions.add("7.x");
-//        versions.add("6.x");
-//        versions.add("5.x");
-//        versions.add("4.x");
-//        servers.add(new Server(7, "Jetty", versions, "Jetty"));
-//
-//		return servers;
-//	}
-//
-//	private List<WebService> getWebservices() {
-//		List<WebService> databases = new ArrayList<WebService>();
-//		databases.add(new WebService(1, "REST/JSON", "1.0", "REST JSON web services"));
-//		databases.add(new WebService(2, "REST/XML", "1.0", "REST XML web services"));
-//		databases.add(new WebService(3, "SOAP", "1.1", "SOAP 1.1"));
-//		databases.add(new WebService(4, "SOAP", "1.2", "SOAP 1.2"));
-//		return databases;
-//	}
-
 	public List<ModuleGroup> getModules(String techId) throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method RepositoryManagerImpl.getModules(String techId)");
@@ -356,20 +210,22 @@ public class RepositoryManagerImpl implements RepositoryManager {
 		return session;
 	}
 
-	public String addArtifact(ArtifactInfo info, File artifactFile) throws PhrescoException {
+	public String addArtifact(ArtifactInfo info, File artifactFile, String customerId) throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method RepositoryManagerImpl.addArtifact(ArtifactInfo info, File artifactFile)");
 		}
+		DbManager dbManager = PhrescoServerFactory.getDbManager();
+		RepoInfo repoInfo = dbManager.getRepoInfo(customerId);
+		String password = ServerUtil.decryptString(repoInfo.getRepoPassword());
 		RepositorySystem system = newRepositorySystem();
 		RepositorySystemSession session = newRepositorySystemSession(system);
 		Artifact artifact = new DefaultArtifact(info.getGroupId(), info.getArtifact(), info.getClassifier(), info
 				.getPackage(), info.getVersion());
 
 		artifact = artifact.setFile(artifactFile);
-
-		RemoteRepository distRepo = new RemoteRepository("", DEFAULT, config.getRepositoryURL());
-
-		Authentication authentication = new Authentication(config.getRepositoryUser(), config.getRepositoryPassword());
+		
+		RemoteRepository distRepo = new RemoteRepository("", DEFAULT, repoInfo.getReleaseRepoURL());
+		Authentication authentication = new Authentication(repoInfo.getRepoUserName(), password);
 		distRepo.setAuthentication(authentication);
 		DeployRequest deployRequest = new DeployRequest();
 		deployRequest.addArtifact(artifact);
@@ -391,7 +247,7 @@ public class RepositoryManagerImpl implements RepositoryManager {
 	}
 
 	@Override
-	public boolean isExist(String filePath) throws PhrescoException {
+	public boolean isExist(String filePath, String customerId) throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method RepositoryManagerImpl.getArtifactAsString(String filePath)");
 		}
@@ -400,7 +256,8 @@ public class RepositoryManagerImpl implements RepositoryManager {
 			if (isDebugEnabled) {
 				S_LOGGER.debug("getArtifactAsString() FilePath=" + filePath);
 			}
-			URL url = new URL(config.getRepositoryURL() + filePath);
+			RepoInfo repoInfo = getDBManager().getRepoInfo(customerId);
+			URL url = new URL(repoInfo.getGroupRepoURL() + filePath);
 			URLConnection openConnection = url.openConnection();
 			int responseCode = ((HttpURLConnection) openConnection).getResponseCode();
 			return (responseCode != HTTP_NOT_FOUND);
@@ -418,7 +275,7 @@ public class RepositoryManagerImpl implements RepositoryManager {
 	}
 
 	@Override
-	public String getArtifactAsString(String filePath) throws PhrescoException {
+	public String getArtifactAsString(String filePath, String customerId) throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method RepositoryManagerImpl.getArtifactAsString(String filePath)");
 		}
@@ -427,7 +284,8 @@ public class RepositoryManagerImpl implements RepositoryManager {
 			if (isDebugEnabled) {
 				S_LOGGER.debug("getArtifactAsString() FilePath=" + filePath);
 			}
-			URL url = new URL(config.getRepositoryURL() + filePath);
+			RepoInfo repoInfo = getDBManager().getRepoInfo(customerId);
+			URL url = new URL(repoInfo.getGroupRepoURL() + filePath);
 			is = url.openStream();
 			return IOUtils.toString(is);
 		} catch (IOException e) {
@@ -442,9 +300,15 @@ public class RepositoryManagerImpl implements RepositoryManager {
 			}
 		}
 	}
-
+	
+	private static DbManager getDBManager() throws PhrescoException {
+	    PhrescoServerFactory.initialize();
+	    DbManager dbManager = PhrescoServerFactory.getDbManager();
+	    return dbManager;
+	}
+	
 	@Override
-	public InputStream getArtifactAsStream(String filePath) throws PhrescoException {
+	public InputStream getArtifactAsStream(String filePath, String customerId) throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method RepositoryManagerImpl.getArtifactAsStream(String filePath)");
 		}
@@ -452,7 +316,8 @@ public class RepositoryManagerImpl implements RepositoryManager {
 			if (isDebugEnabled) {
 				S_LOGGER.debug("getArtifactAsStream() FilePath=" + filePath);
 			}
-			URL url = new URL(config.getRepositoryURL() + filePath);
+			RepoInfo repoInfo = getDBManager().getRepoInfo(customerId);
+			URL url = new URL(repoInfo.getGroupRepoURL() + filePath);
 			return url.openStream();
 		} catch (MalformedURLException e) {
 			S_LOGGER.debug("getArtifactAsStream =" + filePath, e);
@@ -461,11 +326,6 @@ public class RepositoryManagerImpl implements RepositoryManager {
 			S_LOGGER.debug("getArtifactAsStream =" + filePath, e);
 			throw new PhrescoException(e);
 		}
-	}
-
-	@Override
-	public String getRepositoryURL() throws PhrescoException {
-		return config.getRepositoryURL();
 	}
 
 	// get highest service version
@@ -485,11 +345,6 @@ public class RepositoryManagerImpl implements RepositoryManager {
 		}
 		String latestServiceVersion = config.getLatestServiceVersion();
 		return latestServiceVersion;
-	}
-
-	private void removeLocalRepo() {
-		File localRepo = new File(LOCAL_REPO);
-		removeDirectory(localRepo.getParentFile());
 	}
 
 	public static boolean removeDirectory(File directory) {
@@ -569,151 +424,6 @@ public class RepositoryManagerImpl implements RepositoryManager {
 	public String getEmailExtFile() throws PhrescoException {
 		return config.getEmailExtFile();
 	} 
-	
-	public List<ProjectInfo> addPilotProjects(String techId) throws PhrescoException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public void addTechnology(String apptype, com.photon.phresco.model.Technology tech) throws PhrescoException {
-		// TODO Auto-generated method stub
-	}
-	
-	public void addVideo(VideoInfo videoInfo, File dirPath) throws PhrescoException {
-		boolean exist = isExist(ServerConstants.HOMEPAGE_JSON_FILE);
-
-		List<VideoInfo> videoInfoList = null;
-		if (exist) {
-			// Read the VideoInfos from Nexus
-			String videoInfoJSON = getArtifactAsString(ServerConstants.HOMEPAGE_JSON_FILE);
-
-			// Convert it into VideoInfo JSON objects
-			Type type = new TypeToken<List<VideoInfo>>() {
-			}.getType();
-			videoInfoList = gson.fromJson(videoInfoJSON, type);
-		} else {
-			videoInfoList = new ArrayList<VideoInfo>(32);
-		}
-
-		// Add the video to the list
-		videoInfoList.add(videoInfo);
-
-		// convert the JSON objects into String
-		String json = gson.toJson(videoInfoList);
-
-		// Write to temp File
-		File tempFile = new File(Utility.getSystemTemp(), "video.json");
-		writeToFile(json, tempFile);
-
-		// add to nexus
-		ArtifactInfo info = new ArtifactInfo("videos.homepage", "videoinfo", "", "json", "1.0");
-		addArtifact(info, tempFile);
-
-		// TODO:Upload the video content from the inputFile
-
-		// delete the temp file
-		FileUtil.delete(tempFile);
-	}
-
-	private void writeToFile(String content, File file) throws PhrescoException {
-		BufferedWriter writer = null;
-		try {
-			writer = new BufferedWriter(new FileWriter(file));
-			writer.write(content);
-		} catch (IOException e) {
-			throw new PhrescoException(e);
-		} finally {
-			if (writer != null) {
-				try {
-					writer.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-
-	public void addSettings(SettingsTemplate settingsTemplate, File dirPath) throws PhrescoException {
-		boolean exist = isExist(ServerConstants.SETTINGS_CONFIG_FILE);
-		List<SettingsTemplate> settingsList = null;
-
-		if (exist) {
-			// Read the VideoInfos from Nexus
-			String settingsJson = getArtifactAsString(ServerConstants.SETTINGS_CONFIG_FILE);
-
-			// Convert it into VideoInfo JSON objects
-			Type type = new TypeToken<List<SettingsTemplate>>() {
-			}.getType();
-			settingsList = gson.fromJson(settingsJson, type);
-		} else {
-			settingsList = new ArrayList<SettingsTemplate>(32);
-		}
-
-		// Add the video to the list
-		settingsList.add(settingsTemplate);
-
-		// convert the JSON objects into String
-		String json = gson.toJson(settingsList);
-
-		// Write to temp File
-		File tempFile = new File(Utility.getSystemTemp(), "settings.json");
-		writeToFile(json, tempFile);
-
-		// add to nexus
-		ArtifactInfo info = new ArtifactInfo("config", "settings", "", "json", "1.0");
-		addArtifact(info, tempFile);
-
-		// delete the temp file
-		FileUtil.delete(tempFile);
-	}
-
-	public void removeVideo(VideoInfo videoInfo) throws PhrescoException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void addAdminConfig(AdminConfigInfo configInfo) throws PhrescoException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void removeAdminConfig(AdminConfigInfo videoInfo) throws PhrescoException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void addDownload(DownloadInfo downloadInfo, File dirPath) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void Download(DownloadInfo downloadInfo) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public List<ApplicationType> getApplicationTypes() throws PhrescoException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void addApplicationTypes(List<ApplicationType> apptypes)
-			throws PhrescoException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public List<ProjectInfo> getPilotProjects(String id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 	
 	@Override
 	public String getFrameWorkLatestFile() throws PhrescoException {

@@ -56,7 +56,8 @@ public class PilotProjectsService implements ServerConstants {
     public List<ProjectInfo> getPilotProjects(String techId) throws PhrescoException, JSONException {
     	S_LOGGER.info("Retrieving pilot projects for technology " + techId);
         RepositoryManager repoManager = PhrescoServerFactory.getRepositoryManager();
-        return repoManager.getPilotProjects(techId);
+//        return repoManager.getPilotProjects(techId);
+        return null;
     }
 
 }

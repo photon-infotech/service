@@ -73,9 +73,9 @@ public class PhrescoService extends DbService{
 	@Produces({ MediaType.APPLICATION_JSON })
 	public List<ApplicationType> getApplicationTypes() throws PhrescoException {
 		RepositoryManager repManager = PhrescoServerFactory.getRepositoryManager();
-		String repositoryURL = repManager.getRepositoryURL();
-		return repManager.getApplicationTypes();
-		
+//		String repositoryURL = repManager.getRepositoryURL();
+//		return repManager.getApplicationTypes();
+		return null;
 		//return PhrescoServerFactory.getDBManager().getApplicationTypes();
 	}
 

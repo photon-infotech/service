@@ -32,12 +32,14 @@ import org.apache.log4j.Logger;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.VideoInfo;
 import com.photon.phresco.model.VideoType;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.model.ServerConstants;
+import com.photon.phresco.util.ServiceConstants;
 
 public class VideoDownloader extends Thread implements ServerConstants {
 
@@ -45,6 +47,7 @@ public class VideoDownloader extends Thread implements ServerConstants {
 	private static final Logger s_logger = Logger.getLogger(VideoDownloader.class);
 	private static Boolean debugEnabled = s_logger.isDebugEnabled();
 	private String serverContext;
+	private String repoUrl;
 	
 	public VideoDownloader(String serverContext) {
 		this.serverContext = serverContext;
@@ -66,9 +69,10 @@ public class VideoDownloader extends Thread implements ServerConstants {
 	private void downloadFiles() throws PhrescoException{
 		
 		PhrescoServerFactory.initialize();
+		repoUrl = getRepositoryUrl();
 		Gson gson = new Gson();
 		RepositoryManager repoMgr = PhrescoServerFactory.getRepositoryManager();
-		String videoInfoJSON = repoMgr.getArtifactAsString(HOMEPAGE_JSON_FILE);
+		String videoInfoJSON = repoMgr.getArtifactAsString(HOMEPAGE_JSON_FILE, ServiceConstants.DEFAULT_CUSTOMER_NAME);
 		Type type = new TypeToken<List<VideoInfo>>() {
 		}.getType();
 		List<VideoInfo> videoInfoList = gson.fromJson(videoInfoJSON, type);
@@ -97,7 +101,7 @@ public class VideoDownloader extends Thread implements ServerConstants {
 		InputStream in = null;
 		FileOutputStream fos = null;
 		try {
-			URL url = new URL(getRepositoryUrl() + videoURL);
+			URL url = new URL(repoUrl + videoURL);
 			URLConnection connection = url.openConnection();
 			in = connection.getInputStream();
 			int index = videoURL.lastIndexOf("/");
@@ -141,7 +145,7 @@ public class VideoDownloader extends Thread implements ServerConstants {
 	}
 	
 	private String getRepositoryUrl() throws PhrescoException {
-		String repositoryUrl = PhrescoServerFactory.getRepositoryManager().getRepositoryURL();
-		return repositoryUrl;
+	    RepoInfo repoInfo = PhrescoServerFactory.getDbManager().getRepoInfo(ServiceConstants.DEFAULT_CUSTOMER_NAME);
+        return repoInfo.getGroupRepoURL();
 	}
 }

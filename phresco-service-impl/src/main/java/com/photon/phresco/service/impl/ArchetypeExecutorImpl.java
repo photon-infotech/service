@@ -49,6 +49,7 @@ import com.photon.phresco.service.api.ArchetypeExecutor;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.model.ServerConfiguration;
 import com.photon.phresco.service.model.ServerConstants;
+import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.Constants;
 import com.photon.phresco.util.ProjectUtils;
 import com.photon.phresco.util.Utility;
@@ -81,7 +82,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 			}
 			// the below implementation is required since a new command or shell is forked from the 
 			//existing running web server command or shell instance
-			tempFolderPath = getTempFolderPath();
+			tempFolderPath = ServerUtil.getTempFolderPath();
 			BufferedReader bufferedReader = Utility.executeCommand(commandString, tempFolderPath);
 			String line = null;
 			while ((line = bufferedReader.readLine()) != null) {
@@ -111,33 +112,6 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 			S_LOGGER.info("create .phresco folder inside the project");
 		}
        ProjectUtils.writeProjectInfo(info, phrescoFolder);
-    }
-
-	private String getTempFolderPath() {
-    	if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method ArchetypeExecutorImpl.getTempFolderPath()");
-		}
-    	String tempFolderPath = "";
-        String systemTempFolder = System.getProperty(JAVA_TMP_DIR);
-        String uuid = UUID.randomUUID().toString();
-
-        // handled the file separator since java.io.tmpdir does not return
-        // the last file separator in linux and Mac OS
-        if ((systemTempFolder.endsWith(File.separator))) {
-            tempFolderPath = systemTempFolder + PHRESCO_FOLDER_NAME;
-        } else {
-            tempFolderPath = systemTempFolder + File.separator + PHRESCO_FOLDER_NAME;
-        }
-
-        tempFolderPath = tempFolderPath + File.separator + uuid;
-        File tempFolder = new File(tempFolderPath);
-        tempFolder.mkdirs();
-
-        if (isDebugEnabled) {
-            S_LOGGER.debug("getTempFolderPath() Temp Folder path= " + tempFolderPath);
-        }
-
-        return tempFolderPath;
     }
 
     private String buildCommandString(ProjectInfo info) throws PhrescoException {

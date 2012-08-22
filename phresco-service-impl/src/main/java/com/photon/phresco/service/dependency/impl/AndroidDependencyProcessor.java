@@ -50,6 +50,7 @@ import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.ModuleGroup;
 import com.photon.phresco.model.ProjectInfo;
 import com.photon.phresco.model.Technology;
+import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.pom.AndroidTestPOMUpdater;
 import com.photon.phresco.util.TechnologyTypes;
@@ -89,20 +90,28 @@ public class AndroidDependencyProcessor extends AbstractJsLibDependencyProcessor
 		}
 		Technology technology = info.getTechnology();
 		// copy pilot projects
-		if (StringUtils.isNotBlank(info.getPilotProjectName())) {
-			List<ProjectInfo> pilotProjects = getRepositoryManager().getPilotProjects(technology.getId());
-			if (CollectionUtils.isEmpty(pilotProjects)) {
-				return;
-			}
-			for (ProjectInfo projectInfo : pilotProjects) {
-				List<String> urls = projectInfo.getPilotProjectUrls();
-				if (urls != null) {
-					for (String url : urls) {
-						DependencyUtils.extractFiles(url, path);
-					}
-				}
-			}
+//		if (StringUtils.isNotBlank(info.getPilotProjectName())) {
+//			List<ProjectInfo> pilotProjects = getRepositoryManager().getPilotProjects(technology.getId());
+//			if (CollectionUtils.isEmpty(pilotProjects)) {
+//				return;
+//			}
+//			for (ProjectInfo projectInfo : pilotProjects) {
+//				List<String> urls = projectInfo.getPilotProjectUrls();
+//				if (urls != null) {
+//					for (String url : urls) {
+//						DependencyUtils.extractFiles(url, path);
+//					}
+//				}
+//			}
+//		}
+		
+		//To Get Pilot Project
+		ProjectInfo projectInfo = PhrescoServerFactory.getDbManager().
+		    getProjectInfo(info.getTechnology().getId(), info.getPilotProjectName());
+		if(projectInfo != null) {
+		    DependencyUtils.extractFiles(projectInfo.getProjectURL(), path, info.getCustomerId());
 		}
+		
 		updateAndroidVersion(path, info);
 		try {
 	    	 List<ModuleGroup> modules = technology.getModules();

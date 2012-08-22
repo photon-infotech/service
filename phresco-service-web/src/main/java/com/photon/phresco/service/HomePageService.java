@@ -39,11 +39,13 @@ import org.apache.log4j.Logger;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.VideoInfo;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.model.ServerConstants;
+import com.photon.phresco.util.ServiceConstants;
 
 /**
  * Example resource class hosted at the URI path "/video"
@@ -54,7 +56,7 @@ public class HomePageService implements ServerConstants {
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
-	public List<VideoInfo> getHomePageVideo() throws PhrescoException,
+	public List<VideoInfo> getHomePageVideo(@QueryParam(ServiceConstants.REST_QUERY_CUSTOMERID) String customerId) throws PhrescoException,
 			IOException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method HomePageService.getHomePageVideo()");
@@ -62,7 +64,7 @@ public class HomePageService implements ServerConstants {
 		PhrescoServerFactory.initialize();
 		Gson gson = new Gson();
 		RepositoryManager repoMgr = PhrescoServerFactory.getRepositoryManager();
-		String videoInfoJSON = repoMgr.getArtifactAsString(repoMgr.getHomePageJsonFile());
+		String videoInfoJSON = repoMgr.getArtifactAsString(repoMgr.getHomePageJsonFile(), customerId);
 		// convert the json string back to object
 		Type type = new TypeToken<List<VideoInfo>>() {
 		}.getType();
@@ -116,9 +118,8 @@ public class HomePageService implements ServerConstants {
 			InputStream fis = null;
 			try {
 				PhrescoServerFactory.initialize();
-				String path = PhrescoServerFactory.getRepositoryManager()
-						.getRepositoryURL();
-				URL url = new URL(path + projectPath);
+				RepoInfo repo = PhrescoServerFactory.getDbManager().getRepoInfo(ServiceConstants.DEFAULT_CUSTOMER_NAME);
+				URL url = new URL(repo.getGroupRepoURL() + projectPath);
 				fis = url.openStream();
 				byte[] buf = new byte[1024];
 				int i = 0;

@@ -3,6 +3,7 @@ package com.photon.phresco.service.impl;
 import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
 
+import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.ArchetypeInfo;
 import com.photon.phresco.model.ProjectInfo;
@@ -35,6 +36,13 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
         Technology technology = mongoOperation.findOne(TECHNOLOGIES_COLLECTION_NAME, 
                 new Query(Criteria.whereId().is(techId)), Technology.class);
         return technology;
+    }
+
+    @Override
+    public RepoInfo getRepoInfo(String customerId) throws PhrescoException {
+        RepoInfo repoInfo = mongoOperation.findOne(REPOINFO_COLLECTION_NAME, 
+                new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)), RepoInfo.class);
+        return repoInfo;
     }
 
 }

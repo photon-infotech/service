@@ -1,5 +1,6 @@
 package com.photon.phresco.service.api;
 
+import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.ArchetypeInfo;
 import com.photon.phresco.model.ProjectInfo;
@@ -31,5 +32,12 @@ public interface DbManager {
      * @throws PhrescoException
      */
     Technology getTechnologyDoc(String techId) throws PhrescoException;
+
+    /**
+     * Returns the repository information for the given customerId
+     * @param customerId
+     * @throws PhrescoException
+     */
+    RepoInfo getRepoInfo(String customerId) throws PhrescoException;
     
 }

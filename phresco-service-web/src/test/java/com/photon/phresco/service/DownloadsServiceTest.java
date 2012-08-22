@@ -1,9 +1,8 @@
 package com.photon.phresco.service;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
@@ -15,6 +14,7 @@ import com.photon.phresco.model.DownloadInfo;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.model.ServerConstants;
+import com.photon.phresco.util.ServiceConstants;
 
 public class DownloadsServiceTest implements ServerConstants{
 
@@ -23,7 +23,7 @@ public class DownloadsServiceTest implements ServerConstants{
 	public void testGetAvailableDownloads() throws PhrescoException {
     	PhrescoServerFactory.initialize();
     	RepositoryManager repoMgr = PhrescoServerFactory.getRepositoryManager();
-		String downloadInfoJSON = repoMgr.getArtifactAsString(SOFTWARE_REPO_PATH);
+		String downloadInfoJSON = repoMgr.getArtifactAsString(SOFTWARE_REPO_PATH, ServiceConstants.DEFAULT_CUSTOMER_NAME);
     	Type type = new TypeToken<List<DownloadInfo>>() {}.getType();
 		Gson gson = new Gson();
 		List<DownloadInfo> downloadInfoList = gson.fromJson(downloadInfoJSON, type);

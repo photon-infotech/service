@@ -84,7 +84,7 @@ public abstract class AbstractJsLibDependencyProcessor extends AbstractDependenc
             List<Module> versions = moduleGroup.getVersions();
             for (Module module : versions) {
                 if(module != null) {
-                    DependencyUtils.extractFiles(module.getContentURL(), libPath);
+                    DependencyUtils.extractFiles(module.getContentURL(), libPath, "photon");
                 }
             }
         }
