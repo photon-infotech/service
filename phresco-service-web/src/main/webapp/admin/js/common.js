@@ -34,48 +34,6 @@ function clickButton(button, tag) {
 	});
 }
 
-function clickButtonFileUpload(button, csvElementIds, tag) {
-	button.click(function() {
-		var selectedMenu = $(this).attr("id");
-		formSubmitFileUpload(selectedMenu, csvElementIds, tag);
-	});
-}
-
-function formSubmitFileUpload(pageUrl, csvElementIds, tag, progressText) {
-	var formDataJson = formSerializeToJson($('form').serializeArray());
-	showProgressBar(progressText);
-	$.ajaxFileUpload ({
-		url: pageUrl,
-		secureuri: true,
-		fileElementId: csvElementIds,
-		dataType: 'json',
-		data: formDataJson,   //{name:'logan', version:'2'}
-		success: function (data, status) {
-			hideProgressBar();
-			if (status == 'success') {
-				loadData(data, tag);
-			}
-		},
-		error: function (data, status, e) {
-		}
-	});
-}
-
-function formSerializeToJson(a) {
-	var o = {};
-    $.each(a, function() {
-        if (o[this.name] !== undefined) {
-            if (!o[this.name].push) {
-                o[this.name] = [o[this.name]];
-            }
-            o[this.name].push(this.value || '');
-        } else {
-            o[this.name] = this.value || '';
-        }
-    });
-    return o;
-}
-
 function loadContent(pageUrl, form, tag) {
 	showLoadingIcon(tag);
 	if (form != undefined && !isBlank(form)) {
@@ -117,8 +75,9 @@ function clickSave(pageUrl, params, tag, progressText) {
 }
 
 function validate(pageUrl, form, tag, progressText) {
+	var params = "";
 	if (form != undefined && !isBlank(form)) {
-		var params = form.serialize();
+		params = form.serialize();
 	}
 	$.ajax({
 		url : pageUrl + "Validate",
@@ -227,6 +186,7 @@ function showLoadingIcon(tag) {
     if (theme == undefined || theme == "theme/photon/css/red.css") {
     	src = "theme/photon/images/loading_red.gif";
     }
+    disableScreen();
  	tag.empty();
 	tag.html("<img class='loadingIcon' src='"+ src +"' style='display: block'>");
 }
@@ -273,10 +233,19 @@ function showWelcomeImage() {
 		$('.headerlogoimg').attr("src","theme/photon/images/phresco_header_red.png");
 		$('.phtaccinno').attr("src","theme/photon/images/acc_inov_red.png");
 		$('.welcomeimg').attr("src","theme/photon/images/welcome_photon_red.png");
-
 	}
 }
 
 function isBlank(str) {
     return (!str || /^\s*$/.test(str));
+}
+
+//To disable the screen by showing an overlay
+function disableScreen() {
+	$(".modal-backdrop").show();
+}
+
+//To enable the screen by hiding an overlay
+function enableScreen() {
+	$(".modal-backdrop").hide();
 }

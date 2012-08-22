@@ -31,7 +31,6 @@
    String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID); 
 %>
 
-
 <form id="formRoleList"  class="form-horizontal customer_list">
 	<div class="operation" id="operation">
 		<%-- <input type="button" id="roleAdd" class="btn btn-primary" name="role_action" onclick="loadContent('roleAdd', '', $('#subcontainer'));" value="<s:text name='lbl.hdr.adm.rlelst.add'/>"/> --%>
@@ -154,98 +153,91 @@
     <input type="hidden" name="customerId" value="<%= customerId %>">
 </form>
 
-<script language="JavaScript" type="text/javascript">
+<script type="text/javascript">
+	$(document).ready(function() {
+		enableScreen();
+	});
+	
+	function editRole(id) {
+	    var params = "roleId=";
+	    params = params.concat(id);
+	    params = params.concat("&fromPage=");
+	    params = params.concat("edit");
+	    loadContentParam("roleEdit", params, $('#subcontainer'));
+	}
+	
+	var NS4 = (navigator.appName == "Netscape" && parseInt(navigator.appVersion) < 5);
 
-var NS4 = (navigator.appName == "Netscape" && parseInt(navigator.appVersion) < 5);
-
-function editRole(id) {
-    var params = "roleId=";
-    params = params.concat(id);
-    params = params.concat("&fromPage=");
-    params = params.concat("edit");
-    loadContentParam("roleEdit", params, $('#subcontainer'));
-}
-
-function addOption(theSel, theText, theValue)
-{
-  var newOpt = new Option(theText, theValue);
-  var selLength = theSel.length;
-  theSel.options[selLength] = newOpt;
-}
-
-function deleteOption(theSel, theIndex)
-{ 
-  var selLength = theSel.length;
-  if(selLength>0)
-  {
-    theSel.options[theIndex] = null;
-  }
-}
-
-function moveOptions(theSelFrom, theSelTo){
-  
-  var selLength = theSelFrom.length;
-  var selectedText = new Array();
-  var selectedValues = new Array();
-  var selectedCount = 0;
-  
-  var i;
-  
-  // Find the selected Options in reverse order
-  // and delete them from the 'from' Select.
-  for(i=selLength-1; i>=0; i--)
-  {
-    if(theSelFrom.options[i].selected)
-    {
-      selectedText[selectedCount] = theSelFrom.options[i].text;
-      selectedValues[selectedCount] = theSelFrom.options[i].value;
-      deleteOption(theSelFrom, i);
-      selectedCount++;
-    }
-  }
-  
-  // Add the selected text/values in reverse order.
-  // This will add the Options to the 'to' Select
-  // in the same order as they were in the 'from' Select.
-  for(i=selectedCount-1; i>=0; i--)
-  {
-    addOption(theSelTo, selectedText[i], selectedValues[i]);
-  }
-  
-  if(NS4) history.go(0);
-}
-
-function moveAllOptions(theSelFrom, theSelTo){
-      
-      var selLength = theSelFrom.length;
-      var selectedText = new Array();
-      var selectedValues = new Array();
-      var selectedCount = 0;
-      
-      var i;
-      
-      // Find the selected Options in reverse order
-      // and delete them from the 'from' Select.
-      for(i=selLength-1; i>=0; i--)
-      {
-        if(theSelFrom.options[i])
-        {
-          selectedText[selectedCount] = theSelFrom.options[i].text;
-          selectedValues[selectedCount] = theSelFrom.options[i].value;
-          deleteOption(theSelFrom, i);
-          selectedCount++;
-        }
-      }
-      
-      // Add the selected text/values in reverse order.
-      // This will add the Options to the 'to' Select
-      // in the same order as they were in the 'from' Select.
-      for(i=selectedCount-1; i>=0; i--)
-      {
-        addOption(theSelTo, selectedText[i], selectedValues[i]);
-      }
-      
-      if(NS4) history.go(0);
-    }
-//
+	function addOption(theSel, theText, theValue) {
+	    var newOpt = new Option(theText, theValue);
+	    var selLength = theSel.length;
+	    theSel.options[selLength] = newOpt;
+	}
+	
+	function deleteOption(theSel, theIndex) {
+	    var selLength = theSel.length;
+	    if(selLength>0) {
+	      theSel.options[theIndex] = null;
+	    }
+	}
+	
+	function moveOptions(theSelFrom, theSelTo){
+		var selLength = theSelFrom.length;
+	    var selectedText = new Array();
+	    var selectedValues = new Array();
+	    var selectedCount = 0;
+	    var i;
+	  
+	   	// Find the selected Options in reverse order
+	   	// and delete them from the 'from' Select.
+	   	for (i=selLength-1; i>=0; i--) {
+	    	if (theSelFrom.options[i].selected) {
+				selectedText[selectedCount] = theSelFrom.options[i].text;
+	       		selectedValues[selectedCount] = theSelFrom.options[i].value;
+	       		deleteOption(theSelFrom, i);
+	       		selectedCount++;
+    		}
+	  	}
+	  
+		// Add the selected text/values in reverse order.
+		// This will add the Options to the 'to' Select
+		// in the same order as they were in the 'from' Select.
+	  	for (i=selectedCount-1; i>=0; i--) {
+			addOption(theSelTo, selectedText[i], selectedValues[i]);
+	  	}
+	  
+	  	if (NS4) {
+	  		history.go(0);
+	  	}
+	}
+	
+	function moveAllOptions(theSelFrom, theSelTo) {
+		var selLength = theSelFrom.length;
+		var selectedText = new Array();
+		var selectedValues = new Array();
+		var selectedCount = 0;
+		var i;
+	      
+		// Find the selected Options in reverse order
+		// and delete them from the 'from' Select.
+		for (i=selLength-1; i>=0; i--) {
+			if (theSelFrom.options[i]) {
+				selectedText[selectedCount] = theSelFrom.options[i].text;
+	          	selectedValues[selectedCount] = theSelFrom.options[i].value;
+	          	deleteOption(theSelFrom, i);
+	          	selectedCount++;
+	        }
+		}
+	      
+		// Add the selected text/values in reverse order.
+		// This will add the Options to the 'to' Select
+		// in the same order as they were in the 'from' Select.
+		for (i=selectedCount-1; i>=0; i--) {
+			addOption(theSelTo, selectedText[i], selectedValues[i]);
+		}
+	      
+		if (NS4) {
+			history.go(0);
+		}
+	}
 </script>

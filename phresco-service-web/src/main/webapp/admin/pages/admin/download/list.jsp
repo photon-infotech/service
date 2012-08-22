@@ -28,8 +28,8 @@
 <%@ page import="com.photon.phresco.model.DownloadInfo" %>
 
 <% 
-  List<DownloadInfo> downloadInfo = (List<DownloadInfo>)request.getAttribute(ServiceUIConstants.REQ_DOWNLOAD_INFO); 
-  String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
+	List<DownloadInfo> downloadInfo = (List<DownloadInfo>)request.getAttribute(ServiceUIConstants.REQ_DOWNLOAD_INFO); 
+	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
 %>
 
 <form id="formDownloadList" class="customer_list">
@@ -115,6 +115,10 @@
 </form>
 
 <script type="text/javascript">
+	$(document).ready(function() {
+		enableScreen();
+	});
+
     /** To edit the download **/
     function editDownload(id) {
         var params = "id=";

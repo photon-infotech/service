@@ -20,6 +20,7 @@
 <%@ taglib uri="/struts-tags" prefix="s" %>
 
 <%@ page import="org.apache.commons.collections.CollectionUtils"%>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="java.util.List"%>
 
 <%@ page import="com.photon.phresco.commons.model.Customer"%>
@@ -96,8 +97,12 @@
 								<td class="namelabel-width">
 									<a href="#" onclick="editCustomer('<%= customer.getId() %>');"><%= customer.getName() %></a>
 								</td>
-								<td class="desclabel-width"><%= customer.getDescription() %></td>
-								<td><%= customer.getValidUpto() %></td>
+								<td class="desclabel-width">
+									<%= StringUtils.isNotEmpty(customer.getDescription()) ? customer.getDescription() : "" %>
+								</td>
+								<td>
+									<%= customer.getValidUpto() != null ? customer.getValidUpto() : "" %>
+								</td>
 								<td><%= customer.getType() %></td>		
 							</tr>	
 						<%		
@@ -112,6 +117,10 @@
 </form>
 
 <script type="text/javascript">
+	$(document).ready(function() {
+		enableScreen();
+	});
+	
 	/** To edit the customer **/
 	function editCustomer(id) {
 		var params = "customerId=";

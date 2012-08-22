@@ -20,22 +20,14 @@
 package com.photon.phresco.service.admin.actions.components;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import com.itextpdf.text.log.SysoLogger;
-import com.itextpdf.text.pdf.codec.Base64.OutputStream;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.ApplicationType;
 import com.photon.phresco.model.Module;
 import com.photon.phresco.model.ModuleGroup;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
@@ -71,7 +63,7 @@ public class Features extends ServiceBaseAction {
     	}
     	
     	try {
-    		List<ModuleGroup> moduleGroup = getServiceManager().getModules(customerId);
+    		List<ModuleGroup> moduleGroup = getServiceManager().getFeatures(customerId);
     		getHttpRequest().setAttribute(REQ_MODULE_GROUP, moduleGroup);
     		getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
     	} catch(Exception e){
@@ -86,6 +78,8 @@ public class Features extends ServiceBaseAction {
 			S_LOGGER.debug("Entering Method  Features.add()");
 		}
 		
+		getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+		
 		return COMP_FEATURES_ADD;
 	}
 	
@@ -95,9 +89,10 @@ public class Features extends ServiceBaseAction {
 		}
 		
 		try {
-		    ModuleGroup moduleGroup = getServiceManager().getModule(techId);
+		    ModuleGroup moduleGroup = getServiceManager().getFeature(techId, customerId);
 			getHttpRequest().setAttribute(REQ_MODULE_GROUP, moduleGroup);
 			getHttpRequest().setAttribute(REQ_FROM_PAGE, fromPage);
+			getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
 		} catch (Exception e) {
 		    throw new PhrescoException(e);
 		}
@@ -124,7 +119,7 @@ public class Features extends ServiceBaseAction {
 			moduleGroup.setType(REST_QUERY_TYPE_MODULE);
 			moduleGroup.setCustomerId(customerId);
 			moduleGroups.add(moduleGroup);
-			ClientResponse clientResponse = getServiceManager().createModules(moduleGroups);
+			ClientResponse clientResponse = getServiceManager().createFeatures(moduleGroups, customerId);
 			if(clientResponse.getStatus() != 200 && clientResponse.getStatus() != 201){
 				addActionError(getText(FEATURE_NOT_ADDED, Collections.singletonList(name)));
 			} else {
@@ -148,7 +143,8 @@ public class Features extends ServiceBaseAction {
 			moduleGroup.setName(name);
 			moduleGroup.setDescription(description);
 			moduleGroup.setVersions(versions);
-			getServiceManager().updateModuleGroups(moduleGroup, techId);
+			moduleGroup.setCustomerId(customerId);
+			getServiceManager().updateFeature(moduleGroup, techId, customerId);
 		} catch(Exception e){
 			throw new PhrescoException(e);
 		}
@@ -165,7 +161,7 @@ public class Features extends ServiceBaseAction {
 			String[] techIds = getHttpRequest().getParameterValues(REST_QUERY_TECHID);
 			if (techIds != null) {
 				for (String techId : techIds) {
-					ClientResponse clientResponse = getServiceManager().deleteModule(techId);
+					ClientResponse clientResponse = getServiceManager().deleteFeature(techId, customerId);
 					if (clientResponse.getStatus() != 200) {
 						addActionError(getText(ROLE_NOT_DELETED));
 					}
@@ -205,7 +201,6 @@ public class Features extends ServiceBaseAction {
 		}
 		return SUCCESS;
 	}
-
 
 	public String getName() {
 		return name;
@@ -326,5 +321,4 @@ public class Features extends ServiceBaseAction {
 	public void setType(String type) {
 		this.type = type;
 	}
-	
 }

@@ -127,6 +127,10 @@
 </form>
 
 <script type="text/javascript">
+	$(document).ready(function() {
+		enableScreen();
+	});
+
     function editTech(id) {
 		var params = "techId=";
 		params = params.concat(id);

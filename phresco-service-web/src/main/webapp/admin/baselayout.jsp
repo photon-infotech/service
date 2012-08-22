@@ -37,7 +37,7 @@
 		<link rel="stylesheet" href="css/media-queries.css">
 		<link rel="stylesheet" href="css/datepicker.css"> <!-- used for date picker-->
 		<link rel="stylesheet" href="css/jquery.ui.all.css"> <!-- used for date picker -->
-<!-- 		<link rel="stylesheet" href="css/fileuploader.css"> -->
+ 		<link rel="stylesheet" href="css/fileuploader.css"> <!-- used for file upload -->
 		
         <script type="text/javascript" src="js/main.js"></script>
 		<!-- basic js -->
@@ -58,9 +58,8 @@
 		<script type="text/javascript" src="js/common.js"></script>
 		
 		<!-- file upload -->
-		<script type="text/javascript" src="js/ajaxfileupload.js"></script>
-<%--         <script type="text/javascript" src="js/fileuploader.js"></script> --%>
-		
+		<script type="text/javascript" src="js/fileuploader.js"></script>
+
 		<!-- date picker -->
 		<script type="text/javascript" src="js/jquery.ui.datepicker.js"></script>
 	   	<script type="text/javascript" src="js/jquery.cookie.js"></script>
@@ -70,6 +69,8 @@
 		    changeTheme(); 
 		
 		    $(document).ready(function() {
+		    	enableScreen();
+		    	
 				$(".styles").click(function() {
 					localStorage.clear();
 		             var value = $(this).attr("rel");

@@ -116,6 +116,10 @@
 </form>
 
 <script type="text/javascript">
+	$(document).ready(function() {
+		enableScreen();
+	});
+
     /** To edit the pilot project **/
     function editPilotProject(id) {
         var params = "projectId=";

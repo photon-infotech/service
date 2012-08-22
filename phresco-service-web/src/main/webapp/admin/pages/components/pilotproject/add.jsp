@@ -116,17 +116,21 @@
 </form>
 
 <script type="text/javascript">
+	$(document).ready(function() {
+		enableScreen();
+	});
+
 	function findError(data) {
-		if(data.nameError != undefined) {
+		if (data.nameError != undefined) {
 			showError($("#nameControl"), $("#nameError"), data.nameError);
 		} else {
 			hideError($("#nameControl"), $("#nameError"));
 		}
 		
-		if(data.fileError != undefined) {
+		if (data.fileError != undefined) {
 			showError($("#fileControl"), $("#fileError"), data.fileError);
-			} else {
-				hideError($("#fileControl"), $("#fileError"));
-			}
+		} else {
+			hideError($("#fileControl"), $("#fileError"));
+		}
 	}
 </script>

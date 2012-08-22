@@ -177,26 +177,30 @@
 </form>
 
 <script type="text/javascript">
+	$(document).ready(function() {
+		enableScreen();
+	});
+
 	function findError(data) {
-		if(data.nameError != undefined) {
+		if (data.nameError != undefined) {
 			showError($("#nameControl"), $("#nameError"), data.nameError);
 		} else {
 			hideError($("#nameControl"), $("#nameError"));
 		}
 		
-		if(data.verError != undefined) {
+		if (data.verError != undefined) {
 			showError($("#verControl"), $("#verError"), data.verError);
 		} else {
 			hideError($("#verControl"), $("#verError"));
 		}
 		
-		if(data.appltError != undefined) {
+		if (data.appltError != undefined) {
 			showError($("#appltControl"), $("#appltError"), data.appltError);
 		} else {
 			hideError($("#appltControl"), $("#appltError"));
 		}
 		
-		if(data.groupError != undefined) {
+		if (data.groupError != undefined) {
 			showError($("#groupControl"), $("#groupError"), data.groupError);
 		} else {
 			hideError($("#groupControl"), $("#groupError"));

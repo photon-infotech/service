@@ -20,92 +20,7 @@
  <%@ taglib uri="/struts-tags" prefix="s" %>
 
 <script language="JavaScript" type="text/javascript">
-<!--
 
-var NS4 = (navigator.appName == "Netscape" && parseInt(navigator.appVersion) < 5);
-
-function addOption(theSel, theText, theValue)
-{
-  var newOpt = new Option(theText, theValue);
-  var selLength = theSel.length;
-  theSel.options[selLength] = newOpt;
-}
-
-function deleteOption(theSel, theIndex)
-{ 
-  var selLength = theSel.length;
-  if(selLength>0)
-  {
-    theSel.options[theIndex] = null;
-  }
-}
-
-function moveOptions(theSelFrom, theSelTo){
-  
-  var selLength = theSelFrom.length;
-  var selectedText = new Array();
-  var selectedValues = new Array();
-  var selectedCount = 0;
-  
-  var i;
-  
-  // Find the selected Options in reverse order
-  // and delete them from the 'from' Select.
-  for(i=selLength-1; i>=0; i--)
-  {
-    if(theSelFrom.options[i].selected)
-    {
-      selectedText[selectedCount] = theSelFrom.options[i].text;
-      selectedValues[selectedCount] = theSelFrom.options[i].value;
-      deleteOption(theSelFrom, i);
-      selectedCount++;
-    }
-  }
-  
-  // Add the selected text/values in reverse order.
-  // This will add the Options to the 'to' Select
-  // in the same order as they were in the 'from' Select.
-  for(i=selectedCount-1; i>=0; i--)
-  {
-    addOption(theSelTo, selectedText[i], selectedValues[i]);
-  }
-  
-  if(NS4) history.go(0);
-}
-
-function moveAllOptions(theSelFrom, theSelTo){
-	  
-	  var selLength = theSelFrom.length;
-	  var selectedText = new Array();
-	  var selectedValues = new Array();
-	  var selectedCount = 0;
-	  
-	  var i;
-	  
-	  // Find the selected Options in reverse order
-	  // and delete them from the 'from' Select.
-	  for(i=selLength-1; i>=0; i--)
-	  {
-	    if(theSelFrom.options[i])
-	    {
-	      selectedText[selectedCount] = theSelFrom.options[i].text;
-	      selectedValues[selectedCount] = theSelFrom.options[i].value;
-	      deleteOption(theSelFrom, i);
-	      selectedCount++;
-	    }
-	  }
-	  
-	  // Add the selected text/values in reverse order.
-	  // This will add the Options to the 'to' Select
-	  // in the same order as they were in the 'from' Select.
-	  for(i=selectedCount-1; i>=0; i--)
-	  {
-	    addOption(theSelTo, selectedText[i], selectedValues[i]);
-	  }
-	  
-	  if(NS4) history.go(0);
-	}
-//-->
 </script>
 
 <form class="form-horizontal customer_list">
@@ -246,54 +161,6 @@ function moveAllOptions(theSelFrom, theSelTo){
 								</select> 
 							</div>
 						</div>
-						
-						<script language="javascript">
-							$(document).ready(function() {
-								$("#addValues").click(function() {
-									var val = $("#txtCombo").val();
-									$("#valuesCombo").append($("<option></option>").attr("value", val).text(val));
-									$("#txtCombo").val("");
-								});
-																											
-								$('.add').click(function(){
-									var appendRow =  '<tr class="configdynamiadd">' + $('.configdynamiadd').html() + '</tr>';
-									appendRow = appendRow.replace('class="add" src="images/add_icon.png"', 'class = "del" src="images/minus_icon.png" onclick="removeTag(this);"');
-									$("tr:last").after(appendRow);			
-								}); 
-								
-								$('#remove').click(function(){
-									$('#valuesCombo option:selected').each( function() {
-										$(this).remove();
-									});
-								});
-								
-								//To move up the values
-								$('#up').bind('click', function() {
-									$('#valuesCombo option:selected').each( function() {
-										var newPos = $('#valuesCombo  option').index(this) - 1;
-										if (newPos > -1) {
-											$('#valuesCombo  option').eq(newPos).before("<option value='"+$(this).val()+"' selected='selected'>"+$(this).text()+"</option>");
-											$(this).remove();
-										}
-									});
-								});
-								
-								//To move down the values
-								$('#down').bind('click', function() {
-									var countOptions = $('#valuesCombo option').size();
-									$('#valuesCombo option:selected').each( function() {
-										var newPos = $('#valuesCombo  option').index(this) + 1;
-										if (newPos < countOptions) {
-											$('#valuesCombo  option').eq(newPos).after("<option value='"+$(this).val()+"' selected='selected'>"+$(this).text()+"</option>");
-											$(this).remove();
-										}
-									});
-								});
-							});
-							function removeTag(currentTag) {
-								$(currentTag).parent().parent().parent().remove();
-							}
-						</script>
 					</div>
 					<div class="modal-footer">
 					  <a href="#" class="btn btn-primary" data-dismiss="modal"><s:label key="lbl.hdr.comp.cancel" theme="simple"/></a>
@@ -304,3 +171,129 @@ function moveAllOptions(theSelFrom, theSelTo){
 		</div>
 	</div>
 </form>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		enableScreen();
+		
+		$("#addValues").click(function() {
+			var val = $("#txtCombo").val();
+			$("#valuesCombo").append($("<option></option>").attr("value", val).text(val));
+			$("#txtCombo").val("");
+		});
+																					
+		$('.add').click(function() {
+			var appendRow =  '<tr class="configdynamiadd">' + $('.configdynamiadd').html() + '</tr>';
+			appendRow = appendRow.replace('class="add" src="images/add_icon.png"', 'class = "del" src="images/minus_icon.png" onclick="removeTag(this);"');
+			$("tr:last").after(appendRow);			
+		}); 
+		
+		$('#remove').click(function() {
+			$('#valuesCombo option:selected').each( function() {
+				$(this).remove();
+			});
+		});
+		
+		//To move up the values
+		$('#up').bind('click', function() {
+			$('#valuesCombo option:selected').each( function() {
+				var newPos = $('#valuesCombo  option').index(this) - 1;
+				if (newPos > -1) {
+					$('#valuesCombo  option').eq(newPos).before("<option value='"+$(this).val()+"' selected='selected'>"+$(this).text()+"</option>");
+					$(this).remove();
+				}
+			});
+		});
+		
+		//To move down the values
+		$('#down').bind('click', function() {
+			var countOptions = $('#valuesCombo option').size();
+			$('#valuesCombo option:selected').each( function() {
+				var newPos = $('#valuesCombo  option').index(this) + 1;
+				if (newPos < countOptions) {
+					$('#valuesCombo  option').eq(newPos).after("<option value='"+$(this).val()+"' selected='selected'>"+$(this).text()+"</option>");
+					$(this).remove();
+				}
+			});
+		});
+	});
+	
+	function removeTag(currentTag) {
+		$(currentTag).parent().parent().parent().remove();
+	}
+	
+	var NS4 = (navigator.appName == "Netscape" && parseInt(navigator.appVersion) < 5);
+
+	function addOption(theSel, theText, theValue) {
+		var newOpt = new Option(theText, theValue);
+		var selLength = theSel.length;
+		theSel.options[selLength] = newOpt;
+	}
+
+	function deleteOption(theSel, theIndex) { 
+		var selLength = theSel.length;
+		if (selLength>0) {
+	    	theSel.options[theIndex] = null;
+	  	}
+	}
+
+	function moveOptions(theSelFrom, theSelTo) {
+		var selLength = theSelFrom.length;
+	  	var selectedText = new Array();
+	  	var selectedValues = new Array();
+	  	var selectedCount = 0;
+	  	var i;
+	  
+	  	// Find the selected Options in reverse order
+	  	// and delete them from the 'from' Select.
+	  	for (i=selLength-1; i>=0; i--) {
+			if (theSelFrom.options[i].selected) {
+	      		selectedText[selectedCount] = theSelFrom.options[i].text;
+	      		selectedValues[selectedCount] = theSelFrom.options[i].value;
+	      		deleteOption(theSelFrom, i);
+	      		selectedCount++;
+	    	}
+	  	}
+	  
+	  	// Add the selected text/values in reverse order.
+	  	// This will add the Options to the 'to' Select
+	  	// in the same order as they were in the 'from' Select.
+	  	for (i=selectedCount-1; i>=0; i--) {
+	    	addOption(theSelTo, selectedText[i], selectedValues[i]);
+	  	}
+	  
+	  	if (NS4) {
+	  		history.go(0);
+	  	}
+	}
+
+	function moveAllOptions(theSelFrom, theSelTo) {
+		var selLength = theSelFrom.length;
+		var selectedText = new Array();
+		var selectedValues = new Array();
+		var selectedCount = 0;
+		var i;
+		  
+		// Find the selected Options in reverse order
+		// and delete them from the 'from' Select.
+		for (i=selLength-1; i>=0; i--) {
+			if (theSelFrom.options[i]) {
+		      	selectedText[selectedCount] = theSelFrom.options[i].text;
+		      	selectedValues[selectedCount] = theSelFrom.options[i].value;
+		      	deleteOption(theSelFrom, i);
+		      	selectedCount++;
+			}
+		}
+		  
+		// Add the selected text/values in reverse order.
+		// This will add the Options to the 'to' Select
+		// in the same order as they were in the 'from' Select.
+		for (i=selectedCount-1; i>=0; i--) {
+			addOption(theSelTo, selectedText[i], selectedValues[i]);
+		}
+		  
+		if (NS4) {
+			history.go(0);
+		}
+	}
+</script>

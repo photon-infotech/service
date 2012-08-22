@@ -19,23 +19,6 @@
   --%>
 <%@ taglib uri="/struts-tags" prefix="s" %>
 
-<script type="text/javascript">
-function findError(data) {
-	if(data.nameError != undefined) {
-		showError($("#nameControl"), $("#nameError"), data.nameError);
-	} else {
-		hideError($("#nameControl"), $("#nameError"));
-	}
-	
-	if(data.urlError != undefined) {
-		showError($("#urlControl"), $("#urlError"), data.urlError);
-	} else {
-		hideError($("#urlControl"), $("#urlError"));
-	}
-}
-
-</script>
-
 <form class="form-horizontal customer_list">
 	<h4><s:label key="lbl.hdr.adm.url.tiltle" theme="simple"/></h4>	
 	<div class="content_adder">
@@ -75,3 +58,23 @@ function findError(data) {
 		<input type="button" id="globalurlCancel" class="btn btn-primary" onclick="loadContent('globalurlCancel', '', $('#subcontainer'));" value="<s:text name='lbl.hdr.comp.cancel'/>"/>
 	</div>
 </form>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		enableScreen();
+	});
+	
+	function findError(data) {
+		if (data.nameError != undefined) {
+			showError($("#nameControl"), $("#nameError"), data.nameError);
+		} else {
+			hideError($("#nameControl"), $("#nameError"));
+		}
+		
+		if (data.urlError != undefined) {
+			showError($("#urlControl"), $("#urlError"), data.urlError);
+		} else {
+			hideError($("#urlControl"), $("#urlError"));
+		}
+	}
+</script>
