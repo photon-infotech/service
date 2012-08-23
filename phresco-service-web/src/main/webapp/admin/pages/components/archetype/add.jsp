@@ -41,12 +41,18 @@
 	String versionComment = "";
 	boolean isSystem = false;
 	if (technology != null) {
-		if(StringUtils.isNotEmpty(technology.getName())){
+		if (StringUtils.isNotEmpty(technology.getName())) {
 			name = technology.getName();
 		}
-		desc = technology.getDescription();
-		versions = technology.getVersions();
-		versionComment = technology.getVersionComment();
+		if (StringUtils.isNotEmpty(technology.getDescription())) {
+			desc = technology.getDescription();
+		}
+		if (CollectionUtils.isNotEmpty(technology.getVersions())) {
+			versions = technology.getVersions();
+		}
+		if (StringUtils.isNotEmpty(technology.getVersionComment())) {
+			versionComment = technology.getVersionComment();
+		}
 		isSystem = technology.isSystem();
 	}
 %>
@@ -82,7 +88,7 @@
 					name='lbl.hdr.comp.desc' /> </label>
 			<div class="controls">
 				<textarea id="description" class="input-xlarge" placeholder='<s:text name="place.hldr.archetype.add.desc"/>' 
-					rows="3" name="description" maxlength="150" title="150 Characters only"><%= StringUtils.isNotEmpty(desc) ? desc : "" %></textarea>
+					rows="3" name="description" maxlength="150" title="150 Characters only"><%= desc %></textarea>
 			</div>
 		</div>
 
@@ -92,7 +98,8 @@
 			</label>
 			<div class="controls">
 				<input id="version" placeholder='<s:text name="place.hldr.archetype.add.version"/>' class="input-xlarge" 
-					type="text" name="version" value="<%= CollectionUtils.isNotEmpty(versions) ? versions : "" %>" maxlength="30" title="30 Characters only">
+					type="text" name="version" value="<%= CollectionUtils.isNotEmpty(versions) ? versions : "" %>" maxlength="30" 
+					title="30 Characters only">
 				<span class="help-inline" id="verError"></span>
 			</div>
 		</div>
@@ -102,7 +109,7 @@
 					name='lbl.hdr.com.vercmnt' /> </label>
 			<div class="controls">
 				<textarea name="versionComment" placeholder='<s:text name="place.hldr.archetype.add.ver.comment"/>' class="input-xlarge" 
-					rows="2" cols="10" maxlength="150" title="150 Characters only"><%= StringUtils.isNotEmpty(versionComment) ? versionComment : "" %></textarea>
+					rows="2" cols="10" maxlength="150" title="150 Characters only"><%= versionComment %></textarea>
 			</div>
 		</div>
 

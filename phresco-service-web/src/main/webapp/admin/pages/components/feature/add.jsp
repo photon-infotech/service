@@ -21,16 +21,43 @@
 
 <%@ page import="java.util.List" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="org.apache.commons.collections.CollectionUtils"%>
 
+<%@ page import="com.photon.phresco.model.Module" %>
 <%@ page import="com.photon.phresco.model.ModuleGroup" %>
 <%@ page import="com.photon.phresco.model.Technology" %>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
 
-<% 
-    ModuleGroup moduleGroup = (ModuleGroup)request.getAttribute(ServiceUIConstants.REQ_MODULE_GROUP); 
+<%
+	ModuleGroup moduleGroup = (ModuleGroup)request.getAttribute(ServiceUIConstants.REQ_MODULE_GROUP); 
     List<Technology> technologys = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
     String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
     String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
+    
+  	//For edit
+    String name = "";
+    String description = "";
+    String helpText = "";
+    String version = "";
+	if (moduleGroup != null) {
+		if (StringUtils.isNotEmpty(moduleGroup.getName())) {
+			name = moduleGroup.getName();
+		}
+		if (StringUtils.isNotEmpty(moduleGroup.getDescription())) {
+			description = moduleGroup.getDescription();
+		}
+		if (CollectionUtils.isNotEmpty(moduleGroup.getVersions())) {
+			List<Module> versions = moduleGroup.getVersions();
+			if (CollectionUtils.isNotEmpty(versions)) {
+				for (Module moduleVersion : versions) {
+					version = moduleVersion.getVersion();
+				}
+			}
+		}
+		if (StringUtils.isNotEmpty(moduleGroup.getHelpText())) {
+			helpText = moduleGroup.getHelpText();
+		}
+	}
 %>
 
 <form id="formFeatureAdd" class="form-horizontal customer_list" method="post" enctype="multipart/form-data">
@@ -43,7 +70,7 @@
 			</label>
 			<div class="controls">
 				<input id="input01" placeholder="<s:text name='place.hldr.feature.add.name'/>" 
-				     class="input-xlarge" type="text" name="name" value="<%= moduleGroup != null ? moduleGroup.getName():"" %>">
+				     class="input-xlarge" type="text" name="name" value="<%= name %>">
 				<span class="help-inline" id="nameError"></span>
 			</div>
 		</div>
@@ -54,7 +81,7 @@
 			</label>
 			<div class="controls">
 				<input id="input01" placeholder="<s:text name='place.hldr.feature.add.desc'/>" 
-				     class="input-xlarge" type="text" name="description" value="<%= moduleGroup != null ? moduleGroup.getDescription():"" %>">
+				     class="input-xlarge" type="text" name="description" value="<%= description %>">
 			</div>
 		</div>
 		
@@ -64,7 +91,7 @@
 			</label>
 			<div class="controls">
 				<input id="input01" placeholder="<s:text name='place.hldr.feature.add.version'/>" 
-				     class="input-xlarge" type="text" name="version" value="<%= moduleGroup != null ? moduleGroup.getVersions():"" %>">
+				     class="input-xlarge" type="text" name="version" value="<%= version %>">
 				<span class="help-inline" id="verError"></span>
 			</div>
 		</div>
@@ -75,7 +102,7 @@
 			</label>
 			<div class="controls">
 				<textarea id="input01" placeholder="<s:text name='place.hldr.feature.add.help.text'/>" 
-				               class="input-xlarge" rows="2" cols="10" ></textarea>
+				               class="input-xlarge" value="<%= helpText %>" rows="2" cols="10" ></textarea>
 			</div>
 		</div>
 		

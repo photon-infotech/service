@@ -57,10 +57,6 @@
 			<a id="globalurlList" class="inactive" name="adminTab" href="#">
 			<s:label key="lbl.hdr.adm.glblurl"  theme="simple"/></a>
 		</li>
-		<li>
-			<a id="downloadList" class="inactive" name="adminTab" href="#">
-			<s:label key="lbl.hdr.adm.dwnld"  theme="simple"/></a>
-		</li>
 	</ul>		
 </nav>
 
