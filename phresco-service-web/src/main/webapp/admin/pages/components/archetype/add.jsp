@@ -41,7 +41,9 @@
 	String versionComment = "";
 	boolean isSystem = false;
 	if (technology != null) {
-		name = technology.getName();
+		if(StringUtils.isNotEmpty(technology.getName())){
+			name = technology.getName();
+		}
 		desc = technology.getDescription();
 		versions = technology.getVersions();
 		versionComment = technology.getVersionComment();
@@ -70,7 +72,7 @@
 			</label>
 			<div class="controls">
 				<input id="name" placeholder='<s:text name="place.hldr.archetype.add.name"/>' class="input-xlarge" type="text" 
-					name="name" value="<%= StringUtils.isNotEmpty(name) ? name : "" %>" maxlength="30" title="30 Characters only">
+					name="name" value="<%= name %>" maxlength="30" title="30 Characters only">
 				<span class="help-inline" id="nameError"></span>
 			</div>
 		</div>
@@ -287,7 +289,7 @@
 		params = params.concat("&type=");
 		params = params.concat($(obj).attr("tempattr"));
 		$.ajax({
-			url : "removeUploadedJar",
+			url : "removeArchetypeJar",
 			data : params,
 			type : "POST",
 			success : function(data) {

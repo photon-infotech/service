@@ -37,7 +37,8 @@
 		<input type="button" id="roleAdd" class="btn btn-primary" 
 		        name="role_action" onclick="loadContent('roleAdd', $('#formRoleList'), $('#subcontainer'));" value="<s:text name='lbl.hdr.adm.rlelst.add'/>"/>
 		
-		<input type="button" id="del" class="btn" disabled value="<s:text name='lbl.hdr.adm.delete'/>"  onclick="loadContent('roleDelete', $('#formRoleList'), $('#subcontainer'));"/>
+		<input type="button" id="del" class="btn" disabled value="<s:text 
+		        name='lbl.hdr.adm.delete'/>"  onclick="loadContent('roleDelete', $('#formRoleList'), $('#subcontainer'));"/>
 		<s:if test="hasActionMessages()">
 			<div class="alert alert-success alert-message"  id="successmsg">
 				<s:actionmessage />

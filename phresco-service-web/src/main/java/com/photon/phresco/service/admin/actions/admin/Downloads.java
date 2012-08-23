@@ -19,19 +19,27 @@
  */
 package com.photon.phresco.service.admin.actions.admin;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.ws.rs.core.MediaType;
+
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.DownloadInfo;
-import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
+import com.photon.phresco.service.client.api.Content;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.multipart.BodyPart;
+import com.sun.jersey.multipart.MultiPart;
 
 public class Downloads extends ServiceBaseAction { 
 
@@ -56,12 +64,17 @@ public class Downloads extends ServiceBaseAction {
 
 	private File iconArc;
 	private String iconArcFileName;
-	private String iconArcContentType;
+	private String iconArcContentType;  
 
 	private String description=null;
 	private String id = null;
 	private String fromPage = null;
 	private String customerId = null;
+   
+	private static byte[] downloadByteArray = null;
+	private static String downloadJarName = null;
+
+
 
 	public String list() throws PhrescoException {
 		if (isDebugEnabled) {
@@ -85,8 +98,8 @@ public class Downloads extends ServiceBaseAction {
 		}
 		
 		try {
-			List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
-			getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
+			/*List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
+			getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);*/
 		} catch(Exception e) {
 			throw new PhrescoException(e);
 		}
@@ -100,16 +113,7 @@ public class Downloads extends ServiceBaseAction {
 		}
 
 		try {
-			/*if(fileArc != null) {
-					InputStream inputStream = new FileInputStream(fileArc);
-					FileOutputStream outputStream = new FileOutputStream(new File("c:/" + fileArcFileName));
-					IOUtils.copy(inputStream, outputStream);
-				}
-				if(iconArc != null) {
-					InputStream inputStream = new FileInputStream(iconArc);
-					FileOutputStream outputStream = new FileOutputStream(new File("c:/" + iconArcFileName));
-					IOUtils.copy(inputStream, outputStream);
-				}*/
+			MultiPart multiPart = new MultiPart();
 
 			List<DownloadInfo> downloadInfo = new ArrayList<DownloadInfo>();
 			DownloadInfo download = new DownloadInfo();
@@ -117,9 +121,22 @@ public class Downloads extends ServiceBaseAction {
 			download.setDescription(description);
 			download.setVersion(version);
 			download.setCustomerId(customerId);
+			
+			BodyPart jsonPart = new BodyPart();
+		    jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
+		    jsonPart.setEntity(download);
+		    Content content = new Content("object", name, null, null, null, 0);
+		    jsonPart.setContentDisposition(content);
+		    multiPart.bodyPart(jsonPart);
+		    if (StringUtils.isNotEmpty(downloadJarName)) {
+		    	InputStream downloadIs = new ByteArrayInputStream(downloadByteArray);
+				BodyPart binaryPart2 = getServiceManager().createBodyPart(name, FILE_FOR_APPTYPE, downloadIs);
+		        multiPart.bodyPart(binaryPart2);
+			}
+			
 			downloadInfo.add(download);
 			ClientResponse clientResponse = getServiceManager().createDownloads(downloadInfo, customerId);
-			if(clientResponse.getStatus() != 200){
+			if (clientResponse.getStatus() != 200) {
 				addActionError(getText(DOWNLOAD_NOT_ADDED, Collections.singletonList(name)));
 			} else {
 				addActionMessage(getText(DOWNLOAD_ADDED, Collections.singletonList(name)));
@@ -127,7 +144,44 @@ public class Downloads extends ServiceBaseAction {
 		} catch (Exception e) {
 			throw new PhrescoException(e);
 		}
+		
 		return list();
+	}
+	
+	public String uploadFile() throws PhrescoException {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method  Downloads.uploadFile()");
+		}
+		
+		PrintWriter writer = null;
+		try {
+            writer = getHttpResponse().getWriter();
+	        downloadJarName = getHttpRequest().getHeader(X_FILE_NAME);
+	        if (downloadJarName.endsWith(REQ_JAR_FILE_EXTENSION) || downloadJarName.endsWith(REQ_ZIP_FILE_EXTENSION) 
+	        		|| downloadJarName.endsWith(REQ_TAR_GZ_FILE_EXTENSION)) {
+	        	InputStream is = getHttpRequest().getInputStream();
+	        	downloadByteArray = IOUtils.toByteArray(is);
+	            getHttpResponse().setStatus(getHttpResponse().SC_OK);
+	            writer.print(SUCCESS_TRUE);
+		        writer.flush();
+		        writer.close();
+	        }
+		} catch (Exception e) {
+			getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
+            writer.print(SUCCESS_FALSE);
+			throw new PhrescoException(e);
+		}
+		
+		return SUCCESS;
+	}
+	
+	public void removeUploadedFile() {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method  Downloads.removeUploadedFile()");
+		}
+		
+		downloadByteArray = null;
+		downloadJarName = null;
 	}
 
 	public String edit() throws PhrescoException {

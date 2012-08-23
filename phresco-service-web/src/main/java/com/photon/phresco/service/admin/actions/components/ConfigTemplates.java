@@ -48,7 +48,6 @@ public class ConfigTemplates extends ServiceBaseAction {
     private String customerId = null;
     private List<String> appliesTo = null;
     private String configId = null;
-    private String fromPage = null;
 	
 	public String list() throws PhrescoException {
 		if (isDebugEnabled) {
@@ -82,7 +81,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 		try {
 		    SettingsTemplate configTemp = getServiceManager().getConfigTemplate(configId, customerId);
 			getHttpRequest().setAttribute(REQ_CONFIG_TEMP , configTemp);
-			getHttpRequest().setAttribute(REQ_FROM_PAGE, fromPage);
+			getHttpRequest().setAttribute(REQ_FROM_PAGE, REQ_EDIT);
 		} catch(Exception e) {
 			throw new PhrescoException(e);
 		}
@@ -180,7 +179,6 @@ public class ConfigTemplates extends ServiceBaseAction {
 		}
 		
 		boolean isError = false;
-		
 		if (StringUtils.isEmpty(name)) {
 			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY ));
 			isError = true;

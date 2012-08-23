@@ -83,10 +83,16 @@
 			<label class="control-label labelbold">
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.file'/>
 			</label>
-			<div class="controls">
-				<input class="input-xlarge" type="file" id="featureArc" name="featureArc">
-				<span class="help-inline" id="fileError"></span>
+			
+			 <div class="controls" style="float: left; margin-left: 3%;">
+				<div id="feature-file-uploader" class="file-uploader">
+					<noscript>
+						<p>Please enable JavaScript to use file uploader.</p>
+						<!-- or put a simple form for upload here -->
+					</noscript>
+				</div>
 			</div>
+			 <span class="help-inline fileError" id="fileError"></span>
 		</div>
 		
 		<div class="control-group">
@@ -160,18 +166,10 @@
 	</div>
 	
 	<div class="bottom_button">
-		 <%-- <input type="button" id="featuresSave" class="btn btn-primary" 
-		          onclick="formSubmitFileUpload('featuresSave', 'featureArc', $('#subcontainer'), 'Creating Feature');" 
-		             value="<s:text name='lbl.hdr.comp.save'/>"/> --%>
-     	<input type="button" id="featuresSave" class="btn btn-primary"
-			onclick="validate('featuresSave', $('#formFeatureAdd'), $('#subcontainer'), 'Creating Feature');"
-			value="<s:text name='lbl.hdr.comp.save'/>" /> 
-		<%-- <input type="button" id="featuresCancel" class="btn btn-primary" 
-		           onclick="loadContent('featuresCancel', '', $('#subcontainer'));" value="<s:text name='lbl.hdr.comp.cancel'/>"/> --%>
-		<input type="button" id="featuresCancel" class="btn btn-primary"
-			onclick="loadContent('featuresList', $('#formFeatureAdd'), $('#subcontainer'));"
-			value="<s:text name='lbl.hdr.comp.cancel'/>" />
-
+     	<input type="button" id="featuresSave" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.save'/>" 
+			onclick="validate('featuresSave', $('#formFeatureAdd'), $('#subcontainer'), 'Creating Feature');"/> 
+		<input type="button" id="featuresCancel" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.cancel'/>"
+			onclick="loadContent('featuresList', $('#formFeatureAdd'), $('#subcontainer'));" />
 	</div>
 	
 	<!-- Hidden Fields -->
@@ -183,8 +181,9 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
+	    createUploader();
 		enableScreen();
-		
+       
 		$("input[type=radio]").change(function() {
 	        var name = $(this).attr('name');
 	        $("input:checkbox[name='" + name + "']").prop("checked", true);
@@ -225,4 +224,79 @@
             hideError($("#fileControl"), $("#fileError"));
         }
     }
+    
+	 function applnJarError(data) {
+		if (data != undefined) {
+			showError($("#fileControl"), $("#fileError"), data);
+		} else {
+			hideError($("#fileControl"), $("#fileError"));
+		}
+	} 
+
+	$("input[type=radio]").change(function() {
+		var name = $(this).attr('name');
+		$("input:checkbox[name='" + name + "']").prop("checked", true);
+		var version = $("input:radio[name='" + name + "']").val();
+		$("p[id='" + name + "']").html(version);
+	});
+
+	$("input[type=checkbox]").change(function() {
+		var checkboxChecked = $(this).is(":checked");
+		var name = $(this).attr('name');
+		if (!checkboxChecked) {
+			$("input:radio[name='" + name + "']").prop("checked", false);
+			$("p[id='" + name + "']").empty();
+		} else {
+			$("input:radio[name='" + name + "']:first").prop("checked", true);
+			var version = $("input:radio[name='" + name + "']").val();
+			$("p[id='" + name + "']").html(version);
+		}
+	});
+
+	 function createUploader() {
+		var featureUploader = new qq.FileUploader({
+			element : document.getElementById('feature-file-uploader'),
+			action : 'uploadJar',
+			multiple : false,
+			type : 'applnJar',
+			buttonLabel : '<s:label key="lbl.comp.featr.upload" />',
+			typeError : '<s:text name="err.invalid.file.selection" />',
+			params : {
+				type : 'applnJar'
+			},
+			debug : true
+		});
+	}
+ 
+	 function removeUploadedJar(obj) {
+		$(obj).parent().remove();
+		var params = "uploadedJar=";
+		params = params.concat($(obj).attr("id"));
+		params = params.concat("&type=");
+		params = params.concat($(obj).attr("tempattr"));
+		$.ajax({
+			url : "removeFeatureJar",
+			data : params,
+			type : "POST",
+			success : function(data) {
+			}
+		});
+		enableDisableUpload();
+		//pluginJarError();
+		applnJarError();
+	}
+
+	function enableDisableUpload() {
+		if ($('ul[temp="applnJar"] > li').length === 1) {
+			$('#feature-file-uploader').find("input[type='file']").attr(
+					'disabled', 'disabled');
+			$('#feature-file-uploader').find($(".qq-upload-button")).removeClass(
+					"btn-primary qq-upload-button").addClass("disabled");
+		} else {
+			$('#feature-file-uploader').find("input[type='file']").attr(
+					'disabled', false);
+			$('#feature-file-uploader').find($(".btn")).removeClass("disabled")
+					.addClass("btn-primary qq-upload-button");
+		}
+	} 
 </script>

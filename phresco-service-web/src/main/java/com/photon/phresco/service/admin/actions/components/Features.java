@@ -19,11 +19,17 @@
  */
 package com.photon.phresco.service.admin.actions.components;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.ws.rs.core.MediaType;
+
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -31,7 +37,10 @@ import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.Module;
 import com.photon.phresco.model.ModuleGroup;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
+import com.photon.phresco.service.client.api.Content;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.multipart.BodyPart;
+import com.sun.jersey.multipart.MultiPart;
 
 public class Features extends ServiceBaseAction {
 
@@ -53,6 +62,9 @@ public class Features extends ServiceBaseAction {
     private String fromPage = null;
     private String techId = null;
     private String type = null;
+    	
+	private static byte[] featureByteArray = null;
+	private static String featureJarName = null;
     
 	private String description = null;
     private List<Module> versions = null;
@@ -91,7 +103,7 @@ public class Features extends ServiceBaseAction {
 		try {
 		    ModuleGroup moduleGroup = getServiceManager().getFeature(techId, customerId);
 			getHttpRequest().setAttribute(REQ_MODULE_GROUP, moduleGroup);
-			getHttpRequest().setAttribute(REQ_FROM_PAGE, fromPage);
+			getHttpRequest().setAttribute(REQ_FROM_PAGE, REQ_EDIT);
 			getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
 		} catch (Exception e) {
 		    throw new PhrescoException(e);
@@ -107,9 +119,7 @@ public class Features extends ServiceBaseAction {
 		}
 		
 		try {
-			//InputStream inputStream = new FileInputStream(featureArc);
-			/*FileOutputStream outputStream = new FileOutputStream(new File("c:/" + featureArcFileName));
-			IOUtils.copy(inputStream, outputStream);*/
+			MultiPart multiPart = new MultiPart();
 			
 			List<ModuleGroup> moduleGroups = new ArrayList<ModuleGroup>();
 			ModuleGroup moduleGroup = new ModuleGroup();
@@ -118,9 +128,24 @@ public class Features extends ServiceBaseAction {
 			moduleGroup.setVersions(versions);
 			moduleGroup.setType(REST_QUERY_TYPE_MODULE);
 			moduleGroup.setCustomerId(customerId);
-			moduleGroups.add(moduleGroup);
+
+			BodyPart jsonPart = new BodyPart();
+			jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
+			jsonPart.setEntity(moduleGroup);
+			Content content = new Content("object", name, null, null, null, 0);
+			jsonPart.setContentDisposition(content);
+			multiPart.bodyPart(jsonPart);
+			    
+			if (StringUtils.isNotEmpty(featureJarName)) {
+				InputStream featureIs = new ByteArrayInputStream(featureByteArray);
+				BodyPart binaryPart2 = getServiceManager().createBodyPart(name, FILE_FOR_APPTYPE, featureIs);
+				multiPart.bodyPart(binaryPart2);
+			}
+
+			moduleGroups.add(moduleGroup);   
+			
 			ClientResponse clientResponse = getServiceManager().createFeatures(moduleGroups, customerId);
-			if(clientResponse.getStatus() != 200 && clientResponse.getStatus() != 201){
+			if (clientResponse.getStatus() != 200 && clientResponse.getStatus() != 201) {
 				addActionError(getText(FEATURE_NOT_ADDED, Collections.singletonList(name)));
 			} else {
 			addActionMessage(getText(FEATURE_ADDED, Collections.singletonList(name)));
@@ -132,6 +157,41 @@ public class Features extends ServiceBaseAction {
 		return list();
 	}
 	
+	public String uploadFile() throws PhrescoException {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method  Features.uploadFile()");
+		}
+		
+		PrintWriter writer = null;
+		try {
+            writer = getHttpResponse().getWriter();
+	        featureJarName = getHttpRequest().getHeader(X_FILE_NAME);
+	        if (featureJarName.endsWith(REQ_JAR_FILE_EXTENSION) || featureJarName.endsWith(REQ_ZIP_FILE_EXTENSION) 
+	        		|| featureJarName.endsWith(REQ_TAR_GZ_FILE_EXTENSION)) {
+	        	InputStream is = getHttpRequest().getInputStream();
+	        	featureByteArray = IOUtils.toByteArray(is);
+	            getHttpResponse().setStatus(getHttpResponse().SC_OK);
+	            writer.print(SUCCESS_TRUE);
+		        writer.flush();
+		        writer.close();
+	        }
+		} catch (Exception e) {
+			getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
+            writer.print(SUCCESS_FALSE);
+			throw new PhrescoException(e);
+		}
+		
+		return SUCCESS;
+	}
+	
+	public void removeUploadedFile() {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method  Features.removeUploadedFile()");
+		}
+		
+		featureByteArray = null;
+		featureJarName = null;
+	}
 
 	public String update() throws PhrescoException {
 		if (isDebugEnabled) {
@@ -163,10 +223,10 @@ public class Features extends ServiceBaseAction {
 				for (String techId : techIds) {
 					ClientResponse clientResponse = getServiceManager().deleteFeature(techId, customerId);
 					if (clientResponse.getStatus() != 200) {
-						addActionError(getText(ROLE_NOT_DELETED));
+						addActionError(getText(FEATURE_NOT_DELETED));
 					}
 				}
-				addActionMessage(getText(ROLE_DELETED));
+				addActionMessage(getText(FEATURE_DELETED));
 			}
 		} catch (Exception e) {
 			throw new PhrescoException(e);
@@ -199,6 +259,7 @@ public class Features extends ServiceBaseAction {
 		if (isError) {
 			setErrorFound(true);
 		}
+		
 		return SUCCESS;
 	}
 
