@@ -246,6 +246,50 @@
             <result type="json" />
         </action>
 		<!-- COMPONENT PILOT PROJECTS ENDS-->
+		
+		<!-- COMPONENT DOWNLOAD STARTS-->
+		<action name="downloadList" class="com.photon.phresco.service.admin.actions.components.Downloads" method="list">
+			<result name="downloadList">/admin/pages/components/download/list.jsp</result>
+        </action>
+		
+		<action name="downloadAdd" class="com.photon.phresco.service.admin.actions.components.Downloads" method="add">
+			<result name="downloadAdd">/admin/pages/components/download/add.jsp</result>
+        </action>
+		
+		<action name="downloadSave" class="com.photon.phresco.service.admin.actions.components.Downloads" method="save">
+			<result name="downloadList">/admin/pages/components/download/list.jsp</result>
+			<result type="json" />
+        </action>
+        
+        <action name="uploadFile" class="com.photon.phresco.service.admin.actions.components.Downloads" method="uploadFile">
+            <result type="json" />
+        </action>
+        
+        <action name="removeDownloadZip" class="com.photon.phresco.service.admin.actions.components.Downloads" method="removeUploadedJar">
+            <result type="json" />
+        </action>
+        
+        <action name="downloadEdit" class="com.photon.phresco.service.admin.actions.components.Downloads" method="edit">
+            <result name="downloadAdd">/admin/pages/components/download/add.jsp</result>
+        </action>
+        
+        <action name="downloadUpdate" class="com.photon.phresco.service.admin.actions.components.Downloads" method="update">
+            <result name="downloadList">/admin/pages/components/download/list.jsp</result>
+            <result type="json" />
+        </action>
+        
+		<action name="downloadDelete" class="com.photon.phresco.service.admin.actions.components.Downloads" method="delete">
+            <result name="downloadList">/admin/pages/components/download/list.jsp</result>
+        </action>
+	    
+        <action name="downloadSaveValidate" class="com.photon.phresco.service.admin.actions.components.Downloads" method="validateForm">
+            <result type="json" />
+        </action>
+        
+        <action name="downloadUpdateValidate" class="com.photon.phresco.service.admin.actions.components.Downloads" method="validateForm">
+            <result type="json" />
+        </action>
+		<!-- COMPONENT DOWNLOAD ENDS-->
 			
 	<!--- ADMIN-->
 		<action name="adminMenu" class="com.photon.phresco.service.admin.actions.admin.AdminMenu" method="getAdminMenu">
@@ -366,49 +410,5 @@
 			<result name="globalurlCancel">/admin/pages/admin/globalurl/list.jsp</result>
         </action>
 		<!-- ADMIN GLOBALURL ENDS-->
-			
-		<!-- ADMIN DOWNLOAD STARTS-->
-		<action name="downloadList" class="com.photon.phresco.service.admin.actions.admin.Downloads" method="list">
-			<result name="downloadList">/admin/pages/admin/download/list.jsp</result>
-        </action>
-		
-		<action name="downloadAdd" class="com.photon.phresco.service.admin.actions.admin.Downloads" method="add">
-			<result name="downloadAdd">/admin/pages/admin/download/add.jsp</result>
-        </action>
-		
-		<action name="downloadSave" class="com.photon.phresco.service.admin.actions.admin.Downloads" method="save">
-			<result name="downloadList">/admin/pages/admin/download/list.jsp</result>
-			<result type="json" />
-        </action>
-        
-        <action name="uploadFile" class="com.photon.phresco.service.admin.actions.admin.Downloads" method="uploadFile">
-            <result type="json" />
-        </action>
-        
-        <action name="removeDownloadZip" class="com.photon.phresco.service.admin.actions.admin.Downloads" method="removeUploadedJar">
-            <result type="json" />
-        </action>
-        
-        <action name="downloadEdit" class="com.photon.phresco.service.admin.actions.admin.Downloads" method="edit">
-            <result name="downloadAdd">/admin/pages/admin/download/add.jsp</result>
-        </action>
-        
-        <action name="downloadUpdate" class="com.photon.phresco.service.admin.actions.admin.Downloads" method="update">
-            <result name="downloadList">/admin/pages/admin/download/list.jsp</result>
-            <result type="json" />
-        </action>
-        
-		<action name="downloadDelete" class="com.photon.phresco.service.admin.actions.admin.Downloads" method="delete">
-            <result name="downloadList">/admin/pages/admin/download/list.jsp</result>
-        </action>
-	    
-        <action name="downloadSaveValidate" class="com.photon.phresco.service.admin.actions.admin.Downloads" method="validateForm">
-            <result type="json" />
-        </action>
-        
-        <action name="downloadUpdateValidate" class="com.photon.phresco.service.admin.actions.admin.Downloads" method="validateForm">
-            <result type="json" />
-        </action>
-		<!-- ADMIN DOWNLOAD ENDS-->
     </package>
 </struts>
