@@ -40,4 +40,17 @@ public interface DbManager {
      */
     RepoInfo getRepoInfo(String customerId) throws PhrescoException;
     
+    /**
+     * Store the created project details in Db
+     * @param projectInfo
+     * @throws PhrescoException
+     */
+    void storeCreatedProjects(ProjectInfo projectInfo) throws PhrescoException;
+    
+    /**
+     * To update the created project information in db
+     * @param projectInfo
+     * @throws PhrescoException
+     */
+    void updateCreatedProjects(ProjectInfo projectInfo) throws PhrescoException;
 }

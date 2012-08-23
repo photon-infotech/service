@@ -45,4 +45,19 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
         return repoInfo;
     }
 
+    @Override
+    public void storeCreatedProjects(ProjectInfo projectInfo) throws PhrescoException {
+        if(projectInfo != null) {
+            mongoOperation.save(CREATEDPROJECTS_COLLECTION_NAME, projectInfo);
+        }
+    }
+
+    @Override
+    public void updateCreatedProjects(ProjectInfo projectInfo)
+            throws PhrescoException {
+        if(projectInfo != null) {
+            mongoOperation.save(CREATEDPROJECTS_COLLECTION_NAME, projectInfo);
+        }
+    }
+
 }
