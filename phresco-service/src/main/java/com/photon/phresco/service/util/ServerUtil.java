@@ -35,12 +35,12 @@ public class ServerUtil {
      * @return
      * @throws PhrescoException
      */
-    public static ArchetypeInfo getArtifactinfo(InputStream inputJarStream, String fileName) throws PhrescoException {
+    public static ArchetypeInfo getArtifactinfo(InputStream inputJarStream) throws PhrescoException {
         File jarFile = null;
         FileOutputStream fileOutStream = null;
         
         try {
-            jarFile = new File(getTempFolderPath() + "/" + fileName + ".jar");
+            jarFile = new File(getTempFolderPath() + "/" + "temp" + ".jar");
             fileOutStream = new FileOutputStream(jarFile);
             byte buf[]=new byte[1024];
             int len;
