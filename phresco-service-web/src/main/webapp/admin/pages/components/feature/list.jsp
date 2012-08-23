@@ -140,6 +140,8 @@
 	function editFeature(id) {
 	    var params = "techId=";
 	    params = params.concat(id);
+	    params = params.concat("&customerId=");
+        params = params.concat("<%= customerId %>");
 	    loadContentParam("featuresEdit", params, $('#subcontainer'));
 	}
 </script>
