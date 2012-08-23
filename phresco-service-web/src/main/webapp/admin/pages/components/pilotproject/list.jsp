@@ -124,8 +124,6 @@
     function editPilotProject(id) {
         var params = "projectId=";
         params = params.concat(id);
-        params = params.concat("&fromPage=");
-        params = params.concat("edit");
         params = params.concat("&customerId=");
         params = params.concat("<%= customerId %>");
         loadContentParam("pilotprojEdit", params, $('#subcontainer'));

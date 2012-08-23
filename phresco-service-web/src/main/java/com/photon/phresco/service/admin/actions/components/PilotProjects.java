@@ -19,11 +19,17 @@
  */
 package com.photon.phresco.service.admin.actions.components;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.ws.rs.core.MediaType;
+
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -31,7 +37,10 @@ import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.ProjectInfo;
 import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
+import com.photon.phresco.service.client.api.Content;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.multipart.BodyPart;
+import com.sun.jersey.multipart.MultiPart;
 
 public class PilotProjects extends ServiceBaseAction { 
 	
@@ -53,6 +62,8 @@ public class PilotProjects extends ServiceBaseAction {
 	private String fromPage = null;
 	private String customerId = null;
 	private String techId = null;
+	private static byte[] pilotProByteArray = null;
+	private static String pilotProJarName = null;
 
 	public String list() throws PhrescoException {
         if (isDebugEnabled) {
@@ -91,17 +102,30 @@ public class PilotProjects extends ServiceBaseAction {
     	}
 
     	try {
-//    		InputStream inputStream = new FileInputStream(projArc);
-//    		FileOutputStream outputStream = new FileOutputStream(new File("c:/" + projArcFileName));
-//    		IOUtils.copy(inputStream, outputStream);
+    		MultiPart multiPart = new MultiPart();
+    		
     		List<ProjectInfo> pilotProInfo = new ArrayList<ProjectInfo>();
     		ProjectInfo proInfo = new ProjectInfo();
     		proInfo.setName(name);
     		proInfo.setDescription(description);
     		proInfo.setCustomerId(customerId);
+    		
+    		BodyPart jsonPart = new BodyPart();
+		    jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
+		    jsonPart.setEntity(proInfo);
+		    Content content = new Content("object", name, null, null, null, 0);
+		    jsonPart.setContentDisposition(content);
+		    multiPart.bodyPart(jsonPart);
+		    
+		    if (StringUtils.isNotEmpty(pilotProJarName)) {
+				InputStream pilotProIs = new ByteArrayInputStream(pilotProByteArray);
+				BodyPart binaryPart2 = getServiceManager().createBodyPart(name, FILE_FOR_APPTYPE, pilotProIs );
+		        multiPart.bodyPart(binaryPart2);
+			}
+		    
     		pilotProInfo.add(proInfo);
     		ClientResponse clientResponse = getServiceManager().createPilotProjects(pilotProInfo, customerId);
-    		if(clientResponse.getStatus() != 200 && clientResponse.getStatus() != 201  ){
+    		if (clientResponse.getStatus() != 200 && clientResponse.getStatus() != 201  ) {
     			addActionError(getText(PLTPROJ_NOT_ADDED, Collections.singletonList(name)));
     		} else {
     			addActionMessage(getText(PLTPROJ_ADDED, Collections.singletonList(name)));
@@ -112,6 +136,42 @@ public class PilotProjects extends ServiceBaseAction {
 
     	return list();
     }
+    
+    public String uploadFile() throws PhrescoException {
+    	if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method  PilotProjects.uploadFile()");
+		}
+    	
+    	PrintWriter writer = null;
+		try {
+            writer = getHttpResponse().getWriter();
+	        pilotProJarName = getHttpRequest().getHeader(X_FILE_NAME);
+	        if (pilotProJarName.endsWith(REQ_JAR_FILE_EXTENSION) || pilotProJarName.endsWith(REQ_ZIP_FILE_EXTENSION) 
+	        		|| pilotProJarName.endsWith(REQ_TAR_GZ_FILE_EXTENSION)) {
+	        	InputStream is = getHttpRequest().getInputStream();
+	        	pilotProByteArray = IOUtils.toByteArray(is);
+	            getHttpResponse().setStatus(getHttpResponse().SC_OK);
+	            writer.print(SUCCESS_TRUE);
+		        writer.flush();
+		        writer.close();
+	        }
+		} catch (Exception e) {
+			getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
+            writer.print(SUCCESS_FALSE);
+			throw new PhrescoException(e);
+		}
+		
+		return SUCCESS;
+	}
+	
+	public void removeUploadedFile() {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method  PilotProjects.removeUploadedFile()");
+		}
+		
+		pilotProJarName = null;
+		pilotProByteArray = null;
+	}
 	
     public String edit() throws PhrescoException {
     	if (isDebugEnabled) {
@@ -121,7 +181,7 @@ public class PilotProjects extends ServiceBaseAction {
     	try {
     		ProjectInfo pilotProjectInfo = getServiceManager().getPilotProject(projectId, customerId);
     		getHttpRequest().setAttribute(REQ_PILOT_PROINFO, pilotProjectInfo);
-    		getHttpRequest().setAttribute(REQ_FROM_PAGE, fromPage);
+    		getHttpRequest().setAttribute(REQ_FROM_PAGE, REQ_EDIT);
     	} catch (Exception e) {
     		throw new PhrescoException(e);
     	}

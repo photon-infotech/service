@@ -19,11 +19,13 @@
   --%>
 
 <%@ taglib uri="/struts-tags" prefix="s" %>
-<%@page import="com.photon.phresco.model.ProjectInfo"%>
-<%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %> 
+
 <%@ page import="org.apache.commons.lang.StringUtils" %>
-<%@page import="com.photon.phresco.model.Technology"%>
-<%@page import="java.util.List"  %>
+<%@ page import="java.util.List" %>
+
+<%@ page import="com.photon.phresco.model.ProjectInfo"%>
+<%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
+<%@ page import="com.photon.phresco.model.Technology"%>
 
 <% 
 	ProjectInfo pilotProjectInfo = (ProjectInfo)request.getAttribute(ServiceUIConstants.REQ_PILOT_PROINFO); 
@@ -35,12 +37,12 @@
 <form id="formPilotProAdd" class="form-horizontal customer_list">
 	<h4 class="hdr">
 	<% if (StringUtils.isNotEmpty(fromPage)) { %>
-	      <s:label key="lbl.hdr.comp.edit.pltprjt.title" theme="simple"/>
-	    <% } else { %>
-	      <s:label key="lbl.hdr.comp.add.pltprjt.title" theme="simple"/>
-	     <% } %> 
+		<s:label key="lbl.hdr.comp.edit.pltprjt.title" theme="simple"/>
+    <% } else { %>
+		<s:label key="lbl.hdr.comp.add.pltprjt.title" theme="simple"/>
+	<% } %> 
+	</h4>
 	
-	</h4>	
 	<div class="content_adder">
 		<div class="control-group" id="nameControl">
 			<label class="control-label labelbold">
@@ -66,16 +68,16 @@
 				class="mandatory">*</span>&nbsp;<s:text name="Technology" /> </label>
 			<div class="controls">
 				<select id="multiSelect" name="technology">
-					   <%
-                        if (technologys != null) {
-                            for (Technology technology : technologys) {
-                    %>
-                      <option value="<%=technology.getName() %>"><%=technology.getName() %></option>
-                    <%
+				<%
+					if (technologys != null) {
+						for (Technology technology : technologys) {
+				%>
+							<option value="<%=technology.getName() %>"><%=technology.getName() %></option>
+				<%
                         }
-                        }
-                    %>
-				</select> <span class="help-inline applyerror" id="techError"></span>
+					}
+				%>
+				</select><span class="help-inline applyerror" id="techError"></span>
 			</div>
 		</div>
 
@@ -83,27 +85,28 @@
 			<label class="control-label labelbold">
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.projsrc'/>
 			</label>
-			<div class="controls">
-				<input class="input-xlarge" type="file" id="projArc" name="projArc">
-				<span class="help-inline" id="fileError"></span>
+			
+			<div class="controls" style="float: left; margin-left: 3%;">
+				<div id="pilotPro-file-uploader" class="file-uploader">
+					<noscript>
+						<p>Please enable JavaScript to use file uploader.</p>
+						<!-- or put a simple form for upload here -->
+					</noscript>
+				</div>
 			</div>
+			<span class="help-inline fileError" id="fileError"></span>
 		</div>
 	</div>
 	
 	<div class="bottom_button">
 	    <% if (StringUtils.isNotEmpty(fromPage)) { %>
-               <%--  <input type="button" id="pilotprojUpdate" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.update'/>" 
-                    onclick="formSubmitFileUpload('pilotprojUpdate', 'projArc', $('#subcontainer'), 'Updating Pilotproject');" /> --%>
-			<input type="button" id="pilotprojUpdate" class="btn btn-primary"
-				value="<s:text name='lbl.hdr.comp.update'/>"
+			<input type="button" id="pilotprojUpdate" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.update'/>"
 				onclick="validate('pilotprojUpdate', $('#formPilotProAdd'), $('#subcontainer'), 'Updating Pilotproject');" />
 		<%
 			} else {
 		%>
-		<%-- <input type="button" id="pilotprojSave" class="btn btn-primary" onclick="formSubmitFileUpload('pilotprojSave', 'projArc', $('#subcontainer'), 'Creating Pilotproject');" value="<s:text name='lbl.hdr.comp.save'/>"/> --%>
-			<input type="button" id="pilotprojSave" class="btn btn-primary"
-				onclick="validate('pilotprojSave', $('#formPilotProAdd'), $('#subcontainer'), 'Creating Pilotproject');"
-				value="<s:text name='lbl.hdr.comp.save'/>" />
+			<input type="button" id="pilotprojSave" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.save'/>"
+				onclick="validate('pilotprojSave', $('#formPilotProAdd'), $('#subcontainer'), 'Creating Pilotproject');" />
 		<% } %>
 		<input type="button" id="pilotprojCancel" class="btn btn-primary" onclick="loadContent('pilotprojList', '', $('#subcontainer'));" value="<s:text name='lbl.hdr.comp.cancel'/>"/>
 	</div>
@@ -118,6 +121,7 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 		enableScreen();
+        createUploader();
 	});
 
 	function findError(data) {
@@ -133,4 +137,44 @@
 			hideError($("#fileControl"), $("#fileError"));
 		}
 	}
+	
+	function createUploader() {
+		var fileUploader = new qq.FileUploader({
+			element: document.getElementById('pilotPro-file-uploader'),
+			action: 'uploadJar',
+			multiple: false,
+			type: 'applnJar',
+			buttonLabel: '<s:label key="lbl.comp.featr.upload" />',
+			typeError : '<s:text name="err.invalid.file.selection" />',
+			params: {type: 'applnJar'}, 
+			debug: true
+		});
+	} 
+	 
+	function removeUploadedJar(obj) {
+		$(obj).parent().remove();
+		var params = "uploadedJar=";
+		params = params.concat($(obj).attr("id"));
+		params = params.concat("&type=");
+		params = params.concat($(obj).attr("tempattr"));
+		$.ajax({
+			url : "removePilotProjJar",
+			data : params,
+			type : "POST",
+			success : function(data) {
+			}
+		});
+		enableDisableUpload();
+		applnJarError();
+	} 
+	    
+	function enableDisableUpload() {
+		if ($('ul[temp="applnJar"] > li').length === 1 ) {
+			$('#pilotPro-file-uploader').find("input[type='file']").attr('disabled','disabled');
+			$('#pilotPro-file-uploader').find($(".qq-upload-button")).removeClass("btn-primary qq-upload-button").addClass("disabled");
+		} else {
+			$('#pilotPro-file-uploader').find("input[type='file']").attr('disabled', false);
+			$('#pilotPro-file-uploader').find($(".btn")).removeClass("disabled").addClass("btn-primary qq-upload-button");
+		}
+	} 
 </script>

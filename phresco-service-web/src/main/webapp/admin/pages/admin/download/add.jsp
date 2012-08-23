@@ -88,9 +88,18 @@
 			<label class="control-label labelbold">
 				<s:text name='lbl.hdr.adm.dwnld.fle'/>
 			</label>
-			<div class="controls">
-				<input class="input-xlarge" type="file" id="fileArc" name="fileArc">
+			<div class="controls" style="float: left; margin-left: 3%;">
+				<div id="download-file-uploader" class="file-uploader">
+					<noscript>
+						<p>Please enable JavaScript to use file uploader.</p>
+						<!-- or put a simple form for upload here -->
+					</noscript>
+				</div>
 			</div>
+			 <span class="help-inline fileError" id="fileError"></span>
+			<!-- <div class="controls">
+				<input class="input-xlarge" type="file" id="fileArc" name="fileArc">
+			</div> -->
 		</div>
 		
 		<div class="control-group" id="appltControl">
@@ -112,9 +121,15 @@
 			<label class="control-label labelbold">
 				<s:text name='lbl.hdr.adm.dwnld.icon'/>
 			</label>
-			<div class="controls">
-				<input class="input-xlarge" type="file" id="iconArc" name="iconArc">
+			<div class="controls" style="float: left; margin-left: 3%;">
+				<div id="plugin-file-uploader" class="file-uploader">
+					<noscript>
+						<p>Please enable JavaScript to use file uploader.</p>
+						<!-- or put a simple form for upload here -->
+					</noscript> 
+				</div>
 			</div>
+			<span class="help-inline pluginError" id="pluginError"></span>
 		</div>
 			
 		<div class="control-group" id="verControl">
@@ -156,16 +171,12 @@
 	</div>
 
 	<div class="bottom_button">
-	   <% if (StringUtils.isNotEmpty(fromPage)) { %>
-			<%-- <input type="button" id="downloadUpdate" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.update'/>" 
-				onclick="formSubmitFileUpload('downloadUpdate', 'fileArc,iconArc', $('#subcontainer'), 'Updating Download');" /> --%>
-			   <input type="button" id="downloadUpdate" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.update'/>" 
-                onclick="validate('downloadUpdate', $('#formDownloadAdd'), $('#subcontainer'), 'Updating Download');" />	
+		<% if (StringUtils.isNotEmpty(fromPage)) { %>
+			<input type="button" id="downloadUpdate" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.update'/>" 
+				onclick="validate('downloadUpdate', $('#formDownloadAdd'), $('#subcontainer'), 'Updating Download');" />	
         <% } else { %>
-			<%-- <input type="button" id="downloadSave" class="btn btn-primary" onclick="formSubmitFileUpload('downloadSave', 'fileArc,iconArc', $('#subcontainer'), 'Creating Download');" value="<s:text name='lbl.hdr.comp.save'/>"/> --%>
-		<input type="button" id="downloadSave" class="btn btn-primary"
-			onclick="validate('downloadSave', $('#formDownloadAdd'), $('#subcontainer'), 'Creating Download');"
-			value="<s:text name='lbl.hdr.comp.save'/>" />
+			<input type="button" id="downloadSave" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.save'/>"
+				onclick="validate('downloadSave', $('#formDownloadAdd'), $('#subcontainer'), 'Creating Download');" />
 		<% } %>
 		<input type="button" id="downloadCancel" class="btn btn-primary" onclick="loadContent('downloadList', $('#formDownloadAdd'), $('#subcontainer'));" value="<s:text name='lbl.hdr.comp.cancel'/>"/>
 	</div>
@@ -179,6 +190,7 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 		enableScreen();
+        createUploader(); 
 	});
 
 	function findError(data) {
@@ -206,12 +218,105 @@
 			hideError($("#groupControl"), $("#groupError"));
 		}
 	}
-	
-	function showDiv() {
-	    $('#othersDiv').show();
+	 
+	function applnJarError(data) {
+		if (data != undefined) {
+			showError($("#fileControl"), $("#fileError"), data);
+		} else {
+			hideError($("#fileControl"), $("#fileError"));
+		}
 	}
+
 	
-	function hideDiv(){
-	    $('#othersDiv').hide();
+	function pluginJarError(data) {
+		if (data != undefined) {
+			showError($("#pluginControl"), $("#pluginError"), data);
+		} else {
+			hideError($("#pluginControl"), $("#pluginError"));
+		}
+	}
+
+	function showDiv() {
+		$('#othersDiv').show();
+	}
+
+	function hideDiv() {
+		$('#othersDiv').hide();
+	}
+
+	function createUploader() {
+		var applnUploader = new qq.FileUploader({
+			element : document.getElementById('download-file-uploader'),
+			action : 'uploadJar',
+			multiple : false,
+			type : 'applnJar',
+			buttonLabel : '<s:label key="lbl.comp.featr.upload" />',
+			typeError : '<s:text name="err.invalid.file.selection" />',
+			params : {
+				type : 'applnJar'
+			},
+			debug : true
+		});
+
+		var pluginUploader = new qq.FileUploader({
+			element : document.getElementById('plugin-file-uploader'),
+			action : 'uploadJar',
+			multiple : false,
+			type : 'pluginJar',
+			buttonLabel : '<s:text name="lbl.comp.featr.upload" />',
+			typeError : '<s:text name="err.invalid.file.selection" />',
+			params : {
+				type : 'pluginJar'
+			},
+			debug : true
+		});
+	}
+
+	function removeUploadedJar(obj) {
+		$(obj).parent().remove();
+		var params = "uploadedJar=";
+		params = params.concat($(obj).attr("id"));
+		params = params.concat("&type=");
+		params = params.concat($(obj).attr("tempattr"));
+		$.ajax({
+			url : "removeDownloadZip",
+			data : params,
+			type : "POST",
+			success : function(data) {
+			}
+		});
+		enableDisableUpload();
+		enablePluginDisableUpload();
+		pluginJarError();
+		applnJarError();
+	}
+
+	function enableDisableUpload() {
+		if ($('ul[temp="applnJar"] > li').length === 1) {
+			$('#download-file-uploader').find("input[type='file']").attr(
+					'disabled', 'disabled');
+			$('#download-file-uploader').find($(".qq-upload-button")).removeClass(
+					"btn-primary qq-upload-button").addClass("disabled");
+		} else {
+			$('#download-file-uploader').find("input[type='file']").attr(
+					'disabled', false);
+			$('#download-file-uploader').find($(".btn")).removeClass("disabled")
+					.addClass("btn-primary qq-upload-button");
+		}
+	}
+
+	function enablePluginDisableUpload() {
+		if ($('ul[temp="pluginJar"] > li').length === 1) {
+			$('#plugin-file-uploader').find("input[type='file']").attr(
+					'disabled', 'disabled');
+			$('#plugin-file-uploader').find($(".qq-upload-button"))
+					.removeClass("btn-primary qq-upload-button").addClass(
+							"disabled");
+		} else {
+			$('#plugin-file-uploader').find("input[type='file']").attr(
+					'disabled', false);
+			$('#plugin-file-uploader').find($(".btn")).removeClass("disabled")
+					.addClass("btn-primary qq-upload-button");
+		}
 	}
 </script>
