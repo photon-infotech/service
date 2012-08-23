@@ -1461,18 +1461,14 @@ public class ComponentService extends DbService implements ServiceConstants {
         String fileName = bodyPart.getContentDisposition().getFileName();
         BodyPartEntity bpe = (BodyPartEntity) bodyPart.getEntity();
         try {
-              
               source = bpe.getInputStream();
               file = new File(ServerUtil.getTempFolderPath() + "/" + fileName + ".jar");
               fileOutStream = new FileOutputStream(file);
-              int i = 0;
-              while (i != -1) {
-                  i = source.read();
-                  fileOutStream.write(i);
+              byte buf[] = new byte[1024];
+              int len;
+              while((len = source.read(buf))>0) {
+                  fileOutStream.write(buf,0,len);
               }
-              fileOutStream.flush();
-              source.close();
-              fileOutStream.close();
         } catch (IOException e) {
             throw new PhrescoException();
         } finally {

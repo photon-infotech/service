@@ -1,6 +1,9 @@
 package com.photon.phresco.service.util;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
@@ -17,11 +20,96 @@ import org.apache.commons.codec.binary.Base64;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.ArchetypeInfo;
 import com.photon.phresco.util.Constants;
+import com.photon.phresco.util.FileUtil;
+import com.photon.phresco.util.Utility;
 import com.phresco.pom.util.PomProcessor;
 
 public class ServerUtil {
     
     private static JarInputStream jarInputStream = null;
+    
+    /**
+     * Get the artifact information from jar inputstream
+     * @param inputJarStream
+     * @param fileName
+     * @return
+     * @throws PhrescoException
+     */
+    public static ArchetypeInfo getArtifactinfo(InputStream inputJarStream, String fileName) throws PhrescoException {
+        File jarFile = null;
+        FileOutputStream fileOutStream = null;
+        
+        try {
+            jarFile = new File(getTempFolderPath() + "/" + fileName + ".jar");
+            fileOutStream = new FileOutputStream(jarFile);
+            byte buf[]=new byte[1024];
+            int len;
+            while((len=inputJarStream.read(buf))>0) {
+                fileOutStream.write(buf,0,len);
+            }
+        } catch (Exception e) {
+            throw new PhrescoException(e);
+        } finally {
+            Utility.closeStream(inputJarStream);
+            Utility.closeStream(fileOutStream);
+        }
+        ArchetypeInfo artifactInfo = getArtifactInfoFromJar(jarFile);
+        FileUtil.delete(jarFile);
+        return artifactInfo;
+    }
+    
+    /**
+     * Find archetype info from the given jar file
+     * @return
+     * @throws IOException 
+     * @throws JAXBException 
+     */
+    public static ArchetypeInfo getArtifactInfoFromJar(File jarFile) throws PhrescoException {
+        ArchetypeInfo info = null;
+        String pomFile = null;
+        try {
+            JarFile jarfile = new JarFile(jarFile);
+            for(Enumeration<JarEntry> em = jarfile.entries(); em.hasMoreElements();) {
+                JarEntry jarEntry = em.nextElement();
+                if (jarEntry.getName().endsWith("pom.xml")) {
+                    pomFile = jarEntry.getName();
+                }
+            }
+            if(pomFile != null) {
+                ZipEntry entry = jarfile.getEntry(pomFile);
+                InputStream inputStream = jarfile.getInputStream(entry);
+                PomProcessor processor = new PomProcessor(inputStream);
+                info = new ArchetypeInfo();
+                info.setGroupId(processor.getGroupId());
+                info.setArtifactId(processor.getArtifactId());
+                info.setVersion(processor.getVersion());
+            }
+        }catch (Exception e) {
+            throw new PhrescoException(e);
+        }
+        return info;
+    }
+    
+    /**
+     * Validate the given jar is valid maven  jar
+     * @return
+     * @throws PhrescoException 
+     */
+    public static boolean validateMavenJar(InputStream inputJar) throws PhrescoException {
+        boolean mavenJar = false;
+        try {
+            jarInputStream = new JarInputStream(inputJar);
+            JarEntry nextJarEntry = jarInputStream.getNextJarEntry();
+            while ((nextJarEntry = jarInputStream.getNextJarEntry()) != null) {
+                if(nextJarEntry.getName().contains("pom.xml")) {
+                    mavenJar =  true;
+                }
+            }
+        } catch (Exception e) {
+            throw new PhrescoException(e);
+        }
+        return mavenJar;
+    }
     
     /**
      * Validate the given jar is valid maven archetype jar
@@ -63,38 +151,6 @@ public class ServerUtil {
             throw new PhrescoException(e);
         }
         return false;
-    }
-    
-    /**
-     * Find archetype info from the given jar file
-     * @return
-     * @throws IOException 
-     * @throws JAXBException 
-     */
-    public static ArchetypeInfo getArtifactInfoFromJar(File jarFile) throws PhrescoException {
-        ArchetypeInfo info = null;
-        String pomFile = null;
-        try {
-            JarFile jarfile = new JarFile(jarFile);
-            for(Enumeration<JarEntry> em = jarfile.entries(); em.hasMoreElements();) {
-                JarEntry jarEntry = em.nextElement();
-                if (jarEntry.getName().contains("pom.xml")) {
-                    pomFile = jarEntry.getName();
-                }
-            }
-            if(pomFile != null) {
-                ZipEntry entry = jarfile.getEntry(pomFile);
-                InputStream inputStream = jarfile.getInputStream(entry);
-                PomProcessor processor = new PomProcessor(inputStream);
-                info = new ArchetypeInfo();
-                info.setGroupId(processor.getGroupId());
-                info.setArtifactId(processor.getArtifactId());
-                info.setVersion(processor.getVersion());
-            }
-        }catch (Exception e) {
-            throw new PhrescoException(e);
-        }
-        return info;
     }
     
     /**
