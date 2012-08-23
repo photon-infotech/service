@@ -12,6 +12,7 @@ import org.junit.Test;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
+import com.photon.phresco.util.ServiceConstants;
 
 public class RepositoryServiceTest {
 	
@@ -22,42 +23,43 @@ public class RepositoryServiceTest {
 	public void init() throws PhrescoException {
 		PhrescoServerFactory.initialize();
 		repoMgr = PhrescoServerFactory.getRepositoryManager();
-		repositoryURL = repoMgr.getRepositoryURL();	
+		repositoryURL = PhrescoServerFactory.getDbManager()
+		    .getRepoInfo(ServiceConstants.DEFAULT_CUSTOMER_NAME).getGroupRepoURL();
 	}
 	
 	@Ignore
 	public void testGetCiConfigPath() throws PhrescoException {
-		String configPath= repoMgr.getRepositoryURL() + repoMgr.getCiConfigPath();
+		String configPath= repositoryURL + repoMgr.getCiConfigPath();
 		assertEquals(repositoryURL + "/config/ci/config/0.2/config-0.2.xml", configPath);
 	}
 
 	@Ignore
 	public void testGetCredentialXmlFile() throws PhrescoException {
-		InputStream cXmlFile= repoMgr.getArtifactAsStream(repoMgr.getCiCredentialXmlFilePath());
+		InputStream cXmlFile= repoMgr.getArtifactAsStream(repoMgr.getCiCredentialXmlFilePath(), ServiceConstants.DEFAULT_CUSTOMER_NAME);
 		assertNotNull(cXmlFile);
 	}
 
 	@Ignore
 	public void testGetJavaHomeXmlFile() throws PhrescoException {
-		InputStream javaHome= repoMgr.getArtifactAsStream(repoMgr.getJavaHomeConfigPath());
+		InputStream javaHome= repoMgr.getArtifactAsStream(repoMgr.getJavaHomeConfigPath(), ServiceConstants.DEFAULT_CUSTOMER_NAME);
 		assertNotNull(javaHome);
 	}
 
 	@Ignore
 	public void testGetMavenHomeXmlFile() throws PhrescoException {
-		InputStream mavenHome= repoMgr.getArtifactAsStream(repoMgr.getMavenHomeConfigPath());
+		InputStream mavenHome= repoMgr.getArtifactAsStream(repoMgr.getMavenHomeConfigPath(), ServiceConstants.DEFAULT_CUSTOMER_NAME);
 		assertNotNull(mavenHome);
 	}
 
 	@Ignore
 	public void testGetProducts() throws PhrescoException {
-		InputStream credential = repoMgr.getArtifactAsStream(repoMgr.getCredentialFile());
+		InputStream credential = repoMgr.getArtifactAsStream(repoMgr.getCredentialFile(), ServiceConstants.DEFAULT_CUSTOMER_NAME);
 		assertNotNull(credential);
 	}
 
 	@Test
 	public void testGetEmailExtFile() throws PhrescoException {
-		InputStream eeFile=repoMgr.getArtifactAsStream(repoMgr.getEmailExtFile());
+		InputStream eeFile=repoMgr.getArtifactAsStream(repoMgr.getEmailExtFile(), ServiceConstants.DEFAULT_CUSTOMER_NAME);
 		assertNotNull(eeFile);
 	}
 }

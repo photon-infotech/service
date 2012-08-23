@@ -19,6 +19,7 @@
  */
 package com.photon.phresco.service.rest.api;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -38,6 +39,7 @@ import com.photon.phresco.service.api.DbService;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.converters.ConvertersFactory;
+import com.photon.phresco.service.dao.CustomerDAO;
 import com.photon.phresco.service.dao.UserDAO;
 import com.photon.phresco.service.model.ServerConstants;
 import com.photon.phresco.service.util.AuthenticationUtil;
@@ -79,7 +81,14 @@ public class LoginService extends DbService {
         if(userDao != null) {
         	convertedUser = converter.convertDAOToObject(userDao, mongoOperation);
         }
-        List<Customer> customers = mongoOperation.getCollection(ServiceConstants.CUSTOMERS_COLLECTION_NAME , Customer.class);
+//        List<Customer> customers = mongoOperation.getCollection(ServiceConstants.CUSTOMERS_COLLECTION_NAME , Customer.class);
+        List<Customer> customers = new ArrayList<Customer>();
+        Converter<CustomerDAO, Customer> customerConverter = 
+            (Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
+        List<CustomerDAO> customerDAOs = mongoOperation.getCollection(ServiceConstants.CUSTOMERDAO_COLLECTION_NAME , CustomerDAO.class);
+        for (CustomerDAO customerDAO : customerDAOs) {
+            customers.add(customerConverter.convertDAOToObject(customerDAO, mongoOperation));
+        }
         AuthenticationUtil authTokenUtil = AuthenticationUtil.getInstance();
         convertedUser.setLoginId(credentials.getUsername());
         convertedUser.setToken(authTokenUtil.generateToken(credentials.getUsername()));

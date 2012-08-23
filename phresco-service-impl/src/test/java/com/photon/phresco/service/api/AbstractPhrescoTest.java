@@ -55,7 +55,7 @@ public class AbstractPhrescoTest {
         archetypeExecutor = PhrescoServerFactory.getArchetypeExecutor();
 
         //To Initialize the cache
-        PhrescoServerFactory.getRepositoryManager().getApplicationTypes();
+//        PhrescoServerFactory.getRepositoryManager().getApplicationTypes();
     }
 
     @After

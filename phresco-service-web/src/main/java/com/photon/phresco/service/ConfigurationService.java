@@ -25,6 +25,7 @@ import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.log4j.Logger;
@@ -37,6 +38,7 @@ import com.photon.phresco.model.SettingsTemplate;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.model.ServerConstants;
+import com.photon.phresco.util.ServiceConstants;
 
 /**
  * Example resource class hosted at the URI path "/apps"
@@ -55,12 +57,12 @@ public class ConfigurationService implements ServerConstants {
 
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
-	public List<SettingsTemplate> getSettingsTemplates() throws PhrescoException, JSONException {
+	public List<SettingsTemplate> getSettingsTemplates(@QueryParam(ServiceConstants.REST_QUERY_CUSTOMERID) String customerId) throws PhrescoException, JSONException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method ConfigurationService.getSettingsTemplates()");
 		}
 		RepositoryManager repoManager = PhrescoServerFactory.getRepositoryManager();
-		String settingsJson = repoManager.getArtifactAsString(repoManager.getSettingConfigFile());
+		String settingsJson = repoManager.getArtifactAsString(repoManager.getSettingConfigFile(), customerId);
 		Gson gson = new Gson();
 		Type type = new TypeToken<List<SettingsTemplate>>(){}.getType();
 		List<SettingsTemplate> settings = (List<SettingsTemplate>)gson.fromJson(settingsJson, type);

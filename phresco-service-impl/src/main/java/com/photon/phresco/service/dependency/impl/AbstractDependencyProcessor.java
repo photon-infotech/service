@@ -135,7 +135,7 @@ public abstract class AbstractDependencyProcessor implements DependencyProcessor
 		for (Module module : versions) {
             String contentUrl = module.getContentURL();
             if (!StringUtils.isEmpty(contentUrl)) {
-              DependencyUtils.extractFiles(contentUrl, path);
+              DependencyUtils.extractFiles(contentUrl, path, moduleGroup.getCustomerId());
           }
         }
 	}
@@ -189,7 +189,7 @@ public abstract class AbstractDependencyProcessor implements DependencyProcessor
 	    
 	    ProjectInfo projectInfo = PhrescoServerFactory.getDbManager().getProjectInfo(info.getTechnology().getId(), info.getPilotProjectName());
         if(projectInfo != null) {
-            DependencyUtils.extractFiles(projectInfo.getProjectURL(), path);
+            DependencyUtils.extractFiles(projectInfo.getProjectURL(), path, info.getCustomerId());
         }
 	}
 	

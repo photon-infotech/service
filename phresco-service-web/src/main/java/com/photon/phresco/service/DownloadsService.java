@@ -29,6 +29,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.log4j.Logger;
@@ -42,6 +43,7 @@ import com.photon.phresco.model.DownloadPropertyInfo;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.model.ServerConstants;
+import com.photon.phresco.util.ServiceConstants;
 
 /**
  * Example resource class hosted at the URI path "/downloads"
@@ -55,12 +57,12 @@ public class DownloadsService implements ServerConstants {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({MediaType.APPLICATION_JSON})
-    public List<DownloadInfo> getAvailableDownloads(DownloadPropertyInfo downloadPropertyInfo) throws PhrescoException, JSONException, FileNotFoundException {
+    public List<DownloadInfo> getAvailableDownloads(DownloadPropertyInfo downloadPropertyInfo, @QueryParam(ServiceConstants.REST_QUERY_CUSTOMERID) String customerId) throws PhrescoException, JSONException, FileNotFoundException {
     	S_LOGGER.info("Retrieving downloads ");
     	List<DownloadInfo> downloadList = new ArrayList<DownloadInfo>();
     	PhrescoServerFactory.initialize();
     	RepositoryManager repoMgr = PhrescoServerFactory.getRepositoryManager();
-		String downloadInfoJSON = repoMgr.getArtifactAsString(SOFTWARE_REPO_PATH);
+		String downloadInfoJSON = repoMgr.getArtifactAsString(SOFTWARE_REPO_PATH, customerId);
     	Type type = new TypeToken<List<DownloadInfo>>() {}.getType();
 		Gson gson = new Gson();
 		List<DownloadInfo> downloadInfoList = gson.fromJson(downloadInfoJSON, type);

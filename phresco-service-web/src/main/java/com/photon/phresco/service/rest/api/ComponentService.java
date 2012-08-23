@@ -52,6 +52,7 @@ import org.springframework.stereotype.Component;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.exception.PhrescoWebServiceException;
 import com.photon.phresco.model.ApplicationType;
+import com.photon.phresco.model.ArchetypeInfo;
 import com.photon.phresco.model.Database;
 import com.photon.phresco.model.ModuleGroup;
 import com.photon.phresco.model.ProjectInfo;
@@ -65,7 +66,10 @@ import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.converters.ConvertersFactory;
 import com.photon.phresco.service.dao.ApplicationTypeDAO;
+import com.photon.phresco.service.dependency.impl.DependencyUtils;
 import com.photon.phresco.service.model.ArtifactInfo;
+import com.photon.phresco.service.util.ServerUtil;
+import com.photon.phresco.util.FileUtil;
 import com.photon.phresco.util.ServiceConstants;
 import com.photon.phresco.util.Utility;
 import com.sun.jersey.multipart.BodyPart;
@@ -1369,8 +1373,7 @@ public class ComponentService extends DbService implements ServiceConstants {
 	@POST
 	@Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
 	@Path (REST_API_TECHNOLOGIES)
-	public Response createTechnologies(@QueryParam("appId") String appTypeId, 
-	        MultiPart multiPart) throws PhrescoException, IOException {
+	public Response createTechnologies(MultiPart multiPart, @QueryParam(REST_QUERY_APPTYPEID) String appTypeId) throws PhrescoException, IOException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.createTechnologies(List<Technology> technologies)" + appTypeId);
 	    }
@@ -1379,6 +1382,7 @@ public class ComponentService extends DbService implements ServiceConstants {
 	    List<BodyPart> techs = new ArrayList<BodyPart>();
 	    List<BodyPart> entities = new ArrayList<BodyPart>();
 	    
+	    //To separete the object and binary file
 	    List<BodyPart> bodyParts = multiPart.getBodyParts();
 	    for (BodyPart bodyPart : bodyParts) {
 	        if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
@@ -1388,17 +1392,19 @@ public class ComponentService extends DbService implements ServiceConstants {
 	        }
         }
 	    
+	    //To map the binary file with corresponding object
 	    List<BodyPart> foundBodyPart ;
 	     for (BodyPart tech : techs) {
 	        foundBodyPart = new ArrayList<BodyPart>();
             for (BodyPart bodyPart : entities) {
-                if (tech.getContentDisposition().getType().equals(bodyPart.getContentDisposition().getType())) {
+                if (tech.getContentDisposition().getFileName().equals(bodyPart.getContentDisposition().getFileName())) {
                     foundBodyPart.add(bodyPart);
                 }
             }
             map.put(tech.getEntityAs(Technology.class), foundBodyPart);
         } 
 	   
+	   //Iterate the content map for upload binaries
        Set<Technology> keySet = map.keySet();
             for (Technology technology : keySet) {
                 technology.setId(appTypeId);
@@ -1406,41 +1412,74 @@ public class ComponentService extends DbService implements ServiceConstants {
                 createBinary (technology, list);
             }
 	        
-		return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
+		return Response.status(Response.Status.OK).build();
 	}
 	
-	private void createBinary(Technology technology, List<BodyPart> list) throws PhrescoException, IOException {
-         mongoOperation.save(TECHNOLOGIES_COLLECTION_NAME, technology);
-         
-         FileOutputStream fileOutStream = null;
-         InputStream source = null;
-         File file = null;
-         for (BodyPart bodyPart : list) {
-             BodyPartEntity bpe = (BodyPartEntity) bodyPart.getEntity();
-             try {
-                   source = bpe.getInputStream();
-                   file = new File("C:\\" + technology.getName() + ".jar");
-                   fileOutStream = new FileOutputStream(file);
-                   int i = 0;
-                   while (i != -1) {
-                       i = source.read();
-                       fileOutStream.write(i);
-                   }
-                   source.close();
-             } catch (IOException e) {
-                 throw new PhrescoException();
-             } finally {
-                 Utility.closeStream(source);
-                 Utility.closeStream(fileOutStream);
-             }
-             uploadBinary(file, technology);
-             } 
+	private void createBinary(Technology technology, List<BodyPart> list) throws PhrescoException {
+        List<ArchetypeInfo> infos = new ArrayList<ArchetypeInfo>();
+        for (BodyPart bodyPart : list) {
+            if (bodyPart.getContentDisposition().getType().equals("appType")) {
+                File appJarFile = writeFile(bodyPart);
+                ArchetypeInfo archetypeInfo = createArchetypeInfo("archetypes", technology);
+//                ArchetypeInfo artifactInfoFromJar = ServerUtil
+//                        .getArtifactInfoFromJar(appJarFile);
+                technology.setArchetypeInfo(archetypeInfo);
+                uploadBinary(archetypeInfo, appJarFile, technology.getCustomerId());
+                FileUtil.delete(appJarFile);
+            } else {
+                File appJarFile = writeFile(bodyPart);
+//                ArchetypeInfo artifactInfoFromJar = ServerUtil
+//                        .getArtifactInfoFromJar(appJarFile);
+                ArchetypeInfo archetypeInfo = createArchetypeInfo("plugins", technology);
+                infos.add(archetypeInfo);
+                uploadBinary(archetypeInfo, appJarFile, technology.getCustomerId());
+                FileUtil.delete(appJarFile);
+            }
+        }
+        technology.setPlugins(infos);
+        mongoOperation.save(TECHNOLOGIES_COLLECTION_NAME, technology);
     }
 
 
-    private void uploadBinary(File file, Technology technology) throws PhrescoException {
-        ArtifactInfo info = new ArtifactInfo(technology.getName(), technology.getName(), "", "jar", "1.0");
-        repositoryManager.addArtifact(info, file);
+    private ArchetypeInfo createArchetypeInfo(String type,Technology technology ) {
+        ArchetypeInfo artifactInfoFromJar = new ArchetypeInfo();
+        artifactInfoFromJar.setGroupId("com.upload.test." + type);
+        artifactInfoFromJar.setArtifactId(technology.getName() + type);
+        artifactInfoFromJar.setVersion("1.0");
+        return artifactInfoFromJar;
+    }
+
+    private void uploadBinary(ArchetypeInfo archetypeInfo, File artifactFile, String customerId) throws PhrescoException {
+        ArtifactInfo info = new ArtifactInfo(archetypeInfo.getGroupId(), archetypeInfo.getArtifactId(), "", "jar", archetypeInfo.getVersion());
+        repositoryManager.addArtifact(info, artifactFile, customerId); 
+    }
+
+    private File writeFile(BodyPart bodyPart) throws PhrescoException {
+        FileOutputStream fileOutStream = null;
+        InputStream source = null;
+        File file = null;
+        String fileName = bodyPart.getContentDisposition().getFileName();
+        BodyPartEntity bpe = (BodyPartEntity) bodyPart.getEntity();
+        try {
+              
+              source = bpe.getInputStream();
+              file = new File(ServerUtil.getTempFolderPath() + "/" + fileName + ".jar");
+              fileOutStream = new FileOutputStream(file);
+              int i = 0;
+              while (i != -1) {
+                  i = source.read();
+                  fileOutStream.write(i);
+              }
+              fileOutStream.flush();
+              source.close();
+              fileOutStream.close();
+        } catch (IOException e) {
+            throw new PhrescoException();
+        } finally {
+            Utility.closeStream(source);
+            Utility.closeStream(fileOutStream);
+        }
+        return file;
     }
 
     /**
@@ -1563,4 +1602,5 @@ public class ComponentService extends DbService implements ServiceConstants {
 		
 		return Response.status(Response.Status.OK).build();
 	}
+	
 }

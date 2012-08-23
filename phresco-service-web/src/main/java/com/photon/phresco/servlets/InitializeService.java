@@ -45,7 +45,7 @@ public class InitializeService extends HttpServlet {
 		String serverContextPath = config.getServletContext().getContextPath();
 		try {
 			PhrescoServerFactory.initialize();
-			PhrescoServerFactory.getRepositoryManager().getApplicationTypes();
+//			PhrescoServerFactory.getRepositoryManager().getApplicationTypes();
 //			List<ApplicationType> applicationTypes = PhrescoServerFactory.getDBManager().getApplicationTypes();
 //			System.out.println("applicationTypes " + applicationTypes);
 		} catch (PhrescoException e) {

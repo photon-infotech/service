@@ -19,7 +19,6 @@
  */
 package com.photon.phresco.service.admin.actions.admin;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -60,7 +59,7 @@ public class Customers extends ServiceBaseAction  {
 	private boolean errorFound = false;
 	private Date validFrom = null;
 	private Date validUpTo = null;
-	private URL repoURL = null;
+	private String repoURL = null;
 	private String fromPage = null;
 	private String customerId = null;
 	private String oldName = null;
@@ -118,7 +117,6 @@ public class Customers extends ServiceBaseAction  {
 			customer.setType(Integer.parseInt(licence));
 			customer.setValidFrom(validFrom);
 			customer.setValidUpto(validUpTo);
-			customer.setRepoURL(repoURL);
 			customers.add(customer);
 			ClientResponse clientResponse = getServiceManager().createCustomers(customers);
 			if (clientResponse.getStatus() != 200) {
@@ -151,7 +149,6 @@ public class Customers extends ServiceBaseAction  {
             customer.setType(Integer.parseInt(licence));
             customer.setValidFrom(validFrom);
             customer.setValidUpto(validUpTo);
-            customer.setRepoURL(repoURL);
 			getServiceManager().updateCustomer(customer, customerId);
 		} catch(Exception e)  {
 			throw new PhrescoException(e);
@@ -380,11 +377,11 @@ public class Customers extends ServiceBaseAction  {
 		this.description = description;
 	}
 	
-	public URL getRepoURL() {
+	public String getRepoURL() {
 		return repoURL;
 	}
 
-	public void setRepoURL(URL repoURL) {
+	public void setRepoURL(String repoURL) {
 		this.repoURL = repoURL;
 	}
 	

@@ -111,16 +111,16 @@ public class DocumentGeneratorTest extends AbstractPhrescoTest {
         RepositoryManager repoManager = PhrescoServerFactory.getRepositoryManager();
         try {
             PhrescoServerFactory.initialize();
-            List<ProjectInfo> pilotProjects = repoManager.getPilotProjects(info.getTechnology().getId());
-            for (ProjectInfo projectInfo : pilotProjects) {
-                 List<ModuleGroup> modules = projectInfo.getTechnology().getModules();
-                 List<ModuleGroup> modules2 = technology.getModules();
-                 if(CollectionUtils.isEmpty(modules2)){
-                     modules2 = new ArrayList<ModuleGroup>(8);
-                     technology.setModules(modules2);
-                 }
-                 modules2.addAll(modules);
-            }
+//            List<ProjectInfo> pilotProjects = repoManager.getPilotProjects(info.getTechnology().getId());
+//            for (ProjectInfo projectInfo : pilotProjects) {
+//                 List<ModuleGroup> modules = projectInfo.getTechnology().getModules();
+//                 List<ModuleGroup> modules2 = technology.getModules();
+//                 if(CollectionUtils.isEmpty(modules2)){
+//                     modules2 = new ArrayList<ModuleGroup>(8);
+//                     technology.setModules(modules2);
+//                 }
+//                 modules2.addAll(modules);
+//            }
         } catch (PhrescoException e1) {
             fail("Exception caught....at testGenerateWithNoDocuments" + e1.getMessage());		}
         DocumentGenerator docgen = PhrescoServerFactory.getDocumentGenerator();

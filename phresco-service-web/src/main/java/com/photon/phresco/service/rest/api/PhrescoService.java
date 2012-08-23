@@ -45,6 +45,7 @@ import com.photon.phresco.model.Technology;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.DbService;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.ProjectService;
@@ -55,6 +56,7 @@ import com.photon.phresco.service.util.UnauthorizedException;
 import com.photon.phresco.util.ArchiveUtil;
 import com.photon.phresco.util.ArchiveUtil.ArchiveType;
 import com.photon.phresco.util.Constants;
+import com.photon.phresco.util.FileUtil;
 
 /**
  * Phresco Service Class hosted at the URI path "/api"
@@ -65,18 +67,19 @@ public class PhrescoService extends DbService{
 	private static final Logger S_LOGGER = Logger.getLogger(PhrescoService.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	private AuthenticationUtil authUtil = null;
-	    
-	public PhrescoService() {
-     super();   // TODO Auto-generated constructor stub
+	private DbManager dbManager = null;
+	
+	public PhrescoService() throws PhrescoException {
+     super();  
+     PhrescoServerFactory.initialize();
+     dbManager = PhrescoServerFactory.getDbManager();
     }
+	
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
 	public List<ApplicationType> getApplicationTypes() throws PhrescoException {
 		RepositoryManager repManager = PhrescoServerFactory.getRepositoryManager();
-		String repositoryURL = repManager.getRepositoryURL();
-		return repManager.getApplicationTypes();
-		
-		//return PhrescoServerFactory.getDBManager().getApplicationTypes();
+		return null;
 	}
 
 	@POST
@@ -109,8 +112,13 @@ public class PhrescoService extends DbService{
 			}
 
 			ArchiveUtil.createArchive(projectPathStr, projectPathStr + ".zip", ArchiveType.ZIP);
-//			FileUtil.delete(projectPath);
-			return new ServiceOutput(projectPathStr);
+			FileUtil.delete(projectPath);
+			ServiceOutput serviceOutput = new ServiceOutput(projectPathStr);
+			if(serviceOutput != null) {
+			    dbManager.storeCreatedProjects(projectInfo);
+			}
+			
+			return serviceOutput;
 		} catch (Exception pe) {
 			S_LOGGER.error("Error During createProject(projectInfo)", pe);
 			throw new PhrescoException(pe);
@@ -146,8 +154,11 @@ public class PhrescoService extends DbService{
 			// //TODO: Need to design a proper way to throw the error response
 			// to client
 		}
-
-		return new ServiceOutput(projectPathStr);
+		ServiceOutput serviceOutput = new ServiceOutput(projectPathStr);
+		if(serviceOutput != null) {
+		    dbManager.updateCreatedProjects(projectInfo);
+		}
+		return serviceOutput;
 	}
 	
 	@POST

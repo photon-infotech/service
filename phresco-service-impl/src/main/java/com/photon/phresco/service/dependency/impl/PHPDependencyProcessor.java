@@ -115,7 +115,7 @@ public class PHPDependencyProcessor  extends AbstractJsLibDependencyProcessor {
 //            }
             ProjectInfo projectInfo = PhrescoServerFactory.getDbManager().getProjectInfo(info.getTechnology().getId(), info.getPilotProjectName());
             if(projectInfo != null) {
-                DependencyUtils.extractFiles(projectInfo.getProjectURL(), path);
+                DependencyUtils.extractFiles(projectInfo.getProjectURL(), path, projectInfo.getCustomerId());
             }
             extractJsLibraries(path, info.getTechnology().getJsLibraries());
             createSqlFolder(info, path);

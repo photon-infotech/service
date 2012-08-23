@@ -86,6 +86,8 @@ public class ServerConfiguration {
 	private static final String PHRESCO_DB_COLLECTION = "db.defaultcollection";
 	private static final String PHRESCO_TWITTER_SERVICE_URL = "phresco.twitter.service.url";
 	private static final String PHRESCO_FRAMEWORK_LATEST_URL = "phresco.framework.latest.version.file";
+	private String DATABASES = "Database";
+	private String WEBSERVICE = "WebService";
 	private String repositoryURL;
 	private String repositoryUser;
 	private String repositoryPassword;
@@ -99,8 +101,12 @@ public class ServerConfiguration {
 	private String dbHost;
 	private String dbPort;
 	private String dbName;
+	private String HOST = "host";
+	private String PORT= "port";
+	private String DBNAME = "dbname";
 	private String dbDefaultCollectionName;
 	private String twitterServiceURL; 
+	private String configFilePath =  "phresco-env-config.xml";
 
 	public ServerConfiguration(String fileName) throws PhrescoException {
 		initServerConfig(fileName);
@@ -145,9 +151,9 @@ public class ServerConfiguration {
 			this.credentialurl = serverProps.getProperty(KEY_CREDENTIAL_URL);
 			this.authenticateurl= serverProps.getProperty(AUTHENTICATION_SERVICE_URL);
 			this.serviceContextName = serverProps.getProperty(PHRESCO_SERVER_CONTEXT_NAME);
-			this.dbHost = serverProps.getProperty(PHRESCO_DB_HOST);
-			this.dbPort = serverProps.getProperty(PHRESCO_DB_PORT);
-			this.dbName = serverProps.getProperty(PHRESCO_DB_NAME);
+//			this.dbHost = serverProps.getProperty(PHRESCO_DB_HOST);
+//			this.dbPort = serverProps.getProperty(PHRESCO_DB_PORT);
+//			this.dbName = serverProps.getProperty(PHRESCO_DB_NAME);
 			this.dbDefaultCollectionName = serverProps.getProperty(PHRESCO_DB_COLLECTION);
 			this.twitterServiceURL = serverProps.getProperty(PHRESCO_TWITTER_SERVICE_URL);
 		} catch (IOException e) {
@@ -269,27 +275,32 @@ public class ServerConfiguration {
 	}
 
 	public String getAuthServiceURL() {
+		List<Configuration> configurations = configurationList("WebService");
+		for (Configuration configuration : configurations) {
+			String protocol = configuration.getProperties().getProperty("protocol");
+			String host = configuration.getProperties().getProperty("host");
+			String port = configuration.getProperties().getProperty("port");
+			String context = configuration.getProperties().getProperty("context");
+			authenticateurl = protocol + "://" + host + ":" +  port + "/" + context;
+		}
+		return authenticateurl;
+	}
+
+	private List<Configuration> configurationList(String configType) {
 		InputStream stream = null;
-		stream = this.getClass().getClassLoader().getResourceAsStream("phresco-env-config.xml");
+		stream = this.getClass().getClassLoader().getResourceAsStream(configFilePath);
 		try {
 			ConfigReader configReader = new ConfigReader(stream);
 			String environment = System.getProperty("SERVER_ENVIRONMENT");
 			if (environment == null || environment.isEmpty() ) {
 				environment = configReader.getDefaultEnvName();
 			}
-			List<Configuration> configurations = configReader.getConfigurations(environment,"WebService");
-			for (Configuration configuration : configurations) {
-				String protocol = configuration.getProperties().getProperty("protocol");
-				String host = configuration.getProperties().getProperty("host");
-				String port = configuration.getProperties().getProperty("port");
-				String context = configuration.getProperties().getProperty("context");
-				authenticateurl = protocol + "://" + host + ":" +  port + "/" + context;
-			}
-			return authenticateurl;
+			List<Configuration> configurations = configReader.getConfigurations(environment, configType);
+			return configurations;
 		} catch (Exception e) {
 				e.printStackTrace();
 		}
-		return "";
+		return null;
 	}
 
 	public String getEmailExtFile() {
@@ -297,14 +308,35 @@ public class ServerConfiguration {
 	}
 	
 	public String getDbHost() {
-		return dbHost;
+		List<Configuration> configurations = configurationList(DATABASES);
+		if (configurations != null) {
+			for (Configuration configuration : configurations) {
+				 dbHost = configuration.getProperties().getProperty(HOST);
+			}
+			return dbHost;
+		}
+		return null;
 	}
 	
 	public int getDbPort() {
-		return Integer.parseInt(dbPort);
+		List<Configuration> configurations = configurationList(DATABASES);
+		if (configurations != null) {
+			for (Configuration configuration : configurations) {
+				 dbPort = configuration.getProperties().getProperty(PORT);
+			}
+			return Integer.parseInt(dbPort);
+		}
+		return  Integer.parseInt(dbPort);
 	}
 	
 	public String getDbName() {
+		List<Configuration> configurations = configurationList(DATABASES);
+		if (configurations != null) {
+			for (Configuration configuration : configurations) {
+				 dbName = configuration.getProperties().getProperty(DBNAME);
+			}
+			return dbName;
+		}
 		return dbName;
 	}
 	

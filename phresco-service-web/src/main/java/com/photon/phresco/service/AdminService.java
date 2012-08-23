@@ -59,7 +59,7 @@ public class AdminService implements ServerConstants {
 		public List<AdminConfigInfo> getProducts()throws Exception {
 			PhrescoServerFactory.initialize();
 			RepositoryManager repoMgr = PhrescoServerFactory.getRepositoryManager();
-			String config = repoMgr.getArtifactAsString(repoMgr.getAdminConfigFile());
+			String config = repoMgr.getArtifactAsString(repoMgr.getAdminConfigFile(), "photon");
 			Gson gson = new Gson();
 			Type type = new TypeToken<List<AdminConfigInfo>>(){}.getType();
 			List<AdminConfigInfo> adminConfigInfos = gson.fromJson(config, type);

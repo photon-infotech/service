@@ -34,7 +34,9 @@
 		
 <form id="formFeaturesList" class="form-horizontal customer_list">
 	<div class="operation">
-		<input type="button" id="featuresAdd" class="btn btn-primary" name="features_add" onclick="loadContent('featuresAdd', $('#formFeaturesList'), $('#subcontainer'));" value="<s:text name='lbl.hdr.comp.featrs.add'/>"/>
+		<input type="button" id="featuresAdd" class="btn btn-primary" name="features_add" 
+		    onclick="loadContent('featuresAdd', $('#formFeaturesList'), $('#subcontainer'));" 
+		       value="<s:text name='lbl.hdr.comp.featrs.add'/>"/>
 		<input type="button" class="btn" id="del" disabled value="<s:text name='lbl.hdr.comp.delete'/>" 
             onclick="loadContent('featuresDelete', $('#formFeaturesList'), $('#subcontainer'));"/>
 		<s:if test="hasActionMessages()">
@@ -138,8 +140,6 @@
 	function editFeature(id) {
 	    var params = "techId=";
 	    params = params.concat(id);
-	    params = params.concat("&fromPage=");
-	    params = params.concat("edit");
 	    loadContentParam("featuresEdit", params, $('#subcontainer'));
 	}
 </script>

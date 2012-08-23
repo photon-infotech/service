@@ -437,7 +437,7 @@
 			</label>
 			<div class="controls">
 				<input id="repUrl" class="datealign" type="text" name="repoURL"
-				    value="<%= customer != null ? customer.getRepoURL() : "" %>">
+				    value="<%= customer != null ? customer.getRepoInfo().getGroupRepoURL() : "" %>">
 			</div>
 		</div>
 	</div>

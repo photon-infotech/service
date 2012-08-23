@@ -61,4 +61,12 @@ public interface ServerConstants {
 	  //Authentication Constants
 	 String AUTHENTICATE = "/authenticate";
 	 
+	 
+	 /*
+	  * Constants for jar processor
+	  */
+	 String ARCHETYPE_FILE = "META-INF/maven/archetype.xml";
+     String ARCHETYPE_METADATA_FILE = "META-INF/maven/archetype-metadata.xml";
+     String PLUGIN_XML_FILE = "META-INF/maven/plugin.xml";
+     String PLUGIN_COMPONENTS_XML_FILE = "META-INF/plexus/components.xml";
 }

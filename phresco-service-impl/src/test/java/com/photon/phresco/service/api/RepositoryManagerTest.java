@@ -69,7 +69,7 @@ public class RepositoryManagerTest {
     public void testGetArtifactAsString() throws PhrescoException {
         RepositoryManager repoManager = PhrescoServerFactory.getRepositoryManager();
         System.out.println("RepoMan " + repoManager);
-        String technologies = repoManager.getArtifactAsString("tech.xml");
+        String technologies = repoManager.getArtifactAsString("tech.xml", "photon");
         System.out.println(technologies);
     }
 

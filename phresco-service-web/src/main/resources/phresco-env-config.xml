@@ -7,6 +7,15 @@
             <host>172.16.18.174</host>
             <protocol>http</protocol>
             <username/>
-        </WebService>
-    </environment>
+        </WebService>	
+	<Database  desc="" name="database">
+		<host>172.16.17.227</host>
+		<port>27017</port>
+		<username></username>
+		<password/>
+		<dbname>Test</dbname>
+		<type>mongodb</type>
+		<version>2.0.4</version>
+	</Database>
+	</environment>
 </environments>

@@ -29,11 +29,13 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.model.ServerConstants;
 import com.photon.phresco.util.ArchiveUtil;
 import com.photon.phresco.util.ArchiveUtil.ArchiveType;
+import com.photon.phresco.util.ServiceConstants;
 import com.photon.phresco.util.TechnologyTypes;
 import com.photon.phresco.util.Utility;
 
@@ -114,7 +116,7 @@ public class ImageDownloader extends Thread implements ServerConstants {
 	}
 
 	private String getRepositoryUrl() throws PhrescoException {
-		String repositoryUrl = PhrescoServerFactory.getRepositoryManager().getRepositoryURL();
-		return repositoryUrl;
+		RepoInfo repoInfo = PhrescoServerFactory.getDbManager().getRepoInfo(ServiceConstants.DEFAULT_CUSTOMER_NAME);
+		return repoInfo.getGroupRepoURL();
 	}	
 }
