@@ -63,6 +63,9 @@
 		<li>
 			<a href="#" class="inactive" name="compTab" id="pilotprojList"><s:label key="lbl.hdr.comp.pltprjt" theme="simple"/></a>
 		</li>
+		<li>
+			<a href="#" class="inactive" name="compTab" id="downloadList"><s:label key="lbl.hdr.adm.dwnld"  theme="simple"/></a>
+		</li>
 	</ul>
 	<form id="formCustomerId" class="form">
 		<div class="control-group customer_name">

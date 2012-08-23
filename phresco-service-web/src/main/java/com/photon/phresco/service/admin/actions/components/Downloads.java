@@ -17,7 +17,7 @@
  * limitations under the License.
  * ###
  */
-package com.photon.phresco.service.admin.actions.admin;
+package com.photon.phresco.service.admin.actions.components;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
