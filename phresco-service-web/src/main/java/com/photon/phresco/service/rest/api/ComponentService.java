@@ -1420,16 +1420,10 @@ public class ComponentService extends DbService implements ServiceConstants {
         for (BodyPart bodyPart : list) {
             if (bodyPart.getContentDisposition().getType().equals("appType")) {
                 File appJarFile = writeFile(bodyPart);
-                ArchetypeInfo archetypeInfo = createArchetypeInfo("archetypes", technology);
-//                ArchetypeInfo artifactInfoFromJar = ServerUtil
-//                        .getArtifactInfoFromJar(appJarFile);
-                technology.setArchetypeInfo(archetypeInfo);
-                uploadBinary(archetypeInfo, appJarFile, technology.getCustomerId());
+                uploadBinary(technology.getArchetypeInfo(), appJarFile, technology.getCustomerId());
                 FileUtil.delete(appJarFile);
             } else {
                 File appJarFile = writeFile(bodyPart);
-//                ArchetypeInfo artifactInfoFromJar = ServerUtil
-//                        .getArtifactInfoFromJar(appJarFile);
                 ArchetypeInfo archetypeInfo = createArchetypeInfo("plugins", technology);
                 infos.add(archetypeInfo);
                 uploadBinary(archetypeInfo, appJarFile, technology.getCustomerId());
@@ -1439,7 +1433,6 @@ public class ComponentService extends DbService implements ServiceConstants {
         technology.setPlugins(infos);
         mongoOperation.save(TECHNOLOGIES_COLLECTION_NAME, technology);
     }
-
 
     private ArchetypeInfo createArchetypeInfo(String type,Technology technology ) {
         ArchetypeInfo artifactInfoFromJar = new ArchetypeInfo();

@@ -152,7 +152,7 @@ public class Archetypes extends ServiceBaseAction {
 	        technology.setAppTypeId(apptype);
 	        technology.setVersionComment(versionComment);
 	        technology.setCustomerId(customerId);
-	        ArchetypeInfo archetypeInfo = new ArchetypeInfo(groupId, artifactId, version);
+	        ArchetypeInfo archetypeInfo = new ArchetypeInfo(groupId, artifactId, version, "jar");
 	        technology.setArchetypeInfo(archetypeInfo);
 	        
 		    BodyPart jsonPart = new BodyPart();
