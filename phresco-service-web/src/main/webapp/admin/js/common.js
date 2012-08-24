@@ -249,3 +249,19 @@ function disableScreen() {
 function enableScreen() {
 	$(".modal-backdrop").hide();
 }
+
+//To fill the pom details in the textbox if available while uploading the files
+function fillTextBoxes(responseJSON) {
+	$('#jarDetailsDiv').show();
+	if (responseJSON.mavenJar) {
+		disableEnableTextBox(responseJSON.groupId, responseJSON.artifactId, responseJSON.version, true)
+	} else {
+		disableEnableTextBox('', '', '', false)
+	}
+}
+
+function disableEnableTextBox(groupId, artifactId, jarVersion, isEnable) {
+	$('input[name=groupId]').val(groupId).attr('disabled', isEnable);
+	$('input[name=artifactId]').val(artifactId).attr('disabled', isEnable);
+	$('input[name=jarVersion]').val(jarVersion).attr('disabled', isEnable);
+}

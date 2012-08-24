@@ -270,6 +270,7 @@ qq.FileUploaderBasic = function(o){
 		        	if (o.type === "pluginJar") {
 		        		pluginJarError();
 		        	} else {
+		        		fillTextBoxes(responseJSON);
 		        		applnJarError();
 		        		enableDisableUpload();
 		        	}

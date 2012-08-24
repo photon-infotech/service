@@ -96,19 +96,21 @@ public class ServerUtil {
      * @throws PhrescoException 
      */
     public static boolean validateMavenJar(InputStream inputJar) throws PhrescoException {
-        boolean mavenJar = false;
-        try {
+    	boolean returnValue = false;
+    	try {
             jarInputStream = new JarInputStream(inputJar);
             JarEntry nextJarEntry = jarInputStream.getNextJarEntry();
             while ((nextJarEntry = jarInputStream.getNextJarEntry()) != null) {
-                if(nextJarEntry.getName().contains("pom.xml")) {
-                    mavenJar =  true;
+                if (nextJarEntry.getName().contains("pom.xml")) {
+                	returnValue = true;
+                	break;
                 }
             }
         } catch (Exception e) {
             throw new PhrescoException(e);
         }
-        return mavenJar;
+        
+        return returnValue;
     }
     
     /**

@@ -132,7 +132,41 @@
 				<span class="help-inline" id="appError"></span>
 			</div>
 		</div>
-
+		
+		<!-- POM details starts -->
+		<div id="jarDetailsDiv" class="hideContent">
+			<div class="control-group">
+				<label class="control-label labelbold">
+					<s:text name='lbl.hdr.comp.groupid'/>
+				</label>
+				<div class="controls">
+					<input name="groupId" class="input-xlarge" type="text"
+						placeholder="<s:text name='place.hldr.archetype.add.groupId'/>">
+				</div>
+			</div>
+			
+			<div class="control-group">
+				<label class="control-label labelbold">
+					<s:text name='lbl.hdr.comp.artifactid'/>
+				</label>
+				<div class="controls">
+					<input name="artifactId" class="input-xlarge" type="text"
+						placeholder="<s:text name='place.hldr.archetype.add.artifactId'/>">
+				</div>
+			</div>
+			
+			<div class="control-group">
+				<label class="control-label labelbold">
+					<s:text name='lbl.hdr.comp.jar.version'/>
+				</label>
+				<div class="controls">
+					<input name="jarVersion" class="input-xlarge" type="text"
+						placeholder="<s:text name='place.hldr.archetype.add.jar.version'/>">
+				</div>
+			</div>
+		</div>
+		<!-- POM details ends -->
+		
 		<div class="control-group" id="fileControl">
 			<label class="control-label labelbold"> <span
 				class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.applnjar' />
@@ -147,7 +181,7 @@
 			</div>
 			<span class="help-inline fileError" id="fileError"></span>
 		</div>
-
+		
 		<div class="control-group" id="pluginControl">
 			<label class="control-label labelbold"> <s:text
 					name='lbl.hdr.comp.pluginjar' /> </label>
@@ -290,6 +324,7 @@
    	}
    
 	function removeUploadedJar(obj) {
+		$('#jarDetailsDiv').hide();
 		$(obj).parent().remove();
 		var params = "uploadedJar=";
 		params = params.concat($(obj).attr("id"));
@@ -315,5 +350,5 @@
 			$('#appln-file-uploader').find("input[type='file']").attr('disabled', false);
 			$('#appln-file-uploader').find($(".btn")).removeClass("disabled").addClass("btn-primary qq-upload-button");
 		}
-	} 
+	}
 </script>

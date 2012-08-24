@@ -32,6 +32,9 @@ public interface ServiceUIConstants {
     String REQ_EDIT = "edit";
     String REQ_USER_INFO = "userInfo";
     String SESSION_USER_INFO = "userInfo";
+    String SUCCESS_FALSE = "{success: false}";
+	String SUCCESS_TRUE = "{success: true}";
+	String MAVEN_JAR_FALSE = "{mavenJar: false,success: true}";
     
     
 	/*****************************
@@ -71,9 +74,7 @@ public interface ServiceUIConstants {
     String FILE_FOR_APPTYPE = "appType";
 	String FILE_FOR_PLUGIN = "plugin";
     String X_FILE_NAME = "X-File-Name";
-	String SUCCESS_FALSE = "{success: false}";
-	String SUCCESS_TRUE = "{success: true}";
-    
+
     
     /*****************************
      * Customer Request Constants

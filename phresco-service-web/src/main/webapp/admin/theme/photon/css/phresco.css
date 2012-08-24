@@ -1787,3 +1787,7 @@ input[class*='sample'] {
     position: relative;
     top: 8px;
 }
+
+.hideContent {
+	display: none;	
+}

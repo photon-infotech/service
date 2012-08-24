@@ -35,15 +35,19 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.google.gson.Gson;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.MultiPart;
 
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.ApplicationType;
+import com.photon.phresco.model.ArchetypeInfo;
 import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.client.api.Content;
+import com.photon.phresco.service.util.ServerUtil;
+
 
 
 public class Archetypes extends ServiceBaseAction { 
@@ -73,7 +77,11 @@ public class Archetypes extends ServiceBaseAction {
     private String customerId = null;
 	
 	private String versionComment = null;
-
+	
+	private String jarVersion = "";
+	private String groupId = "";
+	private String artifactId = "";
+	
 	public String list() throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.list()");
@@ -144,11 +152,13 @@ public class Archetypes extends ServiceBaseAction {
 	        technology.setAppTypeId(apptype);
 	        technology.setVersionComment(versionComment);
 	        technology.setCustomerId(customerId);
+	        ArchetypeInfo archetypeInfo = new ArchetypeInfo(groupId, artifactId, version);
+	        technology.setArchetypeInfo(archetypeInfo);
 	        
 		    BodyPart jsonPart = new BodyPart();
 		    jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
 		    jsonPart.setEntity(technology);
-		    Content content = new Content("object", name, null, null, null, 0);
+		    Content content = new Content(name, name, null, null, null, 0);
 		    jsonPart.setContentDisposition(content);
 		    multiPart.bodyPart(jsonPart);
 			   
@@ -202,8 +212,18 @@ public class Archetypes extends ServiceBaseAction {
 	        		|| applnJarName.endsWith(REQ_TAR_GZ_FILE_EXTENSION)) {
 	        	InputStream is = getHttpRequest().getInputStream();
 	        	applnByteArray = IOUtils.toByteArray(is);
+	        	InputStream applnIs = new ByteArrayInputStream(applnByteArray);
+	        	ArchetypeInfo archetypeInfo = ServerUtil.getArtifactinfo(applnIs);
 	            getHttpResponse().setStatus(getHttpResponse().SC_OK);
-	            writer.print(SUCCESS_TRUE);
+	            if (archetypeInfo != null) {
+	            	archetypeInfo.setMavenJar(true);
+	            	archetypeInfo.setSuccess(true);
+	            	Gson gson = new Gson();
+	                String json = gson.toJson(archetypeInfo);
+	            	writer.print(json);
+	            } else {
+	            	writer.print(MAVEN_JAR_FALSE);
+	            }
 		        writer.flush();
 		        writer.close();
 	        }
@@ -433,5 +453,29 @@ public class Archetypes extends ServiceBaseAction {
 
 	public void setCustomerId(String customerId) {
 		this.customerId = customerId;
+	}
+	
+	public String getJarVersion() {
+		return jarVersion;
+	}
+
+	public void setJarVersion(String jarVersion) {
+		this.jarVersion = jarVersion;
+	}
+
+	public String getGroupId() {
+		return groupId;
+	}
+
+	public void setGroupId(String groupId) {
+		this.groupId = groupId;
+	}
+
+	public String getArtifactId() {
+		return artifactId;
+	}
+
+	public void setArtifactId(String artifactId) {
+		this.artifactId = artifactId;
 	}
 }
