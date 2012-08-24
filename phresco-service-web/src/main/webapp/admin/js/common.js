@@ -261,7 +261,10 @@ function fillTextBoxes(responseJSON) {
 }
 
 function disableEnableTextBox(groupId, artifactId, jarVersion, isEnable) {
-	$('input[name=groupId]').val(groupId).attr('disabled', isEnable);
-	$('input[name=artifactId]').val(artifactId).attr('disabled', isEnable);
-	$('input[name=jarVersion]').val(jarVersion).attr('disabled', isEnable);
+	$('.groupId').val(groupId).attr('disabled', isEnable);
+	$('.artifactId').val(artifactId).attr('disabled', isEnable);
+	$('.jarVersion').val(jarVersion).attr('disabled', isEnable);
+	$('input[name=groupId]').val(groupId);
+	$('input[name=artifactId]').val(artifactId);
+	$('input[name=jarVersion]').val(jarVersion);
 }

@@ -140,7 +140,7 @@
 					<s:text name='lbl.hdr.comp.groupid'/>
 				</label>
 				<div class="controls">
-					<input name="groupId" class="input-xlarge" type="text"
+					<input class="groupId" class="input-xlarge" type="text"
 						placeholder="<s:text name='place.hldr.archetype.add.groupId'/>">
 				</div>
 			</div>
@@ -150,7 +150,7 @@
 					<s:text name='lbl.hdr.comp.artifactid'/>
 				</label>
 				<div class="controls">
-					<input name="artifactId" class="input-xlarge" type="text"
+					<input class="artifactId" class="input-xlarge" type="text"
 						placeholder="<s:text name='place.hldr.archetype.add.artifactId'/>">
 				</div>
 			</div>
@@ -160,7 +160,7 @@
 					<s:text name='lbl.hdr.comp.jar.version'/>
 				</label>
 				<div class="controls">
-					<input name="jarVersion" class="input-xlarge" type="text"
+					<input class="jarVersion" class="input-xlarge" type="text"
 						placeholder="<s:text name='place.hldr.archetype.add.jar.version'/>">
 				</div>
 			</div>
@@ -226,7 +226,10 @@
 	<input type="hidden" name="fromPage" value="<%= StringUtils.isNotEmpty(fromPage) ? fromPage : "" %>"/>
 	<input type="hidden" name="techId" value="<%= technology != null ? technology.getId() : "" %>"/>
 	<input type="hidden" name="oldName" value="<%= technology != null ? technology.getName() : "" %>"/>
-	<input type="hidden" name="customerId" value="<%= customerId %>"> 
+	<input type="hidden" name="customerId" value="<%= customerId %>">
+	<input type="hidden" name="groupId">
+	<input type="hidden" name="artifactId">
+	<input type="hidden" name="jarVersion">
 </form>
 
 <script type="text/javascript">
