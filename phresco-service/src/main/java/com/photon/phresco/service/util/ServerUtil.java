@@ -1,8 +1,6 @@
 package com.photon.phresco.service.util;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,23 +34,7 @@ public class ServerUtil {
      * @throws PhrescoException
      */
     public static ArchetypeInfo getArtifactinfo(InputStream inputJarStream) throws PhrescoException {
-        File jarFile = null;
-        FileOutputStream fileOutStream = null;
-        
-        try {
-            jarFile = new File(getTempFolderPath() + "/" + "temp" + ".jar");
-            fileOutStream = new FileOutputStream(jarFile);
-            byte buf[]=new byte[1024];
-            int len;
-            while((len=inputJarStream.read(buf))>0) {
-                fileOutStream.write(buf,0,len);
-            }
-        } catch (Exception e) {
-            throw new PhrescoException(e);
-        } finally {
-            Utility.closeStream(inputJarStream);
-            Utility.closeStream(fileOutStream);
-        }
+        File jarFile = writeFileFromStream(inputJarStream, null);
         ArchetypeInfo artifactInfo = getArtifactInfoFromJar(jarFile);
         FileUtil.delete(jarFile);
         return artifactInfo;
@@ -200,6 +182,31 @@ public class ServerUtil {
         byte[] decodedBytes = Base64.decodeBase64(inputString);
         String decodedString = new String(decodedBytes);
         return decodedString;
+    }
+    
+    public static File writeFileFromStream(InputStream inputStream, String path) throws PhrescoException {
+        File artifactFile = null;
+        FileOutputStream fileOutStream = null;
+        if (path == null) {
+            artifactFile = new File(ServerUtil.getTempFolderPath() + "/" + "temp" + ".jar");
+        } else {
+            artifactFile = new File(path);
+        }
+        try {
+            fileOutStream = new FileOutputStream(artifactFile);
+            byte buf[] = new byte[1024];
+            int len;
+            while((len = inputStream.read(buf))>0) {
+                fileOutStream.write(buf,0,len);
+            }
+      } catch (IOException e) {
+          throw new PhrescoException();
+      } finally {
+          Utility.closeStream(inputStream);
+          Utility.closeStream(fileOutStream);
+      }
+        return artifactFile;
+        
     }
     
 }

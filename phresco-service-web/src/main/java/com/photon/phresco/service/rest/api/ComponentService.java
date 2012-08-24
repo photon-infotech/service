@@ -1419,11 +1419,13 @@ public class ComponentService extends DbService implements ServiceConstants {
         List<ArchetypeInfo> infos = new ArrayList<ArchetypeInfo>();
         for (BodyPart bodyPart : list) {
             if (bodyPart.getContentDisposition().getType().equals("appType")) {
-                File appJarFile = writeFile(bodyPart);
+                BodyPartEntity bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
+                File appJarFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null);
                 uploadBinary(technology.getArchetypeInfo(), appJarFile, technology.getCustomerId());
                 FileUtil.delete(appJarFile);
             } else {
-                File appJarFile = writeFile(bodyPart);
+                BodyPartEntity bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
+                File appJarFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null);
                 ArchetypeInfo archetypeInfo = createArchetypeInfo("plugins", technology);
                 infos.add(archetypeInfo);
                 uploadBinary(archetypeInfo, appJarFile, technology.getCustomerId());
@@ -1445,30 +1447,6 @@ public class ComponentService extends DbService implements ServiceConstants {
     private void uploadBinary(ArchetypeInfo archetypeInfo, File artifactFile, String customerId) throws PhrescoException {
         ArtifactInfo info = new ArtifactInfo(archetypeInfo.getGroupId(), archetypeInfo.getArtifactId(), "", "jar", archetypeInfo.getVersion());
         repositoryManager.addArtifact(info, artifactFile, customerId); 
-    }
-
-    private File writeFile(BodyPart bodyPart) throws PhrescoException {
-        FileOutputStream fileOutStream = null;
-        InputStream source = null;
-        File file = null;
-        String fileName = bodyPart.getContentDisposition().getFileName();
-        BodyPartEntity bpe = (BodyPartEntity) bodyPart.getEntity();
-        try {
-              source = bpe.getInputStream();
-              file = new File(ServerUtil.getTempFolderPath() + "/" + fileName + ".jar");
-              fileOutStream = new FileOutputStream(file);
-              byte buf[] = new byte[1024];
-              int len;
-              while((len = source.read(buf))>0) {
-                  fileOutStream.write(buf,0,len);
-              }
-        } catch (IOException e) {
-            throw new PhrescoException();
-        } finally {
-            Utility.closeStream(source);
-            Utility.closeStream(fileOutStream);
-        }
-        return file;
     }
 
     /**
