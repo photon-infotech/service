@@ -22,6 +22,7 @@
 
 <%@ page import="java.util.List" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="org.apache.commons.collections.CollectionUtils"%>
 
 <%@ page import="com.photon.phresco.model.Technology"%>
 <%@ page import="com.photon.phresco.model.DownloadInfo" %>
@@ -32,6 +33,22 @@
     String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
     List<Technology> technologys = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
     String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
+  
+    //For edit
+    String name = "";
+    String description = "";
+    String version = "";
+    if (downloadInfo != null) {
+    	if (StringUtils.isNotEmpty(downloadInfo.getName())) {
+    		name = downloadInfo.getName();
+    	}
+    	if (StringUtils.isNotEmpty(downloadInfo.getDescription())) {
+    		description = downloadInfo.getDescription();
+    	}
+    	if (StringUtils.isNotEmpty(downloadInfo.getVersion())) {
+    		version = downloadInfo.getVersion();
+    	}
+    }
 %>
 
 <form id="formDownloadAdd" class="form-horizontal customer_list">
@@ -50,7 +67,7 @@
 			</label>
 			<div class="controls">
 				<input id="input01" placeholder="<s:text name='place.hldr.download.add.name'/>" 
-					value="<%= downloadInfo != null ? downloadInfo.getName() : "" %>" class="input-xlarge" type="text" name="name">
+					value="<%= name %>" class="input-xlarge" type="text" name="name">
 				<span class="help-inline" id="nameError"></span>
 			</div>
 		</div>
@@ -61,7 +78,7 @@
 			</label>
 			<div class="controls">
 				<input id="input01"  placeholder="<s:text name='place.hldr.download.add.desc'/>" class="input-xlarge" type="text"
-					value="<%= downloadInfo != null ? downloadInfo.getDescription() : "" %>" name="description">
+					value="<%= description %>" name="description">
 			</div>
 		</div>
 		
@@ -137,7 +154,7 @@
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.dwnld.ver'/>
 			</label>
 			<div class="controls">
-				<input id="input01" placeholder="<s:text name='place.hldr.download.add.version'/>" value="<%= downloadInfo != null ? downloadInfo.getVersion() : "" %>" class="input-xlarge" type="text" name="version">
+				<input id="input01" placeholder="<s:text name='place.hldr.download.add.version'/>" value="<%= version %>" class="input-xlarge" type="text" name="version">
 				<span class="help-inline" id="verError"></span>
 			</div>
 		</div>

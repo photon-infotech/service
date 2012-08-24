@@ -25,7 +25,17 @@
 <%@ page import="com.photon.phresco.commons.model.Role" %>
 <% 
    Role role = (Role)request.getAttribute(ServiceUIConstants.REQ_ROLE_ROLE);  
-   String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE); 
+   String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
+   String name = "";
+   String description = "";
+   if ( role != null) {
+	   if (StringUtils.isNotEmpty(role.getName())) {
+		   name = role.getName();
+	   }
+	   if (StringUtils.isNotEmpty(role.getDescription())) {
+		   description = role.getDescription();
+	   }
+   }
 %>
 
 <form id="formRoleAdd" class="form-horizontal customer_list">
@@ -36,7 +46,7 @@
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.name'/>
 			</label>
 			<div class="controls">
-				<input id="input01" placeholder="<s:text name='place.hldr.role.add.name'/>" class="input-xlarge" type="text" name="name" value="<%= role != null ? role.getName() : "" %>">
+				<input id="input01" placeholder="<s:text name='place.hldr.role.add.name'/>" class="input-xlarge" type="text" name="name" value="<%= name %>">
 				<span class="help-inline" id="nameError"></span>
 			</div>
 		</div>
@@ -46,7 +56,7 @@
 				<s:text name='lbl.hdr.adm.desc'/>
 			</label>
 			<div class="controls">
-				<input id="input01" placeholder="<s:text name='place.hldr.role.add.desc'/>" class="input-xlarge" type="text" name="description" value="<%= role != null ? role.getDescription() : "" %>" >
+				<input id="input01" placeholder="<s:text name='place.hldr.role.add.desc'/>" class="input-xlarge" type="text" name="description" value="<%= description %>" >
 			</div>
 		</div>
 	</div>

@@ -28,6 +28,48 @@
 <%
 	Customer customer = (Customer) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER);
 	String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
+	String name = "";
+	String description = "";
+	String emailId = "";
+	String address = "";
+	String state = "";
+	String zipCode = "";
+	String contactNo = "";
+	String fax = "";
+	String helpText = "";
+	String repoUrl = "";
+	if (customer != null) {
+		if (StringUtils.isNotEmpty(customer.getName())) {
+			name = customer.getName();
+		}
+		if (StringUtils.isNotEmpty(customer.getDescription())) {
+			description = customer.getDescription();
+		}
+		if (StringUtils.isNotEmpty(customer.getEmailId())) {
+			emailId = customer.getEmailId();
+		}
+		if (StringUtils.isNotEmpty(customer.getAddress())) {
+			address = customer.getAddress();
+		} 
+		if (StringUtils.isNotEmpty(customer.getState())) {
+			state = customer.getState();
+		} 
+		if (StringUtils.isNotEmpty(customer.getZipcode())) {
+			zipCode = customer.getZipcode();
+		} 
+		if (StringUtils.isNotEmpty(customer.getContactNumber())) {
+			contactNo = customer.getContactNumber();
+		} 
+		if (StringUtils.isNotEmpty(customer.getFax())) {
+			fax = customer.getFax();
+		} 
+		if (StringUtils.isNotEmpty(customer.getHelpText())) {
+			helpText = customer.getHelpText();
+		} 
+		if (StringUtils.isNotEmpty(customer.getRepoInfo().getReleaseRepoURL())) {
+			repoUrl = customer.getRepoInfo().getReleaseRepoURL();
+		}
+	}
 %>
 
 <form id="formCustomerAdd" class="form-horizontal customer_list">
@@ -45,7 +87,7 @@
 			</label>
 			<div class="controls">
 				<input id="input01" placeholder="<s:text name='place.hldr.cust.add.name'/>" class="input-xlarge" name="name" type="text" 
-				    value="<%= customer != null ? customer.getName() : "" %>">
+				    value="<%= name %>">
 					<span class="help-inline" id="nameError"></span>
 			</div>
 		</div>
@@ -56,7 +98,7 @@
 			</label>
 			<div class="controls">
 				<textarea id="textarea" placeholder="<s:text name='place.hldr.cust.add.desc'/>" class="input-xlarge" rows="3" 
-				    name="description"><%= customer != null ? customer.getDescription() : "" %></textarea>
+				    name="description"><%= description %></textarea>
 			</div>
 		</div>
 
@@ -68,7 +110,7 @@
 				<div class="input-prepend">
 					<span class="add-on"> <i class="icon-envelope"></i></span> 
 					<input id="inputIcon" class="span2" type="text" name="email" 
-                        value="<%= customer != null ? customer.getEmailId() : "" %>">
+                        value="<%= emailId %>">
 					<span class="help-inline" id="mailError"></span>
 				</div>
 			</div>
@@ -80,7 +122,7 @@
 			</label>
 			<div class="controls">
 				<textarea id="textarea" placeholder="<s:text name='place.hldr.cust.add.address'/>" class="input-xlarge" rows="3" 
-				    name="address"><%= customer != null ? customer.getAddress() : "" %></textarea>
+				    name="address"><%= address %></textarea>
 				<span class="help-inline applyerror" id="addresError"></span>
 			</div>
 		</div>
@@ -349,7 +391,7 @@
 			</label>
 			<div class="controls">
 				<input id="input01" placeholder="<s:text name='place.hldr.cust.add.state'/>" class="input-xlarge" type="text" name="state"
-				    value="<%= customer != null ? customer.getState() : "" %>">
+				    value="<%= state %>">
 			</div>
 		</div>
 
@@ -359,7 +401,7 @@
 			</label>
 			<div class="controls">
 				<input id="input01" placeholder="<s:text name='place.hldr.cust.add.zipcode'/>" class="input-xlarge" type="text" name="zipcode"
-				    value="<%= customer != null ? customer.getZipcode() : "" %>">
+				    value="<%= zipCode %>">
 				<span class="help-inline" id="zipError"></span>
 			</div>
 		</div>
@@ -370,7 +412,7 @@
 			</label>
 			<div class="controls">
 				<input id="input01" placeholder="<s:text name='place.hldr.cust.add.contact.no'/>" class="input-xlarge" type="text" name="number"
-				    value="<%= customer != null ? customer.getContactNumber() : "" %>">
+				    value="<%= contactNo %>">
 				<span class="help-inline" id="numError"></span>
 			</div>
 		</div>
@@ -381,7 +423,7 @@
 			</label>
 			<div class="controls">
 				<input id="input01" placeholder="<s:text name='place.hldr.cust.add.fax.no'/>" class="input-xlarge" type="text" name="fax"
-				    value="<%= customer != null ? customer.getFax() : "" %>">
+				    value="<%= fax %>">
 				<span class="help-inline" id="faxError"></span>
 			</div>
 		</div>
@@ -392,7 +434,7 @@
 			</label>
 			<div class="controls">
 				<input id="input01" placeholder="<s:text name='place.hldr.cust.add.help.text'/>" class="input-xlarge" type="text" name="helpText"
-				    value="<%= customer != null ? customer.getHelpText() : "" %>">
+				    value="<%= helpText %>">
 			</div>
 		</div>
 
@@ -417,7 +459,7 @@
 			</label>
 			<div class="controls">
 				<input id="fromdate" class="datealign" type="text" name="validFrom" 
-				    value="<%= customer != null ? customer.getValidFrom() : "" %>">
+				    value="<%= customer.getValidFrom() != null ? customer.getValidFrom() : "" %>">
 			</div>
 		</div>
 
@@ -427,7 +469,7 @@
 			</label>
 			<div class="controls">
 				<input id="todate" class="datealign" type="text" name="validUpTo" 
-				    value="<%= customer != null ? customer.getValidUpto() : "" %>">
+				    value="<%= customer.getValidUpto() != null ? customer.getValidUpto() : "" %>">
 			</div>
 		</div>
 
@@ -437,7 +479,7 @@
 			</label>
 			<div class="controls">
 				<input id="repUrl" class="datealign" type="text" name="repoURL"
-				    value="<%= customer != null ? customer.getRepoInfo().getGroupRepoURL() : "" %>">
+				    value="<%= repoUrl %>">
 			</div>
 		</div>
 	</div>

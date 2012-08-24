@@ -32,6 +32,18 @@
 	String fromPage = (String)request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE); 
 	List<Technology> technologys = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
+	
+	//For edit
+    String name = "";
+    String description = "";
+    if (pilotProjectInfo != null) {
+    	if (StringUtils.isNotEmpty(pilotProjectInfo.getName())) {
+    		name = pilotProjectInfo.getName();
+    	}
+    	if (StringUtils.isNotEmpty(pilotProjectInfo.getDescription())) {
+    		description = pilotProjectInfo.getDescription();
+    	}
+    }
 %>
 
 <form id="formPilotProAdd" class="form-horizontal customer_list">
@@ -49,7 +61,7 @@
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.name'/>
 			</label>
 			<div class="controls">
-				<input id="input01" placeholder="<s:text name='place.hldr.pilot.add.name'/>" value="<%= pilotProjectInfo != null ? pilotProjectInfo.getName() : "" %>" class="input-xlarge" type="text" name="name">
+				<input id="input01" placeholder="<s:text name='place.hldr.pilot.add.name'/>" value="<%= name %>" class="input-xlarge" type="text" name="name">
 				<span class="help-inline" id="nameError"></span>
 			</div>
 		</div>
@@ -59,7 +71,7 @@
 				<s:text name='lbl.hdr.comp.desc'/>
 			</label>
 			<div class="controls">
-				<input id="input01" placeholder="<s:text name='place.hldr.pilot.add.desc'/>" value="<%= pilotProjectInfo != null ? pilotProjectInfo.getDescription() : "" %>"  class="input-xlarge" type="text" name="description">
+				<input id="input01" placeholder="<s:text name='place.hldr.pilot.add.desc'/>" value="<%= description %>"  class="input-xlarge" type="text" name="description">
 			</div>
 		</div>
 
