@@ -26,7 +26,6 @@
 
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
 <%@ page import="com.photon.phresco.model.SettingsTemplate" %>
-<%@ page import="com.photon.phresco.model.PropertyTemplate" %>
 
 <%
 	List<SettingsTemplate> configTemplates = (List<SettingsTemplate>) request.getAttribute(ServiceUIConstants.REQ_CONFIG_TEMPLATES);
@@ -90,26 +89,20 @@
 							%>
 									<tr>
 										<td class="checkboxwidth">
-											<input type="checkbox" class="check" name="configId" value="<%= configTemplate.getId() %>" onclick="checkboxEvent();">
+											<input type="checkbox" class="check" name="configId" value="<%= configTemplate.getId() %>" 
+												onclick="checkboxEvent();">
 										</td>
-										
-										<% 
-											List<PropertyTemplate> propTemps = configTemplate.getProperties();
-											if (CollectionUtils.isNotEmpty(propTemps)) {
-												for (PropertyTemplate propTemp : propTemps) {
-							            %>
-												<td>
-													<a href="#" onclick="editConfigTemp('<%= configTemplate.getId() %>');" name="edit" id="" >
-														<%= StringUtils.isNotEmpty(propTemp.getIName()) ? propTemp.getIName() : "" %>
-													</a>
-												</td>
-												<td><%= StringUtils.isNotEmpty(propTemp.getIDesc()) ? propTemp.getIDesc() : "" %></td>
-										<%
-												}
-											}
-										%>
-										
-										<td><%= CollectionUtils.isNotEmpty(configTemplate.getAppliesTo()) ? configTemplate.getAppliesTo() : "" %></td>
+										<td class="nameConfig">
+											<a href="#" onclick="editConfigTemp('<%= configTemplate.getId() %>');" name="edit" id="" >
+												<%= StringUtils.isNotEmpty(configTemplate.getType()) ? configTemplate.getType() : "" %>
+											</a>
+										</td>
+										<td class="descConfig">
+											<%= StringUtils.isNotEmpty(configTemplate.getDescription()) ? configTemplate.getDescription() : "" %>
+										</td>
+										<td>
+											<%= CollectionUtils.isNotEmpty(configTemplate.getAppliesTo()) ? configTemplate.getAppliesTo() : "" %>
+										</td>
 									</tr>
 							<% 
 							       }

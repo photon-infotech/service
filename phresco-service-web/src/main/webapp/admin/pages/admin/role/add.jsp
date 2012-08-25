@@ -26,9 +26,11 @@
 <% 
    Role role = (Role)request.getAttribute(ServiceUIConstants.REQ_ROLE_ROLE);  
    String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
+   
+   //For edit
    String name = "";
    String description = "";
-   if ( role != null) {
+   if (role != null) {
 	   if (StringUtils.isNotEmpty(role.getName())) {
 		   name = role.getName();
 	   }
@@ -46,7 +48,8 @@
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.name'/>
 			</label>
 			<div class="controls">
-				<input id="input01" placeholder="<s:text name='place.hldr.role.add.name'/>" class="input-xlarge" type="text" name="name" value="<%= name %>">
+				<input id="input01" placeholder="<s:text name='place.hldr.role.add.name'/>" class="input-xlarge" type="text" 
+					name="name" value="<%= name %>">
 				<span class="help-inline" id="nameError"></span>
 			</div>
 		</div>
@@ -56,19 +59,22 @@
 				<s:text name='lbl.hdr.adm.desc'/>
 			</label>
 			<div class="controls">
-				<input id="input01" placeholder="<s:text name='place.hldr.role.add.desc'/>" class="input-xlarge" type="text" name="description" value="<%= description %>" >
+				<input id="input01" placeholder="<s:text name='place.hldr.role.add.desc'/>" class="input-xlarge" type="text" 
+					name="description" value="<%= description %>" >
 			</div>
 		</div>
 	</div>
 	
 	<div class="bottom_button">
-		<%-- <input type="button" id="roleSave" class="btn btn-primary" onclick="clickSave('roleSave','', $('#subcontainer'), 'Creating Role');" value="<s:text name='lbl.hdr.comp.save'/>"/> --%>
 		<% if(StringUtils.isNotEmpty(fromPage)) { %>
-		 <input type="button" id="roleUpdate" class="btn btn-primary" onclick="validate('roleUpdate',$('#formRoleAdd'),$('#subcontainer'), '<s:text name='lbl.prog.role.update'/>');" value="<s:text name='lbl.hdr.comp.update'/>"/>
-		 <% } else { %> 
-		<input type="button" id="roleSave" class="btn btn-primary" onclick="validate('roleSave',$('#formRoleAdd'),$('#subcontainer'), '<s:text name='lbl.prog.role.save'/>');" value="<s:text name='lbl.hdr.comp.save'/>"/>
+			<input type="button" id="roleUpdate" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.update'/>"
+		 		onclick="validate('roleUpdate',$('#formRoleAdd'),$('#subcontainer'), '<s:text name='lbl.prog.role.update'/>');" />
+		<% } else { %> 
+			<input type="button" id="roleSave" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.save'/>"
+				onclick="validate('roleSave',$('#formRoleAdd'),$('#subcontainer'), '<s:text name='lbl.prog.role.save'/>');" />
 		<% } %>
-		<input type="button" id="roleCancel" class="btn btn-primary" onclick="loadContent('roleList', $('#formRoleAdd'), $('#subcontainer'));" value="<s:text name='lbl.hdr.comp.cancel'/>"/>
+		<input type="button" id="roleCancel" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.cancel'/>" 
+			onclick="loadContent('roleList', $('#formRoleAdd'), $('#subcontainer'));" />
 	</div>
 	
 	<!-- Hidden Fields -->

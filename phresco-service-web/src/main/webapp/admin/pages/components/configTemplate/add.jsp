@@ -26,11 +26,25 @@
 <%@ page import="com.photon.phresco.model.SettingsTemplate" %>
 <%@ page import="com.photon.phresco.model.PropertyTemplate" %>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
+<%@ page import="com.photon.phresco.model.Technology"%>
 
-<% 
-    SettingsTemplate configTemp = (SettingsTemplate) request.getAttribute(ServiceUIConstants.REQ_CONFIG_TEMP);
+<%
+	List<Technology> technologys = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
     String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
-    String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID); 
+    String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
+    SettingsTemplate settingsTemplate = (SettingsTemplate) request.getAttribute(ServiceUIConstants.REQ_CONFIG_TEMP);
+    
+	//For edit
+    String name = "";
+    String desc = "";
+    if (settingsTemplate != null) {
+    	if (StringUtils.isNotEmpty(settingsTemplate.getType())) {
+    		name = settingsTemplate.getType();	
+    	}
+    	if (StringUtils.isNotEmpty(settingsTemplate.getDescription())) {
+    		desc = settingsTemplate.getDescription();	
+    	}
+    }
 %>
 
 <form id="formConfigTempAdd" name="configForm" class="form-horizontal customer_list">
@@ -50,7 +64,7 @@
 			
 			<div class="controls">
 				<input id="configname" placeholder="<s:text name='place.hldr.configTemp.add.name'/>" class="input-xlarge" 
-					type="text" name="name" >
+					type="text" name="name"  value="<%= name %>">
 				<span class="help-inline" id="nameError"></span>
 			</div>
 		</div>
@@ -60,7 +74,8 @@
 				<s:text name='lbl.hdr.comp.desc'/>
 			</label>
 			<div class="controls">
-				<input id="input01" placeholder="<s:text name='place.hldr.configTemp.add.desc'/>" class="input-xlarge" type="text">
+				<input id="input01" placeholder="<s:text name='place.hldr.configTemp.add.desc'/>" class="input-xlarge" 
+				type="text" name="description" value="<%= desc %>">
 			</div>
 		</div>
 		
@@ -69,12 +84,25 @@
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.appliesto'/>
 			</label>
 			<div class="controls">
-				<select id="multiSelect" multiple="multiple" name="applies">
-					<option value="PH">PHP</option>
-					<option value="DR">Drupal</option>
-					<option value="HT">HTML5 Multichannel Widget</option>
-					<option value="JA">Java</option>
-					<option value="NJ">Node JS</option>
+				<select id="multiSelect" multiple="multiple" name="appliesTo">
+					<% 
+						if (CollectionUtils.isNotEmpty(technologys)) {
+							for (Technology technology : technologys) {
+								String selectedStr = "";
+								if (settingsTemplate != null) {
+									List<String> appliesTos = settingsTemplate.getAppliesTo();
+									if (appliesTos.contains(technology.getId())) {
+										selectedStr = "selected";
+									} else {
+										selectedStr = "";
+									}
+								}
+					%>
+								<option value="<%= technology.getId() %>" <%= selectedStr %>><%= technology.getName() %></option>
+					<%  
+							}
+						}
+					%>
 				</select>
 				<span class="help-inline applyerror" id="applyError"></span>
 			</div>
@@ -87,7 +115,7 @@
 			<div class="controls">
 				<input id="input01" placeholder="<s:text name='place.hldr.configTemp.add.help.text'/>" class="input-xlarge" type="text">
 			</div>
-		</div>						
+		</div>
 			
 		<fieldset class = "configFieldset">
 			<legend class = "configLegend"><s:label key="lbl.hdr.comp.proptemplate" cssClass="labelbold" theme="simple"/></legend>
@@ -107,6 +135,9 @@
 										<th class="third">
 											<div class="th-inner tablehead"><s:label key="lbl.hdr.comp.cnfigtmplt.psblvalue.title"  theme="simple"/></div>
 										</th>
+										<%-- <th class="third">
+											<div class="th-inner tablehead"><s:label key="lbl.hdr.comp.help"/></div>
+										</th> --%>
 										<th class="third">
 											<div class="th-inner tablehead"><s:label key="lbl.hdr.comp.cnfigtmplt.mndtry.title"  theme="simple"/></div>
 										</th>
@@ -133,14 +164,16 @@
 												<option>- select -</option>
 												<option>String</option>
 												<option>Integer</option>
-												<option>Data</option>
 												<option>Password</option>
 											</select>
 										</td>
 										<td class="psblevalue">
-											<input type="text" placeholder="" class="span3">
+											<input type="text" placeholder="" class="propTempTxt">
 											<a data-toggle="modal" href="#myModal"><img class="addiconAlign imagealign" src="images/add_icon.png"/></a>
 										</td>
+										<!-- <td class="hlpText">
+											<input type="text" placeholder="" class="propTempTxt">
+										</td> -->
 										<td class="mandatoryfld">
 											<input type="checkbox" value="option1" id="optionsCheckbox">
 										</td>
@@ -200,8 +233,7 @@
 	<% if (StringUtils.isNotEmpty(fromPage)) { %>
 		<input type="button" id="configtempUpdate" class="btn btn-primary"
 				onclick="validate('configtempUpdate', $('#formConfigTempAdd'), $('#subcontainer'), 'Updating Config Template');" 
-		        value="<s:text name='lbl.hdr.comp.save'/>"/>
-		
+		        value="<s:text name='lbl.hdr.comp.update'/>"/>
     <% } else { %>		
 		<input type="button" id="configtempSave" class="btn btn-primary"
 		        onclick="validate('configtempSave', $('#formConfigTempAdd'), $('#subcontainer'), 'Creating Config Template');" 

@@ -88,14 +88,15 @@
             </label>
             <div class="controls">
                 <select id="multiSelect" multiple="multiple" name="technology">
-                    <% if(technologys != null) {
-                    	 for(Technology technology : technologys) { %>
-                    		<option value="<%=technology.getName() %>"><%=technology.getName() %></option> 
-                   <% 	 
-                      }
-                      }
-                   %> 
-                    
+                    <% 
+                    	if (technologys != null) {
+							for (Technology technology : technologys) { 
+					%>
+                    			<option value="<%=technology.getName() %>"><%=technology.getName() %></option> 
+					<% 	 
+							}
+						}
+					%> 
                 </select>
                 <span class="help-inline applyerror" id="techError"></span>
             </div>
@@ -114,9 +115,6 @@
 				</div>
 			</div>
 			 <span class="help-inline fileError" id="fileError"></span>
-			<!-- <div class="controls">
-				<input class="input-xlarge" type="file" id="fileArc" name="fileArc">
-			</div> -->
 		</div>
 		
 		<div class="control-group" id="appltControl">
@@ -154,7 +152,8 @@
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.dwnld.ver'/>
 			</label>
 			<div class="controls">
-				<input id="input01" placeholder="<s:text name='place.hldr.download.add.version'/>" value="<%= version %>" class="input-xlarge" type="text" name="version">
+				<input id="input01" placeholder="<s:text name='place.hldr.download.add.version'/>" value="<%= version %>" 
+					class="input-xlarge" type="text" name="version">
 				<span class="help-inline" id="verError"></span>
 			</div>
 		</div>
@@ -176,12 +175,12 @@
 		</div>
         
         <div class="control-group popupalign" id="othersDiv">
-			<%-- <s:label cssClass="control-label labelbold" theme="simple"/> --%>
 			<label class="control-label labelbold">
 				<span class="mandatory">*</span>
 			</label>
 			<div class="controls">
-				<input id="input01" placeholder="<s:text name='place.hldr.download.add.others'/>" class="input-xlarge" type="text" name="others">
+				<input id="input01" placeholder="<s:text name='place.hldr.download.add.others'/>" class="input-xlarge" 
+					type="text" name="others">
 				<span class="help-inline" id="othersError"></span>
 			</div>
 		</div>
@@ -244,7 +243,6 @@
 		}
 	}
 
-	
 	function pluginJarError(data) {
 		if (data != undefined) {
 			showError($("#pluginControl"), $("#pluginError"), data);

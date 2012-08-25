@@ -28,6 +28,8 @@
 <%
 	Customer customer = (Customer) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER);
 	String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
+	
+	//For edit
 	String name = "";
 	String description = "";
 	String emailId = "";

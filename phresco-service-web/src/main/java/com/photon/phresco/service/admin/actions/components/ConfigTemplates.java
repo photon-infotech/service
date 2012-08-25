@@ -27,10 +27,11 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.I18NString;
 import com.photon.phresco.model.PropertyTemplate;
 import com.photon.phresco.model.SettingsTemplate;
+import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
+import com.photon.phresco.service.util.ServerUtil;
 import com.sun.jersey.api.client.ClientResponse;
 
 public class ConfigTemplates extends ServiceBaseAction { 
@@ -40,7 +41,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
 	private String name = null;
-	private I18NString description = null;
+	private String description = null;
 	private String nameError = null;
 	private String applies = null;
 	private String applyError = null;
@@ -65,9 +66,16 @@ public class ConfigTemplates extends ServiceBaseAction {
 		return COMP_CONFIGTEMPLATE_LIST;
 	}
 	
-	public String add() {
+	public String add() throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method ConfigTemplates.add()");
+		}
+		
+		try {
+			List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
+			getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
+		} catch (Exception e) {
+			throw new PhrescoException(e);
 		}
 		
 		return COMP_CONFIGTEMPLATE_ADD;
@@ -81,6 +89,8 @@ public class ConfigTemplates extends ServiceBaseAction {
 		try {
 		    SettingsTemplate configTemp = getServiceManager().getConfigTemplate(configId, customerId);
 			getHttpRequest().setAttribute(REQ_CONFIG_TEMP , configTemp);
+			List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
+			getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
 			getHttpRequest().setAttribute(REQ_FROM_PAGE, REQ_EDIT);
 		} catch(Exception e) {
 			throw new PhrescoException(e);
@@ -93,24 +103,21 @@ public class ConfigTemplates extends ServiceBaseAction {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method ConfigTemplates.save()");
 		}
-		
 		try  {
-			List<SettingsTemplate> configTemps = new ArrayList<SettingsTemplate>();
-			List<PropertyTemplate> propTemps = new ArrayList<PropertyTemplate>();
+			List<SettingsTemplate> settingsTemplates = new ArrayList<SettingsTemplate>();
 			
-			PropertyTemplate propTemp = new PropertyTemplate();
-			propTemp.setiName(name);
-            propTemp.setDescription(description);
-			propTemps.add(propTemp);
-            
-            SettingsTemplate configTemp = new SettingsTemplate();
-            configTemp.setAppliesTo(appliesTo);	
-            configTemp.setProperties(propTemps);
-            configTemp.setCustomerId(customerId);
-            
-            configTemps.add(configTemp);
-            
-            ClientResponse clientResponse = getServiceManager().createConfigTemplates(configTemps, customerId);
+			List<PropertyTemplate> propertyTemplates = new ArrayList<PropertyTemplate>();
+			PropertyTemplate propertyTemplate = new PropertyTemplate();
+			propertyTemplates.add(propertyTemplate);
+			
+            SettingsTemplate settingTemplate = new SettingsTemplate();
+            settingTemplate.setType(name);
+            settingTemplate.setDescription(description);
+            settingTemplate.setAppliesTo(appliesTo);
+            settingTemplate.setCustomerId(customerId);
+            settingTemplate.setProperties(propertyTemplates);
+            settingsTemplates.add(settingTemplate);
+            ClientResponse clientResponse = getServiceManager().createConfigTemplates(settingsTemplates, customerId);
             if (clientResponse.getStatus() != 200 && clientResponse.getStatus() != 201) {
             	addActionError(getText(CONFIGTEMPLATE_NOT_ADDED, Collections.singletonList(name)));
             } else {
@@ -128,20 +135,18 @@ public class ConfigTemplates extends ServiceBaseAction {
     	if (isDebugEnabled) {
     		S_LOGGER.debug("Entering Method  ConfigTemplates.update()");
     	}
-
     	try {
-    		List<PropertyTemplate> propTemps = new ArrayList<PropertyTemplate>();
-    		
-    		PropertyTemplate propTemp = new PropertyTemplate();
-			propTemp.setiName(name);
-            propTemp.setDescription(description);
-            propTemps.add(propTemp);
-            
-            SettingsTemplate configTemp = new SettingsTemplate();
-            configTemp.setAppliesTo(appliesTo);	
-            configTemp.setProperties(propTemps);
-            configTemp.setId(configId);
-    		getServiceManager().updateConfigTemp(configTemp, configId, customerId);
+			List<PropertyTemplate> propertyTemplates = new ArrayList<PropertyTemplate>();
+			PropertyTemplate propertyTemplate = new PropertyTemplate();
+			propertyTemplates.add(propertyTemplate);
+			
+            SettingsTemplate settingTemplate = new SettingsTemplate();
+            settingTemplate.setType(name);
+            settingTemplate.setDescription(description);
+            settingTemplate.setAppliesTo(appliesTo);
+            settingTemplate.setCustomerId(customerId);
+            settingTemplate.setProperties(propertyTemplates);
+    		getServiceManager().updateConfigTemp(settingTemplate, configId, customerId);
     	} catch(Exception e) {
     		throw new PhrescoException(e);
     	}
@@ -184,7 +189,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 			isError = true;
 		}
 		
-		if (StringUtils.isEmpty(applies)) {
+		if ( appliesTo == null ) {
 			setApplyError(getText(KEY_I18N_ERR_APPLIES_EMPTY ));
 			isError = true;
 		}
@@ -244,10 +249,22 @@ public class ConfigTemplates extends ServiceBaseAction {
 		this.customerId = customerId;
 	}
 	
-	public void setDescription(I18NString description) {
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
 		this.description = description;
 	}
 	
+	public List<String> getAppliesTo() {
+		return appliesTo;
+	}
+
+	public void setAppliesTo(List<String> appliesTo) {
+		this.appliesTo = appliesTo;
+	}
+
 	public String getConfigId() {
 		return configId;
 	}

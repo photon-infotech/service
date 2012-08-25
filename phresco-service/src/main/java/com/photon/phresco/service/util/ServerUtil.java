@@ -17,6 +17,8 @@ import org.apache.commons.codec.binary.Base64;
 
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.ArchetypeInfo;
+import com.photon.phresco.model.I18NString;
+import com.photon.phresco.model.L10NString;
 import com.photon.phresco.util.Constants;
 import com.photon.phresco.util.FileUtil;
 import com.photon.phresco.util.Utility;
@@ -170,6 +172,7 @@ public class ServerUtil {
     public static String encryptString(String inputString) {
         byte[] encodeBase64 = Base64.encodeBase64(inputString.getBytes());
         String encodedString = new String(encodeBase64);
+        
         return encodedString;
     }
     
@@ -181,6 +184,7 @@ public class ServerUtil {
     public static String decryptString(String inputString) {
         byte[] decodedBytes = Base64.decodeBase64(inputString);
         String decodedString = new String(decodedBytes);
+        
         return decodedString;
     }
     
@@ -209,4 +213,18 @@ public class ServerUtil {
         
     }
     
+	/**
+     * To create the i18n String
+     * @param inputString
+     * @return I18NString
+     */
+    public static I18NString createI18NString(String str) {
+    	I18NString displayName;
+    	L10NString value;
+    	displayName = new I18NString();
+    	value = new L10NString("en-US", str);
+    	displayName.add(value);
+    	
+    	return displayName;
+	}
 }
