@@ -122,4 +122,25 @@ public interface ServerConstants {
 
 	//Authentication Constants
 	String AUTHENTICATE = "/authenticate";
+	
+	/*
+     * Constants for jar processor
+     */
+    String ARCHETYPE_FILE = "META-INF/maven/archetype.xml";
+    String ARCHETYPE_METADATA_FILE = "META-INF/maven/archetype-metadata.xml";
+    String PLUGIN_XML_FILE = "META-INF/maven/plugin.xml";
+    String PLUGIN_COMPONENTS_XML_FILE = "META-INF/plexus/components.xml";
+    
+	//Constants for create pom.xml file for upload
+	String POM_FILE_NAME = "pom.xml";
+	String POM_PROJECT = "project";
+	String POM_MODELVERSION = "modelVersion";
+	String POM_MODELVERSION_VAL = "4.0.0";
+	String POM_GROUPID = "groupId";
+	String POM_ARTIFACTID = "artifactId";
+	String POM_VERSION = "version";
+	String POM_PACKAGING = "packaging";
+	String POM_DESC = "description";
+	String POM_DESC_VAL = "created by phresco";
+	String POM_OMMIT = "yes";
 }

@@ -123,7 +123,7 @@
 						if (appTypes != null)  {
 							for (ApplicationType appType : appTypes) {
 					%>
-							<option value="<%= appType.getName() %>"><%= appType.getName() %></option>
+							<option value="<%= appType.getId() %>"><%= appType.getName() %></option>
 					<%
 							}
 						}

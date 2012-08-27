@@ -21,9 +21,7 @@
 package com.photon.phresco.service.rest.api;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -66,12 +64,10 @@ import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.converters.ConvertersFactory;
 import com.photon.phresco.service.dao.ApplicationTypeDAO;
-import com.photon.phresco.service.dependency.impl.DependencyUtils;
 import com.photon.phresco.service.model.ArtifactInfo;
 import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.FileUtil;
 import com.photon.phresco.util.ServiceConstants;
-import com.photon.phresco.util.Utility;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.MultiPart;
@@ -1418,35 +1414,32 @@ public class ComponentService extends DbService implements ServiceConstants {
 	private void createBinary(Technology technology, List<BodyPart> list) throws PhrescoException {
         List<ArchetypeInfo> infos = new ArrayList<ArchetypeInfo>();
         for (BodyPart bodyPart : list) {
-            if (bodyPart.getContentDisposition().getType().equals("appType")) {
+            if (bodyPart.getContentDisposition().getType().equals(APPTYPE)) {
                 BodyPartEntity bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
                 File appJarFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null);
                 uploadBinary(technology.getArchetypeInfo(), appJarFile, technology.getCustomerId());
                 FileUtil.delete(appJarFile);
             } else {
                 BodyPartEntity bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
+                ArchetypeInfo artifactinfo = ServerUtil.getArtifactinfo(bodyPartEntity.getInputStream());
                 File appJarFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null);
-                ArchetypeInfo archetypeInfo = createArchetypeInfo("plugins", technology);
-                infos.add(archetypeInfo);
-                uploadBinary(archetypeInfo, appJarFile, technology.getCustomerId());
+                infos.add(artifactinfo);
+                uploadBinary(artifactinfo, appJarFile, technology.getCustomerId());
                 FileUtil.delete(appJarFile);
             }
         }
         technology.setPlugins(infos);
         mongoOperation.save(TECHNOLOGIES_COLLECTION_NAME, technology);
     }
-
-    private ArchetypeInfo createArchetypeInfo(String type,Technology technology ) {
-        ArchetypeInfo artifactInfoFromJar = new ArchetypeInfo();
-        artifactInfoFromJar.setGroupId("com.upload.test." + type);
-        artifactInfoFromJar.setArtifactId(technology.getName() + type);
-        artifactInfoFromJar.setVersion("1.0");
-        return artifactInfoFromJar;
-    }
-
+	
     private void uploadBinary(ArchetypeInfo archetypeInfo, File artifactFile, String customerId) throws PhrescoException {
-        ArtifactInfo info = new ArtifactInfo(archetypeInfo.getGroupId(), archetypeInfo.getArtifactId(), "", "jar", archetypeInfo.getVersion());
-        repositoryManager.addArtifact(info, artifactFile, customerId); 
+        File pomFile = ServerUtil.createPomFile(archetypeInfo);
+        
+		ArtifactInfo info = new ArtifactInfo(archetypeInfo.getGroupId(), archetypeInfo.getArtifactId(), "", 
+                archetypeInfo.getPackaging(), archetypeInfo.getVersion());
+        info.setPomFile(pomFile);
+        repositoryManager.addArtifact(info, artifactFile, customerId);
+        FileUtil.delete(pomFile);
     }
 
     /**
