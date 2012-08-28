@@ -1594,6 +1594,14 @@ h3 label {
     margin-bottom: 8px;
 }
 
+.nameConfig {
+	width:170px;
+}
+
+.descConfig {
+	width:250px;
+}
+
 .popopimage {
 	float: right; 
 	margin-right: 97px;

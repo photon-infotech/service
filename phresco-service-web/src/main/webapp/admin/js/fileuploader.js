@@ -245,7 +245,6 @@ qq.obj2url = function(obj, temp, prefixDone){
 //
 
 var qq = qq || {};
-    
 /**
  * Creates upload button, validates upload, but doesn't create file list or dd. 
  */
@@ -259,21 +258,38 @@ qq.FileUploaderBasic = function(o){
         multiple: o.multiple,
         maxConnections: 3,
         // validation        
-        allowedExtensions: ["jar", "gz", "zip"],               
+        allowedExtensions: o.allowedExtensions,
         sizeLimit: 0,   
         minSizeLimit: 0,                             
         // events
         // return false to cancel submit
-        onSubmit: function(id, fileName){},
-        onProgress: function(id, fileName, loaded, total){},
+        onSubmit: function(id, fileName){
+        	jarError('', o.type);
+        },
+        onProgress: function(id, fileName, loaded, total){
+        	jarError('', o.type);
+        },
         onComplete: function(id, fileName, responseJSON){
-		        	if (o.type === "pluginJar") {
-		        		pluginJarError();
-		        	} else {
-		        		fillTextBoxes(responseJSON);
-		        		applnJarError();
-		        		enableDisableUpload();
-		        	}
+        			//To show the error msg if the uploaded jar is not a valid jar
+        			if (responseJSON.isJarTypeValid != undefined && !responseJSON.isJarTypeValid) {
+        				$('.qq-upload-file').each(function() {
+        					if ($.trim($(this).text()) == fileName) {
+        						if ($(this).parent().parent().attr("temp") == o.type) {
+        							$(this).parent().remove();
+        						}
+        					}
+        				});
+        				jarError(responseJSON.errorMsg, o.type);
+        			} else {
+        				if (o.type === "applnJar" || o.type === "uploadFile" || o.type === "featureJar" || o.type === "pilotProZip") {
+        					fillTextBoxes(responseJSON);// To show the text box for groupId, artifactId and version 
+    		        		enableDisableUpload();// To disable the upload button when a file is uploaded successfully
+        				}
+        				if(o.type === "uploadIcon") {
+        					enableIconDisableUpload();// to disable the upload Icon Button when a image is uploaded successfully
+        				}
+        				jarError('', o.type);// To empty the error msg if exists when the specified type of file is uploaded
+        			}
 	        	},
         onCancel: function(id, fileName){},
         // messages                
@@ -285,12 +301,8 @@ qq.FileUploaderBasic = function(o){
             onLeave: "The files are being uploaded, if you leave now the upload will be cancelled."            
         },
         showMessage: function(message){
-        	if (o.type === "pluginJar") {
-        		pluginJarError(message);
-        	} else {
-        		applnJarError(message)
-        	}
-        }               
+        	jarError(message, o.type);// To show the error msg when a file is uploaded other than the specified type
+        }
     };
     qq.extend(this._options, o);
         
@@ -639,7 +651,7 @@ qq.extend(qq.FileUploader.prototype, {
         var item = qq.toElement(this._options.fileTemplate);                
         item.qqFileId = id;
         var fileElement = this._find(item, 'file');
-        qq.setText(fileElement, this._formatFileName(fileName));
+        qq.setText(fileElement, fileName);
         var removeElement = this._find(item, 'remove');
         qq.setId(removeElement, this._formatFileName(fileName));
         this._find(item, 'size').style.display = 'none';        

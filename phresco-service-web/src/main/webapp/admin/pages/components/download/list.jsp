@@ -112,6 +112,9 @@
 			</div>
 		</div>
 	<% } %>
+	
+	<!-- Hidden Fields -->
+	<input type="hidden" name="customerId" value="<%= customerId %>">
 </form>
 
 <script type="text/javascript">

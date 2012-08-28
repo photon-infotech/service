@@ -58,7 +58,7 @@
             <result type="json" />
         </action>
         
-        <action name="uploadFile" class="com.photon.phresco.service.admin.actions.components.Features" method="uploadFile">
+        <action name="uploadFeatureFile" class="com.photon.phresco.service.admin.actions.components.Features" method="uploadFile">
             <result type="json" />
         </action>
         
@@ -217,7 +217,7 @@
 			<result type="json" />
         </action>
         
-        <action name="uploadFile" class="com.photon.phresco.service.admin.actions.components.PilotProjects" method="uploadFile">
+        <action name="uploadPilotProjZip" class="com.photon.phresco.service.admin.actions.components.PilotProjects" method="uploadFile">
             <result type="json" />
         </action>
         
@@ -400,14 +400,31 @@
 		<action name="globalurlAdd" class="com.photon.phresco.service.admin.actions.admin.GlobalUrlList" method="add">
 			<result name="globalurlAdd">/admin/pages/admin/globalurl/add.jsp</result>
         </action>
+        
+        <action name="globalurlEdit" class="com.photon.phresco.service.admin.actions.admin.GlobalUrlList" method="edit">
+			<result name="globalurlAdd">/admin/pages/admin/globalurl/add.jsp</result>
+        </action>
 		
 		<action name="globalurlSave" class="com.photon.phresco.service.admin.actions.admin.GlobalUrlList" method="save">
 			<result name="globalurlList">/admin/pages/admin/globalurl/list.jsp</result>
 			<result type="json" />
         </action>
+        
+        <action name="globalurlUpdate" class="com.photon.phresco.service.admin.actions.admin.GlobalUrlList" method="update">
+            <result name="globalurlList">/admin/pages/admin/globalurl/list.jsp</result>
+            <result type="json" />
+        </action>
+        
+        <action name="globalurlSaveValidate" class="com.photon.phresco.service.admin.actions.admin.GlobalUrlList" method="validateForm">
+			<result type="json" />
+        </action>
+        
+        <action name="globalurlUpdateValidate" class="com.photon.phresco.service.admin.actions.admin.GlobalUrlList" method="validateForm">
+			<result type="json" />
+        </action>
 		
-		<action name="globalurlCancel" class="com.photon.phresco.service.admin.actions.admin.GlobalUrlList" method="cancel">
-			<result name="globalurlCancel">/admin/pages/admin/globalurl/list.jsp</result>
+         <action name="globalurlDelete" class="com.photon.phresco.service.admin.actions.admin.GlobalUrlList" method="delete">
+            <result name="globalurlList">/admin/pages/admin/globalurl/list.jsp</result>
         </action>
 		<!-- ADMIN GLOBALURL ENDS-->
     </package>

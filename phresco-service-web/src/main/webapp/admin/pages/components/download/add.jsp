@@ -31,7 +31,7 @@
 <%
     DownloadInfo downloadInfo = (DownloadInfo)request.getAttribute(ServiceUIConstants.REQ_DOWNLOAD_INFO);
     String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
-    List<Technology> technologys = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
+    List<Technology> technologies = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
     String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
   
     //For edit
@@ -89,10 +89,10 @@
             <div class="controls">
                 <select id="multiSelect" multiple="multiple" name="technology">
                     <% 
-                    	if (technologys != null) {
-							for (Technology technology : technologys) { 
+                    	if (technologies != null) {
+							for (Technology technology : technologies) { 
 					%>
-                    			<option value="<%=technology.getName() %>"><%=technology.getName() %></option> 
+                    			<option value="<%= technology.getId() %>"><%= technology.getName() %></option> 
 					<% 	 
 							}
 						}
@@ -101,8 +101,42 @@
                 <span class="help-inline applyerror" id="techError"></span>
             </div>
         </div>
+        
+        <!-- POM details starts -->
+		<div id="jarDetailsDiv" class="hideContent">
+			<div class="control-group">
+				<label class="control-label labelbold">
+					<s:text name='lbl.hdr.comp.groupid'/>
+				</label>
+				<div class="controls">
+					<input name="groupId" class="input-xlarge" type="text"
+						placeholder="<s:text name='place.hldr.archetype.add.groupId'/>">
+				</div>
+			</div>
+			
+			<div class="control-group">
+				<label class="control-label labelbold">
+					<s:text name='lbl.hdr.comp.artifactid'/>
+				</label>
+				<div class="controls">
+					<input name="artifactId" class="input-xlarge" type="text"
+						placeholder="<s:text name='place.hldr.archetype.add.artifactId'/>">
+				</div>
+			</div>
+			
+			<div class="control-group">
+				<label class="control-label labelbold">
+					<s:text name='lbl.hdr.comp.jar.version'/>
+				</label>
+				<div class="controls">
+					<input class="jarVersion" class="input-xlarge" type="text"
+						placeholder="<s:text name='place.hldr.download.add.version'/>">
+				</div>
+			</div>
+		</div>
+		<!-- POM details ends -->
 		
-		<div class="control-group">
+		<div class="control-group" id="downloadFileControl">
 			<label class="control-label labelbold">
 				<s:text name='lbl.hdr.adm.dwnld.fle'/>
 			</label>
@@ -132,19 +166,19 @@
 			</div>
 		</div>
 			
-		<div class="control-group">
+		<div class="control-group"  id="iconControl">
 			<label class="control-label labelbold">
 				<s:text name='lbl.hdr.adm.dwnld.icon'/>
 			</label>
 			<div class="controls" style="float: left; margin-left: 3%;">
-				<div id="plugin-file-uploader" class="file-uploader">
+				<div id="icon-file-uploader" class="file-uploader">
 					<noscript>
 						<p>Please enable JavaScript to use file uploader.</p>
 						<!-- or put a simple form for upload here -->
 					</noscript> 
 				</div>
 			</div>
-			<span class="help-inline pluginError" id="pluginError"></span>
+			<span class="help-inline iconError" id="iconError"></span>
 		</div>
 			
 		<div class="control-group" id="verControl">
@@ -200,7 +234,8 @@
 	<!-- Hidden Fields -->
     <input type="hidden" name="fromPage" value="<%= StringUtils.isNotEmpty(fromPage) ? fromPage : "" %>"/>
     <input type="hidden" name="id" value="<%= downloadInfo != null ? downloadInfo.getId() : "" %>"/>
-    <input type="hidden" name="oldName" value="<%= downloadInfo != null ? downloadInfo.getName() : "" %>"/> 
+    <input type="hidden" name="oldName" value="<%= downloadInfo != null ? downloadInfo.getName() : "" %>"/>
+    <input type="hidden" name="customerId" value="<%= customerId %>"> 
 </form>
 
 <script type="text/javascript">
@@ -235,22 +270,6 @@
 		}
 	}
 	 
-	function applnJarError(data) {
-		if (data != undefined) {
-			showError($("#fileControl"), $("#fileError"), data);
-		} else {
-			hideError($("#fileControl"), $("#fileError"));
-		}
-	}
-
-	function pluginJarError(data) {
-		if (data != undefined) {
-			showError($("#pluginControl"), $("#pluginError"), data);
-		} else {
-			hideError($("#pluginControl"), $("#pluginError"));
-		}
-	}
-
 	function showDiv() {
 		$('#othersDiv').show();
 	}
@@ -258,41 +277,62 @@
 	function hideDiv() {
 		$('#othersDiv').hide();
 	}
+	
+	function jarError(data, type) {
+		var controlObj;
+		var msgObj;
+		if (type == "uploadIcon") {
+			controlObj = $("#iconControl");
+			msgObj = $("#iconError");
+		} else if (type == "uploadFile") {
+			controlObj = $("#downloadFileControl");
+			msgObj = $("#fileError");
+		}
+		if (data != undefined && !isBlank(data)) {
+			showError(controlObj, msgObj, data);
+		} else {
+			hideError(controlObj, msgObj);
+		}
+	}
 
 	function createUploader() {
-		var applnUploader = new qq.FileUploader({
+		var fileUploader = new qq.FileUploader({
 			element : document.getElementById('download-file-uploader'),
-			action : 'uploadJar',
+			action : 'uploadFile',
 			multiple : false,
-			type : 'applnJar',
+			allowedExtensions : ["jar","zip","gz","exe","dll"],
+			type : 'uploadFile',
 			buttonLabel : '<s:label key="lbl.comp.featr.upload" />',
-			typeError : '<s:text name="err.invalid.file.selection" />',
+			typeError : '<s:text name="err.invalid.dwnloadfile.selection" />',
 			params : {
-				type : 'applnJar'
+				type : 'uploadFile'
 			},
 			debug : true
 		});
 
-		var pluginUploader = new qq.FileUploader({
-			element : document.getElementById('plugin-file-uploader'),
-			action : 'uploadJar',
+		var iconUploader = new qq.FileUploader({
+			element : document.getElementById('icon-file-uploader'),
+			action : 'uploadFile',
 			multiple : false,
-			type : 'pluginJar',
-			buttonLabel : '<s:text name="lbl.comp.featr.upload" />',
-			typeError : '<s:text name="err.invalid.file.selection" />',
+			allowedExtensions : ["jpg","jpeg","png"],
+			type : 'uploadIcon',
+			buttonLabel : '<s:text name="lbl.hdr.comp.dwnload.icon" />',
+			typeError : '<s:text name="err.invalid.image.selection" />',
 			params : {
-				type : 'pluginJar'
+				type : 'uploadIcon'
 			},
 			debug : true
 		});
 	}
 
 	function removeUploadedJar(obj) {
+		$('#jarDetailsDiv').hide();
 		$(obj).parent().remove();
-		var params = "uploadedJar=";
+		var type = $(obj).attr("tempattr");
+		var params = "uploadedFile=";
 		params = params.concat($(obj).attr("id"));
 		params = params.concat("&type=");
-		params = params.concat($(obj).attr("tempattr"));
+		params = params.concat(type);
 		$.ajax({
 			url : "removeDownloadZip",
 			data : params,
@@ -300,14 +340,13 @@
 			success : function(data) {
 			}
 		});
+		jarError('', type);
 		enableDisableUpload();
-		enablePluginDisableUpload();
-		pluginJarError();
-		applnJarError();
+		enableIconDisableUpload();
 	}
 
 	function enableDisableUpload() {
-		if ($('ul[temp="applnJar"] > li').length === 1) {
+		if ($('ul[temp="uploadFile"] > li').length === 1) {
 			$('#download-file-uploader').find("input[type='file']").attr(
 					'disabled', 'disabled');
 			$('#download-file-uploader').find($(".qq-upload-button")).removeClass(
@@ -320,17 +359,17 @@
 		}
 	}
 
-	function enablePluginDisableUpload() {
-		if ($('ul[temp="pluginJar"] > li').length === 1) {
-			$('#plugin-file-uploader').find("input[type='file']").attr(
+	function enableIconDisableUpload() {
+		if ($('ul[temp="uploadIcon"] > li').length === 1) {
+			$('#icon-file-uploader').find("input[type='file']").attr(
 					'disabled', 'disabled');
-			$('#plugin-file-uploader').find($(".qq-upload-button"))
+			$('#icon-file-uploader').find($(".qq-upload-button"))
 					.removeClass("btn-primary qq-upload-button").addClass(
 							"disabled");
 		} else {
-			$('#plugin-file-uploader').find("input[type='file']").attr(
+			$('#icon-file-uploader').find("input[type='file']").attr(
 					'disabled', false);
-			$('#plugin-file-uploader').find($(".btn")).removeClass("disabled")
+			$('#icon-file-uploader').find($(".btn")).removeClass("disabled")
 					.addClass("btn-primary qq-upload-button");
 		}
 	}

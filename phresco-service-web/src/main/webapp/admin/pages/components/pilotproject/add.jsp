@@ -92,8 +92,42 @@
 				</select><span class="help-inline applyerror" id="techError"></span>
 			</div>
 		</div>
-
-		<div class="control-group" id="fileControl">
+        
+        <!-- POM details starts -->
+		<div id="jarDetailsDiv" class="hideContent">
+			<div class="control-group">
+				<label class="control-label labelbold">
+					<s:text name='lbl.hdr.comp.groupid'/>
+				</label>
+				<div class="controls">
+					<input name="groupId" class="input-xlarge" type="text"
+						placeholder="<s:text name='place.hldr.archetype.add.groupId'/>">
+				</div>
+			</div>
+			
+			<div class="control-group">
+				<label class="control-label labelbold">
+					<s:text name='lbl.hdr.comp.artifactid'/>
+				</label>
+				<div class="controls">
+					<input name="artifactId" class="input-xlarge" type="text"
+						placeholder="<s:text name='place.hldr.archetype.add.artifactId'/>">
+				</div>
+			</div>
+			
+			<div class="control-group">
+				<label class="control-label labelbold">
+					<s:text name='lbl.hdr.comp.jar.version'/>
+				</label>
+				<div class="controls">
+					<input name="jarVersion" class="input-xlarge" type="text"
+						placeholder="<s:text name='place.hldr.archetype.add.jar.version'/>">
+				</div>
+			</div>
+		</div>
+		<!-- POM details ends -->
+         
+		<div class="control-group" id="pilotProFileControl">
 			<label class="control-label labelbold">
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.projsrc'/>
 			</label>
@@ -106,7 +140,7 @@
 					</noscript>
 				</div>
 			</div>
-			<span class="help-inline fileError" id="fileError"></span>
+			<span class="help-inline fileError" id="pilotProFileError"></span>
 		</div>
 	</div>
 	
@@ -142,33 +176,50 @@
 		} else {
 			hideError($("#nameControl"), $("#nameError"));
 		}
-		
+		/* 
 		if (data.fileError != undefined) {
 			showError($("#fileControl"), $("#fileError"), data.fileError);
 		} else {
 			hideError($("#fileControl"), $("#fileError"));
+		} */
+	}
+	
+	function jarError(data, type) {
+		var controlObj;
+		var msgObj;
+		if (type == "pilotProZip") {
+			controlObj = $("#pilotProFileControl");
+			msgObj = $("#pilotProFileError");
+		} 
+		if (data != undefined && !isBlank(data)) {
+			showError(controlObj, msgObj, data);
+		} else {
+			hideError(controlObj, msgObj);
 		}
 	}
 	
 	function createUploader() {
 		var fileUploader = new qq.FileUploader({
 			element: document.getElementById('pilotPro-file-uploader'),
-			action: 'uploadJar',
+			action: 'uploadPilotProjZip',
 			multiple: false,
-			type: 'applnJar',
-			buttonLabel: '<s:label key="lbl.comp.featr.upload" />',
-			typeError : '<s:text name="err.invalid.file.selection" />',
-			params: {type: 'applnJar'}, 
+			allowedExtensions : ["zip"],
+			type: 'pilotProZip',
+			buttonLabel: '<s:label key="lbl.hdr.comp.pilotpro.upload" />',
+			typeError : '<s:text name="err.invalid.zip.selection" />',
+			params: {type: 'pilotProZip'}, 
 			debug: true
 		});
 	} 
 	 
 	function removeUploadedJar(obj) {
+		$('#jarDetailsDiv').hide();
 		$(obj).parent().remove();
+		var type = $(obj).attr("tempattr"); 
 		var params = "uploadedJar=";
 		params = params.concat($(obj).attr("id"));
 		params = params.concat("&type=");
-		params = params.concat($(obj).attr("tempattr"));
+		params = params.concat(type);
 		$.ajax({
 			url : "removePilotProjJar",
 			data : params,
@@ -177,11 +228,11 @@
 			}
 		});
 		enableDisableUpload();
-		applnJarError();
+		jarError('', type)
 	} 
 	    
 	function enableDisableUpload() {
-		if ($('ul[temp="applnJar"] > li').length === 1 ) {
+		if ($('ul[temp="pilotProZip"] > li').length === 1 ) {
 			$('#pilotPro-file-uploader').find("input[type='file']").attr('disabled','disabled');
 			$('#pilotPro-file-uploader').find($(".qq-upload-button")).removeClass("btn-primary qq-upload-button").addClass("disabled");
 		} else {

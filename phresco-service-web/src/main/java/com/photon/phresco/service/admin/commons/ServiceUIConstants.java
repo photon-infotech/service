@@ -32,9 +32,11 @@ public interface ServiceUIConstants {
     String REQ_EDIT = "edit";
     String REQ_USER_INFO = "userInfo";
     String SESSION_USER_INFO = "userInfo";
-    String SUCCESS_FALSE = "{success: false}";
-	String SUCCESS_TRUE = "{success: true}";
-	String MAVEN_JAR_FALSE = "{mavenJar: false,success: true}";
+    String SUCCESS_FALSE = "{\"success\": false}";
+	String SUCCESS_TRUE = "{\"success\": true}";
+	String MAVEN_JAR_FALSE = "{\"mavenJar\": false,\"success\": true}";
+	String INVALID_ARCHETYPE_JAR = "{\"isJarTypeValid\": false,\"errorMsg\": \"Not a valid application jar\"}";
+	String INVALID_PLUGIN_JAR = "{\"isJarTypeValid\": false,\"errorMsg\": \"Not a valid plugin jar\"}";
     
     
 	/*****************************
@@ -66,6 +68,9 @@ public interface ServiceUIConstants {
     String REQ_JAR_FILE_EXTENSION = ".jar";
     String REQ_ZIP_FILE_EXTENSION  = ".zip";
     String REQ_TAR_GZ_FILE_EXTENSION = ".gz";
+    String REQ_IMAGE_JPG_EXTENSION = "jpg";
+    String REQ_IMAGE_JPEG_EXTENSION = "jpeg";
+    String REQ_IMAGE_PNG_EXTENSION = "png";
     
     
     /*****************************
@@ -113,6 +118,13 @@ public interface ServiceUIConstants {
      * String REQ_DOWNLOAD_XXX
      *****************************/ 
     String REQ_MODULE_GROUP = "moduleGroup";
+    
+    /*****************************
+     * GlobalUrl Request Constants
+     * String REQ_GLOBURL_XXX
+     *****************************/ 
+    String REQ_GLOBURL_URL = "globalUrl";
+    String REQ_GLOBURL_ID = "globalurlId";
     
     
     /*****************************
@@ -201,6 +213,9 @@ public interface ServiceUIConstants {
     
     String URL_ADDED = "succ.url.add";
     String URL_NOT_ADDED = "fail.url.add";
+    String URL_DELETED = "succ.globurl.delete";
+    String URL_NOT_DELETED = "fail.globurl.delete";
+    
     
     String DOWNLOAD_ADDED = "succ.download.add";
     String DOWNLOAD_NOT_ADDED = "fail.download.add";

@@ -33,10 +33,14 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.google.gson.Gson;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.model.ArchetypeInfo;
 import com.photon.phresco.model.DownloadInfo;
+import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.client.api.Content;
+import com.photon.phresco.service.util.ServerUtil;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.MultiPart;
@@ -74,8 +78,6 @@ public class Downloads extends ServiceBaseAction {
 	private static byte[] downloadByteArray = null;
 	private static String downloadJarName = null;
 
-
-
 	public String list() throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Downloads.list()");
@@ -98,8 +100,8 @@ public class Downloads extends ServiceBaseAction {
 		}
 		
 		try {
-			/*List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
-			getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);*/
+			List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
+			getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
 		} catch(Exception e) {
 			throw new PhrescoException(e);
 		}
@@ -158,11 +160,23 @@ public class Downloads extends ServiceBaseAction {
             writer = getHttpResponse().getWriter();
 	        downloadJarName = getHttpRequest().getHeader(X_FILE_NAME);
 	        if (downloadJarName.endsWith(REQ_JAR_FILE_EXTENSION) || downloadJarName.endsWith(REQ_ZIP_FILE_EXTENSION) 
-	        		|| downloadJarName.endsWith(REQ_TAR_GZ_FILE_EXTENSION)) {
+	        		|| downloadJarName.endsWith(REQ_TAR_GZ_FILE_EXTENSION) || downloadJarName.endsWith(REQ_IMAGE_JPG_EXTENSION) 
+	        		|| downloadJarName.endsWith(REQ_IMAGE_JPEG_EXTENSION) || downloadJarName.endsWith(REQ_IMAGE_PNG_EXTENSION)) {
+	        
 	        	InputStream is = getHttpRequest().getInputStream();
 	        	downloadByteArray = IOUtils.toByteArray(is);
+	        	InputStream applnIs = new ByteArrayInputStream(downloadByteArray);
+	        	ArchetypeInfo archetypeInfo = ServerUtil.getArtifactinfo(applnIs);
 	            getHttpResponse().setStatus(getHttpResponse().SC_OK);
-	            writer.print(SUCCESS_TRUE);
+	            if (archetypeInfo != null) {
+	            	archetypeInfo.setMavenJar(true);
+	            	archetypeInfo.setSuccess(true);
+	            	Gson gson = new Gson();
+	                String json = gson.toJson(archetypeInfo);
+	            	writer.print(json);
+	            } else {
+	            	writer.print(MAVEN_JAR_FALSE);
+	            }
 		        writer.flush();
 		        writer.close();
 	        }

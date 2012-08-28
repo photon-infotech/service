@@ -34,8 +34,9 @@
 <form id="formRoleList"  class="form-horizontal customer_list">
 	<div class="operation" id="operation">
 		<%-- <input type="button" id="roleAdd" class="btn btn-primary" name="role_action" onclick="loadContent('roleAdd', '', $('#subcontainer'));" value="<s:text name='lbl.hdr.adm.rlelst.add'/>"/> --%>
-		<input type="button" id="roleAdd" class="btn btn-primary" 
-		        name="role_action" onclick="loadContent('roleAdd', $('#formRoleList'), $('#subcontainer'));" value="<s:text name='lbl.hdr.adm.rlelst.add'/>"/>
+		<input type="button" id="roleAdd" class="btn btn-disabled" 
+		        name="role_action" disabled="disbaled" onclick="loadContent('roleAdd', $('#formRoleList'), $('#subcontainer'));" 
+		            value="<s:text name='lbl.hdr.adm.rlelst.add'/>"/>
 		
 		<input type="button" id="del" class="btn" disabled value="<s:text 
 		        name='lbl.hdr.adm.delete'/>"  onclick="loadContent('roleDelete', $('#formRoleList'), $('#subcontainer'));"/>

@@ -30,7 +30,7 @@
 
 <%
 	ModuleGroup moduleGroup = (ModuleGroup)request.getAttribute(ServiceUIConstants.REQ_MODULE_GROUP); 
-    List<Technology> technologys = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
+    List<Technology> technologies = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
     String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
     String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
     
@@ -106,7 +106,49 @@
 			</div>
 		</div>
 		
-		<div class="control-group" id="fileControl">
+		<div class="control-group" id="applyControl">
+			<label class="control-label labelbold"> <span
+				class="mandatory">*</span>&nbsp;<s:text name="Technology" /> </label>
+			<div class="controls">
+				<select id="multiSelect" name="technology">
+				<%
+					if (technologies != null) {
+						for (Technology technology : technologies) {
+				%>
+							<option value="<%=technology.getId() %>"><%=technology.getName() %></option>
+				<%
+                        }
+					}
+				%>
+				</select><span class="help-inline applyerror" id="techError"></span>
+			</div>
+		</div>
+		
+		<!-- POM details starts -->
+		<div id="jarDetailsDiv" class="hideContent">
+			<div class="control-group">
+				<label class="control-label labelbold">
+					<s:text name='lbl.hdr.comp.groupid'/>
+				</label>
+				<div class="controls">
+					<input name="groupId" class="input-xlarge" type="text"
+						placeholder="<s:text name='place.hldr.archetype.add.groupId'/>">
+				</div>
+			</div>
+			
+			<div class="control-group">
+				<label class="control-label labelbold">
+					<s:text name='lbl.hdr.comp.artifactid'/>
+				</label>
+				<div class="controls">
+					<input name="artifactId" class="input-xlarge" type="text"
+						placeholder="<s:text name='place.hldr.archetype.add.artifactId'/>">
+				</div>
+			</div>
+		</div>
+		<!-- POM details ends -->
+		
+		<div class="control-group" id="featureFileControl">
 			<label class="control-label labelbold">
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.file'/>
 			</label>
@@ -119,7 +161,7 @@
 					</noscript>
 				</div>
 			</div>
-			 <span class="help-inline fileError" id="fileError"></span>
+			 <span class="help-inline fileError" id="featureFileError"></span>
 		</div>
 		
 		<div class="control-group">
@@ -244,22 +286,8 @@
         } else {
             hideError($("#verControl"), $("#verError"));
         }
-        
-        if (data.fileError != undefined) {
-            showError($("#fileControl"), $("#fileError"), data.fileError);
-        } else {
-            hideError($("#fileControl"), $("#fileError"));
-        }
     }
     
-	 function applnJarError(data) {
-		if (data != undefined) {
-			showError($("#fileControl"), $("#fileError"), data);
-		} else {
-			hideError($("#fileControl"), $("#fileError"));
-		}
-	} 
-
 	$("input[type=radio]").change(function() {
 		var name = $(this).attr('name');
 		$("input:checkbox[name='" + name + "']").prop("checked", true);
@@ -279,28 +307,45 @@
 			$("p[id='" + name + "']").html(version);
 		}
 	});
+	
+	function jarError(data, type) {
+		var controlObj;
+		var msgObj;
+		if (type == "featureJar") {
+			controlObj = $("#featureFileControl");
+			msgObj = $("#featureFileError");
+		} 
+		if (data != undefined && !isBlank(data)) {
+			showError(controlObj, msgObj, data);
+		} else {
+			hideError(controlObj, msgObj);
+		}
+	}
 
 	 function createUploader() {
 		var featureUploader = new qq.FileUploader({
 			element : document.getElementById('feature-file-uploader'),
-			action : 'uploadJar',
+			action : 'uploadFeatureFile',
 			multiple : false,
-			type : 'applnJar',
+			allowedExtensions : ["zip","jar"],
+			type : 'featureJar',
 			buttonLabel : '<s:label key="lbl.comp.featr.upload" />',
 			typeError : '<s:text name="err.invalid.file.selection" />',
 			params : {
-				type : 'applnJar'
+				type : 'featureJar'
 			},
 			debug : true
 		});
 	}
  
-	 function removeUploadedJar(obj) {
+	function removeUploadedJar(obj) {
+		$('#jarDetailsDiv').hide();
 		$(obj).parent().remove();
+		var type = $(obj).attr("tempattr");
 		var params = "uploadedJar=";
 		params = params.concat($(obj).attr("id"));
 		params = params.concat("&type=");
-		params = params.concat($(obj).attr("tempattr"));
+		params = params.concat(type);
 		$.ajax({
 			url : "removeFeatureJar",
 			data : params,
@@ -308,13 +353,12 @@
 			success : function(data) {
 			}
 		});
+		jarError('', type);
 		enableDisableUpload();
-		//pluginJarError();
-		applnJarError();
 	}
 
 	function enableDisableUpload() {
-		if ($('ul[temp="applnJar"] > li').length === 1) {
+		if ($('ul[temp="featureJar"] > li').length === 1) {
 			$('#feature-file-uploader').find("input[type='file']").attr(
 					'disabled', 'disabled');
 			$('#feature-file-uploader').find($(".qq-upload-button")).removeClass(

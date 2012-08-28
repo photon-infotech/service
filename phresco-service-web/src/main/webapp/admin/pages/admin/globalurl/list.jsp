@@ -19,12 +19,29 @@
   --%>
 <%@ taglib uri="/struts-tags" prefix="s" %>
 
-<form class="customer_list">
+<%@ page import="java.util.List"%>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="org.apache.commons.collections.CollectionUtils"%>
+
+<%@ page import="com.photon.phresco.model.GlobalURL"%>
+<%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
+
+<% 
+ 	List<GlobalURL> globalUrls = (List<GlobalURL>) request.getAttribute(ServiceUIConstants.REQ_GLOBURL_URL);
+	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
+%>
+
+<form id="formGlobalUrlList" class="customer_list">
 	<div class="operation" id="operation">
-		<input type="button" id="globalurlAdd" class="btn btn-primary" name="url_add" onclick="loadContent('globalurlAdd', '', $('#subcontainer'));" value="<s:text name='lbl.hdr.adm.urllst.title'/>"/>
-		<input type="button" id="del" class="btn" disabled value="<s:text name='lbl.hdr.adm.delete'/>"/>
+		<input type="button" id="globalurlAdd" class="btn btn-primary" name="url_add" 
+		              onclick="loadContent('globalurlAdd', $('#formGlobalUrlList'), $('#subcontainer'));" 
+		                      value="<s:text name='lbl.hdr.adm.urllst.title'/>"/>
+		              
+		<input type="button" class="btn" id="del" disabled 
+		        onclick="loadContent('globalurlDelete', $('#formGlobalUrlList'), $('#subcontainer'));" 
+		        value="<s:text name='lbl.hdr.comp.delete'/>"/>              
 		<s:if test="hasActionMessages()">
-			<div class="alert alert-success"  id="successmsg">
+			<div class="alert alert-success alert-message"  id="successmsg">
 				<s:actionmessage />
 			</div>
 		</s:if>
@@ -35,6 +52,11 @@
 		</s:if>	
 	</div>
 	
+	<% if (CollectionUtils.isEmpty(globalUrls)) { %>
+		<div class="alert alert-block">
+			<s:text name='alert.msg.globalUrl.not.available'/>
+		</div>
+    <% } else { %>	
 	<div class="table_div">
 		<div class="fixed-table-container">
 			<div class="header-background"> </div>
@@ -60,54 +82,38 @@
 					</thead>
 		
 					<tbody>
+					<% if(CollectionUtils.isNotEmpty(globalUrls)) {
+						  for(GlobalURL globalUrl : globalUrls) {
+						
+					%>
 						<tr>
 							<td class="checkboxwidth">
-								<input type="checkbox" class="check" name="check" onclick="checkboxEvent();">
+								<input type="checkbox" class="check" name="globalurlId" value="<%= globalUrl.getId() %>" onclick="checkboxEvent();">
 							</td>
 							<td class="namelabel-width">
-								<a href="#" name="edit" id="" >Login Service</a>
+								<a href="#" name="edit" id="" onclick="editGlobalUrl('<%= globalUrl.getId() %>');">
+								     <%= StringUtils.isNotEmpty(globalUrl.getName()) ? globalUrl.getName() : "" %>
+								</a>
 							</td>
-							<td>Authentication Details</td>
-							<td>http://172.16.28.1:3030/service</td>
+							<td><%= StringUtils.isNotEmpty(globalUrl.getDescription()) ? globalUrl.getDescription() : "" %></td>
+							<td><%= StringUtils.isNotEmpty(globalUrl.getUrl()) ? globalUrl.getUrl() : "" %></td>
 						</tr>
-						
-						<tr>
-							<td>
-								<input type="checkbox" class="check" name="check" onclick="checkboxEvent();">
-							</td>
-							<td>
-								<a href="#" name="edit" id="">forum</a>
-							</td>
-							<td>Group Discussion Board</td>
-							<td>http://172.16.27.121:3030/service</td>
-						</tr>
-						
-						<tr>
-							<td>
-								<input type="checkbox" class="check" name="check" onclick="checkboxEvent();">
-							</td>
-							<td>
-								<a href="#" name="edit" id="">Twitter</a>
-							</td>
-							<td >Social Blog </td>
-							<td>http://172.165.28.11:3030/service</td>
-						</tr>
-						
-						<tr>
-							<td>
-								<input type="checkbox" class="check" name="check" onclick="checkboxEvent();">
-							</td>
-							<td>
-								<a href="#" name="edit" id="" >Gmailer</a>
-							</td>
-							<td >Mailing Service Provider</td>
-							<td>http://172.161.28.1:3030/service</td>
-						</tr>
+						<%
+						   }
+						 }
+						%>
 					</tbody>
 				</table>
 			</div>
 		</div>
 	</div>
+	<%
+      }
+	%>
+	
+	<!-- Hidden Fields -->
+	<input type="hidden" name="customerId" value="<%= customerId %>">
+	
 </form>	
 
 <script type="text/javascript">
@@ -116,4 +122,12 @@
 	$(document).ready(function() {
 		enableScreen();
 	});
+	
+	function editGlobalUrl(id) {
+		var params = "globalurlId=";
+		params = params.concat(id);
+	    params = params.concat("&customerId=");
+	    params = params.concat("<%= customerId %>");
+		loadContentParam("globalurlEdit", params, $('#subcontainer'));
+	}
 </script>

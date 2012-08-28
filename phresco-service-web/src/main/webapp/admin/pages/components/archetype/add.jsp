@@ -167,7 +167,7 @@
 		</div>
 		<!-- POM details ends -->
 		
-		<div class="control-group" id="fileControl">
+		<div class="control-group" id="appFileControl">
 			<label class="control-label labelbold"> <span
 				class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.applnjar' />
 			</label>
@@ -278,27 +278,22 @@
         } else {
             hideError($("#appControl"), $("#appError"));
         }
-
-        if (data.fileError != undefined) {
-            showError($("#fileControl"), $("#fileError"), data.fileError);
-        } else {
-            hideError($("#fileControl"), $("#fileError"));
-        }
     }
     
-    function pluginJarError(data) {
-		if (data != undefined ) {
-			showError($("#pluginControl"), $("#pluginError"), data);
-		} else {
-			hideError($("#pluginControl"), $("#pluginError"));
+	function jarError(data, type) {
+		var controlObj;
+		var msgObj;
+		if (type == "pluginJar") {
+			controlObj = $("#pluginControl");
+			msgObj = $("#pluginError");
+		} else if (type == "applnJar") {
+			controlObj = $("#appFileControl");
+			msgObj = $("#fileError");
 		}
-	}
-	
-	function applnJarError(data) {
-		if (data != undefined) {
-			showError($("#fileControl"), $("#fileError"), data);
+		if (data != undefined && !isBlank(data)) {
+			showError(controlObj, msgObj, data);
 		} else {
-			hideError($("#fileControl"), $("#fileError"));
+			hideError(controlObj, msgObj);
 		}
 	}
     
@@ -307,9 +302,10 @@
             element: document.getElementById('appln-file-uploader'),
             action: 'uploadJar',
             multiple: false,
+            allowedExtensions : ["jar"],
             type: 'applnJar',
             buttonLabel: '<s:label key="lbl.comp.arhtyp.upload" />',
-            typeError : '<s:text name="err.invalid.file.selection" />',
+            typeError : '<s:text name="err.invalid.jar.selection" />',
             params: {type: 'applnJar'}, 
             debug: true
         });
@@ -318,9 +314,10 @@
            	element: document.getElementById('plugin-file-uploader'),
            	action: 'uploadJar',
            	multiple: true,
+           	allowedExtensions : ["jar"],
            	type: 'pluginJar',
            	buttonLabel: '<s:text name="lbl.comp.arhtyp.upload" />',
-           	typeError : '<s:text name="err.invalid.file.selection" />',
+           	typeError : '<s:text name="err.invalid.jar.selection" />',
 			params: {type: 'pluginJar'}, 
            	debug: true
 		});
@@ -329,10 +326,11 @@
 	function removeUploadedJar(obj) {
 		$('#jarDetailsDiv').hide();
 		$(obj).parent().remove();
+		var type = $(obj).attr("tempattr");
 		var params = "uploadedJar=";
 		params = params.concat($(obj).attr("id"));
 		params = params.concat("&type=");
-		params = params.concat($(obj).attr("tempattr"));
+		params = params.concat(type);
 		$.ajax({
 			url : "removeArchetypeJar",
 			data : params,
@@ -341,8 +339,7 @@
 			}
 		});
 		enableDisableUpload();
-		pluginJarError();
-		applnJarError();
+		jarError('', type);
 	}
 	
 	function enableDisableUpload() {

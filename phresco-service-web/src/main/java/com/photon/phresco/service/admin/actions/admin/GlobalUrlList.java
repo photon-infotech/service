@@ -19,64 +19,168 @@
  */
 package com.photon.phresco.service.admin.actions.admin;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import java.util.Collections;
+
+import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.model.GlobalURL;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
+import com.sun.jersey.api.client.ClientResponse;
 
 public class GlobalUrlList extends ServiceBaseAction { 
 	
 	private static final long serialVersionUID = 6801037145464060759L;
 	private static final Logger S_LOGGER = Logger.getLogger(GlobalUrlList.class);
+	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
 	private String name = null;
+	private String description = "";
 	private String nameError = null;
 	private String url = null;
 	private String urlError = null;
 	private boolean errorFound = false;
+	private String customerId = "";
+	private String globalurlId ="";
 	
-	public String list() {
-		S_LOGGER.debug("Entering Method GlobalUrlList.list()");
+	public String list() throws PhrescoException {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method GlobalUrlList.list()");
+		}
+         
+		try {
+    		List<GlobalURL> globalUrl = getServiceManager().getGlobalUrls(customerId);
+    		getHttpRequest().setAttribute(REQ_GLOBURL_URL, globalUrl);
+    		getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+    	} catch(Exception e){
+    		throw new PhrescoException(e);
+    	}
+    	
 		return ADMIN_GLOBALURL_LIST;	
 	}
 	
 	public String add() {
-		S_LOGGER.debug("Entering Method GlobalUrlList.list()");
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method GlobalUrlList.add()");
+		}
+
 		return ADMIN_GLOBALURL_ADD;
 	}
 	
-	public String save() {
-		S_LOGGER.debug("Entering Method GlobalUrlList.list()");
-	try  {
-		if (validateForm()) {
-			setErrorFound(true);
-			return SUCCESS;
+	public String save() throws PhrescoException {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method GlobalUrlList.save()");
 		}
-		addActionMessage(getText(URL_ADDED, Collections.singletonList(name)));
-		
-	}  catch (Exception e) {
-		addActionError(getText(URL_NOT_ADDED, Collections.singletonList(name)));
-	}
-	return  ADMIN_GLOBALURL_LIST;
+
+		try  {
+			List<GlobalURL> globalUrls = new ArrayList<GlobalURL>();
+			GlobalURL globalUrl = new GlobalURL();
+			globalUrl.setName(name);
+			globalUrl.setDescription(description);
+			globalUrl.setUrl(url);
+			globalUrls.add(globalUrl);
+			ClientResponse clientResponse = getServiceManager().createGlobalUrl(globalUrls, customerId);
+			if( clientResponse.getStatus() != 200 && clientResponse.getStatus() != 201) {
+				addActionError(getText(URL_NOT_ADDED, Collections.singletonList(name)));
+			} else {
+			    addActionMessage(getText(URL_ADDED, Collections.singletonList(name)));
+			}
+		}  catch (Exception e) {
+			throw new PhrescoException(e);
+		}
+
+		return  list();
 	}
 	
-	private boolean validateForm() {
+	public String edit() throws PhrescoException {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method GlobalUrlList.edit()");
+		}
+		
+		try {
+			  GlobalURL globalUrl = getServiceManager().getGlobalUrl(globalurlId, customerId);
+			  getHttpRequest().setAttribute(REQ_GLOBURL_URL , globalUrl);
+			  getHttpRequest().setAttribute(REQ_FROM_PAGE, REQ_EDIT);
+		} catch(Exception e) {
+			throw new PhrescoException(e);
+		}
+		
+		return ADMIN_GLOBALURL_ADD;
+	}
+	
+	public String update() throws PhrescoException { 
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method GlobalUrlList.update()");
+		}
+		
+		try {
+			GlobalURL globalUrl = new GlobalURL();
+			globalUrl.setName(name);
+			globalUrl.setDescription(description);
+			globalUrl.setUrl(url);
+			getServiceManager().updateGlobalUrl(globalUrl, globalurlId, customerId);
+		} catch(Exception e){
+			throw new PhrescoException();
+		}
+		
+		return list();
+	}
+	
+	
+	public String delete() throws PhrescoException {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entering Method GlobalUrlList.delete()");
+	    }
+
+		try {
+			String[] globalUrlIds = getHttpRequest().getParameterValues(REQ_GLOBURL_ID);
+			if (globalUrlIds != null) {
+				for (String globalUrlId : globalUrlIds) {
+					ClientResponse clientResponse = getServiceManager().deleteglobalUrl(globalUrlId, customerId);
+					if (clientResponse.getStatus() != 200) {
+						addActionError(getText(URL_NOT_DELETED));
+					}
+				}
+				addActionMessage(getText(URL_DELETED));
+			}
+		} catch (Exception e) {
+			throw new PhrescoException(e);
+		}
+
+		return list();
+	}
+	
+	public String validateForm() {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method GlobalUrlList.validateForm()");
+		}
+
 		boolean isError = false;
 		if (StringUtils.isEmpty(name)) {
 			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY));
 			isError = true;
 		} 
-		
+
 		if (StringUtils.isEmpty(url)) {
 			setUrlError(getText(KEY_I18N_ERR_URL_EMPTY));
 			isError = true;
-		} 
+		}
 		
-		return isError;
+		if (isError) {
+            setErrorFound(true);
+        }
+
+		return SUCCESS;
 	}
 	
 	public String cancel() {
-		S_LOGGER.debug("Entering Method GlobalUrlList.list()");
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method GlobalUrlList.list()");
+		}
+
 		return ADMIN_GLOBALURL_CANCEL;
 	}
 	
@@ -116,10 +220,24 @@ public class GlobalUrlList extends ServiceBaseAction {
 		this.urlError = urlError;
 	}
 
-	
-
 	public void setErrorFound(boolean errorFound) {
 		this.errorFound = errorFound;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getGlobalurlId() {
+		return globalurlId;
+	}
+
+	public void setGlobalurlId(String globalurlId) {
+		this.globalurlId = globalurlId;
 	}
 
 	

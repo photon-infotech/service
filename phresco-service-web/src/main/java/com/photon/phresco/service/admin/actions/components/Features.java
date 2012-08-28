@@ -29,15 +29,20 @@ import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.google.gson.Gson;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.model.ArchetypeInfo;
 import com.photon.phresco.model.Module;
 import com.photon.phresco.model.ModuleGroup;
+import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.client.api.Content;
+import com.photon.phresco.service.util.ServerUtil;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.MultiPart;
@@ -49,7 +54,6 @@ public class Features extends ServiceBaseAction {
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
 	private String name = null;
-	private String version = null;
 	private String nameError = null;
 	private String versError = null;
 	private String fileError = null;
@@ -62,7 +66,11 @@ public class Features extends ServiceBaseAction {
     private String fromPage = null;
     private String techId = null;
     private String type = null;
-    	
+    
+    private String artifactId = "";
+    private String groupId = "";
+    private String jarVersion = "";
+    
 	private static byte[] featureByteArray = null;
 	private static String featureJarName = null;
     
@@ -85,11 +93,13 @@ public class Features extends ServiceBaseAction {
     	return COMP_FEATURES_LIST;
     }
 	
-	public String add() {
+	public String add() throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Features.add()");
 		}
 		
+		List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
+		getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
 		getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
 		
 		return COMP_FEATURES_ADD;
@@ -128,7 +138,10 @@ public class Features extends ServiceBaseAction {
 			moduleGroup.setVersions(versions);
 			moduleGroup.setType(REST_QUERY_TYPE_MODULE);
 			moduleGroup.setCustomerId(customerId);
-
+			moduleGroup.setArtifactId(artifactId);
+			moduleGroup.setGroupId(groupId);
+			moduleGroup.setVersions(versions);
+		     
 			BodyPart jsonPart = new BodyPart();
 			jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
 			jsonPart.setEntity(moduleGroup);
@@ -246,15 +259,10 @@ public class Features extends ServiceBaseAction {
 			isError = true;
 		} 
 
-		if (StringUtils.isEmpty(version)) {
+		if (CollectionUtils.isEmpty(versions)) {
 			setVersError(getText(KEY_I18N_ERR_VER_EMPTY));
 			isError = true;
 		}
-		
-		/*if (StringUtils.isEmpty(featureArcFileName) || featureArc == null) {
-			setFileError(getText(KEY_I18N_ERR_FILE_EMPTY));
-			isError = true;
-		}*/
 		
 		if (isError) {
 			setErrorFound(true);
@@ -271,14 +279,6 @@ public class Features extends ServiceBaseAction {
 		this.name = name;
 	}
 	
-	public String getVersion() {
-		return version;
-	}
-
-	public void setVersion(String version) {
-		this.version = version;
-	}
-
 	public String getNameError() {
 		return nameError;
 	}
