@@ -31,7 +31,7 @@ import com.photon.phresco.model.PropertyTemplate;
 import com.photon.phresco.model.SettingsTemplate;
 import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
-import com.photon.phresco.service.util.ServerUtil;
+import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
 
 public class ConfigTemplates extends ServiceBaseAction { 
@@ -118,7 +118,7 @@ public class ConfigTemplates extends ServiceBaseAction {
             settingTemplate.setProperties(propertyTemplates);
             settingsTemplates.add(settingTemplate);
             ClientResponse clientResponse = getServiceManager().createConfigTemplates(settingsTemplates, customerId);
-            if (clientResponse.getStatus() != 200 && clientResponse.getStatus() != 201) {
+            if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200 && clientResponse.getStatus() != ServiceConstants.RES_CODE_201) {
             	addActionError(getText(CONFIGTEMPLATE_NOT_ADDED, Collections.singletonList(name)));
             } else {
             	addActionMessage(getText(CONFIGTEMPLATE_ADDED, Collections.singletonList(name)));
@@ -165,7 +165,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 			if (configIds != null) {
 				for (String configId : configIds) {
 					ClientResponse clientResponse = getServiceManager().deleteConfigTemp(configId, customerId);
-					if (clientResponse.getStatus() != 200) {
+					if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
 						addActionError(getText(CONFIGTEMPLATE_NOT_DELETED));
 					}
 				}

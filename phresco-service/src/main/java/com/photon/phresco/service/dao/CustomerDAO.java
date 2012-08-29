@@ -19,8 +19,8 @@ public class CustomerDAO extends BaseDAO {
     private String contactNumber;
     private String fax;
     private String helpText;
-    Date validFrom;
-    Date validUpto;
+    private Date validFrom;
+    private Date validUpto;
     private CustomerStatus status;
     private int type;
     

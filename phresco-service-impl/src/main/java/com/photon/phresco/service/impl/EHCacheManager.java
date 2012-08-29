@@ -10,7 +10,7 @@ public class EHCacheManager {
 	/**
      * The CacheManager provides us access to individual Cache instances
      */
-    private static final CacheManager cacheManager = new CacheManager();
+    private static final CacheManager CACHE_MANAGER = new CacheManager();
     
     /**
      * A cache that we're designating to hold Widget instances
@@ -21,7 +21,7 @@ public class EHCacheManager {
     public EHCacheManager()
     {
         // Load our widgets cache:
-        widgetCache = cacheManager.getEhcache( "widgets" );
+        widgetCache = CACHE_MANAGER.getEhcache( "widgets" );
         
     }
     

@@ -41,6 +41,7 @@ import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.client.api.Content;
 import com.photon.phresco.service.util.ServerUtil;
+import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.MultiPart;
@@ -138,7 +139,7 @@ public class Downloads extends ServiceBaseAction {
 			
 			downloadInfo.add(download);
 			ClientResponse clientResponse = getServiceManager().createDownloads(downloadInfo, customerId);
-			if (clientResponse.getStatus() != 200) {
+			if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
 				addActionError(getText(DOWNLOAD_NOT_ADDED, Collections.singletonList(name)));
 			} else {
 				addActionMessage(getText(DOWNLOAD_ADDED, Collections.singletonList(name)));
@@ -245,7 +246,7 @@ public class Downloads extends ServiceBaseAction {
 			if (downloadIds != null) {
 				for (String downloadId : downloadIds) {
 					ClientResponse clientResponse =getServiceManager().deleteDownloadInfo(downloadId, customerId);
-					if (clientResponse.getStatus() != 200) {
+					if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
 						addActionError(getText(DOWNLOAD_NOT_DELETED));
 					}
 				}

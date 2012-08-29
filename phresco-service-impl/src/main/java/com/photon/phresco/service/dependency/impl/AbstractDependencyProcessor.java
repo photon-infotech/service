@@ -38,7 +38,6 @@ package com.photon.phresco.service.dependency.impl;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +49,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.Database;
 import com.photon.phresco.model.Module;
@@ -59,11 +59,11 @@ import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.api.DependencyProcessor;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
-import com.photon.phresco.service.model.ServerConstants;
+import com.photon.phresco.service.util.ServerConstants;
+import com.photon.phresco.util.Constants;
 import com.photon.phresco.util.TechnologyTypes;
 import com.phresco.pom.exception.PhrescoPomException;
 import com.phresco.pom.util.PomProcessor;
-import com.photon.phresco.util.Constants;
 
 /**
  * Abstract dependency processor has methods to get the binaries from
@@ -145,15 +145,15 @@ public abstract class AbstractDependencyProcessor implements DependencyProcessor
 	}
 
 	private static void initDbPathAndTestPom() {
-		sqlFolderPathMap.put(TechnologyTypes.PHP, "/source/sql/");
-		sqlFolderPathMap.put(TechnologyTypes.PHP_DRUPAL6, "/source/sql/");
-		sqlFolderPathMap.put(TechnologyTypes.PHP_DRUPAL7, "/source/sql/");
-		sqlFolderPathMap.put(TechnologyTypes.NODE_JS_WEBSERVICE, "/source/sql/");
-		sqlFolderPathMap.put(TechnologyTypes.HTML5_MULTICHANNEL_JQUERY_WIDGET, "/src/sql/");
-		sqlFolderPathMap.put(TechnologyTypes.HTML5_MOBILE_WIDGET, "/src/sql/");
-		sqlFolderPathMap.put(TechnologyTypes.HTML5_WIDGET, "/src/sql/");
-		sqlFolderPathMap.put(TechnologyTypes.JAVA_WEBSERVICE, "/src/sql/");
-		sqlFolderPathMap.put(TechnologyTypes.WORDPRESS, "/source/sql/");
+		sqlFolderPathMap.put(TechnologyTypes.PHP, ServerConstants.SOURCE_SQL);
+		sqlFolderPathMap.put(TechnologyTypes.PHP_DRUPAL6, ServerConstants.SOURCE_SQL);
+		sqlFolderPathMap.put(TechnologyTypes.PHP_DRUPAL7, ServerConstants.SOURCE_SQL);
+		sqlFolderPathMap.put(TechnologyTypes.NODE_JS_WEBSERVICE, ServerConstants.SOURCE_SQL);
+		sqlFolderPathMap.put(TechnologyTypes.HTML5_MULTICHANNEL_JQUERY_WIDGET, ServerConstants.SRC_SQL);
+		sqlFolderPathMap.put(TechnologyTypes.HTML5_MOBILE_WIDGET, ServerConstants.SRC_SQL);
+		sqlFolderPathMap.put(TechnologyTypes.HTML5_WIDGET, ServerConstants.SRC_SQL);
+		sqlFolderPathMap.put(TechnologyTypes.JAVA_WEBSERVICE, ServerConstants.SRC_SQL);
+		sqlFolderPathMap.put(TechnologyTypes.WORDPRESS, ServerConstants.SOURCE_SQL);
 	
 		testPomFiles.put("functional", "/test/functional/pom.xml");
 		testPomFiles.put("load", "/test/load/pom.xml");

@@ -13,7 +13,6 @@ import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 import java.util.zip.ZipEntry;
 
-import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
@@ -29,7 +28,6 @@ import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.ArchetypeInfo;
 import com.photon.phresco.model.I18NString;
 import com.photon.phresco.model.L10NString;
-import com.photon.phresco.service.model.ServerConstants;
 import com.photon.phresco.util.Constants;
 import com.photon.phresco.util.FileUtil;
 import com.photon.phresco.util.Utility;
@@ -244,7 +242,7 @@ public class ServerUtil {
                 fileOutStream.write(buf, 0, len);
             }
         } catch (IOException e) {
-            throw new PhrescoException();
+            throw new PhrescoException(e);
         } finally {
             Utility.closeStream(inputStream);
             Utility.closeStream(fileOutStream);
@@ -327,7 +325,7 @@ public class ServerUtil {
             writer.write(xmlString);
             writer.close();
         } catch (Exception e) {
-            throw new PhrescoException();
+            throw new PhrescoException(e);
         } finally {
             Utility.closeStream(writer);
         }

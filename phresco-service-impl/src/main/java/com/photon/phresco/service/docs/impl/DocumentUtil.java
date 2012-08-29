@@ -61,8 +61,6 @@ import com.photon.phresco.model.Documentation;
 import com.photon.phresco.model.Documentation.DocumentationType;
 import com.photon.phresco.model.ModuleGroup;
 import com.photon.phresco.model.ProjectInfo;
-import com.photon.phresco.service.api.RepositoryManager;
-import com.photon.phresco.service.model.EntityType;
 
 /**
  * Document Util to process PDF documents
@@ -384,7 +382,7 @@ public final class DocumentUtil {
         sb.append("<ul>"); //$NON-NLS-1$
         for (String fileOrFolder : list) {
             File newFile = new File(file.toString()+File.separator+fileOrFolder);
-            if(newFile.isHidden()) continue;
+            if(newFile.isHidden()) { continue; }
             /*if(newFile.isDirectory()){
                 sb.append("<li>"); //$NON-NLS-1$
                 sb.append("<a href=./"); //$NON-NLS-1$

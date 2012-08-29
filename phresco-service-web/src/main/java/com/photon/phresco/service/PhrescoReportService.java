@@ -34,7 +34,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.sonatype.aether.resolution.VersionRangeResolutionException;
 
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.service.model.ServerConstants;
+import com.photon.phresco.service.util.ServerConstants;
 import com.photon.phresco.util.TechnologyTypes;
 import com.phresco.pom.site.Reports;
 
@@ -49,8 +49,7 @@ public class PhrescoReportService implements ServerConstants {
 	@Path("{techId}")
 	@Produces({ MediaType.APPLICATION_JSON})
 	public List<Reports> getReportJSON(@PathParam("techId") String techId) throws VersionRangeResolutionException, PhrescoException, JSONException {
-		List<Reports> list = siteReport.get(techId);
-		return list;
+		return siteReport.get(techId);
 	}
 	
 	public static void initializeReportMap() {

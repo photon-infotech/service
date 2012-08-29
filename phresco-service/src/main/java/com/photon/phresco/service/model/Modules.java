@@ -19,46 +19,59 @@
  */
 package com.photon.phresco.service.model;
 
-public class Modules {
-	 int id;
-	 String moduleId;
-	/**
-	 * @return the id
-	 */
-	public int getId() {
-		return id;
-	}
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(int id) {
-		this.id = id;
-	}
-	/**
-	 * @return the moduleId
-	 */
-	public String getModuleId() {
-		return moduleId;
-	}
-	/**
-	 * @param moduleId the moduleId to set
-	 */
-	public void setModuleId(String moduleId) {
-		this.moduleId = moduleId;
-	}
-	public Modules(int id, String moduleId) {
-		super();
-		this.id = id;
-		this.moduleId = moduleId;
-	}
-	public Modules () {
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 
-	}
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return "Modules [id=" + id + ", moduleId=" + moduleId + "]";
-	}
+public class Modules {
+
+    private int id;
+    private String moduleId;
+
+    public Modules(int id, String moduleId) {
+        super();
+        this.id = id;
+        this.moduleId = moduleId;
+    }
+
+    public Modules() {
+
+    }
+
+    /**
+     * @return the id
+     */
+    public int getId() {
+        return id;
+    }
+
+    /**
+     * @param id
+     *            the id to set
+     */
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    /**
+     * @return the moduleId
+     */
+    public String getModuleId() {
+        return moduleId;
+    }
+
+    /**
+     * @param moduleId
+     *            the moduleId to set
+     */
+    public void setModuleId(String moduleId) {
+        this.moduleId = moduleId;
+    }
+
+    public String toString() {
+        return new ToStringBuilder(this,
+                ToStringStyle.DEFAULT_STYLE)
+                .append("id", id)
+                .append("moduleId", moduleId)
+                .toString();
+    }
 }

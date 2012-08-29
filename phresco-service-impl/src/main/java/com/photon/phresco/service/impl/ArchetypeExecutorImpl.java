@@ -38,7 +38,6 @@ package com.photon.phresco.service.impl;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
@@ -47,8 +46,7 @@ import com.photon.phresco.model.ArchetypeInfo;
 import com.photon.phresco.model.ProjectInfo;
 import com.photon.phresco.service.api.ArchetypeExecutor;
 import com.photon.phresco.service.api.PhrescoServerFactory;
-import com.photon.phresco.service.model.ServerConfiguration;
-import com.photon.phresco.service.model.ServerConstants;
+import com.photon.phresco.service.util.ServerConstants;
 import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.Constants;
 import com.photon.phresco.util.ProjectUtils;
@@ -56,17 +54,15 @@ import com.photon.phresco.util.Utility;
 
 public class ArchetypeExecutorImpl implements ArchetypeExecutor,
         ServerConstants, Constants {
-    public static final Logger S_LOGGER 			= Logger.getLogger(ArchetypeExecutorImpl.class);
-    public static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
+    private static final Logger S_LOGGER 			= Logger.getLogger(ArchetypeExecutorImpl.class);
+    private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
     private static final String INTERACTIVE_MODE 	= "false";
     public static final String WINDOWS 			= "Windows";
     private static final String PHRESCO_FOLDER_NAME = "phresco";
     private static final String DOT_PHRESCO_FOLDER 	= "." + PHRESCO_FOLDER_NAME;
 
-    private ServerConfiguration serverConfig = null;
 
-    public ArchetypeExecutorImpl(ServerConfiguration serverConfig) {
-        this.serverConfig = serverConfig;
+    public ArchetypeExecutorImpl() {
     }
 
     public File execute(ProjectInfo info) throws PhrescoException {

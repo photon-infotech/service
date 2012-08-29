@@ -53,11 +53,9 @@ import com.photon.phresco.model.ProjectInfo;
 import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.api.DocumentGenerator;
 import com.photon.phresco.service.api.PhrescoServerFactory;
-import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.docs.impl.DocConvertor;
 import com.photon.phresco.service.docs.impl.DocumentUtil;
 import com.photon.phresco.service.docs.impl.PdfInput;
-import com.photon.phresco.service.model.EntityType;
 import com.photon.phresco.util.Utility;
 
 /**
@@ -68,52 +66,56 @@ import com.photon.phresco.util.Utility;
 public class DocumentGeneratorImpl implements DocumentGenerator {
 	private static final Logger S_LOGGER= Logger.getLogger(DocumentGeneratorImpl.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
-    private RepositoryManager repoManager = PhrescoServerFactory.getRepositoryManager();
-    private static String MODULES = "Modules";
-    private static String LIB = "JsLibraries";
+    private static final String MODULES = "Modules";
+    private static final String LIB = "JsLibraries";
 
     @Override
-    public void generate(ProjectInfo info, File filePath) throws PhrescoException {
-    	if (isDebugEnabled) {
-    		S_LOGGER.debug("Entering Method DocumentGeneratorImpl.generate(ProjectInfo info, File filePath)");
-		}
+    public void generate(ProjectInfo info, File filePath)
+            throws PhrescoException {
+        if (isDebugEnabled) {
+            S_LOGGER.debug("Entering Method DocumentGeneratorImpl.generate(ProjectInfo info, File filePath)");
+        }
         OutputStream os = null, fos = null;
 
-        try{
-        	if (isDebugEnabled) {
-        		S_LOGGER.debug("generate() Filepath="+filePath.getPath());
-    		}
+        try {
+            if (isDebugEnabled) {
+                S_LOGGER.debug("generate() Filepath=" + filePath.getPath());
+            }
             String folderPath = filePath.toString() + File.separator + "docs";
             File docsFolder = new File(folderPath);
-            if(!docsFolder.exists()){
+            if (!docsFolder.exists()) {
                 docsFolder.mkdirs();
             }
             if (isDebugEnabled) {
-            	S_LOGGER.debug("generate() ProjectCode="+info.getCode());
-    		}
-            String path = folderPath + File.separator + info.getName() + "_doc.pdf";
+                S_LOGGER.debug("generate() ProjectCode=" + info.getCode());
+            }
+            String path = folderPath + File.separator + info.getName()
+                    + "_doc.pdf";
             os = new FileOutputStream(new File(path));
 
             com.itextpdf.text.Document docu = new com.itextpdf.text.Document();
 
-            PdfCopy pdfCopy = new PdfCopy(docu,os);
+            PdfCopy pdfCopy = new PdfCopy(docu, os);
             docu.open();
             InputStream titleSection = DocumentUtil.getTitleSection(info);
             DocumentUtil.addPages(titleSection, pdfCopy);
 
-            Technology technology = PhrescoServerFactory.getDbManager().getTechnologyDoc(info.getTechnology().getId());
+            Technology technology = PhrescoServerFactory.getDbManager()
+                    .getTechnologyDoc(info.getTechnology().getId());
             List<Documentation> technologyDoc = technology.getDocs();
-            if(technologyDoc != null) {
+            if (technologyDoc != null) {
                 for (Documentation documentation : technologyDoc) {
-                    if(!StringUtils.isEmpty(documentation.getUrl())){
-                        PdfInput convertToPdf = DocConvertor.convertToPdf(documentation.getUrl());
-                        if(convertToPdf != null) {
-                          DocumentUtil.addPages(convertToPdf.getInputStream(), pdfCopy);
+                    if (!StringUtils.isEmpty(documentation.getUrl())) {
+                        PdfInput convertToPdf = DocConvertor
+                                .convertToPdf(documentation.getUrl());
+                        if (convertToPdf != null) {
+                            DocumentUtil.addPages(
+                                    convertToPdf.getInputStream(), pdfCopy);
                         }
-                    }
-                     else {
-                          InputStream stringAsPDF = DocumentUtil.getStringAsPDF(documentation.getContent());
-                          DocumentUtil.addPages(stringAsPDF, pdfCopy);
+                    } else {
+                        InputStream stringAsPDF = DocumentUtil
+                                .getStringAsPDF(documentation.getContent());
+                        DocumentUtil.addPages(stringAsPDF, pdfCopy);
                     }
                 }
             }

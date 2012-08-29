@@ -22,7 +22,6 @@ package com.photon.phresco.service;
 import java.io.FileNotFoundException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -42,7 +41,7 @@ import com.photon.phresco.model.DownloadInfo;
 import com.photon.phresco.model.DownloadPropertyInfo;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
-import com.photon.phresco.service.model.ServerConstants;
+import com.photon.phresco.service.util.ServerConstants;
 import com.photon.phresco.util.ServiceConstants;
 
 /**

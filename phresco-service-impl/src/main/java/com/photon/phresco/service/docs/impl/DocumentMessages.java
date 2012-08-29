@@ -38,7 +38,7 @@ package com.photon.phresco.service.docs.impl;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-public class DocumentMessages {
+public final class DocumentMessages {
 	private static final String BUNDLE_NAME = "com.photon.phresco.service.docs.impl.documentMessages"; //$NON-NLS-1$
 
 	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);

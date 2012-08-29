@@ -35,30 +35,18 @@
  ******************************************************************************/
 package com.photon.phresco.service.impl;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.maven.repository.internal.MavenRepositorySystemSession;
@@ -76,29 +64,17 @@ import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.aether.util.artifact.SubArtifact;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.AdminConfigInfo;
-import com.photon.phresco.model.ApplicationType;
-import com.photon.phresco.model.DownloadInfo;
 import com.photon.phresco.model.ModuleGroup;
-import com.photon.phresco.model.ProjectInfo;
-import com.photon.phresco.model.SettingsTemplate;
-import com.photon.phresco.model.Technology;
-import com.photon.phresco.model.VideoInfo;
 import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.model.ArtifactInfo;
 import com.photon.phresco.service.model.ServerConfiguration;
-import com.photon.phresco.service.model.ServerConstants;
 import com.photon.phresco.service.util.ServerUtil;
-import com.photon.phresco.util.FileUtil;
 import com.photon.phresco.util.TechnologyTypes;
 import com.photon.phresco.util.Utility;
-import com.sun.jersey.server.impl.container.servlet.PerSessionFactory;
 
 public  class RepositoryManagerImpl implements RepositoryManager {
 
@@ -110,13 +86,10 @@ public  class RepositoryManagerImpl implements RepositoryManager {
 	private static final String LOCAL_REPO = "../temp/target/local-repo";
 
 	private ServerConfiguration config = null;
-	private Gson gson = null;
 
 	// TODO:Add ehcaching
 	private static Map<String, String[]> versionMap = new HashMap<String, String[]>(16);
 
-	private String url;
-	private String username;
 	
 	private void initMap() {
 		versionMap.put(TechnologyTypes.PHP, new String[]{"5.4.x", "5.3.x", "5.2.x", "5.1.x", "5.0.x"});
@@ -144,18 +117,10 @@ public  class RepositoryManagerImpl implements RepositoryManager {
 		}
 		this.config = config;
 		try {
-
-			gson = new Gson();
 			initMap();
 		} catch (Exception e) {
 			throw new PhrescoException(e);
 		}
-	}
-	
-	public RepositoryManagerImpl(String url, String username, String password) throws PhrescoException {
-		this.url = url;
-		this.username = username;
-	//	this.password = password;
 	}
 	
 	public List<ModuleGroup> getModules(String techId) throws PhrescoException {
@@ -303,8 +268,7 @@ public  class RepositoryManagerImpl implements RepositoryManager {
 	
 	private static DbManager getDBManager() throws PhrescoException {
 	    PhrescoServerFactory.initialize();
-	    DbManager dbManager = PhrescoServerFactory.getDbManager();
-	    return dbManager;
+	    return PhrescoServerFactory.getDbManager();
 	}
 	
 	@Override
@@ -334,8 +298,7 @@ public  class RepositoryManagerImpl implements RepositoryManager {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method RepositoryManagerImpl.getFrameworkVersion()");
 		}
-		String latestFrameworkVersion = config.getLatestFrameworkVersion();
-		return latestFrameworkVersion;
+		return config.getLatestFrameworkVersion();
 	}
 
 	@Override
@@ -343,17 +306,19 @@ public  class RepositoryManagerImpl implements RepositoryManager {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method RepositoryManagerImpl.getFrameworkVersion()");
 		}
-		String latestServiceVersion = config.getLatestServiceVersion();
-		return latestServiceVersion;
+		return config.getLatestServiceVersion();
 	}
 
 	public static boolean removeDirectory(File directory) {
-		if (directory == null)
-			return false;
-		if (!directory.exists())
+		if (directory == null) {
+		    return false;
+		}
+		if (!directory.exists()) {
 			return true;
-		if (!directory.isDirectory())
+		}
+		if (!directory.isDirectory()) {
 			return false;
+		}
 
 		String[] list = directory.list();
 
@@ -363,11 +328,13 @@ public  class RepositoryManagerImpl implements RepositoryManager {
 			for (int i = 0; i < list.length; i++) {
 				File entry = new File(directory, list[i]);
 				if (entry.isDirectory()) {
-					if (!removeDirectory(entry))
-						return false;
+					if (!removeDirectory(entry)) {
+					    return false;
+					}
 				} else {
-					if (!entry.delete())
-						return false;
+					if (!entry.delete()) {
+					    return false;
+					}
 				}
 			}
 		}

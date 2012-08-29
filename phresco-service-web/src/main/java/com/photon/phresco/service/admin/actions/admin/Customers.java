@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
+import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
 
 public class Customers extends ServiceBaseAction  { 
@@ -119,7 +120,7 @@ public class Customers extends ServiceBaseAction  {
 			customer.setValidUpto(validUpTo);
 			customers.add(customer);
 			ClientResponse clientResponse = getServiceManager().createCustomers(customers);
-			if (clientResponse.getStatus() != 200) {
+			if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
 				addActionError(getText(CUSTOMER_NOT_ADDED, Collections.singletonList(name)));
 			} else {
 				addActionMessage(getText(CUSTOMER_ADDED, Collections.singletonList(name)));
@@ -220,7 +221,7 @@ public class Customers extends ServiceBaseAction  {
 			if (customerIds != null) {
 				for (String customerId : customerIds) {
 			    	ClientResponse clientResponse =getServiceManager().deleteCustomer(customerId);
-			    	if (clientResponse.getStatus() != 200) {
+			    	if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
 			        	addActionError(getText(CUSTOMER_NOT_DELETED));
 			        }
 				}

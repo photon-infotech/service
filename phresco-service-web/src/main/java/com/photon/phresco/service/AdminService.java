@@ -38,11 +38,12 @@ import org.apache.log4j.Logger;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.AdminConfigInfo;
 import com.photon.phresco.model.LogInfo;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
-import com.photon.phresco.service.model.ServerConstants;
+import com.photon.phresco.service.util.ServerConstants;
 
 /**
  * Admin config file and Log service"
@@ -56,26 +57,29 @@ public class AdminService implements ServerConstants {
 		@GET
 		@Path("/config")
 		@Produces({ MediaType.APPLICATION_JSON })
-		public List<AdminConfigInfo> getProducts()throws Exception {
-			PhrescoServerFactory.initialize();
-			RepositoryManager repoMgr = PhrescoServerFactory.getRepositoryManager();
-			String config = repoMgr.getArtifactAsString(repoMgr.getAdminConfigFile(), "photon");
-			Gson gson = new Gson();
-			Type type = new TypeToken<List<AdminConfigInfo>>(){}.getType();
-			List<AdminConfigInfo> adminConfigInfos = gson.fromJson(config, type);
-			return adminConfigInfos;
+		public List<AdminConfigInfo> getProducts() throws PhrescoException {
+		    try {
+		        PhrescoServerFactory.initialize();
+	            RepositoryManager repoMgr = PhrescoServerFactory.getRepositoryManager();
+	            String config = repoMgr.getArtifactAsString(repoMgr.getAdminConfigFile(), "photon");
+	            Gson gson = new Gson();
+	            Type type = new TypeToken<List<AdminConfigInfo>>(){}.getType();
+	            return gson.fromJson(config, type);
+		    } catch (Exception e) {
+                throw new PhrescoException(e);
+            }
 		}
 
 		@POST
 		@Path("/log")
 		@Consumes(MediaType.APPLICATION_JSON)
-		public void submitReport(LogInfo phrescoCrashReport)throws Exception {
+		public void submitReport(LogInfo phrescoCrashReport) {
 	    	if (isDebugEnabled) {
 				S_LOGGER.debug("Entering Method AdminService.submitReport" + phrescoCrashReport.toString());
 			}
 		}
 		
-		public static void main(String[] args) {
+		public static void main(String[] args) throws PhrescoException {
 			String key = "phresco.forum.url";
 			String value = "http://172.16.18.86:7070/jforum";
 			AdminConfigInfo adminConfigInfo = new AdminConfigInfo(key, value);
@@ -83,23 +87,22 @@ public class AdminService implements ServerConstants {
 			list.add(adminConfigInfo);
 			Gson gson = new Gson();
 			String jsonAdminConfig = gson.toJson(list);
-			System.out.println(list);
 			File file = new File ("/Users/bharatkumarradha/work/admin_config.json");
 			FileOutputStream fos = null;
 			try {
 				fos = new FileOutputStream(file);
 				fos.write(jsonAdminConfig.getBytes());
 			} catch (FileNotFoundException e) {
-				e.printStackTrace();
+			    throw new PhrescoException(e);
 			} catch (IOException e) {
-				e.printStackTrace();
+			    throw new PhrescoException(e);
 			} finally {
 				if (fos != null) {
 					try {
 						fos.flush();
 						fos.close();
 					} catch (IOException e) {
-						e.printStackTrace();
+						throw new PhrescoException(e);
 					}
 				}
 			}

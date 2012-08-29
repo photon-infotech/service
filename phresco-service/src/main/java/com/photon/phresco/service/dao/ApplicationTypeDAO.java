@@ -68,7 +68,7 @@ public class ApplicationTypeDAO extends BaseDAO {
     public String toString() {
         return "ApplicationTypeDAO [name=" + name + ", description="
                 + description + ", system=" + system + ", customerId="
-                + customerId + ", id=" + id + "]";
+                + customerId + " ]";
     }
 
 }

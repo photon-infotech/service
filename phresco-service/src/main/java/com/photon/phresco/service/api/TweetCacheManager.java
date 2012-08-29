@@ -7,14 +7,14 @@ public interface TweetCacheManager {
      * Get the twitter message and save it to the cache.
      * 
      */ 
-	public void cacheTweetMessage(); 
+	void cacheTweetMessage(); 
 	
 	/**
      * Returns twitter message from the cache.
      * @return twitter message
      * 
      */
-	public String getTweetMessageFromCache();
+	String getTweetMessageFromCache();
 
 	
 }

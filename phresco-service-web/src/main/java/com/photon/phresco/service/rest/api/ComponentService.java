@@ -79,7 +79,7 @@ public class ComponentService extends DbService implements ServiceConstants {
 	
 	private static final Logger S_LOGGER= Logger.getLogger(ComponentService.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
-	RepositoryManager repositoryManager;
+	private static RepositoryManager repositoryManager;
 	
 	public ComponentService() throws PhrescoException {
 		super();
@@ -245,7 +245,6 @@ public class ComponentService extends DbService implements ServiceConstants {
 		try {
 		    Converter<ApplicationTypeDAO, ApplicationType> converter = 
 	            (Converter<ApplicationTypeDAO, ApplicationType>) ConvertersFactory.getConverter(ApplicationTypeDAO.class);          
-	        List<ApplicationTypeDAO> appTypeDAOs = new ArrayList<ApplicationTypeDAO>();
 	        ApplicationTypeDAO appTypeDAO = converter.convertObjectToDAO(appType);
 	        mongoOperation.save(APPTYPESDAO_COLLECTION_NAME, appTypeDAO);
 		} catch (Exception e) {

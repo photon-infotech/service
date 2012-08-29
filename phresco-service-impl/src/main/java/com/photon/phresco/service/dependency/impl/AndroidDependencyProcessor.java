@@ -43,7 +43,6 @@ import java.util.List;
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.photon.phresco.exception.PhrescoException;
@@ -70,9 +69,8 @@ public class AndroidDependencyProcessor extends AbstractJsLibDependencyProcessor
     private static final String FUNCTIONAL_TEST_POM_XML = "/test/functional/pom.xml";
     private static final Logger S_LOGGER = Logger.getLogger(AndroidDependencyProcessor.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
-	private String ANDROID_VERSION = "android.version";
-	private String POM_FILE = "pom.xml";
-	private String PROPERTIES = "properties";
+	private static final String ANDROID_VERSION = "android.version";
+	private static final String POM_FILE = "pom.xml";
 
 	/**
 	 * @param dependencyManager
@@ -119,9 +117,9 @@ public class AndroidDependencyProcessor extends AbstractJsLibDependencyProcessor
 	    		 updatePOMModules(path, modules);
 	    	 }
 		} catch (JAXBException e) {
-			e.printStackTrace();
+		    throw new PhrescoException(e);
 		} catch (PhrescoPomException e) {
-			e.printStackTrace();
+		    throw new PhrescoException(e);
 		}
 		AndroidTestPOMUpdater.updatePOM(path);
 		if (technology.getId().equals(TechnologyTypes.ANDROID_HYBRID)) {

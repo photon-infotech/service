@@ -38,6 +38,7 @@ import com.photon.phresco.model.ProjectInfo;
 import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.client.api.Content;
+import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.MultiPart;
@@ -125,7 +126,7 @@ public class PilotProjects extends ServiceBaseAction {
 		    
     		pilotProInfo.add(proInfo);
     		ClientResponse clientResponse = getServiceManager().createPilotProjects(pilotProInfo, customerId);
-    		if (clientResponse.getStatus() != 200 && clientResponse.getStatus() != 201  ) {
+    		if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200 && clientResponse.getStatus() != ServiceConstants.RES_CODE_201  ) {
     			addActionError(getText(PLTPROJ_NOT_ADDED, Collections.singletonList(name)));
     		} else {
     			addActionMessage(getText(PLTPROJ_ADDED, Collections.singletonList(name)));
@@ -217,7 +218,7 @@ public class PilotProjects extends ServiceBaseAction {
     		if (projectIds != null) {
     			for (String projectID : projectIds) {
     				ClientResponse clientResponse =getServiceManager().deletePilotProject(projectID, customerId);
-    				if (clientResponse.getStatus() != 200) {
+    				if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
     					addActionError(getText(PLTPROJ_NOT_DELETED));
     				}
     			}

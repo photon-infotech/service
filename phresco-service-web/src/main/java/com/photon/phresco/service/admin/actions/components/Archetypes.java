@@ -47,6 +47,7 @@ import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.client.api.Content;
 import com.photon.phresco.service.util.ServerUtil;
+import com.photon.phresco.util.ServiceConstants;
 
 
 
@@ -180,7 +181,7 @@ public class Archetypes extends ServiceBaseAction {
 			}
 			
 			ClientResponse clientResponse = getServiceManager().createArcheTypes(multiPart, customerId);
-			if (clientResponse.getStatus() != 200 && clientResponse.getStatus() != 201) {
+			if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200 && clientResponse.getStatus() != ServiceConstants.RES_CODE_201) {
 				addActionError(getText(ARCHETYPE_NOT_ADDED, Collections.singletonList(name)));
 			} else {
 				addActionMessage(getText(ARCHETYPE_ADDED, Collections.singletonList(name)));
@@ -315,7 +316,7 @@ public class Archetypes extends ServiceBaseAction {
 			if (techTypeIds != null) {
 				for (String techId : techTypeIds) {
 					ClientResponse clientResponse = getServiceManager().deleteArcheType(techId, customerId);
-					if (clientResponse.getStatus() != 200) {
+					if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
 						addActionError(getText(ARCHETYPE_NOT_DELETED));
 					}
 				}

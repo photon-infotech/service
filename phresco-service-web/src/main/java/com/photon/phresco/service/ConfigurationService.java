@@ -37,7 +37,7 @@ import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.SettingsTemplate;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
-import com.photon.phresco.service.model.ServerConstants;
+import com.photon.phresco.service.util.ServerConstants;
 import com.photon.phresco.util.ServiceConstants;
 
 /**
@@ -47,13 +47,6 @@ import com.photon.phresco.util.ServiceConstants;
 public class ConfigurationService implements ServerConstants {
 	private static final Logger S_LOGGER = Logger.getLogger(ConfigurationService.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
-	static {
-		try {
-			PhrescoServerFactory.initialize();
-		} catch (PhrescoException e) {
-			e.printStackTrace();
-		}
-	}
 
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
@@ -61,12 +54,12 @@ public class ConfigurationService implements ServerConstants {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method ConfigurationService.getSettingsTemplates()");
 		}
+		PhrescoServerFactory.initialize();
 		RepositoryManager repoManager = PhrescoServerFactory.getRepositoryManager();
 		String settingsJson = repoManager.getArtifactAsString(repoManager.getSettingConfigFile(), customerId);
 		Gson gson = new Gson();
 		Type type = new TypeToken<List<SettingsTemplate>>(){}.getType();
-		List<SettingsTemplate> settings = (List<SettingsTemplate>)gson.fromJson(settingsJson, type);
-		return settings;
+		return (List<SettingsTemplate>)gson.fromJson(settingsJson, type);
 	}
 	
 }

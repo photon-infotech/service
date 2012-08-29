@@ -42,7 +42,7 @@ public class ProjectServiceFactory {
 
 //	private static Map<String, ProjectService> projectServiceCache = new HashMap<String, ProjectService>();
 	
-	private static ProjectService _serverInstance = null;
+	private static ProjectService SERVERINSTANCE = null;
 
 	private ProjectServiceFactory(){
 		//prevent instantiation
@@ -51,10 +51,10 @@ public class ProjectServiceFactory {
 	public static synchronized ProjectService getProjectService(ProjectInfo projectInfo) {
 		assert projectInfo != null;
 		//irrespective of Technology return the DefaultProjectService. Change this when new Project Service is required.
-		if (_serverInstance == null) {
-			_serverInstance = new DefaultProjectService();
+		if (SERVERINSTANCE == null) {
+			SERVERINSTANCE = new DefaultProjectService();
 		}
-		return _serverInstance;
+		return SERVERINSTANCE;
 	}
 	public static synchronized ProjectService getNewProjectService(ProjectInfo projectInfo) {
 		return new DefaultProjectService();

@@ -37,14 +37,17 @@ package com.photon.phresco.service.model;
 
 import java.io.File;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
+
 public class ArtifactInfo {
 
-    String groupId;
-    String artifact;
-    String classifier;
-    String pack;
-    String version;
-    File pomFile;
+    private String groupId;
+    private String artifact;
+    private String classifier;
+    private String pack;
+    private String version;
+    private File pomFile;
 
     public ArtifactInfo(String groupId, String artifact, String classifier,
             String pack, String version) {
@@ -56,39 +59,66 @@ public class ArtifactInfo {
         this.version = version;
     }
 
+    /**
+     * @return
+     */
     public String getGroupId() {
         return groupId;
     }
 
+    /**
+     * @return
+     */
     public String getArtifact() {
         return artifact;
     }
 
+    /**
+     * @return
+     */
     public String getClassifier() {
         return classifier;
     }
 
+    /**
+     * @return
+     */
     public String getPackage() {
         return pack;
     }
 
+    /**
+     * @return
+     */
     public String getVersion() {
         return version;
     }
 
+    /**
+     * @return
+     */
     public File getPomFile() {
         return pomFile;
     }
 
+    /**
+     * @param pomFile
+     */
     public void setPomFile(File pomFile) {
         this.pomFile = pomFile;
     }
 
-    @Override
     public String toString() {
-        return "ArtifactInfo [groupId=" + groupId + ", artifact=" + artifact
-                + ", classifier=" + classifier + ", pack=" + pack
-                + ", version=" + version + "]";
+        return new ToStringBuilder(this,
+                ToStringStyle.DEFAULT_STYLE)
+                .append(super.toString())
+                .append("groupId", groupId)
+                .append("artifact", artifact)
+                .append("classifier", classifier)
+                .append("pack", pack)
+                .append("version", version)
+                .append("pomFile", pomFile)
+                .toString();
     }
 
 }

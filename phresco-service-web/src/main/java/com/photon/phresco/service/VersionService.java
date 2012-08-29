@@ -37,7 +37,6 @@ import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.VersionInfo;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
-import com.photon.phresco.service.model.ServerConfiguration;
 import com.photon.phresco.service.util.ServerConstants;
 
 @Path("/version")
@@ -51,7 +50,6 @@ public class VersionService implements ServerConstants {
 	private static final String SNAPSHOT = "SNAPSHOT";
 	private static final Logger S_LOGGER = Logger.getLogger(VersionService.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
-	public ServerConfiguration config = null;
 
 	@GET
 	@Path("{version}")

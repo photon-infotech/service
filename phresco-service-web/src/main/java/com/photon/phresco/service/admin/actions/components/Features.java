@@ -34,15 +34,13 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import com.google.gson.Gson;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.ArchetypeInfo;
 import com.photon.phresco.model.Module;
 import com.photon.phresco.model.ModuleGroup;
 import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.client.api.Content;
-import com.photon.phresco.service.util.ServerUtil;
+import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.MultiPart;
@@ -158,7 +156,7 @@ public class Features extends ServiceBaseAction {
 			moduleGroups.add(moduleGroup);   
 			
 			ClientResponse clientResponse = getServiceManager().createFeatures(moduleGroups, customerId);
-			if (clientResponse.getStatus() != 200 && clientResponse.getStatus() != 201) {
+			if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200 && clientResponse.getStatus() != ServiceConstants.RES_CODE_201) {
 				addActionError(getText(FEATURE_NOT_ADDED, Collections.singletonList(name)));
 			} else {
 			addActionMessage(getText(FEATURE_ADDED, Collections.singletonList(name)));
@@ -235,7 +233,7 @@ public class Features extends ServiceBaseAction {
 			if (techIds != null) {
 				for (String techId : techIds) {
 					ClientResponse clientResponse = getServiceManager().deleteFeature(techId, customerId);
-					if (clientResponse.getStatus() != 200) {
+					if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
 						addActionError(getText(FEATURE_NOT_DELETED));
 					}
 				}

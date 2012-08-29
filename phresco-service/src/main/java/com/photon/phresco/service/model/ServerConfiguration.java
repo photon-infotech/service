@@ -80,14 +80,10 @@ public class ServerConfiguration {
 	private static final String AUTHENTICATION_SERVICE_URL = "phresco.authenticate.url";
 	private static final String EMAIL_EXT_FILE = "phresco.ci.emailext.file";
 	private static final String PHRESCO_SERVER_CONTEXT_NAME = "phresco.server.context.name";
-	private static final String PHRESCO_DB_HOST = "db.host";
-	private static final String PHRESCO_DB_PORT = "db.port";
-	private static final String PHRESCO_DB_NAME = "db.name";
 	private static final String PHRESCO_DB_COLLECTION = "db.defaultcollection";
 	private static final String PHRESCO_TWITTER_SERVICE_URL = "phresco.twitter.service.url";
 	private static final String PHRESCO_FRAMEWORK_LATEST_URL = "phresco.framework.latest.version.file";
-	private String DATABASES = "Database";
-	private String WEBSERVICE = "WebService";
+	private static final String DATABASES = "Database";
 	private String repositoryURL;
 	private String repositoryUser;
 	private String repositoryPassword;
@@ -101,9 +97,9 @@ public class ServerConfiguration {
 	private String dbHost;
 	private String dbPort;
 	private String dbName;
-	private String HOST = "host";
-	private String PORT= "port";
-	private String DBNAME = "dbname";
+	private static final String HOST = "host";
+	private static final String PORT= "port";
+	private static final String DBNAME = "dbname";
 	private String dbDefaultCollectionName;
 	private String twitterServiceURL; 
 	private String configFilePath =  "phresco-env-config.xml";
@@ -274,7 +270,7 @@ public class ServerConfiguration {
 		return credentialurl;
 	}
 
-	public String getAuthServiceURL() {
+	public String getAuthServiceURL() throws PhrescoException {
 		List<Configuration> configurations = configurationList("WebService");
 		for (Configuration configuration : configurations) {
 			String protocol = configuration.getProperties().getProperty("protocol");
@@ -286,7 +282,7 @@ public class ServerConfiguration {
 		return authenticateurl;
 	}
 
-	private List<Configuration> configurationList(String configType) {
+	private List<Configuration> configurationList(String configType) throws PhrescoException {
 		InputStream stream = null;
 		stream = this.getClass().getClassLoader().getResourceAsStream(configFilePath);
 		try {
@@ -295,19 +291,17 @@ public class ServerConfiguration {
 			if (environment == null || environment.isEmpty() ) {
 				environment = configReader.getDefaultEnvName();
 			}
-			List<Configuration> configurations = configReader.getConfigurations(environment, configType);
-			return configurations;
+			return configReader.getConfigurations(environment, configType);
 		} catch (Exception e) {
-				e.printStackTrace();
+		    throw new PhrescoException(e);
 		}
-		return null;
 	}
 
 	public String getEmailExtFile() {
 		return dependencyConfig.getProperty(EMAIL_EXT_FILE);
 	}
 	
-	public String getDbHost() {
+	public String getDbHost() throws PhrescoException {
 		List<Configuration> configurations = configurationList(DATABASES);
 		if (configurations != null) {
 			for (Configuration configuration : configurations) {
@@ -318,7 +312,7 @@ public class ServerConfiguration {
 		return null;
 	}
 	
-	public int getDbPort() {
+	public int getDbPort() throws PhrescoException {
 		List<Configuration> configurations = configurationList(DATABASES);
 		if (configurations != null) {
 			for (Configuration configuration : configurations) {
@@ -329,7 +323,7 @@ public class ServerConfiguration {
 		return  Integer.parseInt(dbPort);
 	}
 	
-	public String getDbName() {
+	public String getDbName() throws PhrescoException {
 		List<Configuration> configurations = configurationList(DATABASES);
 		if (configurations != null) {
 			for (Configuration configuration : configurations) {

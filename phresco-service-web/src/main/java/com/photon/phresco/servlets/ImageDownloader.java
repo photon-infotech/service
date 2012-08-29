@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
 import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.PhrescoServerFactory;
-import com.photon.phresco.service.model.ServerConstants;
+import com.photon.phresco.service.util.ServerConstants;
 import com.photon.phresco.util.ArchiveUtil;
 import com.photon.phresco.util.ArchiveUtil.ArchiveType;
 import com.photon.phresco.util.ServiceConstants;
@@ -45,8 +45,8 @@ public class ImageDownloader extends Thread implements ServerConstants {
 	private static final String BACK_FOLDER = "../";
 	private static final String SEPERATOR = "/";
 	private String serverContext;
-	private static final Logger s_logger = Logger.getLogger(ImageDownloader.class);
-	private static Boolean debugEnabled = s_logger.isDebugEnabled();
+	private static final Logger S_LOGGER = Logger.getLogger(ImageDownloader.class);
+	private static Boolean debugEnabled = S_LOGGER.isDebugEnabled();
 	private static Map<String, String> pathMap = new HashMap<String, String>();
 	
 	public ImageDownloader(String serverContext) {
@@ -67,7 +67,7 @@ public class ImageDownloader extends Thread implements ServerConstants {
 	
 	public void run()  {
 		if (debugEnabled) {
-			s_logger.debug("Entering Method ImageDownloader.run()");
+			S_LOGGER.debug("Entering Method ImageDownloader.run()");
 		}
 		try {
 			for (String tech : pathMap.values()) {
@@ -75,7 +75,7 @@ public class ImageDownloader extends Thread implements ServerConstants {
 			}
 		} catch (PhrescoException e) {
 			if (debugEnabled) {
-				s_logger.debug("Entering Method ImageDownloader.run()");
+				S_LOGGER.debug("Entering Method ImageDownloader.run()");
 			}
 		}
 	}
@@ -110,8 +110,6 @@ public class ImageDownloader extends Thread implements ServerConstants {
 			}
 		} catch (Exception e) {
 			throw new PhrescoException(e);
-		} finally {
-			
 		}
 	}
 

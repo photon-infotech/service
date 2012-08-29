@@ -45,7 +45,6 @@ public class PhrescoServerFactory {
     private static final String DOCUMENT_GENERATOR_IMPL_CLASS = "com.photon.phresco.service.impl.DocumentGeneratorImpl";
     private static final String ARCHETYPE_EXECUTOR_IMPL_CLASS = "com.photon.phresco.service.impl.ArchetypeExecutorImpl";
     private static final String REPOSITORY_MANAGER_IMPL_CLASS = "com.photon.phresco.service.impl.RepositoryManagerImpl";
-	private static final String TWITTER_CACHE_MANAGER_IMPL_CLASS = "com.photon.phresco.service.impl.TweetCacheManagerImpl";
 	private static final String DB_MANAGER_IMPL_CLASS = "com.photon.phresco.service.impl.DbManagerImpl";
 
     private static final String SERVER_CONFIG_FILE = "server.config";

@@ -54,12 +54,10 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 			}
 		} catch (Exception e) {
 			try {
-				throw new PhrescoException(ServiceConstants.EX_PHEX00007);
+				throw new PhrescoException(e, ServiceConstants.EX_PHEX00007);
 			} catch (PhrescoException e1) {
-				e1.printStackTrace();
 			}
 		}
-		 
 		return null;
 	}
 

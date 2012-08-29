@@ -38,14 +38,14 @@ import com.photon.phresco.model.VideoInfo;
 import com.photon.phresco.model.VideoType;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
-import com.photon.phresco.service.model.ServerConstants;
+import com.photon.phresco.service.util.ServerConstants;
 import com.photon.phresco.util.ServiceConstants;
 
 public class VideoDownloader extends Thread implements ServerConstants {
 
 	private static final String VIDEO_FOLDER = "/webapps";
-	private static final Logger s_logger = Logger.getLogger(VideoDownloader.class);
-	private static Boolean debugEnabled = s_logger.isDebugEnabled();
+	private static final Logger S_LOGGER = Logger.getLogger(VideoDownloader.class);
+	private static Boolean debugEnabled = S_LOGGER.isDebugEnabled();
 	private String serverContext;
 	private String repoUrl;
 	
@@ -55,13 +55,12 @@ public class VideoDownloader extends Thread implements ServerConstants {
 	
 	public void run()  {
 		if (debugEnabled) {
-			s_logger.debug("Entering Method  VideoDownloader.run()");
+			S_LOGGER.debug("Entering Method  VideoDownloader.run()");
 		}
 		try {
 		    PhrescoServerFactory.initialize();
 			downloadFiles();
 		} catch (PhrescoException e) {
-			e.printStackTrace();
 		}
 		
 	}

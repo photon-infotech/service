@@ -51,7 +51,7 @@ import com.photon.phresco.util.TechnologyTypes;
  */
 public class ConfiguratorFactory {
 	private static final Logger S_LOGGER = Logger.getLogger(ConfiguratorFactory.class);
-	private static Boolean DebugEnabled = S_LOGGER.isDebugEnabled();
+	private static Boolean DEBUGENABLED = S_LOGGER.isDebugEnabled();
 	/**
 	 * Cache for Application Configurators
 	 */
@@ -62,16 +62,16 @@ public class ConfiguratorFactory {
 	}
 	
 	public static ApplicationConfigurator getConfigurator(ProjectInfo projectInfo) {
-		if (DebugEnabled) {
+		if (DEBUGENABLED) {
 			S_LOGGER.debug("Entering Method ConfiguratorFactory.getConfigurator(ProjectInfo projectInfo)");
 		}
-		if (DebugEnabled) {
+		if (DEBUGENABLED) {
 			S_LOGGER.debug("getConfigurator() ProjectCode"+projectInfo.getCode());
 		}
 		assert projectInfo != null;
 		Technology technology = projectInfo.getTechnology();
 		String techId = technology.getId();
-		if (DebugEnabled) {
+		if (DEBUGENABLED) {
 			S_LOGGER.debug("getConfigurator() TechnologyID="+techId);
 		}
 		ApplicationConfigurator applicationConfigurator = configurators.get(techId);
@@ -88,10 +88,10 @@ public class ConfiguratorFactory {
 	 * @return {@link ApplicationConfigurator}
 	 */
 	private static ApplicationConfigurator initializeConfigurators(String techId) {
-		if (DebugEnabled) {
+		if (DEBUGENABLED) {
 			S_LOGGER.debug("Entering Method  ConfiguratorFactory.initializeConfigurators(String techId)");
 		}
-		if (DebugEnabled) {
+		if (DEBUGENABLED) {
 			S_LOGGER.debug("initializeConfigurators() TechnologyId="+techId);
 		}
 		ApplicationConfigurator applicationConfigurator = null;

@@ -49,9 +49,9 @@ public class MongoConfig extends AbstractMongoConfiguration implements ServiceCo
 		try {
 			mongo = new Mongo(config.getDbHost(), config.getDbPort());
 		} catch (UnknownHostException e) {
-			throw new PhrescoException(EX_PHEX00002);
+			throw new PhrescoException(e, EX_PHEX00002);
 		} catch (MongoException e) {
-			throw new PhrescoException(EX_PHEX00003);
+			throw new PhrescoException(e, EX_PHEX00003);
 		}
 		return mongo;
 	}
@@ -62,7 +62,7 @@ public class MongoConfig extends AbstractMongoConfiguration implements ServiceCo
 		try {
 			mongoTemplate = new MongoTemplate(mongo(), config.getDbName() , config.getDbCollection());
 		}catch (MongoException e) {
-			throw new PhrescoException(EX_PHEX00003);
+			throw new PhrescoException(e, EX_PHEX00003);
 		}
 		return mongoTemplate;
 	}

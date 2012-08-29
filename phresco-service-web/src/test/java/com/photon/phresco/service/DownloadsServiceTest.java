@@ -13,7 +13,7 @@ import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.DownloadInfo;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
-import com.photon.phresco.service.model.ServerConstants;
+import com.photon.phresco.service.util.ServerConstants;
 import com.photon.phresco.util.ServiceConstants;
 
 public class DownloadsServiceTest implements ServerConstants{

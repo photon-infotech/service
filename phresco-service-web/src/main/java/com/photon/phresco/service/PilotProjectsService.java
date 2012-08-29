@@ -32,8 +32,7 @@ import org.codehaus.jettison.json.JSONException;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.ProjectInfo;
 import com.photon.phresco.service.api.PhrescoServerFactory;
-import com.photon.phresco.service.api.RepositoryManager;
-import com.photon.phresco.service.model.ServerConstants;
+import com.photon.phresco.service.util.ServerConstants;
 
 /**
  * Example resource class hosted at the URI path "/apps"
@@ -55,7 +54,6 @@ public class PilotProjectsService implements ServerConstants {
     @Produces({ MediaType.APPLICATION_JSON })
     public List<ProjectInfo> getPilotProjects(String techId) throws PhrescoException, JSONException {
     	S_LOGGER.info("Retrieving pilot projects for technology " + techId);
-        RepositoryManager repoManager = PhrescoServerFactory.getRepositoryManager();
 //        return repoManager.getPilotProjects(techId);
         return null;
     }

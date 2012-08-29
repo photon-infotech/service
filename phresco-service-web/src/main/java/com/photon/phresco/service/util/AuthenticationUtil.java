@@ -4,22 +4,20 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.photon.phresco.exception.PhrescoException;
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
+import com.photon.phresco.exception.PhrescoException;
 public class AuthenticationUtil {
 	
-	private static final String ALGORITHM_NAME = "SHA1PRNG";
 	private static final String AUTH_TOKEN_CACHE_TIME = "auth.token.cache.ttl";
 	private static AuthenticationUtil authTokenUtil = null;
-	Cache<String, String> tokenCache = null;
+	private static Cache<String, String> tokenCache = null;
 
 	public static AuthenticationUtil getInstance() throws PhrescoException {
 		return getInstance(null);
@@ -46,7 +44,6 @@ public class AuthenticationUtil {
 					{
 						@Override
 						public void onRemoval(RemovalNotification notification) {
-							System.out.println("testing");
 						}
 					}).build();
 		} catch (NumberFormatException e) {

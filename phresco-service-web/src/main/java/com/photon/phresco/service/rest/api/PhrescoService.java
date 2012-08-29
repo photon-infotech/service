@@ -35,21 +35,17 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.FileUtils;
 
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.ApplicationType;
 import com.photon.phresco.model.ProjectInfo;
-import com.photon.phresco.model.Technology;
-
-import org.apache.commons.lang.StringUtils;
-
 import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.DbService;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.ProjectService;
-import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.projects.ProjectServiceFactory;
 import com.photon.phresco.service.util.AuthenticationUtil;
 import com.photon.phresco.service.util.UnauthorizedException;
@@ -64,7 +60,8 @@ import com.photon.phresco.util.FileUtil;
 
 @Path("/project")
 public class PhrescoService extends DbService{
-	private static final Logger S_LOGGER = Logger.getLogger(PhrescoService.class);
+	private static final String ZIP = ".zip";
+    private static final Logger S_LOGGER = Logger.getLogger(PhrescoService.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	private AuthenticationUtil authUtil = null;
 	private DbManager dbManager = null;
@@ -78,7 +75,6 @@ public class PhrescoService extends DbService{
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
 	public List<ApplicationType> getApplicationTypes() throws PhrescoException {
-		RepositoryManager repManager = PhrescoServerFactory.getRepositoryManager();
 		return null;
 	}
 
@@ -111,7 +107,7 @@ public class PhrescoService extends DbService{
 				S_LOGGER.debug("Project Path = " + projectPathStr);
 			}
 
-			ArchiveUtil.createArchive(projectPathStr, projectPathStr + ".zip", ArchiveType.ZIP);
+			ArchiveUtil.createArchive(projectPathStr, projectPathStr + ZIP, ArchiveType.ZIP);
 			FileUtil.delete(projectPath);
 			ServiceOutput serviceOutput = new ServiceOutput(projectPathStr);
 			if(serviceOutput != null) {
@@ -147,7 +143,7 @@ public class PhrescoService extends DbService{
 			if (isDebugEnabled) {
 				S_LOGGER.debug("updateProject() ProjectPath=" + projectPathStr);
 			}
-			ArchiveUtil.createArchive(projectPathStr, projectPathStr + ".zip", ArchiveType.ZIP);
+			ArchiveUtil.createArchive(projectPathStr, projectPathStr + ZIP, ArchiveType.ZIP);
 		} catch (Exception pe) {
 			S_LOGGER.error("Error During updateProject(projectInfo)" + pe);
 			throw new PhrescoException(pe);
@@ -175,7 +171,7 @@ public class PhrescoService extends DbService{
 			ProjectService projectService = ProjectServiceFactory.getProjectService(projectInfo);
 			File projectPath = projectService.updateDocumentProject(projectInfo);
 			projectPathStr = projectPath.getPath();
-			ArchiveUtil.createArchive(projectPathStr, projectPathStr + ".zip", ArchiveType.ZIP);
+			ArchiveUtil.createArchive(projectPathStr, projectPathStr + ZIP, ArchiveType.ZIP);
 		} catch (Exception pe) {
 			S_LOGGER.error("Error During updateProject(projectInfo)" + pe);
 			throw new PhrescoException(pe);
@@ -184,7 +180,7 @@ public class PhrescoService extends DbService{
 	}
 	
 	class ServiceOutput implements StreamingOutput {
-		String projectPath = "";
+        private String projectPath = "";
 
 		public ServiceOutput(String projectPath) {
 			this.projectPath = projectPath;
@@ -200,7 +196,7 @@ public class PhrescoService extends DbService{
 				S_LOGGER.debug("PhrescoService.write() FILe PATH = " + path.getPath());
 			}
 			try {
-				fis = new FileInputStream(projectPath + ".zip");
+				fis = new FileInputStream(projectPath + ZIP);
 				byte[] buf = new byte[1024];
 				int i = 0;
 				while ((i = fis.read(buf)) != -1) {

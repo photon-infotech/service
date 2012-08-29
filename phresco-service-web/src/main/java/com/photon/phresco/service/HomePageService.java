@@ -44,7 +44,7 @@ import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.VideoInfo;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
-import com.photon.phresco.service.model.ServerConstants;
+import com.photon.phresco.service.util.ServerConstants;
 import com.photon.phresco.util.ServiceConstants;
 
 /**
@@ -52,7 +52,8 @@ import com.photon.phresco.util.ServiceConstants;
  */
 @Path("/homepagevideos")
 public class HomePageService implements ServerConstants {
-	private static final Logger S_LOGGER = Logger.getLogger(HomePageService.class);
+	private static final String FILE = "file";
+    private static final Logger S_LOGGER = Logger.getLogger(HomePageService.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
@@ -68,14 +69,13 @@ public class HomePageService implements ServerConstants {
 		// convert the json string back to object
 		Type type = new TypeToken<List<VideoInfo>>() {
 		}.getType();
-		List<VideoInfo> videoInfoList = gson.fromJson(videoInfoJSON, type);
-		return videoInfoList;
+		return gson.fromJson(videoInfoJSON, type);
 	}
 
 	@GET
 	@Path("/webm")
 	@Produces({ "video/webm" })
-	public StreamingOutput webmVideo(@QueryParam("file") String filename)
+	public StreamingOutput webmVideo(@QueryParam(FILE) String filename)
 			throws FileNotFoundException {
 		return new ServiceOutput(filename);
 	}
@@ -83,7 +83,7 @@ public class HomePageService implements ServerConstants {
 	@GET
 	@Path("/mp4")
 	@Produces({ "video/mp4" })
-	public StreamingOutput mp4Video(@QueryParam("file") String filename)
+	public StreamingOutput mp4Video(@QueryParam(FILE) String filename)
 			throws FileNotFoundException {
 		return new ServiceOutput(filename);
 	}
@@ -91,7 +91,7 @@ public class HomePageService implements ServerConstants {
 	@GET
 	@Path("/ogv")
 	@Produces({ "video/webm" })
-	public StreamingOutput ogvVideo(@QueryParam("file") String filename)
+	public StreamingOutput ogvVideo(@QueryParam(FILE) String filename)
 			throws FileNotFoundException {
 		return new ServiceOutput(filename);
 	}
@@ -99,13 +99,13 @@ public class HomePageService implements ServerConstants {
 	@GET
 	@Path("/ogg")
 	@Produces({ "video/ogg" })
-	public StreamingOutput oggVideo(@QueryParam("file") String filename)
+	public StreamingOutput oggVideo(@QueryParam(FILE) String filename)
 			throws FileNotFoundException {
 		return new ServiceOutput(filename);
 	}
 
 	class ServiceOutput implements StreamingOutput {
-		String projectPath = "";
+		private String projectPath = "";
 
 		public ServiceOutput(String projectPath) {
 			this.projectPath = projectPath;

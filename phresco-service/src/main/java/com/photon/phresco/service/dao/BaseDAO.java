@@ -20,25 +20,36 @@
 
 package com.photon.phresco.service.dao;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
+
 public abstract class BaseDAO {
 	
-	String id;
+	private String id;
 	
 	public BaseDAO() {
 		super();
 	}
 
+	/**
+	 * @return
+	 */
 	public String getId() {
 		return id;
 	}
 
+	/**
+	 * @param id
+	 */
 	public void setId(String id) {
 		this.id = id;
 	}
 
-	@Override
 	public String toString() {
-		return "BaseDAO [id=" + id + "]";
-	}
+        return new ToStringBuilder(this,
+                ToStringStyle.DEFAULT_STYLE)
+                .append("id", id)
+                .toString();
+    }
 	
 }

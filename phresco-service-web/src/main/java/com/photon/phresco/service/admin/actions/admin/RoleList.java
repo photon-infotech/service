@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import com.photon.phresco.commons.model.Role;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
+import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
 
 public class RoleList extends ServiceBaseAction { 
@@ -97,7 +98,7 @@ public class RoleList extends ServiceBaseAction {
 			role.setDescription(description);
 			roleList.add(role);
 			ClientResponse clientResponse = getServiceManager().createRoles(roleList);
-			if(clientResponse.getStatus() != 200){
+			if(clientResponse.getStatus() != ServiceConstants.RES_CODE_200){
 				addActionError(getText(ROLE_NOT_ADDED, Collections.singletonList(name)));
 			} else {
 				addActionMessage(getText(ROLE_ADDED, Collections.singletonList(name)));
@@ -135,7 +136,7 @@ public class RoleList extends ServiceBaseAction {
 			if (roleIds != null) {
 				for (String roleId : roleIds) {
 					ClientResponse clientResponse = getServiceManager().deleteRole(roleId);
-					if (clientResponse.getStatus() != 200) {
+					if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
 						addActionError(getText(ROLE_NOT_DELETED));
 					}
 				}

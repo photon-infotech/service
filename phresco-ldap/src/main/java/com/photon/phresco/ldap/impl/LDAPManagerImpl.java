@@ -54,7 +54,6 @@ import org.apache.log4j.Logger;
 
 import com.photon.phresco.commons.model.User;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.ldap.LDAPConstants;
 import com.photon.phresco.ldap.api.LDAPManager;
 import com.photon.phresco.ldap.model.LDAPConfiguration;
 import com.photon.phresco.util.Constants;
@@ -93,11 +92,7 @@ public class LDAPManagerImpl implements LDAPManager {
 			}
 			return getUser(credentials, dc);
 		} catch (Exception e) {
-			e.printStackTrace();
-			if (isDebugEnabled) {
-				S_LOGGER.debug("authenticate() Login Failed for " + userName);
-			}
-			return new User();
+		    throw new PhrescoException(e);
 		} finally {
 			try {
 				if (dc != null) {

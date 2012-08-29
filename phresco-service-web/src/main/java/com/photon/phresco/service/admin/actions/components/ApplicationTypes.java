@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.ApplicationType;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
+import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
 
 public class ApplicationTypes extends ServiceBaseAction { 
@@ -98,7 +99,7 @@ public class ApplicationTypes extends ServiceBaseAction {
 			appType.setCustomerId(customerId);
 			appTypes.add(appType);
 			ClientResponse clientResponse = getServiceManager().createApplicationTypes(appTypes, customerId);
-			if (clientResponse.getStatus() != 200 && clientResponse.getStatus() != 201) {
+			if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200 && clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
 				addActionError(getText(APPLNTYPES_NOT_ADDED, Collections.singletonList(name)));
 			} else {
 				addActionMessage(getText(APPLNTYPES_ADDED, Collections.singletonList(name)));
@@ -137,7 +138,7 @@ public class ApplicationTypes extends ServiceBaseAction {
 			if (appTypeIds != null) {
 				for (String appTypeId : appTypeIds) {
 					ClientResponse clientResponse = getServiceManager().deleteApplicationType(appTypeId, customerId);
-					if (clientResponse.getStatus() != 200) {
+					if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
 						addActionError(getText(APPLNTYPES_NOT_DELETED));
 					}
 				}

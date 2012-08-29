@@ -71,6 +71,7 @@ import com.photon.phresco.model.Technology;
 public class POMUpdater {
 	private static final Logger S_LOGGER = Logger.getLogger(POMUpdater.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
+	
 	/**
 	 * @param path
 	 *            file path where the pom.xml present.

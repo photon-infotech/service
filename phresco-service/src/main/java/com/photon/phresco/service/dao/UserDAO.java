@@ -22,56 +22,132 @@ package com.photon.phresco.service.dao;
 
 import java.util.List;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
+
 public class UserDAO extends BaseDAO {
 
-	String userId;
-	String email;
-	String firstName;
-	String lastName;
-	int status;
-
-	List<String> roleIds;
-	List<String> customerIds;
+	private String userId;
+	private String email;
+	private String firstName;
+	private String lastName;
+	private int status;
+	private List<String> roleIds;
+	private List<String> customerIds;
 
 	public UserDAO() {
 		super();
 	}
 	
+	/**
+	 * @return
+	 */
 	public String getUserId() {
 		return userId;
 	}
 	
+	/**
+	 * @param userId
+	 */
 	public void setUserId(String userId) {
 		this.userId = userId;
 	}
 	
+	/**
+	 * @return
+	 */
 	public String getEmail() {
 		return email;
 	}
 	
+	/**
+	 * @param email
+	 */
 	public void setEmail(String email) {
 		this.email = email;
 	}
 	
-	public List<String> getRoleIds() {
+	/**
+	 * @return
+	 */
+	public String getFirstName() {
+        return firstName;
+    }
+
+    /**
+     * @param firstName
+     */
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    /**
+     * @return
+     */
+    public String getLastName() {
+        return lastName;
+    }
+
+    /**
+     * @param lastName
+     */
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    /**
+     * @return
+     */
+    public int getStatus() {
+        return status;
+    }
+
+    /**
+     * @param status
+     */
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    /**
+     * @return
+     */
+    public List<String> getRoleIds() {
 		return roleIds;
 	}
 	
+	/**
+	 * @param roleIds
+	 */
 	public void setRoleIds(List<String> roleIds) {
 		this.roleIds = roleIds;
 	}
 	
+	/**
+	 * @return
+	 */
 	public List<String> getCustomerIds() {
 		return customerIds;
 	}
 	
+	/**
+	 * @param customerIds
+	 */
 	public void setCustomerIds(List<String> customerIds) {
 		this.customerIds = customerIds;
 	}
 	
-	@Override
 	public String toString() {
-		return "UserDAO [id=" + id + ", userId=" + userId + ", email=" + email
-				+ ", roleIds=" + roleIds + ", customerIds=" + customerIds + "]";
-	}
+        return new ToStringBuilder(this,
+                ToStringStyle.DEFAULT_STYLE)
+                .append(super.toString())
+                .append("userId", userId)
+                .append("email", email)
+                .append("firstName", firstName)
+                .append("lastName", lastName)
+                .append("status", status)
+                .append("roleIds", roleIds)
+                .append("customerIds", customerIds)
+                .toString();
+    }
 }
