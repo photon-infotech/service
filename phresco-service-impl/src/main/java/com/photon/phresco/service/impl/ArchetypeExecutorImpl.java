@@ -46,6 +46,7 @@ import com.photon.phresco.model.ArchetypeInfo;
 import com.photon.phresco.model.ProjectInfo;
 import com.photon.phresco.service.api.ArchetypeExecutor;
 import com.photon.phresco.service.api.PhrescoServerFactory;
+import com.photon.phresco.service.model.ServerConfiguration;
 import com.photon.phresco.service.util.ServerConstants;
 import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.Constants;
@@ -60,9 +61,10 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
     public static final String WINDOWS 			= "Windows";
     private static final String PHRESCO_FOLDER_NAME = "phresco";
     private static final String DOT_PHRESCO_FOLDER 	= "." + PHRESCO_FOLDER_NAME;
+    private ServerConfiguration serverConfiguration; 
 
-
-    public ArchetypeExecutorImpl() {
+    public ArchetypeExecutorImpl(ServerConfiguration serverConfiguration) {
+        this.serverConfiguration = serverConfiguration;
     }
 
     public File execute(ProjectInfo info) throws PhrescoException {
