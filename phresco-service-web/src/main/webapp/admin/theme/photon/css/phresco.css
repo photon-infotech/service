@@ -1743,7 +1743,10 @@ input[class*='sample'] {
 }
 
 .progress .bar {
-    -moz-transition: none;
+	transition: none;
+	-webkit-transition: none; /* Safari and Chrome */
+	-o-transition: none; /* Opera */
+    -moz-transition: none; /* firefox */
 }
 
 .alert-message {

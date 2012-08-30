@@ -897,4 +897,14 @@ label {
 
 .actionMessage li {
 	color:green;
-}	
+}
+
+.progress .bar {
+	background-color: #EE5F5B;
+	background-image: -ms-linear-gradient(top, #EE5F5B, #EE5F5B);
+	background-image : -moz-linear-gradient(top,  #EE5F5B, #EE5F5B);
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#EE5F5B), to(#EE5F5B));
+	background-image: -webkit-linear-gradient(top, #EE5F5B, #EE5F5B);
+	background-image: -o-linear-gradient(top, #EE5F5B, #EE5F5B);
+	background-image: linear-gradient(top, #EE5F5B, #EE5F5B);
+}
