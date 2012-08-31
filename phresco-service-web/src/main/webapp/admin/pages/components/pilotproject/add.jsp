@@ -36,6 +36,7 @@
 	//For edit
     String name = "";
     String description = "";
+    boolean isSystem = false;
     if (pilotProjectInfo != null) {
     	if (StringUtils.isNotEmpty(pilotProjectInfo.getName())) {
     		name = pilotProjectInfo.getName();
@@ -43,6 +44,7 @@
     	if (StringUtils.isNotEmpty(pilotProjectInfo.getDescription())) {
     		description = pilotProjectInfo.getDescription();
     	}
+    	isSystem = pilotProjectInfo.isSystem();
     }
 %>
 
@@ -145,8 +147,14 @@
 	</div>
 	
 	<div class="bottom_button">
-	    <% if (StringUtils.isNotEmpty(fromPage)) { %>
-			<input type="button" id="pilotprojUpdate" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.update'/>"
+	  <%String disabledClass = "btn-primary";
+		String disabled = "";
+		if (isSystem) {
+			disabledClass = "btn-disabled";
+			disabled = "disabled";
+		} 
+	    if (StringUtils.isNotEmpty(fromPage)) { %>
+			<input type="button" id="pilotprojUpdate" class="btn <%= disabledClass %>" <%= disabled %> value="<s:text name='lbl.hdr.comp.update'/>"
 				onclick="validate('pilotprojUpdate', $('#formPilotProAdd'), $('#subcontainer'), 'Updating Pilotproject');" />
 		<%
 			} else {

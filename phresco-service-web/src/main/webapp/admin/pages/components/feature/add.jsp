@@ -107,10 +107,11 @@
 		</div>
 		
 		<div class="control-group" id="applyControl">
-			<label class="control-label labelbold"> <span
-				class="mandatory">*</span>&nbsp;<s:text name="Technology" /> </label>
+			<label class="control-label labelbold"> 
+				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.comp.featr.technology'/>
+			 </label>
 			<div class="controls">
-				<select id="multiSelect" name="technology">
+				<select name="technology">
 				<%
 					if (technologies != null) {
 						for (Technology technology : technologies) {
@@ -121,6 +122,29 @@
 					}
 				%>
 				</select><span class="help-inline applyerror" id="techError"></span>
+			</div>
+		</div>
+		
+		<div class="control-group" id="typeList">
+			<label class="control-label labelbold">
+				<span class="mandatory">*</span>&nbsp;<s:text name="lbl.comp.featr.type" /></label>
+			<div class="controls">
+				<select name="type" id="type">
+			        <option>JSLibs</option>
+			        <option>Modules</option>
+     		 	</select>
+			</div>
+		</div>
+		
+		<div class="control-group hideContent" id="moduleSelection">
+			<label class="control-label labelbold">
+				<span class="mandatory">*</span>&nbsp;<s:text name="lbl.comp.featr.module.type" /></label>
+			<div class="controls">
+				<select name="moduleType" id="type">
+			        <option>Core Module</option>
+			        <option>Custom Module</option>
+     		 	</select>
+     		 	<input type="checkbox" name="default" value="true">&nbsp;<s:text name="lbl.comp.featr.default.module" />
 			</div>
 		</div>
 		
@@ -161,7 +185,7 @@
 					</noscript>
 				</div>
 			</div>
-			 <span class="help-inline fileError" id="featureFileError"></span>
+			<span class="help-inline fileError" id="featureFileError"></span>
 		</div>
 		
 		<div class="control-group">
@@ -272,6 +296,35 @@
 	            $("p[id='" + name + "']").html(version);
 	        }
 	    });
+	    
+	    $('#type').change(function() {
+			var selectVal = $('#type :selected').val();
+			if (selectVal == 'Modules') {
+				$('#moduleSelection').show();
+			} else {
+				$('#moduleSelection').hide();
+			}
+		});
+	    
+	    $("input[type=radio]").change(function() {
+			var name = $(this).attr('name');
+			$("input:checkbox[name='" + name + "']").prop("checked", true);
+			var version = $("input:radio[name='" + name + "']").val();
+			$("p[id='" + name + "']").html(version);
+		});
+
+		$("input[type=checkbox]").change(function() {
+			var checkboxChecked = $(this).is(":checked");
+			var name = $(this).attr('name');
+			if (!checkboxChecked) {
+				$("input:radio[name='" + name + "']").prop("checked", false);
+				$("p[id='" + name + "']").empty();
+			} else {
+				$("input:radio[name='" + name + "']:first").prop("checked", true);
+				var version = $("input:radio[name='" + name + "']").val();
+				$("p[id='" + name + "']").html(version);
+			}
+		});
 	});
 
     function findError(data) {
@@ -288,26 +341,6 @@
         }
     }
     
-	$("input[type=radio]").change(function() {
-		var name = $(this).attr('name');
-		$("input:checkbox[name='" + name + "']").prop("checked", true);
-		var version = $("input:radio[name='" + name + "']").val();
-		$("p[id='" + name + "']").html(version);
-	});
-
-	$("input[type=checkbox]").change(function() {
-		var checkboxChecked = $(this).is(":checked");
-		var name = $(this).attr('name');
-		if (!checkboxChecked) {
-			$("input:radio[name='" + name + "']").prop("checked", false);
-			$("p[id='" + name + "']").empty();
-		} else {
-			$("input:radio[name='" + name + "']:first").prop("checked", true);
-			var version = $("input:radio[name='" + name + "']").val();
-			$("p[id='" + name + "']").html(version);
-		}
-	});
-	
 	function jarError(data, type) {
 		var controlObj;
 		var msgObj;

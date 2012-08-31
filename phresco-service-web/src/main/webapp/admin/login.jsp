@@ -19,8 +19,10 @@
   --%>
 <!DOCTYPE html>
 <%@ taglib uri="/struts-tags" prefix="s"%>
-<%@page import="org.apache.commons.lang.StringUtils"%>
-<%@page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
+
+<%@ page import="org.apache.commons.lang.StringUtils"%>
+<%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
+
 <html>
 	<head>
 		<title>Phresco Admin</title>
@@ -38,7 +40,6 @@
 		<!-- right panel scroll bar -->
 		<script type="text/javascript" src="js/home.js"></script>
 		<script type="text/javascript" src="js/main.js"></script>
-<%-- 		<script type="text/javascript" src="js/jquery.cookie.js"></script> --%>
 		
 		<!-- commons.js -->
 		<script type="text/javascript" src="js/common.js"></script>
@@ -104,9 +105,8 @@
 							<input type="submit" value="Login" class="btn btn-primary lgnBtn">
 							<%
 	                        	String loginError = (String)request.getAttribute(ServiceUIConstants.REQ_LOGIN_ERROR);
-													      
 	                    	%>
-							&nbsp;&nbsp;&nbsp;<div class="lgnError"><%= loginError == null ? "" : loginError %></div>
+							&nbsp;&nbsp;&nbsp;<div class="lgnError"><%= StringUtils.isNotEmpty(loginError) ? loginError : "" %></div>
 						</div>
 					</div>
 				</form>

@@ -37,6 +37,7 @@
 	//For edit
     String name = "";
     String desc = "";
+    boolean isSystem = false;
     if (settingsTemplate != null) {
     	if (StringUtils.isNotEmpty(settingsTemplate.getType())) {
     		name = settingsTemplate.getType();	
@@ -44,6 +45,7 @@
     	if (StringUtils.isNotEmpty(settingsTemplate.getDescription())) {
     		desc = settingsTemplate.getDescription();	
     	}
+    	isSystem = settingsTemplate.isSystem();
     }
 %>
 
@@ -230,8 +232,15 @@
 	</div>
 	 
 	<div class="bottom_button">
-	<% if (StringUtils.isNotEmpty(fromPage)) { %>
-		<input type="button" id="configtempUpdate" class="btn btn-primary"
+	<%
+	String disabledClass = "btn-primary";
+	String disabled = "";
+	if (isSystem) {
+		disabledClass = "btn-disabled";
+		disabled = "disabled";
+	}
+	if (StringUtils.isNotEmpty(fromPage)) { %>
+		<input type="button" id="configtempUpdate" class="btn <%= disabledClass %>" <%= disabled %>
 				onclick="validate('configtempUpdate', $('#formConfigTempAdd'), $('#subcontainer'), 'Updating Config Template');" 
 		        value="<s:text name='lbl.hdr.comp.update'/>"/>
     <% } else { %>		

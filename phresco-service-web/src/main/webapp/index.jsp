@@ -17,4 +17,4 @@
   limitations under the License.
   ###
   --%>
-<META HTTP-EQUIV="Refresh" CONTENT="0;URL=admin/login.jsp">
+<META HTTP-EQUIV="Refresh" CONTENT="0;URL=admin/login.action">

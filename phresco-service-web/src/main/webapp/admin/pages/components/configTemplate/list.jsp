@@ -89,8 +89,13 @@
 							%>
 									<tr>
 										<td class="checkboxwidth">
-											<input type="checkbox" class="check" name="configId" value="<%= configTemplate.getId() %>" 
-												onclick="checkboxEvent();">
+								 		<% 
+											String disabled = "";
+										 	if (configTemplate.isSystem()) {
+									 			disabled = "disabled"; 
+									 	%>
+												<input type="checkbox" class="check" name="configId" value="<%= configTemplate.getId() %>" <%= disabled %> onclick="checkboxEvent();" />
+										<% } %>
 										</td>
 										<td class="nameConfig">
 											<a href="#" onclick="editConfigTemp('<%= configTemplate.getId() %>');" name="edit" id="" >

@@ -94,10 +94,14 @@ function validate(pageUrl, form, tag, progressText) {
 }
 
 function loadData(data, tag) {
-	tag.empty();
-	tag.html(data);
-	accordion();
-	setTimeOut();
+	if (data != undefined && !isBlank(data) && data.indexOf("Remember me") >= 0) { //To load the login page if the user session is not available
+		window.location.href = "logout.action";
+	} else {
+		tag.empty();
+		tag.html(data);
+		accordion();
+		setTimeOut();
+	}
 }
 
 function inActivateAllMenu(allLink) {
@@ -228,7 +232,7 @@ function showWelcomeImage() {
 		$('.headerlogoimg').attr("src","theme/photon/images/phresco_header_blue.png");
 		$('.phtaccinno').attr("src","theme/photon/images/acc_inov_blue.png");
 		$('.welcomeimg').attr("src","theme/photon/images/welcome_photon_blue.png");
-	} else if (theme == null || theme == "theme/photon/css/red.css") {
+	} else if (theme == null || theme == undefined || theme == "theme/photon/css/red.css") {
 		$("link[id='theme']").attr("href", "theme/photon/css/red.css");
 		$('.headerlogoimg').attr("src","theme/photon/images/phresco_header_red.png");
 		$('.phtaccinno').attr("src","theme/photon/images/acc_inov_red.png");

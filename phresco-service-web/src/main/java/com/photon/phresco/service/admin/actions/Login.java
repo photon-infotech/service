@@ -11,6 +11,7 @@ public class Login extends ServiceBaseAction {
 	private static final long serialVersionUID = -1858839078372821734L;
 	private static final Logger S_LOGGER = Logger.getLogger(Login.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
+	private static Boolean debugEnabled  = S_LOGGER.isDebugEnabled();
 	
 	private String username = null;
 	private String password = null;
@@ -20,12 +21,15 @@ public class Login extends ServiceBaseAction {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method  Login.login()");
 	    }
-
-		if (loginFirst) {
-		
-        	return LOGIN_RESULT;	
+	    
+	    User user = (User) getHttpSession().getAttribute(SESSION_USER_INFO);
+	    if (user != null) {
+	    	return SUCCESS;
+	    }
+	    if (loginFirst) {
+	    	getHttpRequest().setAttribute(REQ_LOGIN_ERROR, "");
+        	return LOGIN_FAILURE;	
 		}
-
 		if (validateLogin()) {
 			return authenticate();
 		}
@@ -33,31 +37,50 @@ public class Login extends ServiceBaseAction {
 		return LOGIN_FAILURE;
 	}
 	
+	public String logout() {
+		if (debugEnabled) {
+			S_LOGGER.debug("Entering Method  Login.logout()");
+		}
+		
+		getHttpSession().removeAttribute(SESSION_USER_INFO);
+		String errorTxt = (String) getHttpSession().getAttribute(REQ_LOGIN_ERROR);
+		if (StringUtils.isNotEmpty(errorTxt)) {
+			getHttpRequest().setAttribute(REQ_LOGIN_ERROR, getText(errorTxt));
+		} else {
+			getHttpRequest().setAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_SUCCESS_LOGOUT));
+		}
+		getHttpSession().removeAttribute(REQ_LOGIN_ERROR);
+		
+        return SUCCESS;
+    }
+	
 	private String authenticate() {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method  Login.authenticate()");
 	    }
 		
 		User user = null;
-			try {
-				byte[] encodeBase64 = Base64.encodeBase64(password.getBytes());
-				String encodedPassword = new String(encodeBase64);
+		try {
+			byte[] encodeBase64 = Base64.encodeBase64(password.getBytes());
+			String encodedPassword = new String(encodeBase64);
+			
+			user = doLogin(username, encodedPassword);
+			if (StringUtils.isEmpty(user.getDisplayName())) {
+				getHttpRequest().setAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_ERROR_LOGIN));
 				
-				user = doLogin(username, encodedPassword);
-				if (StringUtils.isEmpty(user.getDisplayName())) {
-					getHttpRequest().setAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_ERROR_LOGIN));
-					return LOGIN_FAILURE;
-				}
-				if (!user.isPhrescoEnabled()) {
-					getHttpRequest().setAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_ERROR_LOGIN_ACCESS_DENIED));
-					return LOGIN_FAILURE;
-				}
-				getHttpSession().setAttribute(SESSION_USER_INFO, user);
-			} catch (Exception e) {
 				return LOGIN_FAILURE;
 			}
+			if (!user.isPhrescoEnabled()) {
+				getHttpRequest().setAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_ERROR_LOGIN_ACCESS_DENIED));
+				
+				return LOGIN_FAILURE;
+			}
+			getHttpSession().setAttribute(SESSION_USER_INFO, user);
+		} catch (Exception e) {
+			return LOGIN_FAILURE;
+		}
 			
-		return LOGIN_SUCCESS;
+		return SUCCESS;
 	}
 
 	private boolean validateLogin() {
@@ -88,7 +111,7 @@ public class Login extends ServiceBaseAction {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-
+	
 	public boolean isLoginFirst() {
 		return loginFirst;
 	}

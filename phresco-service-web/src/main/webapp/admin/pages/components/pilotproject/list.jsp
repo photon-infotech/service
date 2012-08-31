@@ -92,7 +92,13 @@
 						%>
 								<tr>
 									<td class="checkboxwidth">
-										<input type="checkbox" class="check" name="projectId" value="<%=proInfo.getId() %>" onclick="checkboxEvent();">
+		 					        <%	
+		 					        	String disabled = "";
+										if (proInfo.isSystem()) {
+											disabled = "disabled";
+									%>
+											<input type="checkbox" class="check" name="projectId" value="<%=proInfo.getId() %>" <%= disabled %> onclick="checkboxEvent();" />
+									<% } %>
 									</td>
 									<td>
 										<a href="#" onclick="editPilotProject('<%=proInfo.getId() %>');" name="edit" id=""><%=proInfo.getName()%></a>

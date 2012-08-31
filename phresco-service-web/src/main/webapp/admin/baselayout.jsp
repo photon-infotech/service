@@ -99,7 +99,6 @@
 				activateMenu($("#dashboard"));
 				showWelcomeImage();
 			});
-			
 		</script>
 	</head>
 	<body>
@@ -166,8 +165,8 @@
 								<img src="images/blue_themer.jpg" class="skinImage">
 							</a>
                         </div>
-                        <div class="userInfo"><a href="#" class="abtPopUp about"><s:label key="lbl.usrset.abtservice" theme="simple"/></a></div>
-                        <div class="userInfo"><a href="<s:url action='logout'/>" id="signOut"><s:label key="lbl.usrset.signout" theme="simple"/></a></div>
+                        <div class="userInfo"><a href="#" class="abtPopUp about"><s:label key="lbl.usrset.abtservice"/></a></div>
+                        <div class="userInfo"><a href="<s:url action='admin/logout'/>" id="signOut"><s:label key="lbl.usrset.signout"/></a></div>
 					</li>
 				</div>
 			</div>

@@ -145,6 +145,8 @@ public interface ServiceUIConstants {
     String KEY_I18N_LOGIN_INVALID_CRED = "err.login.invalid.cred";
     String KEY_I18N_LOGIN_EMPTY_CRED = "err.login.empty.cred";
     String KEY_I18N_LOGIN_ACCESS_DENIED	= "err.login.invalid.cred";
+    String KEY_I18N_SESSION_EXPIRED = "err.login.session.expired";
+    String KEY_I18N_SUCCESS_LOGOUT = "succ.logout";
 
     String KEY_I18N_ERR_NAME_EMPTY = "err.msg.name.empty";
     String KEY_I18N_ERR_DESC_EMPTY = "err.msg.desc.empty";

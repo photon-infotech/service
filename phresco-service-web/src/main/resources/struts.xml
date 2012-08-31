@@ -25,16 +25,31 @@
 	<constant name="struts.custom.i18n.resources" value="service-messages" />
 	<constant name="struts.ui.theme" value="simple"/>
 	<!-- <constant name="struts.devMode" value="true" /> -->
-    <package name="default" extends="struts-default, json-default">
-       
-		<!--- LOGIN-->
+	
+	<package name="login" extends="struts-default, json-default">
 		<action name="login" class="com.photon.phresco.service.admin.actions.Login" method="login" >
-			<result name="login">/admin/login.jsp</result>
 			<result name="success">/admin/baselayout.jsp</result>
 			<result name="failure">/admin/login.jsp</result>
 		</action>
-
-		<!--- DASHBOARD-->
+		
+		<action name="logout" class="com.photon.phresco.service.admin.actions.Login" method="logout">
+            <result name="success">/admin/login.jsp</result>
+        </action>
+	</package>
+	
+    <package name="admin" extends="struts-default, json-default">
+		<interceptors>
+			<interceptor name="sessionValidatorInterceptor" class="com.photon.phresco.service.interceptors.SessionValidatorInterceptor">
+			</interceptor>
+		</interceptors>
+		
+		<default-interceptor-ref name="sessionValidatorInterceptor"/>
+  
+  		<global-results>  
+			<result name="success">/admin/login.jsp</result>
+		</global-results>
+  
+	<!--- DASHBOARD-->
 		<action name="dashboard" class="com.photon.phresco.service.admin.actions.Dashboard" method="list" >
             <result name="dashboard">/admin/pages/dashboard/report.jsp</result>
         </action>
