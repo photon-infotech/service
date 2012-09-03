@@ -13,7 +13,7 @@
 		<port>27017</port>
 		<username></username>
 		<password/>
-		<dbname>Test</dbname>
+		<dbname>phresco</dbname>
 		<type>mongodb</type>
 		<version>2.0.4</version>
 	</Database>
