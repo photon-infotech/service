@@ -50,7 +50,6 @@ import com.photon.phresco.service.api.RepositoryManager;
  */
 public class Drupal7DependencyProcessor  extends AbstractJsLibDependencyProcessor {
 	private static final Logger S_LOGGER = Logger.getLogger(Drupal7DependencyProcessor.class);
-	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	/**
      * @param dependencyManager
      */
@@ -72,11 +71,13 @@ public class Drupal7DependencyProcessor  extends AbstractJsLibDependencyProcesso
 	 */
 	@Override
 	public void process(ProjectInfo info, File path) throws PhrescoException {
-		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method Drupal7DependencyProcessor.process(ProjectInfo info, File path)");
-			S_LOGGER.debug("process() Path=" + path.getPath());
-		}
+		S_LOGGER.debug("Entering Method Drupal7DependencyProcessor.process(ProjectInfo info, File path)");
+		S_LOGGER.debug("process() Path=" + path.getPath());
+		
 		super.process(info, path);
+		String id = info.getTechnology().getId();
+		updatePOMWithModules(path, info.getTechnology().getModules(), id);
+		updatePOMWithPluginArtifact(path,info.getTechnology().getModules(), id);
 		createSqlFolder(info, path);
 		updateTestPom(path);
 	}

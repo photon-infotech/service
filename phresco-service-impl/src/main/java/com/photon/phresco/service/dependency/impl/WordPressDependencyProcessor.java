@@ -51,7 +51,6 @@ import com.photon.phresco.service.api.RepositoryManager;
  */
 public class WordPressDependencyProcessor extends AbstractJsLibDependencyProcessor {
 	private static final Logger S_LOGGER = Logger.getLogger(WordPressDependencyProcessor.class);
-	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 
 	/**
 	 * @param dependencyManager
@@ -72,10 +71,13 @@ public class WordPressDependencyProcessor extends AbstractJsLibDependencyProcess
 	@Override
 	public void process(ProjectInfo info, File path) throws PhrescoException {
 		super.process(info, path);
-		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method WordPressDependencyProcessor.process(ProjectInfo info, File path)");
-			S_LOGGER.debug("process() Path=" + path.getPath());
-		}
+		
+		S_LOGGER.debug("Entering Method WordPressDependencyProcessor.process(ProjectInfo info, File path)");
+		S_LOGGER.debug("process() Path=" + path.getPath());
+
+		String id = info.getTechnology().getId();
+		updatePOMWithModules(path, info.getTechnology().getModules(), id);
+		updatePOMWithPluginArtifact(path,info.getTechnology().getModules(), id);
 		createSqlFolder(info, path);
 		updateTestPom(path);
 	}

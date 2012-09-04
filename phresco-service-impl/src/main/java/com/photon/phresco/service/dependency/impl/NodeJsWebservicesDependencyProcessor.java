@@ -45,7 +45,6 @@ import com.photon.phresco.service.api.RepositoryManager;
 
 public class NodeJsWebservicesDependencyProcessor extends DefaultDependencyProcessor {
 	private static final Logger S_LOGGER = Logger.getLogger(NodeJsWebservicesDependencyProcessor.class);
-	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 
 	public NodeJsWebservicesDependencyProcessor(RepositoryManager repoManager) {
 		super(repoManager);
@@ -59,10 +58,13 @@ public class NodeJsWebservicesDependencyProcessor extends DefaultDependencyProce
 	@Override
 	public void process(ProjectInfo info, File path) throws PhrescoException {
 		super.process(info, path);
-		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method NodeJsWebservicesDependencyProcessor.process(ProjectInfo info, File path)");
-			S_LOGGER.debug("process() Path=" + path.getPath());
-		}
+		
+		S_LOGGER.debug("Entering Method NodeJsWebservicesDependencyProcessor.process(ProjectInfo info, File path)");
+		S_LOGGER.debug("process() Path=" + path.getPath());
+		
+		String id = info.getTechnology().getId();
+		updatePOMWithModules(path, info.getTechnology().getModules(), id);
+		updatePOMWithPluginArtifact(path,info.getTechnology().getModules(), id);
 		createSqlFolder(info, path);
 		updateTestPom(path);
 	}

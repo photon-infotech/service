@@ -18,42 +18,29 @@
  * limitations under the License.
  * ###
  */
-/*******************************************************************************
- * Copyright (c) 2011 Photon.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Photon Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.photon.in/legal/ppl-v10.html
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * 
- * Contributors:
- *     Photon - initial API and implementation
- ******************************************************************************/
 package com.photon.phresco.service.dependency.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.Database;
-import com.photon.phresco.model.Module;
-import com.photon.phresco.model.ModuleGroup;
 import com.photon.phresco.model.ProjectInfo;
 import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.api.DependencyProcessor;
@@ -75,7 +62,6 @@ import com.phresco.pom.util.PomProcessor;
 public abstract class AbstractDependencyProcessor implements DependencyProcessor {
 
 	private static final Logger S_LOGGER = Logger.getLogger(AbstractDependencyProcessor.class);
-	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	private static Map<String, String> sqlFolderPathMap = new HashMap<String, String>();
 	private static Map<String, String> testPomFiles = new HashMap<String, String>();
 
@@ -92,59 +78,13 @@ public abstract class AbstractDependencyProcessor implements DependencyProcessor
 		this.repoManager = repoManager;
 	}
 
-	/**
-	 * @param path
-	 * @param dependencyManager
-	 * @param modules
-	 * @throws PhrescoException
-	 */
-	protected void extractModules(File path, List<ModuleGroup> modules) throws PhrescoException {
-		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method  AbstractDependencyProcessor.extractModules(File path, List<TupleBean> modules)");
-		}
-		if (CollectionUtils.isEmpty(modules)) {
-			return;
-		}
-
-		for (ModuleGroup tupleBean : modules) {
-			extractModule(path, tupleBean);
-		}
-	}
-
-	/**
-	 * 
-	 * @param path
-	 * @param module
-	 * @throws PhrescoException
-	 */
-	protected void extractModule(File path, ModuleGroup moduleGroup) throws PhrescoException {
-		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method  AbstractDependencyProcessor.extractModules(File path, List<TupleBean> modules)");
-			S_LOGGER.debug("extractModule() FilePath=" + path.getPath());
-		}
-		// Module module = repoManager.getModule(tupleBean.getId());
-
-		// TODO:Handle all versions
-
-//		Module moduleVersion = module.getVersions().get(0);
-//		String contentURL = moduleVersion.getUrl();
-//		if (!StringUtils.isEmpty(contentURL)) {
-//			DependencyUtils.extractFiles(contentURL, path);
-//		}
-		List<Module> versions = moduleGroup.getVersions();
-		for (Module module : versions) {
-            String contentUrl = module.getContentURL();
-            if (!StringUtils.isEmpty(contentUrl)) {
-              DependencyUtils.extractFiles(contentUrl, path, moduleGroup.getCustomerId());
-          }
-        }
-	}
-
+	
 	protected RepositoryManager getRepositoryManager() {
 		return repoManager;
 	}
 
 	private static void initDbPathAndTestPom() {
+		//FIXME: this map needs to be removed and should go into respective subclasses
 		sqlFolderPathMap.put(TechnologyTypes.PHP, ServerConstants.SOURCE_SQL);
 		sqlFolderPathMap.put(TechnologyTypes.PHP_DRUPAL6, ServerConstants.SOURCE_SQL);
 		sqlFolderPathMap.put(TechnologyTypes.PHP_DRUPAL7, ServerConstants.SOURCE_SQL);
@@ -166,20 +106,12 @@ public abstract class AbstractDependencyProcessor implements DependencyProcessor
 
 	@Override
 	public void process(ProjectInfo info, File path) throws PhrescoException {
-		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method  AbstractDependencyProcessor.process(ProjectInfo info, File path)");
-			S_LOGGER.debug("process() FilePath=" + path.getPath());
-			S_LOGGER.debug("process() ProjectCode=" + info.getCode());
-		}
+		S_LOGGER.debug("Entering Method  AbstractDependencyProcessor.process(ProjectInfo info, File path)");
+		S_LOGGER.debug("process() FilePath=" + path.getPath());
+		S_LOGGER.debug("process() ProjectCode=" + info.getCode());
 
-		File modulesPath = path;
-		String modulePathKey = getModulePathKey();
-		if (!StringUtils.isEmpty(modulePathKey)) {
-			String modulesPathString = DependencyProcessorMessages.getString(modulePathKey);
-			modulesPath = new File(path, modulesPathString);
-		}
 		Technology technology = info.getTechnology();
-		extractModules(modulesPath, technology.getModules());
+
 		// pilot projects
 		extractPilots(info, path, technology);
 	}
@@ -234,9 +166,7 @@ public abstract class AbstractDependencyProcessor implements DependencyProcessor
 	protected void updatePOMWithModules(File path, List<com.photon.phresco.model.ModuleGroup> modules)
 	throws PhrescoException, JAXBException, PhrescoPomException {
 		try {
-			if (isDebugEnabled) {
-				S_LOGGER.debug("extractModules() path=" + path.getPath());
-			}
+			S_LOGGER.debug("updatePOMWithModules() path=" + path.getPath());
 			File pomFile = new File(path, "pom.xml");
 			if (pomFile.exists()) {
 				PomProcessor processor = new PomProcessor(pomFile);
@@ -255,9 +185,7 @@ public abstract class AbstractDependencyProcessor implements DependencyProcessor
 	
 	protected void updatePOMWithJsLibs(File path, List<com.photon.phresco.model.ModuleGroup> jsLibs) throws PhrescoException{
         try {
-            if (isDebugEnabled) {
-                S_LOGGER.debug("extractModules() path=" + path.getPath());
-            }
+        	S_LOGGER.debug("updatePOMWithJsLibs() path=" + path.getPath());
             File pomFile = new File(path, "pom.xml");
             if (pomFile.exists()) {
                 PomProcessor processor = new PomProcessor(pomFile);
@@ -318,4 +246,90 @@ public abstract class AbstractDependencyProcessor implements DependencyProcessor
 		}
 		return null;
 	}
+	
+	protected void updatePOMWithModules(File path, List<com.photon.phresco.model.ModuleGroup> modules, String id) throws PhrescoException {
+		if(CollectionUtils.isEmpty(modules)) {
+			return;
+		}
+		try {
+			File pomFile = new File(path, "pom.xml");
+			if (pomFile.exists()) {
+				PomProcessor processor = new PomProcessor(pomFile);
+				for (com.photon.phresco.model.ModuleGroup module : modules) {
+					if (module != null) {
+						String groupId ="modules." + id + ".files";
+						processor.addDependency(groupId, module.getId(), module.getVersions()
+								.get(0).getVersion(), "" ,"Zip" , "");
+					}
+				}
+				processor.save();
+			}
+		} catch (IOException e) {
+			throw new PhrescoException(e);
+		} catch (JAXBException e) {
+			throw new PhrescoException(e);
+		} catch (PhrescoPomException e) {
+			throw new PhrescoException(e);
+		}
+	}
+	
+	protected void updatePOMWithPluginArtifact(File path, List<com.photon.phresco.model.ModuleGroup> modules, String techId) throws PhrescoException {
+		try {
+			if(CollectionUtils.isEmpty(modules)) {
+				return;
+			}
+			 List<Element> configList = new ArrayList<Element>();
+			File pomFile = new File(path, "pom.xml");
+			if (pomFile.exists()) {
+				PomProcessor processor = new PomProcessor(pomFile);
+				DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+				DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
+				Document doc = docBuilder.newDocument();
+				for (com.photon.phresco.model.ModuleGroup module : modules) {
+					if (module != null) {
+						String groupId ="modules." + techId + ".files";
+						String artifactId = module.getId();
+						String version = module.getVersions().get(0).getVersion();
+						configList = configList(pomFile, groupId, artifactId, version, doc, techId);
+					 processor.addExecutionConfiguration("org.apache.maven.plugins", "maven-dependency-plugin", "unpack-module", "validate", "unpack", configList, false, doc);
+					}
+				}
+				processor.save();
+			}
+		} catch (JAXBException e) {
+			throw new PhrescoException(e);
+		} catch (IOException e) {
+			throw new PhrescoException(e);
+		} catch (PhrescoPomException e) {
+			throw new PhrescoException(e);
+		} catch (ParserConfigurationException e) {
+			throw new PhrescoException(e);
+		}
+	}
+
+	protected List<Element> configList(File pomFile,String moduleGroupId, String moduleArtifactId, String moduleVersion, Document doc, String techId) throws PhrescoException {
+		String modulePathKey = getModulePathKey();
+		String modulesPathString = DependencyProcessorMessages.getString(modulePathKey);
+		List<Element> configList = new ArrayList<Element>();
+		Element groupId = doc.createElement("groupId");
+		groupId.setTextContent(moduleGroupId);
+		Element artifactId = doc.createElement("artifactId");
+		artifactId.setTextContent(moduleArtifactId);
+		Element version = doc.createElement("version");
+		version.setTextContent(moduleVersion);
+		Element type = doc.createElement("type");
+		type.setTextContent("zip");
+		Element overWrite = doc.createElement("overWrite");
+		overWrite.setTextContent("false");
+		Element outputDirectory = doc.createElement("outputDirectory");
+		outputDirectory.setTextContent("${project.basedir}/" + modulesPathString);	
+		configList.add(groupId);
+		configList.add(artifactId);
+		configList.add(version);
+		configList.add(type);
+		configList.add(overWrite);
+		configList.add(outputDirectory);
+		return configList;
+	}
+	
 }

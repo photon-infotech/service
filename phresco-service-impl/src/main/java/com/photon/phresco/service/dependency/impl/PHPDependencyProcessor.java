@@ -17,37 +17,17 @@
  * limitations under the License.
  * ###
  */
-/*******************************************************************************
- * Copyright (c) 2011 Photon.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Photon Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.photon.in/legal/ppl-v10.html
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * 
- * Contributors:
- *     Photon - initial API and implementation
- ******************************************************************************/
+
 package com.photon.phresco.service.dependency.impl;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.UUID;
 
 import org.apache.log4j.Logger;
-import org.codehaus.plexus.util.FileUtils;
 
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.ProjectInfo;
-import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
-import com.photon.phresco.util.Utility;
 
 /**
  * Dependency handler for PHP projects
@@ -57,7 +37,6 @@ import com.photon.phresco.util.Utility;
  */
 public class PHPDependencyProcessor  extends AbstractJsLibDependencyProcessor {
 	private static final Logger S_LOGGER = Logger.getLogger(PHPDependencyProcessor.class);
-	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
     /**
      * @param dependencyManager
      */
@@ -67,32 +46,10 @@ public class PHPDependencyProcessor  extends AbstractJsLibDependencyProcessor {
     
     @Override
     public void process(ProjectInfo info, File path) throws PhrescoException {
-    	if (isDebugEnabled) {
-    		S_LOGGER.debug("Entering Method PHPDependencyProcessor.process(ProjectInfo info, File path)");
-    		S_LOGGER.debug("process() Path=" + path.getPath());
-		}
-    	
-    	String modulesPathString=DependencyProcessorMessages.getString(getModulePathKey()); //$NON-NLS-1$
-        File modulesPath = new File(path, modulesPathString);
-        Technology technology = info.getTechnology();
-        File tempPath= new File(Utility.getPhrescoTemp(), UUID.randomUUID().toString()+ "/temp/modules");
-        if (isDebugEnabled) {
-        	S_LOGGER.debug("process() ProjectCode=" + info.getCode());
-        	S_LOGGER.debug("Getting the Temporary File path="+ tempPath.getPath());
-		}
-        
-        tempPath.mkdirs();
-        try {
-           
-            //extract the selected modules into tempPath
-            extractModules(tempPath, technology.getModules());
-            File[] listFiles = tempPath.listFiles();
-            for (File file : listFiles) {
-                if(file.isDirectory()){
-                    //copy the top level folders to the actual PHP content.
-                    FileUtils.copyDirectoryStructure(file, modulesPath);
-                }
-            }
+    	S_LOGGER.debug("Entering Method PHPDependencyProcessor.process(ProjectInfo info, File path)");
+    	S_LOGGER.debug("process() Path=" + path.getPath());
+        S_LOGGER.debug("process() ProjectCode=" + info.getCode());
+
             
 //            //copy pilot projects
 //            if(StringUtils.isNotBlank(info.getPilotProjectName())){
@@ -114,14 +71,12 @@ public class PHPDependencyProcessor  extends AbstractJsLibDependencyProcessor {
             if(projectInfo != null) {
                 DependencyUtils.extractFiles(projectInfo.getProjectURL(), path, projectInfo.getCustomerId());
             }
+            String id = info.getTechnology().getId();
+            updatePOMWithModules(path, info.getTechnology().getModules(), id);
+            updatePOMWithPluginArtifact(path,info.getTechnology().getModules(), id);
             extractJsLibraries(path, info.getTechnology().getJsLibraries());
             createSqlFolder(info, path);
             updateTestPom(path);
-        } catch (IOException e) {
-            throw new PhrescoException(e);
-        } finally {
-        	  org.apache.commons.io.FileUtils.deleteQuietly(tempPath);
-        }
     }
 
     @Override
