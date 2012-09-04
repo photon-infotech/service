@@ -1874,3 +1874,8 @@ input[class*='sample'] {
     overflow-x: visible;
     overflow-y: auto;
 }
+
+.fixTableHdr {
+	top: 0;
+	position: absolute;
+}

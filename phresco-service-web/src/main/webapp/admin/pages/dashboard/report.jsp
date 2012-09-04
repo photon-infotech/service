@@ -43,19 +43,19 @@
 								<thead>
 									<tr>
 										<th class="first">
-											<div class="th-inner tablehead" style="top: 0; position:absolute;">
+											<div class="th-inner tablehead fixTableHdr">
 												<s:label key="lbl.hdr.dash.archtyp.archtyp"  theme="simple"/>
 											</div>
 										</th>
 									
 										<th class="first">
-											<div class="th-inner tablehead" style="top: 0; position:absolute;">
+											<div class="th-inner tablehead fixTableHdr">
 												<s:label key="lbl.hdr.dash.archtyp.cus"  theme="simple"/>
 											</div>
 										</th>
 										
 										<th class="first">
-											<div class="th-inner tablehead" style="top: 0; position:absolute;">
+											<div class="th-inner tablehead fixTableHdr">
 												<s:label key="lbl.hdr.dash.archtyp.hits"  theme="simple"/>
 											</div>
 										</th>
@@ -113,18 +113,18 @@
 								<thead>
 									<tr>
 										<th class="first">
-											<div class="th-inner tablehead" style="top: 0; position:absolute;">
+											<div class="th-inner tablehead fixTableHdr">
 												<s:label key="lbl.hdr.dash.featrs.featrs"  theme="simple"/>
 											</div>
 										</th>
 									
 										<th class="first">
-											<div class="th-inner tablehead" style="top: 0; position:absolute;">
+											<div class="th-inner tablehead fixTableHdr">
 												<s:label key="lbl.hdr.dash.featrs.tech"  theme="simple"/>
 											</div>
 										</th>
 										<th class="first">
-											<div class="th-inner tablehead" style="top: 0; position:absolute;">
+											<div class="th-inner tablehead fixTableHdr">
 											<s:label key="lbl.hdr.dash.featrs.hits"  theme="simple"/>	
 											</div>
 										</th>
@@ -180,18 +180,18 @@
 								<thead>
 									<tr>
 										<th class="first">
-											<div class="th-inner tablehead" style="top: 0; position:absolute;">
+											<div class="th-inner tablehead fixTableHdr">
 												<s:label key="lbl.hdr.dash.plt.plprjt"  theme="simple"/>
 											</div>
 										</th>
 									
 										<th class="first">
-											<div class="th-inner tablehead" style="top: 0; position:absolute;">
+											<div class="th-inner tablehead fixTableHdr">
 												<s:label key="lbl.hdr.dash.plt.cus" cssClass="slideheading  subtablemenu" theme="simple"/>
 											</div>
 										</th>
 										<th class="first">
-											<div class="th-inner tablehead" style="top: 0; position:absolute;">
+											<div class="th-inner tablehead fixTableHdr">
 												<s:label key="lbl.hdr.dash.plt.hits" cssClass="slideheading  subtablemenu" theme="simple"/>
 											</div>
 										</th>

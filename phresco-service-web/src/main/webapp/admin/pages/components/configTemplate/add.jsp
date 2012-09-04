@@ -128,19 +128,19 @@
 								<thead class = "fieldset-tableheader">
 									<tr>
 										<th class="second">
-											<div class="th-inner tablehead" style="position: absolute; top: 0;"><s:label key="lbl.hdr.comp.cnfigtmplt.key.title" theme="simple"/></div>
+											<div class="th-inner tablehead fixTableHdr""><s:label key="lbl.hdr.comp.cnfigtmplt.key.title" theme="simple"/></div>
 										</th>
 										<th class="second">
-											<div class="th-inner tablehead" style="position: absolute; top: 0;"><s:label key="lbl.hdr.comp.cnfigtmplt.type.title" theme="simple"/></div>
+											<div class="th-inner tablehead fixTableHdr"><s:label key="lbl.hdr.comp.cnfigtmplt.type.title" theme="simple"/></div>
 										</th>
 										<th class="third">
-											<div class="th-inner tablehead" style="position: absolute; top: 0;"><s:label key="lbl.hdr.comp.cnfigtmplt.psblvalue.title"  theme="simple"/></div>
+											<div class="th-inner tablehead fixTableHdr"><s:label key="lbl.hdr.comp.cnfigtmplt.psblvalue.title"  theme="simple"/></div>
 										</th>
 										<th class="third">
-											<div class="th-inner tablehead" style="position: absolute; top: 0;"><s:label key="lbl.hdr.comp.cnfigtmplt.mndtry.title"  theme="simple"/></div>
+											<div class="th-inner tablehead fixTableHdr"><s:label key="lbl.hdr.comp.cnfigtmplt.mndtry.title"  theme="simple"/></div>
 										</th>
 										<th class="third">
-											<div class="th-inner tablehead" style="position: absolute; top: 0;"><s:label key="lbl.hdr.comp.cnfigtmplt.mltpl.title" theme="simple"/></div>
+											<div class="th-inner tablehead fixTableHdr"><s:label key="lbl.hdr.comp.cnfigtmplt.mltpl.title" theme="simple"/></div>
 										</th>
 										<th class="third">
 											<div class="th-inner">
