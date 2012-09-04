@@ -272,3 +272,10 @@ function disableEnableTextBox(groupId, artifactId, jarVersion, isEnable) {
 	$('input[name=artifactId]').val(artifactId);
 	$('input[name=jarVersion]').val(jarVersion);
 }
+
+function isiPad() {
+    return (
+        (navigator.platform.indexOf("iPhone") != -1) ||
+        (navigator.platform.indexOf("iPad") != -1)
+    );
+}

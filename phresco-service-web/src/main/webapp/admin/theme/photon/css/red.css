@@ -908,3 +908,21 @@ label {
 	background-image: -o-linear-gradient(top, #EE5F5B, #EE5F5B);
 	background-image: linear-gradient(top, #EE5F5B, #EE5F5B);
 }
+
+/* scrollbar starts */
+.scroll-bar .scroll-slider {
+    background-image: url(../images/strp_bg.png);
+}
+
+.scroll-line {
+    background-image: url(../images/grystrip.png) ;
+}
+
+.scroll-slider-inner-stp {
+    background-image: url(../images/strp.png);
+}
+/* scrollbar ends */
+
+.config_table_div {
+    border: 1px solid #3A090B;
+}

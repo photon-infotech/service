@@ -461,7 +461,7 @@
 			</label>
 			<div class="controls">
 				<input id="fromdate" class="datealign" type="text" name="validFrom" 
-				    value="<%= customer.getValidFrom() != null ? customer.getValidFrom() : "" %>">
+				   value="<%= customer.getValidFrom() != null ? customer.getValidFrom() : "" %>">
 			</div>
 		</div>
 
@@ -505,6 +505,11 @@
 </form>
 
 <script type="text/javascript">
+	//To check whether the device is ipad or not and then apply jquery scrollbar
+	if (!isiPad()) {
+		$(".content_adder").scrollbars();  
+	}
+	
 	$(document).ready(function() {
 		enableScreen();
 

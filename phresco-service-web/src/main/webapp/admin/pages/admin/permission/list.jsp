@@ -59,7 +59,6 @@
 							<td>
 								Access to view
 							</td>
-							
 						</tr>
 						
 						<tr>
@@ -72,7 +71,6 @@
 							<td>
 								Access to edit/delete
 							</td>
-							
 						</tr>
 						
 						<tr>
@@ -85,7 +83,6 @@
 							<td>
 								Access to add/edit/delete
 							</td>
-							
 						</tr>
 					</tbody>
 				</table>
@@ -95,6 +92,11 @@
 </form>
 
 <script type="text/javascript">
+	//To check whether the device is ipad or not and then apply jquery scrollbar
+	if (!isiPad()) {
+		$(".fixed-table-container-inner").scrollbars();  
+	}
+
 	$(document).ready(function() {
 		enableScreen();
 	});

@@ -119,6 +119,11 @@
 <script type="text/javascript">
 	clickMenu($("a[name='url_add']"),$("#subcontainer"));
 	
+	//To check whether the device is ipad or not and then apply jquery scrollbar
+	if (!isiPad()) {
+		$(".fixed-table-container-inner").scrollbars();  
+	}
+
 	$(document).ready(function() {
 		enableScreen();
 	});

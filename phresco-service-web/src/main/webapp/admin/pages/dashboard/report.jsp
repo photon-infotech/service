@@ -38,24 +38,24 @@
 				<div class="table_div">
 					<div class="fixed-table-container">
 						<div class="header-background"></div>
-						<div class="fixed-table-container-inner">
+						<div class="dashbrd-fixed-table-container-inner">
 							<table cellspacing="0" class="zebra-striped">
 								<thead>
 									<tr>
 										<th class="first">
-											<div class="th-inner tablehead">
+											<div class="th-inner tablehead" style="top: 0; position:absolute;">
 												<s:label key="lbl.hdr.dash.archtyp.archtyp"  theme="simple"/>
 											</div>
 										</th>
 									
 										<th class="first">
-											<div class="th-inner tablehead">
+											<div class="th-inner tablehead" style="top: 0; position:absolute;">
 												<s:label key="lbl.hdr.dash.archtyp.cus"  theme="simple"/>
 											</div>
 										</th>
 										
 										<th class="first">
-											<div class="th-inner tablehead">
+											<div class="th-inner tablehead" style="top: 0; position:absolute;">
 												<s:label key="lbl.hdr.dash.archtyp.hits"  theme="simple"/>
 											</div>
 										</th>
@@ -108,23 +108,23 @@
 				<div class="table_div">
 					<div class="fixed-table-container">
 						<div class="header-background"></div>
-						<div class="fixed-table-container-inner">
+						<div class="dashbrd-fixed-table-container-inner">
 							<table cellspacing="0" class="zebra-striped">
 								<thead>
 									<tr>
 										<th class="first">
-											<div class="th-inner tablehead">
+											<div class="th-inner tablehead" style="top: 0; position:absolute;">
 												<s:label key="lbl.hdr.dash.featrs.featrs"  theme="simple"/>
 											</div>
 										</th>
 									
 										<th class="first">
-											<div class="th-inner tablehead">
+											<div class="th-inner tablehead" style="top: 0; position:absolute;">
 												<s:label key="lbl.hdr.dash.featrs.tech"  theme="simple"/>
 											</div>
 										</th>
 										<th class="first">
-											<div class="th-inner tablehead">
+											<div class="th-inner tablehead" style="top: 0; position:absolute;">
 											<s:label key="lbl.hdr.dash.featrs.hits"  theme="simple"/>	
 											</div>
 										</th>
@@ -175,23 +175,23 @@
 				<div class="table_div">
 					<div class="fixed-table-container">
 						<div class="header-background"></div>
-						  <div class="fixed-table-container-inner">  
+						  <div class="dashbrd-fixed-table-container-inner">  
 							<table cellspacing="0" class="zebra-striped">
 								<thead>
 									<tr>
 										<th class="first">
-											<div class="th-inner tablehead">
+											<div class="th-inner tablehead" style="top: 0; position:absolute;">
 												<s:label key="lbl.hdr.dash.plt.plprjt"  theme="simple"/>
 											</div>
 										</th>
 									
 										<th class="first">
-											<div class="th-inner tablehead">
+											<div class="th-inner tablehead" style="top: 0; position:absolute;">
 												<s:label key="lbl.hdr.dash.plt.cus" cssClass="slideheading  subtablemenu" theme="simple"/>
 											</div>
 										</th>
 										<th class="first">
-											<div class="th-inner tablehead">
+											<div class="th-inner tablehead" style="top: 0; position:absolute;">
 												<s:label key="lbl.hdr.dash.plt.hits" cssClass="slideheading  subtablemenu" theme="simple"/>
 											</div>
 										</th>

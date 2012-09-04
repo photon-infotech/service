@@ -183,7 +183,7 @@ div.lgnBtnLabel {
 	margin-left:6px;
 	margin-right:11px;
 	}
-
+ 
 .table_div {
     border-radius: 6px 6px 6px 6px;
     height: 83%;
@@ -256,9 +256,9 @@ td {
 	line-height:30px;
 	margin-left:-5px;
 	padding-left:5px;
-	position:absolute;
+	position:fixed;
 	text-align:left;
-	top:0;
+	top:166px;
 	}
 	
 input[type="checkbox"],input[type="radio"] {
@@ -1801,4 +1801,76 @@ input[class*='sample'] {
 
 .hideContent {
 	display: none;	
+}
+
+
+/* scrollbar starts */
+.scroll-bar {
+    right:2px !important;
+    width:7px !important;
+}
+
+.scroll-up {
+    display:none !important;
+}
+
+.scroll-down {
+    display:none !important;
+}
+
+.scroll-line {
+    background-repeat:no-repeat;
+    background-position:center;
+    width:7px !important;
+    top:7px;
+    height:100%!important;
+}
+
+.scroll-bar .scroll-slider {
+    background-repeat:no-repeat;
+    background-position:bottom;
+    width:7px   !important;
+    left:0px !important;
+}
+
+.scroll-slider-inner {
+    cursor:pointer;
+    height:100%;
+    width:7px;
+    left:0;
+    overflow:hidden;
+    position:absolute;
+    background-repeat:no-repeat;
+    background-position:center;
+    margin-top:-1px;
+}
+
+.scroll-slider-inner-stp {
+    cursor:pointer;
+    height:100%;
+    width:7px;
+    left:0;
+    overflow:hidden;
+    position:absolute;
+    background-repeat:no-repeat;
+    background-position: center;
+    margin-top:-1px;
+}
+
+.scroll-content{
+	width: 100%;
+}
+/* scrollbar ends */
+
+.config_table_div {
+    border-radius: 6px 6px 6px 6px;
+    height: 83%;
+    margin-left: 6px;
+    margin-right: 6px;
+}
+
+.config-fixed-table-container-inner, .dashbrd-fixed-table-container-inner {
+    height: 100%;
+    overflow-x: visible;
+    overflow-y: auto;
 }

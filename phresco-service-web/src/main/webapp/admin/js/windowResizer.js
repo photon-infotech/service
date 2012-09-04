@@ -38,9 +38,21 @@ $(document).ready(function() {
 		
 		var newHeight_form = $("#subcontainer").height();
 		$(".form-horizontal").css("height", newHeight_form - 5);
+		$(".table_div").css("height",newHeight_form - 50);
 		
-		var newHeight_contadder = $(".form-horizontal").height();
-		$(".content_adder").css("height", newHeight_contadder - 70);
+		var newHeight_tableDiv = $(".table_div").height();
+		$(".fixed-table-container-inner").css("height", newHeight_tableDiv - 30);
+		
+		var newHeight_tableContainerInner = $(".fixed-table-container-inner").height();
+		$(".scroll-line").css("height",newHeight_tableContainerInner - 70);
+		$(".scroll-bar").css("height",newHeight_tableContainerInner - 10); 
+		
+		var newHeight_contentAdder = $(".content_adder").height();
+		$(".scroll-line").css("height", newHeight_contentAdder - 70);
+		$(".scroll-bar").css("height", newHeight_contentAdder - 10);
+		
+		var newHeight_formHoriz = $(".form-horizontal").height();
+		$(".content_adder").css("height", newHeight_formHoriz - 70);
 		
 		var newWidth_button = $(".form-horizontal").width();
 		$(".bottom_button").css("width", newWidth_button - 25);		

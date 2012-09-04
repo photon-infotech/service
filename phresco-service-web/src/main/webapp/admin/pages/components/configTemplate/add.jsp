@@ -118,33 +118,29 @@
 				<input id="input01" placeholder="<s:text name='place.hldr.configTemp.add.help.text'/>" class="input-xlarge" type="text">
 			</div>
 		</div>
-			
 		<fieldset class = "configFieldset">
 			<legend class = "configLegend"><s:label key="lbl.hdr.comp.proptemplate" cssClass="labelbold" theme="simple"/></legend>
-			<div class = "table_div">
+			<div class = "config_table_div">
 				<div class="fixed-table-container prpt-header">
-					<div class="fixed-table-container-inner">
+					<div class="config-fixed-table-container-inner">
 						<table cellspacing="0" class="zebra-striped tablelegend">
 							<div class = "header-background">
 								<thead class = "fieldset-tableheader">
 									<tr>
 										<th class="second">
-											<div class="th-inner tablehead"><s:label key="lbl.hdr.comp.cnfigtmplt.key.title" theme="simple"/></div>
+											<div class="th-inner tablehead" style="position: absolute; top: 0;"><s:label key="lbl.hdr.comp.cnfigtmplt.key.title" theme="simple"/></div>
 										</th>
 										<th class="second">
-											<div class="th-inner tablehead"><s:label key="lbl.hdr.comp.cnfigtmplt.type.title" theme="simple"/></div>
+											<div class="th-inner tablehead" style="position: absolute; top: 0;"><s:label key="lbl.hdr.comp.cnfigtmplt.type.title" theme="simple"/></div>
 										</th>
 										<th class="third">
-											<div class="th-inner tablehead"><s:label key="lbl.hdr.comp.cnfigtmplt.psblvalue.title"  theme="simple"/></div>
-										</th>
-										<%-- <th class="third">
-											<div class="th-inner tablehead"><s:label key="lbl.hdr.comp.help"/></div>
-										</th> --%>
-										<th class="third">
-											<div class="th-inner tablehead"><s:label key="lbl.hdr.comp.cnfigtmplt.mndtry.title"  theme="simple"/></div>
+											<div class="th-inner tablehead" style="position: absolute; top: 0;"><s:label key="lbl.hdr.comp.cnfigtmplt.psblvalue.title"  theme="simple"/></div>
 										</th>
 										<th class="third">
-											<div class="th-inner tablehead"><s:label key="lbl.hdr.comp.cnfigtmplt.mltpl.title" theme="simple"/></div>
+											<div class="th-inner tablehead" style="position: absolute; top: 0;"><s:label key="lbl.hdr.comp.cnfigtmplt.mndtry.title"  theme="simple"/></div>
+										</th>
+										<th class="third">
+											<div class="th-inner tablehead" style="position: absolute; top: 0;"><s:label key="lbl.hdr.comp.cnfigtmplt.mltpl.title" theme="simple"/></div>
 										</th>
 										<th class="third">
 											<div class="th-inner">
@@ -259,6 +255,11 @@
 </form>
 
 <script language="javascript">
+	//To check whether the device is ipad or not and then apply jquery scrollbar
+	if (!isiPad()) {
+		$(".content_adder").scrollbars();  
+	}
+
 	$(document).ready(function() {
 		enableScreen();
 		

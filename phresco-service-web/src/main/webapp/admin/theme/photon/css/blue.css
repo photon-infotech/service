@@ -1043,3 +1043,21 @@ h3 label {
 	background-image: -o-linear-gradient(top, #149bdf, #0480be);
 	background-image: linear-gradient(top, #149bdf, #0480be);
 }
+
+/* scroll bar starts */
+.scroll-bar .scroll-slider {
+    background-image: url(../images/strp_bg_blue.png);
+}
+
+.scroll-line {
+    background-image: url(../images/grystrip_blue.png) ;
+}
+
+.scroll-slider-inner-stp {
+    background-image: url(../images/strp_blue.png);
+}
+/* scroll bar ends */
+
+.config_table_div {
+    border: 1px solid #CCCCCC;
+}

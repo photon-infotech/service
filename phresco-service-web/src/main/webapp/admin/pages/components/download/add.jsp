@@ -239,6 +239,11 @@
 </form>
 
 <script type="text/javascript">
+	//To check whether the device is ipad or not and then apply jquery scrollbar
+	if (!isiPad()) {
+		$(".content_adder").scrollbars();  
+	}
+	
 	$(document).ready(function() {
 		enableScreen();
         createUploader(); 

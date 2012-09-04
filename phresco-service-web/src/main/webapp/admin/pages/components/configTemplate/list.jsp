@@ -59,10 +59,10 @@
     <% } else { %>	
 		<div class="table_div">
 			<div class="fixed-table-container">
+				<div class="header-background"> </div>
 				<div class="fixed-table-container-inner">
 					<table cellspacing="0" class="zebra-striped">
 						<thead>
-							<div class="header-background">
 								<tr>
 									<th class="first">
 										<div class="th-inner tablehead">
@@ -79,7 +79,6 @@
 										<div class="th-inner tablehead"><s:label key="lbl.hdr.comp.aplesto" theme="simple"/></div>
 									</th>
 								</tr>
-							</div>
 						</thead>
 						
 						<tbody>
@@ -126,6 +125,11 @@
 </form>
 
 <script type="text/javascript">
+	//To check whether the device is ipad or not and then apply jquery scrollbar
+	if (!isiPad()) {
+		$(".fixed-table-container-inner").scrollbars();  
+	}
+
 	$(document).ready(function() {
 		enableScreen();
    	});

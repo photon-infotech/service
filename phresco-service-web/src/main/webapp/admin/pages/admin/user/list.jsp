@@ -17,7 +17,7 @@
   limitations under the License.
   ###
   --%>
- <%@ taglib uri="/struts-tags" prefix="s" %>
+<%@ taglib uri="/struts-tags" prefix="s" %>
 
 <script language="JavaScript" type="text/javascript">
 
@@ -173,6 +173,11 @@
 </form>
 
 <script type="text/javascript">
+	//To check whether the device is ipad or not and then apply jquery scrollbar
+	if (!isiPad()) {
+		$(".fixed-table-container-inner").scrollbars();  
+	}
+	
 	$(document).ready(function() {
 		enableScreen();
 		
