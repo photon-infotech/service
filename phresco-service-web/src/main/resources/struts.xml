@@ -41,9 +41,14 @@
 		<interceptors>
 			<interceptor name="sessionValidatorInterceptor" class="com.photon.phresco.service.interceptors.SessionValidatorInterceptor">
 			</interceptor>
+		
+			<interceptor-stack name="interceptorStack">
+				<interceptor-ref name="sessionValidatorInterceptor" />
+				<interceptor-ref name="defaultStack" />
+			</interceptor-stack>
 		</interceptors>
 		
-		<default-interceptor-ref name="sessionValidatorInterceptor"/>
+		<default-interceptor-ref name="interceptorStack"/>
   
   		<global-results>  
 			<result name="success">/admin/login.jsp</result>
