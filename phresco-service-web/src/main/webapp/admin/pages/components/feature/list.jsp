@@ -109,10 +109,6 @@
                                                       %>
 													
 													</tr>
-												<%-- <% 
-                                                         }
-                                                     }
-												%>	 --%>
 												</tbody>
 											</table>
 										</section>
@@ -129,10 +125,10 @@
 	<% } %>
 	<!-- Hidden Fields -->
     <input type="hidden" name="customerId" value="<%= customerId %>">
-	
 </form>
 
 <script language="JavaScript" type="text/javascript">
+
 	$(document).ready(function() {
 		enableScreen();
 	});

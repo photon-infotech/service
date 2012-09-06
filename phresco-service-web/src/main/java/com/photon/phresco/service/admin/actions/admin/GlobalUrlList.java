@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.GlobalURL;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
+import com.photon.phresco.service.admin.commons.LogErrorReport;
 import com.sun.jersey.api.client.ClientResponse;
 
 public class GlobalUrlList extends ServiceBaseAction { 
@@ -55,9 +56,12 @@ public class GlobalUrlList extends ServiceBaseAction {
     		List<GlobalURL> globalUrl = getServiceManager().getGlobalUrls(customerId);
     		getHttpRequest().setAttribute(REQ_GLOBURL_URL, globalUrl);
     		getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
-    	} catch(Exception e){
-    		throw new PhrescoException(e);
-    	}
+    	} catch (PhrescoException e) {
+			new LogErrorReport(e, GLOBAL_URL_LIST_EXCEPTION);
+			
+			return LOG_ERROR;	
+		}
+
     	
 		return ADMIN_GLOBALURL_LIST;	
 	}
@@ -67,6 +71,24 @@ public class GlobalUrlList extends ServiceBaseAction {
 			S_LOGGER.debug("Entering Method GlobalUrlList.add()");
 		}
 
+		return ADMIN_GLOBALURL_ADD;
+	}
+	
+	public String edit() throws PhrescoException {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method GlobalUrlList.edit()");
+		}
+		
+		try {
+			  GlobalURL globalUrl = getServiceManager().getGlobalUrl(globalurlId, customerId);
+			  getHttpRequest().setAttribute(REQ_GLOBURL_URL , globalUrl);
+			  getHttpRequest().setAttribute(REQ_FROM_PAGE, REQ_EDIT);
+		} catch (PhrescoException e) {
+			new LogErrorReport(e, GLOBAL_URL_EDIT_EXCEPTION);
+			
+			return LOG_ERROR;	
+		}
+		
 		return ADMIN_GLOBALURL_ADD;
 	}
 	
@@ -88,27 +110,13 @@ public class GlobalUrlList extends ServiceBaseAction {
 			} else {
 			    addActionMessage(getText(URL_ADDED, Collections.singletonList(name)));
 			}
-		}  catch (Exception e) {
-			throw new PhrescoException(e);
+		}  catch (PhrescoException e) {
+			new LogErrorReport(e, GLOBAL_URL_SAVE_EXCEPTION);
+			
+			return LOG_ERROR;	
 		}
 
 		return  list();
-	}
-	
-	public String edit() throws PhrescoException {
-		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method GlobalUrlList.edit()");
-		}
-		
-		try {
-			  GlobalURL globalUrl = getServiceManager().getGlobalUrl(globalurlId, customerId);
-			  getHttpRequest().setAttribute(REQ_GLOBURL_URL , globalUrl);
-			  getHttpRequest().setAttribute(REQ_FROM_PAGE, REQ_EDIT);
-		} catch(Exception e) {
-			throw new PhrescoException(e);
-		}
-		
-		return ADMIN_GLOBALURL_ADD;
 	}
 	
 	public String update() throws PhrescoException { 
@@ -122,13 +130,14 @@ public class GlobalUrlList extends ServiceBaseAction {
 			globalUrl.setDescription(description);
 			globalUrl.setUrl(url);
 			getServiceManager().updateGlobalUrl(globalUrl, globalurlId, customerId);
-		} catch(Exception e){
-			throw new PhrescoException();
+		} catch (PhrescoException e) {
+			new LogErrorReport(e, GLOBAL_URL_UPDATE_EXCEPTION);
+			
+			return LOG_ERROR;	
 		}
 		
 		return list();
 	}
-	
 	
 	public String delete() throws PhrescoException {
 	    if (isDebugEnabled) {
@@ -146,8 +155,10 @@ public class GlobalUrlList extends ServiceBaseAction {
 				}
 				addActionMessage(getText(URL_DELETED));
 			}
-		} catch (Exception e) {
-			throw new PhrescoException(e);
+		} catch (PhrescoException e) {
+			new LogErrorReport(e, GLOBAL_URL_DELETE_EXCEPTION);
+			
+			return LOG_ERROR;	
 		}
 
 		return list();

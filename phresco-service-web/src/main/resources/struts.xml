@@ -52,6 +52,7 @@
   
   		<global-results>  
 			<result name="success">/admin/login.jsp</result>
+			<result name="logError">/admin/pages/errorReport.jsp</result>
 		</global-results>
   
 	<!--- DASHBOARD-->
@@ -241,7 +242,7 @@
             <result type="json" />
         </action>
         
-        <action name="removePilotProjJar" class="com.photon.phresco.service.admin.actions.components.PilotProjects" method="removeUploadedJar">
+        <action name="removePilotProjJar" class="com.photon.phresco.service.admin.actions.components.PilotProjects" method="removeUploadedFile">
             <result type="json" />
         </action>
        
@@ -447,5 +448,8 @@
             <result name="globalurlList">/admin/pages/admin/globalurl/list.jsp</result>
         </action>
 		<!-- ADMIN GLOBALURL ENDS-->
+		
+		<!-- COPY TO CLIPBOARD -->
+		<action name="copyToClipboard" method="copyToClipboard" class="com.photon.phresco.service.admin.actions.ServiceBaseAction"/>
     </package>
 </struts>

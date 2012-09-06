@@ -284,3 +284,15 @@ function isiPad() {
 function showDeleteConfirmation(confirmMsg) {
 	confirmDialog("block", confirmMsg);
 }
+
+function copyToClipboard(data) {
+    var params = "copyToClipboard=";
+    params = params.concat(data);
+    $.ajax({
+		url : "copyToClipboard",
+		data : params,
+		type : "POST",
+		success : function() {
+		}
+	});
+}

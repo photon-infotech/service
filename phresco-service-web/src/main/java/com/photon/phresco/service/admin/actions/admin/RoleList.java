@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import com.photon.phresco.commons.model.Role;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
+import com.photon.phresco.service.admin.commons.LogErrorReport;
 import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
 
@@ -55,8 +56,10 @@ public class RoleList extends ServiceBaseAction {
 		try {
 			List<Role> roleList = getServiceManager().getRoles();
 			getHttpRequest().setAttribute(REQ_ROLE_LIST, roleList);
-		} catch(Exception e) {
-			throw new PhrescoException(e);
+		} catch (PhrescoException e) {
+			new LogErrorReport(e, ROLE_LIST_EXCEPTION);
+			
+			return LOG_ERROR;	
 		}
 
 		return ADMIN_ROLE_LIST;	
@@ -79,9 +82,12 @@ public class RoleList extends ServiceBaseAction {
 		    Role role = getServiceManager().getRole(roleId);
 			getHttpRequest().setAttribute(REQ_ROLE_ROLE , role);
 			getHttpRequest().setAttribute(REQ_FROM_PAGE, fromPage);
-		} catch (Exception e) {
-		    throw new PhrescoException(e);
+		} catch (PhrescoException e) {
+			new LogErrorReport(e, ROLE_EDIT_EXCEPTION);
+			
+			return LOG_ERROR;	
 		}
+
 		
 		return ADMIN_ROLE_ADD;
 	}
@@ -103,9 +109,12 @@ public class RoleList extends ServiceBaseAction {
 			} else {
 				addActionMessage(getText(ROLE_ADDED, Collections.singletonList(name)));
 			}	
-		} catch (Exception e) {
-
+		} catch (PhrescoException e) {
+			new LogErrorReport(e, ROLE_SAVE_EXCEPTION);
+			
+			return LOG_ERROR;	
 		}
+
 		
 		return  list();
 	}
@@ -119,9 +128,12 @@ public class RoleList extends ServiceBaseAction {
 			Role role = new Role(name, description);
 			role.setId(roleId);
 			getServiceManager().updateRole(role, roleId);
-		} catch(Exception e)  {
-			throw new PhrescoException(e);
+		} catch (PhrescoException e) {
+			new LogErrorReport(e, ROLE_UPDATE_EXCEPTION);
+			
+			return LOG_ERROR;	
 		}
+
 
 		return list();
 	}
@@ -142,9 +154,12 @@ public class RoleList extends ServiceBaseAction {
 				}
 				addActionMessage(getText(ROLE_DELETED));
 			}
-		} catch (Exception e) {
-			throw new PhrescoException(e);
+		} catch (PhrescoException e) {
+			new LogErrorReport(e, ROLE_DELETE_EXCEPTION);
+			
+			return LOG_ERROR;	
 		}
+
 
 		return list();
 	}

@@ -31,6 +31,7 @@ import com.photon.phresco.model.PropertyTemplate;
 import com.photon.phresco.model.SettingsTemplate;
 import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
+import com.photon.phresco.service.admin.commons.LogErrorReport;
 import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
 
@@ -60,7 +61,9 @@ public class ConfigTemplates extends ServiceBaseAction {
 			getHttpRequest().setAttribute(REQ_CONFIG_TEMPLATES, configTemplates);
 			getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
 		} catch (PhrescoException e) {
-			throw new PhrescoException(e);
+			new LogErrorReport(e, CONFIG_TEMP_LIST_EXCEPTION);
+			
+			return LOG_ERROR;	
 		}
 		
 		return COMP_CONFIGTEMPLATE_LIST;
@@ -74,8 +77,10 @@ public class ConfigTemplates extends ServiceBaseAction {
 		try {
 			List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
 			getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
-		} catch (Exception e) {
-			throw new PhrescoException(e);
+		} catch (PhrescoException e) {
+			new LogErrorReport(e, CONFIG_TEMP_ADD_EXCEPTION);
+			
+			return LOG_ERROR;	
 		}
 		
 		return COMP_CONFIGTEMPLATE_ADD;
@@ -92,8 +97,10 @@ public class ConfigTemplates extends ServiceBaseAction {
 			List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
 			getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
 			getHttpRequest().setAttribute(REQ_FROM_PAGE, REQ_EDIT);
-		} catch(Exception e) {
-			throw new PhrescoException(e);
+		} catch (PhrescoException e) {
+			new LogErrorReport(e, CONFIG_TEMP_EDIT_EXCEPTION);
+			
+			return LOG_ERROR;	
 		}
 		
 		return COMP_CONFIGTEMPLATE_ADD;
@@ -123,8 +130,10 @@ public class ConfigTemplates extends ServiceBaseAction {
             } else {
             	addActionMessage(getText(CONFIGTEMPLATE_ADDED, Collections.singletonList(name)));
             }
-		} catch (Exception e) {
-			 throw new PhrescoException(e);  
+		} catch (PhrescoException e) {
+			new LogErrorReport(e, CONFIG_TEMP_SAVE_EXCEPTION);
+			
+			return LOG_ERROR;	
 		}
 		
 		 return  list();
@@ -147,9 +156,11 @@ public class ConfigTemplates extends ServiceBaseAction {
             settingTemplate.setCustomerId(customerId);
             settingTemplate.setProperties(propertyTemplates);
     		getServiceManager().updateConfigTemp(settingTemplate, configId, customerId);
-    	} catch(Exception e) {
-    		throw new PhrescoException(e);
-    	}
+    	}catch (PhrescoException e) {
+			new LogErrorReport(e, CONFIG_TEMP_UPDATE_EXCEPTION);
+			
+			return LOG_ERROR;	
+		}
 
     	return list();
     }
@@ -171,8 +182,10 @@ public class ConfigTemplates extends ServiceBaseAction {
 				}
 				addActionMessage(getText(CONFIGTEMPLATE_DELETED));
 			}
-		} catch (Exception e) {
-			throw new PhrescoException(e);
+		} catch (PhrescoException e) {
+			new LogErrorReport(e, CONFIG_TEMP_DELETE_EXCEPTION);
+			
+			return LOG_ERROR;	
 		}
 
 		return list();

@@ -20,7 +20,6 @@
 package com.photon.phresco.service.admin.actions.components;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -35,6 +34,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.service.admin.commons.LogErrorReport;
 import com.photon.phresco.model.Module;
 import com.photon.phresco.model.ModuleGroup;
 import com.photon.phresco.model.Technology;
@@ -57,9 +57,6 @@ public class Features extends ServiceBaseAction {
 	private String fileError = null;
 	private boolean errorFound = false;
 	
-	private File featureArc;
-	private String featureArcFileName;
-	private String featureArcContentType;
     private String customerId = null;
     private String fromPage = null;
     private String techId = null;
@@ -67,7 +64,6 @@ public class Features extends ServiceBaseAction {
     
     private String artifactId = "";
     private String groupId = "";
-    private String jarVersion = "";
     
 	private static byte[] featureByteArray = null;
 	private static String featureJarName = null;
@@ -75,7 +71,7 @@ public class Features extends ServiceBaseAction {
 	private String description = null;
     private List<Module> versions = null;
 	
-    public String list() throws PhrescoException {
+    public String list() {
     	if (isDebugEnabled) {
     		S_LOGGER.debug("Entering Method  Features.list()");
     	}
@@ -84,8 +80,10 @@ public class Features extends ServiceBaseAction {
     		List<ModuleGroup> moduleGroup = getServiceManager().getFeatures(customerId);
     		getHttpRequest().setAttribute(REQ_MODULE_GROUP, moduleGroup);
     		getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
-    	} catch(Exception e){
-    		throw new PhrescoException(e);
+    	} catch (PhrescoException e){
+    		new LogErrorReport(e, FEATURE_LIST_EXCEPTION);
+    		
+    		return LOG_ERROR;
     	}
     	
     	return COMP_FEATURES_LIST;
@@ -113,8 +111,10 @@ public class Features extends ServiceBaseAction {
 			getHttpRequest().setAttribute(REQ_MODULE_GROUP, moduleGroup);
 			getHttpRequest().setAttribute(REQ_FROM_PAGE, REQ_EDIT);
 			getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
-		} catch (Exception e) {
-		    throw new PhrescoException(e);
+		} catch (PhrescoException e) {
+			new LogErrorReport(e, FEATURE_EDIT_EXCEPTION);
+    		
+			return LOG_ERROR;
 		}
 
 		return COMP_FEATURES_ADD;
@@ -161,10 +161,58 @@ public class Features extends ServiceBaseAction {
 			} else {
 			addActionMessage(getText(FEATURE_ADDED, Collections.singletonList(name)));
 			}
-		} catch (Exception e) {
-			throw new PhrescoException(e);
+		} catch (PhrescoException e) {
+			new LogErrorReport(e, FEATURE_SAVE_EXCEPTION);
+    		
+			return LOG_ERROR;
 		} 
 
+		return list();
+	}
+	
+	public String update() throws PhrescoException {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method  Features.update()");
+		}
+		
+		try {
+			ModuleGroup moduleGroup = new ModuleGroup();
+			moduleGroup.setName(name);
+			moduleGroup.setDescription(description);
+			moduleGroup.setVersions(versions);
+			moduleGroup.setCustomerId(customerId);
+			getServiceManager().updateFeature(moduleGroup, techId, customerId);
+		} catch (PhrescoException e){
+			new LogErrorReport(e, FEATURE_UPDATE_EXCEPTION);
+    	
+			return LOG_ERROR;
+		}
+		
+		return list();	
+	}
+	
+	public String delete() throws PhrescoException {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method  Features.delete()");
+		}
+		
+		try {
+			String[] techIds = getHttpRequest().getParameterValues(REST_QUERY_TECHID);
+			if (techIds != null) {
+				for (String techId : techIds) {
+					ClientResponse clientResponse = getServiceManager().deleteFeature(techId, customerId);
+					if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
+						addActionError(getText(FEATURE_NOT_DELETED));
+					}
+				}
+				addActionMessage(getText(FEATURE_DELETED));
+			}
+		} catch (PhrescoException e) {
+			new LogErrorReport(e, FEATURE_DELETE_EXCEPTION);
+			
+    		return LOG_ERROR;
+		}
+		
 		return list();
 	}
 	
@@ -204,48 +252,6 @@ public class Features extends ServiceBaseAction {
 		featureJarName = null;
 	}
 
-	public String update() throws PhrescoException {
-		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method  Features.update()");
-		}
-		
-		try {
-			ModuleGroup moduleGroup = new ModuleGroup();
-			moduleGroup.setName(name);
-			moduleGroup.setDescription(description);
-			moduleGroup.setVersions(versions);
-			moduleGroup.setCustomerId(customerId);
-			getServiceManager().updateFeature(moduleGroup, techId, customerId);
-		} catch(Exception e){
-			throw new PhrescoException(e);
-		}
-		
-		return list();	
-	}
-	
-	public String delete() throws PhrescoException {
-		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method  Features.delete()");
-		}
-		
-		try {
-			String[] techIds = getHttpRequest().getParameterValues(REST_QUERY_TECHID);
-			if (techIds != null) {
-				for (String techId : techIds) {
-					ClientResponse clientResponse = getServiceManager().deleteFeature(techId, customerId);
-					if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
-						addActionError(getText(FEATURE_NOT_DELETED));
-					}
-				}
-				addActionMessage(getText(FEATURE_DELETED));
-			}
-		} catch (Exception e) {
-			throw new PhrescoException(e);
-		}
-		
-		return list();
-	}
-		
 	public String validateForm() {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Features.validateForm()");
@@ -299,30 +305,6 @@ public class Features extends ServiceBaseAction {
 
 	public void setFileError(String fileError) {
 		this.fileError = fileError;
-	}
-
-	public File getFeatureArc() {
-		return featureArc;
-	}
-
-	public void setFeatureArc(File featureArc) {
-		this.featureArc = featureArc;
-	}
-
-	public String getFeatureArcFileName() {
-		return featureArcFileName;
-	}
-
-	public void setFeatureArcFileName(String featureArcFileName) {
-		this.featureArcFileName = featureArcFileName;
-	}
-
-	public String getFeatureArcContentType() {
-		return featureArcContentType;
-	}
-
-	public void setFeatureArcContentType(String featureArcContentType) {
-		this.featureArcContentType = featureArcContentType;
 	}
 
 	public boolean getErrorFound() {

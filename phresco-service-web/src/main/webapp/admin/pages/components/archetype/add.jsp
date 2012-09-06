@@ -283,6 +283,11 @@
         } else {
             hideError($("#appControl"), $("#appError"));
         }
+        if (data.fileError != undefined) {
+            showError($("#appFileControl"), $("#fileError"), data.fileError);
+        } else {
+            hideError($("#appFileControl"), $("#fileError"));
+        }
     }
     
 	function jarError(data, type) {

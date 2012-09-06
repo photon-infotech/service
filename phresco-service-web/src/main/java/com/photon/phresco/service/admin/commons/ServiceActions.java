@@ -68,6 +68,10 @@ public interface ServiceActions {
 	String COMP_PILOTPROJ_SAVE      	= "pilotprojSave";
 	String COMP_PILOTPROJ_CANCEL      	= "pilotprojCancel";
 	
+	String COMP_DOWNLOAD_LIST  			= "downloadList";
+	String COMP_DOWNLOAD_ADD  			= "downloadAdd";
+	String COMP_DOWNLOAD_SAVE  			= "downloadSave";
+	String COMP_DOWNLOAD_CANCEL  		= "downloadCancel";
 	/*****************************
      * Components Action path
      * String ADMIN_XXX
@@ -96,9 +100,6 @@ public interface ServiceActions {
 	String ADMIN_GLOBALURL_SAVE  	= "globalurlSave";
 	String ADMIN_GLOBALURL_CANCEL  	= "globalurlCancel";
 	
-	String ADMIN_DOWNLOAD_LIST  	= "downloadList";
-	String ADMIN_DOWNLOAD_ADD  		= "downloadAdd";
-	String ADMIN_DOWNLOAD_SAVE  	= "downloadSave";
-	String ADMIN_DOWNLOAD_CANCEL  	= "downloadCancel";
+	
 	
 }

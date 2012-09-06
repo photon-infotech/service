@@ -126,7 +126,6 @@ public interface ServiceUIConstants {
     String REQ_GLOBURL_URL = "globalUrl";
     String REQ_GLOBURL_ID = "globalurlId";
     
-    
     /*****************************
      * Role Request Constants
      * String REQ_ROLE_XXX
@@ -135,7 +134,64 @@ public interface ServiceUIConstants {
     String REQ_ROLE_LIST = "roleList";
     String REQ_ROLE_ID = "roleId";
     
+    /*****************************
+     * Error Report
+     * String REQ_LOG_REPORT
+     *****************************/ 
+    String REQ_LOG_REPORT = "logReport";
+    String LOG_ERROR = "logError";
     
+    String CUSTOMERS_DELETE_EXCEPTION = "Customers delete";
+	String CUSTOMERS_UPDATE_EXCEPTION = "Customers update";
+	String CUSTOMERS_SAVE_EXCEPTION = "Customers save";
+	String CUSTOMERS_ADD_EXCEPTION = "Customers add";
+	String CUSTOMERS_LIST_EXCEPTION = "Customers list";
+    
+	String ROLE_DELETE_EXCEPTION = "Role delete";
+	String ROLE_UPDATE_EXCEPTION = "Role update";
+	String ROLE_SAVE_EXCEPTION = "Role save";
+	String ROLE_EDIT_EXCEPTION = "Role edit";
+	String ROLE_LIST_EXCEPTION = "Role list";
+	
+	String GLOBAL_URL_DELETE_EXCEPTION = "GlobalUrl delete";
+	String GLOBAL_URL_UPDATE_EXCEPTION = "GlobalUrl update";
+	String GLOBAL_URL_SAVE_EXCEPTION = "GlobalUrl save";
+	String GLOBAL_URL_EDIT_EXCEPTION = "GlobalUrl edit";
+	String GLOBAL_URL_LIST_EXCEPTION = "GlobalUrl list";
+	
+	String FEATURE_DELETE_EXCEPTION = "Feature delete";
+	String FEATURE_UPDATE_EXCEPTION = "Feature update";
+	String FEATURE_SAVE_EXCEPTION = "Feature save";
+	String FEATURE_EDIT_EXCEPTION = "Feature edit";
+	String FEATURE_LIST_EXCEPTION = "Feature list";
+	
+	String ARCHETYPE_DELETE_EXCEPTION = "Archetype delete";
+	String ARCHETYPE_UPDATE_EXCEPTION = "Archetype update";
+	String ARCHETYPE_SAVE_EXCEPTION = "Archetype save";
+	String ARCHETYPE_EDIT_EXCEPTION = "Archetype edit";
+	String ARCHETYPE_ADD_EXCEPTION = "Archetype add";
+	String ARCHETYPE_LIST_EXCEPTION = "Archetype list";
+	
+	String CONFIG_TEMP_DELETE_EXCEPTION = "ConfigTemplate delete";
+	String CONFIG_TEMP_UPDATE_EXCEPTION = "ConfigTemplate update";
+	String CONFIG_TEMP_SAVE_EXCEPTION = "ConfigTemplate save";
+	String CONFIG_TEMP_EDIT_EXCEPTION = "ConfigTemplate edit";
+	String CONFIG_TEMP_ADD_EXCEPTION = "ConfigTemplate add";
+	String CONFIG_TEMP_LIST_EXCEPTION = "ConfigTemplate list";
+	
+	String PILOT_PROJECTS_DELETE_EXCEPTION = "PilotProjects delete";
+	String PILOT_PROJECTS_UPDATE_EXCEPTION = "PilotProjects update";
+	String PILOT_PROJECTS_SAVE_EXCEPTION = "PilotProjects save";
+	String PILOT_PROJECTS_EDIT_EXCEPTION = "PilotProjects edit";
+	String PILOT_PROJECTS_ADD_EXCEPTION = "PilotProjects add";
+	String PILOT_PROJECTS_LIST_EXCEPTION = "PilotProjects list";
+	
+	String DOWNLOADS_DELETE_EXCEPTION = "Downloads delete";
+	String DOWNLOADS_UPDATE_EXCEPTION = "Downloads update";
+	String DOWNLOADS_SAVE_EXCEPTION = "Downloads save";
+	String DOWNLOADS_EDIT_EXCEPTION = "Downloads edit";
+	String DOWNLOADS_ADD_EXCEPTION = "Downloads add";
+	String DOWNLOADS_LIST_EXCEPTION = "Downloads list";
 	/*****************************
      * I18N Keys Constants
      * String KEY_I18N_XXX_YYY

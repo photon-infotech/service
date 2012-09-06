@@ -19,6 +19,10 @@
  */
 package com.photon.phresco.service.admin.actions;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpServletResponse;
@@ -43,6 +47,7 @@ public class ServiceBaseAction extends ActionSupport implements ServiceActions, 
     private static final long serialVersionUID = 1L;
     
     private static ServiceManager serviceManager = null;
+    private String copyToClipboard = null;
     
     protected ServiceManager getServiceManager() {
 		return serviceManager;
@@ -76,4 +81,17 @@ public class ServiceBaseAction extends ActionSupport implements ServiceActions, 
     protected HttpServletResponse getHttpResponse() {
         return (HttpServletResponse) ActionContext.getContext().get(ServletActionContext.HTTP_RESPONSE);
     }
+
+    public void copyToClipboard () {
+    	Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+    	clipboard.setContents(new StringSelection(copyToClipboard.replaceAll(" ", "").replaceAll("(?m)^[ \t]*\r?\n", "")), null);
+    }
+    
+    public void setCopyToClipboard(String copyToClipboard) {
+		this.copyToClipboard = copyToClipboard;
+	}
+
+	public String getCopyToClipboard() {
+		return copyToClipboard;
+	}
 }

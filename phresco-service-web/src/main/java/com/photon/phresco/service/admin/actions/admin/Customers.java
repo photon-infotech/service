@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
+import com.photon.phresco.service.admin.commons.LogErrorReport;
 import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
 
@@ -74,8 +75,10 @@ public class Customers extends ServiceBaseAction  {
 		try {
             List<Customer> customers = getServiceManager().getCustomers();
 			getHttpRequest().setAttribute(REQ_CUST_CUSTOMERS, customers);
-		} catch (Exception e) {
-			throw new PhrescoException(e);
+		} catch (PhrescoException e) {
+			new LogErrorReport(e, CUSTOMERS_LIST_EXCEPTION);
+			
+			return LOG_ERROR;	
 		}
 		
 		return ADMIN_CUSTOMER_LIST;	
@@ -92,8 +95,10 @@ public class Customers extends ServiceBaseAction  {
 	            getHttpRequest().setAttribute(REQ_CUST_CUSTOMER, customer);
 	            getHttpRequest().setAttribute(REQ_FROM_PAGE, fromPage);
 			}
-		} catch (Exception e) {
-			throw new PhrescoException(e);
+		} catch (PhrescoException e) {
+			new LogErrorReport(e, CUSTOMERS_ADD_EXCEPTION);
+			
+			return LOG_ERROR;	
 		}
 		
 		return ADMIN_CUSTOMER_ADD;
@@ -125,10 +130,12 @@ public class Customers extends ServiceBaseAction  {
 			} else {
 				addActionMessage(getText(CUSTOMER_ADDED, Collections.singletonList(name)));
 			}
-		} catch(Exception e)  {
-			throw new PhrescoException(e);
+		} catch (PhrescoException e) {
+			new LogErrorReport(e, CUSTOMERS_SAVE_EXCEPTION);
+			
+			return LOG_ERROR;	
 		}
-
+		
 		return list();
 	}
 
@@ -151,13 +158,40 @@ public class Customers extends ServiceBaseAction  {
             customer.setValidFrom(validFrom);
             customer.setValidUpto(validUpTo);
 			getServiceManager().updateCustomer(customer, customerId);
-		} catch(Exception e)  {
-			throw new PhrescoException(e);
+		} catch (PhrescoException e) {
+			new LogErrorReport(e, CUSTOMERS_UPDATE_EXCEPTION);
+			
+			return LOG_ERROR;	
 		}
 		
 		return list();
 	}
-
+	
+	public String delete() throws PhrescoException {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entering Method CustomerList.delete()");
+	    }
+		
+		try {
+			String[] customerIds = getHttpRequest().getParameterValues(REQ_CUST_CUSTOMER_ID);
+			if (customerIds != null) {
+				for (String customerId : customerIds) {
+			    	ClientResponse clientResponse =getServiceManager().deleteCustomer(customerId);
+			    	if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
+			        	addActionError(getText(CUSTOMER_NOT_DELETED));
+			        }
+				}
+				addActionMessage(getText(CUSTOMER_DELETED));
+			}
+		} catch (PhrescoException e) {
+			new LogErrorReport(e, CUSTOMERS_DELETE_EXCEPTION);
+			
+			return LOG_ERROR;	
+		}
+		
+		return list();
+	}
+	
 	public String validateForm() {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method CustomerList.validateForm()");
@@ -209,29 +243,6 @@ public class Customers extends ServiceBaseAction  {
         }
 		
 		return SUCCESS;
-	}
-	
-	public String delete() throws PhrescoException {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entering Method CustomerList.delete()");
-	    }
-		
-		try {
-			String[] customerIds = getHttpRequest().getParameterValues(REQ_CUST_CUSTOMER_ID);
-			if (customerIds != null) {
-				for (String customerId : customerIds) {
-			    	ClientResponse clientResponse =getServiceManager().deleteCustomer(customerId);
-			    	if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
-			        	addActionError(getText(CUSTOMER_NOT_DELETED));
-			        }
-				}
-				addActionMessage(getText(CUSTOMER_DELETED));
-			}
-		} catch (Exception e) {
-			throw new PhrescoException(e);
-		}
-		
-		return list();
 	}
 	
 	public String getName() {

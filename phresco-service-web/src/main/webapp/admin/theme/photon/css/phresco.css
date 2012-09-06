@@ -1890,3 +1890,80 @@ input[class*='sample'] {
     margin-left: -280px;
     margin-top: -160px;
 }
+
+/* exception popup starts */
+.modal-header {
+    padding: 5px 3%;
+}
+
+.modal-header h3 {
+	font-size:	15px;
+	line-height: 19px;
+}
+
+.exceptionErrors {
+	border-radius: 0px 0px 0px 0px;
+	top: 54%;
+}
+
+.errorReportTrace {
+	padding:15px;
+	overflow: auto;
+	width: 520px;
+	height: 170px;
+	color: #000000;
+}
+
+.errorMsgDisplay {
+	height:60px;
+	font-weight:bold;
+	width:75%;
+	padding-right: 12px;
+	padding-top: 28px; 
+}
+
+.errLogo {
+	height:60px;
+	width:20%;
+}
+
+.errorReportContainer {
+	padding:0px;
+	height:60px;
+	width:550px;
+}
+
+.errorReportStatus {
+	float: left;
+	font-weight: bold;
+	padding-left: 0px;
+	padding-top: 0;
+}
+
+.modal-header .close {
+	font-size: 20px;
+    line-height: 14px;
+    text-decoration: none;
+    position: absolute;
+    top: 6px;
+    right: 7px;
+    opacity: 1;
+    text-shadow: none;
+}
+
+.abt_logo {
+    float: left;
+}
+
+.clipboardDiv {
+	position:absolute; 
+	right:10px; 
+	top:35px;
+}
+
+.clipboard {
+	height:25px; 
+	width:25px; 
+	cursor:pointer;
+}	
+/* exception popup ends */

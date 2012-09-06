@@ -39,6 +39,7 @@ import com.photon.phresco.model.ArchetypeInfo;
 import com.photon.phresco.model.DownloadInfo;
 import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
+import com.photon.phresco.service.admin.commons.LogErrorReport;
 import com.photon.phresco.service.client.api.Content;
 import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.ServiceConstants;
@@ -63,14 +64,6 @@ public class Downloads extends ServiceBaseAction {
 	private String fileError = null;
 	private boolean errorFound = false;
 
-	private File fileArc;
-	private String fileArcFileName;
-	private String fileArcContentType;
-
-	private File iconArc;
-	private String iconArcFileName;
-	private String iconArcContentType;  
-
 	private String description=null;
 	private String id = null;
 	private String fromPage = null;
@@ -88,11 +81,13 @@ public class Downloads extends ServiceBaseAction {
 			List<DownloadInfo> downloadInfo = getServiceManager().getDownloads(customerId);
 			getHttpRequest().setAttribute(REQ_DOWNLOAD_INFO, downloadInfo);
 			getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
-		} catch(Exception e) {
-			throw new PhrescoException(e);
+		} catch (PhrescoException e) {
+			new LogErrorReport(e, DOWNLOADS_LIST_EXCEPTION);
+			
+			return LOG_ERROR;	
 		}
 
-		return ADMIN_DOWNLOAD_LIST;	
+		return COMP_DOWNLOAD_LIST;	
 	}
 
 	public String add() throws PhrescoException {
@@ -103,13 +98,33 @@ public class Downloads extends ServiceBaseAction {
 		try {
 			List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
 			getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
-		} catch(Exception e) {
-			throw new PhrescoException(e);
+		} catch (PhrescoException e) {
+			new LogErrorReport(e, DOWNLOADS_ADD_EXCEPTION);
+			
+			return LOG_ERROR;	
 		}
 		
-		return ADMIN_DOWNLOAD_ADD;
+		return COMP_DOWNLOAD_ADD;
 	}
+	
+	public String edit() throws PhrescoException {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method Downloads.edit()");
+		}
 
+		try {
+			DownloadInfo downloadInfo = getServiceManager().getDownload(id, customerId);
+			getHttpRequest().setAttribute(REQ_DOWNLOAD_INFO, downloadInfo);
+			getHttpRequest().setAttribute(REQ_FROM_PAGE, fromPage);
+		} catch (PhrescoException e) {
+			new LogErrorReport(e, DOWNLOADS_EDIT_EXCEPTION);
+			
+			return LOG_ERROR;	
+		}
+
+		return COMP_DOWNLOAD_ADD;
+	}
+	
 	public String save() throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Downloads.save()");
@@ -144,13 +159,62 @@ public class Downloads extends ServiceBaseAction {
 			} else {
 				addActionMessage(getText(DOWNLOAD_ADDED, Collections.singletonList(name)));
 			}
-		} catch (Exception e) {
-			throw new PhrescoException(e);
+		} catch (PhrescoException e) {
+			new LogErrorReport(e, DOWNLOADS_SAVE_EXCEPTION);
+			
+			return LOG_ERROR;	
 		}
 		
 		return list();
 	}
 	
+	public String update() throws PhrescoException {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method  Downloads.update()");
+		}
+
+		try {
+			DownloadInfo download = new DownloadInfo();
+			download.setId(id);
+			download.setName(name);
+			download.setDescription(description);
+			download.setVersion(version);
+			download.setCustomerId(customerId);
+			getServiceManager().updateDownload(download, id, customerId);
+		} catch (PhrescoException e) {
+			new LogErrorReport(e, DOWNLOADS_UPDATE_EXCEPTION);
+			
+			return LOG_ERROR;	
+		}
+
+		return list();
+	}
+
+	public String delete() throws PhrescoException {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method Downloads.delete()");
+		}
+
+		try {
+			String[] downloadIds = getHttpRequest().getParameterValues(REQ_DOWNLOAD_ID);
+			if (downloadIds != null) {
+				for (String downloadId : downloadIds) {
+					ClientResponse clientResponse =getServiceManager().deleteDownloadInfo(downloadId, customerId);
+					if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
+						addActionError(getText(DOWNLOAD_NOT_DELETED));
+					}
+				}
+				addActionMessage(getText(DOWNLOAD_DELETED));
+			}
+		}catch (PhrescoException e) {
+			new LogErrorReport(e, DOWNLOADS_DELETE_EXCEPTION);
+			
+			return LOG_ERROR;	
+		}
+
+		return list();
+	}
+
 	public String uploadFile() throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Downloads.uploadFile()");
@@ -198,67 +262,6 @@ public class Downloads extends ServiceBaseAction {
 		downloadByteArray = null;
 		downloadJarName = null;
 	}
-
-	public String edit() throws PhrescoException {
-		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method Downloads.edit()");
-		}
-
-		try {
-			DownloadInfo downloadInfo = getServiceManager().getDownload(id, customerId);
-			getHttpRequest().setAttribute(REQ_DOWNLOAD_INFO, downloadInfo);
-			getHttpRequest().setAttribute(REQ_FROM_PAGE, fromPage);
-		} catch (Exception e) {
-			throw new PhrescoException(e);
-		}
-
-		return ADMIN_DOWNLOAD_ADD;
-	}
-
-
-	public String update() throws PhrescoException {
-		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method  Downloads.update()");
-		}
-
-		try {
-			DownloadInfo download = new DownloadInfo();
-			download.setId(id);
-			download.setName(name);
-			download.setDescription(description);
-			download.setVersion(version);
-			download.setCustomerId(customerId);
-			getServiceManager().updateDownload(download, id, customerId);
-		} catch(Exception e) {
-			throw new PhrescoException(e);
-		}
-
-		return list();
-	}
-
-	public String delete() throws PhrescoException {
-		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method Downloads.delete()");
-		}
-
-		try {
-			String[] downloadIds = getHttpRequest().getParameterValues(REQ_DOWNLOAD_ID);
-			if (downloadIds != null) {
-				for (String downloadId : downloadIds) {
-					ClientResponse clientResponse =getServiceManager().deleteDownloadInfo(downloadId, customerId);
-					if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
-						addActionError(getText(DOWNLOAD_NOT_DELETED));
-					}
-				}
-				addActionMessage(getText(DOWNLOAD_DELETED));
-			}
-		} catch (Exception e) {
-			throw new PhrescoException(e);
-		}
-
-		return list();
-	}
-
 
 	public String validateForm() {
 		if (isDebugEnabled) {
@@ -363,54 +366,6 @@ public class Downloads extends ServiceBaseAction {
 
 	public void setFileError(String fileError) {
 		this.fileError = fileError;
-	}
-
-	public File getFileArc() {
-		return fileArc;
-	}
-
-	public void setFileArc(File fileArc) {
-		this.fileArc = fileArc;
-	}
-
-	public String getFileArcFileName() {
-		return fileArcFileName;
-	}
-
-	public void setFileArcFileName(String fileArcFileName) {
-		this.fileArcFileName = fileArcFileName;
-	}
-
-	public String getFileArcContentType() {
-		return fileArcContentType;
-	}
-
-	public void setFileArcContentType(String fileArcContentType) {
-		this.fileArcContentType = fileArcContentType;
-	}
-
-	public File getIconArc() {
-		return iconArc;
-	}
-
-	public void setIconArc(File iconArc) {
-		this.iconArc = iconArc;
-	}
-
-	public String getIconArcFileName() {
-		return iconArcFileName;
-	}
-
-	public void setIconArcFileName(String iconArcFileName) {
-		this.iconArcFileName = iconArcFileName;
-	}
-
-	public String getIconArcContentType() {
-		return iconArcContentType;
-	}
-
-	public void setIconArcContentType(String iconArcContentType) {
-		this.iconArcContentType = iconArcContentType;
 	}
 
 	public boolean isErrorFound() {

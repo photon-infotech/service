@@ -189,12 +189,12 @@
 		} else {
 			hideError($("#nameControl"), $("#nameError"));
 		}
-		/* 
+		 
 		if (data.fileError != undefined) {
-			showError($("#fileControl"), $("#fileError"), data.fileError);
+			showError($("#pilotProFileControl"), $("#pilotProFileError"), data.fileError);
 		} else {
-			hideError($("#fileControl"), $("#fileError"));
-		} */
+			hideError($("#pilotProFileControl"), $("#pilotProFileError"));
+		} 
 	}
 	
 	function jarError(data, type) {

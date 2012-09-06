@@ -45,6 +45,7 @@ import com.photon.phresco.model.ApplicationType;
 import com.photon.phresco.model.ArchetypeInfo;
 import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
+import com.photon.phresco.service.admin.commons.LogErrorReport;
 import com.photon.phresco.service.client.api.Content;
 import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.ServiceConstants;
@@ -92,8 +93,10 @@ public class Archetypes extends ServiceBaseAction {
 			List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
 			getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
 			getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
-		} catch (Exception e) {
-			throw new PhrescoException(e);
+		} catch (PhrescoException e) {
+			new LogErrorReport(e, ARCHETYPE_LIST_EXCEPTION);
+			
+			return LOG_ERROR;
 		}
 		
 		/* To clear appln & plugin input streams */
@@ -113,12 +116,14 @@ public class Archetypes extends ServiceBaseAction {
 			List<ApplicationType> appTypes = getServiceManager().getApplicationTypes(customerId);
 			getHttpRequest().setAttribute(REQ_APP_TYPES, appTypes);
 		} catch (PhrescoException e) {
-			throw new PhrescoException(e);
+			new LogErrorReport(e, ARCHETYPE_ADD_EXCEPTION);
+			
+			return LOG_ERROR;
 		}
 
 		return COMP_ARCHETYPE_ADD;
 	}
-
+	
 	public String edit() throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.edit()");
@@ -130,13 +135,15 @@ public class Archetypes extends ServiceBaseAction {
 			getHttpRequest().setAttribute(REQ_FROM_PAGE, REQ_EDIT);
 			List<ApplicationType> appTypes = getServiceManager().getApplicationTypes(customerId);
 			getHttpRequest().setAttribute(REQ_APP_TYPES, appTypes);
-		} catch (Exception e) {
-			throw new PhrescoException(e);
+		} catch (PhrescoException e) {
+			new LogErrorReport(e, ARCHETYPE_EDIT_EXCEPTION);
+			
+			return LOG_ERROR;	
 		}
 
 		return COMP_ARCHETYPE_ADD;
 	}
-
+	
 	public String save() throws PhrescoException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Archetypes.save()");
@@ -186,10 +193,60 @@ public class Archetypes extends ServiceBaseAction {
 			} else {
 				addActionMessage(getText(ARCHETYPE_ADDED, Collections.singletonList(name)));
 			}
-		} catch (Exception e) {
-			throw new PhrescoException(e);
+		} catch (PhrescoException e) {
+			new LogErrorReport(e, ARCHETYPE_SAVE_EXCEPTION);
+			
+			return LOG_ERROR;	
 		} 
 		
+		return list();
+	}
+	
+	public String update() throws PhrescoException {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entering Method Archetypes.update()");
+	    }
+
+		try {
+			List<String> appTypes = new ArrayList<String>();
+	        appTypes.add(apptype);
+	    	List<String> versions = new ArrayList<String>();
+	    	versions.add(version);
+			Technology technology = new Technology(name, description, versions, appTypes);
+			technology.setId(techId);
+			technology.setCustomerId(customerId);
+			getServiceManager().updateArcheType(technology, techId, customerId);
+		} catch(PhrescoException e) {
+			new LogErrorReport(e, ARCHETYPE_UPDATE_EXCEPTION);
+			
+			return LOG_ERROR;	
+		}
+		
+		return list();
+	}
+
+	public String delete() throws PhrescoException {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method Archetypes.delete()");
+		}
+
+		try {
+			String[] techTypeIds = getHttpRequest().getParameterValues(REQ_ARCHE_TECHID);
+			if (techTypeIds != null) {
+				for (String techId : techTypeIds) {
+					ClientResponse clientResponse = getServiceManager().deleteArcheType(techId, customerId);
+					if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
+						addActionError(getText(ARCHETYPE_NOT_DELETED));
+					}
+				}
+				addActionMessage(getText(ARCHETYPE_DELETED));
+			}
+		} catch (PhrescoException e) {
+			new LogErrorReport(e, ARCHETYPE_DELETE_EXCEPTION);
+			
+			return LOG_ERROR;	
+		}
+
 		return list();
 	}
 	
@@ -228,6 +285,8 @@ public class Archetypes extends ServiceBaseAction {
 		            	writer.print(MAVEN_JAR_FALSE);
 		        	}
 	        	} else {
+	        		applnJarName = null;
+	        		applnByteArray = null;
 	            	writer.print(INVALID_ARCHETYPE_JAR);
 	        	}
 		        writer.flush();
@@ -285,50 +344,6 @@ public class Archetypes extends ServiceBaseAction {
 		}
 	}
 	
-	public String update() throws PhrescoException {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entering Method Archetypes.update()");
-	    }
-
-		try {
-			List<String> appTypes = new ArrayList<String>();
-	        appTypes.add(apptype);
-	    	List<String> versions = new ArrayList<String>();
-	    	versions.add(version);
-			Technology technology = new Technology(name, description, versions, appTypes);
-			technology.setId(techId);
-			technology.setCustomerId(customerId);
-			getServiceManager().updateArcheType(technology, techId, customerId);
-		} catch(Exception e) {
-			throw new PhrescoException(e);
-		}
-		
-		return list();
-	}
-
-	public String delete() throws PhrescoException {
-		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method Archetypes.delete()");
-		}
-
-		try {
-			String[] techTypeIds = getHttpRequest().getParameterValues(REQ_ARCHE_TECHID);
-			if (techTypeIds != null) {
-				for (String techId : techTypeIds) {
-					ClientResponse clientResponse = getServiceManager().deleteArcheType(techId, customerId);
-					if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
-						addActionError(getText(ARCHETYPE_NOT_DELETED));
-					}
-				}
-				addActionMessage(getText(ARCHETYPE_DELETED));
-			}
-		} catch (Exception e) {
-			throw new PhrescoException(e);
-		}
-
-		return list();
-	}
-
 	public String validateForm() {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.validateForm()");
@@ -347,6 +362,11 @@ public class Archetypes extends ServiceBaseAction {
 
 		if (StringUtils.isEmpty(apptype)) {
 			setAppError(getText(KEY_I18N_ERR_APPTYPE_EMPTY));
+			isError = true;
+		}
+		
+		if (StringUtils.isEmpty(applnJarName) || applnJarName == null) {
+			setFileError(getText(KEY_I18N_ERR_APPLNJAR_EMPTY));
 			isError = true;
 		}
 		
