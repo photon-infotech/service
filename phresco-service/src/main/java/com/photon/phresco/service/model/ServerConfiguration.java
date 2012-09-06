@@ -307,9 +307,8 @@ public class ServerConfiguration {
 			for (Configuration configuration : configurations) {
 				 dbHost = configuration.getProperties().getProperty(HOST);
 			}
-			return dbHost;
 		}
-		return null;
+		return dbHost;
 	}
 	
 	public int getDbPort() throws PhrescoException {
@@ -318,9 +317,8 @@ public class ServerConfiguration {
 			for (Configuration configuration : configurations) {
 				 dbPort = configuration.getProperties().getProperty(PORT);
 			}
-			return Integer.parseInt(dbPort);
 		}
-		return  Integer.parseInt(dbPort);
+		return Integer.parseInt(dbPort);
 	}
 	
 	public String getDbName() throws PhrescoException {
@@ -329,7 +327,6 @@ public class ServerConfiguration {
 			for (Configuration configuration : configurations) {
 				 dbName = configuration.getProperties().getProperty(DBNAME);
 			}
-			return dbName;
 		}
 		return dbName;
 	}

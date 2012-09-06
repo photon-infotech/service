@@ -53,6 +53,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 
 import com.photon.phresco.commons.model.User;
+import com.photon.phresco.configuration.Configuration;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.ldap.api.LDAPManager;
 import com.photon.phresco.ldap.model.LDAPConfiguration;
@@ -65,8 +66,8 @@ public class LDAPManagerImpl implements LDAPManager {
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	private LDAPConfiguration ldapConfig;
 
-	public LDAPManagerImpl(Properties props) throws PhrescoException {
-		ldapConfig = new LDAPConfiguration(props);
+	public LDAPManagerImpl(Properties props, List<Configuration> configurations) throws PhrescoException {
+		ldapConfig = new LDAPConfiguration(props, configurations);
 	}
 
 	@Override
@@ -104,7 +105,7 @@ public class LDAPManagerImpl implements LDAPManager {
 		}
 	}
 
-	private String getUserPrincipal(String userName) {
+	private String getUserPrincipal(String userName) throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method LDAPManagerImpl.getUserPrincipal(String userName)");
 		}
