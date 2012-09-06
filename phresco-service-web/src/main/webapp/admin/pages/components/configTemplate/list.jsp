@@ -35,11 +35,10 @@
 <form id="formConfigTempList" class="customer_list">
 	<div class="operation">
 		<input type="button" class="btn btn-primary" name="configTemplate_add" id="configtempAdd" 
-		         onclick="loadContent('configtempAdd', $('#formConfigTempList'), $('#subcontainer'));" 
+	         onclick="loadContent('configtempAdd', $('#formConfigTempList'), $('#subcontainer'));" 
 		         value="<s:text name='lbl.hdr.comp.cnfigtmplte.add'/>"/>
-		<input type="button" class="btn" id="del" disabled 
-		        onclick="loadContent('configtempDelete', $('#formConfigTempList'), $('#subcontainer'));" 
-		        value="<s:text name='lbl.hdr.comp.delete'/>"/>
+		<input type="button" class="btn" id="del" disabled value="<s:text name='lbl.hdr.comp.delete'/>"
+			onclick="showDeleteConfirmation('<s:text name='del.confirm.configurationTemplate'/>');"/>
 		<s:if test="hasActionMessages()">
 			<div class="alert alert-success alert-message" id="successmsg" >
 				<s:actionmessage />
@@ -89,11 +88,11 @@
 									<tr>
 										<td class="checkboxwidth">
 								 		<% 
-											String disabled = "";
-										 	if (configTemplate.isSystem()) {
-									 			disabled = "disabled"; 
-									 	%>
-												<input type="checkbox" class="check" name="configId" value="<%= configTemplate.getId() %>" <%= disabled %> onclick="checkboxEvent();" />
+										String disabled = "";
+								 		if (configTemplate.isSystem()) { %>
+										<input type="checkbox" class="check" name="configId" value="<%= configTemplate.getId() %>" onclick="checkboxEvent();" disabled/>
+										<% } else { %>
+										<input type="checkbox" class="check" name="configId" value="<%= configTemplate.getId() %>" onclick="checkboxEvent();" />
 										<% } %>
 										</td>
 										<td class="nameConfig">
@@ -143,4 +142,10 @@
 	    params = params.concat("<%= customerId %>");
 		loadContentParam("configtempEdit", params, $('#subcontainer'));
 	}
+    
+ 	// This method calling from confirm_dialog.jsp
+    function continueDeletion() {
+    	confirmDialog('none','');
+    	loadContent('configtempDelete', $('#formConfigTempList'), $('#subcontainer'));
+    }
 </script>

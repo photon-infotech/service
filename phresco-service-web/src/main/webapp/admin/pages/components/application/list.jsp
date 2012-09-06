@@ -37,7 +37,7 @@
 		<input type="button" class="btn btn-primary" name="application_add" id="applicationAdd" 
             onclick="loadContent('applicationAdd', $('#formAppTypeList'), $('#subcontainer'));" value="<s:text name='lbl.hdr.comp.apln.add'/>"/>
 		<input type="button" class="btn" id="del" disabled value="<s:text name='lbl.hdr.comp.delete'/>" 
-            onclick="loadContent('applicationDelete', $('#formAppTypeList'), $('#subcontainer'));"/>
+            onclick="showDeleteConfirmation('<s:text name='del.confirm.applicationType'/>');"/>
 		<s:if test="hasActionMessages()">
 			<div class="alert alert-success alert-message"  id="successmsg">
 				<s:actionmessage />
@@ -131,4 +131,10 @@
 		params = params.concat("<%= customerId %>");
 		loadContentParam("applicationEdit", params, $('#subcontainer'));
 	}
+	
+	// This method calling from confirm_dialog.jsp
+	function continueDeletion() {
+    	confirmDialog('none','');
+    	loadContent('applicationDelete', $('#formAppTypeList'), $('#subcontainer'));
+    }
 </script>

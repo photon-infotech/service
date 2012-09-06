@@ -38,7 +38,7 @@
 		    onclick="loadContent('featuresAdd', $('#formFeaturesList'), $('#subcontainer'));" 
 		       value="<s:text name='lbl.hdr.comp.featrs.add'/>"/>
 		<input type="button" class="btn" id="del" disabled value="<s:text name='lbl.hdr.comp.delete'/>" 
-            onclick="loadContent('featuresDelete', $('#formFeaturesList'), $('#subcontainer'));"/>
+            onclick="showDeleteConfirmation('<s:text name='del.confirm.feature'/>');"/>
 		<s:if test="hasActionMessages()">
 			<div class="alert alert-success alert-message"  id="successmsg">
 				<s:actionmessage />
@@ -144,4 +144,10 @@
         params = params.concat("<%= customerId %>");
 	    loadContentParam("featuresEdit", params, $('#subcontainer'));
 	}
+	
+	// This method calling from confirm_dialog.jsp
+    function continueDeletion() {
+    	confirmDialog('none','');
+    	loadContent('featuresDelete', $('#formFeaturesList'), $('#subcontainer'));
+    }
 </script>

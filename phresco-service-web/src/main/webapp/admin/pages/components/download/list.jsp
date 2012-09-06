@@ -36,8 +36,8 @@
 	<div class="operation" id="operation">
 		<input type="button" id="downloadAdd" class="btn btn-primary" name="download_add" 
 			onclick="loadContent('downloadAdd', $('#formDownloadList'), $('#subcontainer'));" value="<s:text name='lbl.hdr.adm.dwndllst.title'/>"/>
-		<input type="button" id="del" class="btn" disabled onclick="loadContent('downloadDelete', $('#formDownloadList'), $('#subcontainer'));" 
-			value="<s:text name='lbl.hdr.adm.delete'/>"/>
+		<input type="button" id="del" class="btn" disabled value="<s:text name='lbl.hdr.adm.delete'/>"
+			onclick="showDeleteConfirmation('<s:text name='del.confirm.download'/>');"/>
 		<s:if test="hasActionMessages()">
 			<div class="alert alert-success alert-message"  id="successmsg">
 				<s:actionmessage />
@@ -134,5 +134,11 @@
         params = params.concat("&fromPage=");
         params = params.concat("edit");
         loadContentParam("downloadEdit", params, $('#subcontainer'));
+    }
+    
+ 	// This method calling from confirm_dialog.jsp
+    function continueDeletion() {
+    	confirmDialog('none','');
+    	loadContent('downloadDelete', $('#formDownloadList'), $('#subcontainer'));
     }
 </script>

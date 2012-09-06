@@ -179,7 +179,6 @@
 		</header>
 		<!-- Header Ends Here -->
 		
-		
 		<!-- Content Starts Here -->
 		<section class="main_wrapper">
 			<section class="wrapper">
@@ -266,5 +265,8 @@
 		</footer>
 		<!-- Footer Ends Here -->
 		
+		<!-- Delete confirmation dialog starts -->
+		<%@ include file="pages/confirm_dialog.jsp" %>
+		<!-- Delete confirmation dialog ends -->
 	</body>
 </html>

@@ -36,8 +36,8 @@
 		<input type="button" id="archetypeAdd" class="btn btn-primary" name="archetype_add" 
 			onclick="loadContent('archetypeAdd', $('#formArchetypeList'), $('#subcontainer'));" 
 			value="<s:text name='lbl.hdr.comp.arhtyp.add'/>"/>
-		<input type="button" id="del" class="btn" disabled value="<s:text name='lbl.hdr.comp.delete'/>" 
-			onclick="loadContent('archetypeDelete', $('#formArchetypeList'), $('#subcontainer'));"/>
+		<input type="button" id="del" class="btn" disabled value="<s:text name='lbl.hdr.comp.delete'/>"
+		 	onclick="showDeleteConfirmation('<s:text name='del.confirm.archetype'/>');"/>
 		<s:if test="hasActionMessages()">
 			<div class="alert alert-success alert-message"  id="successmsg">
 				<s:actionmessage />
@@ -143,4 +143,10 @@
         params = params.concat("<%= customerId %>");
 		loadContentParam("archetypeEdit", params, $('#subcontainer'));
 	}
+    
+    // This method calling from confirm_dialog.jsp
+    function continueDeletion() {
+    	confirmDialog('none','');
+    	loadContent('archetypeDelete', $('#formArchetypeList'), $('#subcontainer'));
+    }
 </script>

@@ -1879,3 +1879,14 @@ input[class*='sample'] {
 	top: 0;
 	position: absolute;
 }
+
+.confirm {
+    position: absolute;
+    z-index: 60001;
+    display:none;
+    margin: 0 auto; 
+    left: 50%;
+    top: 50%;
+    margin-left: -280px;
+    margin-top: -160px;
+}

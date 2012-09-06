@@ -37,8 +37,8 @@
 	<div class="operation">
 		<input type="button" class="btn btn-primary" name="pilotproj_add" id="pilotprojAdd" 
 			onclick="loadContent('pilotprojAdd', $('#formPilotProjList'), $('#subcontainer'));" value="<s:text name='lbl.hdr.comp.pltprjt.add'/>" /> 
-		<input type="button" class="btn" id="del" disabled onclick="loadContent('pilotprojDelete', $('#formPilotProjList'), $('#subcontainer'));" 
-			value="<s:text name='lbl.hdr.comp.delete'/>" />
+		<input type="button" class="btn" id="del" disabled value="<s:text name='lbl.hdr.comp.delete'/>" 
+			onclick="showDeleteConfirmation('<s:text name='del.confirm.pilotes'/>');"/>
 		<s:if test="hasActionMessages()">
 			<div class="alert alert-success alert-message" id="successmsg">
 				<s:actionmessage />
@@ -138,5 +138,11 @@
         params = params.concat("&customerId=");
         params = params.concat("<%= customerId %>");
         loadContentParam("pilotprojEdit", params, $('#subcontainer'));
+    }
+    
+ 	// This method calling from confirm_dialog.jsp
+    function continueDeletion() {
+    	confirmDialog('none','');
+    	loadContent('pilotprojDelete', $('#formPilotProjList'), $('#subcontainer'));
     }
 </script>

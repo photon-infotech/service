@@ -279,3 +279,8 @@ function isiPad() {
         (navigator.platform.indexOf("iPad") != -1)
     );
 }
+
+//This method is calling from triggering list.jsp
+function showDeleteConfirmation(confirmMsg) {
+	confirmDialog("block", confirmMsg);
+}

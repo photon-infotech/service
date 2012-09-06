@@ -34,12 +34,11 @@
 <form id="formGlobalUrlList" class="customer_list">
 	<div class="operation" id="operation">
 		<input type="button" id="globalurlAdd" class="btn btn-primary" name="url_add" 
-		              onclick="loadContent('globalurlAdd', $('#formGlobalUrlList'), $('#subcontainer'));" 
-		                      value="<s:text name='lbl.hdr.adm.urllst.title'/>"/>
+            onclick="loadContent('globalurlAdd', $('#formGlobalUrlList'), $('#subcontainer'));" 
+            	value="<s:text name='lbl.hdr.adm.urllst.title'/>"/>
 		              
-		<input type="button" class="btn" id="del" disabled 
-		        onclick="loadContent('globalurlDelete', $('#formGlobalUrlList'), $('#subcontainer'));" 
-		        value="<s:text name='lbl.hdr.comp.delete'/>"/>              
+		<input type="button" class="btn" id="del" disabled value="<s:text name='lbl.hdr.comp.delete'/>"
+			onclick="showDeleteConfirmation('<s:text name='del.confirm.globalURL'/>');"/>              
 		<s:if test="hasActionMessages()">
 			<div class="alert alert-success alert-message"  id="successmsg">
 				<s:actionmessage />
@@ -135,4 +134,10 @@
 	    params = params.concat("<%= customerId %>");
 		loadContentParam("globalurlEdit", params, $('#subcontainer'));
 	}
+	
+	// This method calling from confirm_dialog.jsp
+	function continueDeletion() {
+    	confirmDialog('none','');
+    	loadContent('globalurlDelete', $('#formGlobalUrlList'), $('#subcontainer'));
+    }
 </script>
