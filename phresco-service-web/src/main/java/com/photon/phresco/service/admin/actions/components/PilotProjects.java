@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -39,6 +40,7 @@ import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.admin.commons.LogErrorReport;
 import com.photon.phresco.service.client.api.Content;
+import com.photon.phresco.service.rest.api.ComponentService;
 import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.BodyPart;
@@ -120,7 +122,7 @@ public class PilotProjects extends ServiceBaseAction {
     	if (isDebugEnabled) {
     		S_LOGGER.debug("Entering Method PilotProjects.save()");
     	}
-
+    	
     	try {
     		MultiPart multiPart = new MultiPart();
     		
@@ -128,7 +130,15 @@ public class PilotProjects extends ServiceBaseAction {
     		ProjectInfo proInfo = new ProjectInfo();
     		proInfo.setName(name);
     		proInfo.setDescription(description);
+    		proInfo.setTechId(techId);
     		proInfo.setCustomerId(customerId);
+    		Technology technology = new Technology();
+    		technology.setId(techId);
+    		ComponentService cs = new ComponentService();
+    		Response techName = cs.getTechnology(techId);
+    		technology = (Technology) techName.getEntity();
+    		technology.setName(technology.getName());
+    		proInfo.setTechnology(technology);
     		
     		BodyPart jsonPart = new BodyPart();
 		    jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
@@ -169,6 +179,16 @@ public class PilotProjects extends ServiceBaseAction {
     		pilotProInfo.setId(projectId);
     		pilotProInfo.setName(name);
     		pilotProInfo.setDescription(description);
+    		pilotProInfo.setTechId(techId);
+    		pilotProInfo.setCustomerId(customerId);
+    		Technology technology = new Technology();
+    		technology.setId(techId);
+    		ComponentService cs = new ComponentService();
+    		Response techName = cs.getTechnology(techId);
+    		technology = (Technology) techName.getEntity();
+    		technology.setName(technology.getName());
+    		pilotProInfo.setTechnology(technology);
+    		
     		getServiceManager().updatePilotProject(pilotProInfo, projectId, customerId);
     	} catch (PhrescoException e) {
 			new LogErrorReport(e, PILOT_PROJECTS_UPDATE_EXCEPTION);
