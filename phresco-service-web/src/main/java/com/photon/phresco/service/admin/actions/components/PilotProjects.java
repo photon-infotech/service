@@ -175,6 +175,8 @@ public class PilotProjects extends ServiceBaseAction {
     	}
 
     	try {
+    		MultiPart multiPart = new MultiPart();
+    		
     		ProjectInfo pilotProInfo = new ProjectInfo();
     		pilotProInfo.setId(projectId);
     		pilotProInfo.setName(name);
@@ -188,6 +190,19 @@ public class PilotProjects extends ServiceBaseAction {
     		technology = (Technology) techName.getEntity();
     		technology.setName(technology.getName());
     		pilotProInfo.setTechnology(technology);
+    		
+    		BodyPart jsonPart = new BodyPart();
+		    jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
+		    jsonPart.setEntity(pilotProInfo);
+		    Content content = new Content("object", name, null, null, null, 0);
+		    jsonPart.setContentDisposition(content);
+		    multiPart.bodyPart(jsonPart);
+		    
+		    if (StringUtils.isNotEmpty(pilotProJarName)) {
+				InputStream pilotProIs = new ByteArrayInputStream(pilotProByteArray);
+				BodyPart binaryPart2 = getServiceManager().createBodyPart(name, FILE_FOR_APPTYPE, pilotProIs );
+		        multiPart.bodyPart(binaryPart2);
+			}
     		
     		getServiceManager().updatePilotProject(pilotProInfo, projectId, customerId);
     	} catch (PhrescoException e) {

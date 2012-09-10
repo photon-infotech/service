@@ -25,9 +25,11 @@
 
 <%@ page import="com.photon.phresco.model.Technology" %>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
+<%@ page import="com.photon.phresco.model.ApplicationType"%>
 
 <%
 	List<Technology> technologies = (List<Technology>) request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
+	List<ApplicationType> appTypes = (List<ApplicationType>)request.getAttribute(ServiceUIConstants.REQ_APP_TYPES);
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
 %>
 
@@ -108,7 +110,18 @@
 										<%= CollectionUtils.isNotEmpty(technology.getVersions()) ? technology.getVersions() : "" %>
 									</td>
 									<td class="namelabel-width">
-										<%= StringUtils.isNotEmpty(technology.getAppTypeId()) ? technology.getAppTypeId() : "" %>
+										<% 
+											String appTypeName = "";
+											if (CollectionUtils.isNotEmpty(appTypes)) {
+												for (ApplicationType appType : appTypes) {
+													if (appType.getId().equals(technology.getAppTypeId())) {
+														appTypeName = appType.getName();
+														break;
+													}
+												}
+											}
+										%>
+										<%= appTypeName %>
 									</td>		
 								</tr>	
 						<%		

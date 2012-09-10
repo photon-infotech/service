@@ -20,7 +20,6 @@
 package com.photon.phresco.service.admin.actions.components;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -70,7 +69,9 @@ public class Downloads extends ServiceBaseAction {
 	private String customerId = null;
    
 	private static byte[] downloadByteArray = null;
+	private static byte[] byteArray=null;
 	private static String downloadJarName = null;
+	private static String downloadImageName = null;
 
 	public String list() throws PhrescoException {
 		if (isDebugEnabled) {
@@ -152,6 +153,11 @@ public class Downloads extends ServiceBaseAction {
 		        multiPart.bodyPart(binaryPart2);
 			}
 			
+		    if(StringUtils.isNotEmpty(downloadImageName)){
+		    	InputStream downloadImage=new ByteArrayInputStream(byteArray);
+		    	BodyPart binaryPart = getServiceManager().createBodyPart(name, FILE_FOR_APPTYPE, downloadImage);
+		        multiPart.bodyPart(binaryPart);
+		    }
 			downloadInfo.add(download);
 			ClientResponse clientResponse = getServiceManager().createDownloads(downloadInfo, customerId);
 			if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
@@ -174,12 +180,34 @@ public class Downloads extends ServiceBaseAction {
 		}
 
 		try {
+			MultiPart multiPart = new MultiPart();
+			
 			DownloadInfo download = new DownloadInfo();
 			download.setId(id);
 			download.setName(name);
 			download.setDescription(description);
 			download.setVersion(version);
 			download.setCustomerId(customerId);
+			
+			BodyPart jsonPart = new BodyPart();
+		    jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
+		    jsonPart.setEntity(download);
+		    Content content = new Content("object", name, null, null, null, 0);
+		    jsonPart.setContentDisposition(content);
+		    multiPart.bodyPart(jsonPart);
+		    if (StringUtils.isNotEmpty(downloadJarName)) {
+		    	InputStream downloadIs = new ByteArrayInputStream(downloadByteArray);
+				BodyPart binaryPart2 = getServiceManager().createBodyPart(name, FILE_FOR_APPTYPE, downloadIs);
+		        multiPart.bodyPart(binaryPart2);
+			}
+			
+		    if(StringUtils.isNotEmpty(downloadImageName)){
+		    	InputStream downloadImage=new ByteArrayInputStream(byteArray);
+		    	BodyPart binaryPart = getServiceManager().createBodyPart(name, FILE_FOR_APPTYPE, downloadImage);
+		        multiPart.bodyPart(binaryPart);
+		    }
+			
+			
 			getServiceManager().updateDownload(download, id, customerId);
 		} catch (PhrescoException e) {
 			new LogErrorReport(e, DOWNLOADS_UPDATE_EXCEPTION);
@@ -245,6 +273,28 @@ public class Downloads extends ServiceBaseAction {
 		        writer.flush();
 		        writer.close();
 	        }
+		} catch (Exception e) {
+			getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
+            writer.print(SUCCESS_FALSE);
+			throw new PhrescoException(e);
+		}
+		
+		return SUCCESS;
+	}
+	
+	public String uploadImage() throws PhrescoException {
+		PrintWriter writer = null;
+		try {
+			writer = getHttpResponse().getWriter();
+	        downloadImageName = getHttpRequest().getHeader(X_FILE_NAME);
+        	InputStream is = getHttpRequest().getInputStream();
+        	byteArray = IOUtils.toByteArray(is);
+        	InputStream applnIs = new ByteArrayInputStream(byteArray);
+            getHttpResponse().setStatus(getHttpResponse().SC_OK);
+        	writer.print(MAVEN_JAR_FALSE);
+            getHttpResponse().setStatus(getHttpResponse().SC_OK);
+	        writer.flush();
+	        writer.close();
 		} catch (Exception e) {
 			getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
             writer.print(SUCCESS_FALSE);

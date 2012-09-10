@@ -40,6 +40,7 @@
 	List<String> versions = null;
 	String versionComment = "";
 	boolean isSystem = false;
+	String appTypeId = "";
 	if (technology != null) {
 		if (StringUtils.isNotEmpty(technology.getName())) {
 			name = technology.getName();
@@ -54,6 +55,7 @@
 			versionComment = technology.getVersionComment();
 		}
 		isSystem = technology.isSystem();
+		appTypeId = technology.getAppTypeId();
 	}
 %>
 
@@ -120,10 +122,14 @@
 			<div class="controls">
 				<select id="select01" name="apptype">
 					<%
-						if (appTypes != null)  {
+						if (CollectionUtils.isNotEmpty(appTypes))  {
 							for (ApplicationType appType : appTypes) {
+								String selectedStr= "";
+								if (appType.getId().equals(appTypeId)) {
+									selectedStr = "selected";
+								}
 					%>
-							<option value="<%= appType.getId() %>"><%= appType.getName() %></option>
+							<option value="<%= appType.getId() %>" <%= selectedStr %>><%= appType.getName() %></option>
 					<%
 							}
 						}

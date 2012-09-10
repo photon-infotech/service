@@ -91,6 +91,8 @@ public class Archetypes extends ServiceBaseAction {
 
 		try {
 			List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
+			List<ApplicationType> appTypes = getServiceManager().getApplicationTypes(customerId);
+			getHttpRequest().setAttribute(REQ_APP_TYPES, appTypes);
 			getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
 			getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
 		} catch (PhrescoException e) {
@@ -208,13 +210,42 @@ public class Archetypes extends ServiceBaseAction {
 	    }
 
 		try {
+			MultiPart multiPart = new MultiPart();
+
 			List<String> appTypes = new ArrayList<String>();
-	        appTypes.add(apptype);
-	    	List<String> versions = new ArrayList<String>();
-	    	versions.add(version);
+			appTypes.add(apptype);
+			List<String> versions = new ArrayList<String>();
+			versions.add(version);
 			Technology technology = new Technology(name, description, versions, appTypes);
 			technology.setId(techId);
 			technology.setCustomerId(customerId);
+			ArchetypeInfo archetypeInfo = new ArchetypeInfo(groupId, artifactId, version, "jar");
+			technology.setArchetypeInfo(archetypeInfo);
+
+			BodyPart jsonPart = new BodyPart();
+			jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
+			jsonPart.setEntity(technology);
+			Content content = new Content(name, name, null, null, null, 0);
+			jsonPart.setContentDisposition(content);
+			multiPart.bodyPart(jsonPart);
+
+			if (!pluginMap.isEmpty()) {
+				Iterator iter = pluginMap.keySet().iterator();
+				while (iter.hasNext()) {
+					String key = (String) iter.next();
+					byte[] byteArray = (byte[]) pluginMap.get(key);
+					InputStream pluginJarIs = new ByteArrayInputStream(byteArray);
+					BodyPart binaryPart = getServiceManager().createBodyPart(name, FILE_FOR_PLUGIN, pluginJarIs);
+					multiPart.bodyPart(binaryPart);
+				}
+			}
+
+			if (StringUtils.isNotEmpty(applnJarName)) {
+				InputStream applnIs = new ByteArrayInputStream(applnByteArray);
+				BodyPart binaryPart2 = getServiceManager().createBodyPart(name, FILE_FOR_APPTYPE, applnIs);
+				multiPart.bodyPart(binaryPart2);
+			}
+			
 			getServiceManager().updateArcheType(technology, techId, customerId);
 		} catch(PhrescoException e) {
 			new LogErrorReport(e, ARCHETYPE_UPDATE_EXCEPTION);

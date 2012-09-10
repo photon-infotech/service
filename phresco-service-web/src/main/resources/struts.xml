@@ -285,6 +285,10 @@
         <action name="uploadFile" class="com.photon.phresco.service.admin.actions.components.Downloads" method="uploadFile">
             <result type="json" />
         </action>
+         
+        <action name="uploadImage" class="com.photon.phresco.service.admin.actions.components.Downloads" method="uploadImage">
+            <result type="json" />
+        </action>
         
         <action name="removeDownloadZip" class="com.photon.phresco.service.admin.actions.components.Downloads" method="removeUploadedJar">
             <result type="json" />

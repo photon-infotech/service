@@ -176,11 +176,27 @@ public class Features extends ServiceBaseAction {
 		}
 		
 		try {
+			MultiPart multiPart = new MultiPart();
+			
 			ModuleGroup moduleGroup = new ModuleGroup();
 			moduleGroup.setName(name);
 			moduleGroup.setDescription(description);
 			moduleGroup.setVersions(versions);
 			moduleGroup.setCustomerId(customerId);
+			
+			BodyPart jsonPart = new BodyPart();
+			jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
+			jsonPart.setEntity(moduleGroup);
+			Content content = new Content("object", name, null, null, null, 0);
+			jsonPart.setContentDisposition(content);
+			multiPart.bodyPart(jsonPart);
+			    
+			if (StringUtils.isNotEmpty(featureJarName)) {
+				InputStream featureIs = new ByteArrayInputStream(featureByteArray);
+				BodyPart binaryPart2 = getServiceManager().createBodyPart(name, FILE_FOR_APPTYPE, featureIs);
+				multiPart.bodyPart(binaryPart2);
+			}
+			
 			getServiceManager().updateFeature(moduleGroup, techId, customerId);
 		} catch (PhrescoException e){
 			new LogErrorReport(e, FEATURE_UPDATE_EXCEPTION);

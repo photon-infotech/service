@@ -61,7 +61,19 @@
 %>
 
 <form id="formFeatureAdd" class="form-horizontal customer_list" method="post" enctype="multipart/form-data">
-	<h4 class="hdr"><s:label key="lbl.hdr.comp.featrs.title" theme="simple"/></h4>	
+	<h4 class="hdr">
+		<%
+			if (StringUtils.isNotEmpty(fromPage)) {
+		%>
+			<s:label key="lbl.hdr.comp.featrs.edit"/>
+		<%
+			} else {
+		%>
+			<s:label key="lbl.hdr.comp.featrs.add" theme="simple"/>
+		<%
+			}
+		%>
+	</h4>	
 	<div class="content_adder">
 
 		<div class="control-group" id="nameControl">
@@ -259,8 +271,15 @@
 	</div>
 	
 	<div class="bottom_button">
+     	<% if (StringUtils.isNotEmpty(fromPage)) { %>
+     	<input type="button" id="featuresUpdate" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.update'/>" 
+			onclick="validate('featuresUpdate', $('#formFeatureAdd'), $('#subcontainer'), 'Updating Feature');"/> 
+     	 
+     	<% } else { %>
      	<input type="button" id="featuresSave" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.save'/>" 
 			onclick="validate('featuresSave', $('#formFeatureAdd'), $('#subcontainer'), 'Creating Feature');"/> 
+		
+		<% } %>
 		<input type="button" id="featuresCancel" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.cancel'/>"
 			onclick="loadContent('featuresList', $('#formFeatureAdd'), $('#subcontainer'));" />
 	</div>

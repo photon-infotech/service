@@ -317,7 +317,7 @@
 
 		var iconUploader = new qq.FileUploader({
 			element : document.getElementById('icon-file-uploader'),
-			action : 'uploadFile',
+			action : 'uploadImage',
 			multiple : false,
 			allowedExtensions : ["jpg","jpeg","png"],
 			type : 'uploadIcon',
