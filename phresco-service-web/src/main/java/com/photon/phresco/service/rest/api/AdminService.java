@@ -40,6 +40,7 @@ import org.springframework.data.document.mongodb.query.Query;
 import org.springframework.stereotype.Component;
 
 import com.photon.phresco.commons.model.Customer;
+import com.photon.phresco.commons.model.Permission;
 import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.commons.model.Role;
 import com.photon.phresco.commons.model.User;
@@ -1088,4 +1089,171 @@ public class AdminService extends DbService implements ServiceConstants {
 		
 		return Response.status(Response.Status.OK).build();
 	}
+	
+
+	/**
+	 * Returns the Permisions
+	 * @return
+	 */
+	@GET
+	@Path (REST_API_PERMISSIONS)
+	@Produces (MediaType.APPLICATION_JSON)
+	public Response findPermissions() {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into AdminService.findPermissions()");
+	    }
+		
+		try {
+			List<Permission> permissionList = mongoOperation.getCollection(PERMISSION_COLLECTION_NAME , Permission.class);
+			if (permissionList != null) {
+				return Response.status(Response.Status.OK).entity(permissionList).build();
+			} 
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, PERMISSION_COLLECTION_NAME);
+		}
+		
+		return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
+	}
+
+	/**
+	 * Creates the list of permissions
+	 * @param permission
+	 * @return 
+	 */
+	@POST
+	@Consumes (MediaType.APPLICATION_JSON)
+	@Path (REST_API_PERMISSIONS)
+	public Response createPermission(List<Permission> permissions) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into AdminService.createPermission(List<Permission> permissions)");
+	    }
+		
+		try {
+			mongoOperation.insertList(PERMISSION_COLLECTION_NAME , permissions);
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
+		}
+		
+		return Response.status(Response.Status.OK).build();
+	}
+
+	/**
+	 * Updates the list of permissions
+	 * @param permission
+	 * @return
+	 */
+	@PUT
+	@Consumes (MediaType.APPLICATION_JSON)
+	@Produces (MediaType.APPLICATION_JSON)
+	@Path (REST_API_PERMISSIONS)
+	public Response updatePermissions(List<Permission> permissions) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into AdminService.updatePermissions(List<Permission> permissions)");
+	    }
+		
+		try {
+			for (Permission permission : permissions) {
+				Permission permisonInfo = mongoOperation.findOne(PERMISSION_COLLECTION_NAME , 
+				        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(permission.getId())), Permission.class);
+				if (permisonInfo  != null) {
+					mongoOperation.save(PERMISSION_COLLECTION_NAME, permission);
+				}
+			}
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
+		}
+		
+		return Response.status(Response.Status.OK).entity(permissions).build();
+	}
+
+	/**
+	 * Deletes the list of permissions
+	 * @param permission
+	 * @throws PhrescoException 
+	 */
+	@DELETE
+	@Path (REST_API_PERMISSIONS)
+	public void deletePermissions(List<Permission> permissions) throws PhrescoException {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into AdminService.deletePermissions(List<Permission> permissions)");
+	    }
+		
+		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
+		S_LOGGER.error("PhrescoException Is"  + phrescoException.getErrorMessage());
+		throw phrescoException;
+	}
+
+	/**
+	 * Get the Role by id for the given parameter
+	 * @param id
+	 * @return
+	 */
+	@GET
+	@Produces (MediaType.APPLICATION_JSON)
+	@Path (REST_API_PERMISSIONS + REST_API_PATH_ID)
+	public Response getPermission(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into AdminService.Response getPermission(String id)" + id);
+	    }
+		
+		try {
+			Permission permission = mongoOperation.findOne(PERMISSION_COLLECTION_NAME, 
+			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), Permission.class);
+			if (permission != null) {
+				return Response.status(Response.Status.OK).entity(permission).build();
+			} 
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00005, PERMISSION_COLLECTION_NAME);
+		}
+		
+		return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
+	}
+	
+	/**
+	 * Updates the list of permissions by id
+	 * @param permission
+	 * @return
+	 */
+	@PUT
+	@Consumes (MediaType.APPLICATION_JSON)
+	@Produces (MediaType.APPLICATION_JSON)
+	@Path (REST_API_PERMISSIONS + REST_API_PATH_ID)
+	public Response updatePermission(@PathParam(REST_API_PATH_PARAM_ID) String id , Permission permission) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into AdminService.updatePermission(String id , Permission permission)" + id);
+	    }
+		
+		try {
+			if (id.equals(permission.getId())) {
+				mongoOperation.save(PERMISSION_COLLECTION_NAME, permission);
+				return Response.status(Response.Status.OK).entity(permission).build();
+			} 
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
+		}
+		
+		return Response.status(Response.Status.BAD_REQUEST).entity(ERROR_MSG_ID_NOT_EQUAL).build();
+	}
+	
+	/**
+	 * Deletes the permission by id for the given parameter
+	 * @param id
+	 * @return 
+	 */
+	@DELETE
+	@Path (REST_API_PERMISSIONS + REST_API_PATH_ID)
+	public Response deletePermission(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into AdminService.deletePermission(String id)" + id);
+	    }
+		
+		try {
+			mongoOperation.remove(PERMISSION_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), Permission.class);
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
+		}
+		
+		return Response.status(Response.Status.OK).build();
+	}
+
  }
