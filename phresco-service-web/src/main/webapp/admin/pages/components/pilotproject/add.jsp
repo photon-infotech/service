@@ -32,7 +32,7 @@
 	String fromPage = (String)request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE); 
 	List<Technology> technologys = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
-	
+
 	//For edit
     String name = "";
     String description = "";
@@ -81,16 +81,20 @@
 			<label class="control-label labelbold"> <span
 				class="mandatory">*</span>&nbsp;<s:text name="Technology" /> </label>
 			<div class="controls">
-				<select id="multiSelect" name="technology">
-				<%
-					if (technologys != null) {
-						for (Technology technology : technologys) {
-				%>
-							<option value="<%=technology.getName() %>"><%=technology.getName() %></option>
-				<%
-                        }
-					}
-				%>
+				<select id="multiSelect" name="techId">
+					
+				 	<% if(StringUtils.isNotEmpty(fromPage)) { //for edit %>
+							<option value="<%= pilotProjectInfo.getTechnology().getId() %>"><%= pilotProjectInfo.getTechnology().getName()%></option>
+					<% } else { // for add %>		
+						<% if (technologys != null) {
+								for (Technology technology : technologys) { 
+							%>
+									<option value="<%=technology.getId() %>"><%=technology.getName() %></option>
+							<%
+									}
+								}
+							%>
+					<% } %>		
 				</select><span class="help-inline applyerror" id="techError"></span>
 			</div>
 		</div>

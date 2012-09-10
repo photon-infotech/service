@@ -96,9 +96,9 @@
 		 					        	String disabled = "";
 										if (proInfo.isSystem()) {
 											disabled = "disabled";
+										} 
 									%>
 											<input type="checkbox" class="check" name="projectId" value="<%=proInfo.getId() %>" <%= disabled %> onclick="checkboxEvent();" />
-									<% } %>
 									</td>
 									<td>
 										<a href="#" onclick="editPilotProject('<%=proInfo.getId() %>');" name="edit" id=""><%=proInfo.getName()%></a>
@@ -106,7 +106,7 @@
 									<td><%= StringUtils.isNotEmpty(proInfo.getDescription()) ? proInfo.getDescription() : ""%></td>
 									<td><%= proInfo.getTechnology().getName() %></td>
 								</tr>
-						<%
+						<%			
 								}
 							}
 						%>
