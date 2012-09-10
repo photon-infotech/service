@@ -95,6 +95,10 @@ public interface ServiceActions {
 	
 	String ADMIN_PERMISSION_LIST 	= "permissionList";
 	
+	String ADMIN_LDAP_LIST = "ldapList";
+	
+	String ADMIN_VIDEO_LIST = "videoList";
+	
 	String ADMIN_GLOBALURL_LIST 	= "globalurlList";
 	String ADMIN_GLOBALURL_ADD  	= "globalurlAdd";
 	String ADMIN_GLOBALURL_SAVE  	= "globalurlSave";

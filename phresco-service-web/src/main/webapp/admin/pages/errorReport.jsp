@@ -64,6 +64,7 @@
 	
 <script>
 	$(document).ready(function() {
+		$('.modal-backdrop').show();
 		$('#closeAboutDialog').click(function(){
 			errorReportEnable();
 		});

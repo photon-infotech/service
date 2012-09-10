@@ -412,6 +412,18 @@
 			<result name="permissionList">/admin/pages/admin/permission/list.jsp</result>
         </action>
 		<!-- ADMIN PERMISSION ENDS-->
+		
+		<!-- ADMIN LDAP ENDS-->
+		<action name="ldap" class="com.photon.phresco.service.admin.actions.admin.LdapList" method="list">
+			<result name="ldapList">/admin/pages/admin/ldap/list.jsp</result>
+        </action>
+		<!-- ADMIN LDAP ENDS-->
+		
+		<!-- ADMIN VIDEO ENDS-->
+		<action name="video" class="com.photon.phresco.service.admin.actions.admin.VideoList" method="list">
+			<result name="videoList">/admin/pages/admin/video/list.jsp</result>
+        </action>
+		<!-- ADMIN VIDEO ENDS-->
 			
 		<!-- ADMIN GLOBALURL STARTS-->
 		<action name="globalurlList" class="com.photon.phresco.service.admin.actions.admin.GlobalUrlList" method="list">
