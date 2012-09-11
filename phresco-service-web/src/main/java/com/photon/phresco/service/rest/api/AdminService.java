@@ -30,6 +30,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -46,6 +47,7 @@ import com.photon.phresco.commons.model.Role;
 import com.photon.phresco.commons.model.User;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.exception.PhrescoWebServiceException;
+import com.photon.phresco.model.AdminConfigInfo;
 import com.photon.phresco.model.DownloadInfo;
 import com.photon.phresco.model.GlobalURL;
 import com.photon.phresco.model.VideoInfo;
@@ -1255,5 +1257,52 @@ public class AdminService extends DbService implements ServiceConstants {
 		
 		return Response.status(Response.Status.OK).build();
 	}
-
+	
+	/**
+     * Creating the jforum 
+     * @param id
+     * @return
+     */
+	@POST
+	@Consumes (MediaType.APPLICATION_JSON)
+    @Path (REST_API_FORUMS)
+    public Response createForum(List<AdminConfigInfo> adminConfigInfo) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into AdminService.createForum(List<AdminConfigInfo> adminConfigInfo)");
+	    }
+		
+		try {
+			mongoOperation.insertList(FORUM_COLLECTION_NAME , adminConfigInfo);
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
+		}
+		
+		return Response.status(Response.Status.OK).build();
+	}
+	
+	 /**
+     * Get the customer by id for the given parameter
+     * @param id
+     * @return
+     */
+    @GET
+    @Produces (MediaType.APPLICATION_JSON)
+    @Path (REST_API_FORUMS)
+    public Response getForum(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
+        if (isDebugEnabled) {
+            S_LOGGER.debug("Entered into AdminService.getForum(String id)");
+        }
+    	
+    	try {
+    		AdminConfigInfo adminConfig = mongoOperation.findOne(FORUM_COLLECTION_NAME, 
+    		        new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)), AdminConfigInfo.class);
+    		if (adminConfig != null) {
+    			return Response.status(Response.Status.OK).entity(adminConfig).build();
+    		}
+    	} catch (Exception e) {
+    		throw new PhrescoWebServiceException(e, EX_PHEX00005, FORUM_COLLECTION_NAME);
+    	}
+    	
+    	return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
+    }
  }
