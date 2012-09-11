@@ -251,6 +251,7 @@
 	
 	<!-- Hidden Fields -->
 	<input type="hidden" name="fromPage" value="<%= StringUtils.isNotEmpty(fromPage) ? fromPage : "" %>"/>
+	<input type="hidden" name="oldName" value="<%= name %>"/>
 	<input type="hidden" name="customerId" value="<%= customerId %>">
 </form>
 

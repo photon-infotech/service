@@ -67,9 +67,11 @@ public class Downloads extends ServiceBaseAction {
 	private String id = null;
 	private String fromPage = null;
 	private String customerId = null;
+	private String oldVersion = null;
+	private String type = null;
    
 	private static byte[] downloadByteArray = null;
-	private static byte[] byteArray=null;
+	private static byte[] byteArray = null;
 	private static String downloadJarName = null;
 	private static String downloadImageName = null;
 
@@ -88,6 +90,12 @@ public class Downloads extends ServiceBaseAction {
 			return LOG_ERROR;	
 		}
 
+		//to clear file inpustreams
+		downloadByteArray = null;
+		byteArray = null;
+		downloadJarName = null;
+		downloadImageName = null;
+		
 		return COMP_DOWNLOAD_LIST;	
 	}
 
@@ -309,11 +317,16 @@ public class Downloads extends ServiceBaseAction {
 			S_LOGGER.debug("Entering Method  Downloads.removeUploadedFile()");
 		}
 		
-		downloadByteArray = null;
-		downloadJarName = null;
+		if(REQ_DOWNLOAD_UPLOAD_FILE.equals(type)) {
+			downloadByteArray = null;
+			downloadJarName = null;
+		} else {
+			downloadImageName = null;
+			byteArray = null;
+		}
 	}
 
-	public String validateForm() {
+	public String validateForm() throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Downloads.validateForm()");
 		}
@@ -322,12 +335,24 @@ public class Downloads extends ServiceBaseAction {
 		if (StringUtils.isEmpty(name)) {
 			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY));
 			isError = true;
-		} 
+		}
 
 		if (StringUtils.isEmpty(version)) {
 			setVerError(getText(KEY_I18N_ERR_VER_EMPTY));
 			isError = true;
-		} 
+		}  else if (StringUtils.isEmpty(fromPage) || (!version.equals(oldVersion))) {
+			//To check whether the version already exist
+			List<DownloadInfo> downloads = getServiceManager().getDownloads(customerId);
+			if (downloads != null) {
+				for (DownloadInfo download : downloads) {
+					if (download.getName().equalsIgnoreCase(name) && download.getVersion().equals(version)) {
+						setVerError(getText(KEY_I18N_ERR_VER_ALREADY_EXISTS));
+						isError = true;
+						break;
+					}
+				}
+			}
+		}
 
 		if (StringUtils.isEmpty(application)) {
 			setAppltError(getText(KEY_I18N_ERR_APPLNPLTF_EMPTY));
@@ -456,5 +481,21 @@ public class Downloads extends ServiceBaseAction {
 
 	public void setCustomerId(String customerId) {
 		this.customerId = customerId;
+	}
+
+	public void setOldVersion(String oldVersion) {
+		this.oldVersion = oldVersion;
+	}
+
+	public String getOldVersion() {
+		return oldVersion;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getType() {
+		return type;
 	}
 }

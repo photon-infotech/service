@@ -72,6 +72,7 @@ public class Archetypes extends ServiceBaseAction {
 	private String appError = null;
 	private String fileError = null;
 	private boolean errorFound = false;
+	private String oldName = null;
 
 	private String description;
 	private String fromPage = null;
@@ -153,13 +154,13 @@ public class Archetypes extends ServiceBaseAction {
 		
 		try {
 		 	MultiPart multiPart = new MultiPart();
-		 	
 	    	List<String> versions = new ArrayList<String>();
 	    	versions.add(version);
 	        Technology technology = new Technology();
 	        technology.setName(name);
 	        technology.setDescription(description);
 	        technology.setAppTypeId(apptype);
+	        technology.setVersions(versions);
 	        technology.setVersionComment(versionComment);
 	        technology.setCustomerId(customerId);
 	        ArchetypeInfo archetypeInfo = new ArchetypeInfo(groupId, artifactId, version, "jar");
@@ -218,6 +219,7 @@ public class Archetypes extends ServiceBaseAction {
 			versions.add(version);
 			Technology technology = new Technology(name, description, versions, appTypes);
 			technology.setId(techId);
+			technology.setAppTypeId(apptype);
 			technology.setCustomerId(customerId);
 			ArchetypeInfo archetypeInfo = new ArchetypeInfo(groupId, artifactId, version, "jar");
 			technology.setArchetypeInfo(archetypeInfo);
@@ -375,7 +377,7 @@ public class Archetypes extends ServiceBaseAction {
 		}
 	}
 	
-	public String validateForm() {
+	public String validateForm() throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.validateForm()");
 		}
@@ -384,6 +386,18 @@ public class Archetypes extends ServiceBaseAction {
 		if (StringUtils.isEmpty(name)) {
 			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY ));
 			isError = true;
+		} else if (StringUtils.isEmpty(fromPage) || (!name.equals(oldName))) {
+			// To check whether the name already exist (Application type wise)
+			List<Technology> archetypes = getServiceManager().getArcheTypes(customerId);
+			if (archetypes != null) {
+				for (Technology archetype : archetypes) {
+					if (archetype.getAppTypeId().equals(apptype) && archetype.getName().equalsIgnoreCase(name)) {
+						setNameError(getText(KEY_I18N_ERR_NAME_ALREADY_EXIST_APPTYPE));
+						isError = true;
+						break;
+					}
+				}
+			}
 		}
 
 		if (StringUtils.isEmpty(version)) {
@@ -534,5 +548,13 @@ public class Archetypes extends ServiceBaseAction {
 
 	public void setArtifactId(String artifactId) {
 		this.artifactId = artifactId;
+	}
+
+	public void setOldName(String oldName) {
+		this.oldName = oldName;
+	}
+
+	public String getOldName() {
+		return oldName;
 	}
 }

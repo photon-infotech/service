@@ -236,6 +236,7 @@
     <input type="hidden" name="id" value="<%= downloadInfo != null ? downloadInfo.getId() : "" %>"/>
     <input type="hidden" name="oldName" value="<%= downloadInfo != null ? downloadInfo.getName() : "" %>"/>
     <input type="hidden" name="customerId" value="<%= customerId %>"> 
+    <input type="hidden" name="oldVersion" value="<%= downloadInfo != null ? downloadInfo.getVersion() : "" %>"/>
 </form>
 
 <script type="text/javascript">

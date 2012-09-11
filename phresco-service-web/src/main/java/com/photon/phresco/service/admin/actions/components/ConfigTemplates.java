@@ -50,6 +50,8 @@ public class ConfigTemplates extends ServiceBaseAction {
     private String customerId = null;
     private List<String> appliesTo = null;
     private String configId = null;
+    private String fromPage = null;
+    private String oldName = null;
 	
 	public String list() throws PhrescoException {
 		if (isDebugEnabled) {
@@ -191,7 +193,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 		return list();
 	}
 	
-	public String validateForm() {
+	public String validateForm() throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method ConfigTemplates.validateForm()");
 		}
@@ -200,6 +202,18 @@ public class ConfigTemplates extends ServiceBaseAction {
 		if (StringUtils.isEmpty(name)) {
 			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY ));
 			isError = true;
+		} else if(StringUtils.isEmpty(fromPage) || (!name.equals(oldName))) {
+			// to check duplication of name
+			List<SettingsTemplate> configTemplates = getServiceManager().getconfigTemplates(customerId);
+			if (configTemplates != null) {
+				for (SettingsTemplate configTemplate : configTemplates) {
+					if (configTemplate.getType().equalsIgnoreCase(name)) {
+						setNameError(getText(KEY_I18N_ERR_NAME_ALREADY_EXIST));
+			    		isError = true;
+						break;
+					}
+				}
+			}
 		}
 		
 		if ( appliesTo == null ) {
@@ -284,5 +298,21 @@ public class ConfigTemplates extends ServiceBaseAction {
 
 	public void setConfigId(String configId) {
 		this.configId = configId;
+	}
+
+	public void setFromPage(String fromPage) {
+		this.fromPage = fromPage;
+	}
+
+	public String getFromPage() {
+		return fromPage;
+	}
+
+	public void setOldName(String oldName) {
+		this.oldName = oldName;
+	}
+
+	public String getOldName() {
+		return oldName;
 	}
 }

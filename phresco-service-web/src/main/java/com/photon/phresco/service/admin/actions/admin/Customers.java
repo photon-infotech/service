@@ -192,7 +192,7 @@ public class Customers extends ServiceBaseAction  {
 		return list();
 	}
 	
-	public String validateForm() {
+	public String validateForm() throws PhrescoException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method CustomerList.validateForm()");
         }
@@ -201,7 +201,19 @@ public class Customers extends ServiceBaseAction  {
 		if (StringUtils.isEmpty(name)) {
 			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY));
 			isError = true;
-		} 
+		} else if (StringUtils.isEmpty(fromPage) || (!name.equals(oldName))) {
+			// to check duplication of name
+			List<Customer> customers = getServiceManager().getCustomers();
+			if (customers != null) {
+				for (Customer customer : customers) {
+					if (customer.getName().equalsIgnoreCase(name)) {
+						setNameError(getText(KEY_I18N_ERR_NAME_ALREADY_EXIST));
+			    		isError = true;
+						break;
+					}
+				}
+			}
+		}
 		
 		if (StringUtils.isEmpty(email)) {
 			setMailError(getText(KEY_I18N_ERR_EMAIL_EMPTY));

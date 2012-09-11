@@ -20,7 +20,6 @@
 package com.photon.phresco.service.admin.actions.components;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -62,6 +61,7 @@ public class PilotProjects extends ServiceBaseAction {
 	private String fromPage = null;
 	private String customerId = null;
 	private String techId = null;
+	private String oldName = null;
 	private static byte[] pilotProByteArray = null;
 	private static String pilotProJarName = null;
 
@@ -79,6 +79,10 @@ public class PilotProjects extends ServiceBaseAction {
 			
 			return LOG_ERROR;	
 		}
+		
+		//to clear file input stream and byte array
+		pilotProJarName = null;
+		pilotProByteArray = null;
 		
 		return COMP_PILOTPROJ_LIST;
 	}
@@ -274,7 +278,7 @@ public class PilotProjects extends ServiceBaseAction {
 		pilotProByteArray = null;
 	}
 	
-    public String validateForm() {
+    public String validateForm() throws PhrescoException {
     	if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  PilotProjects.validateForm()");
 		}
@@ -283,8 +287,19 @@ public class PilotProjects extends ServiceBaseAction {
     	if (StringUtils.isEmpty(name)) {
     		setNameError(getText(KEY_I18N_ERR_NAME_EMPTY ));
     		isError = true;
+    	} else if (StringUtils.isEmpty(fromPage) || (!name.equals(oldName))) {
+    		//To check whether the name already exist (Technology wise)
+			List<ProjectInfo> pilotProjInfos = getServiceManager().getPilotProjects(customerId);
+			if (pilotProjInfos != null) {
+				for (ProjectInfo projectInfo : pilotProjInfos) {
+					if (projectInfo.getTechId().equals(techId) && projectInfo.getName().equalsIgnoreCase(name)) {
+						setNameError(getText(KEY_I18N_ERR_NAME_ALREADY_EXIST_TECH));
+			    		isError = true;
+			    		break;
+					} 
+				}	
+			}
     	}
-    	
     	if (StringUtils.isEmpty(pilotProJarName) || pilotProJarName == null) {
     		setFileError(getText(KEY_I18N_ERR_PLTPROJ_EMPTY));
     		isError = true;
@@ -293,7 +308,7 @@ public class PilotProjects extends ServiceBaseAction {
     	if (isError) {
     		setErrorFound(true);
     	}
-
+		
     	return SUCCESS;
     }
 
@@ -367,5 +382,13 @@ public class PilotProjects extends ServiceBaseAction {
 
 	public void setTechId(String techId) {
 		this.techId = techId;
+	}
+
+	public void setOldName(String oldName) {
+		this.oldName = oldName;
+	}
+
+	public String getOldName() {
+		return oldName;
 	}
 }

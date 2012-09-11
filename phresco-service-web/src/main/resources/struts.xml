@@ -83,7 +83,7 @@
             <result type="json" />
         </action>
         
-        <action name="removeFeatureJar" class="com.photon.phresco.service.admin.actions.components.Features" method="removeUploadedJar">
+        <action name="removeFeatureJar" class="com.photon.phresco.service.admin.actions.components.Features" method="removeUploadedFile">
             <result type="json" />
         </action>
         
@@ -290,7 +290,7 @@
             <result type="json" />
         </action>
         
-        <action name="removeDownloadZip" class="com.photon.phresco.service.admin.actions.components.Downloads" method="removeUploadedJar">
+        <action name="removeDownloadZip" class="com.photon.phresco.service.admin.actions.components.Downloads" method="removeUploadedFile">
             <result type="json" />
         </action>
         

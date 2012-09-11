@@ -104,6 +104,7 @@ public interface ServiceUIConstants {
      *****************************/ 
     String REQ_DOWNLOAD_INFO = "downloadInfo";
     String REQ_DOWNLOAD_ID = "downloadId";
+    String REQ_DOWNLOAD_UPLOAD_FILE = "uploadFile";
     
     /*****************************
      * PilotProject Request Constants
@@ -205,8 +206,12 @@ public interface ServiceUIConstants {
     String KEY_I18N_SUCCESS_LOGOUT = "succ.logout";
 
     String KEY_I18N_ERR_NAME_EMPTY = "err.msg.name.empty";
+    String KEY_I18N_ERR_NAME_ALREADY_EXIST = "err.msg.name.exists";
+    String KEY_I18N_ERR_NAME_ALREADY_EXIST_TECH = "err.msg.name.tech.exists";
+    String KEY_I18N_ERR_NAME_ALREADY_EXIST_APPTYPE = "err.msg.name.apptype.exists";
     String KEY_I18N_ERR_DESC_EMPTY = "err.msg.desc.empty";
     String KEY_I18N_ERR_VER_EMPTY = "err.msg.ver.empty";
+    String KEY_I18N_ERR_VER_ALREADY_EXISTS = "err.msg.ver.exists";
     String KEY_I18N_ERR_FILE_EMPTY	= "err.msg.file.empty";
     
     String KEY_I18N_ERR_APPTYPE_EMPTY = "err.msg.apptye.empty";
