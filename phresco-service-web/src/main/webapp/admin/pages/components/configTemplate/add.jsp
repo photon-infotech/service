@@ -110,14 +110,6 @@
 			</div>
 		</div>
 		
-		<div class="control-group">
-			<label class="control-label labelbold">
-				<s:text name='lbl.hdr.comp.help'/>
-			</label>
-			<div class="controls">
-				<input id="input01" placeholder="<s:text name='place.hldr.configTemp.add.help.text'/>" class="input-xlarge" type="text">
-			</div>
-		</div>
 		<fieldset class = "configFieldset">
 			<legend class = "configLegend"><s:label key="lbl.hdr.comp.proptemplate" cssClass="labelbold" theme="simple"/></legend>
 			<div class = "config_table_div">
@@ -135,6 +127,9 @@
 										</th>
 										<th class="third">
 											<div class="th-inner tablehead fixTableHdr"><s:label key="lbl.hdr.comp.cnfigtmplt.psblvalue.title"  theme="simple"/></div>
+										</th>
+										<th class="third">
+											<div class="th-inner tablehead fixTableHdr"><s:label key="lbl.hdr.comp.cnfigtmplt.helptext.title"  theme="simple"/></div>
 										</th>
 										<th class="third">
 											<div class="th-inner tablehead fixTableHdr"><s:label key="lbl.hdr.comp.cnfigtmplt.mndtry.title"  theme="simple"/></div>
@@ -158,20 +153,25 @@
 											<input type="text" id = "concate" value="" placeholder="" class="span2">
 										</td>
 										<td class="textwidth">
-											<select id="select01" class = "select typewidth">
+											<select id="select01" class = "select typewidth" style="width:100%;">
 												<option>- select -</option>
 												<option>String</option>
 												<option>Integer</option>
 												<option>Password</option>
 											</select>
 										</td>
-										<td class="psblevalue">
-											<input type="text" placeholder="" class="propTempTxt">
+										<td class="psblevalue" id="psblValMultiple" style="display:none;">
+											<select type="text" placeholder="<s:text name='place.hldr.configTemp.add.possible.values'/>" class="propTempTxt" id="tempTxt"></select>
 											<a data-toggle="modal" href="#myModal"><img class="addiconAlign imagealign" src="images/add_icon.png"/></a>
 										</td>
-										<!-- <td class="hlpText">
-											<input type="text" placeholder="" class="propTempTxt">
-										</td> -->
+										
+										<td class="psblevalue" id="psblValSingle">
+											<input type="text" placeholder="<s:text name='place.hldr.configTemp.add.possible.values'/>" class="propTempTxt" id="tempTxtBox">
+											<a data-toggle="modal" href="#myModal"><img class="addiconAlign imagealign" src="images/add_icon.png"/></a>
+										</td>
+										<td class="hlpText">
+											<input type="text" placeholder="<s:text name='place.hldr.configTemp.add.help.text'/>" class="propTempTxt" style="width:100%;">
+										</td>
 										<td class="mandatoryfld">
 											<input type="checkbox" value="option1" id="optionsCheckbox">
 										</td>
@@ -217,8 +217,9 @@
 							</div>
 							
 							<div class="modal-footer">
+								<div class="errMsg" id="errMsg"></div>
 								<a href="#" class="btn btn-primary" data-dismiss="modal"><s:label key="lbl.hdr.comp.cancel" theme="simple"/></a>
-								<a href="#" class="btn btn-primary" data-dismiss="modal" ><s:label key="lbl.hdr.comp.ok" theme="simple"/></a>
+								<a href="#" id ="ok" class="btn btn-primary" data-dismiss="modal" ><s:label key="lbl.hdr.comp.ok" theme="simple"/></a>
 							</div>
 						</div>
 					</div>	
@@ -265,9 +266,35 @@
 		enableScreen();
 		
 		$("#addValues").click(function() {
-			var val = $("#txtCombo").val();
-			$("#valuesCombo").append($("<option></option>").attr("value", val).text(val));
-			$("#txtCombo").val("");
+			var textComboVal = $("#txtCombo").val();
+			var alreadyExists = false;
+			$('#valuesCombo option').each( function() {
+				if ($(this).val() == textComboVal) {
+					$("#errMsg").html("Key value already exists");
+					alreadyExists = true;
+					return false;
+				}
+			});
+			if (!alreadyExists) {
+				$("#txtCombo").val("");
+				$("#valuesCombo").append($('<option name='+ textComboVal +'></option>').attr("value", textComboVal).text(textComboVal));				
+			}
+		});
+		
+		$("#ok").click(function() {
+			$('#valuesCombo option').each( function() {
+				var length =  $('#valuesCombo option').length;
+				var value = $(this).val();
+				if (length === 1) {
+					$("#psblValSingle").show();
+					$("#psblValMultiple").hide();
+					$("#tempTxtBox").val(value);
+				} else {
+					$("#psblValSingle").hide();
+					$("#psblValMultiple").show();
+					$("#tempTxt").append($("<option></option>").attr("value", value).text(value));	
+				}
+			});
 		});
 	
 		/* $('.add').live('click', function() {
