@@ -62,13 +62,14 @@ public class Downloads extends ServiceBaseAction {
 	private String groupError = null;
 	private String fileError = null;
 	private boolean errorFound = false;
-
 	private String description=null;
 	private String id = null;
+	private List<String> technology = null;
+	private String techError = null;
 	private String fromPage = null;
 	private String customerId = null;
 	private String oldVersion = null;
-	private String type = null;
+	private String type = null; // type of the file uploaded (file or image) 
    
 	private static byte[] downloadByteArray = null;
 	private static byte[] byteArray = null;
@@ -120,11 +121,13 @@ public class Downloads extends ServiceBaseAction {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Downloads.edit()");
 		}
-
+		
 		try {
 			DownloadInfo downloadInfo = getServiceManager().getDownload(id, customerId);
 			getHttpRequest().setAttribute(REQ_DOWNLOAD_INFO, downloadInfo);
 			getHttpRequest().setAttribute(REQ_FROM_PAGE, fromPage);
+			List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
+			getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
 		} catch (PhrescoException e) {
 			new LogErrorReport(e, DOWNLOADS_EDIT_EXCEPTION);
 			
@@ -148,6 +151,8 @@ public class Downloads extends ServiceBaseAction {
 			download.setDescription(description);
 			download.setVersion(version);
 			download.setCustomerId(customerId);
+			download.setAppliesTo(technology);
+			download.setType(group);
 			
 			BodyPart jsonPart = new BodyPart();
 		    jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
@@ -196,6 +201,8 @@ public class Downloads extends ServiceBaseAction {
 			download.setDescription(description);
 			download.setVersion(version);
 			download.setCustomerId(customerId);
+			download.setAppliesTo(technology);
+			download.setType(group);
 			
 			BodyPart jsonPart = new BodyPart();
 		    jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
@@ -364,6 +371,11 @@ public class Downloads extends ServiceBaseAction {
 			isError = true;
 		}
 		
+		if (technology == null) {
+			setTechError(getText(KEY_I18N_ERR_TECH_EMPTY));
+			isError = true;
+		}
+		
 		if (isError) {
 			setErrorFound(true);
 		}
@@ -497,5 +509,21 @@ public class Downloads extends ServiceBaseAction {
 
 	public String getType() {
 		return type;
+	}
+	
+	public void setTechnology(List<String> technology) {
+		this.technology = technology;
+	}
+	
+	public List<String> getTechnology() {
+		return technology;
+	}
+	
+	public void setTechError(String techError) {
+		this.techError = techError;
+	}
+	
+	public String getTechError() {
+		return techError;
 	}
 }
