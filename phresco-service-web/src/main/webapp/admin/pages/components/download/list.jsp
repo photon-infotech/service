@@ -133,6 +133,8 @@
         params = params.concat(id);
         params = params.concat("&fromPage=");
         params = params.concat("edit");
+        params = params.concat("&customerId=");
+        params = params.concat('<%= customerId %>');
         loadContentParam("downloadEdit", params, $('#subcontainer'));
     }
     

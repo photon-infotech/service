@@ -33,7 +33,7 @@
     String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
     List<Technology> technologies = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
     String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
-  
+
     //For edit
     String name = "";
     String description = "";
@@ -82,17 +82,26 @@
 			</div>
 		</div>
 		
-		<div class="control-group" id="applyControl">
+		<div class="control-group" id="techControl">
             <label class="control-label labelbold">
                 <span class="mandatory">*</span>&nbsp;<s:text name="Technology"/>
             </label>
             <div class="controls">
                 <select id="multiSelect" multiple="multiple" name="technology">
-                    <% 
+                    <% 	
                     	if (technologies != null) {
 							for (Technology technology : technologies) { 
+								String selectedStr = "";
+								if (downloadInfo != null) {
+									List<String> appliesTos = downloadInfo.getAppliesTo();
+									if (appliesTos.contains(technology.getId())) {
+										selectedStr = "selected";
+									} else {
+										selectedStr = "";
+									}
+								}
 					%>
-                    			<option value="<%= technology.getId() %>"><%= technology.getName() %></option> 
+                    			<option value="<%= technology.getId() %>" <%= selectedStr %>><%= technology.getName() %></option> 
 					<% 	 
 							}
 						}
@@ -157,10 +166,10 @@
 			</label>
 			<div class="controls">
 				<select id="multiSelect" multiple="multiple" name="application">
-					<option  value="WN">Windows</option>
-					<option  value="LN">Linux</option>
-					<option  value="MC">Mac</option>
-					<option  value="SL">Solaris</option>
+					<option  value="Windows">Windows</option>
+					<option  value="Linux">Linux</option>
+					<option  value="Mac">Mac</option>
+					<option  value="Solaris">Solaris</option>
 				</select>
 				<span class="help-inline applyerror" id="appltError"></span>
 			</div>
@@ -197,12 +206,12 @@
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.dwnld.group'/>
 			</label>	
 			<div class="controls">
-				<select id="select01" name="group">
+				<select id="group" name="group">
 					<option value="" onclick="javascript:hideDiv();">- select -</option>
-					<option value="DB" onclick="javascript:hideDiv();">Database</option>
-					<option value="SR" onclick="javascript:hideDiv();">Servers</option>
-					<option value="ED" onclick="javascript:hideDiv();">Editors</option>
-                    <option value="OT" onclick="javascript:showDiv();">Others</option>
+					<option value="Database" onclick="javascript:hideDiv();">Database</option>
+					<option value="Server" onclick="javascript:hideDiv();">Server</option>
+					<option value="Editor" onclick="javascript:hideDiv();">Editor</option>
+                    <option value="Others" onclick="javascript:showDiv();">Others</option>
 				</select>
 				<span class="help-inline" id="groupError"></span>
 			</div>
@@ -248,6 +257,11 @@
 	$(document).ready(function() {
 		enableScreen();
         createUploader(); 
+        
+        // for edit - to show selected group while page loads 
+        <% if (downloadInfo != null)  {%>
+       		 $("#group option[value='<%= downloadInfo.getType() %>']").attr('selected', 'selected');
+       	<% } %>
 	});
 
 	function findError(data) {
@@ -273,6 +287,12 @@
 			showError($("#groupControl"), $("#groupError"), data.groupError);
 		} else {
 			hideError($("#groupControl"), $("#groupError"));
+		}
+		
+		if (data.techError != undefined) {
+			showError($("#techControl"), $("#techError"), data.techError);
+		} else {
+			hideError($("#techControl"), $("#techError"));
 		}
 	}
 	 

@@ -230,6 +230,7 @@ public interface ServiceUIConstants {
     String KEY_I18N_ERR_URL_EMPTY = "err.msg.url.empty";
     String KEY_I18N_ERR_APPLNPLTF_EMPTY = "err.msg.applnpltf.empty";
     String KEY_I18N_ERR_GROUP_EMPTY = "err.msg.group.empty";
+    String KEY_I18N_ERR_TECH_EMPTY = "err.msg.tech.empty";
     
     String FEATURE_ADDED = "succ.feature.add";
     String FEATURE_NOT_ADDED = "fail.feature.add";

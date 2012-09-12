@@ -21,6 +21,7 @@
 <%@ taglib uri="/struts-tags" prefix="s"%>
 
 <%@ page import="org.apache.commons.lang.StringUtils"%>
+<%@ page import="java.util.Date"%>
 
 <%@ page import="com.photon.phresco.commons.model.Customer"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
@@ -40,6 +41,8 @@
 	String fax = "";
 	String helpText = "";
 	String repoUrl = "";
+	Date validFrom = null;
+	Date validUpto = null;
 	if (customer != null) {
 		if (StringUtils.isNotEmpty(customer.getName())) {
 			name = customer.getName();
@@ -70,6 +73,12 @@
 		} 
 		if (StringUtils.isNotEmpty(customer.getRepoInfo().getReleaseRepoURL())) {
 			repoUrl = customer.getRepoInfo().getReleaseRepoURL();
+		}
+		if (customer.getValidFrom() != null) {
+			validFrom = customer.getValidFrom();
+		}
+		if (customer.getValidUpto() != null) {
+			validUpto = customer.getValidUpto();
 		}
 	}
 %>
@@ -461,7 +470,7 @@
 			</label>
 			<div class="controls">
 				<input id="fromdate" class="datealign" type="text" name="validFrom" 
-				   value="<%= customer.getValidFrom() != null ? customer.getValidFrom() : "" %>">
+				   value="<%= validFrom != null ? validFrom : "" %>">
 			</div>
 		</div>
 
@@ -471,7 +480,7 @@
 			</label>
 			<div class="controls">
 				<input id="todate" class="datealign" type="text" name="validUpTo" 
-				    value="<%= customer.getValidUpto() != null ? customer.getValidUpto() : "" %>">
+				    value="<%= validUpto != null ? validUpto : "" %>">
 			</div>
 		</div>
 
