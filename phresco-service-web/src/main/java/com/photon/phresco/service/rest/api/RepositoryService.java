@@ -17,7 +17,7 @@
  * limitations under the License.
  * ###
  */
-package com.photon.phresco.service;
+package com.photon.phresco.service.rest.api;
 
 import java.io.InputStream;
 
