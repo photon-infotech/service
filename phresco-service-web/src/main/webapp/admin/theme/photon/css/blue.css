@@ -1061,3 +1061,8 @@ h3 label {
 .config_table_div {
     border: 1px solid #CCCCCC;
 }
+
+.errMsg {
+	color: red;
+	float:left;
+}
