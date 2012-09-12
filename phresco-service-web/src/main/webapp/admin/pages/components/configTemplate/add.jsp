@@ -110,14 +110,6 @@
 			</div>
 		</div>
 		
-		<div class="control-group">
-			<label class="control-label labelbold">
-				<s:text name='lbl.hdr.comp.help'/>
-			</label>
-			<div class="controls">
-				<input id="input01" placeholder="<s:text name='place.hldr.configTemp.add.help.text'/>" class="input-xlarge" type="text">
-			</div>
-		</div>
 		<fieldset class = "configFieldset">
 			<legend class = "configLegend"><s:label key="lbl.hdr.comp.proptemplate" cssClass="labelbold" theme="simple"/></legend>
 			<div class = "config_table_div">
@@ -135,6 +127,9 @@
 										</th>
 										<th class="third">
 											<div class="th-inner tablehead fixTableHdr"><s:label key="lbl.hdr.comp.cnfigtmplt.psblvalue.title"  theme="simple"/></div>
+										</th>
+										<th class="third">
+											<div class="th-inner tablehead fixTableHdr"><s:label key="lbl.hdr.comp.cnfigtmplt.helptext.title"  theme="simple"/></div>
 										</th>
 										<th class="third">
 											<div class="th-inner tablehead fixTableHdr"><s:label key="lbl.hdr.comp.cnfigtmplt.mndtry.title"  theme="simple"/></div>
@@ -158,7 +153,7 @@
 											<input type="text" id = "concate" value="" placeholder="" class="span2">
 										</td>
 										<td class="textwidth">
-											<select id="select01" class = "select typewidth">
+											<select id="select01" class = "select typewidth" style="width:100%;">
 												<option>- select -</option>
 												<option>String</option>
 												<option>Integer</option>
@@ -166,12 +161,12 @@
 											</select>
 										</td>
 										<td class="psblevalue">
-											<input type="text" placeholder="" class="propTempTxt">
+											<input type="text" placeholder="" class="propTempTxt" style="width:74%;">
 											<a data-toggle="modal" href="#myModal"><img class="addiconAlign imagealign" src="images/add_icon.png"/></a>
 										</td>
-										<!-- <td class="hlpText">
-											<input type="text" placeholder="" class="propTempTxt">
-										</td> -->
+										<td class="hlpText">
+											<input type="text" placeholder="<s:text name='place.hldr.configTemp.add.help.text'/>" class="propTempTxt" style="width:100%;">
+										</td>
 										<td class="mandatoryfld">
 											<input type="checkbox" value="option1" id="optionsCheckbox">
 										</td>
