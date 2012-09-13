@@ -138,6 +138,14 @@ function buttonStatus(checkAll) {
 	}
 }
 
+function toDisableCheckAll() {
+	if ($(".check:checkbox").length > 0 ) {
+		$('#checkAllAuto').prop('disabled', false);
+	} else {
+		$('#checkAllAuto').prop('disabled', true);
+	}
+}
+
 function showError(tag, span, errmsg) {
 	tag.addClass("error");
 	span.text(errmsg);

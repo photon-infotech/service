@@ -150,7 +150,7 @@
 								<tbody>
 									<tr class="configdynamiadd">
 										<td class="textwidth">
-											<input type="text" id = "concate" value="" placeholder="" class="span2">
+											<input type="text" id = "concate" value="" placeholder="" class="span2" style="width:100%;">
 										</td>
 										<td class="textwidth">
 											<select id="select01" class = "select typewidth" style="width:100%;">
@@ -166,7 +166,7 @@
 										</td>
 										
 										<td class="psblevalue" id="psblValSingle">
-											<input type="text" placeholder="<s:text name='place.hldr.configTemp.add.possible.values'/>" class="propTempTxt" id="tempTxtBox">
+											<input type="text" placeholder="<s:text name='place.hldr.configTemp.add.possible.values'/>" class="propTempTxt" style="width:80%;" id="tempTxtBox">
 											<a data-toggle="modal" href="#myModal"><img class="addiconAlign imagealign" src="images/add_icon.png"/></a>
 										</td>
 										<td class="hlpText">

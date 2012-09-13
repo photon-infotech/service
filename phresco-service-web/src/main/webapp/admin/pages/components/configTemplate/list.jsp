@@ -88,11 +88,12 @@
 									<tr>
 										<td class="checkboxwidth">
 								 		<% 
-										String disabled = "";
 								 		if (configTemplate.isSystem()) { %>
-										<input type="checkbox" class="check" name="configId" value="<%= configTemplate.getId() %>" onclick="checkboxEvent();" disabled/>
+											<input type="checkbox" name="configId" value="<%= configTemplate.getId() %>" 
+											             onclick="checkboxEvent();" disabled/>
 										<% } else { %>
-										<input type="checkbox" class="check" name="configId" value="<%= configTemplate.getId() %>" onclick="checkboxEvent();" />
+										<input type="checkbox" class="check" name="configId" value="<%= configTemplate.getId() %>" 
+										                onclick="checkboxEvent();" />
 										<% } %>
 										</td>
 										<td class="nameConfig">
@@ -130,6 +131,7 @@
 	}
 
 	$(document).ready(function() {
+		toDisableCheckAll();
 		enableScreen();
    	});
 	

@@ -92,13 +92,11 @@
 						%>
 								<tr>
 									<td class="checkboxwidth">
-		 					        <%	
-		 					        	String disabled = "";
-										if (proInfo.isSystem()) {
-											disabled = "disabled";
-										} 
-									%>
-											<input type="checkbox" class="check" name="projectId" value="<%=proInfo.getId() %>" <%= disabled %> onclick="checkboxEvent();" />
+		 					        <% if (proInfo.isSystem()) { %>
+		 					        		<input type="checkbox" name="projectId" value="<%=proInfo.getId() %>" onclick="checkboxEvent();" disabled/>	
+                                        <% } else { %>
+											<input type="checkbox" class="check" name="projectId" value="<%=proInfo.getId() %>" onclick="checkboxEvent();" />
+                                        <% } %>
 									</td>
 									<td>
 										<a href="#" onclick="editPilotProject('<%=proInfo.getId() %>');" name="edit" id=""><%=proInfo.getName()%></a>
@@ -128,6 +126,7 @@
 	}
 
 	$(document).ready(function() {
+		toDisableCheckAll(); 
 		enableScreen();
 	});
 
