@@ -130,9 +130,7 @@
 	function editCustomer(id) {
 		var params = "customerId=";
 		params = params.concat(id);
-		params = params.concat("&fromPage=");
-		params = params.concat("edit");
-		loadContentParam("customerAdd", params, $('#subcontainer'));
+		loadContent("customerEdit", $("#formCustomerList"), $('#subcontainer'), params);
 	}
 	
 	// This method calling from confirm_dialog.jsp

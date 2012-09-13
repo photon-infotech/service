@@ -168,9 +168,7 @@
 	function editRole(id) {
 	    var params = "roleId=";
 	    params = params.concat(id);
-	    params = params.concat("&fromPage=");
-	    params = params.concat("edit");
-	    loadContentParam("roleEdit", params, $('#subcontainer'));
+	    loadContent("roleEdit", $("#formRoleList"), $('#subcontainer'), params);
 	}
 	
 	var NS4 = (navigator.appName == "Netscape" && parseInt(navigator.appVersion) < 5);

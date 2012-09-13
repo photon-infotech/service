@@ -136,9 +136,7 @@
 	function editFeature(id) {
 	    var params = "techId=";
 	    params = params.concat(id);
-	    params = params.concat("&customerId=");
-        params = params.concat("<%= customerId %>");
-	    loadContentParam("featuresEdit", params, $('#subcontainer'));
+	    loadContent("featuresEdit", $('#formFeaturesList'), $('#subcontainer'), params);
 	}
 	
 	// This method calling from confirm_dialog.jsp

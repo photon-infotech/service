@@ -69,7 +69,7 @@ public class Customers extends ServiceBaseAction  {
 
     public String list() throws PhrescoException {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entering Method CustomerList.list()");
+	        S_LOGGER.debug("Entering Method Customers.list()");
 	    }
 		
 		try {
@@ -86,15 +86,21 @@ public class Customers extends ServiceBaseAction  {
 	
 	public String add() throws PhrescoException {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entering Method CustomerList.add()");
+	        S_LOGGER.debug("Entering Method Customers.add()");
 	    }
 		
+		return ADMIN_CUSTOMER_ADD;
+	}
+	
+	public String edit() throws PhrescoException {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method Customers.edit()");
+		}
+
 		try {
-			if (REQ_EDIT.equals(fromPage)) {
-	            Customer customer = getServiceManager().getCustomer(customerId);
-	            getHttpRequest().setAttribute(REQ_CUST_CUSTOMER, customer);
-	            getHttpRequest().setAttribute(REQ_FROM_PAGE, fromPage);
-			}
+			Customer customer = getServiceManager().getCustomer(customerId);
+			getHttpRequest().setAttribute(REQ_CUST_CUSTOMER, customer);
+			getHttpRequest().setAttribute(REQ_FROM_PAGE, REQ_EDIT);
 		} catch (PhrescoException e) {
 			new LogErrorReport(e, CUSTOMERS_ADD_EXCEPTION);
 			
@@ -106,7 +112,7 @@ public class Customers extends ServiceBaseAction  {
 	
 	public String save() throws PhrescoException {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entering Method CustomerList.save()");
+	        S_LOGGER.debug("Entering Method Customers.save()");
 	    }
 	    
 		try {
@@ -141,7 +147,7 @@ public class Customers extends ServiceBaseAction  {
 
 	public String update() throws PhrescoException {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entering Method CustomerList.update()");
+	        S_LOGGER.debug("Entering Method Customers.update()");
 	    }
 
 		try {
@@ -169,7 +175,7 @@ public class Customers extends ServiceBaseAction  {
 	
 	public String delete() throws PhrescoException {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entering Method CustomerList.delete()");
+	        S_LOGGER.debug("Entering Method Customers.delete()");
 	    }
 		
 		try {
@@ -194,7 +200,7 @@ public class Customers extends ServiceBaseAction  {
 	
 	public String validateForm() throws PhrescoException {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entering Method CustomerList.validateForm()");
+	        S_LOGGER.debug("Entering Method Customers.validateForm()");
         }
 	    
 		boolean isError = false;

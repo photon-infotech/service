@@ -135,9 +135,7 @@
     function editPilotProject(id) {
         var params = "projectId=";
         params = params.concat(id);
-        params = params.concat("&customerId=");
-        params = params.concat("<%= customerId %>");
-        loadContentParam("pilotprojEdit", params, $('#subcontainer'));
+        loadContent("pilotprojEdit", $("#formPilotProjList"), $('#subcontainer'), params);
     }
     
  	// This method calling from confirm_dialog.jsp

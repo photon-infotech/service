@@ -339,7 +339,7 @@
         </action>
 		
         <action name="customerEdit" class="com.photon.phresco.service.admin.actions.admin.Customers" method="edit">
-			<result name="customerEdit">/admin/pages/admin/customer/add.jsp</result>
+			<result name="customerAdd">/admin/pages/admin/customer/add.jsp</result>
         </action>
         
         <action name="customerUpdateValidate" class="com.photon.phresco.service.admin.actions.admin.Customers" method="validateForm">
