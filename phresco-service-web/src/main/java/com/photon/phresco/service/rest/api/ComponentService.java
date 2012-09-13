@@ -52,6 +52,8 @@ import com.photon.phresco.exception.PhrescoWebServiceException;
 import com.photon.phresco.model.ApplicationType;
 import com.photon.phresco.model.ArchetypeInfo;
 import com.photon.phresco.model.Database;
+import com.photon.phresco.model.DownloadInfo;
+import com.photon.phresco.model.Module;
 import com.photon.phresco.model.ModuleGroup;
 import com.photon.phresco.model.ProjectInfo;
 import com.photon.phresco.model.Server;
@@ -484,7 +486,7 @@ public class ComponentService extends DbService implements ServiceConstants {
 			}
 
 			if(StringUtils.isNotEmpty(customerId) && type.equals(REST_QUERY_TYPE_JS)) {
-				if (!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
+			    if (!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
 					foundModules = mongoOperation.find(MODULES_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)
 								.and(REST_QUERY_TYPE).is(type)), ModuleGroup.class);
 				}
@@ -503,26 +505,56 @@ public class ComponentService extends DbService implements ServiceConstants {
 	
 	
 	/**
-	 * Creates the list of modules
-	 * @param modules
-	 * @return 
-	 */
-	@POST
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Path (REST_API_MODULES)
-	public Response createModules(List<ModuleGroup> modules) {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.createModules(List<ModuleGroup> modules)");
-	    }
-		
-		try {
-			mongoOperation.insertList(MODULES_COLLECTION_NAME , modules);
-		} catch (Exception e) {
-			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
-		}
-		
-		return Response.status(Response.Status.CREATED).build();
-	}
+     * Creates the list of modules
+     * @param modules
+     * @return 
+     * @throws PhrescoException 
+     */
+    @POST
+    @Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
+    @Path (REST_API_MODULES)
+    public Response createModules(MultiPart moduleInfo) throws PhrescoException {
+        if (isDebugEnabled) {
+            S_LOGGER.debug("Entered into ComponentService.createModules(List<ModuleGroup> modules)");
+        }
+        
+        ModuleGroup moduleGroup = null;
+        BodyPartEntity bodyPartEntity = null;
+        File moduleFile = null;
+        List<BodyPart> bodyParts = moduleInfo.getBodyParts();
+        
+        if (CollectionUtils.isNotEmpty(bodyParts)) {
+            for (BodyPart bodyPart : bodyParts) {
+                if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
+                    moduleGroup = new ModuleGroup();
+                    moduleGroup = bodyPart.getEntityAs(ModuleGroup.class);
+                } else {
+                    bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
+                }
+            }
+        }
+        
+        if (bodyPartEntity != null) {
+            moduleFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null);
+        }
+        
+        Module module = moduleGroup.getVersions().get(0);
+        ArchetypeInfo archetypeInfo = new ArchetypeInfo(moduleGroup.getGroupId(), 
+                moduleGroup.getArtifactId(), module.getVersion(), module.getContentType());
+        createContentURL(archetypeInfo);
+        
+        boolean uploadBinary = uploadBinary(archetypeInfo, moduleFile, moduleGroup.getCustomerId());
+        List<Module> modules = new ArrayList<Module>();
+        module.setContentURL(createContentURL(archetypeInfo));
+        modules.add(module);
+        moduleGroup.setVersions(modules);
+        if (uploadBinary) {
+            mongoOperation.save(MODULES_COLLECTION_NAME, moduleGroup);
+        }
+        FileUtil.delete(moduleFile);
+        
+        return Response.status(Response.Status.CREATED).build();
+    }
 	
 	/**
 	 * Updates the list of modules
@@ -671,26 +703,55 @@ public class ComponentService extends DbService implements ServiceConstants {
 	}
 	
 	/**
-	 * Creates the list of pilots
-	 * @param projectInfos
-	 * @return 
-	 */
-	@POST
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Path (REST_API_PILOTS)
-	public Response createPilots(List<ProjectInfo> projectInfos) {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.createPilots(List<ProjectInfo> projectInfos)");
-	    }
-		
-		try {
-			mongoOperation.insertList(PILOTS_COLLECTION_NAME , projectInfos);
-		} catch (Exception e) {
-			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
-		}
-		
-		return Response.status(Response.Status.CREATED).build();
-	}
+     * Creates the list of pilots
+     * @param projectInfos
+     * @return 
+     * @throws PhrescoException 
+     */
+    @POST
+    @Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
+    @Path (REST_API_PILOTS)
+    public Response createPilots(MultiPart pilotInfo) throws PhrescoException {
+        if (isDebugEnabled) {
+            S_LOGGER.debug("Entered into ComponentService.createPilots(List<ProjectInfo> projectInfos)");
+        }
+        
+        ProjectInfo projectInfo = null;
+        BodyPartEntity bodyPartEntity = null;
+        File pilotFile = null;
+        
+        List<BodyPart> bodyParts = pilotInfo.getBodyParts();
+        if(CollectionUtils.isNotEmpty(bodyParts)) {
+            for (BodyPart bodyPart : bodyParts) {
+                if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
+                    projectInfo = new ProjectInfo();
+                    projectInfo = bodyPart.getEntityAs(ProjectInfo.class);
+                } else {
+                    bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
+                }
+            }
+        }
+        
+        if(bodyPartEntity != null) {
+            pilotFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null);
+        }
+        
+        boolean uploadBinary = uploadBinary(projectInfo.getArchetypeInfo(), 
+                pilotFile, projectInfo.getCustomerId());
+        if(uploadBinary) {
+            projectInfo.setProjectURL(createContentURL(projectInfo.getArchetypeInfo()));
+            mongoOperation.save(PILOTS_COLLECTION_NAME, projectInfo);
+        }
+        FileUtil.delete(pilotFile);
+        
+        return Response.status(Response.Status.CREATED).build();
+    }
+    
+    private String createContentURL(ArchetypeInfo archetypeInfo) {
+        String groupId = archetypeInfo.getGroupId().replace(".", "/");
+        return groupId + "/" + archetypeInfo.getArtifactId() + "/" + archetypeInfo.getVersion() + "/" +
+                archetypeInfo.getArtifactId() + "-" + archetypeInfo.getVersion() + "." + archetypeInfo.getPackaging();
+    }
 	
 	/**
 	 * Updates the list of pilots
@@ -1431,14 +1492,23 @@ public class ComponentService extends DbService implements ServiceConstants {
         mongoOperation.save(TECHNOLOGIES_COLLECTION_NAME, technology);
     }
 	
-    private void uploadBinary(ArchetypeInfo archetypeInfo, File artifactFile, String customerId) throws PhrescoException {
+    /**
+     * Upload binaries using the given artifact info
+     * @param archetypeInfo
+     * @param artifactFile
+     * @param customerId
+     * @return
+     * @throws PhrescoException
+     */
+    private boolean uploadBinary(ArchetypeInfo archetypeInfo, File artifactFile, String customerId) throws PhrescoException {
         File pomFile = ServerUtil.createPomFile(archetypeInfo);
         
 		ArtifactInfo info = new ArtifactInfo(archetypeInfo.getGroupId(), archetypeInfo.getArtifactId(), "", 
                 archetypeInfo.getPackaging(), archetypeInfo.getVersion());
         info.setPomFile(pomFile);
-        repositoryManager.addArtifact(info, artifactFile, customerId);
+        boolean addArtifact = repositoryManager.addArtifact(info, artifactFile, customerId);
         FileUtil.delete(pomFile);
+        return addArtifact;
     }
 
     /**
@@ -1562,4 +1632,192 @@ public class ComponentService extends DbService implements ServiceConstants {
 		return Response.status(Response.Status.OK).build();
 	}
 	
+	/**
+     * Returns the list of downloadInfo
+     * @return
+     */
+    @GET
+    @Path (REST_API_DOWNLOADS)
+    @Produces (MediaType.APPLICATION_JSON)
+    public Response findDownloadInfo() {
+        if (isDebugEnabled) {
+            S_LOGGER.debug("Entered into AdminService.findDownloadInfo()");
+        }
+        
+        try {
+            List<DownloadInfo> downloadList = mongoOperation.getCollection(DOWNLOAD_COLLECTION_NAME , DownloadInfo.class);
+            if (downloadList != null) {
+                return Response.status(Response.Status.OK).entity(downloadList).build();
+            } 
+        } catch (Exception e) {
+            throw new PhrescoWebServiceException(e, EX_PHEX00006, DOWNLOAD_COLLECTION_NAME);
+        }
+        
+        return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
+    }
+
+    /**
+     * Creates the list of downloads
+     * @param downloads
+     * @return 
+     * @throws PhrescoException 
+     */
+    @POST
+    @Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
+    @Path (REST_API_DOWNLOADS)
+    public Response createDownloads(MultiPart downloadPart) throws PhrescoException {
+        if (isDebugEnabled) {
+            S_LOGGER.debug("Entered into ComponentService.createModules(List<ModuleGroup> modules)");
+        }
+        
+        DownloadInfo downloadInfo = null;
+        BodyPartEntity bodyPartEntity = null;
+        File downloadFile = null;
+        
+        List<BodyPart> bodyParts = downloadPart.getBodyParts();
+        if(CollectionUtils.isNotEmpty(bodyParts)) {
+            for (BodyPart bodyPart : bodyParts) {
+                if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
+                    downloadInfo = new DownloadInfo();
+                    downloadInfo = bodyPart.getEntityAs(DownloadInfo.class);
+                } else {
+                    bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
+                }
+            }
+        }
+        
+        if(bodyPartEntity != null) {
+            downloadFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null);
+        }
+        
+        boolean uploadBinary = uploadBinary(downloadInfo.getArchetypeInfo(), 
+                downloadFile, downloadInfo.getCustomerId());
+        if(uploadBinary) {
+            downloadInfo.setDownloadURL(createContentURL(downloadInfo.getArchetypeInfo()));
+            mongoOperation.save(DOWNLOAD_COLLECTION_NAME, downloadInfo);
+        }
+        FileUtil.delete(downloadFile);
+        return Response.status(Response.Status.CREATED).build();
+    }
+
+    /**
+     * Updates the list of downloadInfos
+     * @param downloads
+     * @return
+     */
+    @PUT
+    @Consumes (MediaType.APPLICATION_JSON)
+    @Produces (MediaType.APPLICATION_JSON)
+    @Path (REST_API_DOWNLOADS)
+    public Response updateDownloadInfo(List<DownloadInfo> downloads) {
+        if (isDebugEnabled) {
+            S_LOGGER.debug("Entered into AdminService.updateDownloadInfo(List<DownloadInfo> downloads)");
+        }
+        
+        try {
+            for (DownloadInfo download : downloads) {
+                DownloadInfo downloadInfo = mongoOperation.findOne(DOWNLOAD_COLLECTION_NAME , 
+                        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(download.getId())), DownloadInfo.class);
+                if (downloadInfo  != null) {
+                    mongoOperation.save(DOWNLOAD_COLLECTION_NAME, download);
+                }
+            }
+        } catch (Exception e) {
+            throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
+        }
+        
+        return Response.status(Response.Status.OK).entity(downloads).build();
+    }
+
+    /**
+     * Deletes the list of DownloadInfo
+     * @param downloadInfos
+     * @throws PhrescoException 
+     */
+    @DELETE
+    @Path (REST_API_DOWNLOADS)
+    public void deleteDownloadInfo(List<DownloadInfo> downloadInfos) throws PhrescoException {
+        if (isDebugEnabled) {
+            S_LOGGER.debug("Entered into AdminService.deleteDownloadInfo(List<DownloadInfo> downloadInfos)");
+        }
+        
+        PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
+        S_LOGGER.error("PhrescoException Is"  + phrescoException.getErrorMessage());
+        throw phrescoException;
+    }
+
+    /**
+     * Get the downloadInfo by id for the given parameter
+     * @param id
+     * @return
+     */
+    @GET
+    @Produces (MediaType.APPLICATION_JSON)
+    @Path (REST_API_DOWNLOADS + REST_API_PATH_ID)
+    public Response getDownloadInfo(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+        if (isDebugEnabled) {
+            S_LOGGER.debug("Entered into AdminService.getDownloadInfo(String id)" + id);
+        }
+        
+        try {
+            DownloadInfo downloadInfo = mongoOperation.findOne(DOWNLOAD_COLLECTION_NAME, 
+                    new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), DownloadInfo.class);
+            if (downloadInfo != null) {
+                return Response.status(Response.Status.OK).entity(downloadInfo).build();
+            } 
+        } catch (Exception e) {
+            throw new PhrescoWebServiceException(e, EX_PHEX00005, DOWNLOAD_COLLECTION_NAME);
+        }
+        
+        return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
+    }
+    
+    /**
+     * Updates the list of downloadInfo by id
+     * @param downloadInfos
+     * @return
+     */
+    @PUT
+    @Consumes (MediaType.APPLICATION_JSON)
+    @Produces (MediaType.APPLICATION_JSON)
+    @Path (REST_API_DOWNLOADS + REST_API_PATH_ID)
+    public Response updateDownloadInfo(@PathParam(REST_API_PATH_PARAM_ID) String id , DownloadInfo downloadInfo) {
+        if (isDebugEnabled) {
+            S_LOGGER.debug("Entered into AdminService.updateDownloadInfo(String id , DownloadInfo downloadInfos)" + id);
+        }
+        
+        try {
+            if (id.equals(downloadInfo.getId())) {
+                mongoOperation.save(DOWNLOAD_COLLECTION_NAME, downloadInfo);
+                return Response.status(Response.Status.OK).entity(downloadInfo).build();
+            } 
+        } catch (Exception e) {
+            throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
+        }
+        
+        return Response.status(Response.Status.BAD_REQUEST).entity(ERROR_MSG_ID_NOT_EQUAL).build();
+    }
+    
+    /**
+     * Deletes the user by id for the given parameter
+     * @param id
+     * @return 
+     */
+    @DELETE
+    @Path (REST_API_DOWNLOADS + REST_API_PATH_ID)
+    public Response deleteDownloadInfo(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+        if (isDebugEnabled) {
+            S_LOGGER.debug("Entered into AdminService.deleteDownloadInfo(String id)" + id);
+        }
+        
+        try {
+            mongoOperation.remove(DOWNLOAD_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), DownloadInfo.class);
+        } catch (Exception e) {
+            throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
+        }
+        
+        return Response.status(Response.Status.OK).build();
+    }
+    
+
 }

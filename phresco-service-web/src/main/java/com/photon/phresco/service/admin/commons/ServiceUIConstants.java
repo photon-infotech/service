@@ -121,6 +121,13 @@ public interface ServiceUIConstants {
     String REQ_MODULE_GROUP = "moduleGroup";
     
     /*****************************
+     * Permissions Request Constants
+     * String REQ_PERMISSIONS_XXX
+     *****************************/ 
+    String REQ_PERMISSIONS_LIST = "permissions";
+    String REQ_PERMISSIONS_ID = "permissionId";
+    
+    /*****************************
      * GlobalUrl Request Constants
      * String REQ_GLOBURL_XXX
      *****************************/ 
@@ -153,6 +160,9 @@ public interface ServiceUIConstants {
 	String ROLE_SAVE_EXCEPTION = "Role save";
 	String ROLE_EDIT_EXCEPTION = "Role edit";
 	String ROLE_LIST_EXCEPTION = "Role list";
+	
+	String PERMISSION_LIST_EXCEPTION = "Permission list";
+	String PERMISSION_DELETE_EXCEPTION = "Permission delete";
 	
 	String GLOBAL_URL_DELETE_EXCEPTION = "GlobalUrl delete";
 	String GLOBAL_URL_UPDATE_EXCEPTION = "GlobalUrl update";
@@ -269,6 +279,9 @@ public interface ServiceUIConstants {
     String CUSTOMER_NOT_ADDED = "fail.customer.add";
     String CUSTOMER_NOT_UPDATED = "fail.customer.update";
     String CUSTOMER_NOT_DELETED = "fail.customer.delete";
+    
+    String PERMISSION_DELETED = "succ.permission.delete";
+    String PERMISSION_NOT_DELETED = "fail.permission.delete";
     
     String ROLE_ADDED = "succ.role.add";
     String ROLE_NOT_ADDED = "fail.role.add";

@@ -19,6 +19,7 @@
  */
 package com.photon.phresco.service.rest.api;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +51,7 @@ import com.photon.phresco.exception.PhrescoWebServiceException;
 import com.photon.phresco.model.AdminConfigInfo;
 import com.photon.phresco.model.DownloadInfo;
 import com.photon.phresco.model.GlobalURL;
+import com.photon.phresco.model.ProjectInfo;
 import com.photon.phresco.model.VideoInfo;
 import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.api.DbService;
@@ -57,7 +59,12 @@ import com.photon.phresco.service.converters.ConvertersFactory;
 import com.photon.phresco.service.dao.CustomerDAO;
 import com.photon.phresco.service.dao.UserDAO;
 import com.photon.phresco.service.util.ServerUtil;
+import com.photon.phresco.util.FileUtil;
 import com.photon.phresco.util.ServiceConstants;
+import com.sun.jersey.multipart.BodyPart;
+import com.sun.jersey.multipart.BodyPartEntity;
+import com.sun.jersey.multipart.MultiPart;
+import com.sun.jersey.multipart.MultiPartMediaTypes;
 
 
 @Component
@@ -596,172 +603,7 @@ public class AdminService extends DbService implements ServiceConstants {
 	}
 
 
-	/**
-	 * Returns the list of downloadInfo
-	 * @return
-	 */
-	@GET
-	@Path (REST_API_DOWNLOADS)
-	@Produces (MediaType.APPLICATION_JSON)
-	public Response findDownloadInfo() {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into AdminService.findDownloadInfo()");
-	    }
-		
-		try {
-			List<DownloadInfo> downloadList = mongoOperation.getCollection(DOWNLOAD_COLLECTION_NAME , DownloadInfo.class);
-			if (downloadList != null) {
-				return Response.status(Response.Status.OK).entity(downloadList).build();
-			} 
-		} catch (Exception e) {
-			throw new PhrescoWebServiceException(e, EX_PHEX00006, DOWNLOAD_COLLECTION_NAME);
-		}
-		
-		return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
-	}
-
-	/**
-	 * Creates the list of downloads
-	 * @param downloadInfos
-	 * @return 
-	 */
-	@POST
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Path (REST_API_DOWNLOADS)
-	public Response createDownloadInfo(List<DownloadInfo> downloadInfos) {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into AdminService.createDownloadInfo(List<DownloadInfo> downloadInfos)");
-	    }
-		
-		try {
-			mongoOperation.insertList(DOWNLOAD_COLLECTION_NAME , downloadInfos);
-		} catch (Exception e) {
-			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
-		}
-		
-		return Response.status(Response.Status.OK).build();
-	}
-
-	/**
-	 * Updates the list of downloadInfos
-	 * @param downloads
-	 * @return
-	 */
-	@PUT
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_DOWNLOADS)
-	public Response updateDownloadInfo(List<DownloadInfo> downloads) {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into AdminService.updateDownloadInfo(List<DownloadInfo> downloads)");
-	    }
-		
-		try {
-			for (DownloadInfo download : downloads) {
-				DownloadInfo downloadInfo = mongoOperation.findOne(DOWNLOAD_COLLECTION_NAME , 
-				        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(download.getId())), DownloadInfo.class);
-				if (downloadInfo  != null) {
-					mongoOperation.save(DOWNLOAD_COLLECTION_NAME, download);
-				}
-			}
-		} catch (Exception e) {
-			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
-		}
-		
-		return Response.status(Response.Status.OK).entity(downloads).build();
-	}
-
-	/**
-	 * Deletes the list of DownloadInfo
-	 * @param downloadInfos
-	 * @throws PhrescoException 
-	 */
-	@DELETE
-	@Path (REST_API_DOWNLOADS)
-	public void deleteDownloadInfo(List<DownloadInfo> downloadInfos) throws PhrescoException {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into AdminService.deleteDownloadInfo(List<DownloadInfo> downloadInfos)");
-	    }
-		
-		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-		S_LOGGER.error("PhrescoException Is"  + phrescoException.getErrorMessage());
-		throw phrescoException;
-	}
-
-	/**
-	 * Get the downloadInfo by id for the given parameter
-	 * @param id
-	 * @return
-	 */
-	@GET
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_DOWNLOADS + REST_API_PATH_ID)
-	public Response getDownloadInfo(@PathParam(REST_API_PATH_PARAM_ID) String id) {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into AdminService.getDownloadInfo(String id)" + id);
-	    }
-		
-		try {
-			DownloadInfo downloadInfo = mongoOperation.findOne(DOWNLOAD_COLLECTION_NAME, 
-			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), DownloadInfo.class);
-			if (downloadInfo != null) {
-				return Response.status(Response.Status.OK).entity(downloadInfo).build();
-			} 
-		} catch (Exception e) {
-			throw new PhrescoWebServiceException(e, EX_PHEX00005, DOWNLOAD_COLLECTION_NAME);
-		}
-		
-		return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
-	}
 	
-	/**
-	 * Updates the list of downloadInfo by id
-	 * @param downloadInfos
-	 * @return
-	 */
-	@PUT
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_DOWNLOADS + REST_API_PATH_ID)
-	public Response updateDownloadInfo(@PathParam(REST_API_PATH_PARAM_ID) String id , DownloadInfo downloadInfo) {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into AdminService.updateDownloadInfo(String id , DownloadInfo downloadInfos)" + id);
-	    }
-		
-		try {
-			if (id.equals(downloadInfo.getId())) {
-				mongoOperation.save(DOWNLOAD_COLLECTION_NAME, downloadInfo);
-				return Response.status(Response.Status.OK).entity(downloadInfo).build();
-			} 
-		} catch (Exception e) {
-			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
-		}
-		
-		return Response.status(Response.Status.BAD_REQUEST).entity(ERROR_MSG_ID_NOT_EQUAL).build();
-	}
-	
-	/**
-	 * Deletes the user by id for the given parameter
-	 * @param id
-	 * @return 
-	 */
-	@DELETE
-	@Path (REST_API_DOWNLOADS + REST_API_PATH_ID)
-	public Response deleteDownloadInfo(@PathParam(REST_API_PATH_PARAM_ID) String id) {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into AdminService.deleteDownloadInfo(String id)" + id);
-	    }
-		
-		try {
-			mongoOperation.remove(DOWNLOAD_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), DownloadInfo.class);
-		} catch (Exception e) {
-			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
-		}
-		
-		return Response.status(Response.Status.OK).build();
-	}
-	
-
 	/**
 	 * Returns the GlobalURL
 	 * @return

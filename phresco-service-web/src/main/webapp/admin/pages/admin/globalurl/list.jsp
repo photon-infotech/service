@@ -130,9 +130,7 @@
 	function editGlobalUrl(id) {
 		var params = "globalurlId=";
 		params = params.concat(id);
-	    params = params.concat("&customerId=");
-	    params = params.concat("<%= customerId %>");
-		loadContentParam("globalurlEdit", params, $('#subcontainer'));
+		loadContent("globalurlEdit",$("#formGlobalUrlList"), $('#subcontainer'), params);
 	}
 	
 	// This method calling from confirm_dialog.jsp

@@ -153,9 +153,7 @@
     function editTech(id) {
 		var params = "techId=";
 		params = params.concat(id);
-		params = params.concat("&customerId=");
-        params = params.concat("<%= customerId %>");
-		loadContentParam("archetypeEdit", params, $('#subcontainer'));
+		loadContent("archetypeEdit", $("#formArchetypeList"), $('#subcontainer'), params);
 	}
     
     // This method calling from confirm_dialog.jsp

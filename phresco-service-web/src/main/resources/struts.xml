@@ -339,7 +339,7 @@
         </action>
 		
         <action name="customerEdit" class="com.photon.phresco.service.admin.actions.admin.Customers" method="edit">
-			<result name="customerEdit">/admin/pages/admin/customer/add.jsp</result>
+			<result name="customerAdd">/admin/pages/admin/customer/add.jsp</result>
         </action>
         
         <action name="customerUpdateValidate" class="com.photon.phresco.service.admin.actions.admin.Customers" method="validateForm">
@@ -413,6 +413,10 @@
 			
 		<!-- ADMIN PERMISSION STARTS-->
 		<action name="permissionList" class="com.photon.phresco.service.admin.actions.admin.PermissionList" method="list">
+			<result name="permissionList">/admin/pages/admin/permission/list.jsp</result>
+        </action>
+           
+        <action name="permissionDelete" class="com.photon.phresco.service.admin.actions.admin.PermissionList" method="delete">
 			<result name="permissionList">/admin/pages/admin/permission/list.jsp</result>
         </action>
 		<!-- ADMIN PERMISSION ENDS-->

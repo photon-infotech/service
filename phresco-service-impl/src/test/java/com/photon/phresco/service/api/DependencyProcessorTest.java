@@ -37,19 +37,20 @@ package com.photon.phresco.service.api;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class DependencyProcessorTest {
 
-	@Before
+	@Ignore
 	public void setUp() throws Exception {
 	}
 
-	@After
+	@Ignore
 	public void tearDown() throws Exception {
 	}
 
-	@Test
+	@Ignore
 	public final void testProcess() {
 //		fail("Not yet implemented"); // TODO
 	}

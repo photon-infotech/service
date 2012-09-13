@@ -18,6 +18,7 @@
   ###
   --%>
 
+<%@page import="java.util.ArrayList"%>
 <%@ taglib uri="/struts-tags" prefix="s" %>
 
 <%@ page import="java.util.List" %>
@@ -37,7 +38,7 @@
     //For edit
     String name = "";
     String description = "";
-    String version = "";
+    List<String> version = new ArrayList<String>();
     if (downloadInfo != null) {
     	if (StringUtils.isNotEmpty(downloadInfo.getName())) {
     		name = downloadInfo.getName();
@@ -45,7 +46,7 @@
     	if (StringUtils.isNotEmpty(downloadInfo.getDescription())) {
     		description = downloadInfo.getDescription();
     	}
-    	if (StringUtils.isNotEmpty(downloadInfo.getVersion())) {
+    	if (CollectionUtils.isNotEmpty(downloadInfo.getVersion())) {
     		version = downloadInfo.getVersion();
     	}
     }

@@ -139,12 +139,12 @@ public class AdminServiceTest extends DbService implements ServiceConstants{
 		User user = new User("photon", "from phresco");
 		user.setId("testUser");
 		users.add(user);
-		mongoOperation.insertList(USERS_COLLECTION_NAME , users);
+		mongoOperation.insertList(USERDAO_COLLECTION_NAME , users);
 	}
     
 	@Test
 	public void testFindUsers() {
-		List<User> userist = mongoOperation.getCollection(USERS_COLLECTION_NAME , User.class);
+		List<User> userist = mongoOperation.getCollection(USERDAO_COLLECTION_NAME , User.class);
 		assertNotNull(userist);
 	}
 	
@@ -154,7 +154,7 @@ public class AdminServiceTest extends DbService implements ServiceConstants{
 		User user = new User("phresco", "from phresco");
 		user.setId("testUser");
 		users.add(user);
-		mongoOperation.save(USERS_COLLECTION_NAME, users);
+		mongoOperation.save(USERDAO_COLLECTION_NAME, users);
 	}
 
 	@Ignore
@@ -165,7 +165,7 @@ public class AdminServiceTest extends DbService implements ServiceConstants{
 	@Test
 	public void testGetUser() {
 		String id = "testUser";
-		User user = mongoOperation.findOne(USERS_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), User.class);
+		User user = mongoOperation.findOne(USERDAO_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), User.class);
 		assertNotNull(user);
 	}
 
@@ -173,13 +173,13 @@ public class AdminServiceTest extends DbService implements ServiceConstants{
 	public void testUpdateUser() {
 		User user = new User("photon", "from phresco");
 		user.setId("testUser");
-		mongoOperation.save(USERS_COLLECTION_NAME, user);
+		mongoOperation.save(USERDAO_COLLECTION_NAME, user);
 	} 
 
 	@Test
 	public void testDeleteUser() {
 		String id = "testUser";
-		mongoOperation.remove(USERS_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), User.class);
+		mongoOperation.remove(USERDAO_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), User.class);
 	}
 
 	
@@ -187,10 +187,12 @@ public class AdminServiceTest extends DbService implements ServiceConstants{
 	@Test
 	public void testCreateDownloadInfo() {
 		List<DownloadInfo> infos = new ArrayList<DownloadInfo>();
+		List<String> versions = new ArrayList<String>();
 		DownloadInfo info = new DownloadInfo();
 		info.setName("Eclipse");
 		info.setType("Editor");
-		info.setVersion("juno");
+		versions.add("juno");
+		info.setVersion(versions);
 		info.setId("testdownload");
 		infos.add(info);
 		mongoOperation.insertList(DOWNLOAD_COLLECTION_NAME , infos);
@@ -205,10 +207,11 @@ public class AdminServiceTest extends DbService implements ServiceConstants{
 	@Test
 	public void testUpdateDownloadInfoListOfDownloadInfo() {
 		List<DownloadInfo> infos = new ArrayList<DownloadInfo>();
+		List<String> versions = new ArrayList<String>();
 		DownloadInfo info = new DownloadInfo();
 		info.setName("Eclipse-Juno");
-		info.setType("Editor");
-		info.setVersion("juno");
+		versions.add("juno");
+        info.setVersion(versions);
 		info.setId("testdownload");
 		infos.add(info);
 		for (DownloadInfo downloadInfo : infos) {
@@ -231,9 +234,11 @@ public class AdminServiceTest extends DbService implements ServiceConstants{
 	@Test
 	public void testUpdateDownloadInfoStringDownloadInfo() {
 		DownloadInfo info = new DownloadInfo();
+		List<String> versions = new ArrayList<String>();
 		info.setName("Eclipse-Juno");
 		info.setType("Editor");
-		info.setVersion("juno");
+		versions.add("juno");
+        info.setVersion(versions);
 		info.setId("testdownload");
 		mongoOperation.save(DOWNLOAD_COLLECTION_NAME, info);
 	}

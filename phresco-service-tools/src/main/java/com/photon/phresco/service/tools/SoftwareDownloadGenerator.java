@@ -24,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -37,16 +38,24 @@ import com.google.gson.Gson;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.DownloadInfo;
 import com.photon.phresco.model.DownloadInfos;
-import com.photon.phresco.service.api.PhrescoServerFactory;
+import com.photon.phresco.service.api.DbService;
 import com.photon.phresco.service.api.RepositoryManager;
+import com.photon.phresco.service.client.api.ServiceClientConstant;
+import com.photon.phresco.service.client.api.ServiceContext;
+import com.photon.phresco.service.client.api.ServiceManager;
+import com.photon.phresco.service.client.factory.ServiceClientFactory;
+import com.photon.phresco.service.client.impl.RestClient;
+import com.photon.phresco.service.client.util.RestUtil;
 import com.photon.phresco.service.model.ArtifactInfo;
+import com.photon.phresco.util.ServiceConstants;
+import com.sun.jersey.api.client.ClientResponse;
 
-public class SoftwareDownloadGenerator {
+public class SoftwareDownloadGenerator extends DbService {
 
 	private static final String DOWNLOADS_JSON_FILE = "downloads.json";
 	private static final String DOWNLOADS_EXCEL_FILE = "PHTN_PHRESCO_OpenSourceUsage.xls";
 
-
+	private boolean deployArtifacts = false;
 	private static final int noofRows = 1;
 	private File outputfile = null;
 	private File softDir = null;
@@ -57,13 +66,19 @@ public class SoftwareDownloadGenerator {
 	private static final String SEPERATOR = "/";
 	private static final String FILES = "files";
 	RepositoryManager manager = null;
+	private ServiceContext context = null;
+    private ServiceManager serviceManager = null;
 
 	public SoftwareDownloadGenerator(File inputDir, File outDir ,File softwareDirectory) throws PhrescoException {
+	    super();
 		this.outputfile = new File(outDir, DOWNLOADS_JSON_FILE);
 		this.softDir = new File(softwareDirectory, "/technologies/" );
 		this.workbook = getWorkBook(new File(inputDir,DOWNLOADS_EXCEL_FILE));
-		PhrescoServerFactory.initialize();
-		manager = PhrescoServerFactory.getRepositoryManager();
+		context = new ServiceContext();
+        context.put(ServiceClientConstant.SERVICE_URL, RestUtil.getServerPath());
+        context.put(ServiceClientConstant.SERVICE_USERNAME, "demouser");
+        context.put(ServiceClientConstant.SERVICE_PASSWORD, "phresco");
+        serviceManager = ServiceClientFactory.getServiceManager(context);
 	}
 
 	private HSSFWorkbook getWorkBook(File inputFile) throws PhrescoException {
@@ -85,7 +100,6 @@ public class SoftwareDownloadGenerator {
 	}
 
 	public void publish() throws PhrescoException {
-
 		HSSFSheet downLoadInfoSheet = workbook.getSheet(DOWNLOADS);
 
 		Iterator<Row> rowIterator = downLoadInfoSheet.iterator();
@@ -98,24 +112,30 @@ public class SoftwareDownloadGenerator {
 			Row row = rowIterator.next();
 			info = createDownloadInfo(row);
 			infos.add(info);
-			uploadSoftwareFileToRepository(info);
+//			uploadSoftwareFileToRepository(info);
 		}
-		writeTo(infos);
-		uploadFileToRepository();
+//		writeTo(infos);
+		RestClient<DownloadInfo> newApp = serviceManager.getRestClient(ServiceConstants.REST_API_ADMIN + ServiceConstants.REST_API_DOWNLOADS);
+//        ClientResponse clientResponse = newApp.create(infos);
+		mongoOperation.insertList(ServiceConstants.DATABASES_COLLECTION_NAME, infos);
+//		uploadFileToRepository();
 	}
 
 	// To Deploy Files Set Java VM Argument As -Xmx1300m -Xms300m
 	private void uploadSoftwareFileToRepository(DownloadInfo info) throws PhrescoException {
+	    if(deployArtifacts == false) {
+            return;
+        }
 		String fileName = info.getName();
 		String filePath = info.getFileName();
 		String fileExt = getFileExt(filePath);
-		String version = info.getVersion();
+		List<String> version = info.getVersion();
 		
 		File softwareFile = new File(softDir, info.getFileName());
 		if (softwareFile.exists()) {
-			ArtifactInfo attifactInfo = new ArtifactInfo("softwares." + ".files", fileName, "", fileExt , version);
+			ArtifactInfo attifactInfo = new ArtifactInfo("softwares." + ".files", fileName, "", fileExt , version.get(0));
 			System.out.println("Software path = " + softwareFile.getPath());
-			manager.addArtifact(attifactInfo, softwareFile);
+			manager.addArtifact(attifactInfo, softwareFile, "photon");
 			System.gc();
 			System.gc();
 			System.out.println(fileName + " Uploaded Successfully..... ");
@@ -126,8 +146,11 @@ public class SoftwareDownloadGenerator {
 	}
 
 	private void uploadFileToRepository() throws PhrescoException {
+	        if(deployArtifacts == false) {
+	            return;
+	        }
 			ArtifactInfo info = new ArtifactInfo("softwares", "info", "", "json", "1.0");
-			manager.addArtifact(info, outputfile);
+			manager.addArtifact(info, outputfile, "photon");
 	}
 
 	private void writeTo(List<DownloadInfo> infos) throws PhrescoException {
@@ -146,28 +169,31 @@ public class SoftwareDownloadGenerator {
 
 	private DownloadInfo createDownloadInfo(Row row) throws PhrescoException {
 		DownloadInfo info = new DownloadInfo();
-
 		Cell namecell = row.getCell(1);
-		String name = getValue(namecell).replace(" ", "-");
+		String name = getValue(namecell);
 
 		Cell ver = row.getCell(4);
 		String version = getValue(ver);
+		String[] versions = StringUtils.split(version, ",");
 
-		Cell url = row.getCell(9);
-		if (url == null || Cell.CELL_TYPE_BLANK == url.getCellType()) {
-			return null;
-		}
+//		Cell url = row.getCell(9);
+//		if (url == null || Cell.CELL_TYPE_BLANK == url.getCellType()) {
+//			return null;
+//		}
 
 		Cell apptocell = row.getCell(2);
 		String appliesTo = getValue(apptocell);
 		String[] applyTo = StringUtils.split(appliesTo, ",");
 
-		Cell fileNameCell = row.getCell(10);
-		String fileName = getValue(fileNameCell);
+//		Cell fileNameCell = row.getCell(10);
+//		String fileName = getValue(fileNameCell);
 
 		Cell fileSizeCell = row.getCell(11);
-		String fileSize = getValue(fileSizeCell);
-
+		String fileSize = "";
+		if (fileSizeCell != null && Cell.CELL_TYPE_BLANK != fileSizeCell.getCellType()) {
+		    fileSize = getValue(fileSizeCell);
+		}
+		
 		Cell platformCell = row.getCell(5);
 		if (platformCell .equals(null) || Cell.CELL_TYPE_BLANK == platformCell.getCellType()) {
 			return null;
@@ -176,25 +202,25 @@ public class SoftwareDownloadGenerator {
 		Cell categoryCell = row.getCell(3);
 		String category = getValue(categoryCell);
 
-		Cell extension = row.getCell(9);
-		String fileExt = getValue(extension);
-		String fileExtension = getFileExt(fileExt);
+//		Cell extension = row.getCell(9);
+//		String fileExt = getValue(extension);
+//		String fileExtension = getFileExt(fileExt);
 		
-		PhrescoServerFactory.initialize();
-		String repositoryURL = PhrescoServerFactory.getRepositoryManager().getRepositoryURL();
-		String repoDownloadUrl = repositoryURL+ SEPERATOR + DOWNLOAD + SEPERATOR + FILES + SEPERATOR + name + SEPERATOR + version + SEPERATOR + name + "-" + version + "." + fileExtension;
+//		String repositoryURL = PhrescoServerFactory.getRepositoryManager().getRepositoryURL();
+//		String repoDownloadUrl = repositoryURL+ SEPERATOR + DOWNLOAD + SEPERATOR + FILES + SEPERATOR + name + SEPERATOR + version + SEPERATOR + name + "-" + version + "." + fileExtension;
 
 		String platforms = getValue(platformCell);
 		String[] platform = StringUtils.split(platforms, ",");
 
-		info.setType(category);
 		info.setName(name);
-		info.setVersion(version);
-		info.setDownloadURL(repoDownloadUrl);
-		info.setAppliesTo(applyTo);
-		info.setPlatform(platform);
-		info.setFileName(fileName);
+		info.setCustomerId("photon");
+		info.setDownloadURL(" ");
 		info.setFileSize(fileSize);
+		info.setVersion(Arrays.asList(versions));
+		info.setType(category);
+		info.setAppliesTo(Arrays.asList(applyTo));
+		info.setPlatform(Arrays.asList(platform));
+		info.setSystem(true);
 		return info;
 
 	}
@@ -230,8 +256,8 @@ public class SoftwareDownloadGenerator {
 	}
 
 	public static void main(String[] args) throws PhrescoException {
-		File inputFile = new File("D:\\work\\phresco\\agra\\service\\trunk\\phresco-service-runner\\delivery\\tools\\files\\");
-		File outFile = new File("D:\\work\\phresco\\agra\\service\\trunk\\phresco-service-runner\\delivery\\tools\\files");
+		File inputFile = new File("D:\\work\\phresco\\MasterNew\\servicenew\\phresco-service-runner\\delivery\\tools\\files");
+		File outFile = new File("D:\\work\\phresco\\MasterNew\\servicenew\\phresco-service-runner\\delivery\\tools\\files");
 		File softDir = new File("D:\\work\\phresco\\Phresco-binaries\\technologies\\");
 		SoftwareDownloadGenerator generate = new SoftwareDownloadGenerator(inputFile, outFile , softDir);
 		generate.publish();

@@ -34,23 +34,18 @@ function clickButton(button, tag) {
 	});
 }
 
-function loadContent(pageUrl, form, tag) {
+function loadContent(pageUrl, form, tag, additionalParams) {
 	showLoadingIcon(tag);
-	if (form != undefined && !isBlank(form)) {
-		var params = form.serialize();
+	var params = "";
+	if (form != undefined && form != "" && !isBlank(form.serialize())) {
+		params = form.serialize();
+		if (!isBlank(additionalParams)) {
+			params = params.concat("&");
+			params = params.concat(additionalParams);	
+		} 
+	} else if (additionalParams != undefined && additionalParams != "")  {
+		params = additionalParams;
 	}
-	$.ajax({
-		url : pageUrl,
-		data : params,
-		type : "POST",
-		success : function(data) {
-			loadData(data, tag);
-		}
-	});
-}
-
-function loadContentParam(pageUrl, params, tag) {
-	showLoadingIcon(tag);
 	$.ajax({
 		url : pageUrl,
 		data : params,

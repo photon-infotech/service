@@ -175,7 +175,7 @@ public  class RepositoryManagerImpl implements RepositoryManager {
 		return session;
 	}
 
-	public String addArtifact(ArtifactInfo info, File artifactFile, String customerId) throws PhrescoException {
+	public boolean addArtifact(ArtifactInfo info, File artifactFile, String customerId) throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method RepositoryManagerImpl.addArtifact(ArtifactInfo info, File artifactFile)");
 		}
@@ -208,7 +208,7 @@ public  class RepositoryManagerImpl implements RepositoryManager {
 			throw new PhrescoException(e);
 		}
 
-		return "Succesfully Deployed";
+		return true;
 	}
 
 	@Override

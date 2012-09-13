@@ -19,10 +19,20 @@
   --%>
 <%@ taglib uri="/struts-tags" prefix="s" %>
 
-<form class="form-horizontal customer_list">
+<%@ page import="java.util.List" %>
+<%@ page import="org.apache.commons.collections.CollectionUtils"%>
+
+<%@ page import="com.photon.phresco.commons.model.Permission" %>
+<%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
+
+<%
+    List<Permission> permissions = (List<Permission>) request.getAttribute(ServiceUIConstants.REQ_PERMISSIONS_LIST);
+%>
+
+<form id="formPermissionList" class="form-horizontal customer_list">
 	<div class="operation" id="operation">
-		
-		<input type="button" id="del" class="btn" disabled value="<s:text name='lbl.hdr.adm.delete'/>"/>
+		<input type="button" id="del" class="btn" disabled value="<s:text name='lbl.hdr.adm.delete'/>"
+			onclick="showDeleteConfirmation('<s:text name='del.confirm.permission'/>');"/>
 	</div>
 	
 	<div class="table_div">
@@ -48,42 +58,21 @@
 					</thead>
 		
 					<tbody>
-					
-						<tr>
-							<td class="checkboxwidth">
-								<input type="checkbox" class="check" name="check" onclick="checkboxEvent();">
-							</td>
-							<td class="namelabel-width">
-								View
-							</td>
-							<td>
-								Access to view
-							</td>
-						</tr>
-						
-						<tr>
-							<td>
-								<input type="checkbox" class="check" name="check" onclick="checkboxEvent();">
-							</td>
-							<td>
-								Update
-							</td>
-							<td>
-								Access to edit/delete
-							</td>
-						</tr>
-						
-						<tr>
-							<td>
-								<input type="checkbox" class="check" name="check" onclick="checkboxEvent();">
-							</td>
-							<td>
-								Create
-							</td>
-							<td>
-								Access to add/edit/delete
-							</td>
-						</tr>
+						<%
+							if (CollectionUtils.isNotEmpty(permissions)) {
+								for ( Permission permission : permissions) {
+						%>
+								<tr>
+									<td class="checkboxwidth">
+										<input type="checkbox" class="check" name="permissionId" value="<%= permission.getId() %>" onclick="checkboxEvent();">
+									</td>
+									<td class="namelabel-width"><%= permission.getName()  %></td>
+									<td><%= permission.getPermission()  %></td>
+								</tr>
+						<%		
+								}
+							}
+						%>
 					</tbody>
 				</table>
 			</div>
@@ -100,4 +89,9 @@
 	$(document).ready(function() {
 		enableScreen();
 	});
+	
+	function continueDeletion() {
+		confirmDialog('none','');
+    	loadContent('permissionDelete', $('#formPermissionList'), $('#subcontainer'));
+    }
 </script>

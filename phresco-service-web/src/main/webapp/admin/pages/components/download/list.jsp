@@ -131,11 +131,7 @@
     function editDownload(id) {
         var params = "id=";
         params = params.concat(id);
-        params = params.concat("&fromPage=");
-        params = params.concat("edit");
-        params = params.concat("&customerId=");
-        params = params.concat('<%= customerId %>');
-        loadContentParam("downloadEdit", params, $('#subcontainer'));
+        loadContent("downloadEdit", $("#formDownloadList"), $('#subcontainer'), params);
     }
     
  	// This method calling from confirm_dialog.jsp

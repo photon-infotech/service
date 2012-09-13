@@ -138,11 +138,7 @@
     function editConfigTemp(id) {
 		var params = "configId=";
 		params = params.concat(id);
-		params = params.concat("&fromPage=");
-		params = params.concat("edit");
-	    params = params.concat("&customerId=");
-	    params = params.concat("<%= customerId %>");
-		loadContentParam("configtempEdit", params, $('#subcontainer'));
+		loadContent("configtempEdit", $("#formConfigTempList"), $('#subcontainer'), params);
 	}
     
  	// This method calling from confirm_dialog.jsp
