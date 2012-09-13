@@ -93,10 +93,12 @@
 								String selectedStr = "";
 								if (settingsTemplate != null) {
 									List<String> appliesTos = settingsTemplate.getAppliesTo();
-									if (appliesTos.contains(technology.getId())) {
-										selectedStr = "selected";
-									} else {
-										selectedStr = "";
+									if (CollectionUtils.isNotEmpty(appliesTos)){
+									 	if (appliesTos.contains(technology.getId())) {
+											selectedStr = "selected";
+										} else {
+											selectedStr = "";
+										}
 									}
 								}
 					%>

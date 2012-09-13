@@ -34,11 +34,11 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.service.admin.commons.LogErrorReport;
 import com.photon.phresco.model.Module;
 import com.photon.phresco.model.ModuleGroup;
 import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
+import com.photon.phresco.service.admin.commons.LogErrorReport;
 import com.photon.phresco.service.client.api.Content;
 import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
@@ -69,7 +69,7 @@ public class Features extends ServiceBaseAction {
 	private static String featureJarName = null;
     
 	private String description = null;
-    private List<Module> versions = null;
+	private List<Module> versions = null;
 	
     public String list() {
     	if (isDebugEnabled) {
@@ -120,7 +120,6 @@ public class Features extends ServiceBaseAction {
 		return COMP_FEATURES_ADD;
 	}
 	
-	
 	public String save() throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Features.save()");
@@ -128,7 +127,6 @@ public class Features extends ServiceBaseAction {
 		
 		try {
 			MultiPart multiPart = new MultiPart();
-			
 			List<ModuleGroup> moduleGroups = new ArrayList<ModuleGroup>();
 			ModuleGroup moduleGroup = new ModuleGroup();
 			moduleGroup.setName(name);
@@ -138,8 +136,7 @@ public class Features extends ServiceBaseAction {
 			moduleGroup.setCustomerId(customerId);
 			moduleGroup.setArtifactId(artifactId);
 			moduleGroup.setGroupId(groupId);
-			moduleGroup.setVersions(versions);
-		     
+			
 			BodyPart jsonPart = new BodyPart();
 			jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
 			jsonPart.setEntity(moduleGroup);
@@ -279,10 +276,10 @@ public class Features extends ServiceBaseAction {
 			isError = true;
 		} 
 
-		if (CollectionUtils.isEmpty(versions)) {
+		/*if (CollectionUtils.isEmpty(versions)) {
 			setVersError(getText(KEY_I18N_ERR_VER_EMPTY));
 			isError = true;
-		}
+		}*/
 		
 		if (isError) {
 			setErrorFound(true);

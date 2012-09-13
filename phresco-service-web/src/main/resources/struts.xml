@@ -415,6 +415,10 @@
 		<action name="permissionList" class="com.photon.phresco.service.admin.actions.admin.PermissionList" method="list">
 			<result name="permissionList">/admin/pages/admin/permission/list.jsp</result>
         </action>
+           
+        <action name="permissionDelete" class="com.photon.phresco.service.admin.actions.admin.PermissionList" method="delete">
+			<result name="permissionList">/admin/pages/admin/permission/list.jsp</result>
+        </action>
 		<!-- ADMIN PERMISSION ENDS-->
 		
 		<!-- ADMIN LDAP ENDS-->
