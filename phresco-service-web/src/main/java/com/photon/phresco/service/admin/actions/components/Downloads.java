@@ -144,12 +144,14 @@ public class Downloads extends ServiceBaseAction {
 
 		try {
 			MultiPart multiPart = new MultiPart();
-
+			
+			List<String> versions = new ArrayList<String>();
 			List<DownloadInfo> downloadInfo = new ArrayList<DownloadInfo>();
 			DownloadInfo download = new DownloadInfo();
+			versions.add(version);
 			download.setName(name);
 			download.setDescription(description);
-			download.setVersion(version);
+			download.setVersion(versions);
 			download.setCustomerId(customerId);
 			download.setAppliesTo(technology);
 			download.setType(group);
@@ -196,10 +198,12 @@ public class Downloads extends ServiceBaseAction {
 			MultiPart multiPart = new MultiPart();
 			
 			DownloadInfo download = new DownloadInfo();
+			List<String> versions = new ArrayList<String>();
+			versions.add(version);
 			download.setId(id);
 			download.setName(name);
 			download.setDescription(description);
-			download.setVersion(version);
+			download.setVersion(versions);
 			download.setCustomerId(customerId);
 			download.setAppliesTo(technology);
 			download.setType(group);

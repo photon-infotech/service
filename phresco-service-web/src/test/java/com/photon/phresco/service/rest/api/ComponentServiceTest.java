@@ -546,4 +546,5 @@ public class ComponentServiceTest extends DbService implements ServiceConstants{
 		assertEquals(Response.status(Response.Status.OK).build().getStatus(), 200);
 	}
 	
+	
 }

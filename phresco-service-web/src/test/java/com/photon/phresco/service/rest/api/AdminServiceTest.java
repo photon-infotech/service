@@ -187,10 +187,12 @@ public class AdminServiceTest extends DbService implements ServiceConstants{
 	@Test
 	public void testCreateDownloadInfo() {
 		List<DownloadInfo> infos = new ArrayList<DownloadInfo>();
+		List<String> versions = new ArrayList<String>();
 		DownloadInfo info = new DownloadInfo();
 		info.setName("Eclipse");
 		info.setType("Editor");
-		info.setVersion("juno");
+		versions.add("juno");
+		info.setVersion(versions);
 		info.setId("testdownload");
 		infos.add(info);
 		mongoOperation.insertList(DOWNLOAD_COLLECTION_NAME , infos);
@@ -205,10 +207,11 @@ public class AdminServiceTest extends DbService implements ServiceConstants{
 	@Test
 	public void testUpdateDownloadInfoListOfDownloadInfo() {
 		List<DownloadInfo> infos = new ArrayList<DownloadInfo>();
+		List<String> versions = new ArrayList<String>();
 		DownloadInfo info = new DownloadInfo();
 		info.setName("Eclipse-Juno");
-		info.setType("Editor");
-		info.setVersion("juno");
+		versions.add("juno");
+        info.setVersion(versions);
 		info.setId("testdownload");
 		infos.add(info);
 		for (DownloadInfo downloadInfo : infos) {
@@ -231,9 +234,11 @@ public class AdminServiceTest extends DbService implements ServiceConstants{
 	@Test
 	public void testUpdateDownloadInfoStringDownloadInfo() {
 		DownloadInfo info = new DownloadInfo();
+		List<String> versions = new ArrayList<String>();
 		info.setName("Eclipse-Juno");
 		info.setType("Editor");
-		info.setVersion("juno");
+		versions.add("juno");
+        info.setVersion(versions);
 		info.setId("testdownload");
 		mongoOperation.save(DOWNLOAD_COLLECTION_NAME, info);
 	}
