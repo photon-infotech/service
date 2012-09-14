@@ -97,8 +97,8 @@
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.name'/>
 			</label>
 			<div class="controls">
-				<input id="input01" placeholder="<s:text name='place.hldr.cust.add.name'/>" class="input-xlarge" name="name" type="text" 
-				    value="<%= name %>">
+				<input id="custmname" placeholder="<s:text name='place.hldr.cust.add.name'/>" class="input-xlarge" name="name" type="text" 
+				    value="<%= name %>" maxlength="30" title="30 Characters only">
 					<span class="help-inline" id="nameError"></span>
 			</div>
 		</div>
@@ -109,7 +109,7 @@
 			</label>
 			<div class="controls">
 				<textarea id="textarea" placeholder="<s:text name='place.hldr.cust.add.desc'/>" class="input-xlarge" rows="3" 
-				    name="description"><%= description %></textarea>
+				    name="description" maxlength="150" title="150 Characters only"><%= description %></textarea>
 			</div>
 		</div>
 
@@ -133,7 +133,7 @@
 			</label>
 			<div class="controls">
 				<textarea id="textarea" placeholder="<s:text name='place.hldr.cust.add.address'/>" class="input-xlarge" rows="3" 
-				    name="address"><%= address %></textarea>
+				    name="address" maxlength="150" title="150 Characters only"><%= address %></textarea>
 				<span class="help-inline applyerror" id="addresError"></span>
 			</div>
 		</div>
@@ -401,8 +401,8 @@
 				<s:text name='lbl.hdr.adm.cust.state'/>
 			</label>
 			<div class="controls">
-				<input id="input01" placeholder="<s:text name='place.hldr.cust.add.state'/>" class="input-xlarge" type="text" name="state"
-				    value="<%= state %>">
+				<input id="statefld" placeholder="<s:text name='place.hldr.cust.add.state'/>" class="input-xlarge" type="text" name="state"
+				    value="<%= state %>" maxlength="50" title="50 Characters only">
 			</div>
 		</div>
 
@@ -411,8 +411,8 @@
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.cust.zipcode'/>
 			</label>
 			<div class="controls">
-				<input id="input01" placeholder="<s:text name='place.hldr.cust.add.zipcode'/>" class="input-xlarge" type="text" name="zipcode"
-				    value="<%= zipCode %>">
+				<input id="zipcodefld" placeholder="<s:text name='place.hldr.cust.add.zipcode'/>" class="input-xlarge" type="text" name="zipcode"
+				    value="<%= zipCode %>" maxlength="20" title="20 Characters only">
 				<span class="help-inline" id="zipError"></span>
 			</div>
 		</div>
@@ -422,8 +422,8 @@
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.cust.cont'/>
 			</label>
 			<div class="controls">
-				<input id="input01" placeholder="<s:text name='place.hldr.cust.add.contact.no'/>" class="input-xlarge" type="text" name="number"
-				    value="<%= contactNo %>">
+				<input id="contactNo" placeholder="<s:text name='place.hldr.cust.add.contact.no'/>" class="input-xlarge" type="text" name="number"
+				    value="<%= contactNo %>" maxlength="16" title="16 Characters only">
 				<span class="help-inline" id="numError"></span>
 			</div>
 		</div>
@@ -433,8 +433,8 @@
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.cust.fax'/>
 			</label>
 			<div class="controls">
-				<input id="input01" placeholder="<s:text name='place.hldr.cust.add.fax.no'/>" class="input-xlarge" type="text" name="fax"
-				    value="<%= fax %>">
+				<input id="faxfld" placeholder="<s:text name='place.hldr.cust.add.fax.no'/>" class="input-xlarge" type="text" name="fax"
+				    value="<%= fax %>" maxlength="21" title="21 Characters only">
 				<span class="help-inline" id="faxError"></span>
 			</div>
 		</div>
@@ -444,8 +444,8 @@
 				<s:text name='lbl.hdr.adm.cust.hlptxt'/>
 			</label>
 			<div class="controls">
-				<input id="input01" placeholder="<s:text name='place.hldr.cust.add.help.text'/>" class="input-xlarge" type="text" name="helpText"
-				    value="<%= helpText %>">
+				<input id="hlptext" placeholder="<s:text name='place.hldr.cust.add.help.text'/>" class="input-xlarge" type="text" name="helpText"
+				    value="<%= helpText %>"  maxlength="150" title="150 Characters only">
 			</div>
 		</div>
 
@@ -521,7 +521,35 @@
 	
 	$(document).ready(function() {
 		enableScreen();
-
+		
+		// To check for the special character in name
+        $('#custmname').bind('input propertychange', function (e) {
+            var name = $(this).val();
+            name = checkForSplChr(name);
+            $(this).val(name);        
+		});
+		
+    	// To check for the special character in state
+        $('#statefld').bind('input propertychange', function (e) {
+            var state = $(this).val();
+            statevalue = allowAlpha(state);
+            $(this).val(statevalue);        
+		});
+    	
+     	// To check for the special character in zipcode
+        $('#zipcodefld').bind('input propertychange', function (e) {
+            var zipcode = $(this).val();
+            zipcode = allowAlphaNum(zipcode);
+            $(this).val(zipcode);        
+		});
+     	
+     	// To check for the special character in ContactNumber and fax
+        $('#contactNo, #faxfld').bind('input propertychange', function (e) {
+            var numbr = $(this).val();
+            numbr = allowNumHyphenPlus(numbr);
+            $(this).val(numbr);        
+		});
+     	
 		// Date picker
 		<% if (StringUtils.isEmpty(fromPage)) { %>
 				document.getElementById('fromdate').value = '';

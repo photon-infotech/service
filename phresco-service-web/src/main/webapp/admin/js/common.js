@@ -211,14 +211,29 @@ function hideProgressBar() {
 	$(".progress").hide();
 }
 
-/** It allows A-Z, a-z, 0-9, - and _ **/
+// It allows A-Z, a-z, 0-9, - and _ 
 function checkForSplChr(inputStr) {
 	return inputStr.replace(/[^a-zA-Z 0-9\-\_]+/g, '');
 }
 
-/** It allows A-Z, a-z, 0-9, - , _ and . **/
+//It allows A-Z, a-z,
+function allowAlpha(state) {
+	return state.replace(/[^a-zA-Z]+/g, '');
+}
+
+//It allows A-Z, a-z, 0-9, - , _ and .
 function checkForSplChrExceptDot(inputStr) {
 	return inputStr.replace(/[^a-zA-Z 0-9\.\-\_]+/g, '');
+}
+
+//It allows A-Z, a-z, 0-9
+function allowAlphaNum(inputStr) {
+	return inputStr.replace(/[^a-zA-Z 0-9]+/g, '');
+}
+
+//It allows 0-9,- and +
+function allowNumHyphenPlus(numbr) {
+	return numbr.replace(/[^0-9\-\+]+/g, '');
 }
 
 function changeTheme() {

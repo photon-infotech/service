@@ -58,7 +58,7 @@
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.name'/>
 			</label>
 			<div class="controls">
-				<input id="input01" placeholder="<s:text name='place.hldr.globalurl.add.name'/>" value= "<%= name %>" 
+				<input id="globalUrlName" placeholder="<s:text name='place.hldr.globalurl.add.name'/>" value= "<%= name %>" maxlength="30" title="30 Characters only"
 				                          class="input-xlarge" type="text" name="name">
 				<span class="help-inline" id="nameError"></span>
 			</div>
@@ -69,8 +69,8 @@
 				<s:text name='lbl.hdr.adm.desc'/>
 			</label>
 			<div class="controls">
-				<input id="input01" placeholder="<s:text name='place.hldr.globalurl.add.desc'/>" value="<%= description %>" 
-				                         class="input-xlarge" type="text" name="description">
+				<textarea id="globalUrlDesc" placeholder="<s:text name='place.hldr.globalurl.add.desc'/>" value="<%= description %>" maxlength="150" title="150 Characters only"
+				                         class="input-xlarge" type="text" name="description"></textarea>
 				
 			</div>
 		</div>
@@ -80,7 +80,8 @@
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.glblurl.url'/>
 			</label>
 			<div class="controls">
-				<input id="input01" placeholder="<s:text name='place.hldr.globalurl.add.url'/>" value="<%= url %>" class="input-xlarge" type="text" name="url">
+				<input id="globalUrl" placeholder="<s:text name='place.hldr.globalurl.add.url'/>" 
+					value="<%= url %>" class="input-xlarge" type="text" name="url">
 				<span class="help-inline" id="urlError"></span>
 			</div>
 		</div>
@@ -114,6 +115,13 @@
 
 	$(document).ready(function() {
 		enableScreen();
+		
+		// To check for the special character in name
+        $('#globalUrlName').bind('input propertychange', function (e) {
+            var name = $(this).val();
+            name = checkForSplChr(name);
+            $(this).val(name);        
+		});
 	});
 	
 	function findError(data) {

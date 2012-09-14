@@ -67,8 +67,8 @@
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.name'/>
 			</label>
 			<div class="controls">
-				<input id="input01" placeholder="<s:text name='place.hldr.download.add.name'/>" 
-					value="<%= name %>" class="input-xlarge" type="text" name="name">
+				<input id="downloadName" placeholder="<s:text name='place.hldr.download.add.name'/>" 
+					value="<%= name %>" maxlength="30" title="30 Characters only" class="input-xlarge" type="text" name="name">
 				<span class="help-inline" id="nameError"></span>
 			</div>
 		</div>
@@ -78,8 +78,8 @@
 				<s:text name='lbl.hdr.adm.desc'/>
 			</label>
 			<div class="controls">
-				<input id="input01"  placeholder="<s:text name='place.hldr.download.add.desc'/>" class="input-xlarge" type="text"
-					value="<%= description %>" name="description">
+				<textarea id="downloadDesc"  placeholder="<s:text name='place.hldr.download.add.desc'/>" class="input-xlarge" type="text"
+					maxlength="150" title="150 Characters only" value="<%= description %>" name="description"></textarea>
 			</div>
 		</div>
 		
@@ -119,8 +119,8 @@
 					<s:text name='lbl.hdr.comp.groupid'/>
 				</label>
 				<div class="controls">
-					<input name="groupId" class="input-xlarge" type="text"
-						placeholder="<s:text name='place.hldr.archetype.add.groupId'/>">
+					<input id="grpId" name="groupId" class="input-xlarge" type="text"
+						maxlength="40" title="40 Characters only" placeholder="<s:text name='place.hldr.archetype.add.groupId'/>">
 				</div>
 			</div>
 			
@@ -129,8 +129,8 @@
 					<s:text name='lbl.hdr.comp.artifactid'/>
 				</label>
 				<div class="controls">
-					<input name="artifactId" class="input-xlarge" type="text"
-						placeholder="<s:text name='place.hldr.archetype.add.artifactId'/>">
+					<input id="arftId" name="artifactId" class="input-xlarge" type="text"
+						maxlength="40" title="40 Characters only" placeholder="<s:text name='place.hldr.archetype.add.artifactId'/>">
 				</div>
 			</div>
 			
@@ -139,7 +139,7 @@
 					<s:text name='lbl.hdr.comp.jar.version'/>
 				</label>
 				<div class="controls">
-					<input class="jarVersion" class="input-xlarge" type="text"
+					<input id="jarVersn" class="jarVersion" class="input-xlarge" maxlength="30" title="30 Characters only" type="text"
 						placeholder="<s:text name='place.hldr.download.add.version'/>">
 				</div>
 			</div>
@@ -196,8 +196,8 @@
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.dwnld.ver'/>
 			</label>
 			<div class="controls">
-				<input id="input01" placeholder="<s:text name='place.hldr.download.add.version'/>" value="<%= version %>" 
-					class="input-xlarge" type="text" name="version">
+				<input id="dwnVersn" placeholder="<s:text name='place.hldr.download.add.version'/>" value="<%= version %>" 
+					maxlength="30" title="30 Characters only" class="input-xlarge" type="text" name="version">
 				<span class="help-inline" id="verError"></span>
 			</div>
 		</div>
@@ -258,6 +258,20 @@
 	$(document).ready(function() {
 		enableScreen();
         createUploader(); 
+        
+     	// To check for the special character in name
+        $('#downloadName').bind('input propertychange', function (e) {
+            var name = $(this).val();
+            name = checkForSplChr(name);
+            $(this).val(name);
+        });
+	
+		// To check for the special character in version ,groupId, artifactId
+        $('#jarVersn, #dwnVersn, #arftId, #grpId').bind('input propertychange', function (e) {
+            var version = $(this).val();
+            version = checkForSplChrExceptDot(version);
+            $(this).val(version);
+        });
         
         // for edit - to show selected group while page loads 
         <% if (downloadInfo != null)  {%>

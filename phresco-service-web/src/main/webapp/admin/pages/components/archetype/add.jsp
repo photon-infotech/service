@@ -79,7 +79,7 @@
 				class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.name' />
 			</label>
 			<div class="controls">
-				<input id="name" placeholder='<s:text name="place.hldr.archetype.add.name"/>' class="input-xlarge" type="text" 
+				<input id="archename" placeholder='<s:text name="place.hldr.archetype.add.name"/>' class="input-xlarge" type="text" 
 					name="name" value="<%= name %>" maxlength="30" title="30 Characters only">
 				<span class="help-inline" id="nameError"></span>
 			</div>
@@ -146,7 +146,7 @@
 					<s:text name='lbl.hdr.comp.groupid'/>
 				</label>
 				<div class="controls">
-					<input class="groupId" class="input-xlarge" type="text"
+					<input id="groupid" class="groupId" class="input-xlarge" maxlength="40" title="40 Characters only" type="text"
 						placeholder="<s:text name='place.hldr.archetype.add.groupId'/>">
 				</div>
 			</div>
@@ -156,7 +156,7 @@
 					<s:text name='lbl.hdr.comp.artifactid'/>
 				</label>
 				<div class="controls">
-					<input class="artifactId" class="input-xlarge" type="text"
+					<input id="artifId" class="artifactId" class="input-xlarge" maxlength="40" title="40 Characters only" type="text"
 						placeholder="<s:text name='place.hldr.archetype.add.artifactId'/>">
 				</div>
 			</div>
@@ -166,7 +166,7 @@
 					<s:text name='lbl.hdr.comp.jar.version'/>
 				</label>
 				<div class="controls">
-					<input class="jarVersion" class="input-xlarge" type="text"
+					<input id="versnId" class="jarVersion" maxlength="30" title="30 Characters only" class="input-xlarge" type="text"
 						placeholder="<s:text name='place.hldr.archetype.add.jar.version'/>">
 				</div>
 			</div>
@@ -250,22 +250,22 @@
         createUploader();
         
         // To focus the name textbox by default
-        $('#name').focus();
+        $('#archename').focus();
 
         // To check for the special character in name
-        $('#name').bind('input propertychange', function (e) {
+        $('#archename').bind('input propertychange', function (e) {
             var name = $(this).val();
             name = checkForSplChr(name);
             $(this).val(name);
         });
 
-        // To check for the special character in version
-        $('#version').bind('input propertychange', function (e) {
-            var version = $(this).val();
-            version = checkForSplChrExceptDot(version);
-            $(this).val(version);
+     	// To check for the special character in artifactId, groupId, version and jar version
+        $('#artifId, #groupid, #versnId, #version').bind('input propertychange', function (e) {
+            var artifId = $(this).val();
+            artifId = checkForSplChrExceptDot(artifId);
+            $(this).val(artifId);
         });
-
+     
         // To remove the plugin jar file field
         $('.del').live('click', function() {
             $(this).parent().parent().remove();

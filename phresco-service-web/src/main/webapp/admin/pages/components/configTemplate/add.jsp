@@ -66,7 +66,7 @@
 			
 			<div class="controls">
 				<input id="configname" placeholder="<s:text name='place.hldr.configTemp.add.name'/>" class="input-xlarge" 
-					type="text" name="name"  value="<%= name %>">
+					type="text" name="name"  value="<%= name %>" maxlength="30" title="30 Characters only">
 				<span class="help-inline" id="nameError"></span>
 			</div>
 		</div>
@@ -76,8 +76,8 @@
 				<s:text name='lbl.hdr.comp.desc'/>
 			</label>
 			<div class="controls">
-				<input id="input01" placeholder="<s:text name='place.hldr.configTemp.add.desc'/>" class="input-xlarge" 
-				type="text" name="description" value="<%= desc %>">
+				<textarea placeholder="<s:text name='place.hldr.configTemp.add.desc'/>" class="input-xlarge" 
+					name="description" maxlength="150" title="150 Characters only" value="<%= desc %>"></textarea>
 			</div>
 		</div>
 		
@@ -152,7 +152,7 @@
 								<tbody>
 									<tr class="configdynamiadd">
 										<td class="textwidth">
-											<input type="text" id = "concate" value="" placeholder="" class="span2" style="width:100%;">
+											<input type="text" id = "concate" value="" placeholder="" maxlength="30" title="30 Characters only" class="span2" style="width:100%;">
 										</td>
 										<td class="textwidth">
 											<select id="select01" class = "select typewidth" style="width:100%;">
@@ -172,7 +172,7 @@
 											<a data-toggle="modal" href="#myModal"><img class="addiconAlign imagealign" src="images/add_icon.png"/></a>
 										</td>
 										<td class="hlpText">
-											<input type="text" placeholder="<s:text name='place.hldr.configTemp.add.help.text'/>" class="propTempTxt" style="width:100%;">
+											<input type="text" placeholder="<s:text name='place.hldr.configTemp.add.help.text'/>" maxlength="150" title="150 Characters only" class="propTempTxt" style="width:100%;">
 										</td>
 										<td class="mandatoryfld">
 											<input type="checkbox" value="option1" id="optionsCheckbox">
@@ -267,6 +267,13 @@
 	$(document).ready(function() {
 		enableScreen();
 		
+		// To check for the special character in configname
+        $('#configname').bind('input propertychange', function (e) {
+            var configname = $(this).val();
+            configname = checkForSplChr(configname);
+            $(this).val(configname);
+        });
+     	
 		$("#addValues").click(function() {
 			var textComboVal = $("#txtCombo").val();
 			var alreadyExists = false;

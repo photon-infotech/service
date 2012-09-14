@@ -81,8 +81,8 @@
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.name'/>
 			</label>
 			<div class="controls">
-				<input id="input01" placeholder="<s:text name='place.hldr.feature.add.name'/>" 
-				     class="input-xlarge" type="text" name="name" value="<%= name %>">
+				<input id="featureName" placeholder="<s:text name='place.hldr.feature.add.name'/>" 
+				     maxlength="30" title="30 Characters only" class="input-xlarge" type="text" name="name" value="<%= name %>">
 				<span class="help-inline" id="nameError"></span>
 			</div>
 		</div>
@@ -92,8 +92,8 @@
 				<s:text name='lbl.hdr.comp.desc'/>
 			</label>
 			<div class="controls">
-				<input id="input01" placeholder="<s:text name='place.hldr.feature.add.desc'/>" 
-				     class="input-xlarge" type="text" name="description" value="<%= description %>">
+				<textarea id="featureDesc" placeholder="<s:text name='place.hldr.feature.add.desc'/>" 
+				     maxlength="150" title="150 Characters only" class="input-xlarge" type="text" name="description" value="<%= description %>"></textarea>
 			</div>
 		</div>
 		
@@ -102,8 +102,8 @@
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.version'/>
 			</label>
 			<div class="controls">
-				<input id="input01" placeholder="<s:text name='place.hldr.feature.add.version'/>" 
-				     class="input-xlarge" type="text" name="version" value="<%= version %>">
+				<input id="featureversn" placeholder="<s:text name='place.hldr.feature.add.version'/>" 
+				     maxlength="30" title="30 Characters only" class="input-xlarge" type="text" name="version" value="<%= version %>">
 				<span class="help-inline" id="verError"></span>
 			</div>
 		</div>
@@ -113,8 +113,8 @@
 				<s:text name='lbl.hdr.comp.help'/>
 			</label>
 			<div class="controls">
-				<textarea id="input01" placeholder="<s:text name='place.hldr.feature.add.help.text'/>" 
-				               class="input-xlarge" value="<%= helpText %>" rows="2" cols="10" ></textarea>
+				<textarea id="hlptext" placeholder="<s:text name='place.hldr.feature.add.help.text'/>" 
+				               maxlength="150" title="150 Characters only" class="input-xlarge" value="<%= helpText %>" rows="2" cols="10" ></textarea>
 			</div>
 		</div>
 		
@@ -300,6 +300,20 @@
 	$(document).ready(function() {
 	    createUploader();
 		enableScreen();
+		
+		// To check for the special character in name
+        $('#featureName').bind('input propertychange', function (e) {
+            var name = $(this).val();
+            name = checkForSplChr(name);
+            $(this).val(name);
+        });
+	
+		// To check for the special character in version
+        $('#featureversn').bind('input propertychange', function (e) {
+            var version = $(this).val();
+            version = checkForSplChrExceptDot(version);
+            $(this).val(version);
+        });
        
 		$("input[type=radio]").change(function() {
 	        var name = $(this).attr('name');

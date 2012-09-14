@@ -63,7 +63,7 @@
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.name'/>
 			</label>
 			<div class="controls">
-				<input id="input01" placeholder="<s:text name='place.hldr.pilot.add.name'/>" value="<%= name %>" class="input-xlarge" type="text" name="name">
+				<input id="pilotname" placeholder="<s:text name='place.hldr.pilot.add.name'/>" value="<%= name %>" maxlength="30" title="30 Characters only" class="input-xlarge" type="text" name="name">
 				<span class="help-inline" id="nameError"></span>
 			</div>
 		</div>
@@ -73,7 +73,8 @@
 				<s:text name='lbl.hdr.comp.desc'/>
 			</label>
 			<div class="controls">
-				<input id="input01" placeholder="<s:text name='place.hldr.pilot.add.desc'/>" value="<%= description %>"  class="input-xlarge" type="text" name="description">
+				<textarea id="pilotDesc" placeholder="<s:text name='place.hldr.pilot.add.desc'/>" value="<%= description %>" 
+					maxlength="150" title="150 Characters only" class="input-xlarge" type="text" name="description"></textarea>
 			</div>
 		</div>
 
@@ -185,6 +186,13 @@
 	$(document).ready(function() {
 		enableScreen();
         createUploader();
+        
+     	// To check for the special character in name
+        $('#pilotname').bind('input propertychange', function (e) {
+            var name = $(this).val();
+            name = checkForSplChr(name);
+            $(this).val(name);
+        });
 	});
 
 	function findError(data) {
