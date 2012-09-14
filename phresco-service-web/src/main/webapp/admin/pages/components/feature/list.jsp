@@ -19,110 +19,68 @@
   --%>
 
 <%@ taglib uri="/struts-tags" prefix="s" %>
-<%@ page import="java.util.List" %>
-<%@ page import="org.apache.commons.collections.CollectionUtils"%>
-<%@ page import="org.apache.commons.lang.StringUtils"%>
 
-<%@ page import="com.photon.phresco.model.ModuleGroup"%>
-<%@ page import="com.photon.phresco.model.Module"%>
-<%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
+<%@ page import="java.util.List" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="org.apache.commons.collections.CollectionUtils"%>
+
+<%@ page import="com.photon.phresco.model.Technology" %>
+<%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
 
 <% 
-   List<ModuleGroup> moduleGroups = (List<ModuleGroup>)request.getAttribute(ServiceUIConstants.REQ_MODULE_GROUP);
-   String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
+	List<Technology> technologies = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
+	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
 %>
 		
 <form id="formFeaturesList" class="form-horizontal customer_list">
 	<div class="operation">
-		<input type="button" id="featuresAdd" class="btn btn-primary" name="features_add" 
-		    onclick="loadContent('featuresAdd', $('#formFeaturesList'), $('#subcontainer'));" 
-		       value="<s:text name='lbl.hdr.comp.featrs.add'/>"/>
-		<input type="button" class="btn" id="del" disabled value="<s:text name='lbl.hdr.comp.delete'/>" 
-            onclick="showDeleteConfirmation('<s:text name='del.confirm.feature'/>');"/>
+		<div class="featurelist_add">
+			<input type="button" id="featuresAdd" class="btn btn-primary" name="features_add" 
+				onclick="loadContent('featuresAdd', $('#formFeaturesList'), $('#subcontainer'));" 
+				value="<s:text name='lbl.hdr.comp.featrs.add'/>"/>
+			<input type="button" class="btn" id="del" disabled value="<s:text name='lbl.hdr.comp.delete'/>" 
+				onclick="showDeleteConfirmation('<s:text name='del.confirm.feature'/>');"/>
+		</div>
+		
+		<div class="featurelist_tech">
+			<s:text name='lbl.comp.featr.technology'/>
+			<select name="techId" id="tech_id">
+				<%
+					if (technologies != null) {
+						for (Technology technology : technologies) {
+				%>
+							<option value="<%=technology.getId() %>"><%=technology.getName() %></option>
+				<%
+						}
+					}
+				%>
+			</select>
+		</div>
+        
+		<div class="featurelist_type"><s:text name="lbl.comp.featr.type" />
+			<select class="select_type" name="type" id="type">
+				<option value="module">Modules</option>
+				<option value="js">JSLibraries</option>    
+			</select>
+		</div>  
+		
 		<s:if test="hasActionMessages()">
-			<div class="alert alert-success alert-message"  id="successmsg">
+			<div class="alert alert-success alert-message alert_messagelist" id="successmsg">
 				<s:actionmessage />
 			</div>
 		</s:if>
+		
 		<s:if test="hasActionErrors()">
 			<div class="alert alert-error"  id="errormsg">
 				<s:actionerror />
 			</div>
 		</s:if>
 	</div>	
-	  <% if (CollectionUtils.isEmpty(moduleGroups)) { %>
-            <div class="alert alert-block">
-                <s:text name='alert.msg.feature.not.available'/>
-            </div>
-    <% } else { %>
-	<div class="content_adder">
-		<div class="control-group">
-			<div class="external_features_wrapper">
-				<div class="theme_accordion_container" id="coremodule_accordion_container">
-					<section class="accordion_panel_wid">
-						<% for(ModuleGroup moduleGroup : moduleGroups) { %>
-						<div class="accordion_panel_inner">
-							<section class="lft_menus_container">
-								<span class="siteaccordion">
-									<span>
-									   <input type="checkbox" class="check" name="techId" value="<%= moduleGroup.getId() %>" onclick="checkboxEvent();" >
-										<%= moduleGroup.getName()  %>
-									</span>
-								</span>
-								<div class="mfbox siteinnertooltiptxt">
-									<div class="scrollpanel">
-										<section class="scrollpanel_inner">
-											<table class="download_tbl">
-												<thead>
-													<tr>
-														<th></th>
-														<th class="accordiantable"><s:label key="lbl.hdr.cmp.name" theme="simple"/></th>
-														<th class="accordiantable"><s:label key="lbl.hdr.cmp.desc" theme="simple"/></th>
-														<th class="accordiantable"><s:label key="lbl.hdr.comp.ver" theme="simple"/></th>
-													</tr>
-												</thead>
-													
-												<tbody>
-										         <%-- <%
-                                                     if (CollectionUtils.isNotEmpty(moduleGroups)) {
-                                                         for ( ModuleGroup moduleGroup : moduleGroups) {
-                                                 %> --%>
-										              <tr>
-														<td class="editFeatures_td1">
-															<input type="radio" name="" value="">
-														</td>
-														<td class="editFeatures_td2">
-															<div class="accordalign"></div>
-															<a href="#" name="ModuleDesc" onclick="editFeature('<%= moduleGroup.getId() %>');" ><%= StringUtils.isNotEmpty(moduleGroup.getName()) ? moduleGroup.getName() : "" %></a>
-														</td>
-														<td class="editFeatures_td4"><%= StringUtils.isNotEmpty(moduleGroup.getDescription()) ? moduleGroup.getDescription():"" %></td>
-														<% 
-														   List<Module> versions = moduleGroup.getVersions();
-														     if (CollectionUtils.isNotEmpty(versions)) {
-		                                                           for (Module moduleVersion : versions) {
-														%>
-														
-														<td class="editFeatures_td4"><%= StringUtils.isNotEmpty(moduleVersion.getVersion()) ? moduleVersion.getVersion():"" %></td>
-													     <% 
-                                                           }
-                                                         }
-                                                      %>
-													
-													</tr>
-												</tbody>
-											</table>
-										</section>
-									</div>
-								</div>
-							</section>  
-						</div>
-						<% } %>
-					</section>		
-				</div>
-			</div>
-		</div>
-	</div>	
-	<% } %>
+	
+	<div class="featurelist_height"; id="feature_list">
+	
+	</div>
+    
 	<!-- Hidden Fields -->
     <input type="hidden" name="customerId" value="<%= customerId %>">
 </form>
@@ -130,7 +88,7 @@
 <script language="JavaScript" type="text/javascript">
 
 	$(document).ready(function() {
-		enableScreen();
+		featurelist();
 	});
 	
 	function editFeature(id) {
@@ -144,4 +102,17 @@
     	confirmDialog('none','');
     	loadContent('featuresDelete', $('#formFeaturesList'), $('#subcontainer'));
     }
+	
+    function featurelist() {
+    	loadContent('listFeatures', $('#formFeaturesList'), $('#feature_list'));
+    	
+		$('#tech_id').change(function() {
+			loadContent('listFeatures', $('#formFeaturesList'), $('#feature_list'));
+		});
+    	
+		$('#type').change(function() {
+			loadContent('listFeatures', $('#formFeaturesList'), $('#feature_list'));
+		});
+    }
+    
 </script>

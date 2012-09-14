@@ -1967,3 +1967,31 @@ input[class*='sample'] {
 	cursor:pointer;
 }	
 /* exception popup ends */
+
+.featurelist_tech {
+	margin-right: 7px; 
+	float: left; 
+	font-weight: bold; 
+}
+
+.featurelist_type {
+	margin-right: 7px; 
+	font-weight: bold; 
+}
+
+.featurelist_add {
+	float: left; 
+	margin-right: 7px; 
+}
+
+.select_type {
+	width: 13%;
+}
+
+.alert_messagelist {
+	margin-left: 55%;
+}
+
+.featurelist_height {
+	height:104%;
+}

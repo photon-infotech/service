@@ -69,6 +69,10 @@
 		<action name="featuresList" class="com.photon.phresco.service.admin.actions.components.Features" method="list">
             <result name="featuresList">/admin/pages/components/feature/list.jsp</result>
         </action>
+        
+        <action name="listFeatures" class="com.photon.phresco.service.admin.actions.components.Features" method="featuresWithList">
+            <result name="featuresList">/admin/pages/components/feature/feature_list.jsp</result>
+        </action>
 		
 		<action name="featuresAdd" class="com.photon.phresco.service.admin.actions.components.Features" method="add">
             <result name="featuresAdd">/admin/pages/components/feature/add.jsp</result>

@@ -77,9 +77,26 @@ public class Features extends ServiceBaseAction {
     	}
     	
     	try {
-    		List<ModuleGroup> moduleGroup = getServiceManager().getFeatures(customerId);
+      		getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+    		List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
+    		getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
+    	} catch (PhrescoException e){
+    		new LogErrorReport(e, FEATURE_LIST_EXCEPTION);
+    		
+    		return LOG_ERROR;
+    	}
+    	
+    	return COMP_FEATURES_LIST;
+    }
+    
+    public String featuresWithList() {
+    	if (isDebugEnabled) {
+    		S_LOGGER.debug("Entering Method  Features.featurelist()");
+    	}
+    	try {
+
+    		List<ModuleGroup> moduleGroup = getServiceManager().getFeaturesByTech(customerId, techId, type);
     		getHttpRequest().setAttribute(REQ_MODULE_GROUP, moduleGroup);
-    		getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
     	} catch (PhrescoException e){
     		new LogErrorReport(e, FEATURE_LIST_EXCEPTION);
     		

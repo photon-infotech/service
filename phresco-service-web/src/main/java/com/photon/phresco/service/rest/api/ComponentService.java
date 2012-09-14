@@ -456,7 +456,8 @@ public class ComponentService extends DbService implements ServiceConstants {
 	@GET
 	@Path (REST_API_MODULES)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findModules(@QueryParam(REST_QUERY_TYPE) String type, @QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
+	public Response findModules(@QueryParam(REST_QUERY_TYPE) String type, @QueryParam(REST_QUERY_CUSTOMERID) String customerId,
+			@QueryParam(REST_QUERY_TECHID) String techId) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.findModules()" + type);
 	    }
@@ -477,10 +478,10 @@ public class ComponentService extends DbService implements ServiceConstants {
 			if(StringUtils.isNotEmpty(customerId) && type.equals(REST_QUERY_TYPE_MODULE)) {
 				if (!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
 					foundModules = mongoOperation.find(MODULES_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)
-								.and(REST_QUERY_TYPE).is(type)), ModuleGroup.class);
+								.and(REST_QUERY_TYPE).is(type).and(REST_QUERY_TECHID).is(techId)), ModuleGroup.class);
 				}
 				foundModules.addAll(mongoOperation.find(MODULES_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)
-							.and(REST_QUERY_TYPE).is(type)), ModuleGroup.class));
+							.and(REST_QUERY_TYPE).is(type).and(REST_QUERY_TECHID).is(techId)), ModuleGroup.class));
 				
 				return Response.status(Response.Status.OK).entity(foundModules).build();
 			}
@@ -488,10 +489,10 @@ public class ComponentService extends DbService implements ServiceConstants {
 			if(StringUtils.isNotEmpty(customerId) && type.equals(REST_QUERY_TYPE_JS)) {
 			    if (!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
 					foundModules = mongoOperation.find(MODULES_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)
-								.and(REST_QUERY_TYPE).is(type)), ModuleGroup.class);
+								.and(REST_QUERY_TYPE).is(type).and(REST_QUERY_TECHID).is(techId)), ModuleGroup.class);
 				}
 				foundModules.addAll(mongoOperation.find(MODULES_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)
-							.and(REST_QUERY_TYPE).is(type)), ModuleGroup.class));
+							.and(REST_QUERY_TYPE).is(type).and(REST_QUERY_TECHID).is(techId)), ModuleGroup.class));
 				
 				return Response.status(Response.Status.OK).entity(foundModules).build();
 			}

@@ -1066,3 +1066,11 @@ h3 label {
 	color: red;
 	float:left;
 }
+
+.featurelist_tech { 
+	color: #404040;
+}
+
+.featurelist_type { 
+	color: #404040;
+}
