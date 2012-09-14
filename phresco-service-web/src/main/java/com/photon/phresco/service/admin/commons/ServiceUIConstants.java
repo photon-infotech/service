@@ -298,4 +298,7 @@ public interface ServiceUIConstants {
     String DOWNLOAD_NOT_ADDED = "fail.download.add";
     String DOWNLOAD_DELETED = "succ.download.delete";
     String DOWNLOAD_NOT_DELETED = "fail.download.delete";
+    
+    //Email validation
+    String INVALID_EMAIL = "err.msg.invalid.email";
 }

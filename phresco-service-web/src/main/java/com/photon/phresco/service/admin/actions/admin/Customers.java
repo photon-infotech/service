@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -225,6 +227,16 @@ public class Customers extends ServiceBaseAction  {
 			setMailError(getText(KEY_I18N_ERR_EMAIL_EMPTY));
 			isError = true;
 		} 
+		
+		if (StringUtils.isNotEmpty(email)) {
+	   		Pattern p = Pattern.compile("^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
+	   		Matcher m = p.matcher(email);
+	   		boolean b = m.matches();
+	   		if (!b) {
+	   			setMailError(getText(INVALID_EMAIL));
+	   			isError = true;
+	   		}
+	   	}
 		
 		if (StringUtils.isEmpty(address)) {
 			setAddressError(getText(KEY_I18N_ERR_ADDRS_EMPTY));
