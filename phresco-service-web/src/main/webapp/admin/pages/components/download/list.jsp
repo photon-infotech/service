@@ -77,7 +77,7 @@
 									<div class="th-inner tablehead"><s:label key="lbl.hdr.adm.dwnldlst.appltfrm" theme="simple"/></div>
 								</th>
 								<th class="third">
-									<div class="th-inner tablehead"><s:label key="lbl.hdr.adm.dwnldlst.ver"  theme="simple"/></div>
+									<div class="th-inner tablehead" style="margin-left:-80px;"><s:label key="lbl.hdr.adm.dwnldlst.ver"  theme="simple"/></div>
 								</th>
 							</tr>
 						</thead>
@@ -100,7 +100,7 @@
 								<td>
 									<%= CollectionUtils.isNotEmpty(download.getPlatform()) ? download.getPlatform() : "" %>
 								</td>
-								<td><%= download.getVersion() %></td>
+								<td><%= CollectionUtils.isNotEmpty(download.getVersion()) ? download.getVersion() : "" %></td>
 							</tr>
 						<%
 								}
