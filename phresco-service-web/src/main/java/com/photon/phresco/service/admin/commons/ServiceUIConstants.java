@@ -98,6 +98,13 @@ public interface ServiceUIConstants {
     String REQ_CONFIG_TEMPLATES = "configTemplates";
     String REQ_CONFIG_ID = "configId";
     
+    String REQ_CONFIG_KEY = "propTempKey";
+	String REQ_CONFIG_PSBL_VAL = "_psblVal";
+	String REQ_CONFIG_MULTIPLE = "_propMul";
+	String REQ_CONFIG_MANDATORY = "_propMand";
+	String REQ_CONFIG_HELP_TEXT = "_helpText";
+	String REQ_CONFIG_TYPE = "_type";
+    
     /*****************************
      * Download Request Constants
      * String REQ_DOWNLOAD_XXX

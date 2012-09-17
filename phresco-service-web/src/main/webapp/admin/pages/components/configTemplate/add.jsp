@@ -29,33 +29,39 @@
 <%@ page import="com.photon.phresco.model.Technology"%>
 
 <%
-	List<Technology> technologys = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
-    String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
-    String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
-    SettingsTemplate settingsTemplate = (SettingsTemplate) request.getAttribute(ServiceUIConstants.REQ_CONFIG_TEMP);
-    
+	List<Technology> technologies = (List<Technology>) request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
+	String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
+	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
+	SettingsTemplate settingsTemplate = (SettingsTemplate) request.getAttribute(ServiceUIConstants.REQ_CONFIG_TEMP);
+
 	//For edit
-    String name = "";
-    String desc = "";
-    boolean isSystem = false;
-    if (settingsTemplate != null) {
-    	if (StringUtils.isNotEmpty(settingsTemplate.getType())) {
-    		name = settingsTemplate.getType();	
-    	}
-    	if (StringUtils.isNotEmpty(settingsTemplate.getDescription())) {
-    		desc = settingsTemplate.getDescription();	
-    	}
-    	isSystem = settingsTemplate.isSystem();
-    }
+	String name = "";
+	String desc = "";
+	boolean isSystem = false;
+	if (settingsTemplate != null) {
+		if (StringUtils.isNotEmpty(settingsTemplate.getType())) {
+			name = settingsTemplate.getType();
+		}
+		if (StringUtils.isNotEmpty(settingsTemplate.getDescription())) {
+			desc = settingsTemplate.getDescription();
+		}
+		isSystem = settingsTemplate.isSystem();
+	}
 %>
 
 <form id="formConfigTempAdd" name="configForm" class="form-horizontal customer_list">
 	<h4 class="hdr">
-		<% if (StringUtils.isNotEmpty(fromPage)) { %>
+		<%
+			if (StringUtils.isNotEmpty(fromPage)) {
+		%>
 			<s:label key="lbl.hdr.comp.cnfigtmplt.edit" theme="simple"/>
-		<% } else {%>
+		<%
+			} else {
+		%>
 			<s:label key="lbl.hdr.comp.cnfigtmplte.add" theme="simple"/>   
-		<% } %>   
+		<%
+   			}
+   		%>   
 	 </h4>	
 	
 	<div class="content_adder">
@@ -66,7 +72,7 @@
 			
 			<div class="controls">
 				<input id="configname" placeholder="<s:text name='place.hldr.configTemp.add.name'/>" class="input-xlarge" 
-					type="text" name="name"  value="<%= name %>" maxlength="30" title="30 Characters only">
+					type="text" name="name"  value="<%=name%>" maxlength="30" title="30 Characters only">
 				<span class="help-inline" id="nameError"></span>
 			</div>
 		</div>
@@ -77,7 +83,7 @@
 			</label>
 			<div class="controls">
 				<textarea placeholder="<s:text name='place.hldr.configTemp.add.desc'/>" class="input-xlarge" 
-					name="description" maxlength="150" title="150 Characters only" value="<%= desc %>"></textarea>
+					name="description" maxlength="150" title="150 Characters only"><%=desc%></textarea>
 			</div>
 		</div>
 		
@@ -87,14 +93,15 @@
 			</label>
 			<div class="controls">
 				<select id="multiSelect" multiple="multiple" name="appliesTo">
-					<% 
-						if (CollectionUtils.isNotEmpty(technologys)) {
-							for (Technology technology : technologys) {
+					<%
+						if (CollectionUtils.isNotEmpty(technologies)) {
+							for (Technology technology : technologies) {
 								String selectedStr = "";
 								if (settingsTemplate != null) {
-									List<String> appliesTos = settingsTemplate.getAppliesTo();
-									if (CollectionUtils.isNotEmpty(appliesTos)){
-									 	if (appliesTos.contains(technology.getId())) {
+									List<String> appliesTos = settingsTemplate
+											.getAppliesTo();
+									if (CollectionUtils.isNotEmpty(appliesTos)) {
+										if (appliesTos.contains(technology.getId())) {
 											selectedStr = "selected";
 										} else {
 											selectedStr = "";
@@ -102,13 +109,12 @@
 									}
 								}
 					%>
-								<option value="<%= technology.getId() %>" <%= selectedStr %>><%= technology.getName() %></option>
-					<%  
-							}
+					<option value="<%=technology.getId()%>" <%=selectedStr%>><%=technology.getName()%></option>
+					<%
+						}
 						}
 					%>
-				</select>
-				<span class="help-inline applyerror" id="applyError"></span>
+				</select> <span class="help-inline applyerror" id="applyError"></span>
 			</div>
 		</div>
 		
@@ -122,7 +128,8 @@
 								<thead class = "fieldset-tableheader">
 									<tr>
 										<th class="second">
-											<div class="th-inner tablehead fixTableHdr""><s:label key="lbl.hdr.comp.cnfigtmplt.key.title" theme="simple"/></div>
+											<div class="th-inner tablehead fixTableHdr"><span class="mandatory">*</span>&nbsp;
+												<s:label key="lbl.hdr.comp.cnfigtmplt.key.title" cssClass="keyMandtory" theme="simple"/></div>
 										</th>
 										<th class="second">
 											<div class="th-inner tablehead fixTableHdr"><s:label key="lbl.hdr.comp.cnfigtmplt.type.title" theme="simple"/></div>
@@ -149,39 +156,47 @@
 							</div>
 							
 							<div id="input1" class="clonedInput">
-								<tbody>
-									<tr class="configdynamiadd">
+								<tbody id="propTempTbody">
+									<tr class="1_configdynamiadd">
 										<td class="textwidth">
-											<input type="text" id = "concate" value="" placeholder="" maxlength="30" title="30 Characters only" class="span2" style="width:100%;">
+											<input type="text" id="1" value="" placeholder="<s:text name='place.hldr.configTemp.add.key'/>" name="propTempKey"  
+												temp="1_key" class="key" onblur="updateRowInputNames(this)" maxlength="30" title="30 Characters only">
 										</td>
 										<td class="textwidth">
-											<select id="select01" class = "select typewidth" style="width:100%;">
-												<option>- select -</option>
-												<option>String</option>
-												<option>Integer</option>
-												<option>Password</option>
+											<select id="1_type" class = "select typewidth">
+												<option value="String">String</option>
+												<option value="Integer">Integer</option>
+												<option value="Password">Password</option>
 											</select>
 										</td>
-										<td class="psblevalue" id="psblValMultiple" style="display:none;">
-											<select type="text" placeholder="<s:text name='place.hldr.configTemp.add.possible.values'/>" class="propTempTxt" id="tempTxt"></select>
-											<a data-toggle="modal" href="#myModal"><img class="addiconAlign imagealign" src="images/add_icon.png"/></a>
+										<td class="psblevalue" id="1_psblMulDiv" style="display:none;">
+											<select type="text" placeholder="<s:text name='place.hldr.configTemp.add.possible.values'/>" 
+												class="propTempTxt psblSelect" id="1_psblMul"></select>
+											<input type="hidden" class="1"/>
+											<a data-toggle="modal" href="#myModal"><img class="addiconAlign imagealign" temp="1" src="images/add_icon.png"/ 
+												onclick="addPsblValPopup(this);"></a>
 										</td>
-										
-										<td class="psblevalue" id="psblValSingle">
-											<input type="text" placeholder="<s:text name='place.hldr.configTemp.add.possible.values'/>" class="propTempTxt" style="width:80%;" id="tempTxtBox">
-											<a data-toggle="modal" href="#myModal"><img class="addiconAlign imagealign" src="images/add_icon.png"/></a>
+										<td class="psblevalue" id="1_psblSinglDiv">
+											<input type="text" placeholder="<s:text name='place.hldr.configTemp.add.possible.values'/>" 
+												class="propTempTxt psblSngl" id="1_psblSingl">
+											<input type="hidden" class="1"/>
+											<a data-toggle="modal" href="#myModal"><img class="addiconAlign imagealign" temp="1" 
+												src="images/add_icon.png"/ onclick="addPsblValPopup(this);"/></a>
 										</td>
 										<td class="hlpText">
-											<input type="text" placeholder="<s:text name='place.hldr.configTemp.add.help.text'/>" maxlength="150" title="150 Characters only" class="propTempTxt" style="width:100%;">
+											<input type="text" placeholder="<s:text name='place.hldr.configTemp.add.help.text'/>" 
+												id="1_helpText" class="propTempTxt hlpTxt" maxlength="150" title="150 Characters only">
 										</td>
 										<td class="mandatoryfld">
-											<input type="checkbox" value="option1" id="optionsCheckbox">
+											<input type="checkbox" value="true" id="1_propMand">
 										</td>
 										<td class="multiplefld">
-											<input type="checkbox" value="option1" id="optionsCheckbox">
+											<input type="checkbox" value="true" id="1_propMul">
 										</td>
 										<td class="imagewidth">
-											<a ><img class="add imagealign" src="images/add_icon.png" onclick="addconfig();"></a>
+											<a><img class="add imagealign" temp="1" src="images/add_icon.png" onclick="addconfig(this);"></a>
+										</td>
+										<td>
 										</td>
 									</tr>
 								</tbody>
@@ -219,6 +234,7 @@
 							</div>
 							
 							<div class="modal-footer">
+								<input type="hidden" id="hiddenKey"/>
 								<div class="errMsg" id="errMsg"></div>
 								<a href="#" class="btn btn-primary" data-dismiss="modal"><s:label key="lbl.hdr.comp.cancel" theme="simple"/></a>
 								<a href="#" id ="ok" class="btn btn-primary" data-dismiss="modal" ><s:label key="lbl.hdr.comp.ok" theme="simple"/></a>
@@ -232,30 +248,35 @@
 	 
 	<div class="bottom_button">
 	<%
-	String disabledClass = "btn-primary";
-	String disabled = "";
-	if (isSystem) {
-		disabledClass = "btn-disabled";
-		disabled = "disabled";
-	}
-	if (StringUtils.isNotEmpty(fromPage)) { %>
-		<input type="button" id="configtempUpdate" class="btn <%= disabledClass %>" <%= disabled %>
+		String disabledClass = "btn-primary";
+		String disabled = "";
+		if (isSystem) {
+			disabledClass = "btn-disabled";
+			disabled = "disabled";
+		}
+		if (StringUtils.isNotEmpty(fromPage)) {
+	%>
+		<input type="button" id="configtempUpdate" class="btn <%=disabledClass%>" <%=disabled%>
 				onclick="validate('configtempUpdate', $('#formConfigTempAdd'), $('#subcontainer'), 'Updating Config Template');" 
 		        value="<s:text name='lbl.hdr.comp.update'/>"/>
-    <% } else { %>		
+    <%
+    	} else {
+    %>		
 		<input type="button" id="configtempSave" class="btn btn-primary"
-		        onclick="validate('configtempSave', $('#formConfigTempAdd'), $('#subcontainer'), 'Creating Config Template');" 
+		        onclick="validatePropTempKey();" 
 		        value="<s:text name='lbl.hdr.comp.save'/>"/>
-	<% } %> 
+	<%
+		}
+	%> 
 		<input type="button" id="configtempCancel" class="btn btn-primary" 
 		      onclick="loadContent('configtempList', $('#formConfigTempAdd'), $('#subcontainer'));" 
 		      value="<s:text name='lbl.hdr.comp.cancel'/>"/>
 	</div>
 	
 	<!-- Hidden Fields -->
-	<input type="hidden" name="fromPage" value="<%= StringUtils.isNotEmpty(fromPage) ? fromPage : "" %>"/>
-	<input type="hidden" name="oldName" value="<%= name %>"/>
-	<input type="hidden" name="customerId" value="<%= customerId %>">
+	<input type="hidden" name="fromPage" value="<%=StringUtils.isNotEmpty(fromPage) ? fromPage : ""%>"/>
+	<input type="hidden" name="oldName" value="<%=name%>"/>
+	<input type="hidden" name="customerId" value="<%=customerId%>">
 </form>
 
 <script language="javascript">
@@ -277,6 +298,11 @@
 		$("#addValues").click(function() {
 			var textComboVal = $("#txtCombo").val();
 			var alreadyExists = false;
+			if ($("#txtCombo").val().trim() === "") {
+				$("#errMsg").html("Please enter Key");
+				alreadyExists = true;
+			}
+			
 			$('#valuesCombo option').each( function() {
 				if ($(this).val() == textComboVal) {
 					$("#errMsg").html("Key value already exists");
@@ -284,34 +310,42 @@
 					return false;
 				}
 			});
-			if (!alreadyExists) {
+			
+			if (!alreadyExists && textComboVal.trim() !== "") {
 				$("#txtCombo").val("");
 				$("#valuesCombo").append($('<option name='+ textComboVal +'></option>').attr("value", textComboVal).text(textComboVal));				
 			}
 		});
 		
 		$("#ok").click(function() {
+			var id = $("#hiddenKey").val();
+			var length =  $('#valuesCombo option').length;
+			var psblValName ="";
+			var psblVal = "";
 			$('#valuesCombo option').each( function() {
 				var length =  $('#valuesCombo option').length;
 				var value = $(this).val();
+				var keyVal = $("#"+id).val();
+				psblValName = keyVal + "_psblVal";
 				if (length === 1) {
-					$("#psblValSingle").show();
-					$("#psblValMultiple").hide();
-					$("#tempTxtBox").val(value);
+					$("#"+ id +"_psblMulDiv").hide();
+					$("#"+ id +"_psblSinglDiv").show();
+					$("#"+ id +"_psblSingl").val(value);
+					$("."+id).val(value);
+					$("."+id).attr("name", psblValName);
 				} else {
-					$("#psblValSingle").hide();
-					$("#psblValMultiple").show();
-					$("#tempTxt").append($("<option></option>").attr("value", value).text(value));	
+					$("#"+ id +"_psblSinglDiv").hide();
+					$("#"+ id +"_psblMulDiv").show();
+					$("#"+ id +"_psblMul").append($("<option></option>").attr("value", value).text(value));
+					psblVal = psblVal.concat(value);
+					psblVal = psblVal.concat(",");
 				}
 			});
+			if (length !== 1) {
+				$("."+id).val(psblVal.substring(0, psblVal.length-1));
+				$("."+id).attr("name", psblValName);
+			}
 		});
-	
-		/* $('.add').live('click', function() {
-			alert("sd");
-			var appendRow =  '<tr class="configdynamiadd">' + $('.configdynamiadd').html() + '</tr>';
-			$("tr:last").after(appendRow);			
-			$("td:last").append('<img class = "del imagealign" src="images/minus_icon.png" onclick="removeTag(this);">');		
-		});  */
 	
 		$('#remove').click(function() {
 			$('#valuesCombo option:selected').each( function() {
@@ -343,27 +377,104 @@
 		});
 	});
 	
+	var counter = 2;
 	function addconfig() {
-		var appendRow =  '<tr class="configdynamiadd">' + $('.configdynamiadd').html() + '</tr>';
-		$("tr:last").after(appendRow);			
-		$("td:last").append('<img class = "del imagealign" src="images/minus_icon.png" onclick="removeTag(this);">');		
+		var trId = counter + "_configdynamiadd";
+		var keyId = counter;
+		var keyTmpName = counter+"_key";
+	 	var typeId = counter + "_type";
+	 	var psblMulDivId = counter + "_psblMulDiv";
+	 	var psblValMultipleId = counter + "_psblMul";
+	 	var psblSinglDivId = counter + "_psblSinglDiv";
+	 	var psblValSingleId = counter + "_psblSingl";
+	 	var helpTextId = counter + "_helpText";
+	 	var mandChckId = counter + "_propMand";
+		var mulChckId = counter + "_propMul";
+	 	
+	 	var newPropTempRow = $(document.createElement('tr')).attr("id", trId);
+	 	newPropTempRow.html("<td class='textwidth'><input type='text' id='"+ keyId +"' class='key' name='propTempKey' value='' "+
+	 			" temp='"+ keyTmpName +"' placeholder='<s:text name='place.hldr.configTemp.add.key'/>' onblur='updateRowInputNames(this)'></td>" + 
+	 			"<td class='textwidth'><select id='"+ typeId +"' class = 'select typewidth'><option value='String'>String</option> " + 
+	 			"<option value='Integer'>Integer</option><option value='Password'>Password</option></select></td>"  +
+	 			"<td class='psblevalue' id='"+ psblMulDivId +"' style='display:none;'><select type='text' placeholder='<s:text name='place.hldr.configTemp.add.possible.values'/>'" + 
+	 			" class='propTempTxt psblSelect' id='"+ psblValMultipleId +"'></select>"+
+	 			"<input type='hidden' class='"+ keyId +"'/><a data-toggle='modal' href='#myModal'> " + 
+	 			"<img class='addIcon imagealign' temp='"+ keyId +"' src='images/add_icon.png' onclick='addPsblValPopup(this);'/></a></td>" +
+	 			"<td class='psblevalue' id='"+ psblSinglDivId +"'><input type='text' placeholder='<s:text name='place.hldr.configTemp.add.possible.values'/>' " +
+	 			" class='propTempTxt psblSngl' id='"+ psblValSingleId +"'>" + 
+	 			"<input type='hidden' class='"+ keyId +"'/><a data-toggle='modal' href='#myModal'><img class='addIcon imagealign' temp='"+ keyId +"' " +
+	 			"src='images/add_icon.png' onclick='addPsblValPopup(this);'/></a></td>" +
+	 			"<td class='hlpText'><input type='text' id='"+ helpTextId +"' placeholder='<s:text name='place.hldr.configTemp.add.help.text'/>' " + 
+	 			"name='helpText' class='propTempTxt hlpTxt'></td> <td class='mandatoryfld'><input type='checkbox' value='true' id='"+ mandChckId +"'></td>" +
+	 			"<td class='multiplefld'><input type='checkbox' value='true' id='"+ mulChckId +"'></td>" +
+	 			"<td class='imagewidth'><a ><img class='add imagealign' temp='"+ keyId +"' src='images/add_icon.png' onclick='addconfig(this);'></a></td>" + 
+	 			"<td><img class = 'del imagealign' src='images/minus_icon.png' onclick='removeTag(this);'></td>")
+	 	newPropTempRow.appendTo("#propTempTbody");		
+		counter++;
 	}
 	 
+	function addPsblValPopup(obj) {
+		$("#hiddenKey").val("");
+		$("#txtCombo").val("");
+		$("#errMsg").empty();
+		$("#valuesCombo").empty();
+		$("#hiddenKey").val($(obj).attr("temp"));
+	}
+	
 	function removeTag(currentTag) {
 		$(currentTag).parent().parent().remove();
 	}
 	
-	function findError(data) {
-		if (data.nameError != undefined) {
-			showError($("#nameControl"), $("#nameError"), data.nameError);
+	function updateRowInputNames(obj) {
+		//to check duplications of entered key value
+		var keyClass = $(obj).attr("class");
+		$("."+keyClass).each(function(){
+			if($(obj).attr("temp") !== $(this).attr("temp") && $(obj).val() === $(this).val()) {
+				$(obj).val("");
+				showError($("#"+ $(obj).attr("id") +"_configdynamiadd"));
+				return false;
+			}
+		});
+		
+		//to set names of input fields of current prop template row
+		if ($(obj).val().trim() !== "") {
+			var id = $(obj).attr("id");
+			var typeName =  $(obj).val() + "_type";
+		 	var psblVal = $(obj).val() + "_psblVal";
+		 	var helpTextName =  $(obj).val() + "_helpText";
+		 	var mandChckName =  $(obj).val() + "_propMand";
+			var mulChckName =  $(obj).val() + "_propMul";
+			
+			$("#"+ id +"_type").attr("name", typeName);
+			$("."+id).attr("name", psblVal);
+			$("#"+ id +"_helpText").attr("name", helpTextName);
+			$("#"+ id +"_propMand").attr("name", mandChckName);
+			$("#"+ id +"_propMul").attr("name", mulChckName);
+		} 
+	}
+	
+	function validatePropTempKey() {
+		var redirect = true;
+		$(".key").each(function() {
+			if ($(this).val().trim() === "") {
+				$("#"+$(this).attr("id")).focus();
+				redirect = false;
+				return false;
+			} 
+		});
+		if ($("#configname").val().trim() === "" ) {
+			showError($("#nameControl"), $("#nameError"), '<s:text name='err.msg.name.empty'/>');
 		} else {
 			hideError($("#nameControl"), $("#nameError"));
 		}
-		
-		if (data.applyError != undefined) {
-			showError($("#applyControl"), $("#applyError"), data.applyError);
+		if ($("#multiSelect :selected").length === 0) {
+			showError($("#applyControl"), $("#applyError"), '<s:text name='err.msg.applies.empty'/>');
 		} else {
 			hideError($("#applyControl"), $("#applyError"));
 		}
+		
+		if (redirect) {
+			validate('configtempSave', $('#formConfigTempAdd'), $('#subcontainer'), 'Creating Config Template');
+		} 
 	}
 </script>

@@ -1563,6 +1563,12 @@ h3 label {
 	width: 14%;
 }
 
+.key {
+	float: none;
+    margin-left: 0;
+    width: 124px;
+}
+
 .psblevalue {
 	width: 29%;
 }
@@ -1578,11 +1584,12 @@ h3 label {
 }
 
 .imagewidth {
-	width: 9%;
+	width: 1%;
 }
 
 .typewidth {
-	width:170px;
+	/*width:170px;*/
+	width:100%;
 }
 .imageupdown {
 	cursor: pointer;
@@ -1995,3 +2002,32 @@ input[class*='sample'] {
 .featurelist_height {
 	height:104%;
 }
+
+.prpoTempErr {
+	border-color: #B94A48;
+    color: #B94A48;
+}
+
+.keyMandtory {
+ 	float: right;
+}
+
+.key {
+	width: 100%;
+}
+
+.psblSelect {
+	width: 78.2%;
+}
+
+.psblSngl {
+	width: 75%;
+}
+
+.hlpTxt {
+	 width: 100%;
+}
+
+.addIcon {
+	margin-left: 4px;
+}	
