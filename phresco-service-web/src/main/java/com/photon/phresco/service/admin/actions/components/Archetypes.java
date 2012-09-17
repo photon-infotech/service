@@ -299,32 +299,31 @@ public class Archetypes extends ServiceBaseAction {
 		try {
             writer = getHttpResponse().getWriter();
 	        applnJarName = getHttpRequest().getHeader(X_FILE_NAME);
-	        if (applnJarName.endsWith(REQ_JAR_FILE_EXTENSION) || applnJarName.endsWith(REQ_ZIP_FILE_EXTENSION) 
-	        		|| applnJarName.endsWith(REQ_TAR_GZ_FILE_EXTENSION)) {
-	        	InputStream is = getHttpRequest().getInputStream();
-	        	byte[] tempApplnByteArray = IOUtils.toByteArray(is);
-	        	boolean isArchetypeJar = ServerUtil.validateArchetypeJar(new ByteArrayInputStream(tempApplnByteArray));
-	        	if (isArchetypeJar) {
-	        		applnByteArray = tempApplnByteArray;
-		        	ArchetypeInfo archetypeInfo = ServerUtil.getArtifactinfo(new ByteArrayInputStream(tempApplnByteArray));
-		            getHttpResponse().setStatus(getHttpResponse().SC_OK);
-		            if (archetypeInfo != null) {
-		            	archetypeInfo.setMavenJar(true);
-		            	archetypeInfo.setSuccess(true);
-		            	Gson gson = new Gson();
-		                String json = gson.toJson(archetypeInfo);
-		            	writer.print(json);
-		            } else {
-		            	writer.print(MAVEN_JAR_FALSE);
-		        	}
+	     
+	        InputStream is = getHttpRequest().getInputStream();
+	        byte[] tempApplnByteArray = IOUtils.toByteArray(is);
+	        boolean isArchetypeJar = ServerUtil.validateArchetypeJar(new ByteArrayInputStream(tempApplnByteArray));
+	        if (isArchetypeJar) {
+	        	applnByteArray = tempApplnByteArray;
+	        	ArchetypeInfo archetypeInfo = ServerUtil.getArtifactinfo(new ByteArrayInputStream(tempApplnByteArray));
+	        	getHttpResponse().setStatus(getHttpResponse().SC_OK);
+	        	if (archetypeInfo != null) {
+	        		archetypeInfo.setMavenJar(true);
+	        		archetypeInfo.setSuccess(true);
+	        		Gson gson = new Gson();
+	        		String json = gson.toJson(archetypeInfo);
+	        		writer.print(json);
 	        	} else {
-	        		applnJarName = null;
-	        		applnByteArray = null;
-	            	writer.print(INVALID_ARCHETYPE_JAR);
+	        		writer.print(MAVEN_JAR_FALSE);
 	        	}
-		        writer.flush();
-		        writer.close();
+	        } else {
+	        	applnJarName = null;
+	        	applnByteArray = null;
+	        	writer.print(INVALID_ARCHETYPE_JAR);
 	        }
+	        writer.flush();
+	        writer.close();
+	        
 		} catch (Exception e) {
 			getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
             writer.print(SUCCESS_FALSE);
@@ -339,21 +338,13 @@ public class Archetypes extends ServiceBaseAction {
 		try {
 			writer = getHttpResponse().getWriter();
 	        String jarName = getHttpRequest().getHeader(X_FILE_NAME);
-	        if (jarName.endsWith(REQ_JAR_FILE_EXTENSION) || jarName.endsWith(REQ_ZIP_FILE_EXTENSION) 
-	        		|| jarName.endsWith(REQ_TAR_GZ_FILE_EXTENSION)) {
-	        	InputStream is = getHttpRequest().getInputStream();
-	        	byte[] byteArray = IOUtils.toByteArray(is);
-	        	boolean isPluginJar = ServerUtil.validatePluginJar(new ByteArrayInputStream(byteArray));
-	        	if (isPluginJar) {
-	        		pluginMap.put(jarName, byteArray);
-	        		writer.print(SUCCESS_TRUE);
-	        	} else {
-	        		writer.print(INVALID_PLUGIN_JAR);
-	        	}
-	            getHttpResponse().setStatus(getHttpResponse().SC_OK);
-		        writer.flush();
-		        writer.close();
-	        }
+	        InputStream is = getHttpRequest().getInputStream();
+	        byte[] byteArray = IOUtils.toByteArray(is);
+	        pluginMap.put(jarName, byteArray);
+	        writer.print(SUCCESS_TRUE);
+	        getHttpResponse().setStatus(getHttpResponse().SC_OK);
+	        writer.flush();
+	        writer.close();
 		} catch (Exception e) {
 			getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
             writer.print(SUCCESS_FALSE);
