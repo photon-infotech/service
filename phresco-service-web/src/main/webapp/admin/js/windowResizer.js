@@ -54,6 +54,9 @@ $(document).ready(function() {
 		var newHeight_formHoriz = $(".form-horizontal").height();
 		$(".content_adder").css("height", newHeight_formHoriz - 70);
 		
+		var newHeight_content = $(".form-horizontal").height();
+		$(".content_feature").css("height", newHeight_content - 95);
+		
 		var newWidth_button = $(".form-horizontal").width();
 		$(".bottom_button").css("width", newWidth_button - 25);		
 	}

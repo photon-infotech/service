@@ -65,7 +65,11 @@
 		<action name="components" class="com.photon.phresco.service.admin.actions.components.ComponentMenu" method="getCompMenu">
             <result name="compMenu">/admin/pages/components/menu.jsp</result>
         </action>
-
+		
+		 <action name="featuresMenu" class="com.photon.phresco.service.admin.actions.components.Features" method="menu">
+            <result name="featuresList">/admin/pages/components/feature/feature.jsp</result>
+        </action>
+		
 		<action name="featuresList" class="com.photon.phresco.service.admin.actions.components.Features" method="list">
             <result name="featuresList">/admin/pages/components/feature/list.jsp</result>
         </action>

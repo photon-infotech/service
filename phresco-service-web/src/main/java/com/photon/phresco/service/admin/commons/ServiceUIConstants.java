@@ -124,10 +124,13 @@ public interface ServiceUIConstants {
     
     /*****************************
      * Download Request Constants
-     * String REQ_DOWNLOAD_XXX
+     * String REQ_FEATURES_XXX
      *****************************/ 
     String REQ_FEATURES_MOD_GRP = "moduleGroup";
     String FEATURES_CORE = "core";
+    String REQ_FEATURES_TYPE = "type";
+    String REQ_FEATURES_MODULE = "module";
+    String REQ_FEATURES_HEADER = "header";
     
     
     /*****************************
@@ -262,6 +265,16 @@ public interface ServiceUIConstants {
     String KEY_I18N_ERR_APPLNPLTF_EMPTY = "err.msg.applnpltf.empty";
     String KEY_I18N_ERR_GROUP_EMPTY = "err.msg.group.empty";
     String KEY_I18N_ERR_TECH_EMPTY = "err.msg.tech.empty";
+    
+    /*****************************
+     * I18N Keys Constants
+     * String KEY_I18N_FEATUR_XXX
+     *****************************/	
+    
+    String KEY_I18N_FEATURE_MOD_ADD = "lbl.hdr.comp.featrs.mod.add";
+    String KEY_I18N_FEATURE_JS_ADD = "lbl.hdr.comp.featrs.js.add";
+    String KEY_I18N_FEATURE_MOD_EDIT = "lbl.hdr.comp.featrs.mod.edit";
+    String KEY_I18N_FEATURE_JS_EDIT = "lbl.hdr.comp.featrs.js.edit";
     
     String FEATURE_ADDED = "succ.feature.add";
     String FEATURE_NOT_ADDED = "fail.feature.add";

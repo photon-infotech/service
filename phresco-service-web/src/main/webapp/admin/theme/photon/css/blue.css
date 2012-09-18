@@ -1078,3 +1078,25 @@ h3 label {
 .fontColor {
     color:#5a5a5a;
 }
+
+#navigation {
+    background-color:#FFFFFF;
+    border-bottom: 1px solid #0064CD;
+}
+
+#navigation ul li a {
+    color:#004366;
+    background:#FFFFFF;
+}
+
+#navigation ul li a:hover, #navigation ul li a.selected {
+    color: #FFFFFF;
+    background: #4f0d10; /* Old browsers */
+    background: -moz-linear-gradient(top,  #049cdb 42%, #0064cd 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(42%,#049cdb), color-stop(100%,#0064cd)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #049cdb 42%,#0064cd 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #049cdb 42%,#0064cd 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #049cdb 42%,#0064cd 100%); /* IE10+ */
+    background: linear-gradient(top,  #049cdb 42%,#0064cd 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#049cdb', endColorstr='#0064cd',GradientType=0 ); /* IE6-9 */
+}

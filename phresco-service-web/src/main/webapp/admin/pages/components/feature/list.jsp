@@ -30,14 +30,17 @@
 <% 
 	List<Technology> technologies = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
+	String type = (String) request.getAttribute(ServiceUIConstants.REQ_FEATURES_TYPE);
+	String header = (String) request.getAttribute(ServiceUIConstants.REQ_FEATURES_HEADER);
+
 %>
 		
 <form id="formFeaturesList" class="form-horizontal customer_list">
 	<div class="operation">
 		<div class="featurelist_add">
 			<input type="button" id="featuresAdd" class="btn btn-primary" name="features_add" 
-				onclick="loadContent('featuresAdd', $('#formFeaturesList'), $('#subcontainer'));" 
-				value="<s:text name='lbl.hdr.comp.featrs.add'/>"/>
+				onclick="loadContent('featuresAdd', $('#formFeaturesList'), $('#feature_tab'));" 
+				value="<%= header%>"/>
 			<input type="button" class="btn" id="del" disabled value="<s:text name='lbl.hdr.comp.delete'/>" 
 				onclick="showDeleteConfirmation('<s:text name='del.confirm.feature'/>');"/>
 		</div>
@@ -56,13 +59,6 @@
 				%>
 			</select>
 		</div>
-        
-		<div class="featurelist_type"><s:text name="lbl.comp.featr.type" />
-			<select class="select_type" name="type" id="type">
-				<option value="module">Modules</option>
-				<option value="js">JS Libraries</option>
-			</select>
-		</div>  
 		
 		<s:if test="hasActionMessages()">
 			<div class="alert alert-success alert-message alert_messagelist" id="successmsg">
@@ -83,6 +79,7 @@
     
 	<!-- Hidden Fields -->
     <input type="hidden" name="customerId" value="<%= customerId %>">
+    <input type="hidden" name="type" value="<%= type %>">
 </form>
 
 <script language="JavaScript" type="text/javascript">
@@ -91,28 +88,24 @@
 		featurelist();
 	});
 	
+	$('#tech_id').change(function() {
+		featurelist();
+	});
+	
 	function editFeature(id) {
 	    var params = "techId=";
 	    params = params.concat(id);
-	    loadContent("featuresEdit", $('#formFeaturesList'), $('#subcontainer'), params);
+	    loadContent("featuresEdit", $('#formFeaturesList'), $('#feature_tab'), params);
 	}
 	
 	// This method calling from confirm_dialog.jsp
     function continueDeletion() {
-    	confirmDialog('none','');
-    	loadContent('featuresDelete', $('#formFeaturesList'), $('#subcontainer'));
+    	confirmDialog('none', '');
+    	loadContent('featuresDelete', $('#formFeaturesList'), $('#feature_tab'));
     }
 	
     function featurelist() {
     	loadContent('listFeatures', $('#formFeaturesList'), $('#feature_list'));
-    	
-		$('#tech_id').change(function() {
-			loadContent('listFeatures', $('#formFeaturesList'), $('#feature_list'));
-		});
-    	
-		$('#type').change(function() {
-			loadContent('listFeatures', $('#formFeaturesList'), $('#feature_list'));
-		});
     }
     
 </script>

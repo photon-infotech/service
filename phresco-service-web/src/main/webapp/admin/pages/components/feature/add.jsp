@@ -33,6 +33,8 @@
     List<Technology> technologies = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
     String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
     String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
+    String type = (String) request.getAttribute(ServiceUIConstants.REQ_FEATURES_TYPE);
+    String header = (String) request.getAttribute(ServiceUIConstants.REQ_FEATURES_HEADER);
     
   	//For edit
     String name = "";
@@ -58,23 +60,14 @@
 // 			helpText = moduleGroup.getHelpText();
 // 		}
 	}
+	
 %>
 
 <form id="formFeatureAdd" class="form-horizontal customer_list" method="post" enctype="multipart/form-data">
 	<h4 class="hdr">
-		<%
-			if (StringUtils.isNotEmpty(fromPage)) {
-		%>
-			<s:label key="lbl.hdr.comp.featrs.edit"/>
-		<%
-			} else {
-		%>
-			<s:label key="lbl.hdr.comp.featrs.add" theme="simple"/>
-		<%
-			}
-		%>
+		<%= header %>
 	</h4>	
-	<div class="content_adder">
+	<div class="content_feature">
 
 		<div class="control-group" id="nameControl">
 			<label class="control-label labelbold">
@@ -134,18 +127,6 @@
 					}
 				%>
 				</select><span class="help-inline applyerror" id="techError"></span>
-			</div>
-		</div>
-		
-		<div class="control-group" id="typeList">
-			<label class="control-label labelbold">
-				<span class="mandatory">*</span>&nbsp;<s:text name="lbl.comp.featr.type" />
-			</label>
-			<div class="controls">
-				<select name="type" id="type">
-					<option value="module">Modules</option>
-					<option value="js">JS Libraries</option>
-     		 	</select>
 			</div>
 		</div>
 		
@@ -224,13 +205,13 @@
 	<div class="bottom_button">
      	<% if (StringUtils.isNotEmpty(fromPage)) { %>
 	     	<input type="button" id="featuresUpdate" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.update'/>" 
-				onclick="validate('featuresUpdate', $('#formFeatureAdd'), $('#subcontainer'), 'Updating Feature');"/> 
+				onclick="validate('featuresUpdate', $('#formFeatureAdd'), $('#feature_tab'), 'Updating Feature');"/> 
      	<% } else { %>
 	     	<input type="button" id="featuresSave" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.save'/>" 
-				onclick="validate('featuresSave', $('#formFeatureAdd'), $('#subcontainer'), 'Creating Feature');"/> 
+				onclick="validate('featuresSave', $('#formFeatureAdd'), $('#feature_tab'), 'Creating Feature');"/> 
 		<% } %>
 		<input type="button" id="featuresCancel" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.cancel'/>"
-			onclick="loadContent('featuresList', $('#formFeatureAdd'), $('#subcontainer'));" />
+		onclick="loadContent('featuresMenu', $('#formFeatureAdd'), $('#feature_tab'));" />
 	</div>
 	
 	<!-- Hidden Fields -->
@@ -240,12 +221,13 @@
     <input type="hidden" name="techId" value="<%= moduleGroup != null ? moduleGroup.getId() : "" %>"/>
     <input type="hidden" name="oldName" value="<%= moduleGroup != null ? moduleGroup.getName() : "" %>"/>
     <input type="hidden" name="oldVersion" value="<%= moduleGroup != null ? moduleGroup.getVersions() : "" %>"/>
+    <input type="hidden" name="type" value="<%= type %>">
 </form>
 
 <script type="text/javascript">
 	//To check whether the device is ipad or not and then apply jquery scrollbar
 	if (!isiPad()) {
-		$(".content_adder").scrollbars();  
+		$(".content_feature").scrollbars();  
 	}
 
 	$(document).ready(function() {

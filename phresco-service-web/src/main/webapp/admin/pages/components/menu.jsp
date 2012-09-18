@@ -31,7 +31,7 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 		clickMenu($("a[name='compTab']"), $("#subcontainer"), $('#formCustomerId'));
-		loadContent("featuresList", $('#formCustomerId'), $("#subcontainer"));
+		loadContent("featuresMenu", $('#formCustomerId'), $("#subcontainer"));
 		activateMenu($("#features"));
 		
 		$("select[name='customerId']").change(function() {
@@ -49,7 +49,7 @@
 <nav>
 	<ul class="tabs">
 		<li>
-			<a href="#" class="active" name="compTab" id="featuresList"><s:label key="lbl.hdr.comp.featrs" theme="simple"/></a>
+			<a href="#" class="active" name="compTab" id="featuresMenu"><s:label key="lbl.hdr.comp.featrs" theme="simple"/></a>
 		</li>
 		<li>
 			<a href="#" class="inactive" name="compTab" id="componentList"><s:label key="lbl.hdr.comp.component" theme="simple"/></a>

@@ -82,6 +82,16 @@ public class Features extends ServiceBaseAction {
 	
 	private String from = "";
 	private String appJarError = "";
+
+	public String menu() {
+		if (isDebugEnabled) {
+    		S_LOGGER.debug("Entering Method  Features.menu()");
+    	}
+
+		getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+
+    	return COMP_FEATURES_LIST;
+    }
 	
     public String list() {
     	if (isDebugEnabled) {
@@ -90,6 +100,12 @@ public class Features extends ServiceBaseAction {
     	
     	try {
       		getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+			getHttpRequest().setAttribute(REQ_FEATURES_TYPE, type);
+			if (REQ_FEATURES_MODULE.equals(type)) {
+				getHttpRequest().setAttribute(REQ_FEATURES_HEADER, getText(KEY_I18N_FEATURE_MOD_ADD));
+			} else {
+				getHttpRequest().setAttribute(REQ_FEATURES_HEADER, getText(KEY_I18N_FEATURE_JS_ADD));
+			}
     		List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
     		getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
     	} catch (PhrescoException e){
@@ -130,6 +146,12 @@ public class Features extends ServiceBaseAction {
 		List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
 		getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
 		getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+		getHttpRequest().setAttribute(REQ_FEATURES_TYPE, type);
+		if (REQ_FEATURES_MODULE.equals(type)) {
+			getHttpRequest().setAttribute(REQ_FEATURES_HEADER, getText(KEY_I18N_FEATURE_MOD_ADD));
+		} else {
+			getHttpRequest().setAttribute(REQ_FEATURES_HEADER, getText(KEY_I18N_FEATURE_JS_ADD));
+		}
 		
 		return COMP_FEATURES_ADD;
 	}
@@ -144,6 +166,11 @@ public class Features extends ServiceBaseAction {
 			getHttpRequest().setAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
 			getHttpRequest().setAttribute(REQ_FROM_PAGE, REQ_EDIT);
 			getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+			if (REQ_FEATURES_MODULE.equals(type)) {
+				getHttpRequest().setAttribute(REQ_FEATURES_HEADER, getText(KEY_I18N_FEATURE_MOD_EDIT));
+			} else {
+				getHttpRequest().setAttribute(REQ_FEATURES_HEADER, getText(KEY_I18N_FEATURE_JS_EDIT));
+			}
 		} catch (PhrescoException e) {
 			new LogErrorReport(e, FEATURE_EDIT_EXCEPTION);
     		

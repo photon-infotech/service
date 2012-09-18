@@ -51,12 +51,15 @@ Width <= 1024
 		height: 84%;
 	}
 	
+	.content_feature {
+		height: 79%;
+	}
 	.list-comment {
 		height: auto;
 	}	
 	
 	.alert_messagelist {
-		margin-left: 64%;
+		margin-left: 60%;
 		width: 23%;
 	}
 }
@@ -83,7 +86,7 @@ Width >= 1152 and < 1280
 	}
 	
 	.alert_messagelist {
-		margin-left: 59%;
+		margin-left: 55%;
 	}
 }
 
@@ -93,6 +96,10 @@ Width <= 1280 and height <= 720
 @media screen and (device-aspect-ratio: 1280/720) {
 	.content_adder {
 		height: 83%;
+	}
+	
+	.content_feature {
+		height: 76%;
 	}
 	
 	.list-comment {
@@ -107,6 +114,10 @@ Width <= 1280 and height <= 768
 	.content_adder {
 		height: 83%;
 	}
+	
+	.content_feature {
+		height: 79%;
+	}
 }
 
 /************************************************************************************
@@ -115,6 +126,10 @@ Width >= 1280 and height <= 800
 @media screen and (device-aspect-ratio: 1280/800) {
 	.content_adder {
 		height: 85%;
+	}
+	
+	.content_feature {
+		height: 81%;
 	}
 }
 
@@ -125,6 +140,10 @@ Width >= 1280 and height > 800 and height <= 960
 	.content_adder {
 		height: 91%;
 	}
+	
+	.content_feature {
+		height: 87%;
+	}
 }
 
 /************************************************************************************
@@ -134,6 +153,10 @@ Width >= 1280 and height >= 961 and heigth <=1024
 	.content_adder {
 		height: 92%;
 	}
+	
+	.content_feature {
+		height: 88%;
+	}
 }
 
 /************************************************************************************
@@ -142,6 +165,10 @@ Width > 1280 and <= 1360
 @media screen and (min-width : 1281px) and (max-width : 1360px) {
 	.content_adder {
 		height: 84%;
+	}
+	
+	.content_feature {
+		height: 79%;
 	}
 	
 	.headerInnerTop {
@@ -159,6 +186,10 @@ Width > 1360 and <= 1600
 @media only screen and (min-width : 1361px) and (max-width : 1600px) {
 	.content_adder {
 		height: 89%;
+	}
+	
+	.content_feature {
+		height: 85%;
 	}
 	
 	.headerInnerTop {

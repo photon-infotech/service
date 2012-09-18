@@ -175,6 +175,14 @@ div.lgnBtnLabel {
 	overflow-x:hidden;
 }
 
+.content_feature {
+	height: 85%;
+	overflow-y:auto;
+	padding-top: 0px;
+	width:100%;
+	overflow-x:hidden;
+}
+
 /*** page header ends***/
 
 .table_div {
@@ -2019,7 +2027,6 @@ input[class*='sample'] {
 
 .featurelist_tech {
 	margin-right: 7px; 
-	float: left; 
 	font-weight: bold; 
 }
 
@@ -2048,11 +2055,13 @@ input[class*='sample'] {
 }
 
 .alert_messagelist {
-	margin-left: 55%;
+	margin-left: 45%;
+	top: 32px;
 }
 
 .featurelist_height {
-	height:104%;
+	height: 86%;
+    overflow-x: hidden;
 }
 
 .componentlist_height {
@@ -2101,4 +2110,35 @@ input[class*='sample'] {
 
 .feat_modal-body {
 	height: 250px;
+}
+
+#subTabcontent {
+    height: 98%;
+    margin-top: 2px;
+    overflow: hidden;
+    position: absolute;
+    width: 94%;
+    margin-top: 0px;
+}
+
+#navigation {
+    height:25px;
+    margin-top: -9px;
+}
+
+#navigation li {
+    list-style:none;
+    float:left;
+    position:relative;
+    height:25px;
+}
+
+#navigation ul li a {
+    display:block;
+    text-decoration:none;
+    height: 19px;
+    padding: 3px 14px;
+    border-radius: 4px 4px 0px 0px;
+    -webkit-border-top-left-radius: 5px 5px;
+	-webkit-border-top-right-radius: 5px 5px;
 }
