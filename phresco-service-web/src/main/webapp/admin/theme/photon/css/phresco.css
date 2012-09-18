@@ -1029,6 +1029,15 @@ legend {
 		margin-left:6px;
 		width:98.5%;
 }
+
+.external_component_wrapper {
+		border: 1px solid #a3a3a3;
+		border-radius : 6px; 
+		float: left; 
+		height: auto;
+		margin-left:6px;
+		width:98.5%;
+}
 	
 	
 /*------Accordian--------*/
@@ -1321,6 +1330,32 @@ legend {
 .editFeatures_td4 {
     width:22%;
 }
+
+.editComponent_th1 {
+    width:13px;
+  
+    border-radius: 6px 0 0 0;
+}
+.editComponent_th4 {
+    width:30%;
+    border-radius: 0 6px 0 0;
+}
+
+.editComponent_td1 {
+    width:5%;
+}
+
+.editComponent_td2 {
+    width:20%;
+}
+
+.editComponent_td3 {
+    width:176px;
+}
+
+.editComponent_td4 {
+    width:22%;
+}
 /** table ends **/
 .app-jar {
 	margin-top:3px;
@@ -1536,6 +1571,15 @@ h3 label {
 }
 
 .external_features_wrapper {
+	border: 1px solid #a3a3a3;
+	border-radius : 6px; 
+	float: left; 
+	height: auto;
+	margin-left:6px;
+	width:98.5%;
+}
+
+.external_component_wrapper {
 	border: 1px solid #a3a3a3;
 	border-radius : 6px; 
 	float: left; 
@@ -1989,6 +2033,16 @@ input[class*='sample'] {
 	margin-right: 7px; 
 }
 
+.componentlist_type {
+	margin-right: 7px; 
+	font-weight: bold; 
+}
+
+.componentlist_add {
+	float: left; 
+	margin-right: 7px; 
+}
+
 .select_type {
 	width: 13%;
 }
@@ -1998,6 +2052,10 @@ input[class*='sample'] {
 }
 
 .featurelist_height {
+	height:104%;
+}
+
+.componentlist_height {
 	height:104%;
 }
 

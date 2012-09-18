@@ -52,6 +52,9 @@
 			<a href="#" class="active" name="compTab" id="featuresList"><s:label key="lbl.hdr.comp.featrs" theme="simple"/></a>
 		</li>
 		<li>
+			<a href="#" class="inactive" name="compTab" id="componentList"><s:label key="lbl.hdr.comp.component" theme="simple"/></a>
+		</li>
+		<li>
 			<a href="#" class="inactive" name="compTab" id="archetypesList"><s:label key="lbl.hdr.comp.arhtyp" theme="simple"/></a>
 		</li>
 		<li>

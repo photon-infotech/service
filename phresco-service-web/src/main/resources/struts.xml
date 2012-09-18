@@ -114,7 +114,56 @@
         </action>
 		
 		<!-- COMPONENT FEATURES ENDS-->
-			
+		
+		<!--COMPONENT START-->
+		
+		<action name="componentList" class="com.photon.phresco.service.admin.actions.components.Component" method="list">
+            <result name="componentList">/admin/pages/components/component/list.jsp</result>
+        </action>
+        
+        <action name="listComponent" class="com.photon.phresco.service.admin.actions.components.Component" method="componentWithList">
+            <result name="componentList">/admin/pages/components/component/component_list.jsp</result>
+        </action>
+		
+		<action name="componentAdd" class="com.photon.phresco.service.admin.actions.components.Component" method="add">
+            <result name="componentAdd">/admin/pages/components/component/add.jsp</result>
+        </action>
+		
+		<action name="componentSave" class="com.photon.phresco.service.admin.actions.components.Component" method="save">
+            <result name="componentList">/admin/pages/components/component/list.jsp</result>
+            <result type="json" />
+        </action>
+        
+        <action name="uploadComponentFile" class="com.photon.phresco.service.admin.actions.components.Component" method="uploadFile">
+            <result type="json" />
+        </action>
+        
+        <action name="removeComponentJar" class="com.photon.phresco.service.admin.actions.components.Component" method="removeUploadedFile">
+            <result type="json" />
+        </action>
+        
+        <action name="componentEdit" class="com.photon.phresco.service.admin.actions.components.Component" method="edit">
+            <result name="componentAdd">/admin/pages/components/component/add.jsp</result>
+        </action>
+        
+        <action name="componentUpdate" class="com.photon.phresco.service.admin.actions.components.Component" method="update">
+            <result name="componentList">/admin/pages/components/component/list.jsp</result>
+            <result type="json" />
+        </action>
+        
+        <action name="componentDelete" class="com.photon.phresco.service.admin.actions.components.Component" method="delete">
+            <result name="componentList">/admin/pages/components/component/list.jsp</result>
+        </action>
+        
+         <action name="componentSaveValidate" class="com.photon.phresco.service.admin.actions.components.Component" method="validateForm">
+            <result type="json" />
+        </action>
+        
+         <action name="componentUpdateValidate" class="com.photon.phresco.service.admin.actions.components.Component" method="validateForm">
+            <result type="json" />
+        </action>
+		
+		<!--COMPONENT ENDS-->	
 		<!-- COMPONENT ARCHETYPES STARTS-->
 		<action name="archetypesList" class="com.photon.phresco.service.admin.actions.components.Archetypes" method="list">
             <result name="archetypesList">/admin/pages/components/archetype/list.jsp</result>

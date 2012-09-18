@@ -190,6 +190,12 @@ public interface ServiceUIConstants {
 	String FEATURE_EDIT_EXCEPTION = "Feature edit";
 	String FEATURE_LIST_EXCEPTION = "Feature list";
 	
+	String COMPONENT_DELETE_EXCEPTION = "Component delete";
+	String COMPONENT_UPDATE_EXCEPTION = "Component update";
+	String COMPONENT_SAVE_EXCEPTION = "Component save";
+	String COMPONENT_EDIT_EXCEPTION = "Component edit";
+	String COMPONENT_LIST_EXCEPTION = "Component list";
+	
 	String ARCHETYPE_DELETE_EXCEPTION = "Archetype delete";
 	String ARCHETYPE_UPDATE_EXCEPTION = "Archetype update";
 	String ARCHETYPE_SAVE_EXCEPTION = "Archetype save";
@@ -261,6 +267,11 @@ public interface ServiceUIConstants {
     String FEATURE_NOT_ADDED = "fail.feature.add";
     String FEATURE_DELETED = "succ.feature.delete";
     String FEATURE_NOT_DELETED = "fail.feature.delete" ;
+    
+    String COMPONENT_ADDED = "succ.component.add";
+    String COMPONENT_NOT_ADDED = "fail.component.add";
+    String COMPONENT_DELETED = "succ.component.delete";
+    String COMPONENT_NOT_DELETED = "fail.component.delete" ;
     
     String APPLNTYPES_ADDED = "succ.appType.add";
     String APPLNTYPES_NOT_ADDED = "fail.appType.add";

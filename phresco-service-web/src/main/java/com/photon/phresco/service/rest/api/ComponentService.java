@@ -496,6 +496,17 @@ public class ComponentService extends DbService implements ServiceConstants {
 				
 				return Response.status(Response.Status.OK).entity(foundModules).build();
 			}
+			
+			if(StringUtils.isNotEmpty(customerId) && type.equals(REST_QUERY_TYPE_COMPONENT)) {
+			    if (!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
+					foundModules = mongoOperation.find(MODULES_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)
+								.and(REST_QUERY_TYPE).is(type).and(REST_QUERY_TECHID).is(techId)), ModuleGroup.class);
+				}
+				foundModules.addAll(mongoOperation.find(MODULES_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)
+							.and(REST_QUERY_TYPE).is(type).and(REST_QUERY_TECHID).is(techId)), ModuleGroup.class));
+				
+				return Response.status(Response.Status.OK).entity(foundModules).build();
+			}
 
 		} catch(Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, MODULES_COLLECTION_NAME);
