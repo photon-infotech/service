@@ -81,8 +81,8 @@
 													<td class="editFeatures_td1">
 														<input type="radio" name="<%= module.getId() %>" value="<%= module.getVersion() %>" >
 													</td>
-													<td><%= moduleGroup.getName() %></td>
-													<td><%= module.getVersion() %></td>
+													<td class="fontColor"><%= moduleGroup.getName() %></td>
+													<td class="fontColor"><%= module.getVersion() %></td>
 												</tr>
 											<%	
 													}
