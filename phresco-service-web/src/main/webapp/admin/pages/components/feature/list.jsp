@@ -77,7 +77,7 @@
 		</s:if>
 	</div>	
 	
-	<div class="featurelist_height"; id="feature_list">
+	<div class="featurelist_height" id="feature_list">
 	
 	</div>
     

@@ -1064,7 +1064,7 @@ legend {
 }
 
 .accordion_panel_inner {
-    width:99.5%;
+    width:99%;
     float:left;
     padding: 0px;
     overflow-x: hidden;
@@ -1116,7 +1116,7 @@ legend {
     width:100%;
     float:left;
 	overflow-y:auto;
-	height:74px;
+	height:auto;
 }
 
 .scrollpanel_inner {

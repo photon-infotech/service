@@ -17,7 +17,6 @@
   limitations under the License.
   ###
   --%>
-
 <%@ taglib uri="/struts-tags" prefix="s" %>
 
 <%@ page import="java.util.List" %>
@@ -32,87 +31,82 @@
 <% 
 	List<ModuleGroup> moduleGroups = (List<ModuleGroup>)request.getAttribute(ServiceUIConstants.REQ_FEATURES_MOD_GRP);
 %>
-		
-<% if (CollectionUtils.isEmpty(moduleGroups)) { %>
-	<div class="alert alert-block">
-		<s:text name='alert.msg.feature.not.available'/>
-	</div>
-<% } else { %>
-	<div class="content_adder">
-		<div class="control-group">
-			<div class="external_features_wrapper">
-				<div class="theme_accordion_container" id="coremodule_accordion_container">
-					<section class="accordion_panel_wid">
-						<% for (ModuleGroup moduleGroup : moduleGroups) { %>
-						<div class="accordion_panel_inner">
-							<section class="lft_menus_container">
-								<span class="siteaccordion">
-									<span>
-									   <input type="checkbox" class="check" name="techId" value="<%= moduleGroup.getId() %>" onclick="checkboxEvent();" >
-										<%= moduleGroup.getName()  %>
-									</span>
-								</span>
-								<div class="mfbox siteinnertooltiptxt">
-									<div class="scrollpanel" style="overflow: hidden;">
-										<section class="scrollpanel_inner">
-											<table class="download_tbl">
-												<thead>
-													<tr>
-														<th></th>
-														<th class="accordiantable"><s:label key="lbl.hdr.cmp.name" theme="simple"/></th>
-														<th class="accordiantable"><s:label key="lbl.hdr.cmp.desc" theme="simple"/></th>
-														<th class="accordiantable"><s:label key="lbl.hdr.comp.ver" theme="simple"/></th>
-													</tr>
-												</thead>
-													
-												<tbody>
-												<% 
-													List<Module> versions = moduleGroup.getVersions();
-												    if (CollectionUtils.isNotEmpty(versions)) {
-														for (Module module : versions) {
-														    String name = module.getName();
-														    String desc = "";
-														    if (module.getDoc(DocumentationType.DESCRIPTION) != null) {
-														    	desc = module.getDoc(DocumentationType.DESCRIPTION).getContent();
-														    }
-														    String version = module.getVersion();
-												%>
-														<tr>
-															<td class="editFeatures_td1">
-																<input type="radio" name="" value="">
-															</td>
-															<td class="editFeatures_td2">
-																<div class="accordalign"></div>
-																<a href="#" name="ModuleDesc" onclick="editFeature('<%= moduleGroup.getId() %>');" >
-																	<%= name %>
-																</a>
-															</td>
-															<td class="editFeatures_td4"><%= desc %></td>
-															<td class="editFeatures_td4"><%= StringUtils.isNotEmpty(version) ? version : "" %></td>
-														</tr>
-												<% 
-														}
-													}
-												%>
-												</tbody>
-											</table>
-										</section>
-									</div>
-								</div>
-							</section>  
-						</div>
-						<% } %>
-					</section>		
-				</div>
-			</div>
+    
+   <div class="featuresScrollDiv">
+   	<% 
+		if (CollectionUtils.isEmpty(moduleGroups)) {
+	%>
+		<div class="alert alert-block">
+			<s:text name='alert.msg.feature.not.available'/>
 		</div>
-	</div>	
-<% } %>
+	<% } else { %>		
+		<div class="theme_accordion_container jsLib_accordion_container">
+		    <section class="accordion_panel_wid">
+		        <div class="accordion_panel_inner">
+		            <section class="lft_menus_container">
+		            <%
+						for (ModuleGroup moduleGroup : moduleGroups) {
+					%>
+		                <span class="siteaccordion closereg">
+		                	<span>
+		                		<input type="checkbox" class="" name="" value="<%= moduleGroup.getId()%>" id="<%= moduleGroup.getId()%>checkBox">
+		                		&nbsp;&nbsp;<%= moduleGroup.getName() %>&nbsp;&nbsp;
+		                		<p id="<%= moduleGroup.getId()%>version" class="version versionDisplay_JSLib"></p>
+		                	</span>
+		                </span>
+		                <div class="mfbox siteinnertooltiptxt" style="display: none;">
+		                    <div class="scrollpanel">
+		                        <section class="scrollpanel_inner">
+		                        	<table class="download_tbl">
+			                            <tbody>
+			                            <% 
+									    	List<Module> versions = moduleGroup.getVersions();
+									    	if (CollectionUtils.isNotEmpty(versions)) {
+												for (Module module : versions) {
+												    String descContent = "";
+													if (module.getDoc(DocumentationType.DESCRIPTION) != null) { 
+													  	descContent = module.getDoc(DocumentationType.DESCRIPTION).getContent();
+													}
+													
+													String helpTextContent = "";
+													if (module.getDoc(DocumentationType.HELP_TEXT) != null) { 
+													  	helpTextContent = module.getDoc(DocumentationType.HELP_TEXT).getContent();
+													}
+										%>
+											<tr>
+												<td class="editFeatures_td1">
+													<input type="radio" name="<%= module.getId() %>" value="<%= module.getVersion() %>" >
+												</td>
+												<td class="editFeatures_td2">
+													<a href="#" name="ModuleDesc" onclick="editFeature('<%= moduleGroup.getId() %>');" >
+														<%= moduleGroup.getName() %>
+													</a>
+												</td>
+												<td class="editFeatures_td4"><%= module.getVersion() %></td>
+											</tr>
+										<%	
+												}
+								    		} 
+										%>
+			                            </tbody>
+		                        	</table>
+		                        </section>
+		                    </div>
+		                </div>
+		                <% 		
+							}
+						%>	
+		            </section>  
+		        </div>
+		    </section>
+		</div>
+	<% } %>
+</div>
 
 <script language="JavaScript" type="text/javascript">
 	//To check whether the device is ipad or not and then apply jquery scrollbar
 	if (!isiPad()) {
-		$("#coremodule_accordion_container").scrollbars();  
+		$(".accordion_panel_inner").scrollbars();  
 	}
 	
 	$(document).ready(function() {
