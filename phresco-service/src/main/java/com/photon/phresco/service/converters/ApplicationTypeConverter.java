@@ -59,6 +59,7 @@ public class ApplicationTypeConverter implements Converter<ApplicationTypeDAO, A
 		appTypeDAO.setDescription(applicationType.getDescription());
 		appTypeDAO.setSystem(applicationType.isSystem());
 		appTypeDAO.setCustomerId(applicationType.getCustomerId());
+		appTypeDAO.setDescription(applicationType.getDescription());
 		return appTypeDAO;
 	}
 	
