@@ -29,7 +29,7 @@
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
 
 <%
-	ModuleGroup moduleGroup = (ModuleGroup)request.getAttribute(ServiceUIConstants.REQ_MODULE_GROUP); 
+	ModuleGroup moduleGroup = (ModuleGroup)request.getAttribute(ServiceUIConstants.REQ_FEATURES_MOD_GRP); 
     List<Technology> technologies = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
     String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
     String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
@@ -43,9 +43,9 @@
 		if (StringUtils.isNotEmpty(moduleGroup.getName())) {
 			name = moduleGroup.getName();
 		}
-		if (StringUtils.isNotEmpty(moduleGroup.getDescription())) {
-			description = moduleGroup.getDescription();
-		}
+// 		if (StringUtils.isNotEmpty(moduleGroup.getDescription())) {
+// 			description = moduleGroup.getDescription();
+// 		}
 		if (CollectionUtils.isNotEmpty(moduleGroup.getVersions())) {
 			List<Module> versions = moduleGroup.getVersions();
 			if (CollectionUtils.isNotEmpty(versions)) {
@@ -54,9 +54,9 @@
 				}
 			}
 		}
-		if (StringUtils.isNotEmpty(moduleGroup.getHelpText())) {
-			helpText = moduleGroup.getHelpText();
-		}
+// 		if (StringUtils.isNotEmpty(moduleGroup.getHelpText())) {
+// 			helpText = moduleGroup.getHelpText();
+// 		}
 	}
 %>
 
@@ -114,7 +114,7 @@
 			</label>
 			<div class="controls">
 				<textarea id="hlptext" placeholder="<s:text name='place.hldr.feature.add.help.text'/>" 
-				               maxlength="150" title="150 Characters only" class="input-xlarge" value="<%= helpText %>" rows="2" cols="10" ></textarea>
+					maxlength="150" title="150 Characters only" class="input-xlarge" value="<%= helpText %>" rows="2" cols="10" ></textarea>
 			</div>
 		</div>
 		
@@ -139,24 +139,34 @@
 		
 		<div class="control-group" id="typeList">
 			<label class="control-label labelbold">
-				<span class="mandatory">*</span>&nbsp;<s:text name="lbl.comp.featr.type" /></label>
+				<span class="mandatory">*</span>&nbsp;<s:text name="lbl.comp.featr.type" />
+			</label>
 			<div class="controls">
 				<select name="type" id="type">
-			        <option>JSLibs</option>
-			        <option>Modules</option>
+					<option value="module">Modules</option>
+					<option value="js">JS Libraries</option>
      		 	</select>
 			</div>
 		</div>
 		
-		<div class="control-group hideContent" id="moduleSelection">
+		<div class="control-group" id="moduleSelection">
 			<label class="control-label labelbold">
-				<span class="mandatory">*</span>&nbsp;<s:text name="lbl.comp.featr.module.type" /></label>
+				<span class="mandatory">*</span>&nbsp;<s:text name="lbl.comp.featr.module.type" />
+			</label>
 			<div class="controls">
 				<select name="moduleType" id="type">
-			        <option>Core Module</option>
-			        <option>Custom Module</option>
+			        <option value="core">Core Module</option>
+			        <option value="custom">Custom Module</option>
      		 	</select>
-     		 	<input type="checkbox" name="default" value="true">&nbsp;<s:text name="lbl.comp.featr.default.module" />
+			</div>
+		</div>
+		
+		<div class="control-group">
+			<label class="control-label labelbold">
+				<s:text name="lbl.comp.featr.default.module" />
+			</label>
+			<div class="controls">
+				<input type="checkbox" name="defaultType" value="true">
 			</div>
 		</div>
 		
@@ -205,90 +215,31 @@
 				<s:text name='lbl.hdr.comp.dependency'/>
 			</label>
 			<div class="controls">
-				<a data-toggle="modal" href="#myModal"><input type="button" 
-				        class="btn btn-primary addiconAlign" value="Select Dependency"></a>
+				<input type="button" class="btn btn-primary" value="Select Dependency" 
+					onclick="getFeatures();" />
 			</div>
-		</div>
-	</div>
-	
-	<div id="myModal" class="modal hide fade">
-		<div class="modal-header">
-		  <a class="close" data-dismiss="modal" >&times;</a>
-		  <h3><s:label key="lbl.hdr.comp.featr.popup.title" theme="simple"/></h3>
-		</div>
-		<div class="modal-body">
-			<div class="control-group">
-				<div class="external_features_wrapper">
-					<div class="theme_accordion_container popupaccord" id="coremodule_accordion_container">
-						<section class="accordion_panel_wid">
-							<div class="accordion_panel_inner">
-								<section class="lft_menus_container">
-									<span class="siteaccordion">
-										<span>
-											<input type="checkbox" name="loginForm" id="">&nbsp;&nbsp;Login form 
-											<p id="loginForm" class="accord_veralign"></p>
-										</span>
-									</span>
-									<div class="mfbox siteinnertooltiptxt">
-										<div class="scrollpanel">
-											<section class="scrollpanel_inner">
-												<table class="download_tbl">
-													<thead>
-														<tr>
-															<th></th>
-															<th class="accordiantable modallbl-color"><s:label key="lbl.hdr.cmp.name" theme="simple"/></th>
-															<th class="accordiantable modallbl-color"><s:label key="lbl.hdr.comp.ver" theme="simple"/></th>
-														</tr>
-													</thead>
-																										
-													<tbody>
-														<tr>
-															<td class="editFeatures_td1">
-																<input type="radio" class="" name="loginForm" value="2.0">
-															</td>
-															<td class="editFeatures_td2">
-																<div class="accordalign"></div>
-																<a href="#" name="ModuleDesc" class="modallbl-color">Login form</a>
-															</td>
-															<td class="editFeatures_td4 modallbl-color">2.0</td>
-														</tr>
-													</tbody>
-												</table>
-											</section>
-										</div>
-									</div>
-								</section>  
-							</div>
-						</section>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="modal-footer">
-		  <a href="#" class="btn btn-primary" data-dismiss="modal"><s:label key="lbl.hdr.comp.cancel" theme="simple"/></a>
-		  <a href="#" class="btn btn-primary" data-dismiss="modal" ><s:label key="lbl.hdr.comp.ok" theme="simple"/></a>
 		</div>
 	</div>
 	
 	<div class="bottom_button">
      	<% if (StringUtils.isNotEmpty(fromPage)) { %>
-     	<input type="button" id="featuresUpdate" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.update'/>" 
-			onclick="validate('featuresUpdate', $('#formFeatureAdd'), $('#subcontainer'), 'Updating Feature');"/> 
-     	 
+	     	<input type="button" id="featuresUpdate" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.update'/>" 
+				onclick="validate('featuresUpdate', $('#formFeatureAdd'), $('#subcontainer'), 'Updating Feature');"/> 
      	<% } else { %>
-     	<input type="button" id="featuresSave" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.save'/>" 
-			onclick="validate('featuresSave', $('#formFeatureAdd'), $('#subcontainer'), 'Creating Feature');"/> 
-		
+	     	<input type="button" id="featuresSave" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.save'/>" 
+				onclick="validate('featuresSave', $('#formFeatureAdd'), $('#subcontainer'), 'Creating Feature');"/> 
 		<% } %>
 		<input type="button" id="featuresCancel" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.cancel'/>"
 			onclick="loadContent('featuresList', $('#formFeatureAdd'), $('#subcontainer'));" />
 	</div>
 	
 	<!-- Hidden Fields -->
-	<input type="hidden" name="customerId" value="<%= customerId %>"> 
+	<input type="hidden" name="customerId" value="<%= customerId %>">
+	<input type="hidden" name="from" value="dependency">
 	<input type="hidden" name="fromPage" value="<%= StringUtils.isNotEmpty(fromPage) ? fromPage : "" %>"/>
     <input type="hidden" name="techId" value="<%= moduleGroup != null ? moduleGroup.getId() : "" %>"/>
     <input type="hidden" name="oldName" value="<%= moduleGroup != null ? moduleGroup.getName() : "" %>"/>
+    <input type="hidden" name="oldVersion" value="<%= moduleGroup != null ? moduleGroup.getVersions() : "" %>"/>
 </form>
 
 <script type="text/javascript">
@@ -337,7 +288,7 @@
 	    
 	    $('#type').change(function() {
 			var selectVal = $('#type :selected').val();
-			if (selectVal == 'Modules') {
+			if (selectVal == 'module') {
 				$('#moduleSelection').show();
 			} else {
 				$('#moduleSelection').hide();
@@ -398,7 +349,7 @@
 			element : document.getElementById('feature-file-uploader'),
 			action : 'uploadFeatureFile',
 			multiple : false,
-			allowedExtensions : ["zip","jar"],
+			allowedExtensions : ["zip","jar","dll","so"],
 			type : 'featureJar',
 			buttonLabel : '<s:label key="lbl.comp.featr.upload" />',
 			typeError : '<s:text name="err.invalid.file.selection" />',
@@ -441,4 +392,11 @@
 					.addClass("btn-primary qq-upload-button");
 		}
 	} 
+	
+	function getFeatures() {
+		$('#popup_div').empty();
+		$('#popup_div').show();
+		disableScreen();
+		loadContent('listFeatures', $('#formFeatureAdd'), $('#popup_div'));
+	}
 </script>

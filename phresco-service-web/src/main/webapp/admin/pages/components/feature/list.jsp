@@ -44,7 +44,7 @@
 		
 		<div class="featurelist_tech">
 			<s:text name='lbl.comp.featr.technology'/>
-			<select name="techId" id="tech_id">
+			<select name="technology" id="tech_id">
 				<%
 					if (technologies != null) {
 						for (Technology technology : technologies) {
@@ -60,7 +60,7 @@
 		<div class="featurelist_type"><s:text name="lbl.comp.featr.type" />
 			<select class="select_type" name="type" id="type">
 				<option value="module">Modules</option>
-				<option value="js">JSLibraries</option>    
+				<option value="js">JS Libraries</option>
 			</select>
 		</div>  
 		

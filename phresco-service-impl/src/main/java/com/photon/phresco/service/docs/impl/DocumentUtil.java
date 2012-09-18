@@ -44,7 +44,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.itextpdf.text.DocumentException;
@@ -57,8 +56,6 @@ import com.itextpdf.text.pdf.PdfImportedPage;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.Documentation;
-import com.photon.phresco.model.Documentation.DocumentationType;
 import com.photon.phresco.model.ModuleGroup;
 import com.photon.phresco.model.ProjectInfo;
 
@@ -239,27 +236,27 @@ public final class DocumentUtil {
         addBlankLines(para, 2);
         docu.add(para); 
         
-		for (ModuleGroup tupleBean : modules) {
-		    para = new Paragraph();
-		    para.setFont(DocConstants.CATEGORY_FONT);
-		    para.add(tupleBean.getName());
-		    docu.add(para);
-		    Documentation document = tupleBean.getDoc(DocumentationType.DESCRIPTION);
-		    if (document != null) {
-		        if(!StringUtils.isEmpty(document.getUrl())){
-		            PdfInput convertToPdf = DocConvertor.convertToPdf(document.getUrl());
-		            if(convertToPdf != null) {
-		                DocumentUtil.addPages(convertToPdf.getInputStream(), writer, docu);
-		            }
-		        } else {
-		            para = new Paragraph();
-		            para.setFont(DocConstants.BODY_FONT);
-		            para.add(document.getContent());
-		            addBlankLines(para, 2);
-		            docu.add(para);
-		        }
-		    }
-		}
+//		for (ModuleGroup tupleBean : modules) {
+//		    para = new Paragraph();
+//		    para.setFont(DocConstants.CATEGORY_FONT);
+//		    para.add(tupleBean.getName());
+//		    docu.add(para);
+//		    Documentation document = tupleBean.getDoc(DocumentationType.DESCRIPTION);
+//		    if (document != null) {
+//		        if(!StringUtils.isEmpty(document.getUrl())){
+//		            PdfInput convertToPdf = DocConvertor.convertToPdf(document.getUrl());
+//		            if(convertToPdf != null) {
+//		                DocumentUtil.addPages(convertToPdf.getInputStream(), writer, docu);
+//		            }
+//		        } else {
+//		            para = new Paragraph();
+//		            para.setFont(DocConstants.BODY_FONT);
+//		            para.add(document.getContent());
+//		            addBlankLines(para, 2);
+//		            docu.add(para);
+//		        }
+//		    }
+//		}
 	}
 
     

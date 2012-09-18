@@ -44,6 +44,7 @@ public interface ServiceActions {
 	String COMP_FEATURES_LIST 	    	= "featuresList";
 	String COMP_FEATURES_ADD        	= "featuresAdd";
 	String COMP_FEATURES_CANCEL     	= "featuresCancel";
+	String COMP_FEATURES_DEPENDENCY     = "dependency";
 	
 	String COMP_ARCHETYPE_LIST      	= "archetypesList";
 	String COMP_ARCHETYPE_ADD       	= "archetypeAdd";

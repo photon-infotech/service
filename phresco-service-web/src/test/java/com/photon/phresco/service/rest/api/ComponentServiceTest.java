@@ -179,8 +179,6 @@ public class ComponentServiceTest extends DbService implements ServiceConstants{
 		ModuleGroup module = new ModuleGroup();
 		module.setId("testModule");
 		module.setName("log4j");
-		module.setGroupId("log4j");
-		module.setArtifactId("log4j");
 		modules.add(module);
 		mongoOperation.insertList(MODULES_COLLECTION_NAME , modules);
 		assertEquals(Response.status(Response.Status.OK).build().getStatus(), 200);
@@ -198,8 +196,6 @@ public class ComponentServiceTest extends DbService implements ServiceConstants{
 		ModuleGroup module = new ModuleGroup();
 		module.setId("testModule");
 		module.setName("log4j4");
-		module.setGroupId("log4j4");
-		module.setArtifactId("log4j4");
 		modules.add(module);
 		for(ModuleGroup modules1:modules){
 		mongoOperation.save(MODULES_COLLECTION_NAME, modules1);
@@ -224,8 +220,6 @@ public class ComponentServiceTest extends DbService implements ServiceConstants{
 		ModuleGroup module = new ModuleGroup();
 		module.setId("testModule");
 		module.setName("log4j");
-		module.setGroupId("log4j");
-		module.setArtifactId("log4j");
 		mongoOperation.save(MODULES_COLLECTION_NAME, module);
 		assertEquals(Response.status(Response.Status.OK).entity(module).build().getStatus(), 200);
 	}

@@ -268,5 +268,11 @@
 		<!-- Delete confirmation dialog starts -->
 		<%@ include file="pages/confirm_dialog.jsp" %>
 		<!-- Delete confirmation dialog ends -->
+		
+		<!-- Popup Starts-->
+	    <div class="popup_div" id="popup_div">
+	    
+	    </div>
+	    <!-- Popup Ends -->
 	</body>
 </html>

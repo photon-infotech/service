@@ -113,6 +113,7 @@ public interface ServiceUIConstants {
     String REQ_DOWNLOAD_ID = "downloadId";
     String REQ_DOWNLOAD_UPLOAD_FILE = "uploadFile";
     
+    
     /*****************************
      * PilotProject Request Constants
      * String REQ_PILOT_XXX
@@ -125,7 +126,9 @@ public interface ServiceUIConstants {
      * Download Request Constants
      * String REQ_DOWNLOAD_XXX
      *****************************/ 
-    String REQ_MODULE_GROUP = "moduleGroup";
+    String REQ_FEATURES_MOD_GRP = "moduleGroup";
+    String FEATURES_CORE = "core";
+    
     
     /*****************************
      * Permissions Request Constants
@@ -134,12 +137,14 @@ public interface ServiceUIConstants {
     String REQ_PERMISSIONS_LIST = "permissions";
     String REQ_PERMISSIONS_ID = "permissionId";
     
+    
     /*****************************
      * GlobalUrl Request Constants
      * String REQ_GLOBURL_XXX
      *****************************/ 
     String REQ_GLOBURL_URL = "globalUrl";
     String REQ_GLOBURL_ID = "globalurlId";
+    
     
     /*****************************
      * Role Request Constants
@@ -149,12 +154,14 @@ public interface ServiceUIConstants {
     String REQ_ROLE_LIST = "roleList";
     String REQ_ROLE_ID = "roleId";
     
+    
     /*****************************
      * Error Report
      * String REQ_LOG_REPORT
      *****************************/ 
     String REQ_LOG_REPORT = "logReport";
     String LOG_ERROR = "logError";
+    
     
     String CUSTOMERS_DELETE_EXCEPTION = "Customers delete";
 	String CUSTOMERS_UPDATE_EXCEPTION = "Customers update";
@@ -210,6 +217,7 @@ public interface ServiceUIConstants {
 	String DOWNLOADS_EDIT_EXCEPTION = "Downloads edit";
 	String DOWNLOADS_ADD_EXCEPTION = "Downloads add";
 	String DOWNLOADS_LIST_EXCEPTION = "Downloads list";
+	
 	/*****************************
      * I18N Keys Constants
      * String KEY_I18N_XXX_YYY

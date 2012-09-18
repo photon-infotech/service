@@ -46,6 +46,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.model.Module;
 import com.photon.phresco.model.ModuleGroup;
 import com.photon.phresco.model.ProjectInfo;
 import com.photon.phresco.model.Technology;
@@ -137,9 +138,14 @@ public class AndroidDependencyProcessor extends AbstractJsLibDependencyProcessor
 			File pomFile = new File(path, "pom.xml");
 			if (pomFile.exists()) {
 				PomProcessor processor = new PomProcessor(pomFile);
-				for (com.photon.phresco.model.ModuleGroup module : modules) {
-					if (module != null) {
-						processor.addDependency(module.getGroupId(), module.getArtifactId(), module.getVersions().get(0).getVersion());
+				for (com.photon.phresco.model.ModuleGroup moduleGroup : modules) {
+					if (moduleGroup != null) {
+					    List<Module> versions = moduleGroup.getVersions();
+					    if (CollectionUtils.isNotEmpty(versions)) {
+					        for (Module module : versions) {
+					            processor.addDependency(module.getGroupId(), module.getArtifactId(), module.getVersion());
+                            }
+					    }
 					}
 				}
 				processor.save();

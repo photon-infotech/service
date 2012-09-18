@@ -523,7 +523,7 @@ public class ComponentService extends DbService implements ServiceConstants {
         BodyPartEntity bodyPartEntity = null;
         File moduleFile = null;
         List<BodyPart> bodyParts = moduleInfo.getBodyParts();
-        
+       
         if (CollectionUtils.isNotEmpty(bodyParts)) {
             for (BodyPart bodyPart : bodyParts) {
                 if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
@@ -540,20 +540,25 @@ public class ComponentService extends DbService implements ServiceConstants {
         }
         
         Module module = moduleGroup.getVersions().get(0);
-        ArchetypeInfo archetypeInfo = new ArchetypeInfo(moduleGroup.getGroupId(), 
-                moduleGroup.getArtifactId(), module.getVersion(), module.getContentType());
-        createContentURL(archetypeInfo);
+        ArchetypeInfo archetypeInfo = new ArchetypeInfo(module.getGroupId(), 
+        		module.getArtifactId(), module.getVersion(), module.getContentType());
         
         boolean uploadBinary = uploadBinary(archetypeInfo, moduleFile, moduleGroup.getCustomerId());
-        List<Module> modules = new ArrayList<Module>();
-        module.setContentURL(createContentURL(archetypeInfo));
-        modules.add(module);
-        moduleGroup.setVersions(modules);
+        
         if (uploadBinary) {
-            mongoOperation.save(MODULES_COLLECTION_NAME, moduleGroup);
+        	ModuleGroup foundModuleGroup = mongoOperation.findOne(MODULES_COLLECTION_NAME, 
+        			new Query(Criteria.where("name").is(moduleGroup.getName())), ModuleGroup.class);
+        	if (foundModuleGroup != null) {
+        		List<Module> versions = foundModuleGroup.getVersions();
+        		versions.add(module);
+        		foundModuleGroup.setVersions(versions);
+        		mongoOperation.save(MODULES_COLLECTION_NAME, foundModuleGroup);
+        	} else {
+        		mongoOperation.save(MODULES_COLLECTION_NAME, moduleGroup);
+        	}
         }
         FileUtil.delete(moduleFile);
-        
+       
         return Response.status(Response.Status.CREATED).build();
     }
 	

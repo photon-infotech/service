@@ -27,22 +27,23 @@
 <%@ page import="com.photon.phresco.model.Module" %>
 <%@ page import="com.photon.phresco.model.ModuleGroup" %>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
+<%@ page import="com.photon.phresco.model.Documentation.DocumentationType"%>
 
 <% 
-	List<ModuleGroup> moduleGroups = (List<ModuleGroup>)request.getAttribute(ServiceUIConstants.REQ_MODULE_GROUP);
+	List<ModuleGroup> moduleGroups = (List<ModuleGroup>)request.getAttribute(ServiceUIConstants.REQ_FEATURES_MOD_GRP);
 %>
 		
-	  <% if (CollectionUtils.isEmpty(moduleGroups)) { %>
-            <div class="alert alert-block">
-                <s:text name='alert.msg.feature.not.available'/>
-            </div>
-    <% } else { %>
+<% if (CollectionUtils.isEmpty(moduleGroups)) { %>
+	<div class="alert alert-block">
+		<s:text name='alert.msg.feature.not.available'/>
+	</div>
+<% } else { %>
 	<div class="content_adder">
 		<div class="control-group">
 			<div class="external_features_wrapper">
 				<div class="theme_accordion_container" id="coremodule_accordion_container">
 					<section class="accordion_panel_wid">
-						<% for(ModuleGroup moduleGroup : moduleGroups) { %>
+						<% for (ModuleGroup moduleGroup : moduleGroups) { %>
 						<div class="accordion_panel_inner">
 							<section class="lft_menus_container">
 								<span class="siteaccordion">
@@ -52,7 +53,7 @@
 									</span>
 								</span>
 								<div class="mfbox siteinnertooltiptxt">
-									<div class="scrollpanel">
+									<div class="scrollpanel" style="overflow: hidden;">
 										<section class="scrollpanel_inner">
 											<table class="download_tbl">
 												<thead>
@@ -65,32 +66,34 @@
 												</thead>
 													
 												<tbody>
-										         <%-- <%
-                                                     if (CollectionUtils.isNotEmpty(moduleGroups)) {
-                                                         for ( ModuleGroup moduleGroup : moduleGroups) {
-                                                 %> --%>
-										              <tr>
-														<td class="editFeatures_td1">
-															<input type="radio" name="" value="">
-														</td>
-														<td class="editFeatures_td2">
-															<div class="accordalign"></div>
-															<a href="#" name="ModuleDesc" onclick="editFeature('<%= moduleGroup.getId() %>');" ><%= StringUtils.isNotEmpty(moduleGroup.getName()) ? moduleGroup.getName() : "" %></a>
-														</td>
-														<td class="editFeatures_td4"><%= StringUtils.isNotEmpty(moduleGroup.getDescription()) ? moduleGroup.getDescription():"" %></td>
-														<% 
-														   List<Module> versions = moduleGroup.getVersions();
-														     if (CollectionUtils.isNotEmpty(versions)) {
-		                                                           for (Module moduleVersion : versions) {
-														%>
-														
-														<td class="editFeatures_td4"><%= StringUtils.isNotEmpty(moduleVersion.getVersion()) ? moduleVersion.getVersion():"" %></td>
-													     <% 
-                                                           }
-                                                         }
-                                                      %>
-													
-													</tr>
+												<% 
+													List<Module> versions = moduleGroup.getVersions();
+												    if (CollectionUtils.isNotEmpty(versions)) {
+														for (Module module : versions) {
+														    String name = module.getName();
+														    String desc = "";
+														    if (module.getDoc(DocumentationType.DESCRIPTION) != null) {
+														    	desc = module.getDoc(DocumentationType.DESCRIPTION).getContent();
+														    }
+														    String version = module.getVersion();
+												%>
+														<tr>
+															<td class="editFeatures_td1">
+																<input type="radio" name="" value="">
+															</td>
+															<td class="editFeatures_td2">
+																<div class="accordalign"></div>
+																<a href="#" name="ModuleDesc" onclick="editFeature('<%= moduleGroup.getId() %>');" >
+																	<%= name %>
+																</a>
+															</td>
+															<td class="editFeatures_td4"><%= desc %></td>
+															<td class="editFeatures_td4"><%= StringUtils.isNotEmpty(version) ? version : "" %></td>
+														</tr>
+												<% 
+														}
+													}
+												%>
 												</tbody>
 											</table>
 										</section>
@@ -104,10 +107,14 @@
 			</div>
 		</div>
 	</div>	
-	<% } %>
-</form>
-<script language="JavaScript" type="text/javascript">
+<% } %>
 
+<script language="JavaScript" type="text/javascript">
+	//To check whether the device is ipad or not and then apply jquery scrollbar
+	if (!isiPad()) {
+		$("#coremodule_accordion_container").scrollbars();  
+	}
+	
 	$(document).ready(function() {
 		enableScreen();
 	});

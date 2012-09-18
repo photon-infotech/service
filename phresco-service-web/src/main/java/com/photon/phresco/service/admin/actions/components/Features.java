@@ -34,6 +34,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.model.Documentation;
+import com.photon.phresco.model.Documentation.DocumentationType;
 import com.photon.phresco.model.Module;
 import com.photon.phresco.model.ModuleGroup;
 import com.photon.phresco.model.Technology;
@@ -69,7 +71,17 @@ public class Features extends ServiceBaseAction {
 	private static String featureJarName = null;
     
 	private String description = null;
+	private String helpText = "";
 	private List<Module> versions = null;
+	private String technology = "";
+	
+	private String version = "";
+    private String verError = "";
+	private String oldVersion = "";
+	private String moduleType = "";
+	private String defaultType = "";
+	
+	private String from = "";
 	
     public String list() {
     	if (isDebugEnabled) {
@@ -93,10 +105,14 @@ public class Features extends ServiceBaseAction {
     	if (isDebugEnabled) {
     		S_LOGGER.debug("Entering Method  Features.featurelist()");
     	}
+    	
     	try {
-
-    		List<ModuleGroup> moduleGroup = getServiceManager().getFeaturesByTech(customerId, techId, type);
-    		getHttpRequest().setAttribute(REQ_MODULE_GROUP, moduleGroup);
+    		List<ModuleGroup> moduleGroup = getServiceManager().getFeaturesByTech(customerId, technology, type);
+    		getHttpRequest().setAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
+    		getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+    		if (StringUtils.isNotEmpty(from)) {
+    		    return COMP_FEATURES_DEPENDENCY;
+    		}
     	} catch (PhrescoException e){
     		new LogErrorReport(e, FEATURE_LIST_EXCEPTION);
     		
@@ -125,7 +141,7 @@ public class Features extends ServiceBaseAction {
 		
 		try {
 		    ModuleGroup moduleGroup = getServiceManager().getFeature(techId, customerId);
-			getHttpRequest().setAttribute(REQ_MODULE_GROUP, moduleGroup);
+			getHttpRequest().setAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
 			getHttpRequest().setAttribute(REQ_FROM_PAGE, REQ_EDIT);
 			getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
 		} catch (PhrescoException e) {
@@ -144,44 +160,70 @@ public class Features extends ServiceBaseAction {
 		
 		try {
 			MultiPart multiPart = new MultiPart();
-			List<ModuleGroup> moduleGroups = new ArrayList<ModuleGroup>();
-			ModuleGroup moduleGroup = new ModuleGroup();
-			moduleGroup.setName(name);
-			moduleGroup.setDescription(description);
-			moduleGroup.setVersions(versions);
-			moduleGroup.setType(REST_QUERY_TYPE_MODULE);
-			moduleGroup.setCustomerId(customerId);
-			moduleGroup.setArtifactId(artifactId);
-			moduleGroup.setGroupId(groupId);
-			
 			BodyPart jsonPart = new BodyPart();
 			jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
-			jsonPart.setEntity(moduleGroup);
+			jsonPart.setEntity(createModuleGroup());
 			Content content = new Content("object", name, null, null, null, 0);
 			jsonPart.setContentDisposition(content);
 			multiPart.bodyPart(jsonPart);
-			    
 			if (StringUtils.isNotEmpty(featureJarName)) {
 				InputStream featureIs = new ByteArrayInputStream(featureByteArray);
-				BodyPart binaryPart2 = getServiceManager().createBodyPart(name, FILE_FOR_APPTYPE, featureIs);
-				multiPart.bodyPart(binaryPart2);
+				BodyPart binaryPart = getServiceManager().createBodyPart(name, FILE_FOR_APPTYPE, featureIs);
+				multiPart.bodyPart(binaryPart);
 			}
-
-			moduleGroups.add(moduleGroup);   
 			
-			ClientResponse clientResponse = getServiceManager().createFeatures(moduleGroups, customerId);
+			ClientResponse clientResponse = getServiceManager().createFeatures(multiPart, customerId);
 			if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200 && clientResponse.getStatus() != ServiceConstants.RES_CODE_201) {
 				addActionError(getText(FEATURE_NOT_ADDED, Collections.singletonList(name)));
 			} else {
-			addActionMessage(getText(FEATURE_ADDED, Collections.singletonList(name)));
+				addActionMessage(getText(FEATURE_ADDED, Collections.singletonList(name)));
 			}
 		} catch (PhrescoException e) {
+			e.printStackTrace();
 			new LogErrorReport(e, FEATURE_SAVE_EXCEPTION);
     		
 			return LOG_ERROR;
 		} 
 
 		return list();
+	}
+	
+	private ModuleGroup createModuleGroup() {
+		ModuleGroup moduleGroup = new ModuleGroup();
+		List<Module> modules = new ArrayList<Module>();
+		Module module = new Module();
+		moduleGroup.setName(name);
+		moduleGroup.setTechId(technology);
+		if (FEATURES_CORE.equals(moduleType)) {
+			moduleGroup.setCore(true);
+		} else {
+			moduleGroup.setCore(false);
+		}
+		moduleGroup.setType(type);
+		moduleGroup.setCustomerId(customerId);
+		module.setName(name);
+		List<Documentation> docs = new ArrayList<Documentation>();
+		Documentation descDoc = new Documentation();
+		descDoc.setType(DocumentationType.DESCRIPTION);
+		descDoc.setContent(description);
+		docs.add(descDoc);
+		Documentation helpTextDoc = new Documentation();
+		helpTextDoc.setType(DocumentationType.HELP_TEXT);
+		helpTextDoc.setContent(helpText);
+		docs.add(helpTextDoc);
+		module.setDocs(docs);
+		module.setVersion(version);
+		module.setArtifactId(artifactId);
+		module.setGroupId(groupId);
+		if (StringUtils.isNotEmpty(defaultType)) {
+			module.setRequired(true);
+		} else {
+			module.setRequired(false);
+		}
+		modules.add(module);
+		moduleGroup.setVersions(modules);
+		
+		return moduleGroup;
 	}
 	
 	public String update() throws PhrescoException {
@@ -194,7 +236,7 @@ public class Features extends ServiceBaseAction {
 			
 			ModuleGroup moduleGroup = new ModuleGroup();
 			moduleGroup.setName(name);
-			moduleGroup.setDescription(description);
+			moduleGroup.setTechId(technology);
 			moduleGroup.setVersions(versions);
 			moduleGroup.setCustomerId(customerId);
 			
@@ -212,7 +254,7 @@ public class Features extends ServiceBaseAction {
 			}
 			
 			getServiceManager().updateFeature(moduleGroup, techId, customerId);
-		} catch (PhrescoException e){
+		} catch (PhrescoException e) {
 			new LogErrorReport(e, FEATURE_UPDATE_EXCEPTION);
     	
 			return LOG_ERROR;
@@ -255,15 +297,14 @@ public class Features extends ServiceBaseAction {
 		try {
             writer = getHttpResponse().getWriter();
 	        featureJarName = getHttpRequest().getHeader(X_FILE_NAME);
-	        if (featureJarName.endsWith(REQ_JAR_FILE_EXTENSION) || featureJarName.endsWith(REQ_ZIP_FILE_EXTENSION) 
-	        		|| featureJarName.endsWith(REQ_TAR_GZ_FILE_EXTENSION)) {
-	        	InputStream is = getHttpRequest().getInputStream();
-	        	featureByteArray = IOUtils.toByteArray(is);
-	            getHttpResponse().setStatus(getHttpResponse().SC_OK);
-	            writer.print(SUCCESS_TRUE);
-		        writer.flush();
-		        writer.close();
-	        }
+	       
+	        InputStream is = getHttpRequest().getInputStream();
+	        featureByteArray = IOUtils.toByteArray(is);
+	        getHttpResponse().setStatus(getHttpResponse().SC_OK);
+	        writer.print(SUCCESS_TRUE);
+	        writer.flush();
+	        writer.close();
+	        
 		} catch (Exception e) {
 			getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
             writer.print(SUCCESS_FALSE);
@@ -282,7 +323,7 @@ public class Features extends ServiceBaseAction {
 		featureJarName = null;
 	}
 
-	public String validateForm() {
+	public String validateForm() throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Features.validateForm()");
 		}
@@ -292,10 +333,27 @@ public class Features extends ServiceBaseAction {
 			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY));
 			isError = true;
 		} 
-
-		/*if (CollectionUtils.isEmpty(versions)) {
+		
+		if (CollectionUtils.isEmpty(versions)) {
 			setVersError(getText(KEY_I18N_ERR_VER_EMPTY));
 			isError = true;
+		} /*else if (StringUtils.isEmpty(fromPage) || (!version.equals(oldVersion))) {
+			//To check whether the version already exist
+			List<ModuleGroup> moduleGroups = getServiceManager().getFeatures(customerId);
+			if (CollectionUtils.isNotEmpty(versions)) {
+				for (ModuleGroup moduleGroup : moduleGroups) {
+				    List<Module> versions = moduleGroup.getVersions();
+				    if (CollectionUtils.isNotEmpty(versions)) {
+				        for (Module module : versions) {
+	                        if (module.getName().equalsIgnoreCase(name) && module.getVersion().equals(version)) {
+	                            setVerError(getText(KEY_I18N_ERR_VER_ALREADY_EXISTS));
+	                            isError = true;
+	                            break;
+	                        }
+                        }
+				    }
+				}
+			}
 		}*/
 		
 		if (isError) {
@@ -392,4 +450,84 @@ public class Features extends ServiceBaseAction {
 	public void setType(String type) {
 		this.type = type;
 	}
+	
+	public String getTechnology() {
+		return technology;
+	}
+
+	public void setTechnology(String technology) {
+		this.technology = technology;
+	}
+	
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
+	}
+	
+	public String getVerError() {
+		return verError;
+	}
+
+	public void setVerError(String verError) {
+		this.verError = verError;
+	}
+
+	public String getOldVersion() {
+		return oldVersion;
+	}
+
+	public void setOldVersion(String oldVersion) {
+		this.oldVersion = oldVersion;
+	}
+	
+	public String getArtifactId() {
+		return artifactId;
+	}
+
+	public void setArtifactId(String artifactId) {
+		this.artifactId = artifactId;
+	}
+
+	public String getGroupId() {
+		return groupId;
+	}
+
+	public void setGroupId(String groupId) {
+		this.groupId = groupId;
+	}
+	
+	public String getModuleType() {
+		return moduleType;
+	}
+
+	public void setModuleType(String moduleType) {
+		this.moduleType = moduleType;
+	}
+	
+	public String getDefaultType() {
+		return defaultType;
+	}
+
+	public void setDefaultType(String defaultType) {
+		this.defaultType = defaultType;
+	}
+
+	public String getHelpText() {
+		return helpText;
+	}
+
+	public void setHelpText(String helpText) {
+		this.helpText = helpText;
+	}
+	
+	public String getFrom() {
+        return from;
+    }
+
+    public void setFrom(String from) {
+        this.from = from;
+    }
 }

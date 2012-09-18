@@ -315,3 +315,16 @@ function copyToClipboard(data) {
 		}
 	});
 }
+
+$(document).keydown(function(e) {
+    // ESCAPE key pressed
+	if (e.keyCode == 27) {
+	   showParentPage();
+    }
+});
+
+//Shows the parent page
+function showParentPage() {
+	enableScreen();
+	$('#popup_div').hide();
+}
