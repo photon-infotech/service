@@ -51,10 +51,9 @@
 		                	<span>
 		                		<input type="checkbox" class="" name="" value="<%= moduleGroup.getId()%>" id="<%= moduleGroup.getId()%>checkBox">
 		                		&nbsp;&nbsp;<%= moduleGroup.getName() %>&nbsp;&nbsp;
-		                		<p id="<%= moduleGroup.getId()%>version" class="version versionDisplay_JSLib"></p>
 		                	</span>
 		                </span>
-		                <div class="mfbox siteinnertooltiptxt" style="display: none;">
+		                <div class="mfbox siteinnertooltiptxt hideContent">
 		                    <div class="scrollpanel">
 		                        <section class="scrollpanel_inner">
 		                        	<table class="download_tbl">
@@ -74,15 +73,15 @@
 													}
 										%>
 											<tr>
-												<td class="editFeatures_td1">
+												<td>
 													<input type="radio" name="<%= module.getId() %>" value="<%= module.getVersion() %>" >
 												</td>
-												<td class="editFeatures_td2">
+												<td>
 													<a href="#" name="ModuleDesc" onclick="editFeature('<%= moduleGroup.getId() %>');" >
 														<%= moduleGroup.getName() %>
 													</a>
 												</td>
-												<td class="editFeatures_td4"><%= module.getVersion() %></td>
+												<td><%= module.getVersion() %></td>
 											</tr>
 										<%	
 												}
