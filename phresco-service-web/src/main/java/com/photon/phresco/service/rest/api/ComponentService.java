@@ -464,7 +464,7 @@ public class ComponentService extends DbService implements ServiceConstants {
 		
 		try {
 			List<ModuleGroup> foundModules = new ArrayList<ModuleGroup>();
-			if(StringUtils.isEmpty(type)) {
+			if(StringUtils.isEmpty(techId)) {
 				if(!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
 					foundModules = mongoOperation.find(MODULES_COLLECTION_NAME,
 								new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)), ModuleGroup.class);

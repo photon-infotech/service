@@ -28,7 +28,6 @@ import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -82,6 +81,7 @@ public class Features extends ServiceBaseAction {
 	private String defaultType = "";
 	
 	private String from = "";
+	private String appJarError = "";
 	
     public String list() {
     	if (isDebugEnabled) {
@@ -334,10 +334,16 @@ public class Features extends ServiceBaseAction {
 			isError = true;
 		} 
 		
-		if (CollectionUtils.isEmpty(versions)) {
+		if (StringUtils.isEmpty(version)) {
 			setVersError(getText(KEY_I18N_ERR_VER_EMPTY));
 			isError = true;
-		} /*else if (StringUtils.isEmpty(fromPage) || (!version.equals(oldVersion))) {
+		} 
+		
+		if (featureByteArray == null) {
+		    setAppJarError(getText(KEY_I18N_ERR_APPLNJAR_EMPTY));
+            isError = true;
+		}
+		/*else if (StringUtils.isEmpty(fromPage) || (!version.equals(oldVersion))) {
 			//To check whether the version already exist
 			List<ModuleGroup> moduleGroups = getServiceManager().getFeatures(customerId);
 			if (CollectionUtils.isNotEmpty(versions)) {
@@ -529,5 +535,13 @@ public class Features extends ServiceBaseAction {
 
     public void setFrom(String from) {
         this.from = from;
+    }
+    
+    public String getAppJarError() {
+        return appJarError;
+    }
+
+    public void setAppJarError(String appJarError) {
+        this.appJarError = appJarError;
     }
 }

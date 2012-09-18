@@ -328,6 +328,12 @@
         } else {
             hideError($("#verControl"), $("#verError"));
         }
+        
+        if (data.appJarError != undefined) {
+            showError($("#featureFileControl"), $("#featureFileError"), data.appJarError);
+        } else {
+            hideError($("#featureFileControl"), $("#featureFileError"));
+        }
     }
     
 	function jarError(data, type) {
