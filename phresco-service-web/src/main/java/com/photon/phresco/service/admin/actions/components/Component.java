@@ -106,10 +106,7 @@ public class Component extends ServiceBaseAction {
     		S_LOGGER.debug("Entering Method  Component.componentlist()");
     	}
     	
-    	try {
-    		System.out.println("-------customerId----"+customerId);
-    		System.out.println("-------technology----"+techId);
-    		System.out.println("-------type----------"+type);
+    	try {    		
     		List<ModuleGroup> moduleGroup = getServiceManager().getFeaturesByTech(customerId, techId, type);
     		getHttpRequest().setAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
     		getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
