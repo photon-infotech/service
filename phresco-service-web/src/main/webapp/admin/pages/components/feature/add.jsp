@@ -47,7 +47,8 @@
     String groupId = "";
     String artifactId = "";
     String selectedTechnology = "";
-    boolean isDefaultModule = false; 
+    boolean isDefaultModule = false;
+    boolean isSystem = false;
 	if (moduleGroup != null) {
 	    List<Module> modules = moduleGroup.getVersions();
 	    Module selectedModule = null;
@@ -69,6 +70,7 @@
 			}
 	    }
 		selectedTechnology = moduleGroup.getTechId();
+		isSystem = moduleGroup.isSystem();
 	}
 %>
 
@@ -229,9 +231,18 @@
 	</div>
 	
 	<div class="bottom_button">
+		<%
+			String disabledClass = "btn-primary";
+			String disabled = "";
+			if (isSystem) {
+				disabledClass = "btn-disabled";
+				disabled = "disabled";
+			}
+		%>
      	<% if (StringUtils.isNotEmpty(fromPage)) { %>
-	     	<input type="button" id="featuresUpdate" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.update'/>" 
-				onclick="validate('featuresUpdate', $('#formFeatureAdd'), $('#feature_tab'), 'Updating Feature');"/> 
+	     	<input type="button" id="featuresUpdate" class="btn <%= disabledClass %>" <%= disabled %> 
+				onclick="validate('featuresUpdate', $('#formFeatureAdd'), $('#feature_tab'), 'Updating Feature');"
+				value="<s:text name='lbl.hdr.comp.update'/>"/> 
      	<% } else { %>
 	     	<input type="button" id="featuresSave" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.save'/>" 
 				onclick="validate('featuresSave', $('#formFeatureAdd'), $('#feature_tab'), 'Creating Feature');"/> 

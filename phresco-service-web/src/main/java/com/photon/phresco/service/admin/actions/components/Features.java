@@ -95,7 +95,7 @@ public class Features extends ServiceBaseAction {
     	return COMP_FEATURES_LIST;
     }
 	
-    public String list() {
+    public String technologies() {
     	if (isDebugEnabled) {
     		S_LOGGER.debug("Entering Method  Features.list()");
     	}
@@ -213,7 +213,7 @@ public class Features extends ServiceBaseAction {
 			return LOG_ERROR;
 		} 
 
-		return list();
+		return technologies();
 	}
 	
 	public String update() throws PhrescoException {
@@ -245,7 +245,7 @@ public class Features extends ServiceBaseAction {
 			return LOG_ERROR;
 		}
 		
-		return list();	
+		return technologies();	
 	}
 	
 	private ModuleGroup createModuleGroup() throws PhrescoException {
@@ -320,7 +320,7 @@ public class Features extends ServiceBaseAction {
     		return LOG_ERROR;
 		}
 		
-		return list();
+		return technologies();
 	}
 	
 	public String uploadFile() throws PhrescoException {

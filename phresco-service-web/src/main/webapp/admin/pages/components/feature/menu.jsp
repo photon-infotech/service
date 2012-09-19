@@ -53,7 +53,7 @@
 $(document).ready(function() {
 	var params = "type=";
 	params = params.concat("module");
-	loadContent("featuresList", $('#formMenu'), $("#feature_tab"), params);
+	loadContent("technologiesList", $('#formMenu'), $("#feature_tab"), params);
 	
 	$("#module").click(function(){
 		$("#js").removeClass("selected");
@@ -61,7 +61,7 @@ $(document).ready(function() {
 		$("#module").addClass("selected");
 		 var params = "type=";
 		 params = params.concat("module");
-		loadContent("featuresList", $('#formMenu'), $("#feature_tab"), params);
+		loadContent("technologiesList", $('#formMenu'), $("#feature_tab"), params);
 	});
 	
 	$("#js").click(function(){
@@ -70,7 +70,7 @@ $(document).ready(function() {
 		$("#js").addClass("selected");
 		 var params = "type=";
 		 params = params.concat("js");
-		loadContent("featuresList", $('#formMenu'), $("#feature_tab"), params);
+		loadContent("technologiesList", $('#formMenu'), $("#feature_tab"), params);
 	});
 });
 </script>

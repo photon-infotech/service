@@ -50,7 +50,7 @@
 		
 		<default-interceptor-ref name="interceptorStack"/>
   
-  		<global-results>  
+  		<global-results>
 			<result name="success">/admin/login.jsp</result>
 			<result name="logError">/admin/pages/errorReport.jsp</result>
 		</global-results>
@@ -67,15 +67,15 @@
         </action>
 		
 		 <action name="featuresMenu" class="com.photon.phresco.service.admin.actions.components.Features" method="menu">
-            <result name="featuresList">/admin/pages/components/feature/feature.jsp</result>
+            <result name="featuresList">/admin/pages/components/feature/menu.jsp</result>
         </action>
 		
-		<action name="featuresList" class="com.photon.phresco.service.admin.actions.components.Features" method="list">
+		<action name="technologiesList" class="com.photon.phresco.service.admin.actions.components.Features" method="technologies">
             <result name="featuresList">/admin/pages/components/feature/list.jsp</result>
         </action>
         
         <action name="listFeatures" class="com.photon.phresco.service.admin.actions.components.Features" method="featuresWithList">
-            <result name="featuresList">/admin/pages/components/feature/feature_list.jsp</result>
+            <result name="featuresList">/admin/pages/components/feature/technology.jsp</result>
             <result name="dependency">/admin/pages/components/feature/dependency.jsp</result>
         </action>
 		
