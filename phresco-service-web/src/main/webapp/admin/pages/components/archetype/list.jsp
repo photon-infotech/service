@@ -66,7 +66,7 @@
 							<tr>
 								<th class="first">
 									<div class="th-inner">
-										<input type="checkbox" value="" id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this);">
+										<input type="checkbox" value="" id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this,$('.technolgies'), false);">
 									</div>
 								</th>
 								<th class="second">
@@ -94,7 +94,7 @@
 									<% if (technology.isSystem()) { %>
 										<input type="checkbox" name="techId" value="<%= technology.getId() %>" disabled/>
 									<% } else { %>
-										<input type="checkbox" class="check" name="techId" value="<%= technology.getId() %>" onclick="checkboxEvent();" />
+										<input type="checkbox" class="check technolgies" name="techId" value="<%= technology.getId() %>" onclick="checkboxEvent();" />
 									<% } %>
 									</td>
 									

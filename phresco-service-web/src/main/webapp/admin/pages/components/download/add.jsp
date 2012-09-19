@@ -88,28 +88,38 @@
                 <span class="mandatory">*</span>&nbsp;<s:text name="Technology"/>
             </label>
             <div class="controls">
-                <select id="multiSelect" multiple="multiple" name="technology">
-                    <% 	
-                    	if (technologies != null) {
-							for (Technology technology : technologies) { 
-								String selectedStr = "";
-								if (downloadInfo != null) {
-									List<String> appliesTos = downloadInfo.getAppliesTo();
-									if (appliesTos.contains(technology.getId())) {
-										selectedStr = "selected";
-									} else {
-										selectedStr = "";
+            	<div class="typeFields" id="typefield">
+	                <div class="multilist-scroller multiselct" style="height: 95px; width:300px;" name="technology">
+		                <ul>
+							<li>
+								<input type="checkbox" name="technology" value="all" id="checkAllAuto" onclick="checkAllEvent(this, $('.techCheck'), true);" style="margin: 3px 8px 6px 0;">All
+							</li>
+		                    <% 	
+		                    	if (technologies != null) {
+									for (Technology technology : technologies) { 
+										String checkedStr = "";
+										if (downloadInfo != null) {
+											List<String> appliesTos = downloadInfo.getAppliesTo();
+											if (appliesTos.contains(technology.getId())) {
+												checkedStr = "checked";
+											} else {
+												checkedStr = "";
+											}
+										}
+							%>
+	                   			<li>
+									<input type="checkbox" name="technology" value="<%= technology.getId() %>"  <%= checkedStr %>
+										class="check techCheck"><%= technology.getName() %>
+								</li>
+							<% 	 
 									}
 								}
-					%>
-                    			<option value="<%= technology.getId() %>" <%= selectedStr %>><%= technology.getName() %></option> 
-					<% 	 
-							}
-						}
-					%> 
-                </select>
+							%> 
+						</ul>
+	                </div>
+				</div>
+			</div>
                 <span class="help-inline applyerror" id="techError"></span>
-            </div>
         </div>
         
         <!-- POM details starts -->
@@ -166,12 +176,27 @@
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.dwnld.appltfrm'/>
 			</label>
 			<div class="controls">
-				<select id="multiSelect" multiple="multiple" name="application">
-					<option  value="Windows">Windows</option>
-					<option  value="Linux">Linux</option>
-					<option  value="Mac">Mac</option>
-					<option  value="Solaris">Solaris</option>
-				</select>
+				<div class="typeFields" >
+				<div class="multilist-scroller multiselct" style="height: 95px; width:300px;" name="application">
+					<ul>
+						<li>
+							<input type="checkbox" name="application" value="all" id="checkAll" onclick="checkAllEvent(this, $('.platFormCheck'), true);" style="margin: 3px 8px 6px 0;">All
+						</li>
+						<li>
+							<input type="checkbox" name="application" class="check platFormCheck" value="Windows" >Windows
+						</li>
+						<li>
+							<input type="checkbox" name="application" class="check platFormCheck" value="Linux">Linux
+						</li>
+						<li>
+							<input type="checkbox" name="application" class="check platFormCheck" value="Mac">Mac
+						</li>
+						<li>
+							<input type="checkbox" name="application" class="check platFormCheck" value="Solaris">Solaris
+						</li>
+					</ul>
+				</div>
+				</div>
 				<span class="help-inline applyerror" id="appltError"></span>
 			</div>
 		</div>
@@ -252,7 +277,8 @@
 <script type="text/javascript">
 	//To check whether the device is ipad or not and then apply jquery scrollbar
 	if (!isiPad()) {
-		$(".content_adder").scrollbars();  
+		$(".content_adder").scrollbars(); 
+		$(".multilist-scroller").scrollbars();
 	}
 	
 	$(document).ready(function() {
@@ -265,7 +291,7 @@
             name = checkForSplChr(name);
             $(this).val(name);
         });
-	
+		
 		// To check for the special character in version ,groupId, artifactId
         $('#jarVersn, #dwnVersn, #arftId, #grpId').bind('input propertychange', function (e) {
             var version = $(this).val();

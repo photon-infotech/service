@@ -64,7 +64,7 @@
 							<tr>
 								<th class="first">
 									<div class="th-inner">
-										<input type="checkbox" value="" id="checkAllAuto" class="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this);">
+										<input type="checkbox" value="" id="checkAllAuto" class="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this,$('.dwnloadInfo'), false);">
 									</div>
 								</th>
 								<th class="second">
@@ -89,7 +89,7 @@
 				       	%>
 							<tr>
 								<td class="checkboxwidth">
-									<input type="checkbox" class="check" name="downloadId" value="<%= download.getId() %>" onclick="checkboxEvent();" >
+									<input type="checkbox" class="check dwnloadInfo" name="downloadId" value="<%= download.getId() %>" onclick="checkboxEvent();" >
 								</td>
 								<td class="namelabel-width">
 									<a href="#" onclick="editDownload('<%= download.getId() %>');" name="edit" id="" ><%= download.getName() %></a>

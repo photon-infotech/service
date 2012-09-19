@@ -64,7 +64,7 @@
 							<tr>
 								<th class="first">
 									<div class="th-inner">
-										<input type="checkbox" value="" id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this);">
+										<input type="checkbox" value="" id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this,$('.pilotprojt'), false);">
 									</div>
 								</th>
 								<th class="second">
@@ -95,7 +95,7 @@
 		 					        <% if (proInfo.isSystem()) { %>
 		 					        		<input type="checkbox" name="projectId" value="<%=proInfo.getId() %>" onclick="checkboxEvent();" disabled/>	
                                         <% } else { %>
-											<input type="checkbox" class="check" name="projectId" value="<%=proInfo.getId() %>" onclick="checkboxEvent();" />
+											<input type="checkbox" class="check pilotprojt" name="projectId" value="<%=proInfo.getId() %>" onclick="checkboxEvent();" />
                                         <% } %>
 									</td>
 									<td>

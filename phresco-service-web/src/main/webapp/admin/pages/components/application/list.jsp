@@ -63,7 +63,7 @@
 							<tr>
 								<th class="first nameTd">
 									<div class="th-inner">
-										<input type="checkbox" value="" id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this);">
+										<input type="checkbox" value="" id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this,$('.apptype'), false);">
 									</div>
 								</th>
 								<th class="second">
@@ -85,7 +85,7 @@
 										<% if (appType.isSystem()) { %>
                                                <input type="checkbox" name="apptypeId" value="<%= appType.getId() %>" disabled/>
                                         <% } else { %>
-                                               <input type="checkbox" class="check" name="apptypeId" value="<%= appType.getId() %>" 
+                                               <input type="checkbox" class="check apptype" name="apptypeId" value="<%= appType.getId() %>" 
                                                	onclick="checkboxEvent();"/>
                                         <% } %>
 										</td>

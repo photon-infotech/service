@@ -175,7 +175,7 @@
 		
 		<div class="control-group" id="appFileControl">
 			<label class="control-label labelbold"> <span
-				class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.applnjar' />
+				class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.archtypejar' />
 			</label>
 			<div class="controls" style="float: left; margin-left: 3%;">
 				<div id="appln-file-uploader" class="file-uploader">
@@ -190,7 +190,7 @@
 		
 		<div class="control-group" id="pluginControl">
 			<label class="control-label labelbold"> <s:text
-					name='lbl.hdr.comp.pluginjar' /> </label>
+					name='lbl.hdr.comp.plugindependencies' /> </label>
 			<div class="controls" style="float: left; margin-left: 3%;">
 				<div id="plugin-file-uploader" class="file-uploader">
 					<noscript>
