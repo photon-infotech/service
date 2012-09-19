@@ -53,7 +53,7 @@
 							for (ModuleGroup moduleGroup : moduleGroups) {
 						%>
 			                <span class="siteaccordion closereg">
-			                	<span>
+			                	<span class="dependencySpan">
 			                		<input type="checkbox" name="moduleGroup" value="<%= moduleGroup.getId()%>" id="<%= moduleGroup.getId()%>checkBox">
 			                		&nbsp;&nbsp;<%= moduleGroup.getName() %>&nbsp;&nbsp;
 			                		<p id="<%= moduleGroup.getId()%>version" class="version"></p>

@@ -92,12 +92,6 @@
 		featurelist();
 	});
 	
-	function editFeature(id) {
-	    var params = "techId=";
-	    params = params.concat(id);
-	    loadContent("featuresEdit", $('#formFeaturesList'), $('#feature_tab'), params);
-	}
-	
 	// This method calling from confirm_dialog.jsp
     function continueDeletion() {
     	confirmDialog('none', '');
@@ -107,5 +101,4 @@
     function featurelist() {
     	loadContent('listFeatures', $('#formFeaturesList'), $('#feature_list'));
     }
-    
 </script>

@@ -27,6 +27,7 @@
 <%@ page import="com.photon.phresco.model.ModuleGroup" %>
 <%@ page import="com.photon.phresco.model.Technology" %>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
+<%@ page import="com.photon.phresco.model.Documentation.DocumentationType"%>
 
 <%
 	ModuleGroup moduleGroup = (ModuleGroup)request.getAttribute(ServiceUIConstants.REQ_FEATURES_MOD_GRP); 
@@ -35,34 +36,39 @@
     String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
     String type = (String) request.getAttribute(ServiceUIConstants.REQ_FEATURES_TYPE);
     String header = (String) request.getAttribute(ServiceUIConstants.REQ_FEATURES_HEADER);
+    String selectedModuleId = (String) request.getAttribute(ServiceUIConstants.REQ_FEATURES_SELECTED_MODULEID);
     
   	//For edit
+  	String moduleId = "";
     String name = "";
     String description = "";
     String helpText = "";
     String version = "";
     String groupId = "";
     String artifactId = "";
+    String selectedTechnology = "";
+    boolean isDefaultModule = false; 
 	if (moduleGroup != null) {
-		if (StringUtils.isNotEmpty(moduleGroup.getName())) {
-			name = moduleGroup.getName();
-		}
-// 		if (StringUtils.isNotEmpty(moduleGroup.getDescription())) {
-// 			description = moduleGroup.getDescription();
-// 		}
-		if (CollectionUtils.isNotEmpty(moduleGroup.getVersions())) {
-			List<Module> versions = moduleGroup.getVersions();
-			if (CollectionUtils.isNotEmpty(versions)) {
-				for (Module moduleVersion : versions) {
-					version = moduleVersion.getVersion();
-				}
+	    List<Module> modules = moduleGroup.getVersions();
+	    Module selectedModule = null;
+	    if (CollectionUtils.isNotEmpty(modules)) {
+	        for (Module module : modules) {
+	            if (module.getId().equals(selectedModuleId)) {
+	            	selectedModule = module;
+	            	break;
+	            }
+	        }
+	        moduleId = selectedModule.getId();
+			name = selectedModule.getName();
+			isDefaultModule = selectedModule.getRequired();
+			if (selectedModule.getDoc(DocumentationType.DESCRIPTION) != null) {
+				description = selectedModule.getDoc(DocumentationType.DESCRIPTION).getContent();
 			}
-		}
-		
-// 		if (StringUtils.isNotEmpty(moduleGroup.getHelpText())) {
-// 			helpText = moduleGroup.getHelpText();
-// 		}
-
+			if (selectedModule.getDoc(DocumentationType.HELP_TEXT) != null) {
+			    helpText = selectedModule.getDoc(DocumentationType.HELP_TEXT).getContent();
+			}
+	    }
+		selectedTechnology = moduleGroup.getTechId();
 	}
 %>
 
@@ -71,7 +77,6 @@
 		<%= header %>
 	</h4>	
 	<div class="content_feature">
-
 		<div class="control-group" id="nameControl">
 			<label class="control-label labelbold">
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.name'/>
@@ -89,7 +94,8 @@
 			</label>
 			<div class="controls">
 				<textarea id="featureDesc" placeholder="<s:text name='place.hldr.feature.add.desc'/>" 
-				     maxlength="150" title="150 Characters only" class="input-xlarge" type="text" name="description" value="<%= description %>"></textarea>
+				     maxlength="150" title="150 Characters only" class="input-xlarge" type="text" 
+				     name="description"><%= description %></textarea>
 			</div>
 		</div>
 		
@@ -99,8 +105,9 @@
 				<s:text name='lbl.hdr.comp.help'/>
 			</label>
 			<div class="controls">
-				<textarea id="hlptext" placeholder="<s:text name='place.hldr.feature.add.help.text'/>" 
-					maxlength="150" title="150 Characters only" class="input-xlarge" value="<%= helpText %>" rows="2" cols="10" ></textarea>
+				<textarea name="helpText" id="hlptext" placeholder="<s:text name='place.hldr.feature.add.help.text'/>" 
+					maxlength="150" title="150 Characters only" class="input-xlarge" 
+					rows="2" cols="10" ><%= helpText %></textarea>
 			</div>
 		</div>
 		
@@ -112,14 +119,21 @@
 				<select name="technology">
 				<%
 					if (technologies != null) {
+					    String selectedStr = "";
 						for (Technology technology : technologies) {
+						    if (technology.getId().equals(selectedTechnology)) {
+						        selectedStr = "selected";
+						    } else {
+						        selectedStr = "";
+						    }
 				%>
-							<option value="<%=technology.getId() %>"><%=technology.getName() %></option>
+							<option value="<%= technology.getId() %>" <%= selectedStr %>><%= technology.getName() %></option>
 				<%
                         }
 					}
 				%>
-				</select><span class="help-inline applyerror" id="techError"></span>
+				</select>
+				<span class="help-inline applyerror" id="techError"></span>
 			</div>
 		</div>
 		
@@ -140,7 +154,13 @@
 				<s:text name="lbl.comp.featr.default.module" />
 			</label>
 			<div class="controls">
-				<input type="checkbox" name="defaultType" value="true">
+				<%
+					String checkedStr = "";
+					if (isDefaultModule) {
+					    checkedStr = "checked";
+					}
+				%>
+				<input type="checkbox" name="defaultType" value="true" <%= checkedStr %>>
 			</div>
 		</div>
 		
@@ -151,9 +171,9 @@
 					<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.groupid'/>
 				</label>
 				<div class="controls">
-					<input id="groupid" class="groupId" class="input-xlarge" maxlength="40" title="40 Characters only" type="text"
+					<input name="groupId" class="groupId" class="input-xlarge" maxlength="40" title="40 Characters only" type="text"
 						placeholder="<s:text name='place.hldr.archetype.add.groupId'/>">
-						<span class="help-inline" id="groupError"></span>
+						<span class="help-inline" id="groupIdError"></span>
 				</div>
 			</div>
 			
@@ -162,9 +182,9 @@
 					<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.artifactid'/>
 				</label>
 				<div class="controls">
-					<input id="artifId" class="artifactId" class="input-xlarge" maxlength="40" title="40 Characters only" type="text"
+					<input name="artifactId" class="artifactId" class="input-xlarge" maxlength="40" title="40 Characters only" type="text"
 						placeholder="<s:text name='place.hldr.archetype.add.artifactId'/>">
-						<span class="help-inline" id="artifactError"></span>
+						<span class="help-inline" id="artifactIdError"></span>
 				</div>
 			</div>
 			
@@ -173,7 +193,7 @@
 					<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.jar.version'/>
 				</label>
 				<div class="controls">
-					<input id="versnId" class="jarVersion" maxlength="30" title="30 Characters only" class="input-xlarge" type="text"
+					<input name="version" class="jarVersion" maxlength="30" title="30 Characters only" class="input-xlarge" type="text"
 						placeholder="<s:text name='place.hldr.archetype.add.version'/>">
 						<span class="help-inline" id="verError"></span>
 				</div>
@@ -224,13 +244,10 @@
 	<input type="hidden" name="customerId" value="<%= customerId %>">
 	<input type="hidden" name="from" value="dependency">
 	<input type="hidden" name="fromPage" value="<%= StringUtils.isNotEmpty(fromPage) ? fromPage : "" %>"/>
-    <input type="hidden" name="techId" value="<%= moduleGroup != null ? moduleGroup.getId() : "" %>"/>
-    <input type="hidden" name="oldName" value="<%= moduleGroup != null ? moduleGroup.getName() : "" %>"/>
-    <input type="hidden" name="oldVersion" value="<%= moduleGroup != null ? moduleGroup.getVersions() : "" %>"/>
+    <input type="hidden" name="moduleGroupId" value="<%= moduleId %>"/>
+    <input type="hidden" name="oldName" value="<%= name %>"/>
+    <input type="hidden" name="oldVersion" value="<%= version %>"/>
     <input type="hidden" name="type" value="<%= type %>">
-    <input type="hidden" name="groupId">
-	<input type="hidden" name="artifactId">
-	<input type="hidden" name="jarVersion">
 </form>
 
 <script type="text/javascript">
@@ -308,33 +325,32 @@
 	});
 
     function findError(data) {
-        if (data.nameError != undefined) {
+        if (!isBlank(data.nameError)) {
             showError($("#nameControl"), $("#nameError"), data.nameError);
         } else {
             hideError($("#nameControl"), $("#nameError"));
         }
         
-        if (data.groupError != undefined) {
-            showError($("#groupIdControl"), $("#groupError"), data.groupError);
+        if (!isBlank(data.groupIdError)) {
+            showError($("#groupIdControl"), $("#groupIdError"), data.groupIdError);
         } else {
-            hideError($("#groupIdControl"), $("#groupError"));
+            hideError($("#groupIdControl"), $("#groupIdError"));
         }
         
-        if (data.artifactError != undefined) {
-            showError($("#artifactIdControl"), $("#artifactError"), data.artifactError);
+        if (!isBlank(data.artifactIdError)) {
+            showError($("#artifactIdControl"), $("#artifactIdError"), data.artifactIdError);
         } else {
-            hideError($("#artifactIdControl"), $("#artifactError"));
+            hideError($("#artifactIdControl"), $("#artifactIdError"));
         }
         
-        
-       	if (data.versError != undefined) {
-            showError($("#verControl"), $("#verError"), data.versError);
+       	if (!isBlank(data.verError)) {
+            showError($("#verControl"), $("#verError"), data.verError);
         } else {
             hideError($("#verControl"), $("#verError"));
         }
         
-        if (data.appJarError != undefined) {
-            showError($("#featureFileControl"), $("#featureFileError"), data.appJarError);
+        if (!isBlank(data.fileError)) {
+            showError($("#featureFileControl"), $("#featureFileError"), data.fileError);
         } else {
             hideError($("#featureFileControl"), $("#featureFileError"));
         }

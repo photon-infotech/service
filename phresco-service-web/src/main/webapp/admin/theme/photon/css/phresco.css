@@ -1202,9 +1202,9 @@ legend {
 
 .closereg span {
     float:left;
-    margin:0px -20px;
+    margin:0px;
     background:url(../../../images/r_arrowclose.png) no-repeat 3%;
-    padding-left:4%;
+    padding-left:5%;
     width:92%;
     line-height: 20px;
 }
@@ -1222,9 +1222,9 @@ legend {
 
 .openreg span {
     float:left;
-    margin:0px -20px;
+    margin:0px ;
     background:url(../../../images/r_arrowopen.png) no-repeat 3%;
-    padding-left:4%;
+    padding-left:5%;
     width:92%;
 }
 
@@ -2188,6 +2188,7 @@ input[class*='sample'] {
 
 .border_collapse {
 	border-collapse:separate;
+	margin-left: 20px;
 }
 
 .accor_head {
@@ -2199,3 +2200,6 @@ input[class*='sample'] {
 	margin-left:81px;
 }
 
+.dependencySpan {
+	height: 23px;
+}

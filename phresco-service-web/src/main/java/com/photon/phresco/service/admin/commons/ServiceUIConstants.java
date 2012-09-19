@@ -132,6 +132,7 @@ public interface ServiceUIConstants {
     String REQ_FEATURES_TYPE = "type";
     String REQ_FEATURES_MODULE = "module";
     String REQ_FEATURES_HEADER = "header";
+    String REQ_FEATURES_SELECTED_MODULEID = "selectedModuleId";
     
     
     /*****************************
@@ -284,6 +285,8 @@ public interface ServiceUIConstants {
     
     String FEATURE_ADDED = "succ.feature.add";
     String FEATURE_NOT_ADDED = "fail.feature.add";
+    String FEATURE_UPDATED = "succ.feature.update";
+    String FEATURE_NOT_UPDATED = "fail.feature.update";
     String FEATURE_DELETED = "succ.feature.delete";
     String FEATURE_NOT_DELETED = "fail.feature.delete" ;
     

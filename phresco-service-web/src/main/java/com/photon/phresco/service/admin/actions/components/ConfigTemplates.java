@@ -55,16 +55,6 @@ public class ConfigTemplates extends ServiceBaseAction {
     private String fromPage = null;
     private String oldName = null;
     
-    //property template
-    private String[] propTempKeys = null;
-    private String propTempType = "";
-    private String propTempName = "";
-    private String csvPsblValues = "";
-    private List<String> possibleValues = null;
-    private String propTempHlpTxt = "";
-    private String propTempMndtry = "";
-    private String propTempMul = "";
-	
 	public String list() throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method ConfigTemplates.list()");
@@ -127,47 +117,16 @@ public class ConfigTemplates extends ServiceBaseAction {
 		
 		try  {
 			List<SettingsTemplate> settingsTemplates = new ArrayList<SettingsTemplate>();
-			List<PropertyTemplate> propertyTemplates = new ArrayList<PropertyTemplate>();
 			SettingsTemplate settingTemplate = new SettingsTemplate();
-			propTempKeys = getHttpRequest().getParameterValues(REQ_CONFIG_KEY);
-			for (String propTempKey : propTempKeys) {
-				propTempName = getHttpRequest().getParameter(propTempKey + REQ_CONFIG_NAME);
-				propTempType = getHttpRequest().getParameter(propTempKey + REQ_CONFIG_TYPE);
-				propTempHlpTxt = getHttpRequest().getParameter(propTempKey + REQ_CONFIG_HELP_TEXT);
-				propTempMndtry = getHttpRequest().getParameter(propTempKey + REQ_CONFIG_MANDATORY);
-				propTempMul = getHttpRequest().getParameter(propTempKey + REQ_CONFIG_MULTIPLE);
-				csvPsblValues = getHttpRequest().getParameter(propTempKey + REQ_CONFIG_PSBL_VAL);
-				possibleValues = Arrays.asList(csvPsblValues.split("\\s*,\\s*"));
-				
-				PropertyTemplate propertyTemplate = new PropertyTemplate();
-				propertyTemplate.setKey(propTempKey);
-				propertyTemplate.setName(ServerUtil.createI18NString(propTempName));
-				propertyTemplate.setType(propTempType);
-				propertyTemplate.setPossibleValues(possibleValues);
-				propertyTemplate.setHelpText(propTempHlpTxt);
-				
-				if (StringUtils.isNotEmpty(propTempMndtry)) {
-					propertyTemplate.setRequired(true);	
-				} else {
-					propertyTemplate.setRequired(false);
-				}
-				
-				if (StringUtils.isNotEmpty(propTempMul)) {
-					propertyTemplate.setMultiple(true);
-				} else {
-					propertyTemplate.setMultiple(false);
-				}
-				propertyTemplates.add(propertyTemplate);
-			}
             settingTemplate.setType(name);
             settingTemplate.setDescription(description);
             settingTemplate.setAppliesTo(appliesTo);
             settingTemplate.setCustomerId(customerId);
-            settingTemplate.setProperties(propertyTemplates);
+            settingTemplate.setProperties(createPropertyTemplates());
             settingsTemplates.add(settingTemplate);
-            
             ClientResponse clientResponse = getServiceManager().createConfigTemplates(settingsTemplates, customerId);
-            if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200 && clientResponse.getStatus() != ServiceConstants.RES_CODE_201) {
+            if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200 
+                    && clientResponse.getStatus() != ServiceConstants.RES_CODE_201) {
             	addActionError(getText(CONFIGTEMPLATE_NOT_ADDED, Collections.singletonList(name)));
             } else {
             	addActionMessage(getText(CONFIGTEMPLATE_ADDED, Collections.singletonList(name)));
@@ -178,55 +137,24 @@ public class ConfigTemplates extends ServiceBaseAction {
 			return LOG_ERROR;	
 		}
 		
-		 return  list();
+		return  list();
 	}
-	
+
 	public String update() throws PhrescoException {
     	if (isDebugEnabled) {
     		S_LOGGER.debug("Entering Method  ConfigTemplates.update()");
     	}
     	
     	try {
-			List<PropertyTemplate> propertyTemplates = new ArrayList<PropertyTemplate>();
-			propTempKeys = getHttpRequest().getParameterValues(REQ_CONFIG_KEY);
-			for (String propTempKey : propTempKeys) {
-				propTempName = getHttpRequest().getParameter(propTempKey + REQ_CONFIG_NAME);
-				propTempType = getHttpRequest().getParameter(propTempKey + REQ_CONFIG_TYPE);
-				propTempHlpTxt = getHttpRequest().getParameter(propTempKey + REQ_CONFIG_HELP_TEXT);
-				propTempMndtry = getHttpRequest().getParameter(propTempKey + REQ_CONFIG_MANDATORY);
-				propTempMul = getHttpRequest().getParameter(propTempKey + REQ_CONFIG_MULTIPLE);
-				csvPsblValues = getHttpRequest().getParameter(propTempKey + REQ_CONFIG_PSBL_VAL);
-				possibleValues = Arrays.asList(csvPsblValues.split("\\s*,\\s*"));
-				PropertyTemplate propertyTemplate = new PropertyTemplate();
-				propertyTemplate.setKey(propTempKey);
-				propertyTemplate.setName(ServerUtil.createI18NString(propTempName));
-				propertyTemplate.setType(propTempType);
-				propertyTemplate.setPossibleValues(possibleValues);
-				propertyTemplate.setHelpText(propTempHlpTxt);
-				
-				if (StringUtils.isNotEmpty(propTempMndtry)) {
-					propertyTemplate.setRequired(true);	
-				} else {
-					propertyTemplate.setRequired(false);
-				}
-				
-				if (StringUtils.isNotEmpty(propTempMul)) {
-					propertyTemplate.setMultiple(true);
-				} else {
-					propertyTemplate.setMultiple(false);
-				}
-				propertyTemplates.add(propertyTemplate);
-			}
-			
             SettingsTemplate settingTemplate = new SettingsTemplate();
             settingTemplate.setType(name);
             settingTemplate.setDescription(description);
             settingTemplate.setAppliesTo(appliesTo);
             settingTemplate.setCustomerId(customerId);
             settingTemplate.setId(configId);
-            settingTemplate.setProperties(propertyTemplates);
+            settingTemplate.setProperties(createPropertyTemplates());
     		getServiceManager().updateConfigTemp(settingTemplate, configId, customerId);
-    	}catch (PhrescoException e) {
+    	} catch (PhrescoException e) {
 			new LogErrorReport(e, CONFIG_TEMP_UPDATE_EXCEPTION);
 			
 			return LOG_ERROR;	
@@ -235,6 +163,58 @@ public class ConfigTemplates extends ServiceBaseAction {
     	return list();
     }
 	
+	private List<PropertyTemplate> createPropertyTemplates() throws PhrescoException {
+        if (isDebugEnabled) {
+            S_LOGGER.debug("Entering Method ConfigTemplates.createPropertyTemplates()");
+        }
+        
+        List<PropertyTemplate> propertyTemplates;
+        try {
+            propertyTemplates = new ArrayList<PropertyTemplate>();
+            String[] propTempKeys = getHttpRequest().getParameterValues(REQ_CONFIG_KEY);
+            for (String propTempKey : propTempKeys) {
+                String propTempName = getHttpRequest().getParameter(
+                        propTempKey + REQ_CONFIG_NAME);
+                String propTempType = getHttpRequest().getParameter(
+                        propTempKey + REQ_CONFIG_TYPE);
+                String propTempHlpTxt = getHttpRequest().getParameter(
+                        propTempKey + REQ_CONFIG_HELP_TEXT);
+                String propTempMndtry = getHttpRequest().getParameter(
+                        propTempKey + REQ_CONFIG_MANDATORY);
+                String propTempMul = getHttpRequest().getParameter(
+                        propTempKey + REQ_CONFIG_MULTIPLE);
+                String csvPsblValues = getHttpRequest().getParameter(
+                        propTempKey + REQ_CONFIG_PSBL_VAL);
+                List<String> possibleValues = Arrays
+                        .asList(csvPsblValues.split("\\s*,\\s*"));
+
+                PropertyTemplate propertyTemplate = new PropertyTemplate();
+                propertyTemplate.setKey(propTempKey);
+                propertyTemplate.setName(ServerUtil
+                        .createI18NString(propTempName));
+                propertyTemplate.setType(propTempType);
+                propertyTemplate.setPossibleValues(possibleValues);
+                propertyTemplate.setHelpText(propTempHlpTxt);
+
+                if (StringUtils.isNotEmpty(propTempMndtry)) {
+                    propertyTemplate.setRequired(true);
+                } else {
+                    propertyTemplate.setRequired(false);
+                }
+
+                if (StringUtils.isNotEmpty(propTempMul)) {
+                    propertyTemplate.setMultiple(true);
+                } else {
+                    propertyTemplate.setMultiple(false);
+                }
+                propertyTemplates.add(propertyTemplate);
+            }
+        } catch (Exception e) {
+            throw new PhrescoException(e);
+        }
+        
+        return propertyTemplates;
+    }
 	
 	public String delete() throws PhrescoException {
 	    if (isDebugEnabled) {

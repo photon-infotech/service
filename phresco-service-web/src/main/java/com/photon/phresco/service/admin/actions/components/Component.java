@@ -253,7 +253,7 @@ public class Component extends ServiceBaseAction {
 				multiPart.bodyPart(binaryPart2);
 			}
 			
-			getServiceManager().updateFeature(moduleGroup, techId, customerId);
+			getServiceManager().updateFeature(multiPart, techId, customerId);
 		} catch (PhrescoException e) {
 			new LogErrorReport(e, COMPONENT_UPDATE_EXCEPTION);
     	

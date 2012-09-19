@@ -93,8 +93,8 @@
 													<input type="radio" name="<%= module.getId() %>" value="<%= module.getVersion() %>" >
 												</td>
 												<td>
-													<a href="#" name="ModuleDesc" onclick="editFeature('<%= moduleGroup.getId() %>');" >
-														<%= moduleGroup.getName() %>
+													<a href="#" name="ModuleDesc" onclick="editFeature('<%= moduleGroup.getId() %>', '<%= module.getId() %>');" >
+														<%= module.getName() %>
 													</a>
 												</td>
 												<td><%= module.getVersion() %></td>
@@ -128,4 +128,12 @@
 		toDisableCheckAll();
 		enableScreen();
 	});
+	
+	function editFeature(moduleGroupId, moduleId) {
+		var params = "moduleGroupId=";
+	    params = params.concat(moduleGroupId);
+	    params = params.concat("&moduleId=");
+	    params = params.concat(moduleId);
+	    loadContent("featuresEdit", $('#formFeaturesList'), $('#feature_tab'), params);
+	}
 </script>
