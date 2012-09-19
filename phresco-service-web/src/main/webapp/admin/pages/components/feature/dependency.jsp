@@ -54,8 +54,9 @@
 						%>
 			                <span class="siteaccordion closereg">
 			                	<span>
-			                		<input type="checkbox" class="" name="" value="<%= moduleGroup.getId()%>" id="<%= moduleGroup.getId()%>checkBox">
+			                		<input type="checkbox" name="moduleGroup" value="<%= moduleGroup.getId()%>" id="<%= moduleGroup.getId()%>checkBox">
 			                		&nbsp;&nbsp;<%= moduleGroup.getName() %>&nbsp;&nbsp;
+			                		<p id="<%= moduleGroup.getId()%>version" class="version"></p>
 			                	</span>
 			                </span>
 			                <div class="mfbox siteinnertooltiptxt hideContent">
@@ -68,7 +69,7 @@
 										    	if (CollectionUtils.isNotEmpty(versions)) {
 													for (Module module : versions) {
 													    String descContent = "";
-														if (module.getDoc(DocumentationType.DESCRIPTION) != null) { 
+														if (module.getDoc(DocumentationType.DESCRIPTION) != null) {
 														  	descContent = module.getDoc(DocumentationType.DESCRIPTION).getContent();
 														}
 														
@@ -79,14 +80,15 @@
 											%>
 												<tr>
 													<td class="editFeatures_td1">
-														<input type="radio" name="<%= module.getId() %>" value="<%= module.getVersion() %>" >
+														<input type="radio" class="module" name="<%= moduleGroup.getId() %>" value="<%= module.getVersion() %>" 
+															onclick="selectCheckBox('<%= moduleGroup.getId()%>', this);">
 													</td>
 													<td class="fontColor"><%= moduleGroup.getName() %></td>
 													<td class="fontColor"><%= module.getVersion() %></td>
 												</tr>
 											<%	
 													}
-									    		} 
+									    		}
 											%>
 				                            </tbody>
 			                        	</table>
@@ -119,5 +121,26 @@
 		$('#cancel, #close').click(function() {
 			showParentPage();
 		});
+		
+		//Check box click function
+		$('input[name="moduleGroup"]').click(function() {
+			var modGrpId = $(this).val();
+			var isCheckboxChecked = $(this).is(":checked");
+			if (isCheckboxChecked) {
+				$("input:radio[name='" + modGrpId + "']:first").prop("checked", true);
+				var version = $("input:radio[name='" + modGrpId + "']:first").val();
+				$("p[id='" + modGrpId + "version']").html(version);
+			} else {
+				$("input:radio[name='" + modGrpId + "']").prop("checked", false);
+				$("p[id='" + modGrpId + "version']").html("");
+			}
+		});
 	});
+	
+	//Radio button click function
+	function selectCheckBox(moduleId, currentElement) {
+		var version = currentElement.value;
+		$("input[id='" + moduleId + "checkBox']").prop("checked", true);
+		$("p[id='" + moduleId + "version']").html(version);
+	}
 </script>

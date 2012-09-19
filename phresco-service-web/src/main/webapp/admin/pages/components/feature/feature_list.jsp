@@ -25,6 +25,7 @@
 
 <%@ page import="com.photon.phresco.model.Module" %>
 <%@ page import="com.photon.phresco.model.ModuleGroup" %>
+
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
 <%@ page import="com.photon.phresco.model.Documentation.DocumentationType"%>
 
@@ -39,7 +40,18 @@
 		<div class="alert alert-block">
 			<s:text name='alert.msg.feature.not.available'/>
 		</div>
-	<% } else { %>		
+	<% } else { %>	
+		<div class="header-background accor_head">
+			<table class="border_collapse">
+				<tbody>
+					<tr>
+						<td><input type="checkbox" id="checkAllAuto" name="moduleGroup" onclick="checkAllEvent(this);"></td>
+						<td class="labelbold"><s:text name='lbl.hdr.comp.name'/></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>	
+		
 		<div class="theme_accordion_container jsLib_accordion_container">
 		    <section class="accordion_panel_wid">
 		        <div class="accordion_panel_inner">
@@ -49,8 +61,12 @@
 					%>
 		                <span class="siteaccordion closereg">
 		                	<span>
-		                		<input type="checkbox" class="" name="" value="<%= moduleGroup.getId()%>" id="<%= moduleGroup.getId()%>checkBox">
-		                		&nbsp;&nbsp;<%= moduleGroup.getName() %>&nbsp;&nbsp;
+	                			<% if (moduleGroup.isSystem()) { %>
+									<input type="checkbox" name="moduleGroup" value="<%= moduleGroup.getId() %>" disabled/>&nbsp;&nbsp;<%= moduleGroup.getName() %>&nbsp;&nbsp;
+								<% } else { %>
+			                		<input type="checkbox" class="check" name="moduleGroup" value="<%= moduleGroup.getId()%>" id="<%= moduleGroup.getId()%>checkBox" onclick="checkboxEvent();">
+			                		&nbsp;&nbsp;<%= moduleGroup.getName() %>&nbsp;&nbsp;
+	                			<% } %>
 		                	</span>
 		                </span>
 		                <div class="mfbox siteinnertooltiptxt hideContent">
@@ -85,7 +101,7 @@
 											</tr>
 										<%	
 												}
-								    		} 
+								    		}
 										%>
 			                            </tbody>
 		                        	</table>
@@ -109,6 +125,7 @@
 	}
 	
 	$(document).ready(function() {
+		toDisableCheckAll();
 		enableScreen();
 	});
 </script>

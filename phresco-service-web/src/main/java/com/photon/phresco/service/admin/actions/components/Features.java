@@ -29,6 +29,7 @@ import java.util.List;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -301,10 +302,10 @@ public class Features extends ServiceBaseAction {
 		}
 		
 		try {
-			String[] techIds = getHttpRequest().getParameterValues(REST_QUERY_TECHID);
-			if (techIds != null) {
-				for (String techId : techIds) {
-					ClientResponse clientResponse = getServiceManager().deleteFeature(techId, customerId);
+			String[] moduleGroups = getHttpRequest().getParameterValues(REQ_FEATURES_MOD_GRP);
+			if (!ArrayUtils.isNotEmpty(moduleGroups)) {
+				for (String moduleGroup : moduleGroups) {
+					ClientResponse clientResponse = getServiceManager().deleteFeature(moduleGroup, customerId);
 					if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
 						addActionError(getText(FEATURE_NOT_DELETED));
 					}

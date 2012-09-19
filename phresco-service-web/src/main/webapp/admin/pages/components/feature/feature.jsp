@@ -33,7 +33,7 @@
 <form id="formMenu">
 	<div id="subTabcontent">
 		<div id="navigation">
-			<ul>
+			<ul class="navigation_menu">
 				<li><a href="#" class="selected" id="module" name="featureTab"><s:text name='lbl.hdr.comp.featrs.modules'/></a></li>
 				<li><a href="#" class="unselected" id="js" name="featureTab"><s:text name='lbl.hdr.comp.featrs.jslib'/></a></li>
 			</ul>

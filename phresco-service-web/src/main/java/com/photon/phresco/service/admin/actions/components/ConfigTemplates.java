@@ -184,14 +184,40 @@ public class ConfigTemplates extends ServiceBaseAction {
     	
     	try {
 			List<PropertyTemplate> propertyTemplates = new ArrayList<PropertyTemplate>();
-			PropertyTemplate propertyTemplate = new PropertyTemplate();
-			propertyTemplates.add(propertyTemplate);
+			propTempKeys = getHttpRequest().getParameterValues(REQ_CONFIG_KEY);
+			for (String propTempKey : propTempKeys) {
+				propTempType = getHttpRequest().getParameter(propTempKey + REQ_CONFIG_TYPE);
+				propTempHlpTxt = getHttpRequest().getParameter(propTempKey + REQ_CONFIG_HELP_TEXT);
+				propTempMndtry = getHttpRequest().getParameter(propTempKey + REQ_CONFIG_MANDATORY);
+				propTempMul = getHttpRequest().getParameter(propTempKey + REQ_CONFIG_MULTIPLE);
+				csvPsblValues = getHttpRequest().getParameter(propTempKey + REQ_CONFIG_PSBL_VAL);
+				possibleValues = Arrays.asList(csvPsblValues.split("\\s*,\\s*"));
+				PropertyTemplate propertyTemplate = new PropertyTemplate();
+				propertyTemplate.setKey(propTempKey);
+				propertyTemplate.setType(propTempType);
+				propertyTemplate.setPossibleValues(possibleValues);
+				propertyTemplate.setHelpText(propTempHlpTxt);
+				
+				if (StringUtils.isNotEmpty(propTempMndtry)) {
+					propertyTemplate.setRequired(true);	
+				} else {
+					propertyTemplate.setRequired(false);
+				}
+				
+				if (StringUtils.isNotEmpty(propTempMul)) {
+					propertyTemplate.setMultiple(true);
+				} else {
+					propertyTemplate.setMultiple(false);
+				}
+				propertyTemplates.add(propertyTemplate);
+			}
 			
             SettingsTemplate settingTemplate = new SettingsTemplate();
             settingTemplate.setType(name);
             settingTemplate.setDescription(description);
             settingTemplate.setAppliesTo(appliesTo);
             settingTemplate.setCustomerId(customerId);
+            settingTemplate.setId(configId);
             settingTemplate.setProperties(propertyTemplates);
     		getServiceManager().updateConfigTemp(settingTemplate, configId, customerId);
     	}catch (PhrescoException e) {

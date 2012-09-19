@@ -98,8 +98,7 @@
 							for (Technology technology : technologies) {
 								String selectedStr = "";
 								if (settingsTemplate != null) {
-									List<String> appliesTos = settingsTemplate
-											.getAppliesTo();
+									List<String> appliesTos = settingsTemplate.getAppliesTo();
 									if (CollectionUtils.isNotEmpty(appliesTos)) {
 										if (appliesTos.contains(technology.getId())) {
 											selectedStr = "selected";
@@ -109,9 +108,9 @@
 									}
 								}
 					%>
-					<option value="<%=technology.getId()%>" <%=selectedStr%>><%=technology.getName()%></option>
+							<option value="<%=technology.getId()%>" <%=selectedStr%>><%=technology.getName()%></option>
 					<%
-						}
+							}
 						}
 					%>
 				</select> <span class="help-inline applyerror" id="applyError"></span>
@@ -157,48 +156,127 @@
 							
 							<div id="input1" class="clonedInput">
 								<tbody id="propTempTbody">
-									<tr class="1_configdynamiadd">
-										<td class="textwidth">
-											<input type="text" id="1" value="" placeholder="<s:text name='place.hldr.configTemp.add.key'/>" name="propTempKey"  
-												temp="1_key" class="key" onblur="updateRowInputNames(this)" maxlength="30" title="30 Characters only">
-										</td>
-										<td class="textwidth">
-											<select id="1_type" class = "select typewidth">
-												<option value="String">String</option>
-												<option value="Integer">Integer</option>
-												<option value="Password">Password</option>
-											</select>
-										</td>
-										<td class="psblevalue" id="1_psblMulDiv" style="display:none;">
-											<select type="text" placeholder="<s:text name='place.hldr.configTemp.add.possible.values'/>" 
-												class="propTempTxt psblSelect" id="1_psblMul"></select>
-											<input type="hidden" class="1"/>
-											<a data-toggle="modal" href="#myModal"><img class="addiconAlign imagealign" temp="1" src="images/add_icon.png"/ 
-												onclick="addPsblValPopup(this);"></a>
-										</td>
-										<td class="psblevalue" id="1_psblSinglDiv">
-											<input type="text" placeholder="<s:text name='place.hldr.configTemp.add.possible.values'/>" 
-												class="propTempTxt psblSngl" id="1_psblSingl">
-											<input type="hidden" class="1"/>
-											<a data-toggle="modal" href="#myModal"><img class="addiconAlign imagealign" temp="1" 
-												src="images/add_icon.png"/ onclick="addPsblValPopup(this);"/></a>
-										</td>
-										<td class="hlpText">
-											<input type="text" placeholder="<s:text name='place.hldr.configTemp.add.help.text'/>" 
-												id="1_helpText" class="propTempTxt hlpTxt" maxlength="150" title="150 Characters only">
-										</td>
-										<td class="mandatoryfld">
-											<input type="checkbox" value="true" id="1_propMand">
-										</td>
-										<td class="multiplefld">
-											<input type="checkbox" value="true" id="1_propMul">
-										</td>
-										<td class="imagewidth">
-											<a><img class="add imagealign" temp="1" src="images/add_icon.png" onclick="addconfig(this);"></a>
-										</td>
-										<td>
-										</td>
-									</tr>
+									<!-- For add -->
+									<% if (StringUtils.isEmpty(fromPage)) { %>
+										<tr class="1_configdynamiadd">
+											<td class="textwidth">
+												<input type="text" id="1" value="" placeholder="<s:text name='place.hldr.configTemp.add.key'/>" name="propTempKey"  
+													temp="1_key" class="key" onblur="updateRowInputNames(this)" maxlength="30" title="30 Characters only">
+											</td>
+											<td class="textwidth">
+												<select id="1_type" class = "select typewidth">
+													<option value="String">String</option>
+													<option value="Integer">Integer</option>
+													<option value="Password">Password</option>
+												</select>
+											</td>
+											<td class="psblevalue" id="1_psblMulDiv" style="display:none;">
+												<select type="text" placeholder="<s:text name='place.hldr.configTemp.add.possible.values'/>" 
+													class="propTempTxt psblSelect" id="1_psblMul"></select>
+												<input type="hidden" class="1"/>
+												<a data-toggle="modal" href="#myModal"><img class="addiconAlign imagealign" temp="1" src="images/add_icon.png"/ 
+													onclick="addPsblValPopup(this);"></a>
+											</td>
+											<td class="psblevalue" id="1_psblSinglDiv">
+												<input type="text" placeholder="<s:text name='place.hldr.configTemp.add.possible.values'/>" 
+													class="propTempTxt psblSngl" id="1_psblSingl">
+												<input type="hidden" class="1"/>
+												<a data-toggle="modal" href="#myModal"><img class="addiconAlign imagealign" temp="1" 
+													src="images/add_icon.png"/ onclick="addPsblValPopup(this);"/></a>
+											</td>
+											<td class="hlpText">
+												<input type="text" placeholder="<s:text name='place.hldr.configTemp.add.help.text'/>" 
+													id="1_helpText" class="propTempTxt hlpTxt" maxlength="150" title="150 Characters only">
+											</td>
+											<td class="mandatoryfld">
+												<input type="checkbox" value="true" id="1_propMand">
+											</td>
+											<td class="multiplefld">
+												<input type="checkbox" value="true" id="1_propMul">
+											</td>
+											<td class="imagewidth">
+												<a><img class="add imagealign" temp="1" src="images/add_icon.png" onclick="addconfig(this);"></a>
+											</td>
+											<td>
+											</td>
+										</tr>
+									<% 
+										} else { // for edit
+											String key = "";
+											String helpTxt = "";
+											String mndtryChck = "";
+											String mulChck = "";
+											int dynamicId = 1;
+											List<PropertyTemplate> propertyTemplates = settingsTemplate.getProperties();
+											if (CollectionUtils.isNotEmpty(propertyTemplates)) {
+												for (PropertyTemplate propertyTemplate : propertyTemplates) {
+													List<String> possibleValues = propertyTemplate.getPossibleValues();
+													if (propertyTemplate.isRequired()) {
+														mndtryChck = "checked";
+													} else {
+														mndtryChck = "";
+													}
+													if (propertyTemplate.isMultiple()) {
+														mulChck = "checked";
+													} else {
+														mulChck = "";
+													}
+									%>
+												<tr class='<%= dynamicId + "_configdynamiadd" %>'>
+													<td class="textwidth">
+														<input type="text" id='<%= dynamicId %>' value='<%= propertyTemplate.getKey()%>' 
+															placeholder="<s:text name='place.hldr.configTemp.add.key'/>" name="propTempKey"  
+															temp='<%= dynamicId + "_key" %>' class="key" onblur="updateRowInputNames(this)" 
+															maxlength="30" title="30 Characters only">
+													</td>
+													<td class="textwidth">
+														<select id='<%= dynamicId + "_type" %>' class = "select typewidth">
+															<option value="String">String</option>
+															<option value="Integer">Integer</option>
+															<option value="Password">Password</option>
+														</select>
+													</td>
+													<td class="psblevalue" id='<%= dynamicId + "_psblSinglDiv" %>' style="display:none">
+														<input type="text" placeholder="<s:text name='place.hldr.configTemp.add.possible.values'/>" 
+															class="propTempTxt psblSngl" id='<%= dynamicId + "_psblSingl" %>'>
+														<input type="hidden" class='<%= dynamicId %>'>	
+														<a data-toggle="modal" href="#myModal"><img class="addiconAlign imagealign" temp='<%= dynamicId %>' 
+															src="images/add_icon.png"/ onclick="addPsblValPopup(this);"/></a>
+													</td>
+													<td class="psblevalue" id='<%= dynamicId + "_psblMulDiv" %>' style="display:none">
+														<select type="text" placeholder="<s:text name='place.hldr.configTemp.add.possible.values'/>" 
+															class="propTempTxt psblSelect" id='<%= dynamicId + "_psblMul" %>'>
+														</select>
+														<input type="hidden" class='<%= dynamicId %>'/>
+														<a data-toggle="modal" href="#myModal"><img class="addiconAlign imagealign" temp='<%= dynamicId %>' 
+															src="images/add_icon.png" onclick="addPsblValPopup(this);"></a>
+													</td>
+													<td class="hlpText">
+														<input type="text" placeholder="<s:text name='place.hldr.configTemp.add.help.text'/>" 
+															id=<%= dynamicId + "_helpText"%> class="propTempTxt hlpTxt" maxlength="150" 
+															title="150 Characters only" value='<%= StringUtils.isNotEmpty(propertyTemplate.getHelpText()) ? propertyTemplate.getHelpText() : ""  %>'>
+													</td>
+													<td class="mandatoryfld">
+														<input type="checkbox" value="true" id='<%= dynamicId + "_propMand" %>' <%= mndtryChck %>>
+													</td>
+													<td class="multiplefld">
+														<input type="checkbox" value="true" id='<%= dynamicId + "_propMul" %>' <%= mulChck %>>
+													</td>
+													<td class="imagewidth">
+														<a><img class="add imagealign" temp='<%= dynamicId %>' src="images/add_icon.png" onclick="addconfig(this);"></a>
+													</td>
+													<% if (dynamicId != 1) { %>
+														<td>
+															<img onclick="removeTag(this);" src="images/minus_icon.png" class="del imagealign">
+														</td>
+													<% } %>	
+												</tr>
+									<%
+												dynamicId++;
+												}
+											}
+										}	
+									%>	
 								</tbody>
 							</div>
 						</table>
@@ -257,13 +335,13 @@
 		if (StringUtils.isNotEmpty(fromPage)) {
 	%>
 		<input type="button" id="configtempUpdate" class="btn <%=disabledClass%>" <%=disabled%>
-				onclick="validate('configtempUpdate', $('#formConfigTempAdd'), $('#subcontainer'), 'Updating Config Template');" 
+				onclick="validatePropTempKey('configtempUpdate', 'Updating Config Template');" 
 		        value="<s:text name='lbl.hdr.comp.update'/>"/>
     <%
     	} else {
     %>		
 		<input type="button" id="configtempSave" class="btn btn-primary"
-		        onclick="validatePropTempKey();" 
+		        onclick="validatePropTempKey('configtempSave', 'Creating Config Template');" 
 		        value="<s:text name='lbl.hdr.comp.save'/>"/>
 	<%
 		}
@@ -274,9 +352,10 @@
 	</div>
 	
 	<!-- Hidden Fields -->
-	<input type="hidden" name="fromPage" value="<%=StringUtils.isNotEmpty(fromPage) ? fromPage : ""%>"/>
-	<input type="hidden" name="oldName" value="<%=name%>"/>
-	<input type="hidden" name="customerId" value="<%=customerId%>">
+	<input type="hidden" name="fromPage" value="<%= StringUtils.isNotEmpty(fromPage) ? fromPage : "" %>"/>
+	<input type="hidden" name="oldName" value="<%= name %>"/>
+	<input type="hidden" name="customerId" value="<%= customerId %>">
+	<input type="hidden" name="configId" value="<%= settingsTemplate != null ? settingsTemplate.getId(): "" %>">
 </form>
 
 <script language="javascript">
@@ -288,13 +367,82 @@
 	$(document).ready(function() {
 		enableScreen();
 		
-		// To check for the special character in configname
-        $('#configname').bind('input propertychange', function (e) {
-            var configname = $(this).val();
-            configname = checkForSplChr(configname);
-            $(this).val(configname);
-        });
-     	
+		//for edit -- to dynamically populate possible values in property template fieldset 
+		<% 
+			if (StringUtils.isNotEmpty(fromPage)) {
+				int dynamicId = 1;
+				List<PropertyTemplate> propertyTemplates = settingsTemplate.getProperties();
+				if (CollectionUtils.isNotEmpty(propertyTemplates)) {
+					for (PropertyTemplate propertyTemplate : propertyTemplates) {
+						List<String> possibleValues = propertyTemplate.getPossibleValues(); 
+						if (CollectionUtils.isNotEmpty(possibleValues) && possibleValues.size() == 1) {
+							for(String possibleValue : possibleValues) { 
+		%>
+							$("#" + '<%= dynamicId %>' + "_psblSinglDiv").show();
+							$("#" + '<%= dynamicId %>' + "_psblMulDiv").hide();
+							$("#" + '<%= dynamicId %>' + "_psblSingl").val('<%= possibleValue %>');
+							$("#" + '<%= dynamicId %>' + "_psblMulDiv").hide();
+							$("." + '<%= dynamicId %>').val('<%= possibleValue %>');
+		<% 
+							}
+						} else {
+							StringBuilder csvPsblVal = new StringBuilder();
+							if (CollectionUtils.isNotEmpty(possibleValues)) {
+				            	for (String possibleValue : possibleValues) {
+		%>
+			            			$("#"+ '<%= dynamicId %>' +"_psblMul").append($("<option></option>").attr("value", '<%= possibleValue %>').text('<%= possibleValue %>'));
+			            	
+		<% 
+					            	if (csvPsblVal.length() != 0) {
+										csvPsblVal.append(",");
+						            }
+									csvPsblVal.append(possibleValue);
+		%>
+									$("#" + '<%= dynamicId %>' + "_psblSinglDiv").hide();
+									$("#" + '<%= dynamicId %>' + "_psblMulDiv").show();
+									$("." + '<%= dynamicId %>').val('<%= csvPsblVal %>');
+		<% 
+								}
+							}
+						}
+						if (CollectionUtils.isEmpty(possibleValues)) {
+		%>
+							$("#" + '<%= dynamicId %>' + "_psblSinglDiv").show();
+		<%
+						}	
+		%>
+						selectType('<%= propertyTemplate.getType() %>', '<%= dynamicId %>');
+		<%
+						dynamicId ++; 
+					}
+				}
+		%>
+				updateRowInputNamesInEdit();
+		<% } %>
+
+		//To move up the values
+		$('#up').bind('click', function() {
+			$('#valuesCombo option:selected').each( function() {
+				var newPos = $('#valuesCombo  option').index(this) - 1;
+				if (newPos > -1) {
+					$('#valuesCombo  option').eq(newPos).before("<option value='"+$(this).val()+"' selected='selected'>"+$(this).text()+"</option>");
+					$(this).remove();
+				}
+			});
+		});
+	
+		//To move down the values
+		$('#down').bind('click', function() {
+			var countOptions = $('#valuesCombo option').size();
+			$('#valuesCombo option:selected').each( function() {
+				var newPos = $('#valuesCombo  option').index(this) + 1;
+				if (newPos < countOptions) {
+					$('#valuesCombo  option').eq(newPos).after("<option value='"+$(this).val()+"' selected='selected'>"+$(this).text()+"</option>");
+					$(this).remove();
+				}
+			});
+		});
+		
 		$("#addValues").click(function() {
 			var textComboVal = $("#txtCombo").val();
 			var alreadyExists = false;
@@ -322,6 +470,7 @@
 			var length =  $('#valuesCombo option').length;
 			var psblValName ="";
 			var psblVal = "";
+			$("#"+ id +"_psblMul").empty();// to clear select options before populating
 			$('#valuesCombo option').each( function() {
 				var length =  $('#valuesCombo option').length;
 				var value = $(this).val();
@@ -352,33 +501,11 @@
 				$(this).remove();
 			});
 		});
-	
-		//To move up the values
-		$('#up').bind('click', function() {
-			$('#valuesCombo option:selected').each( function() {
-				var newPos = $('#valuesCombo  option').index(this) - 1;
-				if (newPos > -1) {
-					$('#valuesCombo  option').eq(newPos).before("<option value='"+$(this).val()+"' selected='selected'>"+$(this).text()+"</option>");
-					$(this).remove();
-				}
-			});
-		});
-	
-		//To move down the values
-		$('#down').bind('click', function() {
-			var countOptions = $('#valuesCombo option').size();
-			$('#valuesCombo option:selected').each( function() {
-				var newPos = $('#valuesCombo  option').index(this) + 1;
-				if (newPos < countOptions) {
-					$('#valuesCombo  option').eq(newPos).after("<option value='"+$(this).val()+"' selected='selected'>"+$(this).text()+"</option>");
-					$(this).remove();
-				}
-			});
-		});
 	});
 	
-	var counter = 2;
+	var counter = "";
 	function addconfig() {
+		counter = $(".key").size() + 1;
 		var trId = counter + "_configdynamiadd";
 		var keyId = counter;
 		var keyTmpName = counter+"_key";
@@ -413,16 +540,27 @@
 		counter++;
 	}
 	 
+	function removeTag(currentTag) {
+		$(currentTag).parent().parent().remove();
+	}
+	
 	function addPsblValPopup(obj) {
 		$("#hiddenKey").val("");
 		$("#txtCombo").val("");
 		$("#errMsg").empty();
 		$("#valuesCombo").empty();
 		$("#hiddenKey").val($(obj).attr("temp"));
-	}
-	
-	function removeTag(currentTag) {
-		$(currentTag).parent().parent().remove();
+		
+		//to populate already added possible values in popup
+		var keyClass = $(obj).attr("temp");
+		var psblValSep = new Array();
+		var values = $("." + keyClass).val();
+		if (values !== undefined && values !== "") {
+			psblValSep = values.split(",");
+			for (var i=0; i < psblValSep.length; i++) {
+				$("#valuesCombo").append($('<option name='+ psblValSep[i] +'></option>').attr("value", psblValSep[i]).text(psblValSep[i]));
+			}	
+		}
 	}
 	
 	function updateRowInputNames(obj) {
@@ -453,7 +591,35 @@
 		} 
 	}
 	
-	function validatePropTempKey() {
+	//for edit -- to change names of property template input fields
+	function updateRowInputNamesInEdit() {
+		$(".key").each(function() {
+				var id = $(this).attr("id");
+				var typeName =  $(this).val() + "_type";
+			 	var psblVal = $(this).val() + "_psblVal";
+			 	var helpTextName =  $(this).val() + "_helpText";
+			 	var mandChckName =  $(this).val() + "_propMand";
+				var mulChckName =  $(this).val() + "_propMul";
+				
+				$("#"+ id +"_type").attr("name", typeName);
+				$("."+ id).attr("name", psblVal);
+				$("#"+ id +"_helpText").attr("name", helpTextName);
+				$("#"+ id +"_propMand").attr("name", mandChckName);
+				$("#"+ id +"_propMul").attr("name", mulChckName);
+		});
+	}
+	
+	//for edit -- to preselect type select box value in property template 
+	function selectType(type, id) {
+		$("#"+ id + "_type > option").each(function(){
+			if($(this).val() === type) {
+				$("#"+ id + "_type  option[value='"+ type +"']").attr("selected", "selected");	
+				return false;
+			}
+		});
+	}
+	
+	function validatePropTempKey(pageUrl, progressText) {
 		var redirect = true;
 		$(".key").each(function() {
 			if ($(this).val().trim() === "") {
@@ -474,7 +640,14 @@
 		}
 		
 		if (redirect) {
-			validate('configtempSave', $('#formConfigTempAdd'), $('#subcontainer'), 'Creating Config Template');
+			validate(pageUrl, $('#formConfigTempAdd'), $('#subcontainer'),  progressText);
 		} 
 	}
+	
+	// To check for the special character in configname
+    $('#configname').bind('input propertychange', function (e) {
+        var configname = $(this).val();
+        configname = checkForSplChr(configname);
+        $(this).val(configname);
+    });
 </script>
