@@ -36,10 +36,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.google.gson.Gson;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.multipart.BodyPart;
-import com.sun.jersey.multipart.MultiPart;
-
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.ApplicationType;
 import com.photon.phresco.model.ArchetypeInfo;
@@ -49,6 +45,9 @@ import com.photon.phresco.service.admin.commons.LogErrorReport;
 import com.photon.phresco.service.client.api.Content;
 import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.ServiceConstants;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.multipart.BodyPart;
+import com.sun.jersey.multipart.MultiPart;
 
 
 
@@ -68,6 +67,7 @@ public class Archetypes extends ServiceBaseAction {
 	private String version = null;
 	
 	private String verError = null;
+	private String techvernError = null;
 	private String apptype = null;
 	private String appError = null;
 	private String fileError = null;
@@ -80,6 +80,7 @@ public class Archetypes extends ServiceBaseAction {
     private String customerId = null;
 	
 	private String versionComment = null;
+	private String techVersion = null;
 	
 	private String jarVersion = "";
 	private String groupId = "";
@@ -162,6 +163,7 @@ public class Archetypes extends ServiceBaseAction {
 	        technology.setAppTypeId(apptype);
 	        technology.setVersions(versions);
 	        technology.setVersionComment(versionComment);
+	        technology.setTechVersion(techVersion);
 	        technology.setCustomerId(customerId);
 	        ArchetypeInfo archetypeInfo = new ArchetypeInfo(groupId, artifactId, version, "jar");
 	        technology.setArchetypeInfo(archetypeInfo);
@@ -221,6 +223,7 @@ public class Archetypes extends ServiceBaseAction {
 			technology.setId(techId);
 			technology.setAppTypeId(apptype);
 			technology.setCustomerId(customerId);
+			technology.setTechVersion(techVersion);
 			ArchetypeInfo archetypeInfo = new ArchetypeInfo(groupId, artifactId, version, "jar");
 			technology.setArchetypeInfo(archetypeInfo);
 
@@ -395,6 +398,11 @@ public class Archetypes extends ServiceBaseAction {
 			setVerError(getText(KEY_I18N_ERR_VER_EMPTY));
 			isError = true;
 		}
+		
+		if (StringUtils.isEmpty(techVersion)) {
+			setTechvernError(getText(KEY_I18N_ERR_TECHVER_EMPTY));
+			isError = true;
+		}
 
 		if (StringUtils.isEmpty(apptype)) {
 			setAppError(getText(KEY_I18N_ERR_APPTYPE_EMPTY));
@@ -548,4 +556,21 @@ public class Archetypes extends ServiceBaseAction {
 	public String getOldName() {
 		return oldName;
 	}
+
+	public String getTechVersion() {
+		return techVersion;
+	}
+
+	public void setTechVersion(String techVersion) {
+		this.techVersion = techVersion;
+	}
+
+	public String getTechvernError() {
+		return techvernError;
+	}
+
+	public void setTechvernError(String techvernError) {
+		this.techvernError = techvernError;
+	}
+	
 }

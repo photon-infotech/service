@@ -245,6 +245,9 @@ public interface ServiceUIConstants {
     String KEY_I18N_ERR_NAME_ALREADY_EXIST_APPTYPE = "err.msg.name.apptype.exists";
     String KEY_I18N_ERR_DESC_EMPTY = "err.msg.desc.empty";
     String KEY_I18N_ERR_VER_EMPTY = "err.msg.ver.empty";
+    String KEY_I18N_ERR_TECHVER_EMPTY = "err.msg.techver.empty";
+    String KEY_I18N_ERR_GID_EMPTY = "err.msg.gId.empty";
+    String KEY_I18N_ERR_ARFID_EMPTY = "err.msg.aId.empty";
     String KEY_I18N_ERR_VER_ALREADY_EXISTS = "err.msg.ver.exists";
     String KEY_I18N_ERR_FILE_EMPTY	= "err.msg.file.empty";
     
