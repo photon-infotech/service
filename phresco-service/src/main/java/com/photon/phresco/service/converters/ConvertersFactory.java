@@ -28,6 +28,7 @@ import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.dao.ApplicationTypeDAO;
 import com.photon.phresco.service.dao.BaseDAO;
 import com.photon.phresco.service.dao.CustomerDAO;
+import com.photon.phresco.service.dao.ModuleGroupDAO;
 import com.photon.phresco.service.dao.UserDAO;
 
 /**
@@ -47,6 +48,7 @@ public class ConvertersFactory {
 		CONVERTERS_MAP.put(UserDAO.class, new UserConverter());
 		CONVERTERS_MAP.put(ApplicationTypeDAO.class, new ApplicationTypeConverter());
 		CONVERTERS_MAP.put(CustomerDAO.class, new CustomerConverter());
+		CONVERTERS_MAP.put(ModuleGroupDAO.class, new ModuleGroupConverter());
 	}
 	
 //	public static final Converter<BaseDAO, Element> getConverter(Class<? extends BaseDAO> clazz) {

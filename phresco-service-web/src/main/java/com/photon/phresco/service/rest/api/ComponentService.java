@@ -66,6 +66,7 @@ import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.converters.ConvertersFactory;
 import com.photon.phresco.service.dao.ApplicationTypeDAO;
+import com.photon.phresco.service.dao.ModuleGroupDAO;
 import com.photon.phresco.service.model.ArtifactInfo;
 import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.FileUtil;
@@ -464,47 +465,48 @@ public class ComponentService extends DbService implements ServiceConstants {
 		
 		try {
 			List<ModuleGroup> foundModules = new ArrayList<ModuleGroup>();
+			List<ModuleGroupDAO> moduleDAOs = new ArrayList<ModuleGroupDAO>();
 			if(StringUtils.isEmpty(techId)) {
 				if(!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
-					foundModules = mongoOperation.find(MODULES_COLLECTION_NAME,
-								new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)), ModuleGroup.class);
+				    moduleDAOs = mongoOperation.find(MODULEDAO_COLLECTION_NAME,
+								new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)), ModuleGroupDAO.class);
 				}
-				foundModules.addAll(mongoOperation.find(MODULES_COLLECTION_NAME,
-							new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)), ModuleGroup.class));
-	
+				moduleDAOs.addAll(mongoOperation.find(MODULEDAO_COLLECTION_NAME,
+							new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)), ModuleGroupDAO.class));
+				foundModules = convertDAOToModule(moduleDAOs);
 				return Response.status(Response.Status.OK).entity(foundModules).build();
 			}
 
 			if(StringUtils.isNotEmpty(customerId) && type.equals(REST_QUERY_TYPE_MODULE)) {
 				if (!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
-					foundModules = mongoOperation.find(MODULES_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)
-								.and(REST_QUERY_TYPE).is(type).and(REST_QUERY_TECHID).is(techId)), ModuleGroup.class);
+				    moduleDAOs = mongoOperation.find(MODULEDAO_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)
+								.and(REST_QUERY_TYPE).is(type).and(REST_QUERY_TECHID).is(techId)), ModuleGroupDAO.class);
 				}
-				foundModules.addAll(mongoOperation.find(MODULES_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)
-							.and(REST_QUERY_TYPE).is(type).and(REST_QUERY_TECHID).is(techId)), ModuleGroup.class));
-				
+				moduleDAOs.addAll(mongoOperation.find(MODULEDAO_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)
+							.and(REST_QUERY_TYPE).is(type).and(REST_QUERY_TECHID).is(techId)), ModuleGroupDAO.class));
+				foundModules = convertDAOToModule(moduleDAOs);
 				return Response.status(Response.Status.OK).entity(foundModules).build();
 			}
 
 			if(StringUtils.isNotEmpty(customerId) && type.equals(REST_QUERY_TYPE_JS)) {
 			    if (!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
-					foundModules = mongoOperation.find(MODULES_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)
-								.and(REST_QUERY_TYPE).is(type).and(REST_QUERY_TECHID).is(techId)), ModuleGroup.class);
+			        moduleDAOs = mongoOperation.find(MODULEDAO_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)
+								.and(REST_QUERY_TYPE).is(type).and(REST_QUERY_TECHID).is(techId)), ModuleGroupDAO.class);
 				}
-				foundModules.addAll(mongoOperation.find(MODULES_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)
-							.and(REST_QUERY_TYPE).is(type).and(REST_QUERY_TECHID).is(techId)), ModuleGroup.class));
-				
+			    moduleDAOs.addAll(mongoOperation.find(MODULEDAO_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)
+							.and(REST_QUERY_TYPE).is(type).and(REST_QUERY_TECHID).is(techId)), ModuleGroupDAO.class));
+			    foundModules = convertDAOToModule(moduleDAOs);
 				return Response.status(Response.Status.OK).entity(foundModules).build();
 			}
-			
+
 			if(StringUtils.isNotEmpty(customerId) && type.equals(REST_QUERY_TYPE_COMPONENT)) {
 			    if (!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
-					foundModules = mongoOperation.find(MODULES_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)
-								.and(REST_QUERY_TYPE).is(type).and(REST_QUERY_TECHID).is(techId)), ModuleGroup.class);
+			        moduleDAOs = mongoOperation.find(MODULEDAO_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)
+								.and(REST_QUERY_TYPE).is(type).and(REST_QUERY_TECHID).is(techId)), ModuleGroupDAO.class);
 				}
-				foundModules.addAll(mongoOperation.find(MODULES_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)
-							.and(REST_QUERY_TYPE).is(type).and(REST_QUERY_TECHID).is(techId)), ModuleGroup.class));
-				
+			    moduleDAOs.addAll(mongoOperation.find(MODULEDAO_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)
+							.and(REST_QUERY_TYPE).is(type).and(REST_QUERY_TECHID).is(techId)), ModuleGroupDAO.class));
+				foundModules = convertDAOToModule(moduleDAOs);
 				return Response.status(Response.Status.OK).entity(foundModules).build();
 			}
 
@@ -516,7 +518,18 @@ public class ComponentService extends DbService implements ServiceConstants {
 	}
 	
 	
-	/**
+	private List<ModuleGroup> convertDAOToModule(List<ModuleGroupDAO> moduleDAOs) throws PhrescoException {
+	    List<ModuleGroup> modules = new ArrayList<ModuleGroup>();
+	    Converter<ModuleGroupDAO, ModuleGroup> converter = 
+            (Converter<ModuleGroupDAO, ModuleGroup>) ConvertersFactory.getConverter(ModuleGroupDAO.class);
+	    for (ModuleGroupDAO moduleGroupDAO : moduleDAOs) {
+            ModuleGroup moduleGroup = converter.convertDAOToObject(moduleGroupDAO, mongoOperation);
+            modules.add(moduleGroup);
+        }
+        return modules;
+    }
+
+    /**
      * Creates the list of modules
      * @param modules
      * @return 
@@ -563,9 +576,9 @@ public class ComponentService extends DbService implements ServiceConstants {
         		List<Module> versions = foundModuleGroup.getVersions();
         		versions.add(module);
         		foundModuleGroup.setVersions(versions);
-        		mongoOperation.save(MODULES_COLLECTION_NAME, foundModuleGroup);
+        		saveModuleGroup(foundModuleGroup);
         	} else {
-        		mongoOperation.save(MODULES_COLLECTION_NAME, moduleGroup);
+        	    saveModuleGroup(moduleGroup);
         	}
         }
         FileUtil.delete(moduleFile);
@@ -573,6 +586,18 @@ public class ComponentService extends DbService implements ServiceConstants {
         return Response.status(Response.Status.CREATED).build();
     }
 	
+    private void saveModuleGroup(ModuleGroup moduleGroup) throws PhrescoException {
+        List<Module> versions = moduleGroup.getVersions();
+        Converter<ModuleGroupDAO, ModuleGroup> converter = 
+            (Converter<ModuleGroupDAO, ModuleGroup>) ConvertersFactory.getConverter(ModuleGroupDAO.class);
+        ModuleGroupDAO moduleGroupDAO = converter.convertObjectToDAO(moduleGroup);
+        mongoOperation.save(MODULEDAO_COLLECTION_NAME, moduleGroupDAO);
+        for (Module module : versions) {
+            module.setModuleGroupId(moduleGroupDAO.getId());
+            mongoOperation.save(MODULES_COLLECTION_NAME, module);
+        }
+    }
+    
 	/**
 	 * Updates the list of modules
 	 * @param modules
