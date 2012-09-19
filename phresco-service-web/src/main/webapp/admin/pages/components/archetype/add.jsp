@@ -39,6 +39,7 @@
 	String desc = "";
 	List<String> versions = null;
 	String versionComment = "";
+	String techVersion = "";
 	boolean isSystem = false;
 	String appTypeId = "";
 	if (technology != null) {
@@ -53,6 +54,9 @@
 		}
 		if (StringUtils.isNotEmpty(technology.getVersionComment())) {
 			versionComment = technology.getVersionComment();
+		}
+		if (StringUtils.isNotEmpty(technology.getTechVersion())) {
+			techVersion = technology.getTechVersion();
 		}
 		isSystem = technology.isSystem();
 		appTypeId = technology.getAppTypeId();
@@ -83,6 +87,8 @@
 					name="name" value="<%= name %>" maxlength="30" title="30 Characters only">
 				<span class="help-inline" id="nameError"></span>
 			</div>
+			
+			
 		</div>
 
 		<div class="control-group">
@@ -104,7 +110,18 @@
 					title="30 Characters only">
 				<span class="help-inline" id="verError"></span>
 			</div>
-		</div>
+		</div> 
+
+  		<div class="control-group" id="techverControl">
+			<label class="control-label labelbold"> <span
+				class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.technologVersion' />
+			</label>
+			<div class="controls">
+				<input id="version" placeholder='<s:text name="place.hldr.archetype.add.technologyVersion"/>' class="input-xlarge" 
+					type="text" name="techVersion" value="<%= techVersion %>" maxlength="30" title="30 Characters only">
+				<span class="help-inline" id="techvernError"></span>
+			</div>
+		</div>  
 
 		<div class="control-group">
 			<label class="control-label labelbold"> <s:text
@@ -213,7 +230,7 @@
 			}
 
 			if (StringUtils.isNotEmpty(fromPage)) {
-		%>
+		%>		
 				<input type="button" id="archetypeUpdate" class="btn <%= disabledClass %>" <%= disabled %>
 					onclick="validate('archetypeUpdate', $('#formArcheTypeAdd'), $('#subcontainer'), '<s:text name='lbl.prog.arche.update'/>');"
 					value="<s:text name='lbl.hdr.comp.update'/>" />
@@ -236,6 +253,7 @@
 	<input type="hidden" name="groupId">
 	<input type="hidden" name="artifactId">
 	<input type="hidden" name="jarVersion">
+	
 </form>
 
 <script type="text/javascript">
@@ -284,6 +302,13 @@
         } else {
             hideError($("#verControl"), $("#verError"));
         }
+        
+        if (data.techvernError != undefined) {
+            showError($("#techverControl"), $("#techvernError"), data.techvernError);
+        } else {
+            hideError($("#techverControl"), $("#techvernError"));
+        }
+        
         if (data.appError != undefined) {
             showError($("#appControl"), $("#appError"), data.appError);
         } else {
