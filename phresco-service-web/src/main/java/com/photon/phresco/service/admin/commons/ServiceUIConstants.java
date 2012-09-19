@@ -99,6 +99,7 @@ public interface ServiceUIConstants {
     String REQ_CONFIG_ID = "configId";
     
     String REQ_CONFIG_KEY = "propTempKey";
+    String REQ_CONFIG_NAME = "_propTempName";
 	String REQ_CONFIG_PSBL_VAL = "_psblVal";
 	String REQ_CONFIG_MULTIPLE = "_propMul";
 	String REQ_CONFIG_MANDATORY = "_propMand";

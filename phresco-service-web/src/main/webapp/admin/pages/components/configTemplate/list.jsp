@@ -84,6 +84,12 @@
 						  	<%
 								if (CollectionUtils.isNotEmpty(configTemplates)) {
 									for ( SettingsTemplate configTemplate : configTemplates) {
+										List<String> applsTos = configTemplate.getAppliesTo();
+										String appliesTos = "";
+										for(String applsTo : applsTos) {
+											appliesTos = appliesTos + applsTo + ",";
+										}
+										appliesTos  = appliesTos.substring(0, appliesTos.length() - 1);
 							%>
 									<tr>
 										<td class="checkboxwidth">
@@ -104,8 +110,8 @@
 										<td class="descConfig">
 											<%= StringUtils.isNotEmpty(configTemplate.getDescription()) ? configTemplate.getDescription() : "" %>
 										</td>
-										<td>
-											<%= CollectionUtils.isNotEmpty(configTemplate.getAppliesTo()) ? configTemplate.getAppliesTo() : "" %>
+										<td id="hoverAppliesTo">
+											<%= StringUtils.isNotEmpty(appliesTos) ? appliesTos : "" %>
 										</td>
 									</tr>
 							<% 
@@ -133,6 +139,11 @@
 	$(document).ready(function() {
 		toDisableCheckAll();
 		enableScreen();
+		
+		$("td[id = 'hoverAppliesTo']").text(function(index) {
+	        return textTrim($(this));
+	    });
+		
    	});
 	
     function editConfigTemp(id) {
@@ -145,5 +156,16 @@
     function continueDeletion() {
     	confirmDialog('none','');
     	loadContent('configtempDelete', $('#formConfigTempList'), $('#subcontainer'));
+    }
+ 	
+    function textTrim(obj) {
+        var val = $(obj).text();
+        $(obj).attr("title", val);
+        var len = val.length;
+        if(len > 50) {
+            val = val.substr(0, 50) + "...";
+            return val;
+        }
+        return val;
     }
 </script>
