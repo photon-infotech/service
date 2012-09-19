@@ -27,6 +27,7 @@
 <%@ page import="com.photon.phresco.model.PropertyTemplate" %>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
 <%@ page import="com.photon.phresco.model.Technology"%>
+<%@ page import="com.photon.phresco.model.I18NString"%>
 
 <%
 	List<Technology> technologies = (List<Technology>) request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
@@ -92,28 +93,39 @@
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.appliesto'/>
 			</label>
 			<div class="controls">
-				<select id="multiSelect" multiple="multiple" name="appliesTo">
-					<%
+					<div class="typeFields" id="typefield">
+					<div class="multilist-scroller multiselct" style="height:95px; width:300px;" name="appliesTo">
+					<ul>
+						<li>
+							<input type="checkbox" value="all" id="checkAllAuto" name="appliesTo" onclick="checkAllEvent(this,$('.applsChk'), true);" style="margin: 3px 8px 6px 0;">All
+						</li>
+						<% 
 						if (CollectionUtils.isNotEmpty(technologies)) {
 							for (Technology technology : technologies) {
-								String selectedStr = "";
+								String checkedStr = "";
 								if (settingsTemplate != null) {
 									List<String> appliesTos = settingsTemplate.getAppliesTo();
 									if (CollectionUtils.isNotEmpty(appliesTos)) {
 										if (appliesTos.contains(technology.getId())) {
-											selectedStr = "selected";
+											checkedStr = "checked";
 										} else {
-											selectedStr = "";
+											checkedStr = "";
 										}
 									}
 								}
-					%>
-							<option value="<%=technology.getId()%>" <%=selectedStr%>><%=technology.getName()%></option>
-					<%
+						%>		
+								<li>
+									<input type="checkbox" id="appliestoCheckbox" name="appliesTo" value="<%= technology.getId() %>"  <%= checkedStr %>
+										class="check applsChk"><%= technology.getName() %>
+								</li>
+						<%  
+								}
 							}
-						}
-					%>
-				</select> <span class="help-inline applyerror" id="applyError"></span>
+						%>
+						</ul>
+					</div>
+				</div>
+          		 <span class="help-inline applyerror" id="applyError"></span>
 			</div>
 		</div>
 		
@@ -129,6 +141,9 @@
 										<th class="second">
 											<div class="th-inner tablehead fixTableHdr"><span class="mandatory">*</span>&nbsp;
 												<s:label key="lbl.hdr.comp.cnfigtmplt.key.title" cssClass="keyMandtory" theme="simple"/></div>
+										</th>
+										<th class="second">
+											<div class="th-inner tablehead fixTableHdr"><s:label key="lbl.hdr.comp.cnfigtmplt.name.title" theme="simple"/></div>
 										</th>
 										<th class="second">
 											<div class="th-inner tablehead fixTableHdr"><s:label key="lbl.hdr.comp.cnfigtmplt.type.title" theme="simple"/></div>
@@ -153,7 +168,6 @@
 									</tr>
 								</thead>
 							</div>
-							
 							<div id="input1" class="clonedInput">
 								<tbody id="propTempTbody">
 									<!-- For add -->
@@ -162,6 +176,9 @@
 											<td class="textwidth">
 												<input type="text" id="1" value="" placeholder="<s:text name='place.hldr.configTemp.add.key'/>" name="propTempKey"  
 													temp="1_key" class="key" onblur="updateRowInputNames(this)" maxlength="30" title="30 Characters only">
+											</td>
+											<td class="textwidth">
+												<input type="text" id = "1_propTempName" value="" placeholder="<s:text name='place.hldr.configTemp.add.name'/>" maxlength="30" title="30 Characters only" class="propyName" >
 											</td>
 											<td class="textwidth">
 												<select id="1_type" class = "select typewidth">
@@ -221,6 +238,12 @@
 													} else {
 														mulChck = "";
 													}
+													I18NString i18NString = propertyTemplate.getName();
+													String propName = "";
+													if (i18NString != null) {
+														System.out.println("inside null");
+														propName = i18NString.get("en-US").getValue();
+													}
 									%>
 												<tr class='<%= dynamicId + "_configdynamiadd" %>'>
 													<td class="textwidth">
@@ -228,6 +251,11 @@
 															placeholder="<s:text name='place.hldr.configTemp.add.key'/>" name="propTempKey"  
 															temp='<%= dynamicId + "_key" %>' class="key" onblur="updateRowInputNames(this)" 
 															maxlength="30" title="30 Characters only">
+													</td>
+													<td class="textwidth">
+														<input type="text" placeholder="<s:text name='place.hldr.configTemp.add.name'/>" 
+															id=<%= dynamicId + "_propTempName"%> class="propyName" maxlength="30" 
+															title="30 Characters only" value='<%= propName %>'>
 													</td>
 													<td class="textwidth">
 														<select id='<%= dynamicId + "_type" %>' class = "select typewidth">
@@ -362,6 +390,7 @@
 	//To check whether the device is ipad or not and then apply jquery scrollbar
 	if (!isiPad()) {
 		$(".content_adder").scrollbars();  
+		$(".multilist-scroller").scrollbars();
 	}
 
 	$(document).ready(function() {
@@ -509,6 +538,7 @@
 		var trId = counter + "_configdynamiadd";
 		var keyId = counter;
 		var keyTmpName = counter+"_key";
+		var nameId = counter + "_propTempName";
 	 	var typeId = counter + "_type";
 	 	var psblMulDivId = counter + "_psblMulDiv";
 	 	var psblValMultipleId = counter + "_psblMul";
@@ -521,6 +551,8 @@
 	 	var newPropTempRow = $(document.createElement('tr')).attr("id", trId);
 	 	newPropTempRow.html("<td class='textwidth'><input type='text' id='"+ keyId +"' class='key' name='propTempKey' value='' "+
 	 			" temp='"+ keyTmpName +"' placeholder='<s:text name='place.hldr.configTemp.add.key'/>' onblur='updateRowInputNames(this)'></td>" + 
+				"<td class='textwidth'> <input type='text' id = '"+ nameId +"' placeholder='<s:text name='place.hldr.configTemp.add.name'/>' value='' placeholder='' maxlength='30'" +
+	 			" class='propyName'></td>" +
 	 			"<td class='textwidth'><select id='"+ typeId +"' class = 'select typewidth'><option value='String'>String</option> " + 
 	 			"<option value='Integer'>Integer</option><option value='Password'>Password</option></select></td>"  +
 	 			"<td class='psblevalue' id='"+ psblMulDivId +"' style='display:none;'><select type='text' placeholder='<s:text name='place.hldr.configTemp.add.possible.values'/>'" + 
@@ -577,12 +609,14 @@
 		//to set names of input fields of current prop template row
 		if ($(obj).val().trim() !== "") {
 			var id = $(obj).attr("id");
+			var proptempName =  $(obj).val() + "_propTempName";
 			var typeName =  $(obj).val() + "_type";
 		 	var psblVal = $(obj).val() + "_psblVal";
 		 	var helpTextName =  $(obj).val() + "_helpText";
 		 	var mandChckName =  $(obj).val() + "_propMand";
 			var mulChckName =  $(obj).val() + "_propMul";
 			
+			$("#"+ id +"_propTempName").attr("name", proptempName);
 			$("#"+ id +"_type").attr("name", typeName);
 			$("."+id).attr("name", psblVal);
 			$("#"+ id +"_helpText").attr("name", helpTextName);
@@ -595,12 +629,14 @@
 	function updateRowInputNamesInEdit() {
 		$(".key").each(function() {
 				var id = $(this).attr("id");
+				var proptempName =  $(this).val() + "_propTempName";
 				var typeName =  $(this).val() + "_type";
 			 	var psblVal = $(this).val() + "_psblVal";
 			 	var helpTextName =  $(this).val() + "_helpText";
 			 	var mandChckName =  $(this).val() + "_propMand";
 				var mulChckName =  $(this).val() + "_propMul";
 				
+				$("#"+ id +"_propTempName").attr("name", proptempName);
 				$("#"+ id +"_type").attr("name", typeName);
 				$("."+ id).attr("name", psblVal);
 				$("#"+ id +"_helpText").attr("name", helpTextName);
@@ -633,7 +669,7 @@
 		} else {
 			hideError($("#nameControl"), $("#nameError"));
 		}
-		if ($("#multiSelect :selected").length === 0) {
+		if ($("input[name='appliesTo']:checked").length === 0) {
 			showError($("#applyControl"), $("#applyError"), '<s:text name='err.msg.applies.empty'/>');
 		} else {
 			hideError($("#applyControl"), $("#applyError"));

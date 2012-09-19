@@ -34,6 +34,7 @@ import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.admin.commons.LogErrorReport;
 import com.photon.phresco.util.ServiceConstants;
+import com.photon.phresco.service.util.ServerUtil;
 import com.sun.jersey.api.client.ClientResponse;
 
 public class ConfigTemplates extends ServiceBaseAction { 
@@ -57,6 +58,7 @@ public class ConfigTemplates extends ServiceBaseAction {
     //property template
     private String[] propTempKeys = null;
     private String propTempType = "";
+    private String propTempName = "";
     private String csvPsblValues = "";
     private List<String> possibleValues = null;
     private String propTempHlpTxt = "";
@@ -129,6 +131,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 			SettingsTemplate settingTemplate = new SettingsTemplate();
 			propTempKeys = getHttpRequest().getParameterValues(REQ_CONFIG_KEY);
 			for (String propTempKey : propTempKeys) {
+				propTempName = getHttpRequest().getParameter(propTempKey + REQ_CONFIG_NAME);
 				propTempType = getHttpRequest().getParameter(propTempKey + REQ_CONFIG_TYPE);
 				propTempHlpTxt = getHttpRequest().getParameter(propTempKey + REQ_CONFIG_HELP_TEXT);
 				propTempMndtry = getHttpRequest().getParameter(propTempKey + REQ_CONFIG_MANDATORY);
@@ -138,6 +141,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 				
 				PropertyTemplate propertyTemplate = new PropertyTemplate();
 				propertyTemplate.setKey(propTempKey);
+				propertyTemplate.setName(ServerUtil.createI18NString(propTempName));
 				propertyTemplate.setType(propTempType);
 				propertyTemplate.setPossibleValues(possibleValues);
 				propertyTemplate.setHelpText(propTempHlpTxt);
@@ -186,6 +190,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 			List<PropertyTemplate> propertyTemplates = new ArrayList<PropertyTemplate>();
 			propTempKeys = getHttpRequest().getParameterValues(REQ_CONFIG_KEY);
 			for (String propTempKey : propTempKeys) {
+				propTempName = getHttpRequest().getParameter(propTempKey + REQ_CONFIG_NAME);
 				propTempType = getHttpRequest().getParameter(propTempKey + REQ_CONFIG_TYPE);
 				propTempHlpTxt = getHttpRequest().getParameter(propTempKey + REQ_CONFIG_HELP_TEXT);
 				propTempMndtry = getHttpRequest().getParameter(propTempKey + REQ_CONFIG_MANDATORY);
@@ -194,6 +199,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 				possibleValues = Arrays.asList(csvPsblValues.split("\\s*,\\s*"));
 				PropertyTemplate propertyTemplate = new PropertyTemplate();
 				propertyTemplate.setKey(propTempKey);
+				propertyTemplate.setName(ServerUtil.createI18NString(propTempName));
 				propertyTemplate.setType(propTempType);
 				propertyTemplate.setPossibleValues(possibleValues);
 				propertyTemplate.setHelpText(propTempHlpTxt);
