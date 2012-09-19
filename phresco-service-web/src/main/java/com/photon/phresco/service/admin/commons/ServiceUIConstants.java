@@ -240,6 +240,8 @@ public interface ServiceUIConstants {
     String KEY_I18N_SUCCESS_LOGOUT = "succ.logout";
 
     String KEY_I18N_ERR_NAME_EMPTY = "err.msg.name.empty";
+    String KEY_I18N_ERR_GROUPID_EMPTY = "err.msg.groupid.empty";
+    String KEY_I18N_ERR_ARTIFACTID_EMPTY = "err.msg.artifactid.empty";
     String KEY_I18N_ERR_NAME_ALREADY_EXIST = "err.msg.name.exists";
     String KEY_I18N_ERR_NAME_ALREADY_EXIST_TECH = "err.msg.name.tech.exists";
     String KEY_I18N_ERR_NAME_ALREADY_EXIST_APPTYPE = "err.msg.name.apptype.exists";

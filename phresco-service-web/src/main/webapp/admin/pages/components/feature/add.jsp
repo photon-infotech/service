@@ -41,6 +41,8 @@
     String description = "";
     String helpText = "";
     String version = "";
+    String groupId = "";
+    String artifactId = "";
 	if (moduleGroup != null) {
 		if (StringUtils.isNotEmpty(moduleGroup.getName())) {
 			name = moduleGroup.getName();
@@ -56,11 +58,12 @@
 				}
 			}
 		}
+		
 // 		if (StringUtils.isNotEmpty(moduleGroup.getHelpText())) {
 // 			helpText = moduleGroup.getHelpText();
 // 		}
+
 	}
-	
 %>
 
 <form id="formFeatureAdd" class="form-horizontal customer_list" method="post" enctype="multipart/form-data">
@@ -90,16 +93,6 @@
 			</div>
 		</div>
 		
-		<div class="control-group" id="verControl">
-			<label class="control-label labelbold">
-				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.version'/>
-			</label>
-			<div class="controls">
-				<input id="featureversn" placeholder="<s:text name='place.hldr.feature.add.version'/>" 
-				     maxlength="30" title="30 Characters only" class="input-xlarge" type="text" name="version" value="<%= version %>">
-				<span class="help-inline" id="verError"></span>
-			</div>
-		</div>
 		
 		<div class="control-group">
 			<label class="control-label labelbold">
@@ -153,23 +146,36 @@
 		
 		<!-- POM details starts -->
 		<div id="jarDetailsDiv" class="hideContent">
-			<div class="control-group">
+			<div class="control-group" id="groupIdControl">
 				<label class="control-label labelbold">
-					<s:text name='lbl.hdr.comp.groupid'/>
+					<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.groupid'/>
 				</label>
 				<div class="controls">
-					<input name="groupId" class="input-xlarge" type="text"
+					<input id="groupid" class="groupId" class="input-xlarge" maxlength="40" title="40 Characters only" type="text"
 						placeholder="<s:text name='place.hldr.archetype.add.groupId'/>">
+						<span class="help-inline" id="groupError"></span>
 				</div>
 			</div>
 			
-			<div class="control-group">
+			<div class="control-group" id="artifactIdControl">
 				<label class="control-label labelbold">
-					<s:text name='lbl.hdr.comp.artifactid'/>
+					<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.artifactid'/>
 				</label>
 				<div class="controls">
-					<input name="artifactId" class="input-xlarge" type="text"
+					<input id="artifId" class="artifactId" class="input-xlarge" maxlength="40" title="40 Characters only" type="text"
 						placeholder="<s:text name='place.hldr.archetype.add.artifactId'/>">
+						<span class="help-inline" id="artifactError"></span>
+				</div>
+			</div>
+			
+			<div class="control-group" id="verControl">
+				<label class="control-label labelbold">
+					<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.jar.version'/>
+				</label>
+				<div class="controls">
+					<input id="versnId" class="jarVersion" maxlength="30" title="30 Characters only" class="input-xlarge" type="text"
+						placeholder="<s:text name='place.hldr.archetype.add.version'/>">
+						<span class="help-inline" id="verError"></span>
 				</div>
 			</div>
 		</div>
@@ -222,6 +228,9 @@
     <input type="hidden" name="oldName" value="<%= moduleGroup != null ? moduleGroup.getName() : "" %>"/>
     <input type="hidden" name="oldVersion" value="<%= moduleGroup != null ? moduleGroup.getVersions() : "" %>"/>
     <input type="hidden" name="type" value="<%= type %>">
+    <input type="hidden" name="groupId">
+	<input type="hidden" name="artifactId">
+	<input type="hidden" name="jarVersion">
 </form>
 
 <script type="text/javascript">
@@ -305,7 +314,20 @@
             hideError($("#nameControl"), $("#nameError"));
         }
         
-        if (data.versError != undefined) {
+        if (data.groupError != undefined) {
+            showError($("#groupIdControl"), $("#groupError"), data.groupError);
+        } else {
+            hideError($("#groupIdControl"), $("#groupError"));
+        }
+        
+        if (data.artifactError != undefined) {
+            showError($("#artifactIdControl"), $("#artifactError"), data.artifactError);
+        } else {
+            hideError($("#artifactIdControl"), $("#artifactError"));
+        }
+        
+        
+       	if (data.versError != undefined) {
             showError($("#verControl"), $("#verError"), data.versError);
         } else {
             hideError($("#verControl"), $("#verError"));

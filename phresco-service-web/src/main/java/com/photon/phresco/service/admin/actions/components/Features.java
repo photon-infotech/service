@@ -32,15 +32,18 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.google.gson.Gson;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.Documentation;
 import com.photon.phresco.model.Documentation.DocumentationType;
+import com.photon.phresco.model.ArchetypeInfo;
 import com.photon.phresco.model.Module;
 import com.photon.phresco.model.ModuleGroup;
 import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.admin.commons.LogErrorReport;
 import com.photon.phresco.service.client.api.Content;
+import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.BodyPart;
@@ -55,6 +58,8 @@ public class Features extends ServiceBaseAction {
 	private String name = null;
 	private String nameError = null;
 	private String versError = null;
+	private String artifactError = null;
+	private String groupError = null;
 	private String fileError = null;
 	private boolean errorFound = false;
 	
@@ -324,14 +329,28 @@ public class Features extends ServiceBaseAction {
 		try {
             writer = getHttpResponse().getWriter();
 	        featureJarName = getHttpRequest().getHeader(X_FILE_NAME);
-	       
-	        InputStream is = getHttpRequest().getInputStream();
-	        featureByteArray = IOUtils.toByteArray(is);
-	        getHttpResponse().setStatus(getHttpResponse().SC_OK);
-	        writer.print(SUCCESS_TRUE);
-	        writer.flush();
-	        writer.close();
-	        
+	        if (featureJarName.endsWith(REQ_JAR_FILE_EXTENSION) || featureJarName.endsWith(REQ_ZIP_FILE_EXTENSION) 
+	        		|| featureJarName.endsWith(REQ_TAR_GZ_FILE_EXTENSION)) {
+	        	InputStream is = getHttpRequest().getInputStream();
+	        	byte[] tempFeaByteArray = IOUtils.toByteArray(is);
+	        	boolean isArchetypeJar = ServerUtil.validateArchetypeJar(new ByteArrayInputStream(tempFeaByteArray));
+	        	if (isArchetypeJar) {
+	        		featureByteArray = tempFeaByteArray;
+		        	ArchetypeInfo archetypeInfo = ServerUtil.getArtifactinfo(new ByteArrayInputStream(tempFeaByteArray));
+		            getHttpResponse().setStatus(getHttpResponse().SC_OK);
+		            if (archetypeInfo != null) {
+		            	archetypeInfo.setMavenJar(true);
+		            	archetypeInfo.setSuccess(true);
+		            	Gson gson = new Gson();
+		                String json = gson.toJson(archetypeInfo);
+		            	writer.print(json);
+	            } else {
+	            	writer.print(MAVEN_JAR_FALSE);
+	        	}
+		        writer.flush();
+		        writer.close();
+	        }
+	        }
 		} catch (Exception e) {
 			getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
             writer.print(SUCCESS_FALSE);
@@ -361,8 +380,13 @@ public class Features extends ServiceBaseAction {
 			isError = true;
 		} 
 		
-		if (StringUtils.isEmpty(version)) {
-			setVersError(getText(KEY_I18N_ERR_VER_EMPTY));
+		if (StringUtils.isEmpty(groupId)) {
+			setGroupError(getText(KEY_I18N_ERR_GROUPID_EMPTY));
+			isError = true;
+		} 
+		
+		if (StringUtils.isEmpty(artifactId)) {
+			setArtifactError(getText(KEY_I18N_ERR_ARTIFACTID_EMPTY));
 			isError = true;
 		} 
 		
@@ -370,6 +394,14 @@ public class Features extends ServiceBaseAction {
 		    setAppJarError(getText(KEY_I18N_ERR_APPLNJAR_EMPTY));
             isError = true;
 		}
+		
+		
+		
+		if (StringUtils.isEmpty(version)) {
+			setVersError(getText(KEY_I18N_ERR_VER_EMPTY));
+			isError = true;
+		}
+		
 		/*else if (StringUtils.isEmpty(fromPage) || (!version.equals(oldVersion))) {
 			//To check whether the version already exist
 			List<ModuleGroup> moduleGroups = getServiceManager().getFeatures(customerId);
@@ -571,4 +603,21 @@ public class Features extends ServiceBaseAction {
     public void setAppJarError(String appJarError) {
         this.appJarError = appJarError;
     }
+
+	public String getArtifactError() {
+		return artifactError;
+	}
+
+	public void setArtifactError(String artifactError) {
+		this.artifactError = artifactError;
+	}
+
+	public String getGroupError() {
+		return groupError;
+	}
+
+	public void setGroupError(String groupError) {
+		this.groupError = groupError;
+	}
+    
 }
