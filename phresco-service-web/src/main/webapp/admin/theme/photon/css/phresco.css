@@ -1610,7 +1610,7 @@ h3 label {
 }
 
 .textwidth {
-	width: 14%;
+	width: 13%;
 }
 
 .key {
@@ -1620,7 +1620,7 @@ h3 label {
 }
 
 .psblevalue {
-	width: 29%;
+	width: 23%;
 }
 
 .mandatoryfld {
@@ -2086,7 +2086,10 @@ input[class*='sample'] {
 }
 
 .psblSngl {
-	width: 75%;
+	width: 77%;
+}
+.propyName {
+	width: 100%;
 }
 
 .hlpTxt {
@@ -2142,3 +2145,44 @@ input[class*='sample'] {
     -webkit-border-top-left-radius: 5px 5px;
 	-webkit-border-top-right-radius: 5px 5px;
 }
+
+* For multiselect */
+.multilist-scroller {
+	overflow-y: auto; 
+	height: 100%;
+	width: 100%; 
+	background-color: #fff; 
+	border-radius: 3px;
+	width: 301px; 
+}
+
+.multiselct {
+	overflow-y: auto; 
+	height: 100%;
+	width: 100%; 
+	background-color: #fff; 
+	border-radius: 3px;
+	width: 301px;
+}
+
+.multilist-scroller ul {
+	list-style-type: none; 
+	margin: 0;
+	padding: 5px;
+}
+
+.multilist-scroller ul li {
+	color: #000;
+	padding: 0 5px;
+}
+
+.multilist-scroller input.check {
+	margin: 3px 8px 6px 0;
+}
+
+.multilist-scroller input.checkall {
+	margin: 3px 8px 6px 0;
+}
+
+.modal-backdrop.fade.in {
+	opacity: 0.4;

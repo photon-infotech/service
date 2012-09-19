@@ -65,7 +65,7 @@
 								<tr>
 									<th class="first">
 										<div class="th-inner tablehead">
-											<input type="checkbox" value="" id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this);">
+											<input type="checkbox" value="" id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this,$('.configtempltes'), false);">
 										</div>
 									</th>
 									<th class="second">
@@ -92,7 +92,7 @@
 											<input type="checkbox" name="configId" value="<%= configTemplate.getId() %>" 
 											             onclick="checkboxEvent();" disabled/>
 										<% } else { %>
-										<input type="checkbox" class="check" name="configId" value="<%= configTemplate.getId() %>" 
+										<input type="checkbox" class="check configtempltes" name="configId" value="<%= configTemplate.getId() %>" 
 										                onclick="checkboxEvent();" />
 										<% } %>
 										</td>

@@ -108,10 +108,14 @@ function activateMenu(selectedMenu) {
 	selectedMenu.attr('class', "active");
 }
 
-function checkAllEvent(currentCheckbox) {
+function checkAllEvent(currentCheckbox, childCheckBox, disable) {
 	var checkAll = $(currentCheckbox).prop('checked');
-	$('.check').prop('checked', checkAll);
+	childCheckBox.prop('checked', checkAll);
 	buttonStatus(checkAll);
+	if (!checkAll) {
+		disable = false;
+	}
+	toDisableAllCheckbox(currentCheckbox,childCheckBox, disable);
 }
 
 function checkboxEvent() {
@@ -138,6 +142,15 @@ function toDisableCheckAll() {
 		$('#checkAllAuto').prop('disabled', false);
 	} else {
 		$('#checkAllAuto').prop('disabled', true);
+	}
+}
+
+function toDisableAllCheckbox(currentCheckbox,childCheckBox, disable) {
+	if($(currentCheckbox).is(':checked')){
+		childCheckBox.prop('disabled', disable);
+	} else {
+		childCheckBox.prop('disabled', disable);
+		childCheckBox.prop('checked', false);
 	}
 }
 
