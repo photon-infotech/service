@@ -34,6 +34,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.model.ArchetypeInfo;
 import com.photon.phresco.model.ProjectInfo;
 import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
@@ -55,11 +56,15 @@ public class PilotProjects extends ServiceBaseAction {
 	private String nameError = null;
 	private String fileError = null;
 	private boolean errorFound = false;
-	
 	private String description = null;
+	private String version = null;
 	private String projectId = null;
+	
 	private String fromPage = null;
 	private String customerId = null;
+	private String groupId = null;
+	private String artifactId = null;
+	private String jarVersion = null;
 	private String techId = null;
 	private String oldName = null;
 	private static byte[] pilotProByteArray = null;
@@ -134,8 +139,14 @@ public class PilotProjects extends ServiceBaseAction {
     		ProjectInfo proInfo = new ProjectInfo();
     		proInfo.setName(name);
     		proInfo.setDescription(description);
+    		proInfo.setVersion(version);
     		proInfo.setTechId(techId);
     		proInfo.setCustomerId(customerId);
+    		proInfo.setGroupId(groupId);
+    		proInfo.setArtifactId(artifactId);
+    		proInfo.setVersion(jarVersion);
+    		ArchetypeInfo archetypeInfo = new ArchetypeInfo(groupId, artifactId, jarVersion, "zip");
+    		proInfo.setArchetypeInfo(archetypeInfo);
     		Technology technology = new Technology();
     		technology.setId(techId);
     		ComponentService cs = new ComponentService();
@@ -157,8 +168,7 @@ public class PilotProjects extends ServiceBaseAction {
 		        multiPart.bodyPart(binaryPart2);
 			}
 		    
-    		pilotProInfo.add(proInfo);
-    		ClientResponse clientResponse = getServiceManager().createPilotProjects(pilotProInfo, customerId);
+    		ClientResponse clientResponse = getServiceManager().createPilotProjects(multiPart, customerId);
     		if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200 && clientResponse.getStatus() != ServiceConstants.RES_CODE_201  ) {
     			addActionError(getText(PLTPROJ_NOT_ADDED, Collections.singletonList(name)));
     		} else {
@@ -185,8 +195,14 @@ public class PilotProjects extends ServiceBaseAction {
     		pilotProInfo.setId(projectId);
     		pilotProInfo.setName(name);
     		pilotProInfo.setDescription(description);
+    		pilotProInfo.setVersion(version);
     		pilotProInfo.setTechId(techId);
     		pilotProInfo.setCustomerId(customerId);
+    		pilotProInfo.setGroupId(groupId);
+    		pilotProInfo.setArtifactId(artifactId);
+    		pilotProInfo.setVersion(jarVersion);
+    		ArchetypeInfo archetypeInfo = new ArchetypeInfo(groupId, artifactId, jarVersion, "zip");
+    		pilotProInfo.setArchetypeInfo(archetypeInfo);
     		Technology technology = new Technology();
     		technology.setId(techId);
     		ComponentService cs = new ComponentService();
@@ -391,4 +407,38 @@ public class PilotProjects extends ServiceBaseAction {
 	public String getOldName() {
 		return oldName;
 	}
+	
+	public String getArtifactId() {
+		return artifactId;
+	}
+
+	public void setArtifactId(String artifactId) {
+		this.artifactId = artifactId;
+	}
+	
+	public String getGroupId() {
+		return groupId;
+	}
+
+	public void setGroupId(String groupId) {
+		this.groupId = groupId;
+	}
+	
+	public String getJarVersion() {
+		return jarVersion;
+	}
+
+	public void setJarVersion(String jarVersion) {
+		this.jarVersion = jarVersion;
+	}
+
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
+	}
+
+
 }

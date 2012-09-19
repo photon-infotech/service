@@ -35,6 +35,7 @@
 
 	//For edit
     String name = "";
+	String version = "";
     String description = "";
     boolean isSystem = false;
     if (pilotProjectInfo != null) {
@@ -43,6 +44,9 @@
     	}
     	if (StringUtils.isNotEmpty(pilotProjectInfo.getDescription())) {
     		description = pilotProjectInfo.getDescription();
+    	}
+    	if (StringUtils.isNotEmpty(pilotProjectInfo.getVersion())) {
+    		version = pilotProjectInfo.getVersion();
     	}
     	isSystem = pilotProjectInfo.isSystem();
     }
@@ -77,12 +81,22 @@
 					maxlength="150" title="150 Characters only" class="input-xlarge" type="text" name="description"></textarea>
 			</div>
 		</div>
+		
+		<div class="control-group" id="nameControl">
+			<label class="control-label labelbold">
+				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.version'/>
+			</label>
+			<div class="controls">
+				<input id="versionname" placeholder="<s:text name='place.hldr.pilot.add.version'/>" value="<%= version %>" maxlength="30" title="30 Characters only" class="input-xlarge" type="text" name="version">
+				<span class="help-inline" id="nameError"></span>
+			</div>
+		</div>
 
 		<div class="control-group" id="applyControl">
 			<label class="control-label labelbold"> <span
 				class="mandatory">*</span>&nbsp;<s:text name="Technology" /> </label>
 			<div class="controls">
-				<select id="multiSelect" name="techId">
+				<select id="multiSelect" name="techId" id="tech">
 					
 				 	<% if(StringUtils.isNotEmpty(fromPage)) { //for edit %>
 							<option value="<%= pilotProjectInfo.getTechnology().getId() %>"><%= pilotProjectInfo.getTechnology().getName()%></option>
@@ -128,7 +142,7 @@
 				</label>
 				<div class="controls">
 					<input name="jarVersion" class="input-xlarge" type="text"
-						placeholder="<s:text name='place.hldr.archetype.add.jar.version'/>">
+						placeholder="<s:text name='place.hldr.pilot.add.version'/>">
 				</div>
 			</div>
 		</div>
@@ -186,6 +200,10 @@
 	$(document).ready(function() {
 		enableScreen();
         createUploader();
+        
+        <% if (StringUtils.isNotEmpty(fromPage)) { %>
+    	$("#tech").attr("disabled","disabled");
+    	<% } %>
         
      	// To check for the special character in name
         $('#pilotname').bind('input propertychange', function (e) {
