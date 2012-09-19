@@ -69,7 +69,10 @@ function clickSave(pageUrl, params, tag, progressText) {
 	});
 }
 
-function validate(pageUrl, form, tag, progressText) {
+function validate(pageUrl, form, tag, progressText, disableDiv) {
+	if (disableDiv != undefined && disableDiv != "") {
+		disableDiv.removeAttr("disabled");
+	}
 	var params = "";
 	if (form != undefined && !isBlank(form)) {
 		params = form.serialize();
@@ -80,6 +83,9 @@ function validate(pageUrl, form, tag, progressText) {
 		type : "POST",
 		success : function(data) {
 			if (data.errorFound != undefined && data.errorFound) {
+				if (disableDiv != undefined && disableDiv != "") {
+					disableDiv.attr("disabled", true);
+				}
 				findError(data);
 			} else {
 				clickSave(pageUrl, params, tag, progressText);

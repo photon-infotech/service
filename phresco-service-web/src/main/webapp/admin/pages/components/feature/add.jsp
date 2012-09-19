@@ -241,11 +241,11 @@
 		%>
      	<% if (StringUtils.isNotEmpty(fromPage)) { %>
 	     	<input type="button" id="featuresUpdate" class="btn <%= disabledClass %>" <%= disabled %> 
-				onclick="validate('featuresUpdate', $('#formFeatureAdd'), $('#feature_tab'), 'Updating Feature');"
-				value="<s:text name='lbl.hdr.comp.update'/>"/> 
+				onclick="validate('featuresUpdate', $('#formFeatureAdd'), $('#feature_tab'), 'Updating Feature', $('#jarDetailsDiv :input'));"
+				value="<s:text name='lbl.hdr.comp.update' />"/> 
      	<% } else { %>
 	     	<input type="button" id="featuresSave" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.save'/>" 
-				onclick="validate('featuresSave', $('#formFeatureAdd'), $('#feature_tab'), 'Creating Feature');"/> 
+				onclick="validate('featuresSave', $('#formFeatureAdd'), $('#feature_tab'), 'Creating Feature', $('#jarDetailsDiv :input'));"/> 
 		<% } %>
 		<input type="button" id="featuresCancel" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.cancel'/>"
 		onclick="loadContent('featuresMenu', $('#formFeatureAdd'), $('#feature_tab'));" />
@@ -381,7 +381,7 @@
 		}
 	}
 
-	 function createUploader() {
+	function createUploader() {
 		var featureUploader = new qq.FileUploader({
 			element : document.getElementById('feature-file-uploader'),
 			action : 'uploadFeatureFile',

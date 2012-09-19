@@ -24,6 +24,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -172,42 +174,44 @@ public class ConfigTemplates extends ServiceBaseAction {
         try {
             propertyTemplates = new ArrayList<PropertyTemplate>();
             String[] propTempKeys = getHttpRequest().getParameterValues(REQ_CONFIG_KEY);
-            for (String propTempKey : propTempKeys) {
-                String propTempName = getHttpRequest().getParameter(
-                        propTempKey + REQ_CONFIG_NAME);
-                String propTempType = getHttpRequest().getParameter(
-                        propTempKey + REQ_CONFIG_TYPE);
-                String propTempHlpTxt = getHttpRequest().getParameter(
-                        propTempKey + REQ_CONFIG_HELP_TEXT);
-                String propTempMndtry = getHttpRequest().getParameter(
-                        propTempKey + REQ_CONFIG_MANDATORY);
-                String propTempMul = getHttpRequest().getParameter(
-                        propTempKey + REQ_CONFIG_MULTIPLE);
-                String csvPsblValues = getHttpRequest().getParameter(
-                        propTempKey + REQ_CONFIG_PSBL_VAL);
-                List<String> possibleValues = Arrays
-                        .asList(csvPsblValues.split("\\s*,\\s*"));
+            if (ArrayUtils.isNotEmpty(propTempKeys)) {
+                for (String propTempKey : propTempKeys) {
+                    String propTempName = getHttpRequest().getParameter(
+                            propTempKey + REQ_CONFIG_NAME);
+                    String propTempType = getHttpRequest().getParameter(
+                            propTempKey + REQ_CONFIG_TYPE);
+                    String propTempHlpTxt = getHttpRequest().getParameter(
+                            propTempKey + REQ_CONFIG_HELP_TEXT);
+                    String propTempMndtry = getHttpRequest().getParameter(
+                            propTempKey + REQ_CONFIG_MANDATORY);
+                    String propTempMul = getHttpRequest().getParameter(
+                            propTempKey + REQ_CONFIG_MULTIPLE);
+                    String csvPsblValues = getHttpRequest().getParameter(
+                            propTempKey + REQ_CONFIG_PSBL_VAL);
+                    List<String> possibleValues = Arrays
+                            .asList(csvPsblValues.split("\\s*,\\s*"));
 
-                PropertyTemplate propertyTemplate = new PropertyTemplate();
-                propertyTemplate.setKey(propTempKey);
-                propertyTemplate.setName(ServerUtil
-                        .createI18NString(propTempName));
-                propertyTemplate.setType(propTempType);
-                propertyTemplate.setPossibleValues(possibleValues);
-                propertyTemplate.setHelpText(propTempHlpTxt);
+                    PropertyTemplate propertyTemplate = new PropertyTemplate();
+                    propertyTemplate.setKey(propTempKey);
+                    propertyTemplate.setName(ServerUtil
+                            .createI18NString(propTempName));
+                    propertyTemplate.setType(propTempType);
+                    propertyTemplate.setPossibleValues(possibleValues);
+                    propertyTemplate.setHelpText(propTempHlpTxt);
 
-                if (StringUtils.isNotEmpty(propTempMndtry)) {
-                    propertyTemplate.setRequired(true);
-                } else {
-                    propertyTemplate.setRequired(false);
+                    if (StringUtils.isNotEmpty(propTempMndtry)) {
+                        propertyTemplate.setRequired(true);
+                    } else {
+                        propertyTemplate.setRequired(false);
+                    }
+
+                    if (StringUtils.isNotEmpty(propTempMul)) {
+                        propertyTemplate.setMultiple(true);
+                    } else {
+                        propertyTemplate.setMultiple(false);
+                    }
+                    propertyTemplates.add(propertyTemplate);
                 }
-
-                if (StringUtils.isNotEmpty(propTempMul)) {
-                    propertyTemplate.setMultiple(true);
-                } else {
-                    propertyTemplate.setMultiple(false);
-                }
-                propertyTemplates.add(propertyTemplate);
             }
         } catch (Exception e) {
             throw new PhrescoException(e);
@@ -253,7 +257,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 		} else if(StringUtils.isEmpty(fromPage) || (!name.equals(oldName))) {
 			// to check duplication of name
 			List<SettingsTemplate> configTemplates = getServiceManager().getconfigTemplates(customerId);
-			if (configTemplates != null) {
+			if (CollectionUtils.isNotEmpty(configTemplates)) {
 				for (SettingsTemplate configTemplate : configTemplates) {
 					if (configTemplate.getType().equalsIgnoreCase(name)) {
 						setNameError(getText(KEY_I18N_ERR_NAME_ALREADY_EXIST));
@@ -264,7 +268,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 			}
 		}
 		
-		if ( appliesTo == null ) {
+		if (appliesTo == null) {
 			setApplyError(getText(KEY_I18N_ERR_APPLIES_EMPTY ));
 			isError = true;
 		}
