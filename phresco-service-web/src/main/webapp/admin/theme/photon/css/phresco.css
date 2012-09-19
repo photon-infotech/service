@@ -818,8 +818,6 @@ a {
 	margin-left:3px;
 }
 	
-
-
 #about{
 	text-decoration: none;
 	padding: 3px;
@@ -1204,15 +1202,15 @@ legend {
 
 .closereg span {
     float:left;
-    margin:0px;
-    background:url(../../images/r_arrowclose.png) no-repeat 3%;
-    padding-left:5%;
+    margin:0px -20px;
+    background:url(../../../images/r_arrowclose.png) no-repeat 3%;
+    padding-left:4%;
     width:92%;
     line-height: 20px;
 }
 
 .closereg span:hover {
-     background:url(../../images/r_arrowclose.png) no-repeat 3%;
+     background:url(../../../images/r_arrowclose.png) no-repeat 3%;
 }
 
 .openreg {
@@ -1224,9 +1222,9 @@ legend {
 
 .openreg span {
     float:left;
-    margin:0px;
-    background:url(../../images/r_arrowopen.png) no-repeat 3%;
-    padding-left:5%;
+    margin:0px -20px;
+    background:url(../../../images/r_arrowopen.png) no-repeat 3%;
+    padding-left:4%;
     width:92%;
 }
 
@@ -2186,3 +2184,18 @@ input[class*='sample'] {
 
 .modal-backdrop.fade.in {
 	opacity: 0.4;
+}
+
+.border_collapse {
+	border-collapse:separate;
+}
+
+.accor_head {
+	width: 99%;
+	margin-left: 4px;
+}
+
+.navigation_menu {
+	margin-left:81px;
+}
+
