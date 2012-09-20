@@ -80,7 +80,7 @@ public class ApplicationTypes extends ServiceBaseAction {
 		try {
 		    ApplicationType appType = getServiceManager().getApplicationType(appTypeId, customerId);
 			getHttpRequest().setAttribute(REQ_APP_TYPE, appType);
-			getHttpRequest().setAttribute(REQ_FROM_PAGE, REQ_EDIT);
+			getHttpRequest().setAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (Exception e) {
 		    throw new PhrescoException(e);
 		}

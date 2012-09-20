@@ -142,7 +142,7 @@ public class Component extends ServiceBaseAction {
 		try {
 		    ModuleGroup moduleGroup = getServiceManager().getFeature(techId, customerId);
 			getHttpRequest().setAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
-			getHttpRequest().setAttribute(REQ_FROM_PAGE, REQ_EDIT);
+			getHttpRequest().setAttribute(REQ_FROM_PAGE, EDIT);
 			getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
 		} catch (PhrescoException e) {
 			new LogErrorReport(e, COMPONENT_EDIT_EXCEPTION);

@@ -109,7 +109,8 @@ public class Features extends ServiceBaseAction {
 			}
     		List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
     		getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
-    	} catch (PhrescoException e){
+    		featureByteArray = null;
+    	} catch (PhrescoException e) {
     		new LogErrorReport(e, FEATURE_LIST_EXCEPTION);
     		
     		return LOG_ERROR;
@@ -130,7 +131,7 @@ public class Features extends ServiceBaseAction {
     		if (StringUtils.isNotEmpty(from)) {
     		    return COMP_FEATURES_DEPENDENCY;
     		}
-    	} catch (PhrescoException e){
+    	} catch (PhrescoException e) {
     		new LogErrorReport(e, FEATURE_LIST_EXCEPTION);
     		
     		return LOG_ERROR;
@@ -144,17 +145,26 @@ public class Features extends ServiceBaseAction {
 			S_LOGGER.debug("Entering Method  Features.add()");
 		}
 		
-		List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
-		getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
-		getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
-		getHttpRequest().setAttribute(REQ_FEATURES_TYPE, type);
-		if (REQ_FEATURES_MODULE.equals(type)) {
-			getHttpRequest().setAttribute(REQ_FEATURES_HEADER, getText(KEY_I18N_FEATURE_MOD_ADD));
-		} else {
-			getHttpRequest().setAttribute(REQ_FEATURES_HEADER, getText(KEY_I18N_FEATURE_JS_ADD));
-		}
-		
-		return COMP_FEATURES_ADD;
+		try {
+            List<Technology> technologies = getServiceManager().getArcheTypes(
+                    customerId);
+            getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
+            getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+            getHttpRequest().setAttribute(REQ_FEATURES_TYPE, type);
+            if (REQ_FEATURES_MODULE.equals(type)) {
+                getHttpRequest().setAttribute(REQ_FEATURES_HEADER,
+                        getText(KEY_I18N_FEATURE_MOD_ADD));
+            } else {
+                getHttpRequest().setAttribute(REQ_FEATURES_HEADER,
+                        getText(KEY_I18N_FEATURE_JS_ADD));
+            }
+        } catch (Exception e) {
+            new LogErrorReport(e, FEATURE_ADD_EXCEPTION);
+            
+            return LOG_ERROR;
+        }
+        
+        return COMP_FEATURES_ADD;
 	}
 	
 	public String edit() throws PhrescoException {
@@ -168,7 +178,7 @@ public class Features extends ServiceBaseAction {
 		    ModuleGroup moduleGroup = getServiceManager().getFeature(moduleGroupId, customerId);
 			getHttpRequest().setAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
 			getHttpRequest().setAttribute(REQ_FEATURES_SELECTED_MODULEID, moduleId);
-			getHttpRequest().setAttribute(REQ_FROM_PAGE, REQ_EDIT);
+			getHttpRequest().setAttribute(REQ_FROM_PAGE, EDIT);
 			getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
 			if (REQ_FEATURES_MODULE.equals(type)) {
 				getHttpRequest().setAttribute(REQ_FEATURES_HEADER, getText(KEY_I18N_FEATURE_MOD_EDIT));
@@ -229,9 +239,11 @@ public class Features extends ServiceBaseAction {
             Content content = new Content("object", name, null, null, null, 0);
             jsonPart.setContentDisposition(content);
             multiPart.bodyPart(jsonPart);
-            InputStream featureIs = new ByteArrayInputStream(featureByteArray);
-            BodyPart binaryPart = getServiceManager().createBodyPart(name, FILE_FOR_APPTYPE, featureIs);
-            multiPart.bodyPart(binaryPart);
+            if (featureByteArray != null) {
+                InputStream featureIs = new ByteArrayInputStream(featureByteArray);
+                BodyPart binaryPart = getServiceManager().createBodyPart(name, FILE_FOR_APPTYPE, featureIs);
+                multiPart.bodyPart(binaryPart);
+            }
 			    
 			ClientResponse clientResponse = getServiceManager().updateFeature(multiPart, moduleGroupId, customerId);
 			if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200 && clientResponse.getStatus() != ServiceConstants.RES_CODE_201) {
@@ -375,10 +387,11 @@ public class Features extends ServiceBaseAction {
                 setNameError(getText(KEY_I18N_ERR_NAME_EMPTY));
                 isError = true;
             }
-            if (featureByteArray == null) {
+            if (!EDIT.equals(fromPage) && featureByteArray == null) {
                 setFileError(getText(KEY_I18N_ERR_APPLNJAR_EMPTY));
                 isError = true;
-            } else {
+            } 
+            if (featureByteArray != null) {
                 if (StringUtils.isEmpty(groupId)) {
                     setGroupIdError(getText(KEY_I18N_ERR_GROUPID_EMPTY));
                     isError = true;

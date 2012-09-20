@@ -29,7 +29,7 @@ public interface ServiceUIConstants {
     String SQUARE_OPEN = "[";
     String ADD = "add";
     String REQ_FROM_PAGE = "fromPage";
-    String REQ_EDIT = "edit";
+    String EDIT = "edit";
     String REQ_USER_INFO = "userInfo";
     String SESSION_USER_INFO = "userInfo";
     String SUCCESS_FALSE = "{\"success\": false}";
@@ -194,6 +194,7 @@ public interface ServiceUIConstants {
 	String FEATURE_SAVE_EXCEPTION = "Feature save";
 	String FEATURE_EDIT_EXCEPTION = "Feature edit";
 	String FEATURE_LIST_EXCEPTION = "Feature list";
+	String FEATURE_ADD_EXCEPTION = "Feature add";
 	
 	String COMPONENT_DELETE_EXCEPTION = "Component delete";
 	String COMPONENT_UPDATE_EXCEPTION = "Component update";

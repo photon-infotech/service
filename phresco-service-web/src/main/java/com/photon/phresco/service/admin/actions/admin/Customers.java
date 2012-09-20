@@ -102,7 +102,7 @@ public class Customers extends ServiceBaseAction  {
 		try {
 			Customer customer = getServiceManager().getCustomer(customerId);
 			getHttpRequest().setAttribute(REQ_CUST_CUSTOMER, customer);
-			getHttpRequest().setAttribute(REQ_FROM_PAGE, REQ_EDIT);
+			getHttpRequest().setAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (PhrescoException e) {
 			new LogErrorReport(e, CUSTOMERS_ADD_EXCEPTION);
 			

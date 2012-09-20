@@ -82,7 +82,7 @@ public class GlobalUrlList extends ServiceBaseAction {
 		try {
 			  GlobalURL globalUrl = getServiceManager().getGlobalUrl(globalurlId, customerId);
 			  getHttpRequest().setAttribute(REQ_GLOBURL_URL , globalUrl);
-			  getHttpRequest().setAttribute(REQ_FROM_PAGE, REQ_EDIT);
+			  getHttpRequest().setAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (PhrescoException e) {
 			new LogErrorReport(e, GLOBAL_URL_EDIT_EXCEPTION);
 			
