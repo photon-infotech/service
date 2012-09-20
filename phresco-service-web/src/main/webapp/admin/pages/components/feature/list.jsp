@@ -17,88 +17,126 @@
   limitations under the License.
   ###
   --%>
-
 <%@ taglib uri="/struts-tags" prefix="s" %>
 
 <%@ page import="java.util.List" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.apache.commons.collections.CollectionUtils"%>
 
-<%@ page import="com.photon.phresco.model.Technology" %>
+<%@ page import="com.photon.phresco.model.Module" %>
+<%@ page import="com.photon.phresco.model.ModuleGroup" %>
+
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
+<%@ page import="com.photon.phresco.model.Documentation.DocumentationType"%>
 
 <% 
-	List<Technology> technologies = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
-	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
-	String type = (String) request.getAttribute(ServiceUIConstants.REQ_FEATURES_TYPE);
-	String header = (String) request.getAttribute(ServiceUIConstants.REQ_FEATURES_HEADER);
-
+	List<ModuleGroup> moduleGroups = (List<ModuleGroup>)request.getAttribute(ServiceUIConstants.REQ_FEATURES_MOD_GRP);
 %>
-		
-<form id="formFeaturesList" class="form-horizontal customer_list">
-	<div class="operation">
-		<div class="featurelist_add">
-			<input type="button" id="featuresAdd" class="btn btn-primary" name="features_add" 
-				onclick="loadContent('featuresAdd', $('#formFeaturesList'), $('#feature_tab'));" 
-				value="<%= header%>"/>
-			<input type="button" class="btn" id="del" disabled value="<s:text name='lbl.hdr.comp.delete'/>" 
-				onclick="showDeleteConfirmation('<s:text name='del.confirm.feature'/>');"/>
-		</div>
-		
-		<div class="featurelist_tech">
-			<s:text name='lbl.comp.featr.technology'/>
-			<select name="technology" id="tech_id">
-				<%
-					if (technologies != null) {
-						for (Technology technology : technologies) {
-				%>
-							<option value="<%=technology.getId() %>"><%=technology.getName() %></option>
-				<%
-						}
-					}
-				%>
-			</select>
-		</div>
-		
-		<s:if test="hasActionMessages()">
-			<div class="alert alert-success alert-message alert_messagelist" id="successmsg">
-				<s:actionmessage />
-			</div>
-		</s:if>
-		
-		<s:if test="hasActionErrors()">
-			<div class="alert alert-error"  id="errormsg">
-				<s:actionerror />
-			</div>
-		</s:if>
-	</div>	
-	
-	<div class="featurelist_height" id="feature_list">
-	
-	</div>
     
-	<!-- Hidden Fields -->
-    <input type="hidden" name="customerId" value="<%= customerId %>">
-    <input type="hidden" name="type" value="<%= type %>">
-</form>
+   <div class="featuresScrollDiv">
+   	<% 
+		if (CollectionUtils.isEmpty(moduleGroups)) {
+	%>
+		<div class="alert alert-block">
+			<s:text name='alert.msg.feature.not.available'/>
+		</div>
+	<% } else { %>	
+		<div class="header-background accor_head">
+			<table class="border_collapse">
+				<tbody>
+					<tr>
+						<td>
+							<input type="checkbox" id="checkAllAuto" name="moduleGroup" 
+								onclick="checkAllEvent(this, $('.technology'), false);">
+						</td>
+						<td class="labelbold"><s:text name='lbl.hdr.comp.name'/></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>	
+		
+		<div class="theme_accordion_container jsLib_accordion_container">
+		    <section class="accordion_panel_wid">
+		        <div class="accordion_panel_inner">
+		            <section class="lft_menus_container">
+		            <%
+						for (ModuleGroup moduleGroup : moduleGroups) {
+					%>
+		                <span class="siteaccordion closereg">
+		                	<span>
+	                			<% if (moduleGroup.isSystem()) { %>
+									<input type="checkbox" name="moduleGroup" value="<%= moduleGroup.getId() %>" disabled/>&nbsp;&nbsp;<%= moduleGroup.getName() %>&nbsp;&nbsp;
+								<% } else { %>
+			                		<input type="checkbox" class="check technology" name="moduleGroup" value="<%= moduleGroup.getId()%>" id="<%= moduleGroup.getId()%>checkBox" onclick="checkboxEvent();">
+			                		&nbsp;&nbsp;<%= moduleGroup.getName() %>&nbsp;&nbsp;
+	                			<% } %>
+		                	</span>
+		                </span>
+		                <div class="mfbox siteinnertooltiptxt hideContent">
+		                    <div class="scrollpanel">
+		                        <section class="scrollpanel_inner">
+		                        	<table class="download_tbl">
+			                            <tbody>
+			                            <% 
+									    	List<Module> versions = moduleGroup.getVersions();
+									    	if (CollectionUtils.isNotEmpty(versions)) {
+												for (Module module : versions) {
+												    String descContent = "";
+													if (module.getDoc(DocumentationType.DESCRIPTION) != null) { 
+													  	descContent = module.getDoc(DocumentationType.DESCRIPTION).getContent();
+													}
+													
+													String helpTextContent = "";
+													if (module.getDoc(DocumentationType.HELP_TEXT) != null) { 
+													  	helpTextContent = module.getDoc(DocumentationType.HELP_TEXT).getContent();
+													}
+										%>
+											<tr>
+												<td>
+													<input type="radio" name="<%= module.getId() %>" value="<%= module.getVersion() %>" >
+												</td>
+												<td>
+													<a href="#" name="ModuleDesc" onclick="editFeature('<%= moduleGroup.getId() %>', '<%= module.getId() %>');" >
+														<%= module.getName() %>
+													</a>
+												</td>
+												<td><%= module.getVersion() %></td>
+											</tr>
+										<%	
+												}
+								    		}
+										%>
+			                            </tbody>
+		                        	</table>
+		                        </section>
+		                    </div>
+		                </div>
+		                <% 		
+							}
+						%>	
+		            </section>  
+		        </div>
+		    </section>
+		</div>
+	<% } %>
+</div>
 
 <script language="JavaScript" type="text/javascript">
-
+	//To check whether the device is ipad or not and then apply jquery scrollbar
+	if (!isiPad()) {
+		$(".accordion_panel_inner").scrollbars();  
+	}
+	
 	$(document).ready(function() {
-		featurelist();
+		toDisableCheckAll();
+		enableScreen();
 	});
 	
-	$('#tech_id').change(function() {
-		featurelist();
-	});
-	
-	// This method calling from confirm_dialog.jsp
-    function continueDeletion() {
-    	confirmDialog('none', '');
-    	loadContent('featuresDelete', $('#formFeaturesList'), $('#feature_tab'));
-    }
-	
-    function featurelist() {
-    	loadContent('listFeatures', $('#formFeaturesList'), $('#feature_list'));
-    }
+	function editFeature(moduleGroupId, moduleId) {
+		var params = "moduleGroupId=";
+	    params = params.concat(moduleGroupId);
+	    params = params.concat("&moduleId=");
+	    params = params.concat(moduleId);
+	    loadContent("featuresEdit", $('#formFeaturesList'), $('#feature_tab'), params);
+	}
 </script>

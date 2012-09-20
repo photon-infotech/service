@@ -69,9 +69,9 @@ function clickSave(pageUrl, params, tag, progressText) {
 	});
 }
 
-function validate(pageUrl, form, tag, progressText, disableDiv) {
-	if (disableDiv != undefined && disableDiv != "") {
-		disableDiv.removeAttr("disabled");
+function validate(pageUrl, form, tag, progressText, disabledDiv) {
+	if (disabledDiv != undefined && disabledDiv != "") {
+		disabledDiv.removeAttr("disabled");
 	}
 	var params = "";
 	if (form != undefined && !isBlank(form)) {
@@ -83,9 +83,6 @@ function validate(pageUrl, form, tag, progressText, disableDiv) {
 		type : "POST",
 		success : function(data) {
 			if (data.errorFound != undefined && data.errorFound) {
-				if (disableDiv != undefined && disableDiv != "") {
-					disableDiv.attr("disabled", true);
-				}
 				findError(data);
 			} else {
 				clickSave(pageUrl, params, tag, progressText);
@@ -346,4 +343,14 @@ $(document).keydown(function(e) {
 function showParentPage() {
 	enableScreen();
 	$('#popup_div').hide();
+}
+
+//To disable the given control
+function disableCtrl(control) {
+	control.attr("disabled", true);
+}
+
+//To enable the given control
+function enableCtrl(control) {
+	control.removeAttr("disabled");
 }

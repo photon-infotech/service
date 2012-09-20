@@ -136,7 +136,7 @@ public class Archetypes extends ServiceBaseAction {
 		try {
 			Technology technology = getServiceManager().getArcheType(techId, customerId);
 			getHttpRequest().setAttribute(REQ_ARCHE_TYPE,  technology);
-			getHttpRequest().setAttribute(REQ_FROM_PAGE, REQ_EDIT);
+			getHttpRequest().setAttribute(REQ_FROM_PAGE, EDIT);
 			List<ApplicationType> appTypes = getServiceManager().getApplicationTypes(customerId);
 			getHttpRequest().setAttribute(REQ_APP_TYPES, appTypes);
 		} catch (PhrescoException e) {

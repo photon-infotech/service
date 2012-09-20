@@ -81,7 +81,7 @@ public class RoleList extends ServiceBaseAction {
 		try {
 		    Role role = getServiceManager().getRole(roleId);
 			getHttpRequest().setAttribute(REQ_ROLE_ROLE , role);
-			getHttpRequest().setAttribute(REQ_FROM_PAGE, REQ_EDIT);
+			getHttpRequest().setAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (PhrescoException e) {
 			new LogErrorReport(e, ROLE_EDIT_EXCEPTION);
 			

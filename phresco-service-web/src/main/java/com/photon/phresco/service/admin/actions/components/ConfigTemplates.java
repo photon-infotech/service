@@ -102,7 +102,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 			getHttpRequest().setAttribute(REQ_CONFIG_TEMP , configTemp);
 			List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
 			getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
-			getHttpRequest().setAttribute(REQ_FROM_PAGE, REQ_EDIT);
+			getHttpRequest().setAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (PhrescoException e) {
 			new LogErrorReport(e, CONFIG_TEMP_EDIT_EXCEPTION);
 			

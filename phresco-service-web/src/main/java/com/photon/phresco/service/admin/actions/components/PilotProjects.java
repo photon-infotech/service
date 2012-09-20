@@ -117,7 +117,7 @@ public class PilotProjects extends ServiceBaseAction {
     	try {
     		ProjectInfo pilotProjectInfo = getServiceManager().getPilotProject(projectId, customerId);
     		getHttpRequest().setAttribute(REQ_PILOT_PROINFO, pilotProjectInfo);
-    		getHttpRequest().setAttribute(REQ_FROM_PAGE, REQ_EDIT);
+    		getHttpRequest().setAttribute(REQ_FROM_PAGE, EDIT);
     	} catch (PhrescoException e) {
 			new LogErrorReport(e, PILOT_PROJECTS_EDIT_EXCEPTION);
 			

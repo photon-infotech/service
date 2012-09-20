@@ -125,7 +125,7 @@ public class Downloads extends ServiceBaseAction {
 		try {
 			DownloadInfo downloadInfo = getServiceManager().getDownload(id, customerId);
 			getHttpRequest().setAttribute(REQ_DOWNLOAD_INFO, downloadInfo);
-			getHttpRequest().setAttribute(REQ_FROM_PAGE, REQ_EDIT);
+			getHttpRequest().setAttribute(REQ_FROM_PAGE, EDIT);
 			List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
 			getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
 		} catch (PhrescoException e) {
