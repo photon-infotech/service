@@ -42,11 +42,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gson.Gson;
+import com.photon.phresco.commons.model.PropertyTemplate;
+import com.photon.phresco.commons.model.SettingsTemplate;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.I18NString;
 import com.photon.phresco.model.L10NString;
-import com.photon.phresco.model.PropertyTemplate;
-import com.photon.phresco.model.SettingsTemplate;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.model.ArtifactInfo;

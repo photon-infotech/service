@@ -25,8 +25,8 @@
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.apache.commons.collections.CollectionUtils"%>
 
-<%@ page import="com.photon.phresco.model.Technology"%>
-<%@ page import="com.photon.phresco.model.DownloadInfo" %>
+<%@ page import="com.photon.phresco.commons.model.Technology"%>
+<%@ page import="com.photon.phresco.commons.model.DownloadInfo" %>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %> 
 
 <%
@@ -94,19 +94,19 @@
 							<li>
 								<input type="checkbox" name="technology" value="all" id="checkAllAuto" onclick="checkAllEvent(this, $('.techCheck'), true);" style="margin: 3px 8px 6px 0;">All
 							</li>
-		                    <% 	
-		                    	if (technologies != null) {
-									for (Technology technology : technologies) { 
-										String checkedStr = "";
-										if (downloadInfo != null) {
-											List<String> appliesTos = downloadInfo.getAppliesTo();
-											if (appliesTos.contains(technology.getId())) {
-												checkedStr = "checked";
-											} else {
-												checkedStr = "";
-											}
-										}
-							%>
+		                    <%
+		                        if (technologies != null) {
+		                    									for (Technology technology : technologies) { 
+		                    										String checkedStr = "";
+		                    										if (downloadInfo != null) {
+		                    											List<String> appliesTos = downloadInfo.getAppliesToTechs();
+		                    											if (appliesTos.contains(technology.getId())) {
+		                    												checkedStr = "checked";
+		                    											} else {
+		                    												checkedStr = "";
+		                    											}
+		                    										}
+		                    %>
 	                   			<li>
 									<input type="checkbox" name="technology" value="<%= technology.getId() %>"  <%= checkedStr %>
 										class="check techCheck"><%= technology.getName() %>

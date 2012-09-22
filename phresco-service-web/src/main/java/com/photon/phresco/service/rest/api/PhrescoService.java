@@ -34,12 +34,19 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.FileUtils;
 
+import com.photon.phresco.commons.model.ApplicationType;
+import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.ApplicationType;
-import com.photon.phresco.model.ProjectInfo;
+import com.photon.phresco.model.ArchetypeInfo;
+import com.photon.phresco.model.Database;
+import com.photon.phresco.model.Module;
+import com.photon.phresco.model.ModuleGroup;
+import com.photon.phresco.model.Server;
 import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.DbService;
 import com.photon.phresco.service.api.PhrescoServerFactory;
@@ -48,20 +55,20 @@ import com.photon.phresco.service.projects.ProjectServiceFactory;
 import com.photon.phresco.util.ArchiveUtil;
 import com.photon.phresco.util.ArchiveUtil.ArchiveType;
 import com.photon.phresco.util.FileUtil;
+import com.photon.phresco.util.ServiceConstants;
 
 /**
  * Phresco Service Class hosted at the URI path "/api"
  */
 
 @Path("/project")
-public class PhrescoService extends DbService{
+public class PhrescoService {
 	private static final String ZIP = ".zip";
     private static final Logger S_LOGGER = Logger.getLogger(PhrescoService.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	private DbManager dbManager = null;
 	
 	public PhrescoService() throws PhrescoException {
-     super();  
      PhrescoServerFactory.initialize();
      dbManager = PhrescoServerFactory.getDbManager();
     }
@@ -99,6 +106,7 @@ public class PhrescoService extends DbService{
 			ServiceOutput serviceOutput = new ServiceOutput(projectPathStr);
 			if(serviceOutput != null) {
 			    dbManager.storeCreatedProjects(projectInfo);
+			    updateUsedObjects(projectInfo);
 			}
 			
 			return serviceOutput;
@@ -108,7 +116,43 @@ public class PhrescoService extends DbService{
 		}
 	}
 
-	@POST
+	private void updateUsedObjects(ProjectInfo projectInfo) throws PhrescoException {
+	    
+        if(projectInfo.getArchetypeInfo() != null) {
+            ArchetypeInfo archetypeInfo = projectInfo.getArchetypeInfo();
+            dbManager.updateUsedObjects(ServiceConstants.ARCHETYPEINFO_COLLECTION_NAME, 
+                    ServiceConstants.REST_API_ARTIFACTID, archetypeInfo.getArtifactId());
+        }
+        
+        if(projectInfo.getTechnology().getModules() != null) {
+            List<ModuleGroup> modules = projectInfo.getTechnology().getModules();
+            for (ModuleGroup moduleGroup : modules) {
+                Module module = moduleGroup.getVersions().get(0);
+                dbManager.updateUsedObjects(ServiceConstants.MODULES_COLLECTION_NAME, ServiceConstants.REST_API_NAME, module.getName());
+            }
+        }
+        
+        if (StringUtils.isNotEmpty(projectInfo.getPilotProjectName())) {
+            dbManager.updateUsedObjects(ServiceConstants.PILOTS_COLLECTION_NAME, ServiceConstants.REST_API_NAME, projectInfo.getName());
+        }
+        
+        if (CollectionUtils.isNotEmpty(projectInfo.getTechnology().getServers())) {
+            List<Server> servers = projectInfo.getTechnology().getServers();
+            for (Server server : servers) {
+                dbManager.updateUsedObjects(ServiceConstants.DOWNLOAD_COLLECTION_NAME, ServiceConstants.REST_API_NAME, server.getName());
+            }
+        }
+        
+        if (CollectionUtils.isNotEmpty(projectInfo.getTechnology().getDatabases())) {
+            List<Database> databases = projectInfo.getTechnology().getDatabases();
+            for (Database database : databases) {
+                dbManager.updateUsedObjects(ServiceConstants.DOWNLOAD_COLLECTION_NAME, ServiceConstants.REST_API_NAME, database.getName());
+            }
+        }
+        
+    }
+
+    @POST
 	@Path("/update")
 	@Produces("application/zip")
 	@Consumes(MediaType.APPLICATION_JSON)

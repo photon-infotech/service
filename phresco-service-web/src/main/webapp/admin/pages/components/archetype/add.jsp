@@ -24,8 +24,8 @@
 <%@ page import="org.apache.commons.collections.CollectionUtils"%>
 <%@ page import="java.util.List"%>
 
-<%@ page import="com.photon.phresco.model.ApplicationType"%>
-<%@ page import="com.photon.phresco.model.Technology"%>
+<%@ page import="com.photon.phresco.commons.model.ApplicationType"%>
+<%@ page import="com.photon.phresco.commons.model.Technology"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
 
 <%

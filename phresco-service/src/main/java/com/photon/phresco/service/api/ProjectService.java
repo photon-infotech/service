@@ -37,8 +37,9 @@ package com.photon.phresco.service.api;
 
 import java.io.File;
 
+import com.photon.phresco.commons.model.ApplicationInfo;
+import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.ProjectInfo;
 
 /**
  * A Facade class should organize the project creation using several Managers and Processors.
@@ -52,20 +53,20 @@ public interface ProjectService {
 	 * @param projectInfo
 	 * @param projectPath
 	 */
-	File createProject(ProjectInfo projectInfo)  throws PhrescoException;
+	File createProject(ApplicationInfo projectInfo)  throws PhrescoException;
 	
 	/**
 	 * @param projectInfo
 	 * @param projectPath
 	 */
-	File updateProject(ProjectInfo projectInfo)  throws PhrescoException;
+	File updateProject(ApplicationInfo projectInfo)  throws PhrescoException;
 	
 	/**
 	 * @param projectInfo
 	 * @param projectPath
 	 * @return 
 	 */
-	File updateDocumentProject(ProjectInfo projectInfo)  throws PhrescoException;
+	File updateDocumentProject(ApplicationInfo projectInfo)  throws PhrescoException;
 	
 	/**
 	 * @param projectInfo

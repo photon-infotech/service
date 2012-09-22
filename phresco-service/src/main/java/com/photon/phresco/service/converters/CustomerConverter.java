@@ -48,7 +48,7 @@ public class CustomerConverter implements Converter<CustomerDAO, Customer>, Serv
         customer.setHelpText(dao.getHelpText());
         customer.setState(dao.getState());
         customer.setStatus(dao.getStatus());
-        customer.setType(dao.getType());
+//        customer.setType(dao.getType());
         customer.setZipcode(dao.getZipcode());
         customer.setValidFrom(dao.getValidFrom());
         customer.setValidUpto(dao.getValidUpto());
@@ -75,7 +75,7 @@ public class CustomerConverter implements Converter<CustomerDAO, Customer>, Serv
         dao.setHelpText(customer.getHelpText());
         dao.setState(customer.getState());
         dao.setStatus(customer.getStatus());
-        dao.setType(customer.getType());
+//        dao.setType(customer.getType());
         dao.setValidFrom(customer.getValidFrom());
         dao.setValidUpto(customer.getValidUpto());
         dao.setZipcode(customer.getZipcode());

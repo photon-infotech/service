@@ -37,13 +37,13 @@ package com.photon.phresco.service.config.impl;
 
 import java.io.File;
 
-import com.photon.phresco.model.ProjectInfo;
+import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.service.api.ApplicationConfigurator;
 
 public class BaseApplicationConfigurator implements ApplicationConfigurator {
 
 	@Override
-	public void configure(ProjectInfo projectInfo, File path) {
+	public void configure(ApplicationInfo projectInfo, File path) {
 		// TODO Auto-generated method stub
 
 	}

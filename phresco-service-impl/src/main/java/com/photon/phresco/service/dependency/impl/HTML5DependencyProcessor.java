@@ -43,9 +43,11 @@ import javax.xml.bind.JAXBException;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 
+import com.photon.phresco.commons.model.ApplicationInfo;
+import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.ProjectInfo;
+import com.photon.phresco.commons.model.TechnologyInfo;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.ModuleGroup;
-import com.photon.phresco.model.ProjectInfo;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.util.TechnologyTypes;
 import com.phresco.pom.exception.PhrescoPomException;
@@ -59,21 +61,22 @@ public class HTML5DependencyProcessor extends AbstractJsLibDependencyProcessor {
 	}
 	
 	@Override
-	public void process(ProjectInfo info, File path) throws PhrescoException {
+	public void process(ApplicationInfo applicationInfo, File path) throws PhrescoException {
 		S_LOGGER.debug("Entering Method HTML5DependencyProcessor.process(ProjectInfo info, File path)");
 		S_LOGGER.debug("process() Path=" + path.getPath());
-		updatePom(path, info.getTechnology().getModules());
-		if (info.getTechnology().getId().equals(TechnologyTypes.HTML5_MULTICHANNEL_JQUERY_WIDGET)) {
-		    updatePOMWithJsLibs(path, info.getTechnology().getJsLibraries());
+		TechnologyInfo techInfo = applicationInfo.getTechInfo();
+		updatePom(path, applicationInfo.getSelectedModules());
+		if (techInfo.getId().equals(TechnologyTypes.HTML5_MULTICHANNEL_JQUERY_WIDGET)) {
+		    updatePOMWithJsLibs(path, applicationInfo.getSelectedJSLibs());
 		} else {
-		    extractJsLibraries(path, info.getTechnology().getJsLibraries());
+		    extractJsLibraries(path, applicationInfo.getSelectedJSLibs());
 		}
-		createSqlFolder(info, path);
-		extractPilots(info, path, info.getTechnology());
+		createSqlFolder(applicationInfo, path);
+		extractPilots(applicationInfo, path, applicationInfo.getTechInfo());
 		updateTestPom(path);
 	}
 
-	protected void updatePom(File path, List<ModuleGroup> modules)	throws PhrescoException {
+	protected void updatePom(File path, List<ArtifactGroup> modules)	throws PhrescoException {
 		if(CollectionUtils.isEmpty(modules)) {
 			return;
 		}

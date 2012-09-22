@@ -36,12 +36,12 @@ import org.apache.poi.ss.usermodel.Row;
 import org.codehaus.plexus.util.StringUtils;
 
 import com.google.gson.Gson;
+import com.photon.phresco.commons.model.PropertyTemplate;
+import com.photon.phresco.commons.model.SettingsTemplate;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.model.I18NString;
 import com.photon.phresco.model.L10NString;
-import com.photon.phresco.model.PropertyTemplate;
 import com.photon.phresco.model.Settings;
-import com.photon.phresco.model.SettingsTemplate;
 import com.photon.phresco.service.data.api.PhrescoDataManager;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
@@ -124,7 +124,7 @@ public class ConfigDataGenerator implements Constants{
 				String appliesToArr[] = StringUtils.split(appliesTo, ",");
 				List<String> applyTo = Arrays.asList(appliesToArr);
 				//System.out.println ("applies to-->"+applyTo);
-				template.setAppliesTo(applyTo);
+				template.setAppliesToTechs(applyTo);
 				settingsData.setType(template.getType());
 
 				//Adding data persistense - Settings
@@ -184,7 +184,7 @@ public class ConfigDataGenerator implements Constants{
 			propTemplateList = settingsTemplateTemp.getProperties();
 			propTemplateDataList = new ArrayList <PropertyTemplate> ();
 			List<String> appliesToStr = new ArrayList<String> ();
-			appliesToStr = settingsTemplateTemp.getAppliesTo();
+			appliesToStr = settingsTemplateTemp.getAppliesToTechs();
 			int propertyTracker = 1;
 			//System.out.println ("applies to String-- >"+appliesToStr);
 				for (PropertyTemplate propTemp:propTemplateList){

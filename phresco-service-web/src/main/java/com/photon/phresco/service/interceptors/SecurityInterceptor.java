@@ -41,6 +41,10 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 			LOGGER.debug(absolutePath);
 		}
 		
+		System.out.println("*******************");
+		System.out.println(request.getPath());
+		System.out.println("*******************");
+		
 		if(request.getPath().equals(ServiceConstants.LOGIN)) {
 			return request;
 		}

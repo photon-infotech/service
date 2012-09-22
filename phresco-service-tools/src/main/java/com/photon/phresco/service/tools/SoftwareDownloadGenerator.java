@@ -35,9 +35,9 @@ import org.apache.poi.ss.usermodel.Row;
 import org.codehaus.plexus.util.StringUtils;
 
 import com.google.gson.Gson;
+import com.photon.phresco.commons.model.DownloadInfo;
+import com.photon.phresco.commons.model.DownloadInfos;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.DownloadInfo;
-import com.photon.phresco.model.DownloadInfos;
 import com.photon.phresco.service.api.DbService;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.client.api.ServiceClientConstant;
@@ -218,7 +218,7 @@ public class SoftwareDownloadGenerator extends DbService {
 		info.setFileSize(fileSize);
 		info.setVersion(Arrays.asList(versions));
 		info.setType(category);
-		info.setAppliesTo(Arrays.asList(applyTo));
+		info.setAppliesToTechs(Arrays.asList(applyTo));
 		info.setPlatform(Arrays.asList(platform));
 		info.setSystem(true);
 		return info;

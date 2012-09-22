@@ -37,8 +37,9 @@ package com.photon.phresco.service.api;
 
 import java.io.File;
 
+import com.photon.phresco.commons.model.ApplicationInfo;
+import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.ProjectInfo;
 
 public interface DependencyProcessor {
 
@@ -49,6 +50,6 @@ public interface DependencyProcessor {
 	 * @param projectPath Path of project to be created.
 	 * @throws PhrescoException
 	 */
-	void process(ProjectInfo info, File projectPath) throws PhrescoException;
+	void process(ApplicationInfo applicationInfo, File projectPath) throws PhrescoException;
 
 }

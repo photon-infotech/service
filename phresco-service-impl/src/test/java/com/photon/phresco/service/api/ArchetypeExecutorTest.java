@@ -35,18 +35,12 @@
  ******************************************************************************/
 package com.photon.phresco.service.api;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.File;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Test;
 
+import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.ProjectInfo;
-import com.photon.phresco.model.Technology;
 import com.photon.phresco.util.FileUtil;
 
 public class ArchetypeExecutorTest extends AbstractPhrescoTest {
@@ -71,11 +65,11 @@ public class ArchetypeExecutorTest extends AbstractPhrescoTest {
 	@Ignore
 	public final void testExecute() throws PhrescoException {
 		//test for phresco-php-archetype
-		projectFolder = archetypeExecutor.execute(createPHPProjectInfo());
-		String[] fileList = projectFolder.list();
-		for (String fileName : fileList) {
-			assertEquals(PHTN_PHP_PRJ, fileName);
-		}
+//		projectFolder = archetypeExecutor.execute(createPHPProjectInfo());
+//		String[] fileList = projectFolder.list();
+//		for (String fileName : fileList) {
+//			assertEquals(PHTN_PHP_PRJ, fileName);
+//		}
 	}
 
 	@Ignore
@@ -83,10 +77,10 @@ public class ArchetypeExecutorTest extends AbstractPhrescoTest {
 		ProjectInfo info = new ProjectInfo();
 		info.setName(PHP_PROJECT_NAME);
 		info.setDescription("PHP Project created using Phresco");
-		info.setCode(PHTN_PHP_PRJ);
-		info.setVersion("1.0.0");
-		Technology technology = new Technology("tech-php", "PHP");
-		info.setTechnology(technology);
+//		info.setCode(PHTN_PHP_PRJ);
+//		info.setVersion("1.0.0");
+//		Technology technology = new Technology("tech-php", "PHP");
+//		info.setTechnology(technology);
 		return info;
 	}
 }

@@ -93,6 +93,9 @@ public class ServerConfiguration {
 	private String serviceURL;
 	private String credentialurl;
 	private String authenticateurl;
+	private String repoBaseURL;
+	private String repoUserName;
+	private String repoPassword;
 	private String serviceContextName;
 	private String dbHost;
 	private String dbPort;
@@ -105,8 +108,8 @@ public class ServerConfiguration {
 	private String configFilePath =  "phresco-env-config.xml";
 
 	public ServerConfiguration(String fileName) throws PhrescoException {
-		initServerConfig(fileName);
-		initDependencyConfig();
+//		initServerConfig(fileName);
+//		initDependencyConfig();
 	}
 
 	private void initDependencyConfig() throws PhrescoException {
@@ -281,7 +284,19 @@ public class ServerConfiguration {
 		}
 		return authenticateurl;
 	}
-
+	
+	public String getRepoBaseURL() throws PhrescoException {
+        List<Configuration> configurations = configurationList("Server");
+        for (Configuration configuration : configurations) {
+            String protocol = configuration.getProperties().getProperty("protocol");
+            String host = configuration.getProperties().getProperty("host");
+            String port = configuration.getProperties().getProperty("port");
+            String context = configuration.getProperties().getProperty("context");
+            repoBaseURL = protocol + "://" + host + ":" +  port + "/" + context;
+        }
+        return repoBaseURL;
+    }
+	
 	private List<Configuration> configurationList(String configType) throws PhrescoException {
 		InputStream stream = null;
 		stream = this.getClass().getClassLoader().getResourceAsStream(configFilePath);
@@ -338,4 +353,25 @@ public class ServerConfiguration {
 	public String getFrameWorkLatestFile() {
 		return dependencyConfig.getProperty(PHRESCO_FRAMEWORK_LATEST_URL);
 	}
+	
+	public String getRepoUserName() throws PhrescoException {
+	    List<Configuration> configurations = configurationList("Server");
+	    if (configurations != null) {
+            for (Configuration configuration : configurations) {
+                 repoUserName = configuration.getProperties().getProperty("admin_username");
+            }
+        }
+	    return repoUserName;
+	}
+	
+	public String getRepoPassword() throws PhrescoException {
+	    List<Configuration> configurations = configurationList("Server");
+        if (configurations != null) {
+            for (Configuration configuration : configurations) {
+                 repoPassword = configuration.getProperties().getProperty("admin_password");
+            }
+        }
+        return repoPassword;
+    }
+	
 }

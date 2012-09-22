@@ -37,11 +37,11 @@ package com.photon.phresco.service.api;
 
 import java.io.File;
 
+import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.ProjectInfo;
 
 public interface DocumentGenerator {
 
-	void generate(ProjectInfo info, File filePath) throws PhrescoException;
+	void generate(ApplicationInfo info, File filePath) throws PhrescoException;
 
 }

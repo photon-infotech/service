@@ -39,8 +39,8 @@ import java.io.File;
 
 import org.apache.log4j.Logger;
 
+import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.ProjectInfo;
 import com.photon.phresco.service.api.RepositoryManager;
 
 /**
@@ -70,14 +70,14 @@ public class Drupal7DependencyProcessor  extends AbstractJsLibDependencyProcesso
 	 * @see com.photon.phresco.service.dependency.impl.AbstractJsLibDependencyProcessor#process(com.photon.phresco.model.ProjectInfo, java.io.File)
 	 */
 	@Override
-	public void process(ProjectInfo info, File path) throws PhrescoException {
+	public void process(ApplicationInfo info, File path) throws PhrescoException {
 		S_LOGGER.debug("Entering Method Drupal7DependencyProcessor.process(ProjectInfo info, File path)");
 		S_LOGGER.debug("process() Path=" + path.getPath());
 		
 		super.process(info, path);
-		String id = info.getTechnology().getId();
-		updatePOMWithModules(path, info.getTechnology().getModules(), id);
-		updatePOMWithPluginArtifact(path,info.getTechnology().getModules(), id);
+		String id = info.getTechInfo().getId();
+		updatePOMWithModules(path, info.getSelectedModules(), id);
+		updatePOMWithPluginArtifact(path,info.getSelectedModules(), id);
 		createSqlFolder(info, path);
 		updateTestPom(path);
 	}

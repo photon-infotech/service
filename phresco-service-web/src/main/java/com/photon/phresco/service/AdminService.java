@@ -38,9 +38,9 @@ import org.apache.log4j.Logger;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.photon.phresco.commons.model.LogInfo;
+import com.photon.phresco.commons.model.Property;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.AdminConfigInfo;
-import com.photon.phresco.model.LogInfo;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.util.ServerConstants;
@@ -57,13 +57,13 @@ public class AdminService implements ServerConstants {
 		@GET
 		@Path("/config")
 		@Produces({ MediaType.APPLICATION_JSON })
-		public List<AdminConfigInfo> getProducts() throws PhrescoException {
+		public List<Property> getProducts() throws PhrescoException {
 		    try {
 		        PhrescoServerFactory.initialize();
 	            RepositoryManager repoMgr = PhrescoServerFactory.getRepositoryManager();
 	            String config = repoMgr.getArtifactAsString(repoMgr.getAdminConfigFile(), "photon");
 	            Gson gson = new Gson();
-	            Type type = new TypeToken<List<AdminConfigInfo>>(){}.getType();
+	            Type type = new TypeToken<List<Property>>(){}.getType();
 	            return gson.fromJson(config, type);
 		    } catch (Exception e) {
                 throw new PhrescoException(e);
@@ -82,8 +82,8 @@ public class AdminService implements ServerConstants {
 		public static void main(String[] args) throws PhrescoException {
 			String key = "phresco.forum.url";
 			String value = "http://172.16.18.86:7070/jforum";
-			AdminConfigInfo adminConfigInfo = new AdminConfigInfo(key, value);
-			List<AdminConfigInfo> list = new ArrayList<AdminConfigInfo>(1);
+			Property adminConfigInfo = new Property(key, value);
+			List<Property> list = new ArrayList<Property>(1);
 			list.add(adminConfigInfo);
 			Gson gson = new Gson();
 			String jsonAdminConfig = gson.toJson(list);

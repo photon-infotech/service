@@ -23,10 +23,10 @@
 <%@ page import="org.apache.commons.collections.CollectionUtils" %>
 <%@ page import="java.util.List"%>
 
-<%@ page import="com.photon.phresco.model.SettingsTemplate" %>
-<%@ page import="com.photon.phresco.model.PropertyTemplate" %>
+<%@ page import="com.photon.phresco.commons.model.SettingsTemplate" %>
+<%@ page import="com.photon.phresco.commons.model.PropertyTemplate" %>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
-<%@ page import="com.photon.phresco.model.Technology"%>
+<%@ page import="com.photon.phresco.commons.model.Technology"%>
 <%@ page import="com.photon.phresco.model.I18NString"%>
 
 <%
@@ -99,20 +99,20 @@
 						<li>
 							<input type="checkbox" value="all" id="checkAllAuto" name="appliesTo" onclick="checkAllEvent(this,$('.applsChk'), true);" style="margin: 3px 8px 6px 0;">All
 						</li>
-						<% 
-						if (CollectionUtils.isNotEmpty(technologies)) {
-							for (Technology technology : technologies) {
-								String checkedStr = "";
-								if (settingsTemplate != null) {
-									List<String> appliesTos = settingsTemplate.getAppliesTo();
-									if (CollectionUtils.isNotEmpty(appliesTos)) {
-										if (appliesTos.contains(technology.getId())) {
-											checkedStr = "checked";
-										} else {
-											checkedStr = "";
-										}
-									}
-								}
+						<%
+						    if (CollectionUtils.isNotEmpty(technologies)) {
+													for (Technology technology : technologies) {
+														String checkedStr = "";
+														if (settingsTemplate != null) {
+															List<String> appliesTos = settingsTemplate.getAppliesToTechs();
+															if (CollectionUtils.isNotEmpty(appliesTos)) {
+																if (appliesTos.contains(technology.getId())) {
+																	checkedStr = "checked";
+																} else {
+																	checkedStr = "";
+																}
+															}
+														}
 						%>		
 								<li>
 									<input type="checkbox" id="appliestoCheckbox" name="appliesTo" value="<%= technology.getId() %>"  <%= checkedStr %>

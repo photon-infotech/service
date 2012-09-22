@@ -6,13 +6,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.UUID;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 import java.util.zip.ZipEntry;
 
+import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
@@ -24,10 +27,9 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.commons.codec.binary.Base64;
 import org.w3c.dom.Element;
 
+import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.ArchetypeInfo;
-import com.photon.phresco.model.I18NString;
-import com.photon.phresco.model.L10NString;
 import com.photon.phresco.util.Constants;
 import com.photon.phresco.util.FileUtil;
 import com.photon.phresco.util.Utility;
@@ -45,12 +47,12 @@ public class ServerUtil {
      * @return
      * @throws PhrescoException
      */
-    public static ArchetypeInfo getArtifactinfo(InputStream inputJarStream)
+    public static ArtifactGroup getArtifactinfo(InputStream inputJarStream)
             throws PhrescoException {
         File jarFile = writeFileFromStream(inputJarStream, null);
-        ArchetypeInfo artifactInfo = getArtifactInfoFromJar(jarFile);
+        ArtifactGroup artifactGroup = getArtifactInfoFromJar(jarFile);
         FileUtil.delete(jarFile);
-        return artifactInfo;
+        return artifactGroup;
     }
 
     /**
@@ -60,9 +62,9 @@ public class ServerUtil {
      * @throws IOException
      * @throws JAXBException
      */
-    public static ArchetypeInfo getArtifactInfoFromJar(File jarFile)
+    public static ArtifactGroup getArtifactInfoFromJar(File jarFile)
             throws PhrescoException {
-        ArchetypeInfo info = null;
+        ArtifactGroup info = null;
         String pomFile = null;
         try {
             JarFile jarfile = new JarFile(jarFile);
@@ -77,10 +79,14 @@ public class ServerUtil {
                 ZipEntry entry = jarfile.getEntry(pomFile);
                 InputStream inputStream = jarfile.getInputStream(entry);
                 PomProcessor processor = new PomProcessor(inputStream);
-                info = new ArchetypeInfo();
+                info = new ArtifactGroup();
                 info.setGroupId(processor.getGroupId());
                 info.setArtifactId(processor.getArtifactId());
-                info.setVersion(processor.getVersion());
+                ArtifactInfo artifactInfo = new ArtifactInfo();
+                artifactInfo.setVersion(processor.getVersion());
+                List<ArtifactInfo> artifactInfos = new ArrayList<ArtifactInfo>();
+                artifactInfos.add(artifactInfo);
+                info.setVersions(artifactInfos);
             }
         } catch (Exception e) {
             throw new PhrescoException(e);
@@ -252,29 +258,13 @@ public class ServerUtil {
     }
 
     /**
-     * To create the i18n String
-     * 
-     * @param inputString
-     * @return I18NString
-     */
-    public static I18NString createI18NString(String str) {
-        I18NString displayName;
-        L10NString value;
-        displayName = new I18NString();
-        value = new L10NString("en-US", str);
-        displayName.add(value);
-
-        return displayName;
-    }
-
-    /**
      * To create pom.xml file for artifact upload
      * 
      * @param info
      * @return
      * @throws PhrescoException
      */
-    public static File createPomFile(ArchetypeInfo info)
+    public static File createPomFile(ArtifactGroup info)
             throws PhrescoException {
         FileWriter writer = null;
         File pomFile = new File(getTempFolderPath(), ServerConstants.POM_FILE_NAME);
@@ -300,7 +290,7 @@ public class ServerUtil {
             rootElement.appendChild(artifactId);
 
             Element version = newDoc.createElement(ServerConstants.POM_VERSION);
-            version.setTextContent(info.getVersion());
+            version.setTextContent(info.getVersions().get(0).getVersion());
             rootElement.appendChild(version);
 
             Element packaging = newDoc.createElement(ServerConstants.POM_PACKAGING);
@@ -332,5 +322,18 @@ public class ServerUtil {
 
         return pomFile;
     }
-
+    
+    
+    /**
+     * Create Content Url Using given artifactinfo
+     * @param groupId
+     * @param artifactId
+     * @param version
+     * @param packaging
+     * @return
+     */
+    public static String createContentURL(String groupId, String artifactId, String version, String packaging) {
+    	return groupId.replace(".", "/") + "/" + artifactId + "/" + version + "/" + artifactId + "-" + version + "." + packaging;
+    }
+    
 }

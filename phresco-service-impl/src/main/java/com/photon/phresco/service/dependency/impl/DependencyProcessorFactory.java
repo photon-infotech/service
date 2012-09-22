@@ -40,8 +40,10 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import com.photon.phresco.model.ProjectInfo;
-import com.photon.phresco.model.Technology;
+import com.photon.phresco.commons.model.ApplicationInfo;
+import com.photon.phresco.commons.model.ProjectInfo;
+import com.photon.phresco.commons.model.Technology;
+import com.photon.phresco.commons.model.TechnologyInfo;
 import com.photon.phresco.service.api.DependencyProcessor;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.util.TechnologyTypes;
@@ -70,11 +72,11 @@ public final class DependencyProcessorFactory {
      * @param projectInfo project info
      * @return {@link DependencyProcessor}
      */
-    public static synchronized DependencyProcessor getDependencyProcessor(ProjectInfo projectInfo){
+    public static synchronized DependencyProcessor getDependencyProcessor(ApplicationInfo projectInfo){
 		S_LOGGER.debug("Entering Method DependencyProcessorFactory.getDependencyProcessor(ProjectInfo projectInfo)");
 		S_LOGGER.debug("getDependencyProcessor() projectCode="+projectInfo.getCode());
     	assert projectInfo != null;
-        Technology technology = projectInfo.getTechnology();
+        TechnologyInfo technology = projectInfo.getTechInfo();
         String techId = technology.getId();
         DependencyProcessor dependencyProcessor = processors.get(techId);
         if(dependencyProcessor == null){

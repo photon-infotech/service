@@ -55,9 +55,11 @@ import com.itextpdf.text.pdf.PdfCopy;
 import com.itextpdf.text.pdf.PdfImportedPage;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.photon.phresco.commons.model.ApplicationInfo;
+import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.ModuleGroup;
-import com.photon.phresco.model.ProjectInfo;
+
+import fr.opensagres.xdocreport.core.utils.StringUtils;
 
 /**
  * Document Util to process PDF documents
@@ -79,12 +81,12 @@ public final class DocumentUtil {
      * @return PDF input stream
      * @throws DocumentException
      */
-    public static InputStream getTitleSection(ProjectInfo info) throws DocumentException{
+    public static InputStream getTitleSection(ApplicationInfo info) throws DocumentException{
     	if (isDebugEnabled) {
     		S_LOGGER.debug(" Entering Method DocumentUtil.getTitleSection(ProjectInfo info)");
 		}
     	if (isDebugEnabled) {
-    		S_LOGGER.debug("getTitleSection() projectCode="+info.getCode());
+    		S_LOGGER.debug("getTitleSection() projectCode=" + info.getCode());
 		}
         //create output stream
         com.itextpdf.text.Document docu = new com.itextpdf.text.Document();
@@ -104,9 +106,9 @@ public final class DocumentUtil {
         paragraph = new Paragraph();
         paragraph.setAlignment(Element.ALIGN_CENTER);
         addBlankLines(paragraph, 10);
-        String techName = info.getTechnology().getName();
-    	if(info.getTechnology().getVersions() != null) {
-    		paragraph.add(techName + " - " + info.getTechnology().getVersions().get(0));
+        String techName = info.getTechInfo().getName();
+    	if(StringUtils.isNotEmpty(info.getTechInfo().getVersion())) {
+    		paragraph.add(techName + " - " + info.getTechInfo().getVersion());
     	} else {
     		paragraph.add(techName);
     	}
@@ -115,7 +117,7 @@ public final class DocumentUtil {
         paragraph = new Paragraph();
         addBlankLines(paragraph, 10);
         paragraph.setAlignment(Element.ALIGN_CENTER);
-        paragraph.add(DocumentMessages.getString("Documents.version.name")+getVersion(info)); //$NON-NLS-1$
+        paragraph.add(DocumentMessages.getString("Documents.version.name") + getVersion(info)); //$NON-NLS-1$
         addBlankLines(paragraph, 7);
         docu.add(paragraph);
         paragraph = new Paragraph();
@@ -137,7 +139,7 @@ public final class DocumentUtil {
      * @param info
      * @return
      */
-    private static String getVersion(ProjectInfo info) {
+    private static String getVersion(ApplicationInfo info) {
     	if (isDebugEnabled) {
     		S_LOGGER.debug("Entering Method DocumentUtil.getVersion(ProjectInfo info)");
 		}
@@ -190,7 +192,7 @@ public final class DocumentUtil {
      * @throws DocumentException
      * @throws IOException
      */
-    public static InputStream getDocumentStream(List<ModuleGroup> modules, String moduleType) throws PhrescoException, DocumentException, IOException {
+    public static InputStream getDocumentStream(List<ArtifactGroup> modules, String moduleType) throws PhrescoException, DocumentException, IOException {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entering Method DocumentUtil.getDocumentStream(RepositoryManager repoManager,List<TupleBean> modules, EntityType type)");
         }
@@ -200,15 +202,15 @@ public final class DocumentUtil {
             PdfWriter writer = PdfWriter.getInstance(docu, os);
             docu.open();
             if(moduleType.equals("Modules")) {
-            	 List<ModuleGroup> coreModules = new ArrayList<ModuleGroup>();
-                 List<ModuleGroup> externalModules = new ArrayList<ModuleGroup>();
-                 for (ModuleGroup moduleGroup : modules) {
-                 	if (moduleGroup.isCore()) {
-                      	 coreModules.add(moduleGroup);
-                 	}
-                 	if (!moduleGroup.isCore()) {
-                      	 externalModules.add(moduleGroup);
-                 	}
+            	 List<ArtifactGroup> coreModules = new ArrayList<ArtifactGroup>();
+                 List<ArtifactGroup> externalModules = new ArrayList<ArtifactGroup>();
+                 for (ArtifactGroup moduleGroup : modules) {
+//                 	if (moduleGroup.getC) {
+//                      	 coreModules.add(moduleGroup);
+//                 	}
+//                 	if (!moduleGroup.isCore()) {
+//                      	 externalModules.add(moduleGroup);
+//                 	}
                  }	
              		if (coreModules != null && CollectionUtils.isNotEmpty(coreModules) && moduleType.equals("Modules")) {
              			updateDoc(coreModules, docu, writer, coreModule);
@@ -227,7 +229,7 @@ public final class DocumentUtil {
         return null;
     }
 
-    private static void updateDoc(List<ModuleGroup> modules, com.itextpdf.text.Document docu, PdfWriter writer, String moduleName)	throws DocumentException, PhrescoException, IOException {
+    private static void updateDoc(List<ArtifactGroup> modules, com.itextpdf.text.Document docu, PdfWriter writer, String moduleName)	throws DocumentException, PhrescoException, IOException {
 		Paragraph para = new Paragraph();
 		para.setAlignment(Element.ALIGN_CENTER);
         para.setFont(DocConstants.BODY_FONT);
@@ -336,7 +338,7 @@ public final class DocumentUtil {
      * @throws IOException
      * @throws BadPdfFormatException
      */
-    public static InputStream addPages(List<ModuleGroup> tuples, PdfCopy pdfCopy, String moduleType)
+    public static InputStream addPages(List<ArtifactGroup> tuples, PdfCopy pdfCopy, String moduleType)
             throws PhrescoException, DocumentException, IOException {
     	if (isDebugEnabled) {
     		S_LOGGER.debug("Entering Method DocumentUtil.addPages(RepositoryManager repoManager,List<TupleBean> tuples, EntityType type, PdfCopy pdfCopy)");

@@ -41,27 +41,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.photon.phresco.commons.model.ApplicationType;
+import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.ArtifactInfo;
+import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.ApplicationType;
-import com.photon.phresco.model.ArchetypeInfo;
-import com.photon.phresco.model.Documentation;
-import com.photon.phresco.model.Technology;
-import com.photon.phresco.model.Documentation.DocumentationType;
-import com.photon.phresco.service.client.api.ServiceClientConstant;
-import com.photon.phresco.service.client.api.ServiceContext;
-import com.photon.phresco.service.client.api.ServiceManager;
-import com.photon.phresco.service.client.factory.ServiceClientFactory;
-import com.photon.phresco.service.client.impl.RestClient;
+import com.photon.phresco.service.api.DbService;
 import com.photon.phresco.util.ServiceConstants;
 import com.photon.phresco.util.TechnologyTypes;
-import com.sun.jersey.api.client.ClientResponse;
 
-public class ApptypeGenerator  implements ServiceConstants {
+public class ApptypeGenerator extends DbService implements ServiceConstants {
 
 
-	/*
-	 *
-	 */
+    private static final String PHOTON = "photon";
 
     private final static String phpTechDoc = "PHP is a general-purpose server-side scripting language originally designed for web development to produce dynamic web pages. For this purpose, PHP code is embedded into the HTML source document and interpreted by a web server with a PHP processor module, which generates the web page document. It also has evolved to include a command-line interface capability and can be used in standalone graphical applications." +
             "PHP can be deployed on most web servers and as a standalone interpreter, on almost every operating system and platform free of charge.";
@@ -75,20 +67,24 @@ public class ApptypeGenerator  implements ServiceConstants {
     private final static String sharepointDoc = "Sharepoint is a general-purpose server-side scripting language originally designed for web development to produce dynamic web pages. For this purpose, PHP code is embedded into the HTML source document and interpreted by a web server with a PHP processor module, which generates the web page document. It also has evolved to include a command-line interface capability and can be used in standalone graphical applications." +
     "PHP can be deployed on most web servers and as a standalone interpreter, on almost every operating system and platform free of charge.";
     
-    public ServiceContext context = null;
-    public ServiceManager serviceManager = null;
+//    public ServiceContext context = null;
+//    public ServiceManager serviceManager = null;
     private Map<String, String> archetypeMap = new HashMap<String, String>();
     private Map<String, String> docMap = new HashMap<String, String>();
+    private Map<String, ArtifactGroup> pluginMap = new HashMap<String, ArtifactGroup>();
+    
+    private final String[] artifactVersion = new String[]{"2.0.0.16000", "2.0.0.15000", "2.0.0.14000"};
     
     public ApptypeGenerator() throws PhrescoException {
-        // TODO Auto-generated constructor stub
+        super();
         initArchetypeMap();
         initDocMap();
-        context = new ServiceContext();
-        context.put(ServiceClientConstant.SERVICE_URL, "http://localhost:3030/service/rest/api");
-        context.put(ServiceClientConstant.SERVICE_USERNAME, "demouser");
-        context.put(ServiceClientConstant.SERVICE_PASSWORD, "phresco");
-        serviceManager = ServiceClientFactory.getServiceManager(context);
+        initPluginAndDependencyMap();
+//        context = new ServiceContext();
+//        context.put(ServiceClientConstant.SERVICE_URL, "http://localhost:3030/service/rest/api");
+//        context.put(ServiceClientConstant.SERVICE_USERNAME, "demouser");
+//        context.put(ServiceClientConstant.SERVICE_PASSWORD, "phresco");
+//        serviceManager = ServiceClientFactory.getServiceManager(context);
     }
     
     private void initArchetypeMap() {
@@ -108,6 +104,28 @@ public class ApptypeGenerator  implements ServiceConstants {
         archetypeMap.put(TechnologyTypes.NODE_JS_WEBSERVICE, "phresco-nodejs-archetype");
         archetypeMap.put(TechnologyTypes.SHAREPOINT, "phresco-sharepoint-archetype");
         archetypeMap.put(TechnologyTypes.WORDPRESS, "phresco-wordpress-archetype");
+        archetypeMap.put(TechnologyTypes.ANDROID_LIBRARY, "phresco-android-library-archetype");
+        archetypeMap.put(TechnologyTypes.WIN_METRO, "phresco-windows8-archetype");
+    }
+    
+    private void initPluginAndDependencyMap() {
+        pluginMap.put(TechnologyTypes.PHP, new ArtifactGroup("com.photon.phresco.plugins", "php-maven-plugin"));
+        pluginMap.put(TechnologyTypes.PHP_DRUPAL6, new ArtifactGroup("com.photon.phresco.plugins", "drupal-maven-plugin"));
+        pluginMap.put(TechnologyTypes.PHP_DRUPAL7, new ArtifactGroup("com.photon.phresco.plugins", "drupal-maven-plugin"));
+        pluginMap.put(TechnologyTypes.ANDROID_HYBRID, new ArtifactGroup("com.photon.maven.plugins.android.generation2", "android-maven-plugin"));
+        pluginMap.put(TechnologyTypes.ANDROID_NATIVE, new ArtifactGroup("com.photon.maven.plugins.android.generation2", "android-maven-plugin"));
+        pluginMap.put(TechnologyTypes.DOT_NET, new ArtifactGroup("com.photon.phresco.plugins", "dotnet-maven-plugin"));
+        pluginMap.put(TechnologyTypes.HTML5_JQUERY_MOBILE_WIDGET, new ArtifactGroup("com.photon.phresco.plugins", "java-maven-plugin"));
+        pluginMap.put(TechnologyTypes.HTML5_MOBILE_WIDGET, new ArtifactGroup("com.photon.phresco.plugins", "java-maven-plugin"));
+        pluginMap.put(TechnologyTypes.HTML5_MULTICHANNEL_JQUERY_WIDGET, new ArtifactGroup("com.photon.phresco.plugins", "java-maven-plugin"));
+        pluginMap.put(TechnologyTypes.IPHONE_HYBRID, new ArtifactGroup("com.photon.phresco.plugins.xcode", "xcode-maven-plugin"));
+        pluginMap.put(TechnologyTypes.IPHONE_NATIVE, new ArtifactGroup("com.photon.phresco.plugins.xcode", "xcode-maven-plugin"));
+        pluginMap.put(TechnologyTypes.JAVA_STANDALONE, new ArtifactGroup("com.photon.phresco.plugins", "java-maven-plugin"));
+        pluginMap.put(TechnologyTypes.JAVA_WEBSERVICE, new ArtifactGroup("com.photon.phresco.plugins", "java-maven-plugin"));
+        pluginMap.put(TechnologyTypes.NODE_JS_WEBSERVICE, new ArtifactGroup("com.photon.phresco.plugins", "nodejs-maven-plugin"));
+        pluginMap.put(TechnologyTypes.SHAREPOINT, new ArtifactGroup("com.photon.phresco.plugins", "sharepoint-maven-plugin"));
+        pluginMap.put(TechnologyTypes.WORDPRESS, new ArtifactGroup("com.photon.phresco.plugins", "wordpress-maven-plugin"));
+        pluginMap.put(TechnologyTypes.WIN_METRO, new ArtifactGroup("com.photon.phresco.plugins", "windows-phone-maven-plugin"));
     }
     
     private void initDocMap() {
@@ -120,19 +138,25 @@ public class ApptypeGenerator  implements ServiceConstants {
     
     public void generateApptypes() throws PhrescoException {
     	List<ApplicationType> applicationTypes = new ArrayList<ApplicationType>();
+    	applicationTypes.add(createApplicationType("apptype-webapp", "Web Application"));
+    	applicationTypes.add(createApplicationType("apptype-mobile", "Mobile Applications"));
+    	applicationTypes.add(createApplicationType("apptype-web-services", "Web Services"));
+    	
+    	mongoOperation.insertList(APPTYPES_COLLECTION_NAME , applicationTypes);
+//        RestClient<ApplicationType> applicationTypeClient = serviceManager.getRestClient(REST_API_COMPONENT + REST_API_APPTYPES);
+//        ClientResponse response = applicationTypeClient.create(applicationTypes);
+//        System.out.println(response.getStatus());
+    }
 
-        ApplicationType web = createApptype("apptype-webapp", "Web Application");
-        applicationTypes.add(web);
-
-        ApplicationType mobile = createApptype("apptype-mobile", "Mobile Applications");
-        applicationTypes.add(mobile);
-
-        ApplicationType html5 = createApptype("apptype-web-services", "Web Services");
-        applicationTypes.add(html5);
-        
-        RestClient<ApplicationType> applicationTypeClient = serviceManager.getRestClient(REST_API_COMPONENT + REST_API_APPTYPES);
-        ClientResponse response = applicationTypeClient.create(applicationTypes);
-        System.out.println(response.getStatus());
+    private ApplicationType createApplicationType(String id, String name) {
+        ApplicationType applicationType = new ApplicationType();
+        applicationType.setId(id);
+        applicationType.setName(name);
+        applicationType.setSystem(true);
+        applicationType.setDescription(name);
+        applicationType.setHelpText(name);
+        applicationType.setCustomerIds(getDefaultCustomers());
+        return applicationType;
     }
 
     public void createWebAppTechs() throws PhrescoException {
@@ -143,17 +167,16 @@ public class ApptypeGenerator  implements ServiceConstants {
         techs.add(createTechnology(TechnologyTypes.SHAREPOINT, "Sharepoint", new String[]{"3.5", "3.0", "2.0"},"apptype-webapp"));
         techs.add(createTechnology(TechnologyTypes.HTML5_WIDGET, "HTML5 Multichannel YUI Widget", new String[]{"1.6", "1.5"},"apptype-webapp"));
         techs.add(createTechnology(TechnologyTypes.HTML5_MULTICHANNEL_JQUERY_WIDGET, "HTML5 Multichannel JQuery Widget", new String[]{"1.6", "1.5"},"apptype-webapp"));
-        techs.add(createTechnology("tech-html5-jquery-mobile-widget", "HTML5 JQuery Mobile Widget", new String[]{"1.6", "1.5"},"apptype-webapp"));
+        techs.add(createTechnology(TechnologyTypes.HTML5_JQUERY_MOBILE_WIDGET, "HTML5 JQuery Mobile Widget", new String[]{"1.6", "1.5"},"apptype-webapp"));
         techs.add(createTechnology(TechnologyTypes.HTML5_MOBILE_WIDGET, "HTML5 YUI Mobile Widget", new String[]{"1.6", "1.5"},"apptype-webapp"));
         techs.add(createTechnology(TechnologyTypes.DOT_NET, "ASP.NET", new String[]{"3.5", "3.0", "2.0"},"apptype-webapp"));
         techs.add(createTechnology(TechnologyTypes.WORDPRESS, "WordPress", new String[]{"3.3.1"},"apptype-webapp"));
         techs.add(createTechnology(TechnologyTypes.JAVA_STANDALONE, "Java Standalone", new String[]{"1.6", "1.5"},"apptype-webapp"));
         
-        serviceManager = ServiceClientFactory.getServiceManager(context);
-        RestClient<Technology> techClient = serviceManager.getRestClient("/components/technologies");
-        techClient.queryString("techId", "apptype-webapp");
-        ClientResponse response = techClient.create(techs);
-        System.out.println("response " + response.getStatus());
+//        serviceManager = ServiceClientFactory.getServiceManager(context);
+//        RestClient<Technology> techClient = serviceManager.getRestClient("/components/technologies");
+//        techClient.queryString("techId", "apptype-webapp");
+//        ClientResponse response = techClient.create(techs);
     }
     
     public void createMobAppTechs() throws PhrescoException {
@@ -162,11 +185,14 @@ public class ApptypeGenerator  implements ServiceConstants {
         techs.add(createTechnology(TechnologyTypes.ANDROID_HYBRID, "Android Hybrid", new String[]{"4.0.3", "2.3.3", "2.2"}, "apptype-mobile"));
         techs.add(createTechnology(TechnologyTypes.IPHONE_NATIVE, "iPhone Native", new String[]{}, "apptype-mobile"));
         techs.add(createTechnology(TechnologyTypes.IPHONE_HYBRID, "iPhone Hybrid", new String[]{}, "apptype-mobile"));
-        serviceManager = ServiceClientFactory.getServiceManager(context);
-        RestClient<Technology> techClient = serviceManager.getRestClient("/components/technologies");
-        techClient.queryString("techId", "apptype-mobile");
-        ClientResponse response = techClient.create(techs);
-        System.out.println("response " + response.getStatus());
+        techs.add(createTechnology(TechnologyTypes.WIN_METRO, "Windows Metro", new String[]{}, "apptype-mobile"));
+        techs.add(createTechnology(TechnologyTypes.ANDROID_LIBRARY, "Android Library", new String[]{"4.0.3", "2.3.3", "2.2"}, "apptype-mobile"));
+        
+//        serviceManager = ServiceClientFactory.getServiceManager(context);
+//        RestClient<Technology> techClient = serviceManager.getRestClient("/components/technologies");
+//        techClient.queryString("techId", "apptype-mobile");
+//        ClientResponse response = techClient.create(techs);
+//        System.out.println("response " + response.getStatus());
         
     }
     
@@ -174,61 +200,79 @@ public class ApptypeGenerator  implements ServiceConstants {
         List<Technology> techs = new ArrayList<Technology>();
         techs.add(createTechnology(TechnologyTypes.JAVA_WEBSERVICE, "Java Web Service", new String[]{"1.6", "1.5"}, "apptype-web-services"));
         techs.add(createTechnology(TechnologyTypes.NODE_JS_WEBSERVICE, "Node JS Web Service", new String[]{"6.14","6.11", "6.8","6.7", "6.1"}, "apptype-web-services"));
-        serviceManager = ServiceClientFactory.getServiceManager(context);
-        RestClient<Technology> techClient = serviceManager.getRestClient("/components/technologies");
-        techClient.queryString("techId", "apptype-web-services");
-        ClientResponse response = techClient.create(techs);
-        System.out.println("response " + response.getStatus());
+
+//        serviceManager = ServiceClientFactory.getServiceManager(context);
+//        RestClient<Technology> techClient = serviceManager.getRestClient("/components/technologies");
+//        techClient.queryString("techId", "apptype-web-services");
+//        ClientResponse response = techClient.create(techs);
+//        System.out.println("response " + response.getStatus());
         
     }
     
     public void publish() throws PhrescoException {
         generateApptypes();
-        createWebAppTechs();
-        createMobAppTechs();
-        createWebServiceAppTechs();
+//        createWebAppTechs();
+//        createMobAppTechs();
+//        createWebServiceAppTechs();
     }
     
-    private ApplicationType createApptype(String id, String name) {
-        ApplicationType web = new ApplicationType();
-        web.setId(id);
-        web.setName(name);
-        web.setSystem(true);
-        web.setCustomerId("photon");
-        return web;
-    }
-
     private Technology createTechnology(String id, String name, String[] versions, String appId) throws PhrescoException {
         Technology technology = new Technology();
         technology.setId(id);
+        technology.setAppTypeId(appId);
         technology.setName(name);
         technology.setSystem(true);
-        technology.setVersions(Arrays.asList(versions));
-        technology.setCustomerId("photon");
-        technology.setArchetypeInfo(createArchetypeInfo(id));
-        technology.setAppTypeId(appId);
-        technology.setDocs(cretateDocs(id));
+        technology.setCustomerIds(getDefaultCustomers());
+        technology.setDescription(docMap.get(id));
+        technology.setHelpText(docMap.get(id));
+        technology.setTechVersions(Arrays.asList(versions));
+        technology.setArchetypeInfo(createArchetypeInfo(id, name));
+        technology.setDependencies(createDependencies(id));
         return technology;
     }
     
-    private List<Documentation> cretateDocs(String techId) {
-        List<Documentation> docs = new ArrayList<Documentation>();
-        Documentation doc = new Documentation();
-        doc.setType(DocumentationType.DOCUMENT);
-        doc.setContent(docMap.get(techId));
-        docs.add(doc);
-        return docs;
+    private List<ArtifactGroup> createDependencies(String id) {
+        List<ArtifactGroup> infos = new ArrayList<ArtifactGroup>();
+        ArtifactGroup artifactGroup = pluginMap.get(id);
+        artifactGroup.setSystem(true);
+        artifactGroup.setCustomerIds(getDefaultCustomers());
+        artifactGroup.setVersions(createArtifactInfo());
+        infos.add(artifactGroup);
+        return infos;
     }
 
-    private ArchetypeInfo createArchetypeInfo(String id) {
-        ArchetypeInfo info = new ArchetypeInfo();
-        info.setGroupId("archetypes");
-        info.setArtifactId(archetypeMap.get(id));
-        info.setVersion("1.2.0.9000");
-        info.setProjectGroupId("com.photon.phresco");
-        return null;
+    private ArtifactGroup createArchetypeInfo(String id, String name) {
+        ArtifactGroup group = new ArtifactGroup();
+        group.setGroupId("archetypes");
+        group.setArtifactId(archetypeMap.get(id));
+        group.setCustomerIds(getDefaultCustomers());
+        group.setDescription(name + "Technology Archetype");
+        group.setHelpText(name + "Technology Archetype");
+        group.setName(name + "Technology Archetype");
+        group.setSystem(true);
+        group.setType("archetype");
+        group.setVersions(createArtifactInfo());
+        return group;
     }
 
+    private List<ArtifactInfo> createArtifactInfo() {
+        List<ArtifactInfo> infos = new ArrayList<ArtifactInfo>();
+        ArtifactInfo artifactInfo;
+        for (String version : artifactVersion) {
+            artifactInfo = new ArtifactInfo();
+            artifactInfo.setSystem(true);
+            artifactInfo.setVersion(version);
+            infos.add(artifactInfo);
+        }
+        return infos;
+    }
+
+    private List<String> getDefaultCustomers() {
+        List<String> customerIds = new ArrayList<String>();
+        customerIds.add(PHOTON);
+        return customerIds;
+    }
+    
     public static void main(String[] args) throws PhrescoException {
         ApptypeGenerator generator = new ApptypeGenerator();
         generator.publish();

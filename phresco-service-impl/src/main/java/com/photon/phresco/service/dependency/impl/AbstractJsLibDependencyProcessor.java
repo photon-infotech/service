@@ -26,11 +26,12 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.photon.phresco.commons.model.ApplicationInfo;
+import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.Module;
-import com.photon.phresco.model.ModuleGroup;
-import com.photon.phresco.model.ProjectInfo;
 import com.photon.phresco.service.api.RepositoryManager;
+import com.photon.phresco.service.util.ServerUtil;
 
 public abstract class AbstractJsLibDependencyProcessor extends AbstractDependencyProcessor {
 	private static final Logger S_LOGGER = Logger.getLogger(AbstractJsLibDependencyProcessor.class);
@@ -39,7 +40,7 @@ public abstract class AbstractJsLibDependencyProcessor extends AbstractDependenc
 		super(repoManager);
 	}
 	@Override
-	public void process(ProjectInfo info, File path) throws PhrescoException {
+	public void process(ApplicationInfo info, File path) throws PhrescoException {
 		super.process(info, path);
 	}
 
@@ -48,7 +49,7 @@ public abstract class AbstractJsLibDependencyProcessor extends AbstractDependenc
 		return null;
 	}
 
-	protected void extractJsLibraries(File path, List<ModuleGroup> jsLibraries) throws PhrescoException {
+	protected void extractJsLibraries(File path, List<ArtifactGroup> jsLibraries) throws PhrescoException {
 		S_LOGGER.debug("Entering Method AbstractJsLibDependencyProcessor.extractJsLibraries(File path, List<TupleBean> jsLibraries)");
 		S_LOGGER.debug("extractJsLibraries() Filepath="+path.getPath());
 
@@ -63,11 +64,13 @@ public abstract class AbstractJsLibDependencyProcessor extends AbstractDependenc
 			libPath = new File(path, modulesPathString);
 		}
 		
-		for (ModuleGroup moduleGroup : jsLibraries) {
-            List<Module> versions = moduleGroup.getVersions();
-            for (Module module : versions) {
+		for (ArtifactGroup moduleGroup : jsLibraries) {
+            List<ArtifactInfo> versions = moduleGroup.getVersions();
+            for (ArtifactInfo module : versions) {
                 if(module != null) {
-                    DependencyUtils.extractFiles(module.getContentURL(), libPath, "photon");
+                	String contentURL = ServerUtil.createContentURL(moduleGroup.getGroupId(), moduleGroup.getArtifactId(), 
+                			module.getVersion(), moduleGroup.getPackaging());
+                    DependencyUtils.extractFiles(contentURL, libPath, "photon");
                 }
             }
         }

@@ -38,9 +38,9 @@ import org.apache.poi.ss.usermodel.Row;
 import org.codehaus.plexus.util.StringUtils;
 
 import com.google.gson.Gson;
+import com.photon.phresco.commons.model.VideoInfo;
+import com.photon.phresco.commons.model.VideoType;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.VideoInfo;
-import com.photon.phresco.model.VideoType;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.data.api.PhrescoDataManager;
@@ -66,8 +66,6 @@ import org.codehaus.plexus.util.StringUtils;
 
 import com.google.gson.Gson;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.VideoInfo;
-import com.photon.phresco.model.VideoType;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.model.ArtifactInfo;

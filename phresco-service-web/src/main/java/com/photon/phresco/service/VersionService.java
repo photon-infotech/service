@@ -33,8 +33,8 @@ import javax.ws.rs.core.MediaType;
 import org.apache.log4j.Logger;
 import org.sonatype.aether.resolution.VersionRangeResolutionException;
 
+import com.photon.phresco.commons.model.VersionInfo;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.VersionInfo;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.util.ServerConstants;
@@ -87,7 +87,7 @@ public class VersionService implements ServerConstants {
 			versionInfo.setUpdateAvailable(false);
 			versionInfo.setMessage("No update is available");
 		}
-		versionInfo.setFrameworkversion(latestVersion);
+		versionInfo.setFrameworkVersion(latestVersion);
 		
 		return versionInfo;
 	}

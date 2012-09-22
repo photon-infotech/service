@@ -11,12 +11,12 @@ import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
 
 import com.photon.phresco.commons.model.Customer;
+import com.photon.phresco.commons.model.DownloadInfo;
 import com.photon.phresco.commons.model.Role;
 import com.photon.phresco.commons.model.User;
+import com.photon.phresco.commons.model.VideoInfo;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.DownloadInfo;
 import com.photon.phresco.model.GlobalURL;
-import com.photon.phresco.model.VideoInfo;
 import com.photon.phresco.service.api.DbService;
 import com.photon.phresco.util.ServiceConstants;
 

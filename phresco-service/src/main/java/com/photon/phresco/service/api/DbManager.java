@@ -1,10 +1,11 @@
 package com.photon.phresco.service.api;
 
+import com.photon.phresco.commons.model.ApplicationInfo;
+import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.commons.model.RepoInfo;
+import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.ArchetypeInfo;
-import com.photon.phresco.model.ProjectInfo;
-import com.photon.phresco.model.Technology;
 
 public interface DbManager {
     
@@ -14,7 +15,7 @@ public interface DbManager {
      * @return
      * @throws PhrescoException
      */
-    ArchetypeInfo getArchetypeInfo(String techId) throws PhrescoException;
+    ArtifactGroup getArtifactGroup(String techId) throws PhrescoException;
     
     /**
      * Returns the project info based on techId and projectName
@@ -23,7 +24,7 @@ public interface DbManager {
      * @return
      * @throws PhrescoException
      */
-    ProjectInfo getProjectInfo(String techId, String projectName) throws PhrescoException;
+    ApplicationInfo getProjectInfo(String techId, String projectName) throws PhrescoException;
     
     /**
      * Returns the documents for the given technology type
@@ -53,4 +54,6 @@ public interface DbManager {
      * @throws PhrescoException
      */
     void updateCreatedProjects(ProjectInfo projectInfo) throws PhrescoException;
+    
+    void updateUsedObjects(String collectionName, String criteriaKey, String criteriaValue) throws PhrescoException;
 }

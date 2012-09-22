@@ -49,10 +49,10 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
+import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.ArtifactInfo;
+import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.Module;
-import com.photon.phresco.model.ModuleGroup;
-import com.photon.phresco.model.Technology;
 
 /**
  * POM updater essentially updates the pom.xml of the project based on modules
@@ -95,12 +95,12 @@ public class POMUpdater {
 
 			Element rootNode = doc.getRootElement();
 			Element dependencies = getDependenciesNode(rootNode);
-			if(technology.getModules() != null){
-				for (ModuleGroup bean : technology.getModules()) {
-					Element dependency = createDependencyNode(bean, technology, rootNode.getNamespace());
-					dependencies.addContent(dependency);
-				}
-			}
+//			if(technology.getModules() != null){
+//				for (ModuleGroup bean : technology.getModules()) {
+//					Element dependency = createDependencyNode(bean, technology, rootNode.getNamespace());
+//					dependencies.addContent(dependency);
+//				}
+//			}
 			XMLOutputter xmlOutput = new XMLOutputter();
 
 			// display nice nice
@@ -119,7 +119,7 @@ public class POMUpdater {
 	 * @param namespace
 	 * @return
 	 */
-	private static Element createDependencyNode(ModuleGroup bean, Technology technology, Namespace namespace) {
+	private static Element createDependencyNode(ArtifactGroup bean, Technology technology, Namespace namespace) {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method POMUpdater.createDependencyNode(TupleBean bean, Technology technology, Namespace namespace)");
 		}
@@ -129,7 +129,7 @@ public class POMUpdater {
 		Element artifactId = new Element("artifactId", namespace);
 		artifactId.setText(bean.getId());
 		Element version = new Element("version", namespace);
-		Module moduleVersion = bean.getVersions().get(0);
+		ArtifactInfo moduleVersion = bean.getVersions().get(0);
 		version.setText(moduleVersion.getVersion());
 		dependency.addContent(group);
 		dependency.addContent(artifactId);

@@ -68,7 +68,6 @@ import com.photon.phresco.model.Documentation;
 import com.photon.phresco.model.Documentation.DocumentationType;
 import com.photon.phresco.model.Module;
 import com.photon.phresco.model.ModuleGroup;
-import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.client.api.ServiceClientConstant;
 import com.photon.phresco.service.client.api.ServiceContext;
@@ -76,7 +75,6 @@ import com.photon.phresco.service.client.api.ServiceManager;
 import com.photon.phresco.service.client.factory.ServiceClientFactory;
 import com.photon.phresco.service.client.impl.RestClient;
 import com.photon.phresco.service.model.ArtifactInfo;
-import com.photon.phresco.service.model.ServerConstants;
 import com.photon.phresco.util.ServiceConstants;
 import com.photon.phresco.util.TechnologyTypes;
 import com.sun.jersey.api.client.ClientResponse;
@@ -127,20 +125,20 @@ public class TechnologyDataGenerator implements ServiceConstants {
 	 */
 	private static void initInputExcelMap() {
 		INPUT_EXCEL_MAP.put(TechnologyTypes.PHP,"PHTN_PHRESCO_PHP.xls");
-		INPUT_EXCEL_MAP.put(TechnologyTypes.JAVA_WEBSERVICE,"PHTN_PHRESCO_Java-WebService.xls");
-		INPUT_EXCEL_MAP.put(TechnologyTypes.HTML5_WIDGET,"PHTN_PHRESCO_Java-WebService.xls");
-		INPUT_EXCEL_MAP.put(TechnologyTypes.HTML5_MOBILE_WIDGET,"PHTN_PHRESCO_Java-WebService.xls");
-		INPUT_EXCEL_MAP.put(TechnologyTypes.HTML5_MULTICHANNEL_JQUERY_WIDGET,"PHTN_PHRESCO_Java-WebService.xls");
-		INPUT_EXCEL_MAP.put(TechnologyTypes.PHP_DRUPAL7,"PHTN_PHRESCO_Drupal7.xls");
-		INPUT_EXCEL_MAP.put(TechnologyTypes.SHAREPOINT,"PHTN_PHRESCO_Sharepoint.xls");
-		INPUT_EXCEL_MAP.put(TechnologyTypes.ANDROID_NATIVE,"PHTN_PHRESCO_Andriod-Native.xls");
-		INPUT_EXCEL_MAP.put(TechnologyTypes.IPHONE_NATIVE,"PHTN_PHRESCO_iPhone-Native.xls");
-		INPUT_EXCEL_MAP.put(TechnologyTypes.IPHONE_HYBRID,"PHTN_PHRESCO_iPhone-Native.xls");
-	    INPUT_EXCEL_MAP.put(TechnologyTypes.NODE_JS_WEBSERVICE,"PHTN_PHRESCO_NodeJS-WebService.xls");
-		INPUT_EXCEL_MAP.put(TechnologyTypes.ANDROID_HYBRID,"PHTN_PHRESCO_Andriod-Hybrid.xls");
-		INPUT_EXCEL_MAP.put(TechnologyTypes.WORDPRESS, "PHTN_PHRESCO_Wordpress.xls");
-		INPUT_EXCEL_MAP.put(TechnologyTypes.PHP_DRUPAL6, "PHTN_PHRESCO_Drupal6.xls");
-		INPUT_EXCEL_MAP.put(TechnologyTypes.PHP_DRUPAL6, "PHTN_PHRESCO_Drupal6.3.xls");
+//		INPUT_EXCEL_MAP.put(TechnologyTypes.JAVA_WEBSERVICE,"PHTN_PHRESCO_Java-WebService.xls");
+//		INPUT_EXCEL_MAP.put(TechnologyTypes.HTML5_WIDGET,"PHTN_PHRESCO_Java-WebService.xls");
+//		INPUT_EXCEL_MAP.put(TechnologyTypes.HTML5_MOBILE_WIDGET,"PHTN_PHRESCO_Java-WebService.xls");
+//		INPUT_EXCEL_MAP.put(TechnologyTypes.HTML5_MULTICHANNEL_JQUERY_WIDGET,"PHTN_PHRESCO_Java-WebService.xls");
+//		INPUT_EXCEL_MAP.put(TechnologyTypes.PHP_DRUPAL7,"PHTN_PHRESCO_Drupal7.xls");
+//		INPUT_EXCEL_MAP.put(TechnologyTypes.SHAREPOINT,"PHTN_PHRESCO_Sharepoint.xls");
+//		INPUT_EXCEL_MAP.put(TechnologyTypes.ANDROID_NATIVE,"PHTN_PHRESCO_Andriod-Native.xls");
+//		INPUT_EXCEL_MAP.put(TechnologyTypes.IPHONE_NATIVE,"PHTN_PHRESCO_iPhone-Native.xls");
+//		INPUT_EXCEL_MAP.put(TechnologyTypes.IPHONE_HYBRID,"PHTN_PHRESCO_iPhone-Native.xls");
+//	    INPUT_EXCEL_MAP.put(TechnologyTypes.NODE_JS_WEBSERVICE,"PHTN_PHRESCO_NodeJS-WebService.xls");
+//		INPUT_EXCEL_MAP.put(TechnologyTypes.ANDROID_HYBRID,"PHTN_PHRESCO_Andriod-Hybrid.xls");
+//		INPUT_EXCEL_MAP.put(TechnologyTypes.WORDPRESS, "PHTN_PHRESCO_Wordpress.xls");
+//		INPUT_EXCEL_MAP.put(TechnologyTypes.JAVA_STANDALONE,"PHTN_PHRESCO_Java-WebService.xls");
+//		INPUT_EXCEL_MAP.put(TechnologyTypes.PHP_DRUPAL6, "PHTN_PHRESCO_Drupal6.xls");
 	}
 
 	/**
@@ -243,6 +241,7 @@ public class TechnologyDataGenerator implements ServiceConstants {
       }
       ClientResponse response = applicationTypeClient.create(createdModules);
       System.out.println(response.getStatus());
+      return;
     }
 
 
@@ -264,8 +263,7 @@ public class TechnologyDataGenerator implements ServiceConstants {
 		String name = row.getCell(1).getStringCellValue();
 		
 		String identifier = ID + row.getCell(1).getStringCellValue().toLowerCase().
-		    replace(ServerConstants.STR_BLANK_SPACE, ServerConstants.STR_UNDER_SCORE);
-                
+		    replace(" ", "_");                
 		String version = "1.0";
 		Cell versionCell = row.getCell(2);
 		if (versionCell != null && Cell.CELL_TYPE_BLANK != versionCell.getCellType()) {
@@ -313,7 +311,6 @@ public class TechnologyDataGenerator implements ServiceConstants {
             docs.add(doc);
             
         }
-        moduleGroup.setDocs(docs);
         
         String filePath = "";
         String fileExt = "zip";
@@ -343,27 +340,28 @@ public class TechnologyDataGenerator implements ServiceConstants {
             }
         
 		Cell groupNameCell = row.getCell(14);
+		String groupId = null;
 		if (groupNameCell != null
 				&& Cell.CELL_TYPE_BLANK != groupNameCell.getCellType()) {
-			String groupId = groupNameCell.getStringCellValue();
-			moduleGroup.setGroupId(groupId);
+			groupId = groupNameCell.getStringCellValue();
 		}
 
 		Cell artifactCell = row.getCell(15);
+		String artifactId = null;
 		if (artifactCell != null
 				&& Cell.CELL_TYPE_BLANK != artifactCell.getCellType()) {
-			String artifactId = artifactCell.getStringCellValue();
-			moduleGroup.setArtifactId(artifactId);
+			artifactId = artifactCell.getStringCellValue();
 		}
 		
 		List<Module> versions = createModuleList(name, convertBoolean(core), 
-		        convertBoolean(req), version, identifier, fileExt, techId, filePath, "");
+		        convertBoolean(req), version, identifier, fileExt, techId, filePath, "", docs, groupId, artifactId);
 		moduleGroup.setName(name);
 		moduleGroup.setTechId(techId);
 		moduleGroup.setVersions(versions);
 		moduleGroup.setSystem(true);
 		moduleGroup.setType("module");
 		moduleGroup.setCustomerId("photon");
+		moduleGroup.setCore(convertBoolean(core));
 		makeMap(identifier, moduleGroup);
 	}
 
@@ -388,20 +386,33 @@ public class TechnologyDataGenerator implements ServiceConstants {
      * @param techId
      * @param filePath
      * @param imagePath
+     * @param artifactId 
+     * @param groupId 
+     * @param docs 
      * @return
      * @throws PhresrcoException
      */
-    private List<Module> createModuleList(String name, boolean core, boolean req, 
-            String version, String id, String ext, String techId, String filePath, String imagePath) throws PhrescoException {
+	private List<Module> createModuleList(String name, boolean core, boolean req, 
+            String version, String id, String ext, String techId, String filePath, String imagePath, List<Documentation> docs,
+            String groupId, String artifactId) throws PhrescoException {
         List<Module> modules = new ArrayList<Module>();
         Module module = new Module();
         module.setName(name);
-        module.setCore(core);
         module.setVersion(version);
         module.setRequired(req);
         String moduleId = id + "_" + version;
         module.setId(moduleId);
         module.setContentURL(createContentURL(techId, version, ext, moduleId));
+        if(org.apache.commons.lang.StringUtils.isNotEmpty(groupId)) {
+            module.setGroupId(groupId);
+        } else {
+            module.setGroupId("modules." + techId + ".files");
+        }
+        if(org.apache.commons.lang.StringUtils.isNotEmpty(artifactId)) {
+            module.setArtifactId(artifactId);
+        } else {
+            module.setArtifactId(moduleId);
+        }
         modules.add(module);
         publishModule(techId, module, filePath, ext);
         publishImageFile(techId, module, imagePath);
@@ -650,8 +661,6 @@ public class TechnologyDataGenerator implements ServiceConstants {
             ModuleGroup moduleGroup = moduleMap.get(string);
             group.add(moduleGroup);
         }
-        Gson gson = new Gson();
-        String json = gson.toJson(group);
-        System.out.println(json);
+        System.out.println(group.size());
     }
 }

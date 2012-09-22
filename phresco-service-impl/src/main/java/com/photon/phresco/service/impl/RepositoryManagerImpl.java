@@ -42,12 +42,16 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.MediaType;
+
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.maven.repository.internal.MavenRepositorySystemSession;
 import org.codehaus.plexus.DefaultPlexusContainer;
@@ -64,19 +68,27 @@ import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.aether.util.artifact.SubArtifact;
 
+import com.google.gson.Gson;
+import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.ModuleGroup;
 import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.model.ArtifactInfo;
+import com.photon.phresco.service.model.Data;
+import com.photon.phresco.service.model.RepoData;
 import com.photon.phresco.service.model.ServerConfiguration;
 import com.photon.phresco.service.util.ServerUtil;
+import com.photon.phresco.util.ServiceConstants;
 import com.photon.phresco.util.TechnologyTypes;
 import com.photon.phresco.util.Utility;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 
-public  class RepositoryManagerImpl implements RepositoryManager {
+public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstants {
 
 	private static final Logger S_LOGGER= Logger.getLogger(RepositoryManagerImpl.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
@@ -123,7 +135,7 @@ public  class RepositoryManagerImpl implements RepositoryManager {
 		}
 	}
 	
-	public List<ModuleGroup> getModules(String techId) throws PhrescoException {
+	public List<ArtifactGroup> getModules(String techId) throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method RepositoryManagerImpl.getModules(String techId)");
 		}
@@ -134,7 +146,7 @@ public  class RepositoryManagerImpl implements RepositoryManager {
 		 return null;
 	}
 
-	public List<ModuleGroup> getJSLibraries(String techId) throws PhrescoException {
+	public List<ArtifactGroup> getJSLibraries(String techId) throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method RepositoryManagerImpl.getJSLibraries(String techId)");
 		}
@@ -397,4 +409,77 @@ public  class RepositoryManagerImpl implements RepositoryManager {
 		return config.getFrameWorkLatestFile();
 	}
 
+    @Override
+    public RepoInfo createCustomerRepository(String customerId) throws PhrescoException {
+        String repoBaseURL = config.getRepoBaseURL();
+        RepoInfo repoInfo = new RepoInfo();
+        repoInfo.setCustomerId(customerId);
+        repoInfo.setBaseRepoURL(repoBaseURL);
+        repoInfo.setRepoUserName(config.getRepoUserName());
+        repoInfo.setRepoPassword(ServerUtil.encryptString(config.getRepoPassword()));
+        String releaseRepo = createHostedRepo(customerId, repoBaseURL, REPOTYPE_RELEASE);
+        if(StringUtils.isNotEmpty(releaseRepo)) {
+            repoInfo.setReleaseRepoURL(releaseRepo);
+        }
+        String snapshotRepo = createHostedRepo(customerId, repoBaseURL, REPOTYPE_SNAPSHOT);
+        if(StringUtils.isNotEmpty(snapshotRepo)) {
+            repoInfo.setSnapshotRepoURL(snapshotRepo);
+        }
+        String groupRepo = createGroupRepo(customerId, repoBaseURL, REPOTYPE_GROUP);
+        if(StringUtils.isNotEmpty(groupRepo)) {
+            repoInfo.setGroupRepoURL(groupRepo);
+        }
+        return repoInfo;
+    }
+
+    private String createGroupRepo(String customerId, String repoBaseURL, String repoType) throws PhrescoException {
+        Client client = new Client();
+        client.addFilter(new HTTPBasicAuthFilter(config.getRepoUserName(), config.getRepoPassword()));
+        WebResource resource = client.resource(repoBaseURL + REPO_GROUP_PATH);
+        ClientResponse response = resource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).
+            post(ClientResponse.class, createGroupRepoData(customerId, repoBaseURL, repoType));
+        if(response.getStatus() == 201) {
+            return repoBaseURL + REPO_GROUP_CONTENT + customerId + repoType.toLowerCase();
+        } else {
+            throw new PhrescoException(REPO_FAILURE_MSG);
+        }
+    }
+    
+    private String createHostedRepo(String customerId, String repoBaseURL,
+            String repoType) throws PhrescoException {
+        Client client = new Client();
+        client.addFilter(new HTTPBasicAuthFilter(config.getRepoUserName(), config.getRepoPassword()));
+        WebResource resource = client.resource(repoBaseURL + REPO_HOSTED_PATH);
+        ClientResponse response = resource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).
+            post(ClientResponse.class, createReleaseRepoData(customerId, repoBaseURL, repoType));
+        if(response.getStatus() == 201) {
+            return repoBaseURL + REPO_HOSTED_CONTENT + customerId + repoType.toLowerCase();
+        } else {
+            throw new PhrescoException(REPO_FAILURE_MSG);
+        }
+    }
+    
+    private String createReleaseRepoData(String customerId, String repoBaseURL, String repoType) {
+        String repoId = customerId + repoType.toLowerCase();
+        RepoData data =  new RepoData(repoBaseURL + REPO_HOSTED_CONTENT + repoId, repoId, repoId, REPO_PROVIDER, REPO_PROVIDER_ROLE, 
+                REPO_PROVIDER, REPO_HOSTED, true, REPO_ALLOW_WRITE, true, true, NOT_FOUND_CACHE, repoType, false);
+        String json = new Gson().toJson(data);
+        return OPEN_PHRASE + SLASH + REPO_OBJECT_ID + SLASH + COLON + json + CLOSE_PHRASE;
+    }
+    
+    private String createGroupRepoData(String customerId, String repoBaseURL, String repoType) {
+        String repoId = customerId + repoType.toLowerCase();
+        String releaseId = customerId + REPO_RELEASE_NAME;
+        String snapshotId = customerId + REPO_SNAPSHOT_NAME;
+//        List<Reposito> repositories = new ArrayList<Repository>();
+//        Repository repo = new Repository(releaseId, releaseId, repoBaseURL + LOCAL_REPO_GROUP + releaseId);
+//        repositories.add(repo);
+//        repo = new Repository(snapshotId, snapshotId, repoBaseURL + LOCAL_REPO_GROUP + snapshotId);
+//        repositories.add(repo);
+//        Data data =  new Data(repoBaseURL + REPO_GROUP_CONTENT + repoId, repoId, repoId, REPO_PROVIDER, 
+//                REPO_PROVIDER, REPO_HOSTED, true, repositories);
+//        String json = new Gson().toJson(data);
+        String json = "";
+        return OPEN_PHRASE + SLASH + REPO_OBJECT_ID + SLASH + COLON + json + CLOSE_PHRASE;
+    }
 }

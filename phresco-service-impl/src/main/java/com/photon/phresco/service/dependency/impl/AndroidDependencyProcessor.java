@@ -45,14 +45,15 @@ import javax.xml.bind.JAXBException;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 
+import com.photon.phresco.commons.model.ApplicationInfo;
+import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.ArtifactInfo;
+import com.photon.phresco.commons.model.TechnologyInfo;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.Module;
-import com.photon.phresco.model.ModuleGroup;
-import com.photon.phresco.model.ProjectInfo;
-import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.pom.AndroidTestPOMUpdater;
+import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.TechnologyTypes;
 import com.phresco.pom.exception.PhrescoPomException;
 import com.phresco.pom.util.PomProcessor;
@@ -81,13 +82,13 @@ public class AndroidDependencyProcessor extends AbstractJsLibDependencyProcessor
 	}
 
 	@Override
-	public void process(ProjectInfo info, File path) throws PhrescoException {
+	public void process(ApplicationInfo info, File path) throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method AndroidDependencyProcessor.process(ProjectInfo info, File path)");
 			S_LOGGER.debug("process() ProjectCode=" + info.getCode());
 			S_LOGGER.debug("process() Path=" + path.getPath());
 		}
-		Technology technology = info.getTechnology();
+		TechnologyInfo technology = info.getTechInfo();
 		// copy pilot projects
 //		if (StringUtils.isNotBlank(info.getPilotProjectName())) {
 //			List<ProjectInfo> pilotProjects = getRepositoryManager().getPilotProjects(technology.getId());
@@ -105,15 +106,18 @@ public class AndroidDependencyProcessor extends AbstractJsLibDependencyProcessor
 //		}
 		
 		//To Get Pilot Project
-		ProjectInfo projectInfo = PhrescoServerFactory.getDbManager().
-		    getProjectInfo(info.getTechnology().getId(), info.getPilotProjectName());
+		ApplicationInfo projectInfo = PhrescoServerFactory.getDbManager().
+		    getProjectInfo(technology.getId(), info.getPilotContent().getName());
+		ArtifactGroup pilotContent = projectInfo.getPilotContent();
+		String createContentURL = ServerUtil.createContentURL(pilotContent.getGroupId(), pilotContent.getArtifactId(), 
+				pilotContent.getVersions().get(0).getVersion(), pilotContent.getPackaging());
 		if(projectInfo != null) {
-		    DependencyUtils.extractFiles(projectInfo.getProjectURL(), path, info.getCustomerId());
+		    DependencyUtils.extractFiles(createContentURL, path, "");
 		}
 		
 		updateAndroidVersion(path, info);
 		try {
-	    	 List<ModuleGroup> modules = technology.getModules();
+	    	 List<ArtifactGroup> modules = info.getSelectedModules();
 	    	 if((CollectionUtils.isNotEmpty(modules)) && modules != null) {
 	    		 updatePOMModules(path, modules);
 	    	 }
@@ -124,12 +128,12 @@ public class AndroidDependencyProcessor extends AbstractJsLibDependencyProcessor
 		}
 		AndroidTestPOMUpdater.updatePOM(path);
 		if (technology.getId().equals(TechnologyTypes.ANDROID_HYBRID)) {
-			extractJsLibraries(path, info.getTechnology().getJsLibraries());
+			extractJsLibraries(path, info.getSelectedJSLibs());
 		}
 		updateTestPom(path);
 	}
 
-	private void updatePOMModules(File path, List<com.photon.phresco.model.ModuleGroup> modules)
+	private void updatePOMModules(File path, List<ArtifactGroup> modules)
 	throws PhrescoException, JAXBException, PhrescoPomException {
 		try {
 			if (isDebugEnabled) {
@@ -138,12 +142,12 @@ public class AndroidDependencyProcessor extends AbstractJsLibDependencyProcessor
 			File pomFile = new File(path, "pom.xml");
 			if (pomFile.exists()) {
 				PomProcessor processor = new PomProcessor(pomFile);
-				for (com.photon.phresco.model.ModuleGroup moduleGroup : modules) {
+				for (ArtifactGroup moduleGroup : modules) {
 					if (moduleGroup != null) {
-					    List<Module> versions = moduleGroup.getVersions();
+					    List<ArtifactInfo> versions = moduleGroup.getVersions();
 					    if (CollectionUtils.isNotEmpty(versions)) {
-					        for (Module module : versions) {
-					            processor.addDependency(module.getGroupId(), module.getArtifactId(), module.getVersion());
+					        for (ArtifactInfo module : versions) {
+					            processor.addDependency(moduleGroup.getGroupId(), moduleGroup.getArtifactId(), module.getVersion());
                             }
 					    }
 					}
@@ -160,7 +164,7 @@ public class AndroidDependencyProcessor extends AbstractJsLibDependencyProcessor
 		return "";
 	}
 
-	public void updateAndroidVersion(File path, ProjectInfo info) throws PhrescoException {
+	public void updateAndroidVersion(File path, ApplicationInfo info) throws PhrescoException {
 		File pomPath = new File(path ,POM_FILE);
 		if(!pomPath.exists()) {
 			return;
@@ -175,11 +179,11 @@ public class AndroidDependencyProcessor extends AbstractJsLibDependencyProcessor
 		    if(pomFile.exists()) {
     		    try {
     	            processor = new PomProcessor(pomFile);
-    	            List<String> name = info.getTechnology().getVersions();
-    	            for (String string : name) {
-    	                String selectedVersion = string;
-    	                processor.setProperty(ANDROID_VERSION, selectedVersion);
-    	            }
+    	            String version = info.getTechInfo().getVersion();
+//    	            for (String string : name) {
+//    	                String selectedVersion = string;
+    	                processor.setProperty(ANDROID_VERSION, version);
+//    	            }
     	            processor.save();
     	        } catch (Exception e) {
     	            throw new PhrescoException(e);

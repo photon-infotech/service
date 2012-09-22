@@ -40,8 +40,9 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
+import com.photon.phresco.commons.model.ApplicationInfo;
+import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.ProjectInfo;
 import com.photon.phresco.service.api.DependencyProcessor;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.ProjectService;
@@ -54,7 +55,7 @@ public class DefaultProjectService implements ProjectService, Constants {
 	private static final Logger S_LOGGER = Logger.getLogger(DefaultProjectService.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 
-	public synchronized File createProject(ProjectInfo projectInfo) throws PhrescoException {
+	public synchronized File createProject(ApplicationInfo projectInfo) throws PhrescoException {
 		// TODO:This code should be moved into server initialization
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method DefaultProjectService.createProject(ProjectInfo projectInfo)");
@@ -86,7 +87,7 @@ public class DefaultProjectService implements ProjectService, Constants {
 		return projectPath;
 	}
 
-	public File updateProject(ProjectInfo projectInfo) throws PhrescoException {
+	public File updateProject(ApplicationInfo projectInfo) throws PhrescoException {
 		File projectPath = new File(Utility.getPhrescoTemp(), UUID.randomUUID().toString()) ;
 		projectPath.mkdirs();
 		DependencyProcessor dependencyProcessor = DependencyProcessorFactory.getDependencyProcessor(projectInfo);
@@ -100,7 +101,7 @@ public class DefaultProjectService implements ProjectService, Constants {
 		return projectPath;
 	}
 
-	public File updateDocumentProject(ProjectInfo projectInfo) throws PhrescoException {
+	public File updateDocumentProject(ApplicationInfo projectInfo) throws PhrescoException {
 		File tempPath = new File(Utility.getPhrescoTemp(), UUID.randomUUID().toString()+File.separator + projectInfo.getCode());
 		try {
 			PhrescoServerFactory.getNewDocumentGenerator().generate(projectInfo, tempPath);

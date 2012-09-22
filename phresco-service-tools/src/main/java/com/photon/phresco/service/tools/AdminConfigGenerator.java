@@ -34,8 +34,8 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
 import com.google.gson.Gson;
+import com.photon.phresco.commons.model.Property;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.AdminConfigInfo;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.data.api.PhrescoDataManager;
@@ -80,14 +80,14 @@ public class AdminConfigGenerator {
 	}
 
 	public void publish(boolean overwrite) throws PhrescoException {
-		List<AdminConfigInfo> adminConfigInfos = new ArrayList<AdminConfigInfo>();
+		List<Property> adminConfigInfos = new ArrayList<Property>();
 		HSSFSheet sheet = workBook.getSheet(PROPERTY);
 		Iterator<Row> rowIterator = sheet.rowIterator();
 		for (int i = 0; i <NO_OF_ROWS_TO_SKIP; i++) {
 			rowIterator.next();
 		}
 
-		AdminConfigInfo adminConfigInfo = new AdminConfigInfo();
+		Property adminConfigInfo = new Property();
 		while (rowIterator.hasNext()) {
 			Row row = rowIterator.next();
 			adminConfigInfo = createAdminConfig(row);
@@ -106,9 +106,9 @@ public class AdminConfigGenerator {
 		//uploadToRepository(configInfos, overwrite);
 	}
 
-	private void uploadToRepository(List<AdminConfigInfo> infos, boolean append) throws PhrescoException {
+	private void uploadToRepository(List<Property> infos, boolean append) throws PhrescoException {
 		if (append) {
-			for (AdminConfigInfo adminConfigInfo : infos) {
+			for (Property adminConfigInfo : infos) {
 				repManager.addAdminConfig(adminConfigInfo);
 			}
 		} else {
@@ -117,7 +117,7 @@ public class AdminConfigGenerator {
 		}
 	}
 
-	private void writesJson(List<AdminConfigInfo> adminConfigInfo, File file) throws PhrescoException {
+	private void writesJson(List<Property> adminConfigInfo, File file) throws PhrescoException {
 		try {
 			Gson gson = new Gson();
 			String value = gson.toJson(adminConfigInfo);
@@ -129,8 +129,8 @@ public class AdminConfigGenerator {
 		}
 	}
 
-	private AdminConfigInfo createAdminConfig(Row row) {
-		AdminConfigInfo configInfo = new AdminConfigInfo();
+	private Property createAdminConfig(Row row) {
+		Property configInfo = new Property();
 		//Cell ids = row.getCell(1);
 		//String id = getValue(ids);
 

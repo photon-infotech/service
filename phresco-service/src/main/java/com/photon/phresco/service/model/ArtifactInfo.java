@@ -48,7 +48,11 @@ public class ArtifactInfo {
     private String pack;
     private String version;
     private File pomFile;
-
+    
+    public ArtifactInfo() {
+        
+    }
+    
     public ArtifactInfo(String groupId, String artifact, String classifier,
             String pack, String version) {
         super();
@@ -106,6 +110,30 @@ public class ArtifactInfo {
      */
     public void setPomFile(File pomFile) {
         this.pomFile = pomFile;
+    }
+
+    public String getPack() {
+        return pack;
+    }
+
+    public void setPack(String pack) {
+        this.pack = pack;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
+
+    public void setArtifact(String artifact) {
+        this.artifact = artifact;
+    }
+
+    public void setClassifier(String classifier) {
+        this.classifier = classifier;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     public String toString() {

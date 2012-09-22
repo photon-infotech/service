@@ -42,17 +42,17 @@ import org.springframework.data.document.mongodb.query.Query;
 import org.springframework.stereotype.Component;
 
 import com.photon.phresco.commons.model.Customer;
+import com.photon.phresco.commons.model.DownloadInfo;
 import com.photon.phresco.commons.model.Permission;
+import com.photon.phresco.commons.model.ProjectInfo;
+import com.photon.phresco.commons.model.Property;
 import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.commons.model.Role;
 import com.photon.phresco.commons.model.User;
+import com.photon.phresco.commons.model.VideoInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.exception.PhrescoWebServiceException;
-import com.photon.phresco.model.AdminConfigInfo;
-import com.photon.phresco.model.DownloadInfo;
 import com.photon.phresco.model.GlobalURL;
-import com.photon.phresco.model.ProjectInfo;
-import com.photon.phresco.model.VideoInfo;
 import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.api.DbService;
 import com.photon.phresco.service.converters.ConvertersFactory;
@@ -1108,7 +1108,7 @@ public class AdminService extends DbService implements ServiceConstants {
 	@POST
 	@Consumes (MediaType.APPLICATION_JSON)
     @Path (REST_API_FORUMS)
-    public Response createForum(List<AdminConfigInfo> adminConfigInfo) {
+    public Response createForum(List<Property> adminConfigInfo) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.createForum(List<AdminConfigInfo> adminConfigInfo)");
 	    }
@@ -1136,8 +1136,8 @@ public class AdminService extends DbService implements ServiceConstants {
         }
     	
     	try {
-    		AdminConfigInfo adminConfig = mongoOperation.findOne(FORUM_COLLECTION_NAME, 
-    		        new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)), AdminConfigInfo.class);
+    		Property adminConfig = mongoOperation.findOne(FORUM_COLLECTION_NAME, 
+    		        new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)), Property.class);
     		if (adminConfig != null) {
     			return Response.status(Response.Status.OK).entity(adminConfig).build();
     		}

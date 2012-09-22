@@ -25,8 +25,6 @@ import java.util.Date;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
-import com.photon.phresco.commons.model.Customer.CustomerStatus;
-
 public class CustomerDAO extends BaseDAO {
     
     private String name;
@@ -41,7 +39,6 @@ public class CustomerDAO extends BaseDAO {
     private String helpText;
     private Date validFrom;
     private Date validUpto;
-    private CustomerStatus status;
     private int type;
     
     public CustomerDAO() {
@@ -215,19 +212,6 @@ public class CustomerDAO extends BaseDAO {
         this.validUpto = validUpto;
     }
 
-    /**
-     * @return
-     */
-    public CustomerStatus getStatus() {
-        return status;
-    }
-
-    /**
-     * @param status
-     */
-    public void setStatus(CustomerStatus status) {
-        this.status = status;
-    }
 
     /**
      * @return
@@ -257,7 +241,6 @@ public class CustomerDAO extends BaseDAO {
                 .append("helpText", helpText)
                 .append("validFrom", validFrom)
                 .append("validUpto", validUpto)
-                .append("status", status)
                 .append("type", type)
                 .toString();
     }

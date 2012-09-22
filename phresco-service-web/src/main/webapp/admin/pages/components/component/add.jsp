@@ -25,7 +25,7 @@
 
 <%@ page import="com.photon.phresco.model.Module" %>
 <%@ page import="com.photon.phresco.model.ModuleGroup" %>
-<%@ page import="com.photon.phresco.model.Technology" %>
+<%@ page import="com.photon.phresco.commons.model.Technology" %>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
 
 <%

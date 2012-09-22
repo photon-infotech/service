@@ -40,8 +40,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import com.photon.phresco.model.ProjectInfo;
-import com.photon.phresco.model.Technology;
+import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.service.api.ApplicationConfigurator;
 import com.photon.phresco.util.TechnologyTypes;
 
@@ -61,16 +60,15 @@ public class ConfiguratorFactory {
 		//prevent instantiation
 	}
 	
-	public static ApplicationConfigurator getConfigurator(ProjectInfo projectInfo) {
+	public static ApplicationConfigurator getConfigurator(ApplicationInfo applicationInfo) {
 		if (DEBUGENABLED) {
 			S_LOGGER.debug("Entering Method ConfiguratorFactory.getConfigurator(ProjectInfo projectInfo)");
 		}
 		if (DEBUGENABLED) {
-			S_LOGGER.debug("getConfigurator() ProjectCode"+projectInfo.getCode());
+			S_LOGGER.debug("getConfigurator() ProjectCode" + applicationInfo.getCode());
 		}
-		assert projectInfo != null;
-		Technology technology = projectInfo.getTechnology();
-		String techId = technology.getId();
+		assert applicationInfo != null;
+		String techId = applicationInfo.getTechInfo().getId();
 		if (DEBUGENABLED) {
 			S_LOGGER.debug("getConfigurator() TechnologyID="+techId);
 		}

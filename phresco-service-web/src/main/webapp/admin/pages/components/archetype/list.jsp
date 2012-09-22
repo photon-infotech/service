@@ -23,9 +23,9 @@
 <%@ page import="org.apache.commons.lang.StringUtils"%>
 <%@ page import="java.util.List"%>
 
-<%@ page import="com.photon.phresco.model.Technology" %>
+<%@ page import="com.photon.phresco.commons.model.Technology" %>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
-<%@ page import="com.photon.phresco.model.ApplicationType"%>
+<%@ page import="com.photon.phresco.commons.model.ApplicationType"%>
 
 <%
 	List<Technology> technologies = (List<Technology>) request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);

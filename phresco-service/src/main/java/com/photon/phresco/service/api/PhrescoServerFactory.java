@@ -121,4 +121,8 @@ public class PhrescoServerFactory {
     public static ServerConfiguration getServerConfig() {
     	return serverConfig;
     }
+    
+    public static void main(String[] args) throws PhrescoException {
+        initialize();
+    }
 }

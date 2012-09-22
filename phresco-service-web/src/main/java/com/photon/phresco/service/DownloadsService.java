@@ -36,8 +36,8 @@ import org.codehaus.jettison.json.JSONException;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.photon.phresco.commons.model.DownloadInfo;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.DownloadInfo;
 import com.photon.phresco.model.DownloadPropertyInfo;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
@@ -67,7 +67,7 @@ public class DownloadsService implements ServerConstants {
 		List<DownloadInfo> downloadInfoList = gson.fromJson(downloadInfoJSON, type);
     	for (DownloadInfo downloadInfo : downloadInfoList) {
 			List<String> platforms = downloadInfo.getPlatform();
-			List<String> appliesTo = downloadInfo.getAppliesTo();
+			List<String> appliesTo = downloadInfo.getAppliesToTechs();
 			if (platforms.contains(downloadPropertyInfo.getOsName()) && appliesTo.contains(downloadPropertyInfo.getTechId())) {
 				downloadList.add(downloadInfo);
 			}

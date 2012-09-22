@@ -25,8 +25,8 @@ import javax.xml.bind.JAXBException;
 
 import org.apache.log4j.Logger;
 
+import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.ProjectInfo;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.phresco.pom.exception.PhrescoPomException;
 
@@ -42,13 +42,13 @@ public class JWSDependencyProcessor extends AbstractDependencyProcessor {
 	}
 	
 	@Override
-	public void process(ProjectInfo info, File path) throws PhrescoException {
+	public void process(ApplicationInfo info, File path) throws PhrescoException {
 		S_LOGGER.debug("Entering Method JWSDependencyProcessor.process(ProjectInfo info, File path)");
 		S_LOGGER.debug("process() Path=" + path.getPath());
 		
 		super.process(info, path);
 		try {
-			updatePOMWithModules(path, info.getTechnology().getModules());
+			updatePOMWithModules(path, info.getSelectedModules());
 			createSqlFolder(info, path);
 			updateTestPom(path);
 		} catch (JAXBException e) {

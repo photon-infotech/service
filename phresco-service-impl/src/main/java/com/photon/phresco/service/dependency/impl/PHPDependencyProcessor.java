@@ -24,10 +24,12 @@ import java.io.File;
 
 import org.apache.log4j.Logger;
 
+import com.photon.phresco.commons.model.ApplicationInfo;
+import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.ProjectInfo;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
+import com.photon.phresco.service.util.ServerUtil;
 
 /**
  * Dependency handler for PHP projects
@@ -45,7 +47,7 @@ public class PHPDependencyProcessor  extends AbstractJsLibDependencyProcessor {
     }
     
     @Override
-    public void process(ProjectInfo info, File path) throws PhrescoException {
+    public void process(ApplicationInfo info, File path) throws PhrescoException {
     	S_LOGGER.debug("Entering Method PHPDependencyProcessor.process(ProjectInfo info, File path)");
     	S_LOGGER.debug("process() Path=" + path.getPath());
         S_LOGGER.debug("process() ProjectCode=" + info.getCode());
@@ -67,14 +69,17 @@ public class PHPDependencyProcessor  extends AbstractJsLibDependencyProcessor {
 //	                }
 //	            }
 //            }
-            ProjectInfo projectInfo = PhrescoServerFactory.getDbManager().getProjectInfo(info.getTechnology().getId(), info.getPilotProjectName());
+            ApplicationInfo projectInfo = PhrescoServerFactory.getDbManager().getProjectInfo(info.getTechInfo().getId(), info.getName());
+            ArtifactGroup pilotContent = projectInfo.getPilotContent();
+            String contentURL = ServerUtil.createContentURL(pilotContent.getGroupId(), pilotContent.getArtifactId(),
+            		pilotContent.getVersions().get(0).getVersion(), pilotContent.getPackaging());
             if(projectInfo != null) {
-                DependencyUtils.extractFiles(projectInfo.getProjectURL(), path, projectInfo.getCustomerId());
+                DependencyUtils.extractFiles(contentURL, path, "");
             }
-            String id = info.getTechnology().getId();
-            updatePOMWithModules(path, info.getTechnology().getModules(), id);
-            updatePOMWithPluginArtifact(path,info.getTechnology().getModules(), id);
-            extractJsLibraries(path, info.getTechnology().getJsLibraries());
+            String id = info.getTechInfo().getId();
+            updatePOMWithModules(path, info.getSelectedModules(), id);
+            updatePOMWithPluginArtifact(path,info.getSelectedModules(), id);
+            extractJsLibraries(path, info.getSelectedJSLibs());
             createSqlFolder(info, path);
             updateTestPom(path);
     }

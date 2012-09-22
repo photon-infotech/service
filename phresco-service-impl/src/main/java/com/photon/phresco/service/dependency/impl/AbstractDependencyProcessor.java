@@ -39,15 +39,18 @@ import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import com.photon.phresco.commons.model.ApplicationInfo;
+import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.ArtifactInfo;
+import com.photon.phresco.commons.model.DownloadInfo;
+import com.photon.phresco.commons.model.Technology;
+import com.photon.phresco.commons.model.TechnologyInfo;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.Database;
-import com.photon.phresco.model.Module;
-import com.photon.phresco.model.ProjectInfo;
-import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.api.DependencyProcessor;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.util.ServerConstants;
+import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.Constants;
 import com.photon.phresco.util.TechnologyTypes;
 import com.phresco.pom.exception.PhrescoPomException;
@@ -106,23 +109,25 @@ public abstract class AbstractDependencyProcessor implements DependencyProcessor
 	}
 
 	@Override
-	public void process(ProjectInfo info, File path) throws PhrescoException {
+	public void process(ApplicationInfo applicationInfo, File path) throws PhrescoException {
 		S_LOGGER.debug("Entering Method  AbstractDependencyProcessor.process(ProjectInfo info, File path)");
 		S_LOGGER.debug("process() FilePath=" + path.getPath());
-		S_LOGGER.debug("process() ProjectCode=" + info.getCode());
-
-		Technology technology = info.getTechnology();
-
+		S_LOGGER.debug("process() ProjectCode=" + applicationInfo.getCode());
+		
+		TechnologyInfo techInfo = applicationInfo.getTechInfo();
 		// pilot projects
-		extractPilots(info, path, technology);
+		extractPilots(applicationInfo, path, techInfo);
 	}
 
-	protected void extractPilots(ProjectInfo info, File path,
-			Technology technology) throws PhrescoException {
-	    
-	    ProjectInfo projectInfo = PhrescoServerFactory.getDbManager().getProjectInfo(info.getTechnology().getId(), info.getPilotProjectName());
-        if(projectInfo != null) {
-            DependencyUtils.extractFiles(projectInfo.getProjectURL(), path, info.getCustomerId());
+	protected void extractPilots(ApplicationInfo info, File path,
+			TechnologyInfo techInfo) throws PhrescoException {
+		ApplicationInfo appInfo = PhrescoServerFactory.getDbManager().getProjectInfo(techInfo.getId(), info.getName());
+        if(appInfo != null) {
+        	ArtifactGroup pilotContent = appInfo.getPilotContent();
+        	String customerId= pilotContent.getCustomerIds().get(0);
+        	String contentURL = ServerUtil.createContentURL(pilotContent.getGroupId(), pilotContent.getArtifactId(), 
+        			pilotContent.getVersions().get(0).getVersion(), pilotContent.getPackaging());
+            DependencyUtils.extractFiles(contentURL, path, customerId);
         }
 	}
 	
@@ -164,19 +169,19 @@ public abstract class AbstractDependencyProcessor implements DependencyProcessor
 	
 	protected abstract String getModulePathKey();
 
-	protected void updatePOMWithModules(File path, List<com.photon.phresco.model.ModuleGroup> modules)
+	protected void updatePOMWithModules(File path, List<ArtifactGroup> modules)
 	throws PhrescoException, JAXBException, PhrescoPomException {
 		try {
 			S_LOGGER.debug("updatePOMWithModules() path=" + path.getPath());
 			File pomFile = new File(path, "pom.xml");
 			if (pomFile.exists()) {
 				PomProcessor processor = new PomProcessor(pomFile);
-				for (com.photon.phresco.model.ModuleGroup moduleGroup : modules) {
+				for (ArtifactGroup moduleGroup : modules) {
 					if (moduleGroup != null) {
-					    List<Module> versions = moduleGroup.getVersions();
+					    List<ArtifactInfo> versions = moduleGroup.getVersions();
                         if (CollectionUtils.isNotEmpty(versions)) {
-                            for (Module module : versions) {
-        						processor.addDependency(module.getGroupId(), module.getArtifactId(), module.getVersion());
+                            for (ArtifactInfo module : versions) {
+        						processor.addDependency(moduleGroup.getGroupId(), moduleGroup.getArtifactId(), module.getVersion());
                             }
                         }
 					}
@@ -188,13 +193,13 @@ public abstract class AbstractDependencyProcessor implements DependencyProcessor
 		}
 	}
 	
-	protected void updatePOMWithJsLibs(File path, List<com.photon.phresco.model.ModuleGroup> jsLibs) throws PhrescoException{
+	protected void updatePOMWithJsLibs(File path, List<ArtifactGroup> jsLibs) throws PhrescoException{
         try {
         	S_LOGGER.debug("updatePOMWithJsLibs() path=" + path.getPath());
             File pomFile = new File(path, "pom.xml");
             if (pomFile.exists()) {
                 PomProcessor processor = new PomProcessor(pomFile);
-                for (com.photon.phresco.model.ModuleGroup jsLibrary : jsLibs) {
+                for (ArtifactGroup jsLibrary : jsLibs) {
                     if (jsLibrary != null) {
                         String groupId = "jslibraries.files";
                         String artifactId = "jslib_" + jsLibrary.getName().toLowerCase();
@@ -213,21 +218,21 @@ public abstract class AbstractDependencyProcessor implements DependencyProcessor
         }
     }
 	
-	protected void createSqlFolder(ProjectInfo info, File path) throws PhrescoException {
+	protected void createSqlFolder(ApplicationInfo info, File path) throws PhrescoException {
 		String databaseType = "";
 		try {
-			List<Database> databaseList = info.getTechnology().getDatabases();
-			String techId = info.getTechnology().getId();
+			List<DownloadInfo> databaseList = info.getSelectedDatabases();
+			String techId = info.getTechInfo().getId();
 			if (databaseList == null || databaseList.size() == 0) {
 				return;
 			}
 			File mysqlFolder = new File(path, sqlFolderPathMap.get(techId) + Constants.DB_MYSQL);
 			File mysqlVersionFolder = getMysqlVersionFolder(mysqlFolder);
-			for (Database db : databaseList) {
+			for (DownloadInfo db : databaseList) {
 				databaseType = db.getName().toLowerCase();
-				List<String> versions = db.getVersions();
-				for (String version : versions) {
-					String sqlPath = databaseType + File.separator + version.trim();
+				List<ArtifactInfo> versions = db.getVersions();
+				for (ArtifactInfo version : versions) {
+					String sqlPath = databaseType + File.separator + version.getVersion();
 					File sqlFolder = new File(path, sqlFolderPathMap.get(techId) + sqlPath);
 					sqlFolder.mkdirs();
 					if (databaseType.equals(Constants.DB_MYSQL) && mysqlVersionFolder != null
@@ -252,7 +257,7 @@ public abstract class AbstractDependencyProcessor implements DependencyProcessor
 		return null;
 	}
 	
-	protected void updatePOMWithModules(File path, List<com.photon.phresco.model.ModuleGroup> modules, String id) throws PhrescoException {
+	protected void updatePOMWithModules(File path, List<ArtifactGroup> modules, String id) throws PhrescoException {
 		if(CollectionUtils.isEmpty(modules)) {
 			return;
 		}
@@ -260,7 +265,7 @@ public abstract class AbstractDependencyProcessor implements DependencyProcessor
 			File pomFile = new File(path, "pom.xml");
 			if (pomFile.exists()) {
 				PomProcessor processor = new PomProcessor(pomFile);
-				for (com.photon.phresco.model.ModuleGroup module : modules) {
+				for (ArtifactGroup module : modules) {
 					if (module != null) {
 						String groupId ="modules." + id + ".files";
 						processor.addDependency(groupId, module.getId(), module.getVersions()
@@ -278,7 +283,7 @@ public abstract class AbstractDependencyProcessor implements DependencyProcessor
 		}
 	}
 	
-	protected void updatePOMWithPluginArtifact(File path, List<com.photon.phresco.model.ModuleGroup> modules, String techId) throws PhrescoException {
+	protected void updatePOMWithPluginArtifact(File path, List<ArtifactGroup> modules, String techId) throws PhrescoException {
 		try {
 			if(CollectionUtils.isEmpty(modules)) {
 				return;
@@ -290,7 +295,7 @@ public abstract class AbstractDependencyProcessor implements DependencyProcessor
 				DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
 				DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
 				Document doc = docBuilder.newDocument();
-				for (com.photon.phresco.model.ModuleGroup module : modules) {
+				for (ArtifactGroup module : modules) {
 					if (module != null) {
 						String groupId ="modules." + techId + ".files";
 						String artifactId = module.getId();

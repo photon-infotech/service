@@ -40,22 +40,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.itextpdf.text.pdf.PdfCopy;
+import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.Documentation;
-import com.photon.phresco.model.ModuleGroup;
-import com.photon.phresco.model.ProjectInfo;
-import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.api.DocumentGenerator;
-import com.photon.phresco.service.api.PhrescoServerFactory;
-import com.photon.phresco.service.docs.impl.DocConvertor;
 import com.photon.phresco.service.docs.impl.DocumentUtil;
-import com.photon.phresco.service.docs.impl.PdfInput;
 import com.photon.phresco.util.Utility;
 
 /**
@@ -70,7 +62,7 @@ public class DocumentGeneratorImpl implements DocumentGenerator {
     private static final String LIB = "JsLibraries";
 
     @Override
-    public void generate(ProjectInfo info, File filePath)
+    public void generate(ApplicationInfo info, File filePath)
             throws PhrescoException {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entering Method DocumentGeneratorImpl.generate(ProjectInfo info, File filePath)");
@@ -100,25 +92,27 @@ public class DocumentGeneratorImpl implements DocumentGenerator {
             InputStream titleSection = DocumentUtil.getTitleSection(info);
             DocumentUtil.addPages(titleSection, pdfCopy);
 
-            Technology technology = PhrescoServerFactory.getDbManager()
-                    .getTechnologyDoc(info.getTechnology().getId());
-            List<Documentation> technologyDoc = technology.getDocs();
-            if (technologyDoc != null) {
-                for (Documentation documentation : technologyDoc) {
-                    if (!StringUtils.isEmpty(documentation.getUrl())) {
-                        PdfInput convertToPdf = DocConvertor
-                                .convertToPdf(documentation.getUrl());
-                        if (convertToPdf != null) {
-                            DocumentUtil.addPages(
-                                    convertToPdf.getInputStream(), pdfCopy);
-                        }
-                    } else {
-                        InputStream stringAsPDF = DocumentUtil
-                                .getStringAsPDF(documentation.getContent());
-                        DocumentUtil.addPages(stringAsPDF, pdfCopy);
-                    }
-                }
-            }
+//            Technology technology = PhrescoServerFactory.getDbManager()
+//                    .getTechnologyDoc(info.getTechnology().getId());
+//            List<Documentation> technologyDoc = technology.getDocs();
+//            if (technologyDoc != null) {
+//                for (Documentation documentation : technologyDoc) {
+//                    if (!StringUtils.isEmpty(documentation.getUrl())) {
+//                        PdfInput convertToPdf = DocConvertor
+//                                .convertToPdf(documentation.getUrl());
+//                        if (convertToPdf != null) {
+//                            DocumentUtil.addPages(
+//                                    convertToPdf.getInputStream(), pdfCopy);
+//                        }
+//                    } else {
+//                        InputStream stringAsPDF = DocumentUtil
+//                                .getStringAsPDF(documentation.getContent());
+//                        DocumentUtil.addPages(stringAsPDF, pdfCopy);
+//                    }
+//                }
+//            }
+            
+            
             
 //            Documents documentInfo = repoManager.getDocument(technology.getId(), EntityType.TECHNOLOGY);
 //            if(documentInfo!= null){
@@ -136,11 +130,11 @@ public class DocumentGeneratorImpl implements DocumentGenerator {
 //                }
 //            }
 
-            List<ModuleGroup> tuples = technology.getModules();
-            DocumentUtil.addPages(tuples, pdfCopy, MODULES);
-            
-            List<ModuleGroup> libraries = technology.getJsLibraries();
-            DocumentUtil.addPages(libraries, pdfCopy, LIB);
+//            List<ArtifactGroup> tuples = technology.getModules();
+//            DocumentUtil.addPages(tuples, pdfCopy, MODULES);
+//            
+//            List<ModuleGroup> libraries = technology.getJsLibraries();
+//            DocumentUtil.addPages(libraries, pdfCopy, LIB);
             //TODO: need to do for App servers, databases if required.
 
             docu.close();

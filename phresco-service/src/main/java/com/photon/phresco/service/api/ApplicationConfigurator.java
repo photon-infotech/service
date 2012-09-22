@@ -37,7 +37,8 @@ package com.photon.phresco.service.api;
 
 import java.io.File;
 
-import com.photon.phresco.model.ProjectInfo;
+import com.photon.phresco.commons.model.ApplicationInfo;
+import com.photon.phresco.commons.model.ProjectInfo;
 
 /**
  * @author arunachalam_l
@@ -50,5 +51,5 @@ public interface ApplicationConfigurator {
 	 * @param projectInfo
 	 * @param path
 	 */
-	void configure(ProjectInfo projectInfo, File path);
+	void configure(ApplicationInfo projectInfo, File path);
 }

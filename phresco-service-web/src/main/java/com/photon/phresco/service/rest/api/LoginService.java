@@ -19,6 +19,7 @@
  */
 package com.photon.phresco.service.rest.api;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +32,8 @@ import javax.ws.rs.core.MediaType;
 import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.User;
 import com.photon.phresco.exception.PhrescoException;
@@ -96,5 +99,21 @@ public class LoginService extends DbService {
         convertedUser.setPhrescoEnabled(user.isPhrescoEnabled());
         convertedUser.setCustomers(customers);
         return convertedUser;
+    }
+	
+	@POST
+    @Path("/import")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public List<User> importUser(User user) throws PhrescoException {
+        Client client = Client.create();
+        PhrescoServerFactory.initialize();
+        RepositoryManager repoMgr = PhrescoServerFactory.getRepositoryManager();
+        WebResource resource = client.resource(repoMgr.getAuthServiceURL() + "/ldap/import");
+        resource.accept(MediaType.APPLICATION_JSON_TYPE);
+        String response = resource.type(MediaType.APPLICATION_JSON_TYPE).post(String.class, user);
+        Type type = new TypeToken<List<User>>() {}.getType();
+        Gson gson = new Gson();
+        return gson.fromJson(response, type);
     }
 }

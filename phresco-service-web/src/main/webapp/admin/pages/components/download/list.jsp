@@ -25,7 +25,7 @@
 <%@ page import="org.apache.commons.collections.CollectionUtils" %>
 
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
-<%@ page import="com.photon.phresco.model.DownloadInfo" %>
+<%@ page import="com.photon.phresco.commons.model.DownloadInfo" %>
 
 <% 
 	List<DownloadInfo> downloadInfo = (List<DownloadInfo>)request.getAttribute(ServiceUIConstants.REQ_DOWNLOAD_INFO); 

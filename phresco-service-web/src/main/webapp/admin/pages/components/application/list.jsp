@@ -24,7 +24,7 @@
 <%@ page import="org.apache.commons.lang.StringUtils"%>
 <%@ page import="java.util.List"%>
 
-<%@ page import="com.photon.phresco.model.ApplicationType"%>
+<%@ page import="com.photon.phresco.commons.model.ApplicationType"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
 
 <%

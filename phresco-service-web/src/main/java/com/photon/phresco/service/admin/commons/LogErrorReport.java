@@ -22,9 +22,9 @@ package com.photon.phresco.service.admin.commons;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import com.photon.phresco.commons.model.LogInfo;
 import com.photon.phresco.commons.model.User;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
-import com.photon.phresco.model.LogInfo;
 
 public class LogErrorReport extends ServiceBaseAction {
 	private static final long serialVersionUID = 1L;
@@ -34,7 +34,11 @@ public class LogErrorReport extends ServiceBaseAction {
         e.printStackTrace(new PrintWriter(sw));
         String stacktrace = sw.toString();
         User userInfo = (User) getHttpSession().getAttribute(SESSION_USER_INFO);
-        LogInfo log = new LogInfo(e.getLocalizedMessage(), stacktrace, action, userInfo.getLoginId());
+        LogInfo log = new LogInfo();
+        log.setMessage(e.getLocalizedMessage());
+        log.setTrace(stacktrace);
+        log.setAction(action);
+        log.setUserId(userInfo.getLoginId());
         getHttpRequest().setAttribute(REQ_LOG_REPORT, log);
         addActionError(e.getLocalizedMessage());
 	}

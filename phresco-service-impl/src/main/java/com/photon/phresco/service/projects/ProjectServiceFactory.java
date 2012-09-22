@@ -35,7 +35,7 @@
  ******************************************************************************/
 package com.photon.phresco.service.projects;
 
-import com.photon.phresco.model.ProjectInfo;
+import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.service.api.ProjectService;
 
 public class ProjectServiceFactory {

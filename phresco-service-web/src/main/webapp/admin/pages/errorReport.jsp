@@ -20,7 +20,7 @@
 <%@ taglib uri="/struts-tags" prefix="s"%>
 
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
-<%@ page import="com.photon.phresco.model.LogInfo" %>
+<%@ page import="com.photon.phresco.commons.model.LogInfo" %>
 
 <% 
 	LogInfo log = (LogInfo)request.getAttribute(ServiceUIConstants.REQ_LOG_REPORT); 

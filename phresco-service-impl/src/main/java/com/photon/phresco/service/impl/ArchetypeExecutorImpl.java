@@ -41,11 +41,10 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
+import com.photon.phresco.commons.model.ApplicationInfo;
+import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.ArchetypeInfo;
-import com.photon.phresco.model.ProjectInfo;
 import com.photon.phresco.service.api.ArchetypeExecutor;
-import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.model.ServerConfiguration;
 import com.photon.phresco.service.util.ServerConstants;
 import com.photon.phresco.service.util.ServerUtil;
@@ -67,14 +66,14 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
         this.serverConfiguration = serverConfiguration;
     }
 
-    public File execute(ProjectInfo info) throws PhrescoException {
+    public File execute(ApplicationInfo applicationInfo) throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method ArchetypeExecutorImpl.execute(ProjectInfo info)");
-			S_LOGGER.debug("execute() ProjectCode=" + info.getCode());
+			S_LOGGER.debug("execute() ProjectCode=" + applicationInfo.getCode());
 		}
 		String tempFolderPath = null;
 		try {
-			String commandString = buildCommandString(info);
+			String commandString = buildCommandString(applicationInfo);
 			if (S_LOGGER.isDebugEnabled()) {
 				S_LOGGER.debug("command String " + commandString);
 			}
@@ -88,21 +87,21 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 					S_LOGGER.debug(line);
 				}
 			}
-			createProjectFolders(info, new File(tempFolderPath));
+			createProjectFolders(applicationInfo, new File(tempFolderPath));
 		} catch (IOException e) {
 			throw new PhrescoException(e);
 		}
 		return new File(tempFolderPath);
 	}
 
-    private void createProjectFolders(ProjectInfo info, File file) throws PhrescoException {
+    private void createProjectFolders(ApplicationInfo info, File file) throws PhrescoException {
     	if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method ArchetypeExecutorImpl.createProjectFolders(ProjectInfo info, File file)");
 			S_LOGGER.debug("createProjectFolders()  path="+file.getPath());
 		}
         //create .phresco folder inside the project
     	if (isDebugEnabled) {
-			S_LOGGER.debug("createProjectFolders()  ProjectCode="+info.getCode());
+			S_LOGGER.debug("createProjectFolders()  ProjectCode=" + info.getCode());
 		}
     	File phrescoFolder = new File(file.getPath() + File.separator + info.getCode() + File.separator + DOT_PHRESCO_FOLDER);
         phrescoFolder.mkdirs();
@@ -112,13 +111,12 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
        ProjectUtils.writeProjectInfo(info, phrescoFolder);
     }
 
-    private String buildCommandString(ProjectInfo info) throws PhrescoException {
+    private String buildCommandString(ApplicationInfo info) throws PhrescoException {
     	if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method ArchetypeExecutorImpl.buildCommandString(ProjectInfo info)");
-			S_LOGGER.debug("buildCommandString() ProjectCode="+info.getCode());
+			S_LOGGER.debug("buildCommandString() ProjectCode=" + info.getCode());
 		}
     	
-    	ArchetypeInfo archetypeInfo = PhrescoServerFactory.getDbManager().getArchetypeInfo(info.getTechId());
 //    	ArchetypeInfo archInfo = PhrescoServerFactory.getRepositoryManager().getArchetype(info);
 //    	Object archInfo = null;
 //    	//TEMP BUG - to be cleaned up
@@ -128,21 +126,23 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 
         // For Thread-Safe,using StringBuffer instead of StringBuilder
         StringBuffer commandStr = new StringBuffer();
-
+        
+        ArtifactGroup pilotContent = info.getPilotContent();
+        
         commandStr.append(Constants.MVN_COMMAND).append(Constants.STR_BLANK_SPACE)
                 .append(Constants.MVN_ARCHETYPE).append(STR_COLON).append(Constants.MVN_GOAL_GENERATE)
                 .append(Constants.STR_BLANK_SPACE)
-                .append(ARCHETYPE_ARCHETYPEGROUPID).append(Constants.STR_EQUALS).append(archetypeInfo.getGroupId())
+                .append(ARCHETYPE_ARCHETYPEGROUPID).append(Constants.STR_EQUALS).append(pilotContent.getGroupId())
                 .append(Constants.STR_BLANK_SPACE)
-                .append(ARCHETYPE_ARCHETYPEARTIFACTID).append(Constants.STR_EQUALS).append(archetypeInfo.getArtifactId())
+                .append(ARCHETYPE_ARCHETYPEARTIFACTID).append(Constants.STR_EQUALS).append(pilotContent.getArtifactId())
                 .append(Constants.STR_BLANK_SPACE)
-                .append(ARCHETYPE_ARCHETYPEVERSION).append(Constants.STR_EQUALS).append(archetypeInfo.getVersion())
+//                .append(ARCHETYPE_ARCHETYPEVERSION).append(Constants.STR_EQUALS).append(archetypeInfo.getVersion())
                 .append(Constants.STR_BLANK_SPACE)
-                .append(ARCHETYPE_GROUPID).append(Constants.STR_EQUALS).append(archetypeInfo.getProjectGroupId())
+//                .append(ARCHETYPE_GROUPID).append(Constants.STR_EQUALS).append(archetypeInfo.getProjectGroupId())
                 .append(Constants.STR_BLANK_SPACE)
                 .append(ARCHETYPE_ARTIFACTID).append(Constants.STR_EQUALS).append(STR_DOUBLE_QUOTES).append(info.getCode()).append(STR_DOUBLE_QUOTES) //artifactId --> project name could have space in between
                 .append(Constants.STR_BLANK_SPACE)
-                .append(ARCHETYPE_VERSION).append(Constants.STR_EQUALS).append(info.getVersion())
+                .append(ARCHETYPE_VERSION).append(Constants.STR_EQUALS).append(pilotContent.getVersions().get(0))
                 .append(Constants.STR_BLANK_SPACE)
                 .append(ARCHETYPE_ARCHETYPEREPOSITORYURL).append(Constants.STR_EQUALS).append("http://172.16.18.178:8080/nexus/content/repositories/releases/archetypes/")
                 .append(Constants.STR_BLANK_SPACE)

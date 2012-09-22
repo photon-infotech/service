@@ -25,13 +25,15 @@ import java.util.List;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
+import com.photon.phresco.commons.model.Status;
+
 public class UserDAO extends BaseDAO {
 
 	private String userId;
 	private String email;
 	private String firstName;
 	private String lastName;
-	private int status;
+	private Status status;
 	private List<String> roleIds;
 	private List<String> customerIds;
 
@@ -98,14 +100,14 @@ public class UserDAO extends BaseDAO {
     /**
      * @return
      */
-    public int getStatus() {
+    public Status getStatus() {
         return status;
     }
 
     /**
      * @param status
      */
-    public void setStatus(int status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 

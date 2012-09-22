@@ -37,8 +37,8 @@ package com.photon.phresco.service.dependency.impl;
 
 import java.io.File;
 
+import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.ProjectInfo;
 import com.photon.phresco.service.api.RepositoryManager;
 
 public class WinMetroDependencyProcessor extends AbstractJsLibDependencyProcessor {
@@ -48,7 +48,7 @@ public class WinMetroDependencyProcessor extends AbstractJsLibDependencyProcesso
 	}
 
 	@Override
-	public void process(ProjectInfo info, File path) throws PhrescoException {
+	public void process(ApplicationInfo info, File path) throws PhrescoException {
 //		super.process(info, path);
 //		try {
 //			updatePOMWithModules(path, info.getTechnology().getModules());

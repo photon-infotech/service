@@ -23,9 +23,9 @@
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="java.util.List" %>
 
-<%@ page import="com.photon.phresco.model.ProjectInfo"%>
+<%@ page import="com.photon.phresco.commons.model.ProjectInfo"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
-<%@ page import="com.photon.phresco.model.Technology"%>
+<%@ page import="com.photon.phresco.commons.model.Technology"%>
 
 <% 
 	ProjectInfo pilotProjectInfo = (ProjectInfo)request.getAttribute(ServiceUIConstants.REQ_PILOT_PROINFO); 
