@@ -23,14 +23,13 @@
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.apache.commons.collections.CollectionUtils"%>
 
-<%@ page import="com.photon.phresco.model.Module" %>
-<%@ page import="com.photon.phresco.model.ModuleGroup" %>
-<%@ page import="com.photon.phresco.model.Technology" %>
+<%@ page import="com.photon.phresco.commons.model.ArtifactInfo" %>
+<%@ page import=" com.photon.phresco.commons.model.ArtifactGroup" %>
+<%@ page import="com.photon.phresco.commons.model.Technology" %>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
-<%@ page import="com.photon.phresco.model.Documentation.DocumentationType"%>
 
 <%
-	ModuleGroup moduleGroup = (ModuleGroup)request.getAttribute(ServiceUIConstants.REQ_FEATURES_MOD_GRP); 
+    ArtifactGroup moduleGroup = (ArtifactGroup)request.getAttribute(ServiceUIConstants.REQ_FEATURES_MOD_GRP); 
     List<Technology> technologies = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
     String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
     String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
@@ -50,10 +49,10 @@
     boolean isDefaultModule = false;
     boolean isSystem = false;
 	if (moduleGroup != null) {
-	    List<Module> modules = moduleGroup.getVersions();
-	    Module selectedModule = null;
+	    List<ArtifactInfo> modules = moduleGroup.getVersions();
+	    ArtifactInfo selectedModule = null;
 	    if (CollectionUtils.isNotEmpty(modules)) {
-	        for (Module module : modules) {
+	        for (ArtifactInfo module : modules) {
 	            if (module.getId().equals(selectedModuleId)) {
 	            	selectedModule = module;
 	            	break;
@@ -61,12 +60,12 @@
 	        }
 	        moduleId = selectedModule.getId();
 			name = selectedModule.getName();
-			isDefaultModule = selectedModule.getRequired();
-			if (selectedModule.getDoc(DocumentationType.DESCRIPTION) != null) {
-				description = selectedModule.getDoc(DocumentationType.DESCRIPTION).getContent();
+			isDefaultModule = selectedModule.getAppliesTo();
+			if (selectedModule.getDescription() != null) {
+				description = selectedModule.getDescription();
 			}
-			if (selectedModule.getDoc(DocumentationType.HELP_TEXT) != null) {
-			    helpText = selectedModule.getDoc(DocumentationType.HELP_TEXT).getContent();
+			if (selectedModule.getHelpText() != null) {
+			    helpText = selectedModule.getHelpText();
 			}
 	    }
 		selectedTechnology = moduleGroup.getTechId();

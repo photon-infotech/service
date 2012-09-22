@@ -23,12 +23,13 @@
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="java.util.List" %>
 
-<%@ page import="com.photon.phresco.commons.model.ProjectInfo"%>
+
+<%@ page import="com.photon.phresco.commons.model.ApplicationInfo"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
 <%@ page import="com.photon.phresco.commons.model.Technology"%>
 
 <% 
-	ProjectInfo pilotProjectInfo = (ProjectInfo)request.getAttribute(ServiceUIConstants.REQ_PILOT_PROINFO); 
+    ApplicationInfo pilotProjectInfo = (ApplicationInfo)request.getAttribute(ServiceUIConstants.REQ_PILOT_PROINFO); 
 	String fromPage = (String)request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE); 
 	List<Technology> technologys = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
@@ -99,7 +100,7 @@
 				<select id="multiSelect" name="techId" id="tech">
 					
 				 	<% if(StringUtils.isNotEmpty(fromPage)) { //for edit %>
-							<option value="<%= pilotProjectInfo.getTechnology().getId() %>"><%= pilotProjectInfo.getTechnology().getName()%></option>
+							<option value="<%= pilotProjectInfo.getTechInfo().getId() %>"><%= pilotProjectInfo.getTechInfo().getName()%></option>
 					<% } else { // for add %>		
 						<% if (technologys != null) {
 								for (Technology technology : technologys) { 

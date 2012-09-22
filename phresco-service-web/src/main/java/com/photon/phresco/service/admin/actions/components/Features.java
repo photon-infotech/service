@@ -35,13 +35,12 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.google.gson.Gson;
+import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.ArtifactInfo;
+import com.photon.phresco.commons.model.CoreOption;
+import com.photon.phresco.commons.model.RequiredOption;
+import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.ArchetypeInfo;
-import com.photon.phresco.model.Documentation;
-import com.photon.phresco.model.Documentation.DocumentationType;
-import com.photon.phresco.model.Module;
-import com.photon.phresco.model.ModuleGroup;
-import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.admin.commons.LogErrorReport;
 import com.photon.phresco.service.client.api.Content;
@@ -125,7 +124,7 @@ public class Features extends ServiceBaseAction {
     	}
     	
     	try {
-    		List<ModuleGroup> moduleGroup = getServiceManager().getFeaturesByTech(customerId, technology, type);
+    		List<ArtifactGroup> moduleGroup = getServiceManager().getFeaturesByTech(customerId, technology, type);
     		getHttpRequest().setAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
     		getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
     		if (StringUtils.isNotEmpty(from)) {
@@ -175,7 +174,7 @@ public class Features extends ServiceBaseAction {
 		try {
 		    List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
 	        getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
-		    ModuleGroup moduleGroup = getServiceManager().getFeature(moduleGroupId, customerId);
+		    ArtifactGroup moduleGroup = getServiceManager().getFeature(moduleGroupId, customerId);
 			getHttpRequest().setAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
 			getHttpRequest().setAttribute(REQ_FEATURES_SELECTED_MODULEID, moduleId);
 			getHttpRequest().setAttribute(REQ_FROM_PAGE, EDIT);
@@ -260,47 +259,54 @@ public class Features extends ServiceBaseAction {
 		return technologies();	
 	}
 	
-	private ModuleGroup createModuleGroup() throws PhrescoException {
+	private ArtifactGroup createModuleGroup() throws PhrescoException {
 	    if (isDebugEnabled) {
             S_LOGGER.debug("Entering Method  Features.createModuleGroup()");
         }
 	    
-        ModuleGroup moduleGroup;
+        ArtifactGroup moduleGroup;
+        CoreOption moduleCoreOption;
+        RequiredOption requiredOption;
+        List<CoreOption> appliesTo = new ArrayList<CoreOption>();
+        List<RequiredOption> required = new ArrayList<RequiredOption>();
+        
         try {
-            moduleGroup = new ModuleGroup();
-            List<Module> modules = new ArrayList<Module>();
-            Module module = new Module();
+            moduleGroup = new ArtifactGroup();
+            List<ArtifactInfo> modules = new ArrayList<ArtifactInfo>();
+            ArtifactInfo module = new ArtifactInfo();
             if (StringUtils.isNotEmpty(fromPage)) {
                 moduleGroup.setId(moduleGroupId);
             }
             moduleGroup.setName(name);
-            moduleGroup.setTechId(technology);
             if (FEATURES_CORE.equals(moduleType)) {
-                moduleGroup.setCore(true);
+            	moduleCoreOption= new CoreOption(technology, true);
             } else {
-                moduleGroup.setCore(false);
+            	moduleCoreOption= new CoreOption(technology, false);;
             }
+            
+            appliesTo.add(moduleCoreOption);
+            moduleGroup.setAppliesTo(appliesTo);
+            
             moduleGroup.setType(type);
-            moduleGroup.setCustomerId(customerId);
+            List<String> customerIds = new ArrayList<String>();
+            customerIds.add(customerId);
+           
+            moduleGroup.setCustomerIds(customerIds);
+            moduleGroup.setArtifactId(artifactId);
+            moduleGroup.setGroupId(groupId);
             module.setName(name);
-            List<Documentation> docs = new ArrayList<Documentation>();
-            Documentation descDoc = new Documentation();
-            descDoc.setType(DocumentationType.DESCRIPTION);
-            descDoc.setContent(description);
-            docs.add(descDoc);
-            Documentation helpTextDoc = new Documentation();
-            helpTextDoc.setType(DocumentationType.HELP_TEXT);
-            helpTextDoc.setContent(helpText);
-            docs.add(helpTextDoc);
-            module.setDocs(docs);
-            module.setVersion(version);
-            module.setArtifactId(artifactId);
-            module.setGroupId(groupId);
+            module.setDescription(description);
+            
             if (StringUtils.isNotEmpty(defaultType)) {
-                module.setRequired(true);
+            	requiredOption = new RequiredOption(technology, true);
             } else {
-                module.setRequired(false);
+            	requiredOption = new RequiredOption(technology, false);
             }
+            required.add(requiredOption);
+            module.setAppliesTo(required);
+            
+            module.setHelpText(helpText);
+            module.setVersion(version);
             modules.add(module);
             moduleGroup.setVersions(modules);
         } catch (Exception e) {
@@ -346,7 +352,9 @@ public class Features extends ServiceBaseAction {
         	InputStream is = getHttpRequest().getInputStream();
         	byte[] tempFeaByteArray = IOUtils.toByteArray(is);
     		featureByteArray = tempFeaByteArray;
-        	ArchetypeInfo archetypeInfo = ServerUtil.getArtifactinfo(new ByteArrayInputStream(tempFeaByteArray));
+    		
+    		//TODO Arunprasanna
+        	/*ArchetypeInfo archetypeInfo = ServerUtil.getArtifactinfo(new ByteArrayInputStream(tempFeaByteArray));
             getHttpResponse().setStatus(getHttpResponse().SC_OK);
             if (archetypeInfo != null) {
             	archetypeInfo.setMavenJar(true);
@@ -356,7 +364,7 @@ public class Features extends ServiceBaseAction {
             	writer.print(json);
             } else {
             	writer.print(MAVEN_JAR_FALSE);
-        	}
+        	}*/
 	        writer.flush();
 	        writer.close();
 		} catch (Exception e) {
@@ -406,12 +414,12 @@ public class Features extends ServiceBaseAction {
                 }
                 if (StringUtils.isNotEmpty(version) && (StringUtils.isEmpty(fromPage) 
                         || (!version.equals(oldVersion)))) {//To check whether the version already exist
-                    List<ModuleGroup> moduleGroups = getServiceManager().getFeaturesByTech(customerId, technology, type);
+                    List<ArtifactGroup> moduleGroups = getServiceManager().getFeaturesByTech(customerId, technology, type);
                     if (StringUtils.isNotEmpty(version)) {
-                        for (ModuleGroup moduleGroup : moduleGroups) {
-                            List<Module> versions = moduleGroup.getVersions();
+                        for (ArtifactGroup moduleGroup : moduleGroups) {
+                            List<ArtifactInfo> versions = moduleGroup.getVersions();
                             if (CollectionUtils.isNotEmpty(versions)) {
-                                for (Module module : versions) {
+                                for (ArtifactInfo module : versions) {
                                     if (module.getName().equalsIgnoreCase(name)
                                             && module.getVersion().equals(
                                                     version)) {

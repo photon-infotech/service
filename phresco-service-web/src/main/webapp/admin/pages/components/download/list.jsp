@@ -100,7 +100,7 @@
 								<td>
 									<%= CollectionUtils.isNotEmpty(download.getPlatform()) ? download.getPlatform() : "" %>
 								</td>
-								<td><%= CollectionUtils.isNotEmpty(download.getVersion()) ? download.getVersion() : "" %></td>
+								<td><%= CollectionUtils.isNotEmpty(download.getVersions()) ? download.getVersions() : "" %></td>
 							</tr>
 						<%
 								}

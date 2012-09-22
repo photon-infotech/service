@@ -33,11 +33,11 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.Documentation;
-import com.photon.phresco.model.Documentation.DocumentationType;
-import com.photon.phresco.model.Module;
-import com.photon.phresco.model.ModuleGroup;
-import com.photon.phresco.model.Technology;
+import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.ArtifactInfo;
+import com.photon.phresco.commons.model.CoreOption;
+import com.photon.phresco.commons.model.RequiredOption;
+import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.admin.commons.LogErrorReport;
 import com.photon.phresco.service.client.api.Content;
@@ -71,11 +71,12 @@ public class Component extends ServiceBaseAction {
     
 	private String description = null;
 	private String helpText = "";
-	private List<Module> versions = null;
+	private String versions = "";
 	private String technology = "";
 	
 	private String version = "";
-    private String verError = "";
+   
+	private String verError = "";
 	private String oldVersion = "";
 	private String moduleType = "";
 	private String defaultType = "";
@@ -107,7 +108,7 @@ public class Component extends ServiceBaseAction {
     	}
     	
     	try {    		
-    		List<ModuleGroup> moduleGroup = getServiceManager().getFeaturesByTech(customerId, techId, type);
+    		List<ArtifactGroup> moduleGroup = getServiceManager().getFeaturesByTech(customerId, techId, type);
     		getHttpRequest().setAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
     		getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
     		if (StringUtils.isNotEmpty(from)) {
@@ -140,7 +141,7 @@ public class Component extends ServiceBaseAction {
 		}
 		
 		try {
-		    ModuleGroup moduleGroup = getServiceManager().getFeature(techId, customerId);
+		    ArtifactGroup moduleGroup = getServiceManager().getFeature(techId, customerId);
 			getHttpRequest().setAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
 			getHttpRequest().setAttribute(REQ_FROM_PAGE, EDIT);
 			getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
@@ -188,41 +189,50 @@ public class Component extends ServiceBaseAction {
 		return list();
 	}
 	
-	private ModuleGroup createModuleGroup() {
-		ModuleGroup moduleGroup = new ModuleGroup();
-		List<Module> modules = new ArrayList<Module>();
-		Module module = new Module();
-		moduleGroup.setName(name);
-		moduleGroup.setTechId(technology);
-		if (FEATURES_CORE.equals(moduleType)) {
-			moduleGroup.setCore(true);
-		} else {
-			moduleGroup.setCore(false);
+	private ArtifactGroup createModuleGroup() throws PhrescoException {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method  Component.createModuleGroup()");
 		}
-		moduleGroup.setType(type);
-		moduleGroup.setCustomerId(customerId);
-		module.setName(name);
-		List<Documentation> docs = new ArrayList<Documentation>();
-		Documentation descDoc = new Documentation();
-		descDoc.setType(DocumentationType.DESCRIPTION);
-		descDoc.setContent(description);
-		docs.add(descDoc);
-		Documentation helpTextDoc = new Documentation();
-		helpTextDoc.setType(DocumentationType.HELP_TEXT);
-		helpTextDoc.setContent(helpText);
-		docs.add(helpTextDoc);
-		module.setDocs(docs);
-		module.setVersion(version);
-		module.setArtifactId(artifactId);
-		module.setGroupId(groupId);
-		if (StringUtils.isNotEmpty(defaultType)) {
-			module.setRequired(true);
-		} else {
-			module.setRequired(false);
+
+		ArtifactGroup moduleGroup;
+		CoreOption moduleCoreOption;
+		RequiredOption requiredOption;
+		List<CoreOption> appliesTo = new ArrayList<CoreOption>();
+		List<RequiredOption> required = new ArrayList<RequiredOption>();
+		try {
+			moduleGroup = new ArtifactGroup();
+			List<ArtifactInfo> modules = new ArrayList<ArtifactInfo>();
+			ArtifactInfo module = new ArtifactInfo();
+			moduleGroup.setName(name);
+			if (FEATURES_CORE.equals(moduleType)) {
+				moduleCoreOption= new CoreOption(technology, true);
+			} else {
+				moduleCoreOption= new CoreOption(technology, false);;
+			}
+			appliesTo.add(moduleCoreOption);
+			moduleGroup.setAppliesTo(appliesTo);
+			moduleGroup.setType(type);
+			List<String> customerIds = new ArrayList<String>();
+			moduleGroup.setCustomerIds(customerIds);
+			moduleGroup.setArtifactId(artifactId);
+			moduleGroup.setGroupId(groupId);
+			module.setName(name);
+			module.setDescription(description);
+			module.setHelpText(helpText);
+			module.setVersion(version);
+			if (StringUtils.isNotEmpty(defaultType)) {
+				requiredOption = new RequiredOption(technology, true);
+			} else {
+				requiredOption = new RequiredOption(technology, false);
+			}
+			required.add(requiredOption);
+			module.setAppliesTo(required);
+			modules.add(module);
+			moduleGroup.setVersions(modules);
+		} catch(Exception e) {
+			throw new PhrescoException(e);
 		}
-		modules.add(module);
-		moduleGroup.setVersions(modules);
-		
+
 		return moduleGroup;
 	}
 	
@@ -232,17 +242,10 @@ public class Component extends ServiceBaseAction {
 		}
 		
 		try {
-			MultiPart multiPart = new MultiPart();
-			
-			ModuleGroup moduleGroup = new ModuleGroup();
-			moduleGroup.setName(name);
-			moduleGroup.setTechId(technology);
-			moduleGroup.setVersions(versions);
-			moduleGroup.setCustomerId(customerId);
-			
+			MultiPart multiPart = new MultiPart();			
 			BodyPart jsonPart = new BodyPart();
 			jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
-			jsonPart.setEntity(moduleGroup);
+			jsonPart.setEntity(createModuleGroup());
 			Content content = new Content("object", name, null, null, null, 0);
 			jsonPart.setContentDisposition(content);
 			multiPart.bodyPart(jsonPart);
@@ -440,14 +443,6 @@ public class Component extends ServiceBaseAction {
 		this.description = description;
 	}
 
-	public List<Module> getVersions() {
-		return versions;
-	}
-
-	public void setVersions(List<Module> versions) {
-		this.versions = versions;
-	}
-	
 	public String getType() {
 		return type;
 	}
@@ -543,5 +538,12 @@ public class Component extends ServiceBaseAction {
 	public void setAppJarError(String appJarError) {
 		this.appJarError = appJarError;
 	}
-    
+	
+	public String getVersions() {
+		return versions;
+	}
+
+	public void setVersions(String versions) {
+		this.versions = versions;
+	}
 }

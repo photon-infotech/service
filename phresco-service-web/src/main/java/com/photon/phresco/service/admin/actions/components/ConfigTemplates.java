@@ -29,14 +29,15 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.photon.phresco.commons.model.Element;
+import com.photon.phresco.commons.model.PropertyTemplate;
+import com.photon.phresco.commons.model.SettingsTemplate;
+import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.PropertyTemplate;
-import com.photon.phresco.model.SettingsTemplate;
-import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.admin.commons.LogErrorReport;
-import com.photon.phresco.util.ServiceConstants;
 import com.photon.phresco.service.util.ServerUtil;
+import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
 
 public class ConfigTemplates extends ServiceBaseAction { 
@@ -52,7 +53,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 	private String applyError = null;
 	private boolean errorFound = false;
     private String customerId = null;
-    private List<String> appliesTo = null;
+    private List<Element> appliesTo = null;
     private String configId = null;
     private String fromPage = null;
     private String oldName = null;
@@ -122,8 +123,10 @@ public class ConfigTemplates extends ServiceBaseAction {
 			SettingsTemplate settingTemplate = new SettingsTemplate();
             settingTemplate.setType(name);
             settingTemplate.setDescription(description);
-            settingTemplate.setAppliesTo(appliesTo);
-            settingTemplate.setCustomerId(customerId);
+            settingTemplate.setAppliesToTechs(appliesTo);
+            List<String> customerIds = new ArrayList<String>();
+            customerIds.add(customerId);
+            settingTemplate.setCustomerIds(customerIds);
             settingTemplate.setProperties(createPropertyTemplates());
             settingsTemplates.add(settingTemplate);
             ClientResponse clientResponse = getServiceManager().createConfigTemplates(settingsTemplates, customerId);
@@ -151,8 +154,10 @@ public class ConfigTemplates extends ServiceBaseAction {
             SettingsTemplate settingTemplate = new SettingsTemplate();
             settingTemplate.setType(name);
             settingTemplate.setDescription(description);
-            settingTemplate.setAppliesTo(appliesTo);
-            settingTemplate.setCustomerId(customerId);
+            settingTemplate.setAppliesToTechs(appliesTo);
+            List<String> customerIds = new ArrayList<String>();
+            customerIds.add(customerId);
+            settingTemplate.setCustomerIds(customerIds);
             settingTemplate.setId(configId);
             settingTemplate.setProperties(createPropertyTemplates());
     		getServiceManager().updateConfigTemp(settingTemplate, configId, customerId);
@@ -193,8 +198,9 @@ public class ConfigTemplates extends ServiceBaseAction {
 
                     PropertyTemplate propertyTemplate = new PropertyTemplate();
                     propertyTemplate.setKey(propTempKey);
-                    propertyTemplate.setName(ServerUtil
-                            .createI18NString(propTempName));
+                    //TODO Arunprasanna
+                    /*propertyTemplate.setName(ServerUtil
+                            .createI18NString(propTempName));*/
                     propertyTemplate.setType(propTempType);
                     propertyTemplate.setPossibleValues(possibleValues);
                     propertyTemplate.setHelpText(propTempHlpTxt);
@@ -336,11 +342,11 @@ public class ConfigTemplates extends ServiceBaseAction {
 		this.description = description;
 	}
 	
-	public List<String> getAppliesTo() {
+	public List<Element> getAppliesTo() {
 		return appliesTo;
 	}
 
-	public void setAppliesTo(List<String> appliesTo) {
+	public void setAppliesTo(List<Element> appliesTo) {
 		this.appliesTo = appliesTo;
 	}
 

@@ -23,11 +23,11 @@
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.apache.commons.collections.CollectionUtils"%>
 
-<%@ page import="com.photon.phresco.model.GlobalURL"%>
+<%@ page import="com.photon.phresco.commons.model.Property"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
 
 <% 
- 	List<GlobalURL> globalUrls = (List<GlobalURL>) request.getAttribute(ServiceUIConstants.REQ_GLOBURL_URL);
+ 	List<Property> globalUrls = (List<Property>) request.getAttribute(ServiceUIConstants.REQ_GLOBURL_URL);
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
 %>
 
@@ -82,7 +82,7 @@
 		
 					<tbody>
 					<% if(CollectionUtils.isNotEmpty(globalUrls)) {
-						  for(GlobalURL globalUrl : globalUrls) {
+						  for(Property globalUrl : globalUrls) {
 						
 					%>
 						<tr>

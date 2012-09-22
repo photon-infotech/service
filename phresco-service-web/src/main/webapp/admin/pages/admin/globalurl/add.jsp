@@ -21,11 +21,11 @@
 <%@ page import="org.apache.commons.lang.StringUtils"%>
 <%@ page import="java.util.List"%>
 
-<%@ page import="com.photon.phresco.model.GlobalURL"%>
+<%@ page import="com.photon.phresco.commons.model.Property"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
 
 <% 
-	GlobalURL globalUrls = (GlobalURL) request.getAttribute(ServiceUIConstants.REQ_GLOBURL_URL);
+	Property globalUrls = (Property) request.getAttribute(ServiceUIConstants.REQ_GLOBURL_URL);
     String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
     String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
     String name = "";

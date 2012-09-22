@@ -36,10 +36,11 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.google.gson.Gson;
+import com.photon.phresco.commons.model.ApplicationType;
+import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.ArtifactInfo;
+import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.ApplicationType;
-import com.photon.phresco.model.ArchetypeInfo;
-import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.admin.commons.LogErrorReport;
 import com.photon.phresco.service.client.api.Content;
@@ -155,18 +156,40 @@ public class Archetypes extends ServiceBaseAction {
 		
 		try {
 		 	MultiPart multiPart = new MultiPart();
-	    	List<String> versions = new ArrayList<String>();
-	    	versions.add(version);
-	        Technology technology = new Technology();
+	    	
+	    	Technology technology = new Technology();
 	        technology.setName(name);
+	        technology.setId(techId);
 	        technology.setDescription(description);
 	        technology.setAppTypeId(apptype);
-	        technology.setVersions(versions);
-	        technology.setVersionComment(versionComment);
-	        technology.setTechVersion(techVersion);
-	        technology.setCustomerId(customerId);
-	        ArchetypeInfo archetypeInfo = new ArchetypeInfo(groupId, artifactId, version, "jar");
-	        technology.setArchetypeInfo(archetypeInfo);
+	        
+	        ArtifactGroup artifactGroup = new ArtifactGroup();
+	        artifactGroup.setArtifactId(artifactId);
+	        artifactGroup.setGroupId(groupId);
+	        artifactGroup.setPackaging("jar");
+	        
+	        List<ArtifactInfo> artifactVersion = new ArrayList<ArtifactInfo>();
+	        ArtifactInfo artifactInfo = new ArtifactInfo();
+	        artifactInfo.setVersion(version);
+	        artifactVersion.add(artifactInfo);
+	        artifactGroup.setVersions(artifactVersion);
+	        technology.setArchetypeInfo(artifactGroup);
+	        
+	       /* technology.setVersions(versions);
+	        technology.setVersionComment(versionComment);*/
+	        
+	        List<String> techVersions = new ArrayList<String>();
+	        techVersions.add(techVersion);
+	        technology.setTechVersions(techVersions);
+	        
+	        List<String> customerIds = new ArrayList<String>();
+	        customerIds.add(customerId);
+	        technology.setCustomerIds(customerIds);
+	        
+	       //  ArchetypeInfo archetypeInfo = new ArchetypeInfo(groupId, artifactId, version, "jar");
+	       // jar is Packaging
+	        
+	       // technology.setArchetypeInfo(archetypeInfo);
 	        
 		    BodyPart jsonPart = new BodyPart();
 		    jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
@@ -215,17 +238,43 @@ public class Archetypes extends ServiceBaseAction {
 		try {
 			MultiPart multiPart = new MultiPart();
 
-			List<String> appTypes = new ArrayList<String>();
+		    Technology technology = new Technology();
+			/*List<String> appTypes = new ArrayList<String>();
 			appTypes.add(apptype);
 			List<String> versions = new ArrayList<String>();
 			versions.add(version);
-			Technology technology = new Technology(name, description, versions, appTypes);
+		
 			technology.setId(techId);
-			technology.setAppTypeId(apptype);
-			technology.setCustomerId(customerId);
-			technology.setTechVersion(techVersion);
-			ArchetypeInfo archetypeInfo = new ArchetypeInfo(groupId, artifactId, version, "jar");
-			technology.setArchetypeInfo(archetypeInfo);
+			technology.setAppTypeId(apptype);*/
+		    
+		    technology.setName(name);
+		    technology.setId(techId);
+	        technology.setDescription(description);
+	        technology.setAppTypeId(apptype);
+	        
+	        ArtifactGroup artifactGroup = new ArtifactGroup();
+	        artifactGroup.setArtifactId(artifactId);
+	        artifactGroup.setGroupId(groupId);
+	        artifactGroup.setPackaging("jar");
+	        
+	        List<ArtifactInfo> artifactVersion = new ArrayList<ArtifactInfo>();
+	        ArtifactInfo artifactInfo = new ArtifactInfo();
+	        artifactInfo.setVersion(version);
+	        artifactVersion.add(artifactInfo);
+	        artifactGroup.setVersions(artifactVersion);
+	        technology.setArchetypeInfo(artifactGroup);
+		    
+			
+			List<String> customerIds = new ArrayList<String>();
+			customerIds.add(customerId);
+			technology.setCustomerIds(customerIds);
+			
+			List<String> techVersions = new ArrayList<String>();
+			techVersions.add(techVersion);
+			technology.setTechVersions(techVersions);
+			
+			//ArchetypeInfo archetypeInfo = new ArchetypeInfo(groupId, artifactId, version, "jar");
+			//technology.setArchetypeInfo(archetypeInfo);
 
 			BodyPart jsonPart = new BodyPart();
 			jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
@@ -308,7 +357,8 @@ public class Archetypes extends ServiceBaseAction {
 	        boolean isArchetypeJar = ServerUtil.validateArchetypeJar(new ByteArrayInputStream(tempApplnByteArray));
 	        if (isArchetypeJar) {
 	        	applnByteArray = tempApplnByteArray;
-	        	ArchetypeInfo archetypeInfo = ServerUtil.getArtifactinfo(new ByteArrayInputStream(tempApplnByteArray));
+	        	//TODO
+	        	/*ArchetypeInfo archetypeInfo = ServerUtil.getArtifactinfo(new ByteArrayInputStream(tempApplnByteArray));
 	        	getHttpResponse().setStatus(getHttpResponse().SC_OK);
 	        	if (archetypeInfo != null) {
 	        		archetypeInfo.setMavenJar(true);
@@ -318,7 +368,7 @@ public class Archetypes extends ServiceBaseAction {
 	        		writer.print(json);
 	        	} else {
 	        		writer.print(MAVEN_JAR_FALSE);
-	        	}
+	        	}*/
 	        } else {
 	        	applnJarName = null;
 	        	applnByteArray = null;

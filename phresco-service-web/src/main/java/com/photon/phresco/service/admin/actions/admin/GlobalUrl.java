@@ -26,16 +26,16 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.photon.phresco.commons.model.Property;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.GlobalURL;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.admin.commons.LogErrorReport;
 import com.sun.jersey.api.client.ClientResponse;
 
-public class GlobalUrlList extends ServiceBaseAction { 
+public class GlobalUrl extends ServiceBaseAction { 
 	
 	private static final long serialVersionUID = 6801037145464060759L;
-	private static final Logger S_LOGGER = Logger.getLogger(GlobalUrlList.class);
+	private static final Logger S_LOGGER = Logger.getLogger(GlobalUrl.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
 	private String name = null;
@@ -53,7 +53,7 @@ public class GlobalUrlList extends ServiceBaseAction {
 		}
          
 		try {
-    		List<GlobalURL> globalUrl = getServiceManager().getGlobalUrls(customerId);
+    		List<Property> globalUrl = getServiceManager().getGlobalUrls(customerId);
     		getHttpRequest().setAttribute(REQ_GLOBURL_URL, globalUrl);
     		getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
     	} catch (PhrescoException e) {
@@ -80,7 +80,7 @@ public class GlobalUrlList extends ServiceBaseAction {
 		}
 		
 		try {
-			  GlobalURL globalUrl = getServiceManager().getGlobalUrl(globalurlId, customerId);
+			  Property globalUrl = getServiceManager().getGlobalUrl(globalurlId, customerId);
 			  getHttpRequest().setAttribute(REQ_GLOBURL_URL , globalUrl);
 			  getHttpRequest().setAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (PhrescoException e) {
@@ -98,11 +98,12 @@ public class GlobalUrlList extends ServiceBaseAction {
 		}
 
 		try  {
-			List<GlobalURL> globalUrls = new ArrayList<GlobalURL>();
-			GlobalURL globalUrl = new GlobalURL();
+			List<Property> globalUrls = new ArrayList<Property>();
+			Property globalUrl = new Property();
 			globalUrl.setName(name);
 			globalUrl.setDescription(description);
-			globalUrl.setUrl(url);
+			//TODO Arunpraanna
+			//globalUrl.setUrl(url);
 			globalUrls.add(globalUrl);
 			ClientResponse clientResponse = getServiceManager().createGlobalUrl(globalUrls, customerId);
 			if( clientResponse.getStatus() != 200 && clientResponse.getStatus() != 201) {
@@ -125,10 +126,11 @@ public class GlobalUrlList extends ServiceBaseAction {
 		}
 		
 		try {
-			GlobalURL globalUrl = new GlobalURL();
+			Property globalUrl = new Property();
 			globalUrl.setName(name);
 			globalUrl.setDescription(description);
-			globalUrl.setUrl(url);
+			//TODO Arunprasanna
+			//globalUrl.setUrl(url);
 			getServiceManager().updateGlobalUrl(globalUrl, globalurlId, customerId);
 		} catch (PhrescoException e) {
 			new LogErrorReport(e, GLOBAL_URL_UPDATE_EXCEPTION);

@@ -33,10 +33,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.google.gson.Gson;
+import com.photon.phresco.commons.model.ArtifactInfo;
+import com.photon.phresco.commons.model.DownloadInfo;
+import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.ArchetypeInfo;
-import com.photon.phresco.model.DownloadInfo;
-import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.admin.commons.LogErrorReport;
 import com.photon.phresco.service.client.api.Content;
@@ -145,15 +145,24 @@ public class Downloads extends ServiceBaseAction {
 		try {
 			MultiPart multiPart = new MultiPart();
 			
-			List<String> versions = new ArrayList<String>();
+			
 			List<DownloadInfo> downloadInfo = new ArrayList<DownloadInfo>();
 			DownloadInfo download = new DownloadInfo();
-			versions.add(version);
+		
 			download.setName(name);
 			download.setDescription(description);
-			download.setVersion(versions);
-			download.setCustomerId(customerId);
-			download.setAppliesTo(technology);
+			
+			List<String> customerIds = new ArrayList<String>();
+			customerIds.add(customerId);
+			download.setCustomerIds(customerIds);
+			
+			List<ArtifactInfo> downloadVersions = new ArrayList<ArtifactInfo>();
+			ArtifactInfo downloadVersion = new ArtifactInfo();
+			downloadVersion.setVersion(version);
+			downloadVersions.add(downloadVersion);
+			download.setVersions(downloadVersions);
+			//TODO Arunprasanna
+			//download.setAppliesToTechs(technology); 
 			download.setType(group);
 			
 			BodyPart jsonPart = new BodyPart();
@@ -203,9 +212,17 @@ public class Downloads extends ServiceBaseAction {
 			download.setId(id);
 			download.setName(name);
 			download.setDescription(description);
-			download.setVersion(versions);
-			download.setCustomerId(customerId);
-			download.setAppliesTo(technology);
+			List<String> customerIds = new ArrayList<String>();
+			customerIds.add(customerId);
+			download.setCustomerIds(customerIds);
+			
+			List<ArtifactInfo> downloadVersions = new ArrayList<ArtifactInfo>();
+			ArtifactInfo downloadVersion = new ArtifactInfo();
+			downloadVersion.setVersion(version);
+			downloadVersions.add(downloadVersion);
+			download.setVersions(downloadVersions);
+			//TODO Arunprasanna
+			//download.setAppliesTo(technology);
 			download.setType(group);
 			
 			BodyPart jsonPart = new BodyPart();
@@ -278,7 +295,8 @@ public class Downloads extends ServiceBaseAction {
 	        	InputStream is = getHttpRequest().getInputStream();
 	        	downloadByteArray = IOUtils.toByteArray(is);
 	        	InputStream applnIs = new ByteArrayInputStream(downloadByteArray);
-	        	ArchetypeInfo archetypeInfo = ServerUtil.getArtifactinfo(applnIs);
+	        	//TODO Arunprasanna
+	        	/*ArchetypeInfo archetypeInfo = ServerUtil.getArtifactinfo(applnIs);
 	            getHttpResponse().setStatus(getHttpResponse().SC_OK);
 	            if (archetypeInfo != null) {
 	            	archetypeInfo.setMavenJar(true);
@@ -288,7 +306,7 @@ public class Downloads extends ServiceBaseAction {
 	            	writer.print(json);
 	            } else {
 	            	writer.print(MAVEN_JAR_FALSE);
-	            }
+	            }*/
 		        writer.flush();
 		        writer.close();
 	        }
@@ -356,7 +374,7 @@ public class Downloads extends ServiceBaseAction {
 			List<DownloadInfo> downloads = getServiceManager().getDownloads(customerId);
 			if (downloads != null) {
 				for (DownloadInfo download : downloads) {
-					if (download.getName().equalsIgnoreCase(name) && download.getVersion().equals(version)) {
+					if (download.getName().equalsIgnoreCase(name) && download.getVersions().equals(version)) {
 						setVerError(getText(KEY_I18N_ERR_VER_ALREADY_EXISTS));
 						isError = true;
 						break;

@@ -25,6 +25,7 @@
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
+<%@ page import="com.photon.phresco.commons.model.Element" %>
 <%@ page import="com.photon.phresco.commons.model.SettingsTemplate" %>
 
 <%
@@ -82,15 +83,16 @@
 						
 						<tbody>
 						  	<%
-						  	    if (CollectionUtils.isNotEmpty(configTemplates)) {
-						  										for ( SettingsTemplate configTemplate : configTemplates) {
-						  											List<String> applsTos = configTemplate.getAppliesToTechs();
-						  											String appliesTos = "";
-						  											for(String applsTo : applsTos) {
-						  												appliesTos = appliesTos + applsTo + ",";
-						  											}
-						  											appliesTos  = appliesTos.substring(0, appliesTos.length() - 1);
-						  	%>
+
+								if (CollectionUtils.isNotEmpty(configTemplates)) {
+									for ( SettingsTemplate configTemplate : configTemplates) {
+										List<Element> applsTos = configTemplate.getAppliesToTechs();
+										String appliesTos = "";
+										for(Element applsTo : applsTos) {
+											appliesTos = appliesTos + applsTo + ",";
+										}
+										appliesTos  = appliesTos.substring(0, appliesTos.length() - 1);
+							%>
 									<tr>
 										<td class="checkboxwidth">
 								 		<% 

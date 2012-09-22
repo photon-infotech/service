@@ -26,8 +26,8 @@
 <%@ page import="com.photon.phresco.commons.model.SettingsTemplate" %>
 <%@ page import="com.photon.phresco.commons.model.PropertyTemplate" %>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
-<%@ page import="com.photon.phresco.commons.model.Technology"%>
-<%@ page import="com.photon.phresco.model.I18NString"%>
+<%@ page import="com.photon.phresco.commons.model.Technology" %>
+<%@ page import="com.photon.phresco.commons.model.Element" %>
 
 <%
 	List<Technology> technologies = (List<Technology>) request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
@@ -99,6 +99,7 @@
 						<li>
 							<input type="checkbox" value="all" id="checkAllAuto" name="appliesTo" onclick="checkAllEvent(this,$('.applsChk'), true);" style="margin: 3px 8px 6px 0;">All
 						</li>
+
 						<%
 						    if (CollectionUtils.isNotEmpty(technologies)) {
 													for (Technology technology : technologies) {
@@ -113,6 +114,7 @@
 																}
 															}
 														}
+
 						%>		
 								<li>
 									<input type="checkbox" id="appliestoCheckbox" name="appliesTo" value="<%= technology.getId() %>"  <%= checkedStr %>

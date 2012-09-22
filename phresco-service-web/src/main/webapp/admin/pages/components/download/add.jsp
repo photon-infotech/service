@@ -46,7 +46,7 @@
     	if (StringUtils.isNotEmpty(downloadInfo.getDescription())) {
     		description = downloadInfo.getDescription();
     	}
-    	if (CollectionUtils.isNotEmpty(downloadInfo.getVersion())) {
+    	if (CollectionUtils.isNotEmpty(downloadInfo.getVersions())) {
     		version = downloadInfo.getVersion();
     	}
     }
@@ -271,7 +271,7 @@
     <input type="hidden" name="id" value="<%= downloadInfo != null ? downloadInfo.getId() : "" %>"/>
     <input type="hidden" name="oldName" value="<%= downloadInfo != null ? downloadInfo.getName() : "" %>"/>
     <input type="hidden" name="customerId" value="<%= customerId %>"> 
-    <input type="hidden" name="oldVersion" value="<%= downloadInfo != null ? downloadInfo.getVersion() : "" %>"/>
+    <input type="hidden" name="oldVersion" value="<%= downloadInfo != null ? downloadInfo.getVersions() : "" %>"/>
 </form>
 
 <script type="text/javascript">

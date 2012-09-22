@@ -25,11 +25,11 @@
 <%@ page import="org.apache.commons.lang.StringUtils"%>
 
 <%@ page import="com.photon.phresco.commons.model.Technology" %>
-<%@ page import="com.photon.phresco.commons.model.ProjectInfo"%>
+<%@ page import="com.photon.phresco.commons.model.ApplicationInfo"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
 
 <%
-	List<ProjectInfo> pilotProjectInfo = (List<ProjectInfo>) request.getAttribute(ServiceUIConstants.REQ_PILOT_PROJECTS);
+	List<ApplicationInfo> pilotProjectInfo = (List<ApplicationInfo>) request.getAttribute(ServiceUIConstants.REQ_PILOT_PROJECTS);
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
 %>
 
@@ -88,7 +88,7 @@
 						<tbody>
 						<%
 							if (CollectionUtils.isNotEmpty(pilotProjectInfo)) {
-								for (ProjectInfo proInfo : pilotProjectInfo) {
+								for (ApplicationInfo proInfo : pilotProjectInfo) {
 						%>
 								<tr>
 									<td class="checkboxwidth">
@@ -102,7 +102,7 @@
 										<a href="#" onclick="editPilotProject('<%=proInfo.getId() %>');" name="edit" id=""><%=proInfo.getName()%></a>
 									</td>
 									<td><%= StringUtils.isNotEmpty(proInfo.getDescription()) ? proInfo.getDescription() : ""%></td>
-									<td><%= proInfo.getTechnology().getName() %></td>
+									<td><%= proInfo.getTechInfo().getName() %></td>
 								</tr>
 						<%			
 								}

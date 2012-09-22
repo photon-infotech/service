@@ -33,10 +33,13 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.photon.phresco.commons.model.ApplicationInfo;
+import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.ArtifactInfo;
+import com.photon.phresco.commons.model.ProjectInfo;
+import com.photon.phresco.commons.model.Technology;
+import com.photon.phresco.commons.model.TechnologyInfo;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.ArchetypeInfo;
-import com.photon.phresco.model.ProjectInfo;
-import com.photon.phresco.model.Technology;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.admin.commons.LogErrorReport;
 import com.photon.phresco.service.client.api.Content;
@@ -76,7 +79,7 @@ public class PilotProjects extends ServiceBaseAction {
         }
 
 		try {
-			List<ProjectInfo> pilotProjects = getServiceManager().getPilotProjects(customerId);
+			List<ApplicationInfo> pilotProjects = getServiceManager().getPilotProjects(customerId);
 			getHttpRequest().setAttribute(REQ_PILOT_PROJECTS, pilotProjects);
 			getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
 		} catch (PhrescoException e) {
@@ -115,7 +118,7 @@ public class PilotProjects extends ServiceBaseAction {
     	}
 
     	try {
-    		ProjectInfo pilotProjectInfo = getServiceManager().getPilotProject(projectId, customerId);
+    		ApplicationInfo pilotProjectInfo = getServiceManager().getPilotProject(projectId, customerId);
     		getHttpRequest().setAttribute(REQ_PILOT_PROINFO, pilotProjectInfo);
     		getHttpRequest().setAttribute(REQ_FROM_PAGE, EDIT);
     	} catch (PhrescoException e) {
@@ -135,29 +138,51 @@ public class PilotProjects extends ServiceBaseAction {
     	try {
     		MultiPart multiPart = new MultiPart();
     		
-    		List<ProjectInfo> pilotProInfo = new ArrayList<ProjectInfo>();
-    		ProjectInfo proInfo = new ProjectInfo();
-    		proInfo.setName(name);
-    		proInfo.setDescription(description);
-    		proInfo.setVersion(version);
-    		proInfo.setTechId(techId);
-    		proInfo.setCustomerId(customerId);
-    		proInfo.setGroupId(groupId);
-    		proInfo.setArtifactId(artifactId);
-    		proInfo.setVersion(jarVersion);
-    		ArchetypeInfo archetypeInfo = new ArchetypeInfo(groupId, artifactId, jarVersion, "zip");
-    		proInfo.setArchetypeInfo(archetypeInfo);
-    		Technology technology = new Technology();
-    		technology.setId(techId);
+    		ApplicationInfo pilotProInfo = new ApplicationInfo();
+    		pilotProInfo.setName(name);
+    		pilotProInfo.setDescription(description);
+    		pilotProInfo.setVersion(version);
+    		//pilotProInfo.setTechId(techId);
+    		
+    		ArtifactGroup pilotContent = new ArtifactGroup();
+    		pilotContent.setGroupId(groupId);
+    		pilotContent.setArtifactId(artifactId);
+    		pilotContent.setPackaging("zip");
+    		List<String> customerIds = new ArrayList<String>();
+    		customerIds.add(customerId);
+    		pilotContent.setCustomerIds(customerIds);
+    		
+    		List<ArtifactInfo> jarVersions = new ArrayList<ArtifactInfo>();
+    		ArtifactInfo jarVersion = new ArtifactInfo();
+    		jarVersions.add(jarVersion);
+    		pilotContent.setVersions(jarVersions);
+    		
+    		pilotProInfo.setPilotContent(pilotContent);
+    		
+    	/*	pilotProInfo.setGroupId(groupId);
+    		pilotProInfo.setArtifactId(artifactId);
+    		pilotProInfo.setVersion(jarVersion);
+    		ArtifactInfo archetypeInfo = new ArtifactInfo(groupId, artifactId, jarVersion, "zip");
+    		pilotProInfo.setArchetypeInfo(archetypeInfo);*/
+    		
+    		TechnologyInfo techInfo = new TechnologyInfo();
+    		techInfo.setId(techId);
+    		ComponentService cs = new ComponentService();
+    		Response techName = cs.getTechnology(techId);
+    		techInfo = (TechnologyInfo)techName.getEntity();
+    		techInfo.setName(techInfo.getName());
+    		pilotProInfo.setTechInfo(techInfo);
+    		/*Technology technology = new Technology();
+    		technology.setId(techId)
     		ComponentService cs = new ComponentService();
     		Response techName = cs.getTechnology(techId);
     		technology = (Technology) techName.getEntity();
     		technology.setName(technology.getName());
-    		proInfo.setTechnology(technology);
+    		pilotProInfo.setTechnology(technology);*/
     		
     		BodyPart jsonPart = new BodyPart();
 		    jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
-		    jsonPart.setEntity(proInfo);
+		    jsonPart.setEntity(pilotProInfo);
 		    Content content = new Content("object", name, null, null, null, 0);
 		    jsonPart.setContentDisposition(content);
 		    multiPart.bodyPart(jsonPart);
@@ -191,17 +216,41 @@ public class PilotProjects extends ServiceBaseAction {
     	try {
     		MultiPart multiPart = new MultiPart();
     		
-    		ProjectInfo pilotProInfo = new ProjectInfo();
+    		ApplicationInfo pilotProInfo = new ApplicationInfo();
     		pilotProInfo.setId(projectId);
     		pilotProInfo.setName(name);
     		pilotProInfo.setDescription(description);
     		pilotProInfo.setVersion(version);
-    		pilotProInfo.setTechId(techId);
-    		pilotProInfo.setCustomerId(customerId);
+    		//pilotProInfo.setTechId(techId);
+    		
+    		
+    		/*pilotProInfo.setCustomerId(customerId);
     		pilotProInfo.setGroupId(groupId);
     		pilotProInfo.setArtifactId(artifactId);
-    		pilotProInfo.setVersion(jarVersion);
-    		ArchetypeInfo archetypeInfo = new ArchetypeInfo(groupId, artifactId, jarVersion, "zip");
+    		pilotProInfo.setVersion(jarVersion);*/
+    		ArtifactGroup pilotContent = new ArtifactGroup();
+    		pilotContent.setGroupId(groupId);
+    		pilotContent.setArtifactId(artifactId);
+    		pilotContent.setPackaging("zip");
+    		List<String> customerIds = new ArrayList<String>();
+    		customerIds.add(customerId);
+    		pilotContent.setCustomerIds(customerIds);
+    		
+    		List<ArtifactInfo> jarVersions = new ArrayList<ArtifactInfo>();
+    		ArtifactInfo jarVersion = new ArtifactInfo();
+    		jarVersions.add(jarVersion);
+    		pilotContent.setVersions(jarVersions);
+    		pilotProInfo.setPilotContent(pilotContent);
+    		
+    		TechnologyInfo techInfo = new TechnologyInfo();
+    		techInfo.setId(techId);
+    		ComponentService cs = new ComponentService();
+    		Response techName = cs.getTechnology(techId);
+    		techInfo = (TechnologyInfo)techName.getEntity();
+    		techInfo.setName(techInfo.getName());
+    		pilotProInfo.setTechInfo(techInfo);
+    		
+    		/*ArtifactInfo archetypeInfo = new ArtifactInfo(groupId, artifactId, jarVersion, "zip");
     		pilotProInfo.setArchetypeInfo(archetypeInfo);
     		Technology technology = new Technology();
     		technology.setId(techId);
@@ -209,7 +258,7 @@ public class PilotProjects extends ServiceBaseAction {
     		Response techName = cs.getTechnology(techId);
     		technology = (Technology) techName.getEntity();
     		technology.setName(technology.getName());
-    		pilotProInfo.setTechnology(technology);
+    		pilotProInfo.setTechnology(technology);*/
     		
     		BodyPart jsonPart = new BodyPart();
 		    jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
@@ -305,10 +354,10 @@ public class PilotProjects extends ServiceBaseAction {
     		isError = true;
     	} else if (StringUtils.isEmpty(fromPage) || (!name.equals(oldName))) {
     		//To check whether the name already exist (Technology wise)
-			List<ProjectInfo> pilotProjInfos = getServiceManager().getPilotProjects(customerId);
+			List<ApplicationInfo> pilotProjInfos = getServiceManager().getPilotProjects(customerId);
 			if (pilotProjInfos != null) {
-				for (ProjectInfo projectInfo : pilotProjInfos) {
-					if (projectInfo.getTechId().equals(techId) && projectInfo.getName().equalsIgnoreCase(name)) {
+				for (ApplicationInfo pilotProjectInfo : pilotProjInfos) {
+					if (pilotProjectInfo.getTechInfo().getId().equals(techId) && pilotProjectInfo.getName().equalsIgnoreCase(name)) {
 						setNameError(getText(KEY_I18N_ERR_NAME_ALREADY_EXIST_TECH));
 			    		isError = true;
 			    		break;
