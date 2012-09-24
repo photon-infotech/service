@@ -95,8 +95,10 @@ public class ApplicationTypes extends ServiceBaseAction {
 		
 		try {
 		    List<ApplicationType> appTypes = new ArrayList<ApplicationType>();
-			ApplicationType appType = new ApplicationType(name, description);
-			appType.setCustomerId(customerId);
+			ApplicationType appType = new ApplicationType();
+			appType.setName(name);
+			appType.setDescription(description);
+			appType.setId(customerId);
 			appTypes.add(appType);
 			ClientResponse clientResponse = getServiceManager().createApplicationTypes(appTypes, customerId);
 			if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200 && clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
@@ -117,9 +119,11 @@ public class ApplicationTypes extends ServiceBaseAction {
 	    }
 
 		try {
-			ApplicationType appType = new ApplicationType(name, description);
+			ApplicationType appType = new ApplicationType();
+			appType.setName(name);
+			appType.setDescription(description);
 			appType.setId(appTypeId);
-			appType.setCustomerId(customerId);
+			appType.setId(customerId);
 			getServiceManager().updateApplicationType(appType, appTypeId, customerId);
 		} catch(Exception e)  {
 			throw new PhrescoException(e);
