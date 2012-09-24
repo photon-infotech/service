@@ -95,7 +95,7 @@
 								</a>
 							</td>
 							<td><%= StringUtils.isNotEmpty(globalUrl.getDescription()) ? globalUrl.getDescription() : "" %></td>
-							<td><%= StringUtils.isNotEmpty(globalUrl.getUrl()) ? globalUrl.getUrl() : "" %></td>
+							<%-- <td><%= StringUtils.isNotEmpty(globalUrl.getUrl()) ? globalUrl.getUrl() : "" %></td> --%>
 						</tr>
 						<%
 						   }

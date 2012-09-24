@@ -25,6 +25,7 @@
 
 
 <%@ page import="com.photon.phresco.commons.model.ApplicationInfo"%>
+<%@ page import="com.photon.phresco.commons.model.CoreOption"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
 <%@ page import="com.photon.phresco.commons.model.Technology"%>
 
@@ -99,9 +100,15 @@
 			<div class="controls">
 				<select id="multiSelect" name="techId" id="tech">
 					
-				 	<% if(StringUtils.isNotEmpty(fromPage)) { //for edit %>
-							<option value="<%= pilotProjectInfo.getTechInfo().getId() %>"><%= pilotProjectInfo.getTechInfo().getName()%></option>
-					<% } else { // for add %>		
+				 	<% if(StringUtils.isNotEmpty(fromPage)) { //for edit 
+				 	     
+				 	        List<CoreOption> techIds = pilotProjectInfo.getPilotContent().getAppliesTo();
+				 	         for(CoreOption techId : techIds){
+				 	     
+				 	%>
+							<option value="<%= pilotProjectInfo.getTechInfo().getVersion() %>"><%= techId.getTechId() %></option>
+					<%     }
+					     } else { // for add %>		
 						<% if (technologys != null) {
 								for (Technology technology : technologys) { 
 							%>

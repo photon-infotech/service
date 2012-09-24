@@ -106,9 +106,11 @@
 									<td class="desclabel-width">
 										<%= StringUtils.isNotEmpty(technology.getDescription()) ? technology.getDescription() : "" %>
 									</td>	
+									
 									<td class="namelabel-width">
-										<%= CollectionUtils.isNotEmpty(technology.getVersions()) ? technology.getVersions() : "" %>
+										<%= CollectionUtils.isNotEmpty(technology.getTechVersions()) ? technology.getTechVersions() : "" %>
 									</td>
+									
 									<td class="namelabel-width">
 										<% 
 											String appTypeName = "";

@@ -17,6 +17,8 @@
   limitations under the License.
   ###
   --%>
+<%@page import="org.apache.jasper.tagplugins.jstl.ForEach"%>
+<%@page import="com.photon.phresco.commons.model.RequiredOption"%>
 <%@ taglib uri="/struts-tags" prefix="s" %>
 
 <%@ page import="java.util.List" %>
@@ -26,6 +28,7 @@
 <%@ page import="com.photon.phresco.commons.model.ArtifactInfo" %>
 <%@ page import=" com.photon.phresco.commons.model.ArtifactGroup" %>
 <%@ page import="com.photon.phresco.commons.model.Technology" %>
+<%@ page import="com.photon.phresco.commons.model.CoreOption" %>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
 
 <%
@@ -60,7 +63,13 @@
 	        }
 	        moduleId = selectedModule.getId();
 			name = selectedModule.getName();
-			isDefaultModule = selectedModule.getAppliesTo();
+			
+			List<RequiredOption> isDefaults = selectedModule.getAppliesTo();
+			
+			for(RequiredOption isDefault : isDefaults) {
+			    isDefaultModule = isDefault.isRequired();
+			}
+			
 			if (selectedModule.getDescription() != null) {
 				description = selectedModule.getDescription();
 			}
@@ -68,7 +77,12 @@
 			    helpText = selectedModule.getHelpText();
 			}
 	    }
-		selectedTechnology = moduleGroup.getTechId();
+		
+	    List<CoreOption> selectedTechnologies = moduleGroup.getAppliesTo();
+	     for(CoreOption selectedTech : selectedTechnologies){
+	    	 selectedTechnology = selectedTech.getTechId();
+	     }
+		
 		isSystem = moduleGroup.isSystem();
 	}
 %>

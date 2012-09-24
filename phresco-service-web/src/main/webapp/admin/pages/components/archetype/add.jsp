@@ -18,6 +18,7 @@
   ###
   --%>
 
+<%@page import="com.photon.phresco.commons.model.ArtifactInfo"%>
 <%@ taglib uri="/struts-tags" prefix="s"%>
 
 <%@ page import="org.apache.commons.lang.StringUtils"%>
@@ -26,6 +27,7 @@
 
 <%@ page import="com.photon.phresco.commons.model.ApplicationType"%>
 <%@ page import="com.photon.phresco.commons.model.Technology"%>
+<%@ page import="com.photon.phresco.commons.model.ArtifactGroup"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
 
 <%
@@ -37,9 +39,9 @@
 	//For edit
 	String name = "";
 	String desc = "";
-	List<String> versions = null;
+	String versions = "";
 	String versionComment = "";
-	String techVersion = "";
+	List<String> techVersion = null;
 	boolean isSystem = false;
 	String appTypeId = "";
 	if (technology != null) {
@@ -49,14 +51,19 @@
 		if (StringUtils.isNotEmpty(technology.getDescription())) {
 			desc = technology.getDescription();
 		}
-		if (CollectionUtils.isNotEmpty(technology.getVersions())) {
+		
+		List<ArtifactInfo> technoVersions= technology.getArchetypeInfo().getVersions();
+		for(ArtifactInfo technoVersion : technoVersions){
+			versions = technoVersion.getVersion();
+		}
+		/* if (CollectionUtils.isNotEmpty(technology.getVersions())) {
 			versions = technology.getVersions();
-		}
-		if (StringUtils.isNotEmpty(technology.getVersionComment())) {
+		} */
+		/* if (StringUtils.isNotEmpty(technology.getVersionComment())) {
 			versionComment = technology.getVersionComment();
-		}
-		if (StringUtils.isNotEmpty(technology.getTechVersion())) {
-			techVersion = technology.getTechVersion();
+		} */
+		if (CollectionUtils.isNotEmpty(technology.getTechVersions())) {
+			techVersion = technology.getTechVersions();
 		}
 		isSystem = technology.isSystem();
 		appTypeId = technology.getAppTypeId();
@@ -106,7 +113,7 @@
 			</label>
 			<div class="controls">
 				<input id="version" placeholder='<s:text name="place.hldr.archetype.add.version"/>' class="input-xlarge" 
-					type="text" name="version" value="<%= CollectionUtils.isNotEmpty(versions) ? versions : "" %>" maxlength="30" 
+					type="text" name="version" value="<%= StringUtils.isNotEmpty(versions) ? versions : "" %>" maxlength="30" 
 					title="30 Characters only">
 				<span class="help-inline" id="verError"></span>
 			</div>

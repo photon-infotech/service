@@ -27,6 +27,8 @@
 
 <%@ page import="com.photon.phresco.commons.model.Technology"%>
 <%@ page import="com.photon.phresco.commons.model.DownloadInfo" %>
+<%@ page import="com.photon.phresco.commons.model.ArtifactInfo" %>
+<%@ page import="com.photon.phresco.commons.model.Element" %>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %> 
 
 <%
@@ -38,7 +40,8 @@
     //For edit
     String name = "";
     String description = "";
-    List<String> version = new ArrayList<String>();
+    //List<String> version = new ArrayList<String>();
+    String version = "";
     if (downloadInfo != null) {
     	if (StringUtils.isNotEmpty(downloadInfo.getName())) {
     		name = downloadInfo.getName();
@@ -46,9 +49,14 @@
     	if (StringUtils.isNotEmpty(downloadInfo.getDescription())) {
     		description = downloadInfo.getDescription();
     	}
-    	if (CollectionUtils.isNotEmpty(downloadInfo.getVersions())) {
-    		version = downloadInfo.getVersion();
+    	
+    	List<ArtifactInfo> artifactVersions = downloadInfo.getVersions();
+    	for(ArtifactInfo artifactVersion : artifactVersions){
+    		version = artifactVersion.getVersion();
     	}
+    	/* if (CollectionUtils.isNotEmpty(downloadInfo.getVersions())) {
+    		version = downloadInfo.getVersion();
+    	} */
     }
 %>
 
@@ -99,7 +107,7 @@
 		                    									for (Technology technology : technologies) { 
 		                    										String checkedStr = "";
 		                    										if (downloadInfo != null) {
-		                    											List<String> appliesTos = downloadInfo.getAppliesToTechs();
+		                    											List<Element> appliesTos = downloadInfo.getAppliesToTechs();
 		                    											if (appliesTos.contains(technology.getId())) {
 		                    												checkedStr = "checked";
 		                    											} else {

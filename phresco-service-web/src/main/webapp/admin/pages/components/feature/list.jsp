@@ -81,13 +81,13 @@
 									    	if (CollectionUtils.isNotEmpty(versions)) {
 												for (ArtifactInfo module : versions) {
 												    String descContent = "";
-													if (module.getDoc(DocumentationType.DESCRIPTION) != null) { 
-													  	descContent = module.getDoc(DocumentationType.DESCRIPTION).getContent();
+													if (module.getDescription() != null) { 
+													  	descContent = module.getDescription();
 													}
 													
 													String helpTextContent = "";
-													if (module.getDoc(DocumentationType.HELP_TEXT) != null) { 
-													  	helpTextContent = module.getDoc(DocumentationType.HELP_TEXT).getContent();
+													if (module.getHelpText() != null) { 
+													  	helpTextContent = module.getHelpText();
 													}
 										%>
 											<tr>

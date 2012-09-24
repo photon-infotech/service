@@ -18,13 +18,14 @@
   ###
   --%>
 
-<%@ taglib uri="/struts-tags" prefix="s"%>
+<%@ taglib uri="/struts-tags" prefix="s" %>
 
-<%@ page import="org.apache.commons.lang.StringUtils"%>
-<%@ page import="java.util.Date"%>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="java.util.Date" %>
 
-<%@ page import="com.photon.phresco.commons.model.Customer"%>
-<%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
+<%@ page import="com.photon.phresco.commons.model.Customer" %>
+<%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
+<%@ page import=" com.photon.phresco.commons.model.Customer.LicenseType" %>
 
 <%
 	Customer customer = (Customer) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER);
@@ -455,10 +456,16 @@
 			</label>
 			<div class="controls">
 				<select id="select01" name="licence">
+				<% if(StringUtils.isNotEmpty(fromPage)) { 
+				   LicenseType licenseType = customer.getType();
+				%>
+				      <option><%= licenseType  %></option> 
+				<% } else {%>
 					<option value="">- select -</option>
 					<option value="5">Silver</option>
 					<option value="10">Gold</option>
 					<option value="15">Platinum</option>
+				<% } %>
 				</select>
 				<span class="help-inline" id="licenError"></span>
 			</div>
