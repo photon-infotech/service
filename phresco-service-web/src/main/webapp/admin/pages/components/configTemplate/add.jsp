@@ -105,14 +105,15 @@
 													for (Technology technology : technologies) {
 														String checkedStr = "";
 														if (settingsTemplate != null) {
-															List<String> appliesTos = settingsTemplate.getAppliesToTechs();
-															if (CollectionUtils.isNotEmpty(appliesTos)) {
-																if (appliesTos.contains(technology.getId())) {
-																	checkedStr = "checked";
-																} else {
-																	checkedStr = "";
-																}
-															}
+															// TODO:Arun
+// 															List<String> appliesTos = settingsTemplate.getAppliesToTechs();
+// 															if (CollectionUtils.isNotEmpty(appliesTos)) {
+// 																if (appliesTos.contains(technology.getId())) {
+// 																	checkedStr = "checked";
+// 																} else {
+// 																	checkedStr = "";
+// 																}
+// 															}
 														}
 
 						%>		
@@ -240,11 +241,9 @@
 													} else {
 														mulChck = "";
 													}
-													I18NString i18NString = propertyTemplate.getName();
 													String propName = "";
-													if (i18NString != null) {
-														System.out.println("inside null");
-														propName = i18NString.get("en-US").getValue();
+													if (StringUtils.isNotEmpty(propertyTemplate.getName())) {
+														propName = propertyTemplate.getName();
 													}
 									%>
 												<tr class='<%= dynamicId + "_configdynamiadd" %>'>

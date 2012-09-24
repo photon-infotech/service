@@ -17,20 +17,18 @@
   limitations under the License.
   ###
   --%>
-
 <%@ taglib uri="/struts-tags" prefix="s" %>
 
 <%@ page import="java.util.List" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.apache.commons.collections.CollectionUtils"%>
 
-<%@ page import="com.photon.phresco.model.Module" %>
-<%@ page import="com.photon.phresco.model.ModuleGroup" %>
+<%@ page import="com.photon.phresco.commons.model.ArtifactInfo"%>
+<%@ page import="com.photon.phresco.commons.model.ArtifactGroup"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
-<%@ page import="com.photon.phresco.model.Documentation.DocumentationType"%>
 
 <% 
-	List<ModuleGroup> moduleGroups = (List<ModuleGroup>)request.getAttribute(ServiceUIConstants.REQ_FEATURES_MOD_GRP);
+	List<ArtifactGroup> moduleGroups = (List<ArtifactGroup>)request.getAttribute(ServiceUIConstants.REQ_FEATURES_MOD_GRP);
 %>
 		
 <div class="modal">
@@ -50,7 +48,7 @@
 			        <div class="accordion_panel_inner">
 			            <section class="lft_menus_container">
 			            <%
-							for (ModuleGroup moduleGroup : moduleGroups) {
+							for (ArtifactGroup moduleGroup : moduleGroups) {
 						%>
 			                <span class="siteaccordion closereg">
 			                	<span class="dependencySpan">
@@ -65,17 +63,17 @@
 			                        	<table class="download_tbl">
 				                            <tbody>
 				                            <% 
-										    	List<Module> versions = moduleGroup.getVersions();
+										    	List<ArtifactInfo> versions = moduleGroup.getVersions();
 										    	if (CollectionUtils.isNotEmpty(versions)) {
-													for (Module module : versions) {
+													for (ArtifactInfo module : versions) {
 													    String descContent = "";
-														if (module.getDoc(DocumentationType.DESCRIPTION) != null) {
-														  	descContent = module.getDoc(DocumentationType.DESCRIPTION).getContent();
+														if (StringUtils.isNotEmpty(module.getDescription())) {
+														  	descContent = module.getDescription();
 														}
 														
 														String helpTextContent = "";
-														if (module.getDoc(DocumentationType.HELP_TEXT) != null) { 
-														  	helpTextContent = module.getDoc(DocumentationType.HELP_TEXT).getContent();
+														if (StringUtils.isNotEmpty(module.getHelpText())) { 
+														  	helpTextContent = module.getHelpText();
 														}
 											%>
 												<tr>

@@ -23,7 +23,6 @@
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.apache.commons.collections.CollectionUtils"%>
 
-<%@ page import="com.photon.phresco.model.Technology" %>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
 
 <% 

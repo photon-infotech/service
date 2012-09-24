@@ -67,7 +67,9 @@
 										<input type="checkbox" class="check" name="permissionId" value="<%= permission.getId() %>" onclick="checkboxEvent();">
 									</td>
 									<td class="namelabel-width"><%= permission.getName()  %></td>
-									<td><%= permission.getPermission()  %></td>
+									<!-- TODO:Arun -->
+<%-- 									<td><%= permission.getPermission()  %></td> --%>
+									<td></td>
 								</tr>
 						<%		
 								}

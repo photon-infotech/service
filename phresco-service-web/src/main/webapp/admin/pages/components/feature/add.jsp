@@ -17,8 +17,6 @@
   limitations under the License.
   ###
   --%>
-<%@page import="org.apache.jasper.tagplugins.jstl.ForEach"%>
-<%@page import="com.photon.phresco.commons.model.RequiredOption"%>
 <%@ taglib uri="/struts-tags" prefix="s" %>
 
 <%@ page import="java.util.List" %>
@@ -30,6 +28,7 @@
 <%@ page import="com.photon.phresco.commons.model.Technology" %>
 <%@ page import="com.photon.phresco.commons.model.CoreOption" %>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
+<%@ page import="com.photon.phresco.commons.model.RequiredOption"%>
 
 <%
     ArtifactGroup moduleGroup = (ArtifactGroup)request.getAttribute(ServiceUIConstants.REQ_FEATURES_MOD_GRP); 

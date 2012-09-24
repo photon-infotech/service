@@ -18,7 +18,6 @@
   ###
   --%>
 
-<%@page import="com.photon.phresco.commons.model.ArtifactInfo"%>
 <%@ taglib uri="/struts-tags" prefix="s"%>
 
 <%@ page import="org.apache.commons.lang.StringUtils"%>
@@ -28,6 +27,7 @@
 <%@ page import="com.photon.phresco.commons.model.ApplicationType"%>
 <%@ page import="com.photon.phresco.commons.model.Technology"%>
 <%@ page import="com.photon.phresco.commons.model.ArtifactGroup"%>
+<%@ page import="com.photon.phresco.commons.model.ArtifactInfo"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
 
 <%

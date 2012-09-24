@@ -39,7 +39,7 @@
 				<img src="images/crashReport.png" alt="logo" class="abt_err_img">
 			</div>
 			<div class="abt_content errorMsgDisplay" id="errorMsgDisplay">
-				<%= log.getErrorMessage() %>
+				<%= log.getMessage() %>
 			</div>
 			<div class="clipboardDiv">
 				<img src="images/clipboard-copy.png" alt="clipboard" class="clipboard" 
