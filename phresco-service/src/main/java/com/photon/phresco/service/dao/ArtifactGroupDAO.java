@@ -22,6 +22,8 @@ package com.photon.phresco.service.dao;
 
 import java.util.List;
 
+import com.photon.phresco.commons.model.CoreOption;
+
 public class ArtifactGroupDAO extends BaseDAO {
     
     private static final long serialVersionUID = 1L;
@@ -31,8 +33,8 @@ public class ArtifactGroupDAO extends BaseDAO {
     private String classifier;
     private String type;
     private String imageURL;
-    private List<String> appliesTo;
     private List<String> versionIds;
+    private List<CoreOption> appliesTo;
     
     public String getGroupId() {
         return groupId;
@@ -82,11 +84,11 @@ public class ArtifactGroupDAO extends BaseDAO {
         this.imageURL = imageURL;
     }
     
-    public List<String> getAppliesTo() {
+    public List<CoreOption> getAppliesTo() {
         return appliesTo;
     }
     
-    public void setAppliesTo(List<String> appliesTo) {
+    public void setAppliesTo(List<CoreOption> appliesTo) {
         this.appliesTo = appliesTo;
     }
 

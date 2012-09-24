@@ -121,7 +121,7 @@ public abstract class AbstractDependencyProcessor implements DependencyProcessor
 
 	protected void extractPilots(ApplicationInfo info, File path,
 			TechnologyInfo techInfo) throws PhrescoException {
-		ApplicationInfo appInfo = PhrescoServerFactory.getDbManager().getProjectInfo(techInfo.getId(), info.getName());
+		ApplicationInfo appInfo = PhrescoServerFactory.getDbManager().getProjectInfo(techInfo.getVersion(), info.getName());
         if(appInfo != null) {
         	ArtifactGroup pilotContent = appInfo.getPilotContent();
         	String customerId= pilotContent.getCustomerIds().get(0);
@@ -221,14 +221,18 @@ public abstract class AbstractDependencyProcessor implements DependencyProcessor
 	protected void createSqlFolder(ApplicationInfo info, File path) throws PhrescoException {
 		String databaseType = "";
 		try {
-			List<DownloadInfo> databaseList = info.getSelectedDatabases();
-			String techId = info.getTechInfo().getId();
+			List<String> databaseList = info.getSelectedDatabases();
+			String techId = info.getTechInfo().getVersion();
 			if (databaseList == null || databaseList.size() == 0) {
 				return;
 			}
 			File mysqlFolder = new File(path, sqlFolderPathMap.get(techId) + Constants.DB_MYSQL);
 			File mysqlVersionFolder = getMysqlVersionFolder(mysqlFolder);
-			for (DownloadInfo db : databaseList) {
+			
+			//TODO : get databases from db using the database id from projet info
+			List<DownloadInfo> databaseListTemp = new ArrayList<DownloadInfo>();
+			
+			for (DownloadInfo db : databaseListTemp) {
 				databaseType = db.getName().toLowerCase();
 				List<ArtifactInfo> versions = db.getVersions();
 				for (ArtifactInfo version : versions) {
@@ -257,15 +261,18 @@ public abstract class AbstractDependencyProcessor implements DependencyProcessor
 		return null;
 	}
 	
-	protected void updatePOMWithModules(File path, List<ArtifactGroup> modules, String id) throws PhrescoException {
+	protected void updatePOMWithModules(File path, List<String> modules, String id) throws PhrescoException {
 		if(CollectionUtils.isEmpty(modules)) {
 			return;
 		}
+		
+		//TODO : Get features using id from projectInfo
+		List<ArtifactGroup> modulesTemp = new ArrayList<ArtifactGroup>();
 		try {
 			File pomFile = new File(path, "pom.xml");
 			if (pomFile.exists()) {
 				PomProcessor processor = new PomProcessor(pomFile);
-				for (ArtifactGroup module : modules) {
+				for (ArtifactGroup module : modulesTemp) {
 					if (module != null) {
 						String groupId ="modules." + id + ".files";
 						processor.addDependency(groupId, module.getId(), module.getVersions()
@@ -283,7 +290,10 @@ public abstract class AbstractDependencyProcessor implements DependencyProcessor
 		}
 	}
 	
-	protected void updatePOMWithPluginArtifact(File path, List<ArtifactGroup> modules, String techId) throws PhrescoException {
+	protected void updatePOMWithPluginArtifact(File path, List<String> modules, String techId) throws PhrescoException {
+		
+		//TODO : Get jslibraries from db using the given ids from project info
+		List<ArtifactGroup> databaseListTemp = new ArrayList<ArtifactGroup>();
 		try {
 			if(CollectionUtils.isEmpty(modules)) {
 				return;
@@ -295,7 +305,7 @@ public abstract class AbstractDependencyProcessor implements DependencyProcessor
 				DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
 				DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
 				Document doc = docBuilder.newDocument();
-				for (ArtifactGroup module : modules) {
+				for (ArtifactGroup module : databaseListTemp) {
 					if (module != null) {
 						String groupId ="modules." + techId + ".files";
 						String artifactId = module.getId();

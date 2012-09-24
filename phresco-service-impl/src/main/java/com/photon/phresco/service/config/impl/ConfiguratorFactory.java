@@ -68,7 +68,7 @@ public class ConfiguratorFactory {
 			S_LOGGER.debug("getConfigurator() ProjectCode" + applicationInfo.getCode());
 		}
 		assert applicationInfo != null;
-		String techId = applicationInfo.getTechInfo().getId();
+		String techId = applicationInfo.getTechInfo().getVersion();
 		if (DEBUGENABLED) {
 			S_LOGGER.debug("getConfigurator() TechnologyID="+techId);
 		}

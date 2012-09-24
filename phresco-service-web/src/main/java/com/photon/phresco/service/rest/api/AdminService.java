@@ -19,7 +19,6 @@
  */
 package com.photon.phresco.service.rest.api;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,9 +41,7 @@ import org.springframework.data.document.mongodb.query.Query;
 import org.springframework.stereotype.Component;
 
 import com.photon.phresco.commons.model.Customer;
-import com.photon.phresco.commons.model.DownloadInfo;
 import com.photon.phresco.commons.model.Permission;
-import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.commons.model.Property;
 import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.commons.model.Role;
@@ -52,19 +49,13 @@ import com.photon.phresco.commons.model.User;
 import com.photon.phresco.commons.model.VideoInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.exception.PhrescoWebServiceException;
-import com.photon.phresco.model.GlobalURL;
 import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.api.DbService;
 import com.photon.phresco.service.converters.ConvertersFactory;
 import com.photon.phresco.service.dao.CustomerDAO;
 import com.photon.phresco.service.dao.UserDAO;
 import com.photon.phresco.service.util.ServerUtil;
-import com.photon.phresco.util.FileUtil;
 import com.photon.phresco.util.ServiceConstants;
-import com.sun.jersey.multipart.BodyPart;
-import com.sun.jersey.multipart.BodyPartEntity;
-import com.sun.jersey.multipart.MultiPart;
-import com.sun.jersey.multipart.MultiPartMediaTypes;
 
 
 @Component
@@ -595,173 +586,6 @@ public class AdminService extends DbService implements ServiceConstants {
 		
 		try {
 			mongoOperation.remove(USERS_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), User.class);
-		} catch (Exception e) {
-			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
-		}
-		
-		return Response.status(Response.Status.OK).build();
-	}
-
-
-	
-	/**
-	 * Returns the GlobalURL
-	 * @return
-	 */
-	@GET
-	@Path (REST_API_GLOBALURL)
-	@Produces (MediaType.APPLICATION_JSON)
-	public Response findGlobalURL() {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into AdminService.findGlobalURL()");
-	    }
-		
-		try {
-			List<GlobalURL> globalList = mongoOperation.getCollection(GLOBALURL_COLLECTION_NAME , GlobalURL.class);
-			if (globalList != null) {
-				return Response.status(Response.Status.OK).entity(globalList).build();
-			} 
-		} catch (Exception e) {
-			throw new PhrescoWebServiceException(e, EX_PHEX00006, GLOBALURL_COLLECTION_NAME);
-		}
-		
-		return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
-	}
-
-	/**
-	 * Creates the list of globalURLs
-	 * @param globalURL
-	 * @return 
-	 */
-	@POST
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Path (REST_API_GLOBALURL)
-	public Response createGlobalURL(List<GlobalURL> globalURL) {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into AdminService.createGlobalURL(List<GlobalURL> globalURL)");
-	    }
-		
-		try {
-			mongoOperation.insertList(GLOBALURL_COLLECTION_NAME , globalURL);
-		} catch (Exception e) {
-			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
-		}
-		
-		return Response.status(Response.Status.OK).build();
-	}
-
-	/**
-	 * Updates the list of globalURLs
-	 * @param globalURL
-	 * @return
-	 */
-	@PUT
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_GLOBALURL)
-	public Response updateGlobalURL(List<GlobalURL> globalURLs) {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into AdminService.updateGlobalURL(List<GlobalURL> globalURL)");
-	    }
-		
-		try {
-			for (GlobalURL globalURL : globalURLs) {
-				GlobalURL globalInfo = mongoOperation.findOne(GLOBALURL_COLLECTION_NAME , 
-				        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(globalURL.getId())), GlobalURL.class);
-				if (globalInfo  != null) {
-					mongoOperation.save(GLOBALURL_COLLECTION_NAME, globalURL);
-				}
-			}
-		} catch (Exception e) {
-			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
-		}
-		
-		return Response.status(Response.Status.OK).entity(globalURLs).build();
-	}
-
-	/**
-	 * Deletes the list of GlobalURLs
-	 * @param globalURL
-	 * @throws PhrescoException 
-	 */
-	@DELETE
-	@Path (REST_API_GLOBALURL)
-	public void deleteGlobalURL(List<GlobalURL> globalURL) throws PhrescoException {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into AdminService.deleteGlobalURL(List<GlobalURL> globalURL)");
-	    }
-		
-		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-		S_LOGGER.error("PhrescoException Is"  + phrescoException.getErrorMessage());
-		throw phrescoException;
-	}
-
-	/**
-	 * Get the globalURL by id for the given parameter
-	 * @param id
-	 * @return
-	 */
-	@GET
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_GLOBALURL + REST_API_PATH_ID)
-	public Response getGlobalURL(@PathParam(REST_API_PATH_PARAM_ID) String id) {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into AdminService.getGlobalURL(String id)" + id);
-	    }
-		
-		try {
-			GlobalURL globalInfo = mongoOperation.findOne(GLOBALURL_COLLECTION_NAME, 
-			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), GlobalURL.class);
-			if (globalInfo != null) {
-				return Response.status(Response.Status.OK).entity(globalInfo).build();
-			} 
-		} catch (Exception e) {
-			throw new PhrescoWebServiceException(e, EX_PHEX00005, GLOBALURL_COLLECTION_NAME);
-		}
-		
-		return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
-	}
-	
-	/**
-	 * Updates the list of globalURL by id
-	 * @param globalURL
-	 * @return
-	 */
-	@PUT
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_GLOBALURL + REST_API_PATH_ID)
-	public Response updateGlobalURL(@PathParam(REST_API_PATH_PARAM_ID) String id , GlobalURL globalURL) {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into AdminService.updateGlobalURL(String id , GlobalURL globalURL)" + id);
-	    }
-		
-		try {
-			if (id.equals(globalURL.getId())) {
-				mongoOperation.save(GLOBALURL_COLLECTION_NAME, globalURL);
-				return Response.status(Response.Status.OK).entity(globalURL).build();
-			} 
-		} catch (Exception e) {
-			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
-		}
-		
-		return Response.status(Response.Status.BAD_REQUEST).entity(ERROR_MSG_ID_NOT_EQUAL).build();
-	}
-	
-	/**
-	 * Deletes the url by id for the given parameter
-	 * @param id
-	 * @return 
-	 */
-	@DELETE
-	@Path (REST_API_GLOBALURL + REST_API_PATH_ID)
-	public Response deleteGlobalURL(@PathParam(REST_API_PATH_PARAM_ID) String id) {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into AdminService.deleteGlobalURL(String id)" + id);
-	    }
-		
-		try {
-			mongoOperation.remove(GLOBALURL_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), GlobalURL.class);
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
 		}

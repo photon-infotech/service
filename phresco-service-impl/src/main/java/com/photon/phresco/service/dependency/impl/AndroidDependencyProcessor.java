@@ -107,7 +107,7 @@ public class AndroidDependencyProcessor extends AbstractJsLibDependencyProcessor
 		
 		//To Get Pilot Project
 		ApplicationInfo projectInfo = PhrescoServerFactory.getDbManager().
-		    getProjectInfo(technology.getId(), info.getPilotContent().getName());
+		    getProjectInfo(technology.getVersion(), info.getPilotContent().getName());
 		ArtifactGroup pilotContent = projectInfo.getPilotContent();
 		String createContentURL = ServerUtil.createContentURL(pilotContent.getGroupId(), pilotContent.getArtifactId(), 
 				pilotContent.getVersions().get(0).getVersion(), pilotContent.getPackaging());
@@ -117,7 +117,11 @@ public class AndroidDependencyProcessor extends AbstractJsLibDependencyProcessor
 		
 		updateAndroidVersion(path, info);
 		try {
-	    	 List<ArtifactGroup> modules = info.getSelectedModules();
+			//TODO : Get features using id from projectInfo
+			List<ArtifactGroup> modulesTemp = new ArrayList<ArtifactGroup>();
+			
+			
+	    	 List<ArtifactGroup> modules = modulesTemp;
 	    	 if((CollectionUtils.isNotEmpty(modules)) && modules != null) {
 	    		 updatePOMModules(path, modules);
 	    	 }
@@ -127,8 +131,10 @@ public class AndroidDependencyProcessor extends AbstractJsLibDependencyProcessor
 		    throw new PhrescoException(e);
 		}
 		AndroidTestPOMUpdater.updatePOM(path);
-		if (technology.getId().equals(TechnologyTypes.ANDROID_HYBRID)) {
-			extractJsLibraries(path, info.getSelectedJSLibs());
+		if (technology.getVersion().equals(TechnologyTypes.ANDROID_HYBRID)) {
+			//TODO : Get features using id from projectInfo
+			List<ArtifactGroup> jsTemp = new ArrayList<ArtifactGroup>();
+			extractJsLibraries(path, jsTemp);
 		}
 		updateTestPom(path);
 	}

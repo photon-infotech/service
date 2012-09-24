@@ -77,7 +77,7 @@ public class WordPressDependencyProcessor extends AbstractJsLibDependencyProcess
 		S_LOGGER.debug("Entering Method WordPressDependencyProcessor.process(ProjectInfo info, File path)");
 		S_LOGGER.debug("process() Path=" + path.getPath());
 
-		String id = info.getTechInfo().getId();
+		String id = info.getTechInfo().getVersion();
 		updatePOMWithModules(path, info.getSelectedModules(), id);
 		updatePOMWithPluginArtifact(path, info.getSelectedModules(), id);
 		createSqlFolder(info, path);

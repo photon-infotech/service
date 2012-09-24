@@ -405,33 +405,33 @@ public class ComponentService extends DbService implements ServiceConstants {
 //		return Response.status(Response.Status.OK).build();
 //	}
 //	
-//	/**
-//	 * Returns the list of modules
-//	 * @return
-//	 */
-//	@GET
-//	@Path (REST_API_MODULES)
-//	@Produces (MediaType.APPLICATION_JSON)
-//	public Response findModules(@QueryParam(REST_QUERY_TYPE) String type, @QueryParam(REST_QUERY_CUSTOMERID) String customerId,
-//			@QueryParam(REST_QUERY_TECHID) String techId) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.findModules()" + type);
-//	    }
-//		
-//		try {
-//			List<ModuleGroup> foundModules = new ArrayList<ModuleGroup>();
-//			List<ArtifactGroupDAO> moduleDAOs = new ArrayList<ArtifactGroupDAO>();
-//			if(StringUtils.isEmpty(techId)) {
-//				if(!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
-//				    moduleDAOs = mongoOperation.find(MODULEDAO_COLLECTION_NAME,
-//								new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)), ArtifactGroupDAO.class);
-//				}
-//				moduleDAOs.addAll(mongoOperation.find(MODULEDAO_COLLECTION_NAME,
-//							new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)), ArtifactGroupDAO.class));
-//				foundModules = convertDAOToModule(moduleDAOs);
-//				return Response.status(Response.Status.OK).entity(foundModules).build();
-//			}
-//
+	/**
+	 * Returns the list of modules
+	 * @return
+	 */
+	@GET
+	@Path (REST_API_MODULES)
+	@Produces (MediaType.APPLICATION_JSON)
+	public Response findModules(@QueryParam(REST_QUERY_TYPE) String type, @QueryParam(REST_QUERY_CUSTOMERID) String customerId,
+			@QueryParam(REST_QUERY_TECHID) String techId) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.findModules()" + type);
+	    }
+		
+		try {
+			List<ArtifactGroup> foundModules = new ArrayList<ArtifactGroup>();
+			List<ArtifactGroupDAO> moduleDAOs = new ArrayList<ArtifactGroupDAO>();
+			if(StringUtils.isEmpty(techId)) {
+				if(!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
+				    moduleDAOs = mongoOperation.find(MODULEDAO_COLLECTION_NAME,
+								new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)), ArtifactGroupDAO.class);
+				}
+				moduleDAOs.addAll(mongoOperation.find(MODULEDAO_COLLECTION_NAME,
+							new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)), ArtifactGroupDAO.class));
+				foundModules = convertDAOToModule(moduleDAOs);
+				return Response.status(Response.Status.OK).entity(foundModules).build();
+			}
+
 //			if(StringUtils.isNotEmpty(customerId) && type.equals(REST_QUERY_TYPE_MODULE)) {
 //				if (!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
 //				    moduleDAOs = mongoOperation.find(MODULEDAO_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)
@@ -464,26 +464,26 @@ public class ComponentService extends DbService implements ServiceConstants {
 //				foundModules = convertDAOToModule(moduleDAOs);
 //				return Response.status(Response.Status.OK).entity(foundModules).build();
 //			}
-//
-//		} catch(Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00005, MODULES_COLLECTION_NAME);
-//		}
-//		
-//		return Response.status(Response.Status.BAD_REQUEST).build();
-//	}
-//	
-//	
-//	private List<ModuleGroup> convertDAOToModule(List<ArtifactGroupDAO> moduleDAOs) throws PhrescoException {
-//	    List<ModuleGroup> modules = new ArrayList<ModuleGroup>();
-//	    Converter<ArtifactGroupDAO, ModuleGroup> converter = 
-//            (Converter<ArtifactGroupDAO, ModuleGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
-//	    for (ArtifactGroupDAO moduleGroupDAO : moduleDAOs) {
-//            ModuleGroup moduleGroup = converter.convertDAOToObject(moduleGroupDAO, mongoOperation);
-//            modules.add(moduleGroup);
-//        }
-//        return modules;
-//    }
-//
+
+		} catch(Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00005, MODULES_COLLECTION_NAME);
+		}
+		
+		return Response.status(Response.Status.BAD_REQUEST).build();
+	}
+	
+	private List<ArtifactGroup> convertDAOToModule(List<ArtifactGroupDAO> moduleDAOs) throws PhrescoException {
+		Converter<ArtifactGroupDAO, ArtifactGroup> artifactConverter = 
+            (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
+	    List<ArtifactGroup> modules = new ArrayList<ArtifactGroup>();
+	    for (ArtifactGroupDAO artifactGroupDAO : moduleDAOs) {
+			ArtifactGroup artifactGroup = artifactConverter.convertDAOToObject(artifactGroupDAO, mongoOperation);
+			modules.add(artifactGroup);
+		}
+        return modules;
+    }
+
+	//
 //    /**
 //     * Creates the list of modules
 //     * @param modules

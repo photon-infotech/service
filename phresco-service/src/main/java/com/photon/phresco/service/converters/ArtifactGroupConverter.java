@@ -75,6 +75,8 @@ public class ArtifactGroupConverter implements Converter<ArtifactGroupDAO, Artif
         artifactGroupDAO.setSystem(artifactGroup.isSystem());
         artifactGroupDAO.setType(artifactGroup.getType());
         artifactGroupDAO.setUsed(artifactGroup.isUsed());
+        artifactGroupDAO.setAppliesTo(artifactGroup.getAppliesTo());
+        artifactGroupDAO.setHelpText(artifactGroup.getHelpText());
         return artifactGroupDAO;
     }
 

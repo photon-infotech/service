@@ -36,6 +36,7 @@
 package com.photon.phresco.service.dependency.impl;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.JAXBException;
@@ -45,7 +46,6 @@ import org.apache.log4j.Logger;
 
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ArtifactGroup;
-import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.commons.model.TechnologyInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.RepositoryManager;
@@ -66,22 +66,29 @@ public class HTML5DependencyProcessor extends AbstractJsLibDependencyProcessor {
 		S_LOGGER.debug("process() Path=" + path.getPath());
 		TechnologyInfo techInfo = applicationInfo.getTechInfo();
 		updatePom(path, applicationInfo.getSelectedModules());
-		if (techInfo.getId().equals(TechnologyTypes.HTML5_MULTICHANNEL_JQUERY_WIDGET)) {
-		    updatePOMWithJsLibs(path, applicationInfo.getSelectedJSLibs());
+		if (techInfo.getVersion().equals(TechnologyTypes.HTML5_MULTICHANNEL_JQUERY_WIDGET)) {
+			//TODO: get selected features from db using given ids from projectinfo
+			List<ArtifactGroup> jsTemp = new ArrayList<ArtifactGroup>();
+		    updatePOMWithJsLibs(path, jsTemp);
 		} else {
-		    extractJsLibraries(path, applicationInfo.getSelectedJSLibs());
+			//TODO: get selected features from db using given ids from projectinfo
+			List<ArtifactGroup> modulesTemp = new ArrayList<ArtifactGroup>();
+		    extractJsLibraries(path, modulesTemp);
 		}
 		createSqlFolder(applicationInfo, path);
 		extractPilots(applicationInfo, path, applicationInfo.getTechInfo());
 		updateTestPom(path);
 	}
 
-	protected void updatePom(File path, List<ArtifactGroup> modules)	throws PhrescoException {
+	protected void updatePom(File path, List<String> modules)	throws PhrescoException {
+		//TODO: get selected features from db using given ids from projectinfo
+		List<ArtifactGroup> modulesTemp = new ArrayList<ArtifactGroup>();
+		
 		if(CollectionUtils.isEmpty(modules)) {
 			return;
 		}
 		try {
-			updatePOMWithModules(path, modules);
+			updatePOMWithModules(path, modulesTemp);
 		} catch (JAXBException e) {
 			throw new PhrescoException(e);
 		} catch (PhrescoPomException e) {

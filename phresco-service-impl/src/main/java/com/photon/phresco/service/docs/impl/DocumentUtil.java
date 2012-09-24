@@ -106,7 +106,7 @@ public final class DocumentUtil {
         paragraph = new Paragraph();
         paragraph.setAlignment(Element.ALIGN_CENTER);
         addBlankLines(paragraph, 10);
-        String techName = info.getTechInfo().getName();
+        String techName = info.getTechInfo().getVersion();
     	if(StringUtils.isNotEmpty(info.getTechInfo().getVersion())) {
     		paragraph.add(techName + " - " + info.getTechInfo().getVersion());
     	} else {

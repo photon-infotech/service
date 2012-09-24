@@ -50,9 +50,9 @@ public class ServerUtil {
     public static ArtifactGroup getArtifactinfo(InputStream inputJarStream)
             throws PhrescoException {
         File jarFile = writeFileFromStream(inputJarStream, null);
-        ArchetypeInfo artifactInfo = getArtifactInfoFromJar(jarFile); 
+        ArtifactGroup artifactInfo = getArtifactInfoFromJar(jarFile); 
         FileUtil.delete(jarFile);
-        return artifactGroup;
+        return artifactInfo;
     }
 
     /**

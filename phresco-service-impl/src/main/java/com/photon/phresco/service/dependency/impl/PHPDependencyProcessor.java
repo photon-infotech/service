@@ -69,17 +69,17 @@ public class PHPDependencyProcessor  extends AbstractJsLibDependencyProcessor {
 //	                }
 //	            }
 //            }
-            ApplicationInfo projectInfo = PhrescoServerFactory.getDbManager().getProjectInfo(info.getTechInfo().getId(), info.getName());
+            ApplicationInfo projectInfo = PhrescoServerFactory.getDbManager().getProjectInfo(info.getTechInfo().getVersion(), info.getName());
             ArtifactGroup pilotContent = projectInfo.getPilotContent();
             String contentURL = ServerUtil.createContentURL(pilotContent.getGroupId(), pilotContent.getArtifactId(),
             		pilotContent.getVersions().get(0).getVersion(), pilotContent.getPackaging());
             if(projectInfo != null) {
                 DependencyUtils.extractFiles(contentURL, path, "");
             }
-            String id = info.getTechInfo().getId();
-            updatePOMWithModules(path, info.getSelectedModules(), id);
-            updatePOMWithPluginArtifact(path,info.getSelectedModules(), id);
-            extractJsLibraries(path, info.getSelectedJSLibs());
+            String id = info.getTechInfo().getVersion();
+//            updatePOMWithModules(path, info.getSelectedModules(), id);
+//            updatePOMWithPluginArtifact(path,info.getSelectedModules(), id);
+//            extractJsLibraries(path, info.getSelectedJSLibs());
             createSqlFolder(info, path);
             updateTestPom(path);
     }

@@ -77,7 +77,7 @@ public final class DependencyProcessorFactory {
 		S_LOGGER.debug("getDependencyProcessor() projectCode="+projectInfo.getCode());
     	assert projectInfo != null;
         TechnologyInfo technology = projectInfo.getTechInfo();
-        String techId = technology.getId();
+        String techId = technology.getVersion();
         DependencyProcessor dependencyProcessor = processors.get(techId);
         if(dependencyProcessor == null){
             //initialize if defined

@@ -49,7 +49,7 @@ public class SharePointDependencyProcessor extends AbstractDependencyProcessor {
 		S_LOGGER.debug("process() Path=" + path.getPath());
 		
 		super.process(info, path);
-		String id = info.getTechInfo().getId();
+		String id = info.getTechInfo().getVersion();
 		updatePOMWithModules(path, info.getSelectedModules(), id);
 		updatePOMWithPluginArtifact(path,info.getSelectedModules(), id);
 		updateTestPom(path);

@@ -47,15 +47,15 @@ public class JWSDependencyProcessor extends AbstractDependencyProcessor {
 		S_LOGGER.debug("process() Path=" + path.getPath());
 		
 		super.process(info, path);
-		try {
-			updatePOMWithModules(path, info.getSelectedModules());
+//		try {
+//			updatePOMWithModules(path, info.getSelectedModules());
 			createSqlFolder(info, path);
 			updateTestPom(path);
-		} catch (JAXBException e) {
-			throw new PhrescoException(e);
-		} catch (PhrescoPomException e) {
-			throw new PhrescoException(e);
-		}
+//		} catch (JAXBException e) {
+//			throw new PhrescoException(e);
+//		} catch (PhrescoPomException e) {
+//			throw new PhrescoException(e);
+//		}
 		
 	}
 }
