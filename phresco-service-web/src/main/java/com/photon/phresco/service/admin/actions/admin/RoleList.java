@@ -125,8 +125,7 @@ public class RoleList extends ServiceBaseAction {
 	    }
  
 		try {
-			Role role = new Role(name, description);
-			role.setId(roleId);
+			Role role = new Role(roleId, name, description);
 			getServiceManager().updateRole(role, roleId);
 		} catch (PhrescoException e) {
 			new LogErrorReport(e, ROLE_UPDATE_EXCEPTION);
