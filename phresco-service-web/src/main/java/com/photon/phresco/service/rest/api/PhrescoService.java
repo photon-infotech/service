@@ -39,14 +39,15 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.FileUtils;
 
+import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ApplicationType;
+import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.ArtifactInfo;
+import com.photon.phresco.commons.model.DownloadInfo;
 import com.photon.phresco.commons.model.ProjectInfo;
+import com.photon.phresco.commons.model.Technology;
+import com.photon.phresco.commons.model.TechnologyInfo;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.model.ArchetypeInfo;
-import com.photon.phresco.model.Database;
-import com.photon.phresco.model.Module;
-import com.photon.phresco.model.ModuleGroup;
-import com.photon.phresco.model.Server;
 import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.DbService;
 import com.photon.phresco.service.api.PhrescoServerFactory;
@@ -83,7 +84,7 @@ public class PhrescoService {
 	@Path("/create")
 	@Produces("application/zip")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public StreamingOutput createProject(ProjectInfo projectInfo) throws PhrescoException, IOException {
+	public StreamingOutput createProject(ApplicationInfo projectInfo) throws PhrescoException, IOException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method PhrescoService.createProject(ProjectInfo projectInfo)");
 		}
@@ -106,7 +107,7 @@ public class PhrescoService {
 			ServiceOutput serviceOutput = new ServiceOutput(projectPathStr);
 			if(serviceOutput != null) {
 			    dbManager.storeCreatedProjects(projectInfo);
-			    updateUsedObjects(projectInfo);
+			  //  updateUsedObjects(projectInfo);
 			}
 			
 			return serviceOutput;
@@ -116,18 +117,21 @@ public class PhrescoService {
 		}
 	}
 
-	private void updateUsedObjects(ProjectInfo projectInfo) throws PhrescoException {
+	/*private void updateUsedObjects(ApplicationInfo projectInfo) throws PhrescoException {
 	    
-        if(projectInfo.getArchetypeInfo() != null) {
-            ArchetypeInfo archetypeInfo = projectInfo.getArchetypeInfo();
+        if(projectInfo.getTechInfo() != null) {
+           Technology archetypeInfo = projectInfo.getTechInfo();
             dbManager.updateUsedObjects(ServiceConstants.ARCHETYPEINFO_COLLECTION_NAME, 
                     ServiceConstants.REST_API_ARTIFACTID, archetypeInfo.getArtifactId());
+            dbManager.updateUsedObjects(ServiceConstants.ARCHETYPEINFO_COLLECTION_NAME, 
+                    ServiceConstants.REST_API_ARTIFACTID, archetypeInfo.);
+            
         }
         
         if(projectInfo.getTechnology().getModules() != null) {
-            List<ModuleGroup> modules = projectInfo.getTechnology().getModules();
-            for (ModuleGroup moduleGroup : modules) {
-                Module module = moduleGroup.getVersions().get(0);
+            List<ArtifactGroup> modules = projectInfo.getTechnology().getModules();
+            for (ArtifactGroup moduleGroup : modules) {
+                ArtifactInfo module = moduleGroup.getVersions().get(0);
                 dbManager.updateUsedObjects(ServiceConstants.MODULES_COLLECTION_NAME, ServiceConstants.REST_API_NAME, module.getName());
             }
         }
@@ -136,35 +140,35 @@ public class PhrescoService {
             dbManager.updateUsedObjects(ServiceConstants.PILOTS_COLLECTION_NAME, ServiceConstants.REST_API_NAME, projectInfo.getName());
         }
         
-        if (CollectionUtils.isNotEmpty(projectInfo.getTechnology().getServers())) {
-            List<Server> servers = projectInfo.getTechnology().getServers();
-            for (Server server : servers) {
+        if (CollectionUtils.isNotEmpty(projectInfo.getSelectedServers())) {
+            List<DownloadInfo> servers = projectInfo.getServers();
+            for (DownloadInfo server : servers) {
                 dbManager.updateUsedObjects(ServiceConstants.DOWNLOAD_COLLECTION_NAME, ServiceConstants.REST_API_NAME, server.getName());
             }
         }
         
         if (CollectionUtils.isNotEmpty(projectInfo.getTechnology().getDatabases())) {
-            List<Database> databases = projectInfo.getTechnology().getDatabases();
-            for (Database database : databases) {
+            List<DownloadInfo> databases = projectInfo.getTechnology().getDatabases();
+            for (DownloadInfo database : databases) {
                 dbManager.updateUsedObjects(ServiceConstants.DOWNLOAD_COLLECTION_NAME, ServiceConstants.REST_API_NAME, database.getName());
             }
         }
         
     }
-
+*/
     @POST
 	@Path("/update")
 	@Produces("application/zip")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public StreamingOutput updateProject(ProjectInfo projectInfo) throws PhrescoException {
+	public StreamingOutput updateProject(ApplicationInfo appInfo) throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method PhrescoService.updateProject(ProjectInfo projectInfo)");
-			S_LOGGER.debug("updateProject() ProjectInfo=" + projectInfo.getCode());
+			S_LOGGER.debug("updateProject() ProjectInfo=" + appInfo.getCode());
 		}
 		String projectPathStr = "";
 		try {
-			ProjectService projectService = ProjectServiceFactory.getProjectService(projectInfo);
-			File projectPath = projectService.updateProject(projectInfo);
+			ProjectService projectService = ProjectServiceFactory.getProjectService(appInfo);
+			File projectPath = projectService.updateProject(appInfo);
 			projectPathStr = projectPath.getPath();
 			if (isDebugEnabled) {
 				S_LOGGER.debug("updateProject() ProjectPath=" + projectPathStr);
@@ -178,7 +182,7 @@ public class PhrescoService {
 		}
 		ServiceOutput serviceOutput = new ServiceOutput(projectPathStr);
 		if(serviceOutput != null) {
-		    dbManager.updateCreatedProjects(projectInfo);
+		    dbManager.updateCreatedProjects(appInfo);
 		}
 		return serviceOutput;
 	}
@@ -187,15 +191,15 @@ public class PhrescoService {
 	@Path("/updatedocs")
 	@Produces("application/zip")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public StreamingOutput updateDoc(ProjectInfo projectInfo) throws PhrescoException {
+	public StreamingOutput updateDoc(ApplicationInfo appInfo) throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method PhrescoService.updateDoc(ProjectInfo projectInfo)");
-			S_LOGGER.debug("updateProject() ProjectInfo=" + projectInfo.getCode());
+			S_LOGGER.debug("updateProject() ProjectInfo=" + appInfo.getCode());
 		}
 		String projectPathStr = "";
 		try {
-			ProjectService projectService = ProjectServiceFactory.getProjectService(projectInfo);
-			File projectPath = projectService.updateDocumentProject(projectInfo);
+			ProjectService projectService = ProjectServiceFactory.getProjectService(appInfo);
+			File projectPath = projectService.updateDocumentProject(appInfo);
 			projectPathStr = projectPath.getPath();
 			ArchiveUtil.createArchive(projectPathStr, projectPathStr + ZIP, ArchiveType.ZIP);
 		} catch (Exception pe) {

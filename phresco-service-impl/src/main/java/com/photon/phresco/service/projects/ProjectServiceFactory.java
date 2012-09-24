@@ -35,7 +35,7 @@
  ******************************************************************************/
 package com.photon.phresco.service.projects;
 
-import com.photon.phresco.commons.model.ProjectInfo;
+import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.service.api.ProjectService;
 
 public class ProjectServiceFactory {
@@ -48,15 +48,15 @@ public class ProjectServiceFactory {
 		//prevent instantiation
 	}
 	
-	public static synchronized ProjectService getProjectService(ProjectInfo projectInfo) {
-		assert projectInfo != null;
+	public static synchronized ProjectService getProjectService(ApplicationInfo appInfo) {
+		assert appInfo != null;
 		//irrespective of Technology return the DefaultProjectService. Change this when new Project Service is required.
 		if (SERVERINSTANCE == null) {
 			SERVERINSTANCE = new DefaultProjectService();
 		}
 		return SERVERINSTANCE;
 	}
-	public static synchronized ProjectService getNewProjectService(ProjectInfo projectInfo) {
+	public static synchronized ProjectService getNewProjectService(ApplicationInfo appInfo) {
 		return new DefaultProjectService();
 	}
 }

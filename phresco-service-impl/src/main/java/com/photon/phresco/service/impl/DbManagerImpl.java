@@ -6,7 +6,6 @@ import org.springframework.data.document.mongodb.query.Update;
 
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ArtifactGroup;
-import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
@@ -49,14 +48,14 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
     }
 
     @Override
-    public void storeCreatedProjects(ProjectInfo projectInfo) throws PhrescoException {
+    public void storeCreatedProjects(ApplicationInfo projectInfo) throws PhrescoException {
         if(projectInfo != null) {
             mongoOperation.save(CREATEDPROJECTS_COLLECTION_NAME, projectInfo);
         }
     }
 
     @Override
-    public void updateCreatedProjects(ProjectInfo projectInfo)
+    public void updateCreatedProjects(ApplicationInfo projectInfo)
             throws PhrescoException {
         if(projectInfo != null) {
             mongoOperation.save(CREATEDPROJECTS_COLLECTION_NAME, projectInfo);

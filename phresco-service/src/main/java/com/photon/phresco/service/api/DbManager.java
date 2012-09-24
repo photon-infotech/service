@@ -46,14 +46,14 @@ public interface DbManager {
      * @param projectInfo
      * @throws PhrescoException
      */
-    void storeCreatedProjects(ProjectInfo projectInfo) throws PhrescoException;
+    void storeCreatedProjects(ApplicationInfo projectInfo) throws PhrescoException;
     
     /**
      * To update the created project information in db
      * @param projectInfo
      * @throws PhrescoException
      */
-    void updateCreatedProjects(ProjectInfo projectInfo) throws PhrescoException;
+    void updateCreatedProjects(ApplicationInfo projectInfo) throws PhrescoException;
     
     void updateUsedObjects(String collectionName, String criteriaKey, String criteriaValue) throws PhrescoException;
 }
