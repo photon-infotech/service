@@ -166,12 +166,10 @@ public class PilotProjects extends ServiceBaseAction {
     		pilotProInfo.setArchetypeInfo(archetypeInfo);*/
     		
     		TechnologyInfo techInfo = new TechnologyInfo();
-    		techInfo.setId(techId);
-    		ComponentService cs = new ComponentService();
-    		Response techName = cs.getTechnology(techId);
-    		techInfo = (TechnologyInfo)techName.getEntity();
-    		techInfo.setName(techInfo.getName());
+    		techInfo.setVersion(techId);
     		pilotProInfo.setTechInfo(techInfo);
+    		
+    		
     		/*Technology technology = new Technology();
     		technology.setId(techId)
     		ComponentService cs = new ComponentService();
@@ -242,12 +240,16 @@ public class PilotProjects extends ServiceBaseAction {
     		pilotContent.setVersions(jarVersions);
     		pilotProInfo.setPilotContent(pilotContent);
     		
-    		TechnologyInfo techInfo = new TechnologyInfo();
+    		/*TechnologyInfo techInfo = new TechnologyInfo();
     		techInfo.setId(techId);
     		ComponentService cs = new ComponentService();
     		Response techName = cs.getTechnology(techId);
     		techInfo = (TechnologyInfo)techName.getEntity();
     		techInfo.setName(techInfo.getName());
+    		pilotProInfo.setTechInfo(techInfo);*/
+    		
+    		TechnologyInfo techInfo = new TechnologyInfo();
+    		techInfo.setVersion(techId);
     		pilotProInfo.setTechInfo(techInfo);
     		
     		/*ArtifactInfo archetypeInfo = new ArtifactInfo(groupId, artifactId, jarVersion, "zip");
@@ -357,7 +359,7 @@ public class PilotProjects extends ServiceBaseAction {
 			List<ApplicationInfo> pilotProjInfos = getServiceManager().getPilotProjects(customerId);
 			if (pilotProjInfos != null) {
 				for (ApplicationInfo pilotProjectInfo : pilotProjInfos) {
-					if (pilotProjectInfo.getTechInfo().getId().equals(techId) && pilotProjectInfo.getName().equalsIgnoreCase(name)) {
+					if (pilotProjectInfo.getTechInfo().getVersion().equals(techId) && pilotProjectInfo.getName().equalsIgnoreCase(name)) {
 						setNameError(getText(KEY_I18N_ERR_NAME_ALREADY_EXIST_TECH));
 			    		isError = true;
 			    		break;

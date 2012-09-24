@@ -30,6 +30,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.photon.phresco.commons.model.Customer;
+import com.photon.phresco.commons.model.Customer.LicenseType;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.admin.commons.LogErrorReport;
@@ -119,7 +120,9 @@ public class Customers extends ServiceBaseAction  {
 	    
 		try {
 			List<Customer> customers = new ArrayList<Customer>();
-			Customer customer = new Customer(name, description);
+			Customer customer = new Customer();
+			customer.setName(name);
+			customer.setDescription(description);
 			customer.setEmailId(email);
 			customer.setAddress(address);
 			customer.setCountry(country);
@@ -128,7 +131,8 @@ public class Customers extends ServiceBaseAction  {
 			customer.setContactNumber(number);
 			customer.setFax(fax);
 			customer.setHelpText(helpText);
-			customer.setType(Integer.parseInt(licence));
+			LicenseType licenceType = LicenseType.valueOf(licence);
+			customer.setType(licenceType);
 			customer.setValidFrom(validFrom);
 			customer.setValidUpto(validUpTo);
 			customers.add(customer);
@@ -153,7 +157,10 @@ public class Customers extends ServiceBaseAction  {
 	    }
 
 		try {
-			Customer customer = new Customer(customerId, name, description);
+			Customer customer = new Customer();
+			customer.setId(customerId);
+			customer.setName(name);
+			customer.setDescription(description);
 			customer.setEmailId(email);
             customer.setAddress(address);
             customer.setCountry(country);
@@ -162,7 +169,8 @@ public class Customers extends ServiceBaseAction  {
             customer.setContactNumber(number);
             customer.setFax(fax);
             customer.setHelpText(helpText);
-            customer.setType(Integer.parseInt(licence));
+            LicenseType licenceType = LicenseType.valueOf(licence);
+            customer.setType(licenceType);
             customer.setValidFrom(validFrom);
             customer.setValidUpto(validUpTo);
 			getServiceManager().updateCustomer(customer, customerId);
