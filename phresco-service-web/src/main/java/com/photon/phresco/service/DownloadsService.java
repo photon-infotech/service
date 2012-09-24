@@ -54,8 +54,8 @@ public class DownloadsService implements ServerConstants {
 
 	private static final String SOFTWARE_REPO_PATH = "/softwares/info/1.0/info-1.0.json";
 	private static final Logger S_LOGGER = Logger.getLogger(DownloadsService.class);
-	
-    @POST
+	//TODO Kumar
+   /* @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({MediaType.APPLICATION_JSON})
     public List<DownloadInfo> getAvailableDownloads(DownloadPropertyInfo downloadPropertyInfo, @QueryParam(ServiceConstants.REST_QUERY_CUSTOMERID) String customerId) throws PhrescoException, JSONException, FileNotFoundException {
@@ -75,5 +75,5 @@ public class DownloadsService implements ServerConstants {
 			}
     	}
     	return downloadList;
-    }
+    }*/
 }
