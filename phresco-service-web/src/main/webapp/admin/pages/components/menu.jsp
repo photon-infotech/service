@@ -43,7 +43,8 @@
 
 <%
     User userInfo = (User) session.getAttribute(ServiceUIConstants.SESSION_USER_INFO);
-    List<Customer> customers = userInfo.getCustomers();
+	// TODO:Arunprasanna
+    List<String> customers = userInfo.getCustomerIds();
 %>
 
 <nav>
@@ -77,9 +78,9 @@
 				<select name="customerId" class="customer_listbox">
 	                <% 
 	                    if (CollectionUtils.isNotEmpty(customers)) { 
-				            for (Customer customer : customers) { 
+				            for (String customer : customers) { 
 				    %>
-	                            <option value="<%= customer.getId() %>"><%= customer.getName() %></option>
+	                            <option value="<%= customer %>"><%= customer %></option>
 					<% 
 				            }
 				        } 

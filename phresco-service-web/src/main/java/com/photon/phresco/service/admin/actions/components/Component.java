@@ -32,12 +32,12 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.CoreOption;
 import com.photon.phresco.commons.model.RequiredOption;
 import com.photon.phresco.commons.model.Technology;
+import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.admin.commons.LogErrorReport;
 import com.photon.phresco.service.client.api.Content;
@@ -108,7 +108,7 @@ public class Component extends ServiceBaseAction {
     	}
     	
     	try {    		
-    		List<ArtifactGroup> moduleGroup = getServiceManager().getFeaturesByTech(customerId, techId, type);
+    		List<ArtifactGroup> moduleGroup = getServiceManager().getModules(customerId, techId, type);
     		getHttpRequest().setAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
     		getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
     		if (StringUtils.isNotEmpty(from)) {

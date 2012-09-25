@@ -34,7 +34,6 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import com.google.gson.Gson;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.CoreOption;
@@ -44,7 +43,6 @@ import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.admin.commons.LogErrorReport;
 import com.photon.phresco.service.client.api.Content;
-import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.BodyPart;
@@ -124,7 +122,7 @@ public class Features extends ServiceBaseAction {
     	}
     	
     	try {
-    		List<ArtifactGroup> moduleGroup = getServiceManager().getFeaturesByTech(customerId, technology, type);
+    		List<ArtifactGroup> moduleGroup = getServiceManager().getModules(customerId, technology, type);
     		getHttpRequest().setAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
     		getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
     		if (StringUtils.isNotEmpty(from)) {
@@ -414,7 +412,7 @@ public class Features extends ServiceBaseAction {
                 }
                 if (StringUtils.isNotEmpty(version) && (StringUtils.isEmpty(fromPage) 
                         || (!version.equals(oldVersion)))) {//To check whether the version already exist
-                    List<ArtifactGroup> moduleGroups = getServiceManager().getFeaturesByTech(customerId, technology, type);
+                    List<ArtifactGroup> moduleGroups = getServiceManager().getModules(customerId, technology, type);
                     if (StringUtils.isNotEmpty(version)) {
                         for (ArtifactGroup moduleGroup : moduleGroups) {
                             List<ArtifactInfo> versions = moduleGroup.getVersions();
