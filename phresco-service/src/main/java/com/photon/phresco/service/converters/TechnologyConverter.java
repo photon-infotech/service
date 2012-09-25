@@ -21,20 +21,24 @@
 package com.photon.phresco.service.converters;
 
 import org.springframework.data.document.mongodb.MongoOperations;
+import org.springframework.data.document.mongodb.query.Criteria;
+import org.springframework.data.document.mongodb.query.Query;
 
+import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.Converter;
+import com.photon.phresco.service.dao.ArtifactGroupDAO;
 import com.photon.phresco.service.dao.TechnologyDAO;
 import com.photon.phresco.util.ServiceConstants;
 
 public class TechnologyConverter implements Converter<TechnologyDAO, Technology>, ServiceConstants {
 
     @Override
-    public Technology convertDAOToObject(TechnologyDAO dao,
-            MongoOperations mongoOperation) throws PhrescoException {
+    public Technology convertDAOToObject(TechnologyDAO dao, MongoOperations mongoOperation) throws PhrescoException {
         Technology technology = new Technology(dao.getId());
         technology.setAppTypeId(dao.getAppTypeId());
+        technology.setCreationDate(dao.getCreationDate());
         technology.setCustomerIds(dao.getCustomerIds());
         technology.setDescription(dao.getDescription());
         technology.setHelpText(dao.getHelpText());
@@ -43,12 +47,26 @@ public class TechnologyConverter implements Converter<TechnologyDAO, Technology>
         technology.setSystem(dao.isSystem());
         technology.setTechVersions(dao.getTechVersions());
         technology.setUsed(dao.isUsed());
+        
+        String archetypeGroupDAOId = dao.getArchetypeGroupDAOId();
+        System.out.println("archetypeGroupDAOId " + archetypeGroupDAOId);
+        
+        ArtifactGroupDAO artifactGrpDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
+        		new Query(Criteria.whereId().is(archetypeGroupDAOId)), ArtifactGroupDAO.class);
+        System.out.println("artifactGrpDAO " + artifactGrpDAO);
+
+        if (artifactGrpDAO != null) { 
+			Converter<ArtifactGroupDAO, ArtifactGroup> artifactConverter = 
+		            (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
+	        ArtifactGroup artifactGroup = artifactConverter.convertDAOToObject(artifactGrpDAO, mongoOperation);
+	        technology.setArchetypeInfo(artifactGroup);
+        }
+        
         return technology;
     }
 
     @Override
-    public TechnologyDAO convertObjectToDAO(Technology technology)
-            throws PhrescoException {
+    public TechnologyDAO convertObjectToDAO(Technology technology) throws PhrescoException {
         TechnologyDAO techDAO = new TechnologyDAO();
         techDAO.setId(technology.getId());
         techDAO.setAppTypeId(technology.getAppTypeId());
@@ -60,6 +78,9 @@ public class TechnologyConverter implements Converter<TechnologyDAO, Technology>
         techDAO.setSystem(technology.isSystem());
         techDAO.setTechVersions(technology.getTechVersions());
         techDAO.setUsed(technology.isUsed());
+        
+        techDAO.setArchetypeGroupDAOId(technology.getArchetypeInfo().getId());
+        
         return techDAO;
     }
 	

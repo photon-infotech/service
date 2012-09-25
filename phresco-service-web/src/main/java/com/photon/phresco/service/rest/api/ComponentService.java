@@ -1398,42 +1398,37 @@ public class ComponentService extends DbService {
 	@GET
 	@Path (REST_API_TECHNOLOGIES)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findTechnologies() {
+	public Response findTechnologies(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.findTechnologies()");
 	    }
-		String customerId = "";
-		try {
-			List<TechnologyDAO> techList = new ArrayList<TechnologyDAO>();
-			if (StringUtils.isEmpty(customerId)) {
-				techList = mongoOperation.getCollection("Technology", TechnologyDAO.class);
-				Converter<TechnologyDAO, Technology> technologyConverter = 
-			          (Converter<TechnologyDAO, Technology>) ConvertersFactory.getConverter(TechnologyDAO.class);
-				Converter<ArtifactGroupDAO, ArtifactGroup> artifactConverter = 
-		            (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
-				for (TechnologyDAO technologyDAO : techList) {
-					Technology technology = technologyConverter.convertDAOToObject(technologyDAO, mongoOperation);
-					ArtifactGroupDAO archetypeInfoDAO = mongoOperation.findOne("ArtifactDAO", new Query(Criteria.whereId().is(technologyDAO.getArchetypeGroupDAOId())), ArtifactGroupDAO.class);
-					ArtifactGroup archetypeInfo = artifactConverter.convertDAOToObject(archetypeInfoDAO, mongoOperation);
-					technology.setArchetypeInfo(archetypeInfo);
-				}
-			} else {
-				if(!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
-//					techList = mongoOperation.find(TECHNOLOGIES_COLLECTION_NAME, 
-//								new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)), Technology.class);
-				}
-//				techList.addAll(mongoOperation.find(TECHNOLOGIES_COLLECTION_NAME, 
-//							new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)), Technology.class));
+	    
+	    try {
+		    System.out.println("findTechnlogies " + customerId);
+	
+			Query query = createCustomerIdQuery(customerId);
+		    List<TechnologyDAO> techDAOList = mongoOperation.find(TECHNOLOGIES_COLLECTION_NAME, query, TechnologyDAO.class);
+		    
+		    List<Technology> techList = new ArrayList<Technology>(techDAOList.size() * 2);
+			Converter<TechnologyDAO, Technology> technologyConverter = 
+		          (Converter<TechnologyDAO, Technology>) ConvertersFactory.getConverter(TechnologyDAO.class);
+
+			for (TechnologyDAO technologyDAO : techDAOList) {
+				System.out.println("techDAO " + technologyDAO);
+				Technology technology = technologyConverter.convertDAOToObject(technologyDAO, mongoOperation);
+				techList.add(technology);
 			}
 			
-			if (CollectionUtils.isNotEmpty(techList)) {
-				return Response.status(Response.Status.OK).entity(techList).build();
-			} 
+			//if empty send error message
+			if (techList.isEmpty()) {
+				return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();	
+			}
+			
+			return Response.status(Response.Status.OK).entity(techList).build();
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, TECHNOLOGIES_COLLECTION_NAME);
 		}
-		
-    	return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build(); 
+    	 
 	}
 	
 	/**
@@ -1489,6 +1484,12 @@ public class ComponentService extends DbService {
 	
 	private void createBinary(Technology technology, List<BodyPart> list) throws PhrescoException {
 
+		List<ArtifactGroupDAO> artifactGroups = new ArrayList<ArtifactGroupDAO>();
+		List<com.photon.phresco.commons.model.ArtifactInfo> artifactInfos = new ArrayList<com.photon.phresco.commons.model.ArtifactInfo>();
+		
+		Converter<ArtifactGroupDAO, ArtifactGroup> artifactConverter = 
+	            (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
+		
 		for (BodyPart bodyPart : list) {
 			
 			//check if this is archetype
@@ -1505,12 +1506,23 @@ public class ComponentService extends DbService {
                 artifactinfo = ServerUtil.getArtifactinfo(bodyPartEntity.getInputStream());
             }
 			
+			//convert Artifact Group
+			ArtifactGroupDAO artfGrpDAO = artifactConverter.convertObjectToDAO(artifactinfo);
+			artifactGroups.add(artfGrpDAO);
+			
 			File appJarFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null);
             uploadBinary(artifactinfo, appJarFile, customerId);
             FileUtil.delete(appJarFile);
         }
 		
-        mongoOperation.save(TECHNOLOGIES_COLLECTION_NAME, technology);
+
+		Converter<TechnologyDAO, Technology> technologyConverter = 
+	          (Converter<TechnologyDAO, Technology>) ConvertersFactory.getConverter(TechnologyDAO.class);
+		TechnologyDAO techDAO = technologyConverter.convertObjectToDAO(technology);
+		
+        mongoOperation.insertList(ARTIFACT_INFO_COLLECTION_NAME, artifactInfos);
+        mongoOperation.insertList(ARTIFACT_GROUP_COLLECTION_NAME, artifactGroups);
+        mongoOperation.save(TECHNOLOGIES_COLLECTION_NAME, techDAO);
     }
 	
 	

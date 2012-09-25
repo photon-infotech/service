@@ -25,7 +25,7 @@ import java.util.List;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.CoreOption;
 
-public class ArtifactGroupDAO extends BaseDAO {
+public class ArtifactGroupDAO extends CustomerBaseDAO {
     
     private static final long serialVersionUID = 1L;
     private String groupId;

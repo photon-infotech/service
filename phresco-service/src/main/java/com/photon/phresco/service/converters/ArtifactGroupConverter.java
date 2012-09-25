@@ -34,7 +34,7 @@ import com.photon.phresco.util.ServiceConstants;
 
 public class ArtifactGroupConverter implements Converter<ArtifactGroupDAO, ArtifactGroup>, ServiceConstants {
 
-    @Override
+	@Override
     public ArtifactGroup convertDAOToObject(ArtifactGroupDAO artifactGroupDAO,
             MongoOperations mongoOperation) throws PhrescoException {
         ArtifactGroup artifactGroup = new ArtifactGroup();
@@ -52,9 +52,11 @@ public class ArtifactGroupConverter implements Converter<ArtifactGroupDAO, Artif
         artifactGroup.setType(artifactGroupDAO.getType());
         artifactGroup.setUsed(artifactGroupDAO.isUsed());
         artifactGroupDAO.setAppliesTo(artifactGroupDAO.getAppliesTo());
-        List<ArtifactInfo> versions = mongoOperation.find("ArtifactInfo", 
-                new Query(Criteria.whereId().in(artifactGroupDAO.getVersionIds())), ArtifactInfo.class);
+        
+        List<ArtifactInfo> versions = mongoOperation.find(ARTIFACT_INFO_COLLECTION_NAME, 
+                new Query(Criteria.where(DB_COLUMN_ARTIFACT_GROUP_ID).in(artifactGroupDAO.getId())), ArtifactInfo.class);
         artifactGroup.setVersions(versions);
+        
         return artifactGroup;
     }
 

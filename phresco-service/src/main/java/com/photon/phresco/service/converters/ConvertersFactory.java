@@ -63,5 +63,5 @@ public class ConvertersFactory {
 	public static final Converter<? extends BaseDAO, ? extends Element> getConverter(Class<? extends BaseDAO> clazz) {
 		return CONVERTERS_MAP.get(clazz);
 	}
-	
+
 }

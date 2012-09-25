@@ -20,65 +20,13 @@
 
 package com.photon.phresco.service.dao;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import com.photon.phresco.commons.model.Element;
 
-import com.photon.phresco.commons.model.CustomerBasedElement;
-
-public class BaseDAO extends CustomerBasedElement {
-	
-	private String id;
-    private String name;
-    private String description;
-    private boolean system;
+public class BaseDAO extends Element {
 	
 	public BaseDAO() {
-		super();
+		//do not call super
 	}
 	
-	/**
-	 * @return
-	 */
-	public String getId() {
-		return id;
-	}
-
-	/**
-	 * @param id
-	 */
-	public void setId(String id) {
-		this.id = id;
-	}
-
-    public String getName() {
-        return name;
-    }
-    
-    public void setName(String name) {
-        this.name = name;
-    }
-    
-    public String getDescription() {
-        return description;
-    }
-    
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public boolean isSystem() {
-        return system;
-    }
-
-    public void setSystem(boolean system) {
-        this.system = system;
-    }
-
-	public String toString() {
-        return new ToStringBuilder(this,
-                ToStringStyle.DEFAULT_STYLE)
-                .append("id", id)
-                .toString();
-    }
 	
 }

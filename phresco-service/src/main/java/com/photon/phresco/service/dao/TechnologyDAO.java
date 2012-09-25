@@ -22,8 +22,7 @@ package com.photon.phresco.service.dao;
 
 import java.util.List;
 
-
-public class TechnologyDAO extends BaseDAO {
+public class TechnologyDAO extends CustomerBaseDAO {
 	
     private static final long serialVersionUID = 1L;
     private String appTypeId;
