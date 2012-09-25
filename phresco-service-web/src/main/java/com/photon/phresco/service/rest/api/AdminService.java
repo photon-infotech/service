@@ -19,7 +19,6 @@
  */
 package com.photon.phresco.service.rest.api;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -43,18 +42,12 @@ import org.springframework.stereotype.Component;
 import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.Permission;
 import com.photon.phresco.commons.model.Property;
-import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.commons.model.Role;
 import com.photon.phresco.commons.model.User;
 import com.photon.phresco.commons.model.VideoInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.exception.PhrescoWebServiceException;
-import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.api.DbService;
-import com.photon.phresco.service.converters.ConvertersFactory;
-import com.photon.phresco.service.dao.CustomerDAO;
-import com.photon.phresco.service.dao.UserDAO;
-import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.ServiceConstants;
 
 
@@ -81,14 +74,8 @@ public class AdminService extends DbService {
             S_LOGGER.debug("Entered into AdminService.findCustomer()");
         }
     	try {
-    	    List<Customer> customers = new ArrayList<Customer>();
-    		Converter<CustomerDAO, Customer> converter = 
-                (Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
-    		List<CustomerDAO> customerDAOs = mongoOperation.getCollection(CUSTOMERDAO_COLLECTION_NAME , CustomerDAO.class);
-    		for (CustomerDAO customerDAO : customerDAOs) {
-                customers.add(converter.convertDAOToObject(customerDAO, mongoOperation));
-            }
-    		if(CollectionUtils.isNotEmpty(customers)) {
+    		List<Customer> customers = mongoOperation.getCollection(CUSTOMERDAO_COLLECTION_NAME, Customer.class);
+    		if (CollectionUtils.isNotEmpty(customers)) {
     		    return Response.status(Response.Status.OK).entity(customers).build();
     		}
     	} catch (Exception e) {
@@ -109,19 +96,9 @@ public class AdminService extends DbService {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.createCustomer(List<Customer> customer)");
         }
+        
     	try {
-    	    Converter<CustomerDAO, Customer> converter = 
-                (Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
-    	    for (Customer customer : customers) {
-    	        CustomerDAO customerDAO = converter.convertObjectToDAO(customer);
-    	        mongoOperation.save(CUSTOMERDAO_COLLECTION_NAME, customerDAO);
-    	        if(customer.getRepoInfo() != null) {
-    	            RepoInfo repoInfo = customer.getRepoInfo();
-    	            String repoPassword = repoInfo.getRepoPassword();
-    	            repoInfo.setRepoPassword(ServerUtil.encryptString(repoPassword));
-    	            mongoOperation.save(REPOINFO_COLLECTION_NAME, repoInfo);
-    	        }
-            }
+	        mongoOperation.insertList(CUSTOMERDAO_COLLECTION_NAME, customers);
     	} catch (Exception e) {
     		throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
 		}
@@ -430,18 +407,12 @@ public class AdminService extends DbService {
 	    }
 		
 		try {
-			List<UserDAO> userList = mongoOperation.getCollection(USERDAO_COLLECTION_NAME, UserDAO.class);
+			List<User> userList = mongoOperation.getCollection(USERDAO_COLLECTION_NAME, User.class);
 			if (userList.isEmpty()) {
 				return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
 			}
 			
-			Converter<UserDAO, User> converter = (Converter<UserDAO, User>) ConvertersFactory.getConverter(UserDAO.class);			
-			List<User> users = new ArrayList<User>(userList.size() * 2);
-			for (UserDAO userDAO : userList) {
-				users.add(converter.convertDAOToObject(userDAO, mongoOperation));
-			}
-			
-			return Response.status(Response.Status.OK).entity(users).build();
+			return Response.status(Response.Status.OK).entity(userList).build();
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, USERS_COLLECTION_NAME);
 		}
@@ -461,12 +432,7 @@ public class AdminService extends DbService {
 	    }
 		
 		try {
-			Converter<UserDAO, User> converter = (Converter<UserDAO, User>) ConvertersFactory.getConverter(UserDAO.class);			
-			List<UserDAO> userDAOs = new ArrayList<UserDAO>();
-			for (User user : users) {
-				userDAOs.add(converter.convertObjectToDAO(user));
-			}
-			mongoOperation.insertList(USERDAO_COLLECTION_NAME , userDAOs);
+			mongoOperation.insertList(USERDAO_COLLECTION_NAME, users);
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
 		}

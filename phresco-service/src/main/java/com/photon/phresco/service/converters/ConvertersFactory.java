@@ -27,11 +27,8 @@ import com.photon.phresco.commons.model.Element;
 import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
 import com.photon.phresco.service.dao.BaseDAO;
-import com.photon.phresco.service.dao.CustomerDAO;
-import com.photon.phresco.service.dao.DownloadInfoDAO;
 import com.photon.phresco.service.dao.ProjectInfoDAO;
 import com.photon.phresco.service.dao.TechnologyDAO;
-import com.photon.phresco.service.dao.UserDAO;
 
 /**
  * @author kumar_s
@@ -47,18 +44,10 @@ public class ConvertersFactory {
 	}
 
 	private static void initConverters() {
-		CONVERTERS_MAP.put(UserDAO.class, new UserConverter());
-		CONVERTERS_MAP.put(CustomerDAO.class, new CustomerConverter());
 		CONVERTERS_MAP.put(ArtifactGroupDAO.class, new ArtifactGroupConverter());
 		CONVERTERS_MAP.put(TechnologyDAO.class, new TechnologyConverter());
 		CONVERTERS_MAP.put(ProjectInfoDAO.class, new ProjectInfoConverter());
-		CONVERTERS_MAP.put(DownloadInfoDAO.class, new DownloadsConverter());
 	}
-	
-//	public static final Converter<BaseDAO, Element> getConverter(Class<? extends BaseDAO> clazz) {
-//		return (Converter<BaseDAO, Element>) convertersMap.get(clazz);
-//	}
-
 
 	public static final Converter<? extends BaseDAO, ? extends Element> getConverter(Class<? extends BaseDAO> clazz) {
 		return CONVERTERS_MAP.get(clazz);
