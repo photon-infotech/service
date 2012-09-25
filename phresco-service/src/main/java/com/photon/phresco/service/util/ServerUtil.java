@@ -264,8 +264,7 @@ public class ServerUtil {
      * @return
      * @throws PhrescoException
      */
-    public static File createPomFile(ArtifactGroup info)
-            throws PhrescoException {
+    public static File createPomFile(ArtifactGroup info) throws PhrescoException {
         FileWriter writer = null;
         File pomFile = new File(getTempFolderPath(), ServerConstants.POM_FILE_NAME);
         DocumentBuilderFactory domFactory = DocumentBuilderFactory

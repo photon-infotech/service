@@ -60,7 +60,7 @@ import com.photon.phresco.util.ServiceConstants;
 
 @Component
 @Path(ServiceConstants.REST_API_ADMIN)
-public class AdminService extends DbService implements ServiceConstants {
+public class AdminService extends DbService {
 	
 	private static final Logger S_LOGGER= Logger.getLogger(AdminService.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();

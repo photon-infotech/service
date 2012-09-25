@@ -1,19 +1,19 @@
 <environments>
     <environment default="true" name="Production">
         <WebService name="webservice">
-            <port>7070</port>
+            <port>2020</port>
             <password/>
-            <context>auth-2.0</context>
-            <host>172.16.18.174</host>
+            <context>auth</context>
+            <host>localhost</host>
             <protocol>http</protocol>
             <username/>
         </WebService>	
 	<Database  desc="" name="database">
-		<host>172.16.17.227</host>
+		<host>localhost</host>
 		<port>27017</port>
 		<username></username>
 		<password/>
-		<dbname>phresco</dbname>
+		<dbname>phresco-testing</dbname>
 		<type>mongodb</type>
 		<version>2.0.4</version>
 	</Database>

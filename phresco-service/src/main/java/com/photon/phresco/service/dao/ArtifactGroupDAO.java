@@ -22,6 +22,7 @@ package com.photon.phresco.service.dao;
 
 import java.util.List;
 
+import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.CoreOption;
 
 public class ArtifactGroupDAO extends BaseDAO {
@@ -31,7 +32,7 @@ public class ArtifactGroupDAO extends BaseDAO {
     private String artifactId;
     private String packaging;
     private String classifier;
-    private String type;
+    private ArtifactGroup.Type type;
     private String imageURL;
     private List<String> versionIds;
     private List<CoreOption> appliesTo;
@@ -68,11 +69,11 @@ public class ArtifactGroupDAO extends BaseDAO {
         this.classifier = classifier;
     }
     
-    public String getType() {
+    public ArtifactGroup.Type getType() {
         return type;
     }
     
-    public void setType(String type) {
+    public void setType(ArtifactGroup.Type type) {
         this.type = type;
     }
     

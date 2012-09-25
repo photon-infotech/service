@@ -37,7 +37,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
         <module>phresco-service</module>
         <module>phresco-service-impl</module>
         <module>phresco-service-web</module>
-        <!-- <module>phresco-service-tools</module> -->
+        <!-- <module>phresco-service-tools</module>-->
     </modules>
 	
 	<profiles>
@@ -138,4 +138,62 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 		<jersey-multipart.version>1.8</jersey-multipart.version>
 		<tomcat-maven-plugin.version>1.1</tomcat-maven-plugin.version>
 	</properties>
+	 <build>
+	 	<pluginManagement>
+	 		<plugins>
+	 			<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+	 			<plugin>
+	 				<groupId>org.eclipse.m2e</groupId>
+	 				<artifactId>lifecycle-mapping</artifactId>
+	 				<version>1.0.0</version>
+	 				<configuration>
+	 					<lifecycleMappingMetadata>
+	 						<pluginExecutions>
+	 							<pluginExecution>
+	 								<pluginExecutionFilter>
+	 									<groupId>
+	 										org.apache.geronimo.genesis.plugins
+	 									</groupId>
+	 									<artifactId>
+	 										tools-maven-plugin
+	 									</artifactId>
+	 									<versionRange>
+	 										[1.1,)
+	 									</versionRange>
+	 									<goals>
+	 										<goal>
+	 											copy-legal-files
+	 										</goal>
+	 									</goals>
+	 								</pluginExecutionFilter>
+	 								<action>
+	 									<ignore></ignore>
+	 								</action>
+	 							</pluginExecution>
+	 							<pluginExecution>
+	 								<pluginExecutionFilter>
+	 									<groupId>
+	 										org.codehaus.mojo
+	 									</groupId>
+	 									<artifactId>
+	 										jspc-maven-plugin
+	 									</artifactId>
+	 									<versionRange>
+	 										[1.4.6,)
+	 									</versionRange>
+	 									<goals>
+	 										<goal>compile</goal>
+	 									</goals>
+	 								</pluginExecutionFilter>
+	 								<action>
+	 									<ignore></ignore>
+	 								</action>
+	 							</pluginExecution>
+	 						</pluginExecutions>
+	 					</lifecycleMappingMetadata>
+	 				</configuration>
+	 			</plugin>
+	 		</plugins>
+	 	</pluginManagement>
+	 </build>
 </project>

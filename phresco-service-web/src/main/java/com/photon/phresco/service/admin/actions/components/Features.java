@@ -203,11 +203,11 @@ public class Features extends ServiceBaseAction {
 			BodyPart jsonPart = new BodyPart();
 			jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
 			jsonPart.setEntity(createModuleGroup());
-			Content content = new Content("object", name, null, null, null, 0);
+			Content content = new Content(Content.Type.JSON, name, null, null, null, 0);
 			jsonPart.setContentDisposition(content);
 			multiPart.bodyPart(jsonPart);
 			InputStream featureIs = new ByteArrayInputStream(featureByteArray);
-			BodyPart binaryPart = getServiceManager().createBodyPart(name, FILE_FOR_APPTYPE, featureIs);
+			BodyPart binaryPart = getServiceManager().createBodyPart(name, Content.Type.JAR, featureIs);
 			multiPart.bodyPart(binaryPart);
 			
 			ClientResponse clientResponse = getServiceManager().createFeatures(multiPart, customerId);
@@ -235,12 +235,12 @@ public class Features extends ServiceBaseAction {
             BodyPart jsonPart = new BodyPart();
             jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
             jsonPart.setEntity(createModuleGroup());
-            Content content = new Content("object", name, null, null, null, 0);
+            Content content = new Content(Content.Type.JSON, name, null, null, null, 0);
             jsonPart.setContentDisposition(content);
             multiPart.bodyPart(jsonPart);
             if (featureByteArray != null) {
                 InputStream featureIs = new ByteArrayInputStream(featureByteArray);
-                BodyPart binaryPart = getServiceManager().createBodyPart(name, FILE_FOR_APPTYPE, featureIs);
+                BodyPart binaryPart = getServiceManager().createBodyPart(name, Content.Type.JAR, featureIs);
                 multiPart.bodyPart(binaryPart);
             }
 			    
@@ -286,8 +286,8 @@ public class Features extends ServiceBaseAction {
             
             appliesTo.add(moduleCoreOption);
             moduleGroup.setAppliesTo(appliesTo);
-            
-            moduleGroup.setType(type);
+            //TODO:ARUN PRASANNA
+//            moduleGroup.setType(type);
             List<String> customerIds = new ArrayList<String>();
             customerIds.add(customerId);
            

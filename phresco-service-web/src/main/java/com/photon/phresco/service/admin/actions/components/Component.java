@@ -164,12 +164,12 @@ public class Component extends ServiceBaseAction {
 			BodyPart jsonPart = new BodyPart();
 			jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
 			jsonPart.setEntity(createModuleGroup());
-			Content content = new Content("object", name, null, null, null, 0);
+			Content content = new Content(Content.Type.JSON, name, null, null, null, 0);
 			jsonPart.setContentDisposition(content);
 			multiPart.bodyPart(jsonPart);
 			if (StringUtils.isNotEmpty(componentJarName)) {
 				InputStream featureIs = new ByteArrayInputStream(componentByteArray);
-				BodyPart binaryPart = getServiceManager().createBodyPart(name, FILE_FOR_APPTYPE, featureIs);
+				BodyPart binaryPart = getServiceManager().createBodyPart(name, Content.Type.JAR, featureIs);
 				multiPart.bodyPart(binaryPart);
 			}
 			
@@ -211,7 +211,8 @@ public class Component extends ServiceBaseAction {
 			}
 			appliesTo.add(moduleCoreOption);
 			moduleGroup.setAppliesTo(appliesTo);
-			moduleGroup.setType(type);
+            //TODO:ARUN PRASANNA
+//			moduleGroup.setType(type);
 			List<String> customerIds = new ArrayList<String>();
 			moduleGroup.setCustomerIds(customerIds);
 			moduleGroup.setArtifactId(artifactId);
@@ -246,13 +247,13 @@ public class Component extends ServiceBaseAction {
 			BodyPart jsonPart = new BodyPart();
 			jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
 			jsonPart.setEntity(createModuleGroup());
-			Content content = new Content("object", name, null, null, null, 0);
+			Content content = new Content(Content.Type.JSON, name, null, null, null, 0);
 			jsonPart.setContentDisposition(content);
 			multiPart.bodyPart(jsonPart);
 			    
 			if (StringUtils.isNotEmpty(componentJarName)) {
 				InputStream featureIs = new ByteArrayInputStream(componentByteArray);
-				BodyPart binaryPart2 = getServiceManager().createBodyPart(name, FILE_FOR_APPTYPE, featureIs);
+				BodyPart binaryPart2 = getServiceManager().createBodyPart(name, Content.Type.JAR, featureIs);
 				multiPart.bodyPart(binaryPart2);
 			}
 			

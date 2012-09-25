@@ -685,7 +685,8 @@ public class TechnologyDataGenerator extends DbService implements ServiceConstan
     }
     
     public static void main(String[] args) throws PhrescoException {
-        File toolsHome = new File("D:\\work\\phresco\\MasterNew\\servicenew\\phresco-service-runner\\delivery\\tools");
+    	System.out.println("Hi");
+    	File toolsHome = new File("/Users/jeb/work/projects/phresco/source/master/service/phresco-service-runner/delivery/tools");
         File binariesDir = new File("D:\\work\\phresco\\Phresco-binaries\\");
         File inputRootDir = new File(toolsHome, "files");
         File outputRootDir = new File(toolsHome, "repo");

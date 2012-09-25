@@ -163,23 +163,23 @@ public class Downloads extends ServiceBaseAction {
 			download.setVersions(downloadVersions);
 			//TODO Arunprasanna
 			//download.setAppliesToTechs(technology); 
-			download.setType(group);
+//			download.setType(group);
 			
 			BodyPart jsonPart = new BodyPart();
 		    jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
 		    jsonPart.setEntity(download);
-		    Content content = new Content("object", name, null, null, null, 0);
+		    Content content = new Content(Content.Type.JSON, name, null, null, null, 0);
 		    jsonPart.setContentDisposition(content);
 		    multiPart.bodyPart(jsonPart);
 		    if (StringUtils.isNotEmpty(downloadJarName)) {
 		    	InputStream downloadIs = new ByteArrayInputStream(downloadByteArray);
-				BodyPart binaryPart2 = getServiceManager().createBodyPart(name, FILE_FOR_APPTYPE, downloadIs);
+				BodyPart binaryPart2 = getServiceManager().createBodyPart(name, Content.Type.JAR, downloadIs);
 		        multiPart.bodyPart(binaryPart2);
 			}
 			
 		    if(StringUtils.isNotEmpty(downloadImageName)){
 		    	InputStream downloadImage=new ByteArrayInputStream(byteArray);
-		    	BodyPart binaryPart = getServiceManager().createBodyPart(name, FILE_FOR_APPTYPE, downloadImage);
+		    	BodyPart binaryPart = getServiceManager().createBodyPart(name, Content.Type.JAR, downloadImage);
 		        multiPart.bodyPart(binaryPart);
 		    }
 			downloadInfo.add(download);
@@ -223,23 +223,23 @@ public class Downloads extends ServiceBaseAction {
 			download.setVersions(downloadVersions);
 			//TODO Arunprasanna
 			//download.setAppliesTo(technology);
-			download.setType(group);
+//			download.setType(group);
 			
 			BodyPart jsonPart = new BodyPart();
 		    jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
 		    jsonPart.setEntity(download);
-		    Content content = new Content("object", name, null, null, null, 0);
+		    Content content = new Content(Content.Type.JSON, name, null, null, null, 0);
 		    jsonPart.setContentDisposition(content);
 		    multiPart.bodyPart(jsonPart);
 		    if (StringUtils.isNotEmpty(downloadJarName)) {
 		    	InputStream downloadIs = new ByteArrayInputStream(downloadByteArray);
-				BodyPart binaryPart2 = getServiceManager().createBodyPart(name, FILE_FOR_APPTYPE, downloadIs);
+				BodyPart binaryPart2 = getServiceManager().createBodyPart(name, Content.Type.JAR, downloadIs);
 		        multiPart.bodyPart(binaryPart2);
 			}
 			
 		    if(StringUtils.isNotEmpty(downloadImageName)){
 		    	InputStream downloadImage=new ByteArrayInputStream(byteArray);
-		    	BodyPart binaryPart = getServiceManager().createBodyPart(name, FILE_FOR_APPTYPE, downloadImage);
+		    	BodyPart binaryPart = getServiceManager().createBodyPart(name, Content.Type.JAR, downloadImage);
 		        multiPart.bodyPart(binaryPart);
 		    }
 			

@@ -20,12 +20,23 @@
 
 package com.photon.phresco.service.api;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.data.document.mongodb.MongoOperations;
+import org.springframework.data.document.mongodb.query.Criteria;
+import org.springframework.data.document.mongodb.query.Query;
 
-public class DbService {
+import com.photon.phresco.util.ServiceConstants;
 
+public class DbService implements ServiceConstants {
+
+	private static final Logger S_LOGGER = Logger.getLogger(DbService.class);
+	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
+	
 	private static final String MONGO_TEMPLATE = "mongoTemplate";
 	protected MongoOperations mongoOperation;
 
@@ -33,4 +44,23 @@ public class DbService {
 		ApplicationContext ctx = new AnnotationConfigApplicationContext(MongoConfig.class);
     	mongoOperation = (MongoOperations)ctx.getBean(MONGO_TEMPLATE);
 	}
+
+	protected Query createCustomerIdQuery(String customerId) {
+		List<String> customerIds = new ArrayList<String>();
+		customerIds.add(customerId);
+		
+		if(!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
+			customerIds.add(DEFAULT_CUSTOMER_NAME);
+		}
+
+		Criteria criteria = Criteria.where(DB_COLUMN_CUSTOMERIDS).in(customerIds.toArray());
+		Query query = new Query(criteria);
+
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("query.getQueryObject() " + query.getQueryObject());
+	    }
+	    
+	    return query;
+	}
+
 }

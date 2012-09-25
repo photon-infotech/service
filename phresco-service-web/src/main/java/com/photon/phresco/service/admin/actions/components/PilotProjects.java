@@ -178,13 +178,13 @@ public class PilotProjects extends ServiceBaseAction {
     		BodyPart jsonPart = new BodyPart();
 		    jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
 		    jsonPart.setEntity(pilotProInfo);
-		    Content content = new Content("object", name, null, null, null, 0);
+		    Content content = new Content(Content.Type.JSON, name, null, null, null, 0);
 		    jsonPart.setContentDisposition(content);
 		    multiPart.bodyPart(jsonPart);
 		    
 		    if (StringUtils.isNotEmpty(pilotProJarName)) {
 				InputStream pilotProIs = new ByteArrayInputStream(pilotProByteArray);
-				BodyPart binaryPart2 = getServiceManager().createBodyPart(name, FILE_FOR_APPTYPE, pilotProIs );
+				BodyPart binaryPart2 = getServiceManager().createBodyPart(name, Content.Type.JAR, pilotProIs );
 		        multiPart.bodyPart(binaryPart2);
 			}
 		    
@@ -262,13 +262,13 @@ public class PilotProjects extends ServiceBaseAction {
     		BodyPart jsonPart = new BodyPart();
 		    jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
 		    jsonPart.setEntity(pilotProInfo);
-		    Content content = new Content("object", name, null, null, null, 0);
+		    Content content = new Content(Content.Type.JSON, name, null, null, null, 0);
 		    jsonPart.setContentDisposition(content);
 		    multiPart.bodyPart(jsonPart);
 		    
 		    if (StringUtils.isNotEmpty(pilotProJarName)) {
 				InputStream pilotProIs = new ByteArrayInputStream(pilotProByteArray);
-				BodyPart binaryPart2 = getServiceManager().createBodyPart(name, FILE_FOR_APPTYPE, pilotProIs );
+				BodyPart binaryPart2 = getServiceManager().createBodyPart(name, Content.Type.JAR, pilotProIs);
 		        multiPart.bodyPart(binaryPart2);
 			}
     		

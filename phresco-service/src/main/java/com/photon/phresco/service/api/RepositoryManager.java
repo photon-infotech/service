@@ -74,8 +74,7 @@ public interface RepositoryManager {
 
     String getEmailExtFile() throws PhrescoException;
 
-    boolean addArtifact(ArtifactInfo info, File artifactFile, String customerId)
-            throws PhrescoException;
+    boolean addArtifact(ArtifactInfo info, File artifactFile, String customerId) throws PhrescoException;
 
     String getFrameWorkLatestFile() throws PhrescoException;
 

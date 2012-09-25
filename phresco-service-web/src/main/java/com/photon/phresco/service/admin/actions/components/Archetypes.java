@@ -194,7 +194,7 @@ public class Archetypes extends ServiceBaseAction {
 		    BodyPart jsonPart = new BodyPart();
 		    jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
 		    jsonPart.setEntity(technology);
-		    Content content = new Content(name, name, null, null, null, 0);
+		    Content content = new Content(Content.Type.JSON, name, null, null, null, 0);
 		    jsonPart.setContentDisposition(content);
 		    multiPart.bodyPart(jsonPart);
 			   
@@ -204,14 +204,14 @@ public class Archetypes extends ServiceBaseAction {
 				    String key = (String) iter.next();
 				    byte[] byteArray = (byte[]) pluginMap.get(key);
 				    InputStream pluginJarIs = new ByteArrayInputStream(byteArray);
-				    BodyPart binaryPart = getServiceManager().createBodyPart(name, FILE_FOR_PLUGIN, pluginJarIs);
+				    BodyPart binaryPart = getServiceManager().createBodyPart(name, Content.Type.JAR, pluginJarIs);
 				    multiPart.bodyPart(binaryPart);
 			    }
 			}
 
 			if (StringUtils.isNotEmpty(applnJarName)) {
 				InputStream applnIs = new ByteArrayInputStream(applnByteArray);
-				BodyPart binaryPart2 = getServiceManager().createBodyPart(name, FILE_FOR_APPTYPE, applnIs);
+				BodyPart binaryPart2 = getServiceManager().createBodyPart(name, Content.Type.ARCHETYPE, applnIs);
 		        multiPart.bodyPart(binaryPart2);
 			}
 			
@@ -279,7 +279,7 @@ public class Archetypes extends ServiceBaseAction {
 			BodyPart jsonPart = new BodyPart();
 			jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
 			jsonPart.setEntity(technology);
-			Content content = new Content(name, name, null, null, null, 0);
+			Content content = new Content(Content.Type.JSON, name, null, null, null, 0);
 			jsonPart.setContentDisposition(content);
 			multiPart.bodyPart(jsonPart);
 
@@ -289,14 +289,14 @@ public class Archetypes extends ServiceBaseAction {
 					String key = (String) iter.next();
 					byte[] byteArray = (byte[]) pluginMap.get(key);
 					InputStream pluginJarIs = new ByteArrayInputStream(byteArray);
-					BodyPart binaryPart = getServiceManager().createBodyPart(name, FILE_FOR_PLUGIN, pluginJarIs);
+					BodyPart binaryPart = getServiceManager().createBodyPart(name, Content.Type.JAR, pluginJarIs);
 					multiPart.bodyPart(binaryPart);
 				}
 			}
 
 			if (StringUtils.isNotEmpty(applnJarName)) {
 				InputStream applnIs = new ByteArrayInputStream(applnByteArray);
-				BodyPart binaryPart2 = getServiceManager().createBodyPart(name, FILE_FOR_APPTYPE, applnIs);
+				BodyPart binaryPart2 = getServiceManager().createBodyPart(name, Content.Type.ARCHETYPE, applnIs);
 				multiPart.bodyPart(binaryPart2);
 			}
 			
