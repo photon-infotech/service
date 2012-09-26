@@ -39,7 +39,7 @@
 	<div class="operation">
 		<div class="featurelist_add">
 			<input type="button" id="featuresAdd" class="btn btn-primary" name="features_add" 
-				onclick="loadContent('featuresAdd', $('#formFeaturesList'), $('#feature_tab'));" 
+				onclick="loadContent('featuresAdd', $('#formFeaturesList'), $('#featureContainer'));" 
 				value="<%= header%>"/>
 			<input type="button" class="btn" id="del" disabled value="<s:text name='lbl.hdr.comp.delete'/>" 
 				onclick="showDeleteConfirmation('<s:text name='del.confirm.feature'/>');"/>

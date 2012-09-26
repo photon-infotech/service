@@ -87,29 +87,40 @@ public class Features extends ServiceBaseAction {
 
 		setReqAttribute(REQ_CUST_CUSTOMER_ID, customerId);
 		featureByteArray = null;
-
     	return COMP_FEATURES_LIST;
     }
 	
-    public String technologies() {
+	public String modulesList() {
+	    if (isDebugEnabled) {
+            S_LOGGER.debug("Entering Method  Features.modulesList()");
+        }
+	    
+        setReqAttribute(REQ_FEATURES_HEADER, getText(KEY_I18N_FEATURE_MOD_ADD));
+        setReqAttribute(REQ_FEATURES_TYPE, REST_QUERY_TYPE_MODULE); //for handle in feature sub menu
+	    return setTechnologiesInRequest();
+	}
+	
+	public String jsLibList() {
+	    if (isDebugEnabled) {
+            S_LOGGER.debug("Entering Method  Features.jsLibList()");
+        }
+	    
+        setReqAttribute(REQ_FEATURES_HEADER, getText(KEY_I18N_FEATURE_JS_ADD));
+        setReqAttribute(REQ_FEATURES_TYPE, REST_QUERY_TYPE_JS); //for handle in feature sub menu
+	    return setTechnologiesInRequest();
+    }
+	
+    private String setTechnologiesInRequest() {
     	if (isDebugEnabled) {
     		S_LOGGER.debug("Entering Method  Features.list()");
     	}
     	
     	try {
-      		getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
-			if (REQ_FEATURES_MODULE.equals(type)) {
-				getHttpRequest().setAttribute(REQ_FEATURES_HEADER, getText(KEY_I18N_FEATURE_MOD_ADD));
-			} else {
-				getHttpRequest().setAttribute(REQ_FEATURES_HEADER, getText(KEY_I18N_FEATURE_JS_ADD));
-			}
     		List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
-    		getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
+    		setReqAttribute(REQ_ARCHE_TYPES, technologies);
     		featureByteArray = null;
     	} catch (PhrescoException e) {
-//    		new LogErrorReport(e, FEATURE_LIST_EXCEPTION);
-    		
-    		return LOG_ERROR;
+    	    return showErrorPopup(e, FEATURE_LIST_EXCEPTION);
     	}
     	
     	return COMP_FEATURES_LIST;
@@ -128,9 +139,7 @@ public class Features extends ServiceBaseAction {
     		    return COMP_FEATURES_DEPENDENCY;
     		}
     	} catch (PhrescoException e) {
-//    		new LogErrorReport(e, FEATURE_LIST_EXCEPTION);
-    		
-    		return LOG_ERROR;
+    	    return showErrorPopup(e, FEATURE_LIST_EXCEPTION);
     	}
     	
     	return COMP_FEATURES_LIST;
@@ -154,10 +163,8 @@ public class Features extends ServiceBaseAction {
                 getHttpRequest().setAttribute(REQ_FEATURES_HEADER,
                         getText(KEY_I18N_FEATURE_JS_ADD));
             }
-        } catch (Exception e) {
-//            new LogErrorReport(e, FEATURE_ADD_EXCEPTION);
-            
-            return LOG_ERROR;
+        } catch (PhrescoException e) {
+            return showErrorPopup(e, FEATURE_ADD_EXCEPTION);            
         }
         
         return COMP_FEATURES_ADD;
@@ -219,7 +226,7 @@ public class Features extends ServiceBaseAction {
 			return LOG_ERROR;
 		} 
 
-		return technologies();
+		return setTechnologiesInRequest();
 	}
 	
 	public String update() throws PhrescoException {
@@ -253,7 +260,7 @@ public class Features extends ServiceBaseAction {
 			return LOG_ERROR;
 		}
 		
-		return technologies();	
+		return setTechnologiesInRequest();	
 	}
 	
 	private ArtifactGroup createModuleGroup() throws PhrescoException {
@@ -335,7 +342,7 @@ public class Features extends ServiceBaseAction {
     		return LOG_ERROR;
 		}
 		
-		return technologies();
+		return setTechnologiesInRequest();
 	}
 	
 	public String uploadFile() throws PhrescoException {

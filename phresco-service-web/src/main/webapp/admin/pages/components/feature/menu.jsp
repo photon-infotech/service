@@ -33,12 +33,12 @@
 	<div id="subTabcontent">
 		<div id="navigation">
 			<ul class="navigation_menu">
-				<li><a href="#" class="selected" id="module" name="featureTab"><s:text name='lbl.hdr.comp.featrs.modules'/></a></li>
-				<li><a href="#" class="unselected" id="js" name="featureTab"><s:text name='lbl.hdr.comp.featrs.jslib'/></a></li>
+				<li><a href="#" class="inactive" id="modulesList" name="featureTab"><s:text name='lbl.hdr.comp.featrs.modules'/></a></li>
+				<li><a href="#" class="inactive" id="jsLibList" name="featureTab"><s:text name='lbl.hdr.comp.featrs.jslib'/></a></li>
 			</ul>
 		</div>
 		
-		<div id="feature_tab" style="height:76%;">
+		<div id="featureContainer" style="height:76%;">
 	
 		</div>
 	</div>
@@ -49,33 +49,9 @@
 </form>
 
 <script type="text/javascript">
-$(document).ready(function() {
-	var params = "type=";
-	params = params.concat("module");
-	loadContent("technologiesList", $('#formMenu'), $("#feature_tab"), params);
-	
-	$("#module").click(function(){
-		$("#js").removeClass("selected");
-		$("#js").addClass("unselected");
-		$("#module").addClass("selected");
-		 var params = "type=";
-		 params = params.concat("module");
-		loadContent("technologiesList", $('#formMenu'), $("#feature_tab"), params);
+	$(document).ready(function() {
+		clickMenu($("a[name='featureTab']"), $("#featureContainer"));
+		loadContent("modulesList", $('#formMenu'), $("#featureContainer"));
+		activateMenu($("#module"));
 	});
-	
-	$("#js").click(function(){
-		$("#module").removeClass("selected");
-		$("#module").addClass("unselected");
-		$("#js").addClass("selected");
-		 var params = "type=";
-		 params = params.concat("js");
-		loadContent("technologiesList", $('#formMenu'), $("#feature_tab"), params);
-	});
-
-	function highlightMenu(selectedTab, unselectedTab) {
-		unselected.removeClass("selected");
-		unselected.addClass("selected");
-		selectedTab.addClass("unselected");
-	}
-});
 </script>
