@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -39,35 +41,39 @@ import com.sun.jersey.api.client.ClientResponse;
 public class Customers extends ServiceBaseAction  { 
 	
 	private static final long serialVersionUID = 6801037145464060759L;
+	
 	private static final Logger S_LOGGER = Logger.getLogger(Customers.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
-	private String name = null;
-	private String nameError = null;
-	private String description = null;
-	private String email = null;
-	private String mailError = null;
-	private String address = null;
-	private String addressError = null;
-	private String zipcode = null;
-	private String zipError = null;
-	private String number = null;
-	private String numError = null;
-	private String fax = null;
-	private String faxError = null;
-	private String country = null;
-	private String conError = null;
-	private String state = null;
-    private String licence = null;
-	private String licenError = null;
+	private String customerId = "";
+	
+	private String name = "";
+	private String description = "";
+	private String email = "";
+	private String address = "";
+	private String country = "";
+    private String state = "";
+    private String zipcode = "";
+    private String number = "";
+    private String fax = "";
+	private String helpText = "";
+    private String licence = "";
+    private Date validFrom = null;
+    private Date validUpTo = null;
+	
+	private String nameError = "";
+	private String mailError = "";
+	private String addressError = "";
+	private String zipError = "";
+	private String numError = "";
+	private String faxError = "";
+	private String conError = "";
+	private String licenError = "";
 	private boolean errorFound = false;
-	private Date validFrom = null;
-	private Date validUpTo = null;
-	private String repoURL = null;
-	private String fromPage = null;
-	private String customerId = null;
-	private String oldName = null;
-	private String helpText = null;
+	
+	private String fromPage = "";
+	
+	private String oldName = "";
 
     public String list() throws PhrescoException {
 	    if (isDebugEnabled) {
@@ -76,11 +82,9 @@ public class Customers extends ServiceBaseAction  {
 		
 		try {
             List<Customer> customers = getServiceManager().getCustomers();
-			getHttpRequest().setAttribute(REQ_CUST_CUSTOMERS, customers);
+			setReqAttribute(REQ_CUST_CUSTOMERS, customers);
 		} catch (PhrescoException e) {
-//			new LogErrorReport(e, CUSTOMERS_LIST_EXCEPTION);
-			
-			return LOG_ERROR;	
+			return showErrorPopup(e, EXCEPTION_CUSTOMERS_LIST);
 		}
 		
 		return ADMIN_CUSTOMER_LIST;	
@@ -100,13 +104,12 @@ public class Customers extends ServiceBaseAction  {
 		}
 
 		try {
-			Customer customer = getServiceManager().getCustomer(customerId);
-			getHttpRequest().setAttribute(REQ_CUST_CUSTOMER, customer);
-			getHttpRequest().setAttribute(REQ_FROM_PAGE, EDIT);
+			Customer customer = getServiceManager().getCustomer(getCustomerId());
+			setReqAttribute(REQ_CUST_CUSTOMER, customer);
+			setReqAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (PhrescoException e) {
-//			new LogErrorReport(e, CUSTOMERS_ADD_EXCEPTION);
-			
-			return LOG_ERROR;	
+		    return showErrorPopup(e, EXCEPTION_CUSTOMERS_ADD);
+		    
 		}
 		
 		return ADMIN_CUSTOMER_ADD;
@@ -119,32 +122,15 @@ public class Customers extends ServiceBaseAction  {
 	    
 		try {
 			List<Customer> customers = new ArrayList<Customer>();
-			Customer customer = new Customer();
-			customer.setName(name);
-			customer.setDescription(description);
-			customer.setEmailId(email);
-			customer.setAddress(address);
-			customer.setCountry(country);
-			customer.setState(state);
-			customer.setZipcode(zipcode);
-			customer.setContactNumber(number);
-			customer.setFax(fax);
-			customer.setHelpText(helpText);
-			LicenseType licenceType = LicenseType.valueOf(licence);
-			customer.setType(licenceType);
-			customer.setValidFrom(validFrom);
-			customer.setValidUpto(validUpTo);
-			customers.add(customer);
+			customers.add(createCustomer());
 			ClientResponse clientResponse = getServiceManager().createCustomers(customers);
 			if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
-				addActionError(getText(CUSTOMER_NOT_ADDED, Collections.singletonList(name)));
+				addActionError(getText(CUSTOMER_NOT_ADDED, Collections.singletonList(getName())));
 			} else {
-				addActionMessage(getText(CUSTOMER_ADDED, Collections.singletonList(name)));
+				addActionMessage(getText(CUSTOMER_ADDED, Collections.singletonList(getName())));
 			}
 		} catch (PhrescoException e) {
-//			new LogErrorReport(e, CUSTOMERS_SAVE_EXCEPTION);
-			
-			return LOG_ERROR;	
+		    return showErrorPopup(e, EXCEPTION_CUSTOMERS_SAVE);
 		}
 		
 		return list();
@@ -156,31 +142,36 @@ public class Customers extends ServiceBaseAction  {
 	    }
 
 		try {
-			Customer customer = new Customer();
-			customer.setId(customerId);
-			customer.setName(name);
-			customer.setDescription(description);
-			customer.setEmailId(email);
-            customer.setAddress(address);
-            customer.setCountry(country);
-            customer.setState(state);
-            customer.setZipcode(zipcode);
-            customer.setContactNumber(number);
-            customer.setFax(fax);
-            customer.setHelpText(helpText);
-            LicenseType licenceType = LicenseType.valueOf(licence);
-            customer.setType(licenceType);
-            customer.setValidFrom(validFrom);
-            customer.setValidUpto(validUpTo);
-			getServiceManager().updateCustomer(customer, customerId);
+			getServiceManager().updateCustomer(createCustomer(), getCustomerId());
 		} catch (PhrescoException e) {
-//			new LogErrorReport(e, CUSTOMERS_UPDATE_EXCEPTION);
-			
-			return LOG_ERROR;	
+		    return showErrorPopup(e, EXCEPTION_CUSTOMERS_UPDATE);
 		}
 		
 		return list();
 	}
+	
+	private Customer createCustomer() {
+        Customer customer = new Customer();
+        if (StringUtils.isNotEmpty(getFromPage())) {
+            customer.setId(getCustomerId());
+        }
+        customer.setName(getName());
+        customer.setDescription(getDescription());
+        customer.setEmailId(getEmail());
+        customer.setAddress(getAddress());
+        customer.setCountry(getCountry());
+        customer.setState(getState());
+        customer.setZipcode(getZipcode());
+        customer.setContactNumber(getNumber());
+        customer.setFax(getFax());
+        customer.setHelpText(getHelpText());
+        LicenseType licenceType = LicenseType.valueOf(getLicence());
+        customer.setType(licenceType);
+        customer.setValidFrom(getValidFrom());
+        customer.setValidUpto(getValidUpTo());
+        
+        return customer;
+    }
 	
 	public String delete() throws PhrescoException {
 	    if (isDebugEnabled) {
@@ -189,7 +180,7 @@ public class Customers extends ServiceBaseAction  {
 		
 		try {
 			String[] customerIds = getHttpRequest().getParameterValues(REQ_CUST_CUSTOMER_ID);
-			if (customerIds != null) {
+			if (ArrayUtils.isNotEmpty(customerIds)) {
 				for (String customerId : customerIds) {
 			    	ClientResponse clientResponse =getServiceManager().deleteCustomer(customerId);
 			    	if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
@@ -199,9 +190,7 @@ public class Customers extends ServiceBaseAction  {
 				addActionMessage(getText(CUSTOMER_DELETED));
 			}
 		} catch (PhrescoException e) {
-//			new LogErrorReport(e, CUSTOMERS_DELETE_EXCEPTION);
-			
-			return LOG_ERROR;	
+		    return showErrorPopup(e, EXCEPTION_CUSTOMERS_DELETE);
 		}
 		
 		return list();
@@ -212,72 +201,76 @@ public class Customers extends ServiceBaseAction  {
 	        S_LOGGER.debug("Entering Method Customers.validateForm()");
         }
 	    
-		boolean isError = false;
-		if (StringUtils.isEmpty(name)) {
-			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY));
-			isError = true;
-		} else if (StringUtils.isEmpty(fromPage) || (!name.equals(oldName))) {
-			// to check duplication of name
-			List<Customer> customers = getServiceManager().getCustomers();
-			if (customers != null) {
-				for (Customer customer : customers) {
-					if (customer.getName().equalsIgnoreCase(name)) {
-						setNameError(getText(KEY_I18N_ERR_NAME_ALREADY_EXIST));
-			    		isError = true;
-						break;
-					}
-				}
-			}
-		}
-		
-		if (StringUtils.isEmpty(email)) {
-			setMailError(getText(KEY_I18N_ERR_EMAIL_EMPTY));
-			isError = true;
-		} 
-		
-		if (StringUtils.isNotEmpty(email)) {
-	   		Pattern p = Pattern.compile("^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
-	   		Matcher m = p.matcher(email);
-	   		boolean b = m.matches();
-	   		if (!b) {
-	   			setMailError(getText(INVALID_EMAIL));
-	   			isError = true;
-	   		}
-	   	}
-		
-		if (StringUtils.isEmpty(address)) {
-			setAddressError(getText(KEY_I18N_ERR_ADDRS_EMPTY));
-			isError = true;
-		} 
-		
-		if (StringUtils.isEmpty(zipcode)) {
-			setZipError(getText(KEY_I18N_ERR_ZIPCODE_EMPTY));
-			isError = true;
-		} 
-		
-		if (StringUtils.isEmpty(number)) {
-			setNumError(getText(KEY_I18N_ERR_CONTNUM_EMPTY));
-			isError = true;
-		} 
-		
-		if (StringUtils.isEmpty(fax)) {
-			setFaxError(getText(KEY_I18N_ERR_FAXNUM_EMPTY));
-			isError = true;
-		} 
-		
-		if (StringUtils.isEmpty(country)) {
-			setConError(getText(KEY_I18N_ERR_COUN_EMPTY));
-			isError = true;
-		} 
-		
-		if (StringUtils.isEmpty(licence)) {
-			setLicenError(getText(KEY_I18N_ERR_LICEN_EMPTY));
-			isError = true;
-		}
-		
-		if (isError) {
-            setErrorFound(true);
-        }
+	    try {
+    		boolean isError = false;
+    		if (StringUtils.isEmpty(getName())) {
+    			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY));
+    			isError = true;
+    		} else if (StringUtils.isEmpty(getFromPage()) || (!getName().equals(getOldName()))) {
+    			// to check duplication of name
+    			List<Customer> customers = getServiceManager().getCustomers();
+    			if (CollectionUtils.isNotEmpty(customers)) {
+    				for (Customer customer : customers) {
+    					if (customer.getName().equalsIgnoreCase(getName())) {
+    						setNameError(getText(KEY_I18N_ERR_NAME_ALREADY_EXIST));
+    			    		isError = true;
+    						break;
+    					}
+    				}
+    			}
+    		}
+    		
+    		if (StringUtils.isEmpty(getEmail())) {
+    			setMailError(getText(KEY_I18N_ERR_EMAIL_EMPTY));
+    			isError = true;
+    		} 
+    		
+    		if (StringUtils.isNotEmpty(getEmail())) {
+    	   		Pattern p = Pattern.compile("^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
+    	   		Matcher m = p.matcher(getEmail());
+    	   		boolean b = m.matches();
+    	   		if (!b) {
+    	   			setMailError(getText(INVALID_EMAIL));
+    	   			isError = true;
+    	   		}
+    	   	}
+    		
+    		if (StringUtils.isEmpty(getAddress())) {
+    			setAddressError(getText(KEY_I18N_ERR_ADDRS_EMPTY));
+    			isError = true;
+    		} 
+    		
+    		if (StringUtils.isEmpty(getZipcode())) {
+    			setZipError(getText(KEY_I18N_ERR_ZIPCODE_EMPTY));
+    			isError = true;
+    		} 
+    		
+    		if (StringUtils.isEmpty(getNumber())) {
+    			setNumError(getText(KEY_I18N_ERR_CONTNUM_EMPTY));
+    			isError = true;
+    		} 
+    		
+    		if (StringUtils.isEmpty(getFax())) {
+    			setFaxError(getText(KEY_I18N_ERR_FAXNUM_EMPTY));
+    			isError = true;
+    		} 
+    		
+    		if (StringUtils.isEmpty(getCountry())) {
+    			setConError(getText(KEY_I18N_ERR_COUN_EMPTY));
+    			isError = true;
+    		} 
+    		
+    		if (StringUtils.isEmpty(getLicence())) {
+    			setLicenError(getText(KEY_I18N_ERR_LICEN_EMPTY));
+    			isError = true;
+    		}
+    		
+    		if (isError) {
+                setErrorFound(true);
+            }
+	    } catch (PhrescoException e) {
+	        return showErrorPopup(e, EXCEPTION_CUSTOMERS_VALIDATE);
+	    }
 		
 		return SUCCESS;
 	}
@@ -424,14 +417,6 @@ public class Customers extends ServiceBaseAction  {
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-	
-	public String getRepoURL() {
-		return repoURL;
-	}
-
-	public void setRepoURL(String repoURL) {
-		this.repoURL = repoURL;
 	}
 	
 	public Date getValidFrom() {

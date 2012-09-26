@@ -49,6 +49,7 @@ import org.springframework.stereotype.Component;
 
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.SettingsTemplate;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.commons.model.WebService;
 import com.photon.phresco.exception.PhrescoException;
@@ -348,10 +349,6 @@ public class ComponentService extends DbService {
 			//check if this is archetype
             ContentDisposition disposition = bodyPart.getContentDisposition();
 			Type contentType = Content.Type.valueOf(disposition.getType());
-
-            //Assuming there will be only one customer will be provided here for 2.0.0
-            //Need to handle multiple customer in future
-			String customerId = technology.getCustomerIds().get(0);
 			
 			BodyPartEntity bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
 			ArtifactGroup artifactinfo = technology.getArchetypeInfo();
@@ -362,9 +359,14 @@ public class ComponentService extends DbService {
 			//convert Artifact Group
 			ArtifactGroupDAO artfGrpDAO = artifactConverter.convertObjectToDAO(artifactinfo);
 			artifactGroups.add(artfGrpDAO);
+
+            //Assuming there will be only one customer will be provided here for 2.0.0
+            //Need to handle multiple customer in future
+			String customerId = technology.getCustomerIds().get(0);
+			artifactinfo.setCustomerIds(technology.getCustomerIds());
 			
 			File appJarFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null);
-            uploadBinary(artifactinfo, appJarFile, customerId);
+            uploadBinary(artifactinfo, appJarFile);
             FileUtil.delete(appJarFile);
         }
 		
@@ -387,7 +389,8 @@ public class ComponentService extends DbService {
      * @return
      * @throws PhrescoException
      */
-    private boolean uploadBinary(ArtifactGroup archetypeInfo, File artifactFile, String customerId) throws PhrescoException {
+    private boolean uploadBinary(ArtifactGroup archetypeInfo, File artifactFile) throws PhrescoException {
+    	
         File pomFile = ServerUtil.createPomFile(archetypeInfo);
         
         //Assuming there will be only one version for the artifactGroup
@@ -399,6 +402,8 @@ public class ComponentService extends DbService {
 		
         info.setPomFile(pomFile);
         boolean addArtifact = true;
+        
+        List<String> customerIds = archetypeInfo.getCustomerIds();
         //TODO:Need to upload the content into the repository
 //        boolean addArtifact = repositoryManager.addArtifact(info, artifactFile, customerId);
         FileUtil.delete(pomFile);
@@ -530,178 +535,176 @@ public class ComponentService extends DbService {
 		
 		return Response.status(Response.Status.OK).build();
 	}
+    
+	/**
+	 * Returns the list of settings
+	 * @return
+	 */
+	@GET
+	@Path (REST_API_SETTINGS)
+	@Produces (MediaType.APPLICATION_JSON)
+	public Response findSettings(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.findSettings()" + customerId);
+	    }
+		
+		try {
+			List<SettingsTemplate> settingsList = new ArrayList<SettingsTemplate>();
+			settingsList.addAll(mongoOperation.find(SETTINGS_COLLECTION_NAME, 
+                    new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)), SettingsTemplate.class));
+			if(!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
+			    settingsList.addAll(mongoOperation.find(SETTINGS_COLLECTION_NAME, 
+			            new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)), SettingsTemplate.class));
+			}
+			return Response.status(Response.Status.NO_CONTENT).entity(settingsList).build();
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00005, SETTINGS_COLLECTION_NAME);
+		}
+	}
 	
-    
-    
-//	/**
-//	 * Returns the list of settings
-//	 * @return
-//	 */
-//	@GET
-//	@Path (REST_API_SETTINGS)
-//	@Produces (MediaType.APPLICATION_JSON)
-//	public Response findSettings(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.findSettings()" + customerId);
-//	    }
-//		
-//		try {
-//			List<SettingsTemplate> settingsList = new ArrayList<SettingsTemplate>();
-//			settingsList.addAll(mongoOperation.find(SETTINGS_COLLECTION_NAME, 
-//                    new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)), SettingsTemplate.class));
-//			if(!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
-//			    settingsList.addAll(mongoOperation.find(SETTINGS_COLLECTION_NAME, 
-//			            new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)), SettingsTemplate.class));
-//			}
-//			return Response.status(Response.Status.NO_CONTENT).entity(settingsList).build();
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00005, SETTINGS_COLLECTION_NAME);
-//		}
-//	}
-//	
-//	/**
-//	 * Creates the list of settings
-//	 * @param settings
-//	 * @return 
-//	 */
-//	@POST
-//	@Consumes (MediaType.APPLICATION_JSON)
-//	@Path (REST_API_SETTINGS)
-//	public Response createSettings(List<SettingsTemplate> settings) {
-//		if (isDebugEnabled) {
-//		    S_LOGGER.debug("Entered into ComponentService.createSettings(List<SettingsTemplate> settings)");
-//		}
-//		
-//		try {
-//			mongoOperation.insertList(SETTINGS_COLLECTION_NAME , settings);
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
-//		}
-//		
-//		return Response.status(Response.Status.CREATED).build();
-//	}
-//	
-//	/**
-//	 * Updates the list of settings
-//	 * @param settings
-//	 * @return
-//	 */
-//	@PUT
-//	@Consumes (MediaType.APPLICATION_JSON)
-//	@Produces (MediaType.APPLICATION_JSON)
-//	@Path (REST_API_SETTINGS)
-//	public Response updateSettings(List<SettingsTemplate> settings) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.updateSettings(List<SettingsTemplate> settings)");
-//	    }
-//		
-//		try {
-//			for (SettingsTemplate settingTemplate : settings) {
-//				SettingsTemplate settingTemplateInfo = mongoOperation.findOne(SETTINGS_COLLECTION_NAME , 
-//				        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(settingTemplate.getId())), SettingsTemplate.class);
-//				if (settingTemplateInfo != null) {
-//					mongoOperation.save(SETTINGS_COLLECTION_NAME, settingTemplate);
-//				}
-//			}
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
-//		}
-//		
-//		return Response.status(Response.Status.OK).entity(settings).build();
-//	}
-//	
-//	/**
-//	 * Deletes the list of settings
-//	 * @param settings
-//	 * @throws PhrescoException 
-//	 */
-//	@DELETE
-//	@Path (REST_API_SETTINGS)
-//	public void deleteSettings(List<SettingsTemplate> settings) throws PhrescoException {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.updateSettings(List<SettingsTemplate> settings)");
-//	    }
-//		
-//		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-//		S_LOGGER.error("PhrescoException Is" + phrescoException.getErrorMessage());
-//		throw phrescoException;
-//		
-//	}
-//	
-//	/**
-//	 * Get the settingTemplate by id 
-//	 * @param id
-//	 * @return
-//	 */
-//	@GET
-//	@Produces (MediaType.APPLICATION_JSON)
-//	@Path (REST_API_SETTINGS + REST_API_PATH_ID)
-//	public Response getSettingsTemplate(@PathParam(REST_API_PATH_PARAM_ID) String id) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.getSettingsTemplate(String id)" + id);
-//	    }
-//		
-//		try {
-//			SettingsTemplate settingTemplate = mongoOperation.findOne(SETTINGS_COLLECTION_NAME, 
-//			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), SettingsTemplate.class); 
-//			if (settingTemplate != null) {
-//				return Response.status(Response.Status.OK).entity(settingTemplate).build();
-//			}
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00005, SETTINGS_COLLECTION_NAME);
-//		}
-//		
-//		return Response.status(Response.Status.OK).build();
-//	}
-//	
-//	/**
-//	 * Updates the list of setting
-//	 * @param settings
-//	 * @return
-//	 */
-//	@PUT
-//	@Consumes (MediaType.APPLICATION_JSON)
-//	@Produces (MediaType.APPLICATION_JSON)
-//	@Path (REST_API_SETTINGS + REST_API_PATH_ID)
-//	public Response updateSetting(@PathParam(REST_API_PATH_PARAM_ID) String id , SettingsTemplate settingsTemplate) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.updateAppType(String id , SettingsTemplate settingsTemplate)" + id);
-//	    }
-//		
-//		try {
-//			if (id.equals(settingsTemplate.getId())) {
-//				mongoOperation.save(SETTINGS_COLLECTION_NAME, settingsTemplate);
-//				return Response.status(Response.Status.OK).entity(settingsTemplate).build();
-//			}
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
-//		}
-//		
-//		return Response.status(Response.Status.OK).entity(settingsTemplate).build();
-//	}
-//	
-//	/**
-//	 * Deletes the settingsTemplate by id for the given parameter
-//	 * @param id
-//	 * @return 
-//	 */
-//	@DELETE
-//	@Path (REST_API_SETTINGS + REST_API_PATH_ID)
-//	public Response deleteSettingsTemplate(@PathParam(REST_API_PATH_PARAM_ID) String id) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.deleteSettingsTemplate(String id)" + id);
-//	    }
-//		
-//		try {
-//			mongoOperation.remove(SETTINGS_COLLECTION_NAME, 
-//			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), SettingsTemplate.class);
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
-//		}
-//		
-//		return Response.status(Response.Status.OK).build();
-//	}
-//	
+	/**
+	 * Creates the list of settings
+	 * @param settings
+	 * @return 
+	 */
+	@POST
+	@Consumes (MediaType.APPLICATION_JSON)
+	@Path (REST_API_SETTINGS)
+	public Response createSettings(List<SettingsTemplate> settings) {
+		if (isDebugEnabled) {
+		    S_LOGGER.debug("Entered into ComponentService.createSettings(List<SettingsTemplate> settings)");
+		}
+		
+		try {
+			mongoOperation.insertList(SETTINGS_COLLECTION_NAME , settings);
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
+		}
+		
+		return Response.status(Response.Status.CREATED).build();
+	}
+	
+	/**
+	 * Updates the list of settings
+	 * @param settings
+	 * @return
+	 */
+	@PUT
+	@Consumes (MediaType.APPLICATION_JSON)
+	@Produces (MediaType.APPLICATION_JSON)
+	@Path (REST_API_SETTINGS)
+	public Response updateSettings(List<SettingsTemplate> settings) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.updateSettings(List<SettingsTemplate> settings)");
+	    }
+		
+		try {
+			for (SettingsTemplate settingTemplate : settings) {
+				SettingsTemplate settingTemplateInfo = mongoOperation.findOne(SETTINGS_COLLECTION_NAME , 
+				        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(settingTemplate.getId())), SettingsTemplate.class);
+				if (settingTemplateInfo != null) {
+					mongoOperation.save(SETTINGS_COLLECTION_NAME, settingTemplate);
+				}
+			}
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
+		}
+		
+		return Response.status(Response.Status.OK).entity(settings).build();
+	}
+	
+	/**
+	 * Deletes the list of settings
+	 * @param settings
+	 * @throws PhrescoException 
+	 */
+	@DELETE
+	@Path (REST_API_SETTINGS)
+	public void deleteSettings(List<SettingsTemplate> settings) throws PhrescoException {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.updateSettings(List<SettingsTemplate> settings)");
+	    }
+		
+		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
+		S_LOGGER.error("PhrescoException Is" + phrescoException.getErrorMessage());
+		throw phrescoException;
+		
+	}
+	
+	/**
+	 * Get the settingTemplate by id 
+	 * @param id
+	 * @return
+	 */
+	@GET
+	@Produces (MediaType.APPLICATION_JSON)
+	@Path (REST_API_SETTINGS + REST_API_PATH_ID)
+	public Response getSettingsTemplate(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.getSettingsTemplate(String id)" + id);
+	    }
+		
+		try {
+			SettingsTemplate settingTemplate = mongoOperation.findOne(SETTINGS_COLLECTION_NAME, 
+			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), SettingsTemplate.class); 
+			if (settingTemplate != null) {
+				return Response.status(Response.Status.OK).entity(settingTemplate).build();
+			}
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00005, SETTINGS_COLLECTION_NAME);
+		}
+		
+		return Response.status(Response.Status.OK).build();
+	}
+	
+	/**
+	 * Updates the list of setting
+	 * @param settings
+	 * @return
+	 */
+	@PUT
+	@Consumes (MediaType.APPLICATION_JSON)
+	@Produces (MediaType.APPLICATION_JSON)
+	@Path (REST_API_SETTINGS + REST_API_PATH_ID)
+	public Response updateSetting(@PathParam(REST_API_PATH_PARAM_ID) String id , SettingsTemplate settingsTemplate) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.updateAppType(String id , SettingsTemplate settingsTemplate)" + id);
+	    }
+		
+		try {
+			if (id.equals(settingsTemplate.getId())) {
+				mongoOperation.save(SETTINGS_COLLECTION_NAME, settingsTemplate);
+				return Response.status(Response.Status.OK).entity(settingsTemplate).build();
+			}
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
+		}
+		
+		return Response.status(Response.Status.OK).entity(settingsTemplate).build();
+	}
+	
+	/**
+	 * Deletes the settingsTemplate by id for the given parameter
+	 * @param id
+	 * @return 
+	 */
+	@DELETE
+	@Path (REST_API_SETTINGS + REST_API_PATH_ID)
+	public Response deleteSettingsTemplate(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.deleteSettingsTemplate(String id)" + id);
+	    }
+		
+		try {
+			mongoOperation.remove(SETTINGS_COLLECTION_NAME, 
+			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), SettingsTemplate.class);
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
+		}
+		
+		return Response.status(Response.Status.OK).build();
+	}
+	
 	/**
 	 * Returns the list of modules
 	 * @return
@@ -714,21 +717,34 @@ public class ComponentService extends DbService {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.findModules()" + type);
 	    }
-		
+	    
 		try {
-			List<ArtifactGroup> foundModules = new ArrayList<ArtifactGroup>();
-			List<ArtifactGroupDAO> moduleDAOs = new ArrayList<ArtifactGroupDAO>();
-			if(StringUtils.isEmpty(techId)) {
-				if(!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
-				    moduleDAOs = mongoOperation.find(MODULEDAO_COLLECTION_NAME,
-								new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)), ArtifactGroupDAO.class);
-				}
-				moduleDAOs.addAll(mongoOperation.find(MODULEDAO_COLLECTION_NAME,
-							new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)), ArtifactGroupDAO.class));
-				foundModules = convertDAOToModule(moduleDAOs);
-				return Response.status(Response.Status.OK).entity(foundModules).build();
-			}
-
+			
+			Query custIdQuery = createCustomerIdQuery(customerId);
+			Criteria criteria = Criteria.where(DB_COLUMN_ARTIFACT_GROUP_TYPE).is(ArtifactGroup.Type.valueOf(type));
+			custIdQuery = custIdQuery.addCriteria(criteria);
+			
+			System.out.println(custIdQuery.getQueryObject());
+			
+			//TODO: Need to add more filter for techId
+			
+			List<ArtifactGroupDAO> moduleDAOs = mongoOperation.find(ARTIFACT_GROUP_COLLECTION_NAME, custIdQuery, ArtifactGroupDAO.class);
+		    List<ArtifactGroup> modules = convertDAOToModule(moduleDAOs);
+		    return Response.status(Response.Status.OK).entity(modules).build();
+		    
+//			List<ArtifactGroup> foundModules = new ArrayList<ArtifactGroup>();
+//			List<ArtifactGroupDAO> moduleDAOs = new ArrayList<ArtifactGroupDAO>();
+//			if(StringUtils.isEmpty(techId)) {
+//				if(!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
+//				    moduleDAOs = mongoOperation.find(MODULEDAO_COLLECTION_NAME,
+//								new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)), ArtifactGroupDAO.class);
+//				}
+//				moduleDAOs.addAll(mongoOperation.find(MODULEDAO_COLLECTION_NAME,
+//							new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)), ArtifactGroupDAO.class));
+//				foundModules = convertDAOToModule(moduleDAOs);
+//				return Response.status(Response.Status.OK).entity(foundModules).build();
+//			}
+//
 //			if(StringUtils.isNotEmpty(customerId) && type.equals(REST_QUERY_TYPE_MODULE)) {
 //				if (!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
 //				    moduleDAOs = mongoOperation.find(MODULEDAO_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)
@@ -763,10 +779,9 @@ public class ComponentService extends DbService {
 //			}
 
 		} catch(Exception e) {
-			throw new PhrescoWebServiceException(e, EX_PHEX00005, MODULES_COLLECTION_NAME);
+			throw new PhrescoWebServiceException(e, EX_PHEX00005, ARTIFACT_GROUP_COLLECTION_NAME);
 		}
-		
-		return Response.status(Response.Status.BAD_REQUEST).build();
+
 	}
 	
 	private List<ArtifactGroup> convertDAOToModule(List<ArtifactGroupDAO> moduleDAOs) throws PhrescoException {
@@ -780,197 +795,210 @@ public class ComponentService extends DbService {
         return modules;
     }
 
-	//
-//    /**
-//     * Creates the list of modules
-//     * @param modules
-//     * @return 
-//     * @throws PhrescoException 
-//     */
-//    @POST
-//    @Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
-//    @Path (REST_API_MODULES)
-//    public Response createModules(MultiPart moduleInfo) throws PhrescoException {
-//        if (isDebugEnabled) {
-//            S_LOGGER.debug("Entered into ComponentService.createModules(List<ModuleGroup> modules)");
-//        }
-//        
-//        ModuleGroup moduleGroup = null;
-//        BodyPartEntity bodyPartEntity = null;
-//        File moduleFile = null;
-//        List<BodyPart> bodyParts = moduleInfo.getBodyParts();
-//       
-//        if (CollectionUtils.isNotEmpty(bodyParts)) {
-//            for (BodyPart bodyPart : bodyParts) {
-//                if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
-//                    moduleGroup = new ModuleGroup();
-//                    moduleGroup = bodyPart.getEntityAs(ModuleGroup.class);
-//                } else {
-//                    bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
-//                }
-//            }
-//        }
-//        
-//        if (bodyPartEntity != null) {
-//            moduleFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null);
-//        }
-//        
-//        Module module = moduleGroup.getVersions().get(0);
-//        ArchetypeInfo archetypeInfo = new ArchetypeInfo(module.getGroupId(), 
-//        		module.getArtifactId(), module.getVersion(), module.getContentType());
-//        
-//        boolean uploadBinary = uploadBinary(archetypeInfo, moduleFile, moduleGroup.getCustomerId());
-//        
-//        if (uploadBinary) {
-//        	ModuleGroup foundModuleGroup = mongoOperation.findOne(MODULES_COLLECTION_NAME, 
-//        			new Query(Criteria.where("name").is(moduleGroup.getName())), ModuleGroup.class);
+    /**
+     * Creates the list of modules
+     * @param modules
+     * @return 
+     * @throws PhrescoException 
+     */
+    @POST
+    @Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
+    @Path (REST_API_MODULES)
+    public Response createModules(MultiPart moduleInfo) throws PhrescoException {
+        if (isDebugEnabled) {
+            S_LOGGER.debug("Entered into ComponentService.createModules(List<ModuleGroup> modules)");
+        }
+        
+        ArtifactGroup moduleGroup = null;
+        BodyPartEntity bodyPartEntity = null;
+        File moduleFile = null;
+        List<BodyPart> bodyParts = moduleInfo.getBodyParts();
+       
+        if (CollectionUtils.isNotEmpty(bodyParts)) {
+            for (BodyPart bodyPart : bodyParts) {
+                if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
+                    moduleGroup = bodyPart.getEntityAs(ArtifactGroup.class);
+                } else {
+                    bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
+                }
+            }
+        }
+        
+        if (moduleGroup == null) {
+        	//TODO:Throw exception
+        }
+        
+        if (bodyPartEntity != null) {
+            moduleFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null);
+        }
+        
+        boolean uploadBinary = uploadBinary(moduleGroup, moduleFile);
+        if (uploadBinary) {
+        	saveModuleGroup(moduleGroup);
+        	
+        	//TODO:Old Logic, need to check with Kumar
+        	//check if the module already exist
+        	//This query should be done based on artifactId, groupId
+//        	ArtifactGroupDAO foundModuleGroup = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
+//        			new Query(Criteria.where("name").is(moduleGroup.getName())), ArtifactGroupDAO.class);
+//        	
 //        	if (foundModuleGroup != null) {
-//        		List<Module> versions = foundModuleGroup.getVersions();
-//        		versions.add(module);
+//        		List<String> versions = foundModuleGroup.getVersionIds();
+//        		versions.add(module.getId());
 //        		foundModuleGroup.setVersions(versions);
 //        		saveModuleGroup(foundModuleGroup);
 //        	} else {
 //        	    saveModuleGroup(moduleGroup);
 //        	}
-//        }
-//        FileUtil.delete(moduleFile);
-//       
-//        return Response.status(Response.Status.CREATED).build();
-//    }
-//	
-//    private void saveModuleGroup(ModuleGroup moduleGroup) throws PhrescoException {
-//        List<Module> versions = moduleGroup.getVersions();
-//        Converter<ArtifactGroupDAO, ModuleGroup> converter = 
-//            (Converter<ArtifactGroupDAO, ModuleGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
-//        ArtifactGroupDAO moduleGroupDAO = converter.convertObjectToDAO(moduleGroup);
-//        mongoOperation.save(MODULEDAO_COLLECTION_NAME, moduleGroupDAO);
-//        for (Module module : versions) {
-//            module.setModuleGroupId(moduleGroupDAO.getId());
-//            mongoOperation.save(MODULES_COLLECTION_NAME, module);
-//        }
-//    }
-//    
-//	/**
-//	 * Updates the list of modules
-//	 * @param modules
-//	 * @return
-//	 */
-//	@PUT
-//	@Consumes (MediaType.APPLICATION_JSON)
-//	@Produces (MediaType.APPLICATION_JSON)
-//	@Path (REST_API_MODULES)
-//	public Response updateModules(List<ModuleGroup> modules) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.updateModules(List<ModuleGroup> modules)");
-//	    }
-//		
-//		try {
-//			for (ModuleGroup moduleGroup : modules) {
-//				ModuleGroup module = mongoOperation.findOne(MODULES_COLLECTION_NAME , 
-//				        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(moduleGroup.getId())), ModuleGroup.class);
-//				if (module != null) {
-//					mongoOperation.save(MODULES_COLLECTION_NAME, moduleGroup);
-//				}
-//			}
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
-//		}
-//		
-//		return Response.status(Response.Status.OK).entity(modules).build();
-//	}
-//	
-//	/**
-//	 * Deletes the list of modules
-//	 * @param modules
-//	 * @throws PhrescoException 
-//	 */
-//	@DELETE
-//	@Path (REST_API_MODULES)
-//	public void deleteModules(List<ModuleGroup> modules) throws PhrescoException {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.deleteModules(List<ModuleGroup> modules)");
-//	    }
-//		
-//		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-//		S_LOGGER.error("PhrescoException Is" + phrescoException.getErrorMessage());
-//		throw phrescoException;
-//	}
-//	
-//	/**
-//	 * Get the module by id for the given parameter
-//	 * @param id
-//	 * @return
-//	 */
-//	@GET
-//	@Produces (MediaType.APPLICATION_JSON)
-//	@Path (REST_API_MODULES + REST_API_PATH_ID)
-//	public Response getModule(@PathParam(REST_API_PATH_PARAM_ID) String id) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.getModule(String id)" + id);
-//	    }
-//		
-//		try {
-//			ModuleGroup module = mongoOperation.findOne(MODULES_COLLECTION_NAME, 
-//			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ModuleGroup.class);
-//			if (module != null) {
-//				return  Response.status(Response.Status.OK).entity(module).build();
-//			} 
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00005, MODULES_COLLECTION_NAME);
-//		}
-//		
-//		return Response.status(Response.Status.NO_CONTENT).build();
-//	}
-//	
-//	/**
-//	 * Updates the module given by the parameter
-//	 * @param id
-//	 * @param module
-//	 * @return
-//	 */
-//	@PUT
-//	@Consumes (MediaType.APPLICATION_JSON)
-//	@Produces (MediaType.APPLICATION_JSON)
-//	@Path (REST_API_MODULES + REST_API_PATH_ID)
-//	public Response updatemodule(@PathParam(REST_API_PATH_PARAM_ID) String id , ModuleGroup module) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.updatemodule(String id , ModuleGroup module)" + id);
-//	    }
-//		
-//		try {
-//			if (id.equals(module.getId())) {
-//				mongoOperation.save(MODULES_COLLECTION_NAME, module);
-//				return  Response.status(Response.Status.OK).entity(module).build();
-//			}
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
-//		}
-//		
-//		return Response.status(Response.Status.NO_CONTENT).entity(module).build();
-//	}
-//	
-//	/**
-//	 * Deletes the module by id for the given parameter
-//	 * @param id
-//	 * @return 
-//	 */
-//	@DELETE
-//	@Path (REST_API_MODULES + REST_API_PATH_ID)
-//	public Response deleteModules(@PathParam(REST_API_PATH_PARAM_ID) String id) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.deleteModules(String id)" + id);
-//	    }
-//		
-//		try {
-//			mongoOperation.remove(MODULES_COLLECTION_NAME, 
-//			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ModuleGroup.class);
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
-//		}
-//		
-//		return Response.status(Response.Status.OK).build();
-//	}
-//	
+        	
+        }
+        
+        FileUtil.delete(moduleFile);
+
+        return Response.status(Response.Status.CREATED).build();
+    }
+    
+	
+    private void saveModuleGroup(ArtifactGroup moduleGroup) throws PhrescoException {
+        List<com.photon.phresco.commons.model.ArtifactInfo> versions = moduleGroup.getVersions();
+        Converter<ArtifactGroupDAO, ArtifactGroup> converter = 
+            (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
+        ArtifactGroupDAO moduleGroupDAO = converter.convertObjectToDAO(moduleGroup);
+        
+        for (com.photon.phresco.commons.model.ArtifactInfo module : versions) {
+            module.setArtifactGroupId(moduleGroupDAO.getId());
+            mongoOperation.save(ARTIFACT_INFO_COLLECTION_NAME, module);
+        }
+        
+        mongoOperation.save(ARTIFACT_GROUP_COLLECTION_NAME, moduleGroupDAO);
+    }
+    
+
+	/**
+	 * Updates the list of modules
+	 * @param modules
+	 * @return
+	 */
+	@PUT
+	@Consumes (MediaType.APPLICATION_JSON)
+	@Produces (MediaType.APPLICATION_JSON)
+	@Path (REST_API_MODULES)
+	public Response updateModules(List<ArtifactGroup> modules) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.updateModules(List<ModuleGroup> modules)");
+	    }
+		
+		try {
+			for (ArtifactGroup moduleGroup : modules) {
+				ArtifactGroupDAO module = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME , 
+				        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(moduleGroup.getId())), ArtifactGroupDAO.class);
+				if (module != null) {
+					mongoOperation.save(ARTIFACT_GROUP_COLLECTION_NAME, moduleGroup);
+				}
+			}
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
+		}
+		
+		return Response.status(Response.Status.OK).entity(modules).build();
+	}
+	
+	/**
+	 * Deletes the list of modules
+	 * @param modules
+	 * @throws PhrescoException 
+	 */
+	@DELETE
+	@Path (REST_API_MODULES)
+	public void deleteModules(List<ArtifactGroup> modules) throws PhrescoException {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.deleteModules(List<ModuleGroup> modules)");
+	    }
+		
+		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
+		S_LOGGER.error("PhrescoException Is" + phrescoException.getErrorMessage());
+		throw phrescoException;
+	}
+	
+	/**
+	 * Get the module by id for the given parameter
+	 * @param id
+	 * @return
+	 */
+	@GET
+	@Produces (MediaType.APPLICATION_JSON)
+	@Path (REST_API_MODULES + REST_API_PATH_ID)
+	public Response getModule(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.getModule(String id)" + id);
+	    }
+		
+		try {
+			ArtifactGroupDAO moduleDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
+			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ArtifactGroupDAO.class);
+			
+			if (moduleDAO != null) {
+		        Converter<ArtifactGroupDAO, ArtifactGroup> converter = 
+		            (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
+		        ArtifactGroup moduleGroup = converter.convertDAOToObject(moduleDAO, mongoOperation);
+				return  Response.status(Response.Status.OK).entity(moduleGroup).build();
+			}
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00005, ARTIFACT_GROUP_COLLECTION_NAME);
+		}
+		
+		return Response.status(Response.Status.NO_CONTENT).build();
+	}
+	
+	/**
+	 * Updates the module given by the parameter
+	 * @param id
+	 * @param module
+	 * @return
+	 */
+	@PUT
+	@Consumes (MediaType.APPLICATION_JSON)
+	@Produces (MediaType.APPLICATION_JSON)
+	@Path (REST_API_MODULES + REST_API_PATH_ID)
+	public Response updatemodule(@PathParam(REST_API_PATH_PARAM_ID) String id, ArtifactGroup module) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.updatemodule(String id , ModuleGroup module)" + id);
+	    }
+		
+		try {
+			if (id.equals(module.getId())) {
+				mongoOperation.save(ARTIFACT_GROUP_COLLECTION_NAME, module);
+				return  Response.status(Response.Status.OK).entity(module).build();
+			}
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
+		}
+		
+		return Response.status(Response.Status.NO_CONTENT).entity(module).build();
+	}
+	
+	/**
+	 * Deletes the module by id for the given parameter
+	 * @param id
+	 * @return 
+	 */
+	@DELETE
+	@Path (REST_API_MODULES + REST_API_PATH_ID)
+	public Response deleteModules(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.deleteModules(String id)" + id);
+	    }
+		
+		try {
+			mongoOperation.remove(ARTIFACT_GROUP_COLLECTION_NAME, 
+			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ArtifactGroupDAO.class);
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
+		}
+		
+		return Response.status(Response.Status.OK).build();
+	}
+	
 //	/**
 //	 * Returns the list of pilots
 //	 * @return

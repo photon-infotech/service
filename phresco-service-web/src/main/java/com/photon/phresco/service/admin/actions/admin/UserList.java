@@ -19,10 +19,9 @@
  */
 package com.photon.phresco.service.admin.actions.admin;
 
-import com.opensymphony.xwork2.ActionSupport;
-import com.photon.phresco.service.admin.commons.ServiceActions;
+import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 
-public class UserList extends ActionSupport implements ServiceActions { 
+public class UserList extends ServiceBaseAction { 
 
 	public String list() {
 		return ADMIN_USER_LIST;	
