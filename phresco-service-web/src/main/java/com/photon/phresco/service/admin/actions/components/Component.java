@@ -39,7 +39,6 @@ import com.photon.phresco.commons.model.RequiredOption;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
-import com.photon.phresco.service.admin.commons.LogErrorReport;
 import com.photon.phresco.service.client.api.Content;
 import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
@@ -94,7 +93,7 @@ public class Component extends ServiceBaseAction {
     		List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
     		getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
     	} catch (PhrescoException e){
-    		new LogErrorReport(e, COMPONENT_LIST_EXCEPTION);
+//    		new LogErrorReport(e, COMPONENT_LIST_EXCEPTION);
     		
     		return LOG_ERROR;
     	}
@@ -115,7 +114,7 @@ public class Component extends ServiceBaseAction {
     		    return COMP_FEATURES_DEPENDENCY;
     		}
     	} catch (PhrescoException e){
-    		new LogErrorReport(e, COMPONENT_LIST_EXCEPTION);
+//    		new LogErrorReport(e, COMPONENT_LIST_EXCEPTION);
     		
     		return LOG_ERROR;
     	}
@@ -146,7 +145,7 @@ public class Component extends ServiceBaseAction {
 			getHttpRequest().setAttribute(REQ_FROM_PAGE, EDIT);
 			getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, COMPONENT_EDIT_EXCEPTION);
+//			new LogErrorReport(e, COMPONENT_EDIT_EXCEPTION);
     		
 			return LOG_ERROR;
 		}
@@ -181,7 +180,7 @@ public class Component extends ServiceBaseAction {
 			}
 		} catch (PhrescoException e) {
 			e.printStackTrace();
-			new LogErrorReport(e, COMPONENT_SAVE_EXCEPTION);
+//			new LogErrorReport(e, COMPONENT_SAVE_EXCEPTION);
     		
 			return LOG_ERROR;
 		} 
@@ -259,7 +258,7 @@ public class Component extends ServiceBaseAction {
 			
 			getServiceManager().updateFeature(multiPart, techId, customerId);
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, COMPONENT_UPDATE_EXCEPTION);
+//			new LogErrorReport(e, COMPONENT_UPDATE_EXCEPTION);
     	
 			return LOG_ERROR;
 		}
@@ -284,7 +283,7 @@ public class Component extends ServiceBaseAction {
 				addActionMessage(getText(COMPONENT_DELETED));
 			}
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, COMPONENT_DELETE_EXCEPTION);
+//			new LogErrorReport(e, COMPONENT_DELETE_EXCEPTION);
 			
     		return LOG_ERROR;
 		}

@@ -32,15 +32,12 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import com.google.gson.Gson;
 import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.DownloadInfo;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
-import com.photon.phresco.service.admin.commons.LogErrorReport;
 import com.photon.phresco.service.client.api.Content;
-import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.BodyPart;
@@ -86,7 +83,7 @@ public class Downloads extends ServiceBaseAction {
 			getHttpRequest().setAttribute(REQ_DOWNLOAD_INFO, downloadInfo);
 			getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, DOWNLOADS_LIST_EXCEPTION);
+//			new LogErrorReport(e, DOWNLOADS_LIST_EXCEPTION);
 			
 			return LOG_ERROR;	
 		}
@@ -109,7 +106,7 @@ public class Downloads extends ServiceBaseAction {
 			List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
 			getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, DOWNLOADS_ADD_EXCEPTION);
+//			new LogErrorReport(e, DOWNLOADS_ADD_EXCEPTION);
 			
 			return LOG_ERROR;	
 		}
@@ -129,7 +126,7 @@ public class Downloads extends ServiceBaseAction {
 			List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
 			getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, DOWNLOADS_EDIT_EXCEPTION);
+//			new LogErrorReport(e, DOWNLOADS_EDIT_EXCEPTION);
 			
 			return LOG_ERROR;	
 		}
@@ -190,7 +187,7 @@ public class Downloads extends ServiceBaseAction {
 				addActionMessage(getText(DOWNLOAD_ADDED, Collections.singletonList(name)));
 			}
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, DOWNLOADS_SAVE_EXCEPTION);
+//			new LogErrorReport(e, DOWNLOADS_SAVE_EXCEPTION);
 			
 			return LOG_ERROR;	
 		}
@@ -246,7 +243,7 @@ public class Downloads extends ServiceBaseAction {
 			
 			getServiceManager().updateDownload(download, id, customerId);
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, DOWNLOADS_UPDATE_EXCEPTION);
+//			new LogErrorReport(e, DOWNLOADS_UPDATE_EXCEPTION);
 			
 			return LOG_ERROR;	
 		}
@@ -271,7 +268,7 @@ public class Downloads extends ServiceBaseAction {
 				addActionMessage(getText(DOWNLOAD_DELETED));
 			}
 		}catch (PhrescoException e) {
-			new LogErrorReport(e, DOWNLOADS_DELETE_EXCEPTION);
+//			new LogErrorReport(e, DOWNLOADS_DELETE_EXCEPTION);
 			
 			return LOG_ERROR;	
 		}

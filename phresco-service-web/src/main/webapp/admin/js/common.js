@@ -57,7 +57,9 @@ function loadContent(pageUrl, form, tag, additionalParams) {
 }
 
 function clickSave(pageUrl, params, tag, progressText) {
-	showProgressBar(progressText);
+	if (progressText !== undefined) {
+		showProgressBar(progressText);
+	} 
 	$.ajax({
 		url : pageUrl,
 		data : params,

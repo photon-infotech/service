@@ -33,7 +33,6 @@ import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.Customer.LicenseType;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
-import com.photon.phresco.service.admin.commons.LogErrorReport;
 import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
 
@@ -79,7 +78,7 @@ public class Customers extends ServiceBaseAction  {
             List<Customer> customers = getServiceManager().getCustomers();
 			getHttpRequest().setAttribute(REQ_CUST_CUSTOMERS, customers);
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, CUSTOMERS_LIST_EXCEPTION);
+//			new LogErrorReport(e, CUSTOMERS_LIST_EXCEPTION);
 			
 			return LOG_ERROR;	
 		}
@@ -105,7 +104,7 @@ public class Customers extends ServiceBaseAction  {
 			getHttpRequest().setAttribute(REQ_CUST_CUSTOMER, customer);
 			getHttpRequest().setAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, CUSTOMERS_ADD_EXCEPTION);
+//			new LogErrorReport(e, CUSTOMERS_ADD_EXCEPTION);
 			
 			return LOG_ERROR;	
 		}
@@ -143,7 +142,7 @@ public class Customers extends ServiceBaseAction  {
 				addActionMessage(getText(CUSTOMER_ADDED, Collections.singletonList(name)));
 			}
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, CUSTOMERS_SAVE_EXCEPTION);
+//			new LogErrorReport(e, CUSTOMERS_SAVE_EXCEPTION);
 			
 			return LOG_ERROR;	
 		}
@@ -175,7 +174,7 @@ public class Customers extends ServiceBaseAction  {
             customer.setValidUpto(validUpTo);
 			getServiceManager().updateCustomer(customer, customerId);
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, CUSTOMERS_UPDATE_EXCEPTION);
+//			new LogErrorReport(e, CUSTOMERS_UPDATE_EXCEPTION);
 			
 			return LOG_ERROR;	
 		}
@@ -200,7 +199,7 @@ public class Customers extends ServiceBaseAction  {
 				addActionMessage(getText(CUSTOMER_DELETED));
 			}
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, CUSTOMERS_DELETE_EXCEPTION);
+//			new LogErrorReport(e, CUSTOMERS_DELETE_EXCEPTION);
 			
 			return LOG_ERROR;	
 		}

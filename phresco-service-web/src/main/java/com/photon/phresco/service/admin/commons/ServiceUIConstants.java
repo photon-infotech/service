@@ -167,7 +167,7 @@ public interface ServiceUIConstants {
     String REQ_LOG_REPORT = "logReport";
     String LOG_ERROR = "logError";
     
-    
+    String EXCEPTION_LOGIN = "Login Authenticate";
     String CUSTOMERS_DELETE_EXCEPTION = "Customers delete";
 	String CUSTOMERS_UPDATE_EXCEPTION = "Customers update";
 	String CUSTOMERS_SAVE_EXCEPTION = "Customers save";

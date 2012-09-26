@@ -18,4 +18,4 @@
   ###
   --%>
 
-<META HTTP-EQUIV="Refresh" CONTENT="0;URL=login.action">
+<META HTTP-EQUIV="Refresh" CONTENT="0;URL=login">

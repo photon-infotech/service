@@ -22,6 +22,9 @@ package com.photon.phresco.service.admin.actions;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -31,6 +34,7 @@ import org.apache.struts2.ServletActionContext;
 
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionSupport;
+import com.photon.phresco.commons.model.LogInfo;
 import com.photon.phresco.commons.model.User;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.commons.ServiceActions;
@@ -68,6 +72,56 @@ public class ServiceBaseAction extends ActionSupport implements ServiceActions, 
 		context.put(SERVICE_PASSWORD, password);
 		serviceManager = ServiceClientFactory.getServiceManager(context);
 		return serviceManager.getUserInfo();
+    }
+	
+	protected String showErrorPopup(PhrescoException e, String action) {
+        StringWriter sw = null;
+        PrintWriter pw = null;
+        try {
+            sw = new StringWriter();
+            pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            String stacktrace = sw.toString();
+            User userInfo = (User) getHttpSession().getAttribute(SESSION_USER_INFO);
+            LogInfo log = new LogInfo();
+            log.setMessage(e.getLocalizedMessage());
+            log.setTrace(stacktrace);
+            log.setAction(action);
+            log.setUserId(userInfo.getLoginId());
+            setReqAttribute(REQ_LOG_REPORT, log);
+        } finally {
+            if (pw != null) {
+                pw.close();
+            }
+            if (sw != null) {
+                try {
+                    sw.close();
+                } catch (IOException e1) {
+                    //Do nothing due to error popup
+                }
+            }
+        }
+        return LOG_ERROR;
+	}
+	
+	protected void setReqAttribute(String key, Object value) {
+	    getHttpRequest().setAttribute(key, value);
+	}
+	
+	protected Object getReqAttribute(String key) {
+        return getHttpRequest().getAttribute(key);
+    }
+	
+	protected void setSessionAttribute(String key, Object value) {
+	    getHttpSession().setAttribute(key, value);
+    }
+	
+	protected void removeSessionAttribute(String key) {
+	    getHttpSession().removeAttribute(key);
+	}
+    
+    protected Object getSessionAttribute(String key) {
+        return getHttpSession().getAttribute(key);
     }
     
     protected HttpServletRequest getHttpRequest() {
