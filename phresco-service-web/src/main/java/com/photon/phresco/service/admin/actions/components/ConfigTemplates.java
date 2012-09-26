@@ -63,12 +63,10 @@ public class ConfigTemplates extends ServiceBaseAction {
 		
 		try {
 			List<SettingsTemplate> configTemplates = getServiceManager().getconfigTemplates(customerId);
-			getHttpRequest().setAttribute(REQ_CONFIG_TEMPLATES, configTemplates);
-			getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+			setReqAttribute(REQ_CONFIG_TEMPLATES, configTemplates);
+			setReqAttribute(REQ_CUST_CUSTOMER_ID, customerId);
 		} catch (PhrescoException e) {
-//			new LogErrorReport(e, CONFIG_TEMP_LIST_EXCEPTION);
-			
-			return LOG_ERROR;	
+			showErrorPopup(e, CONFIG_TEMP_LIST_EXCEPTION);
 		}
 		
 		return COMP_CONFIGTEMPLATE_LIST;
@@ -81,11 +79,9 @@ public class ConfigTemplates extends ServiceBaseAction {
 		
 		try {
 			List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
-			getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
+			setReqAttribute(REQ_ARCHE_TYPES, technologies);
 		} catch (PhrescoException e) {
-//			new LogErrorReport(e, CONFIG_TEMP_ADD_EXCEPTION);
-			
-			return LOG_ERROR;	
+			showErrorPopup(e, CONFIG_TEMP_ADD_EXCEPTION);
 		}
 		
 		return COMP_CONFIGTEMPLATE_ADD;
@@ -98,14 +94,12 @@ public class ConfigTemplates extends ServiceBaseAction {
 		
 		try {
 		    SettingsTemplate configTemp = getServiceManager().getConfigTemplate(configId, customerId);
-			getHttpRequest().setAttribute(REQ_CONFIG_TEMP , configTemp);
+		    setReqAttribute(REQ_CONFIG_TEMP , configTemp);
 			List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
-			getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
-			getHttpRequest().setAttribute(REQ_FROM_PAGE, EDIT);
+			setReqAttribute(REQ_ARCHE_TYPES, technologies);
+			setReqAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (PhrescoException e) {
-//			new LogErrorReport(e, CONFIG_TEMP_EDIT_EXCEPTION);
-			
-			return LOG_ERROR;	
+			showErrorPopup(e, CONFIG_TEMP_EDIT_EXCEPTION);
 		}
 		
 		return COMP_CONFIGTEMPLATE_ADD;
@@ -135,9 +129,7 @@ public class ConfigTemplates extends ServiceBaseAction {
             	addActionMessage(getText(CONFIGTEMPLATE_ADDED, Collections.singletonList(name)));
             }
 		} catch (PhrescoException e) {
-//			new LogErrorReport(e, CONFIG_TEMP_SAVE_EXCEPTION);
-			
-			return LOG_ERROR;	
+			showErrorPopup(e, CONFIG_TEMP_SAVE_EXCEPTION);
 		}
 		
 		return  list();
@@ -160,9 +152,7 @@ public class ConfigTemplates extends ServiceBaseAction {
             settingTemplate.setProperties(createPropertyTemplates());
     		getServiceManager().updateConfigTemp(settingTemplate, configId, customerId);
     	} catch (PhrescoException e) {
-//			new LogErrorReport(e, CONFIG_TEMP_UPDATE_EXCEPTION);
-			
-			return LOG_ERROR;	
+    		showErrorPopup(e, CONFIG_TEMP_UPDATE_EXCEPTION);
 		}
 
     	return list();
@@ -196,9 +186,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 
                     PropertyTemplate propertyTemplate = new PropertyTemplate();
                     propertyTemplate.setKey(propTempKey);
-                    //TODO Arunprasanna
-                    /*propertyTemplate.setName(ServerUtil
-                            .createI18NString(propTempName));*/
+                    propertyTemplate.setName(propTempName);
                     propertyTemplate.setType(propTempType);
                     propertyTemplate.setPossibleValues(possibleValues);
                     propertyTemplate.setHelpText(propTempHlpTxt);
@@ -241,9 +229,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 				addActionMessage(getText(CONFIGTEMPLATE_DELETED));
 			}
 		} catch (PhrescoException e) {
-//			new LogErrorReport(e, CONFIG_TEMP_DELETE_EXCEPTION);
-			
-			return LOG_ERROR;	
+			showErrorPopup(e, CONFIG_TEMP_DELETE_EXCEPTION);
 		}
 
 		return list();

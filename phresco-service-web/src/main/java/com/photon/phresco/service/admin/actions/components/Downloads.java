@@ -32,12 +32,17 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.google.gson.Gson;
+import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactInfo;
+import com.photon.phresco.commons.model.CoreOption;
 import com.photon.phresco.commons.model.DownloadInfo;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.client.api.Content;
+import com.photon.phresco.service.model.FileInfo;
+import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.BodyPart;
@@ -61,7 +66,8 @@ public class Downloads extends ServiceBaseAction {
 	private boolean errorFound = false;
 	private String description=null;
 	private String id = null;
-	private List<String> technology = null;
+	//private List<String> technology = null;
+	private String technology = "";
 	private String techError = null;
 	private String fromPage = null;
 	private String customerId = null;
@@ -80,12 +86,10 @@ public class Downloads extends ServiceBaseAction {
 		
 		try {
 			List<DownloadInfo> downloadInfo = getServiceManager().getDownloads(customerId);
-			getHttpRequest().setAttribute(REQ_DOWNLOAD_INFO, downloadInfo);
-			getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+			setReqAttribute(REQ_DOWNLOAD_INFO, downloadInfo);
+			setReqAttribute(REQ_CUST_CUSTOMER_ID, customerId);
 		} catch (PhrescoException e) {
-//			new LogErrorReport(e, DOWNLOADS_LIST_EXCEPTION);
-			
-			return LOG_ERROR;	
+			return showErrorPopup(e, DOWNLOADS_LIST_EXCEPTION);
 		}
 
 		//to clear file inpustreams
@@ -96,7 +100,7 @@ public class Downloads extends ServiceBaseAction {
 		
 		return COMP_DOWNLOAD_LIST;	
 	}
-
+	
 	public String add() throws PhrescoException {
 		if (isDebugEnabled) {	
 			S_LOGGER.debug("Entering Method Downloads.add()");
@@ -104,11 +108,9 @@ public class Downloads extends ServiceBaseAction {
 		
 		try {
 			List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
-			getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
+			setReqAttribute(REQ_ARCHE_TYPES, technologies);
 		} catch (PhrescoException e) {
-//			new LogErrorReport(e, DOWNLOADS_ADD_EXCEPTION);
-			
-			return LOG_ERROR;	
+			return showErrorPopup(e, DOWNLOADS_ADD_EXCEPTION);
 		}
 		
 		return COMP_DOWNLOAD_ADD;
@@ -121,14 +123,12 @@ public class Downloads extends ServiceBaseAction {
 		
 		try {
 			DownloadInfo downloadInfo = getServiceManager().getDownload(id, customerId);
-			getHttpRequest().setAttribute(REQ_DOWNLOAD_INFO, downloadInfo);
-			getHttpRequest().setAttribute(REQ_FROM_PAGE, EDIT);
+			setReqAttribute(REQ_DOWNLOAD_INFO, downloadInfo);
+			setReqAttribute(REQ_FROM_PAGE, EDIT);
 			List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
-			getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
+			setReqAttribute(REQ_ARCHE_TYPES, technologies);
 		} catch (PhrescoException e) {
-//			new LogErrorReport(e, DOWNLOADS_EDIT_EXCEPTION);
-			
-			return LOG_ERROR;	
+			return showErrorPopup(e, DOWNLOADS_EDIT_EXCEPTION);
 		}
 
 		return COMP_DOWNLOAD_ADD;
@@ -159,8 +159,12 @@ public class Downloads extends ServiceBaseAction {
 			downloadVersions.add(downloadVersion);
 			download.setVersions(downloadVersions);
 			//TODO Arunprasanna
-			//download.setAppliesToTechs(technology); 
-//			download.setType(group);
+			List<CoreOption> appliesTo = new ArrayList<CoreOption>();
+			CoreOption coreOption = new CoreOption();
+			coreOption.setTechId(technology);
+			appliesTo.add(coreOption);
+	        download.setAppliesTo(appliesTo); 
+	        //download.setType(group);
 			
 			BodyPart jsonPart = new BodyPart();
 		    jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
@@ -187,9 +191,7 @@ public class Downloads extends ServiceBaseAction {
 				addActionMessage(getText(DOWNLOAD_ADDED, Collections.singletonList(name)));
 			}
 		} catch (PhrescoException e) {
-//			new LogErrorReport(e, DOWNLOADS_SAVE_EXCEPTION);
-			
-			return LOG_ERROR;	
+			return showErrorPopup(e, DOWNLOADS_SAVE_EXCEPTION);
 		}
 		
 		return list();
@@ -219,8 +221,12 @@ public class Downloads extends ServiceBaseAction {
 			downloadVersions.add(downloadVersion);
 			download.setVersions(downloadVersions);
 			//TODO Arunprasanna
-			//download.setAppliesTo(technology);
-//			download.setType(group);
+			List<CoreOption> appliesTo = new ArrayList<CoreOption>();
+			CoreOption coreOption = new CoreOption();
+			coreOption.setTechId(technology);
+			appliesTo.add(coreOption);
+			download.setAppliesTo(appliesTo);
+			//download.setType(group);
 			
 			BodyPart jsonPart = new BodyPart();
 		    jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
@@ -243,9 +249,7 @@ public class Downloads extends ServiceBaseAction {
 			
 			getServiceManager().updateDownload(download, id, customerId);
 		} catch (PhrescoException e) {
-//			new LogErrorReport(e, DOWNLOADS_UPDATE_EXCEPTION);
-			
-			return LOG_ERROR;	
+			return showErrorPopup(e, DOWNLOADS_UPDATE_EXCEPTION);
 		}
 
 		return list();
@@ -268,9 +272,7 @@ public class Downloads extends ServiceBaseAction {
 				addActionMessage(getText(DOWNLOAD_DELETED));
 			}
 		}catch (PhrescoException e) {
-//			new LogErrorReport(e, DOWNLOADS_DELETE_EXCEPTION);
-			
-			return LOG_ERROR;	
+			return showErrorPopup(e, DOWNLOADS_DELETE_EXCEPTION);
 		}
 
 		return list();
@@ -285,32 +287,36 @@ public class Downloads extends ServiceBaseAction {
 		try {
             writer = getHttpResponse().getWriter();
 	        downloadJarName = getHttpRequest().getHeader(X_FILE_NAME);
-	        if (downloadJarName.endsWith(REQ_JAR_FILE_EXTENSION) || downloadJarName.endsWith(REQ_ZIP_FILE_EXTENSION) 
-	        		|| downloadJarName.endsWith(REQ_TAR_GZ_FILE_EXTENSION) || downloadJarName.endsWith(REQ_IMAGE_JPG_EXTENSION) 
-	        		|| downloadJarName.endsWith(REQ_IMAGE_JPEG_EXTENSION) || downloadJarName.endsWith(REQ_IMAGE_PNG_EXTENSION)) {
-	        
-	        	InputStream is = getHttpRequest().getInputStream();
-	        	downloadByteArray = IOUtils.toByteArray(is);
-	        	InputStream applnIs = new ByteArrayInputStream(downloadByteArray);
-	        	//TODO Arunprasanna
-	        	/*ArchetypeInfo archetypeInfo = ServerUtil.getArtifactinfo(applnIs);
-	            getHttpResponse().setStatus(getHttpResponse().SC_OK);
-	            if (archetypeInfo != null) {
-	            	archetypeInfo.setMavenJar(true);
-	            	archetypeInfo.setSuccess(true);
-	            	Gson gson = new Gson();
-	                String json = gson.toJson(archetypeInfo);
-	            	writer.print(json);
-	            } else {
-	            	writer.print(MAVEN_JAR_FALSE);
-	            }*/
-		        writer.flush();
-		        writer.close();
+	        InputStream is = getHttpRequest().getInputStream();
+	        downloadByteArray = IOUtils.toByteArray(is);
+	        InputStream applnIs = new ByteArrayInputStream(downloadByteArray);
+	        //TODO Arunprasanna
+	        ArtifactGroup archetypeInfo = ServerUtil.getArtifactinfo(applnIs);
+	        FileInfo fileInfo = new FileInfo();
+	        getHttpResponse().setStatus(getHttpResponse().SC_OK);
+	        if (archetypeInfo != null) {
+	        	//archetypeInfo.setMavenJar(true);
+	        	//archetypeInfo.setSuccess(true);
+	        	//fileInfo.setArtifactId(artifactId);
+        		//fileInfo.setGroupId(groupId);
+        		List<ArtifactInfo> versions = new ArrayList<ArtifactInfo>();
+        		ArtifactInfo fileInfoversion = new ArtifactInfo();
+        		fileInfoversion.setVersion(version);
+        		versions.add(fileInfoversion);
+        		fileInfo.setVersions(versions);
+        		fileInfo.setMavenJar(true);
+        		fileInfo.setSuccess(true);
+	        	Gson gson = new Gson();
+	        	String json = gson.toJson(fileInfo);
+	        	writer.print(json);
+	        } else {
+	        	writer.print(MAVEN_JAR_FALSE);
 	        }
+	        writer.flush();
+	        writer.close();
 		} catch (Exception e) {
 			getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
             writer.print(SUCCESS_FALSE);
-			throw new PhrescoException(e);
 		}
 		
 		return SUCCESS;
@@ -530,11 +536,11 @@ public class Downloads extends ServiceBaseAction {
 		return type;
 	}
 	
-	public void setTechnology(List<String> technology) {
+	public void setTechnology(String technology) {
 		this.technology = technology;
 	}
 	
-	public List<String> getTechnology() {
+	public String getTechnology() {
 		return technology;
 	}
 	

@@ -102,18 +102,18 @@
 
 						<%
 						    if (CollectionUtils.isNotEmpty(technologies)) {
-													for (Technology technology : technologies) {
-														String checkedStr = "";
+										for (Technology technology : technologies) {
+													String checkedStr = "";
 														if (settingsTemplate != null) {
-															// TODO:Arun
-// 															List<String> appliesTos = settingsTemplate.getAppliesToTechs();
-// 															if (CollectionUtils.isNotEmpty(appliesTos)) {
-// 																if (appliesTos.contains(technology.getId())) {
-// 																	checkedStr = "checked";
-// 																} else {
-// 																	checkedStr = "";
-// 																}
-// 															}
+															// TODO:Arunprasanna
+ 															List<Element> appliesTos = settingsTemplate.getAppliesToTechs();
+ 															if (CollectionUtils.isNotEmpty(appliesTos)) {
+ 																if (appliesTos.contains(technology.getId())) {
+ 																	checkedStr = "checked";
+ 																} else {
+ 																	checkedStr = "";
+ 																}
+ 															}
 														}
 
 						%>		

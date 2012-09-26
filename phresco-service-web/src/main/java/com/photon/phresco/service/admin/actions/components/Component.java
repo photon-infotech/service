@@ -91,11 +91,9 @@ public class Component extends ServiceBaseAction {
     	try {
       		getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
     		List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
-    		getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
+    		setReqAttribute(REQ_ARCHE_TYPES, technologies);
     	} catch (PhrescoException e){
-//    		new LogErrorReport(e, COMPONENT_LIST_EXCEPTION);
-    		
-    		return LOG_ERROR;
+    		showErrorPopup(e, COMPONENT_LIST_EXCEPTION);
     	}
     	
     	return COMP_COMPONENT_LIST;
@@ -108,15 +106,13 @@ public class Component extends ServiceBaseAction {
     	
     	try {    		
     		List<ArtifactGroup> moduleGroup = getServiceManager().getModules(customerId, techId, type);
-    		getHttpRequest().setAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
-    		getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+    		setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
+    		setReqAttribute(REQ_CUST_CUSTOMER_ID, customerId);
     		if (StringUtils.isNotEmpty(from)) {
     		    return COMP_FEATURES_DEPENDENCY;
     		}
     	} catch (PhrescoException e){
-//    		new LogErrorReport(e, COMPONENT_LIST_EXCEPTION);
-    		
-    		return LOG_ERROR;
+    		showErrorPopup(e, COMPONENT_LIST_EXCEPTION);
     	}
     	
     	return COMP_COMPONENT_LIST;
@@ -128,9 +124,9 @@ public class Component extends ServiceBaseAction {
 		}
 		
 		List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
-		getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
-		getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
-		
+		setReqAttribute(REQ_ARCHE_TYPES, technologies);
+		setReqAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+	
 		return COMP_COMPONENT_ADD;
 	}
 	
@@ -141,13 +137,11 @@ public class Component extends ServiceBaseAction {
 		
 		try {
 		    ArtifactGroup moduleGroup = getServiceManager().getFeature(techId, customerId);
-			getHttpRequest().setAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
-			getHttpRequest().setAttribute(REQ_FROM_PAGE, EDIT);
-			getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+		    setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
+		    setReqAttribute(REQ_FROM_PAGE, EDIT);
+		    setReqAttribute(REQ_CUST_CUSTOMER_ID, customerId);
 		} catch (PhrescoException e) {
-//			new LogErrorReport(e, COMPONENT_EDIT_EXCEPTION);
-    		
-			return LOG_ERROR;
+			showErrorPopup(e, COMPONENT_EDIT_EXCEPTION);
 		}
 
 		return COMP_COMPONENT_ADD;
@@ -179,10 +173,7 @@ public class Component extends ServiceBaseAction {
 				addActionMessage(getText(COMPONENT_ADDED, Collections.singletonList(name)));
 			}
 		} catch (PhrescoException e) {
-			e.printStackTrace();
-//			new LogErrorReport(e, COMPONENT_SAVE_EXCEPTION);
-    		
-			return LOG_ERROR;
+			showErrorPopup(e, COMPONENT_SAVE_EXCEPTION);    		
 		} 
 
 		return list();
@@ -210,7 +201,7 @@ public class Component extends ServiceBaseAction {
 			}
 			appliesTo.add(moduleCoreOption);
 			moduleGroup.setAppliesTo(appliesTo);
-            //TODO:ARUN PRASANNA
+            //TODO:change the data type : ARUN PRASANNA
 //			moduleGroup.setType(type);
 			List<String> customerIds = new ArrayList<String>();
 			moduleGroup.setCustomerIds(customerIds);
@@ -258,9 +249,7 @@ public class Component extends ServiceBaseAction {
 			
 			getServiceManager().updateFeature(multiPart, techId, customerId);
 		} catch (PhrescoException e) {
-//			new LogErrorReport(e, COMPONENT_UPDATE_EXCEPTION);
-    	
-			return LOG_ERROR;
+			showErrorPopup(e, COMPONENT_UPDATE_EXCEPTION);
 		}
 		
 		return list();	
@@ -283,9 +272,7 @@ public class Component extends ServiceBaseAction {
 				addActionMessage(getText(COMPONENT_DELETED));
 			}
 		} catch (PhrescoException e) {
-//			new LogErrorReport(e, COMPONENT_DELETE_EXCEPTION);
-			
-    		return LOG_ERROR;
+			showErrorPopup(e, COMPONENT_DELETE_EXCEPTION);
 		}
 		
 		return list();

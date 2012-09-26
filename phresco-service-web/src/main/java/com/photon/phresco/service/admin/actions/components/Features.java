@@ -34,6 +34,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.google.gson.Gson;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.CoreOption;
@@ -42,6 +43,8 @@ import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.client.api.Content;
+import com.photon.phresco.service.model.FileInfo;
+import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.BodyPart;
@@ -133,8 +136,8 @@ public class Features extends ServiceBaseAction {
     	
     	try {
     		List<ArtifactGroup> moduleGroup = getServiceManager().getModules(customerId, technology, type);
-    		getHttpRequest().setAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
-    		getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+    		setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
+    		setReqAttribute(REQ_CUST_CUSTOMER_ID, customerId);
     		if (StringUtils.isNotEmpty(from)) {
     		    return COMP_FEATURES_DEPENDENCY;
     		}
@@ -153,9 +156,9 @@ public class Features extends ServiceBaseAction {
 		try {
             List<Technology> technologies = getServiceManager().getArcheTypes(
                     customerId);
-            getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
-            getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
-            getHttpRequest().setAttribute(REQ_FEATURES_TYPE, type);
+            setReqAttribute(REQ_ARCHE_TYPES, technologies);
+            setReqAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+            setReqAttribute(REQ_FEATURES_TYPE, type);
             if (REQ_FEATURES_MODULE.equals(type)) {
                 getHttpRequest().setAttribute(REQ_FEATURES_HEADER,
                         getText(KEY_I18N_FEATURE_MOD_ADD));
@@ -177,21 +180,19 @@ public class Features extends ServiceBaseAction {
 		
 		try {
 		    List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
-	        getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
+		    setReqAttribute(REQ_ARCHE_TYPES, technologies);
 		    ArtifactGroup moduleGroup = getServiceManager().getFeature(moduleGroupId, customerId);
-			getHttpRequest().setAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
-			getHttpRequest().setAttribute(REQ_FEATURES_SELECTED_MODULEID, moduleId);
-			getHttpRequest().setAttribute(REQ_FROM_PAGE, EDIT);
-			getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+		    setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
+		    setReqAttribute(REQ_FEATURES_SELECTED_MODULEID, moduleId);
+		    setReqAttribute(REQ_FROM_PAGE, EDIT);
+		    setReqAttribute(REQ_CUST_CUSTOMER_ID, customerId);
 			if (REQ_FEATURES_MODULE.equals(type)) {
 				getHttpRequest().setAttribute(REQ_FEATURES_HEADER, getText(KEY_I18N_FEATURE_MOD_EDIT));
 			} else {
 				getHttpRequest().setAttribute(REQ_FEATURES_HEADER, getText(KEY_I18N_FEATURE_JS_EDIT));
 			}
 		} catch (PhrescoException e) {
-//			new LogErrorReport(e, FEATURE_EDIT_EXCEPTION);
-    		
-			return LOG_ERROR;
+			showErrorPopup(e, FEATURE_EDIT_EXCEPTION);
 		}
 
 		return COMP_FEATURES_ADD;
@@ -221,9 +222,7 @@ public class Features extends ServiceBaseAction {
 				addActionMessage(getText(FEATURE_UPDATED, Collections.singletonList(name)));
 			}
 		} catch (PhrescoException e) {
-//			new LogErrorReport(e, FEATURE_SAVE_EXCEPTION);
-    		
-			return LOG_ERROR;
+			showErrorPopup(e, FEATURE_SAVE_EXCEPTION);
 		} 
 
 		return setTechnologiesInRequest();
@@ -255,9 +254,7 @@ public class Features extends ServiceBaseAction {
                 addActionMessage(getText(FEATURE_ADDED, Collections.singletonList(name)));
             }
 		} catch (PhrescoException e) {
-//			new LogErrorReport(e, FEATURE_UPDATE_EXCEPTION);
-    	
-			return LOG_ERROR;
+			showErrorPopup(e, FEATURE_UPDATE_EXCEPTION);
 		}
 		
 		return setTechnologiesInRequest();	
@@ -290,7 +287,7 @@ public class Features extends ServiceBaseAction {
             
             appliesTo.add(moduleCoreOption);
             moduleGroup.setAppliesTo(appliesTo);
-            //TODO:ARUN PRASANNA
+            //TODO: Change the Data type : ARUN PRASANNA
 //            moduleGroup.setType(type);
             List<String> customerIds = new ArrayList<String>();
             customerIds.add(customerId);
@@ -337,9 +334,7 @@ public class Features extends ServiceBaseAction {
 				addActionMessage(getText(FEATURE_DELETED));
 			}
 		} catch (PhrescoException e) {
-//			new LogErrorReport(e, FEATURE_DELETE_EXCEPTION);
-			
-    		return LOG_ERROR;
+			showErrorPopup(e, FEATURE_DELETE_EXCEPTION);
 		}
 		
 		return setTechnologiesInRequest();
@@ -357,18 +352,18 @@ public class Features extends ServiceBaseAction {
         	byte[] tempFeaByteArray = IOUtils.toByteArray(is);
     		featureByteArray = tempFeaByteArray;
     		
-    		//TODO Arunprasanna
-        	/*ArchetypeInfo archetypeInfo = ServerUtil.getArtifactinfo(new ByteArrayInputStream(tempFeaByteArray));
+        	ArtifactGroup archetypeInfo = ServerUtil.getArtifactinfo(new ByteArrayInputStream(tempFeaByteArray));
+        	FileInfo fileInfo = new FileInfo();
             getHttpResponse().setStatus(getHttpResponse().SC_OK);
             if (archetypeInfo != null) {
-            	archetypeInfo.setMavenJar(true);
-            	archetypeInfo.setSuccess(true);
+            	fileInfo.setMavenJar(true);
+            	fileInfo.setSuccess(true);
             	Gson gson = new Gson();
-                String json = gson.toJson(archetypeInfo);
+                String json = gson.toJson(fileInfo);
             	writer.print(json);
             } else {
             	writer.print(MAVEN_JAR_FALSE);
-        	}*/
+        	}
 	        writer.flush();
 	        writer.close();
 		} catch (Exception e) {

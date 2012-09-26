@@ -58,8 +58,8 @@ public class ApplicationTypes extends ServiceBaseAction {
 
 		try {
 		    List<ApplicationType> applicationTypes = getServiceManager().getApplicationTypes(customerId);
-		    getHttpRequest().setAttribute(REQ_APP_TYPES, applicationTypes);
-		    getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+		    setReqAttribute(REQ_APP_TYPES, applicationTypes);
+		    setReqAttribute(REQ_CUST_CUSTOMER_ID, customerId);
 		} catch (Exception e) {
 			throw new PhrescoException(e);
 		}
@@ -71,7 +71,7 @@ public class ApplicationTypes extends ServiceBaseAction {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method ApplicationTypes.add()");
 	    }
-	    getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+	    setReqAttribute(REQ_CUST_CUSTOMER_ID, customerId);
 	    
 		return COMP_APPTYPE_ADD;
 	}
@@ -83,8 +83,8 @@ public class ApplicationTypes extends ServiceBaseAction {
 		
 		try {
 		    ApplicationType appType = getServiceManager().getApplicationType(appTypeId, customerId);
-			getHttpRequest().setAttribute(REQ_APP_TYPE, appType);
-			getHttpRequest().setAttribute(REQ_FROM_PAGE, EDIT);
+		    setReqAttribute(REQ_APP_TYPE, appType);
+		    setReqAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (Exception e) {
 		    throw new PhrescoException(e);
 		}

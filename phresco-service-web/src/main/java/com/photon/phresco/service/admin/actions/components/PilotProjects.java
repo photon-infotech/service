@@ -76,12 +76,10 @@ public class PilotProjects extends ServiceBaseAction {
 
 		try {
 			List<ApplicationInfo> pilotProjects = getServiceManager().getPilotProjects(customerId);
-			getHttpRequest().setAttribute(REQ_PILOT_PROJECTS, pilotProjects);
-			getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+			setReqAttribute(REQ_PILOT_PROJECTS, pilotProjects);
+			setReqAttribute(REQ_CUST_CUSTOMER_ID, customerId);
 		} catch (PhrescoException e) {
-//			new LogErrorReport(e, PILOT_PROJECTS_LIST_EXCEPTION);
-			
-			return LOG_ERROR;	
+			return showErrorPopup(e, PILOT_PROJECTS_LIST_EXCEPTION);
 		}
 		
 		//to clear file input stream and byte array
@@ -98,11 +96,9 @@ public class PilotProjects extends ServiceBaseAction {
     	
     	try {
     		List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
-    		getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
+    		setReqAttribute(REQ_ARCHE_TYPES, technologies);
     	} catch (PhrescoException e) {
-//			new LogErrorReport(e, PILOT_PROJECTS_ADD_EXCEPTION);
-			
-			return LOG_ERROR;	
+    		return showErrorPopup(e, PILOT_PROJECTS_ADD_EXCEPTION);
 		}
     	
     	return COMP_PILOTPROJ_ADD;
@@ -115,12 +111,10 @@ public class PilotProjects extends ServiceBaseAction {
 
     	try {
     		ApplicationInfo pilotProjectInfo = getServiceManager().getPilotProject(projectId, customerId);
-    		getHttpRequest().setAttribute(REQ_PILOT_PROINFO, pilotProjectInfo);
-    		getHttpRequest().setAttribute(REQ_FROM_PAGE, EDIT);
+    		setReqAttribute(REQ_PILOT_PROINFO, pilotProjectInfo);
+    		setReqAttribute(REQ_FROM_PAGE, EDIT);
     	} catch (PhrescoException e) {
-//			new LogErrorReport(e, PILOT_PROJECTS_EDIT_EXCEPTION);
-			
-			return LOG_ERROR;	
+    		return showErrorPopup(e, PILOT_PROJECTS_EDIT_EXCEPTION);
 		}
 
     	return COMP_PILOTPROJ_ADD;
@@ -194,9 +188,7 @@ public class PilotProjects extends ServiceBaseAction {
     			addActionMessage(getText(PLTPROJ_ADDED, Collections.singletonList(name)));
     		}
     	} catch (PhrescoException e) {
-//			new LogErrorReport(e, PILOT_PROJECTS_SAVE_EXCEPTION);
-			
-			return LOG_ERROR;	
+    		return showErrorPopup(e, PILOT_PROJECTS_SAVE_EXCEPTION);
 		}
 
     	return list();
@@ -273,9 +265,7 @@ public class PilotProjects extends ServiceBaseAction {
     		
     		getServiceManager().updatePilotProject(pilotProInfo, projectId, customerId);
     	} catch (PhrescoException e) {
-//			new LogErrorReport(e, PILOT_PROJECTS_UPDATE_EXCEPTION);
-			
-			return LOG_ERROR;	
+    		return showErrorPopup(e, PILOT_PROJECTS_UPDATE_EXCEPTION);
 		}
 
     	return list();
@@ -298,9 +288,7 @@ public class PilotProjects extends ServiceBaseAction {
     			addActionMessage(getText(PLTPROJ_DELETED));
     		}
     	}catch (PhrescoException e) {
-//			new LogErrorReport(e, PILOT_PROJECTS_DELETE_EXCEPTION);
-			
-			return LOG_ERROR;	
+    		return showErrorPopup(e, PILOT_PROJECTS_DELETE_EXCEPTION);
 		}
 
     	return list();
