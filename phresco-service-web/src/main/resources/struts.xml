@@ -75,10 +75,14 @@
             <result name="featuresList">/admin/pages/components/feature/menu.jsp</result>
         </action>
 		
-		<action name="technologiesList" class="com.photon.phresco.service.admin.actions.components.Features" method="technologies">
+		<action name="modulesList" class="com.photon.phresco.service.admin.actions.components.Features" method="modulesList">
             <result name="featuresList">/admin/pages/components/feature/technology.jsp</result>
         </action>
         
+		<action name="jsLibList" class="com.photon.phresco.service.admin.actions.components.Features" method="jsLibList">
+            <result name="featuresList">/admin/pages/components/feature/technology.jsp</result>
+        </action>
+
         <action name="listFeatures" class="com.photon.phresco.service.admin.actions.components.Features" method="featuresWithList">
             <result name="featuresList">/admin/pages/components/feature/list.jsp</result>
             <result name="dependency">/admin/pages/components/feature/dependency.jsp</result>
