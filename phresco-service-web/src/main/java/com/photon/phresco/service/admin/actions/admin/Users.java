@@ -19,11 +19,22 @@
  */
 package com.photon.phresco.service.admin.actions.admin;
 
+import org.apache.log4j.Logger;
+
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 
-public class UserList extends ServiceBaseAction { 
+public class Users extends ServiceBaseAction { 
 
-	public String list() {
+    private static final long serialVersionUID = 1L;
+    
+    private static final Logger S_LOGGER = Logger.getLogger(Customers.class);
+    private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
+
+    public String list() {
+        if (s_isDebugEnabled) {
+            S_LOGGER.debug("Entering Method Users.list()");
+        }
+        
 		return ADMIN_USER_LIST;	
 	}
 }

@@ -32,23 +32,32 @@ import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
 
-public class RoleList extends ServiceBaseAction { 
+public class Roles extends ServiceBaseAction { 
 	
-	private static final long serialVersionUID = 6801037145464060759L;
-	private static final Logger S_LOGGER = Logger.getLogger(RoleList.class);
-	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
+    private static final long serialVersionUID = 1L;
+    
+    private static final Logger S_LOGGER = Logger.getLogger(Roles.class);
+	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
-	private String name = null;
-	private String nameError = null;
-	private boolean errorFound = false;
-	private String description = null;
-	private String oldName = null;
-	private String fromPage = null;
-	private String customerId = null;
-	private String roleId = null;
+	private String name = "";
+	private String description = "";
 	
+	private String nameError = "";
+    private boolean errorFound = false;
+	
+	private String oldName = "";
+	
+	private String fromPage = "";
+	
+	private String roleId = "";
+	
+	/**
+	 * To get the list of roles
+	 * @return
+	 * @throws PhrescoException
+	 */
 	public String list() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method RolesList.list()");
 		}
 		
@@ -65,7 +74,7 @@ public class RoleList extends ServiceBaseAction {
 	}
 	
 	public String add() {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method RolesList.add()");
 		}
 		
@@ -73,7 +82,7 @@ public class RoleList extends ServiceBaseAction {
 	}
 	
 	public String edit() throws PhrescoException {
-	    if (isDebugEnabled) {
+	    if (s_isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method RoleList.edit()");
 	    }
 		
@@ -92,7 +101,7 @@ public class RoleList extends ServiceBaseAction {
 	}
 	
 	public String save() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method RolesList.save()");
 		}
 		
@@ -119,7 +128,7 @@ public class RoleList extends ServiceBaseAction {
 	}
 	
 	public String update() throws PhrescoException {
-	    if (isDebugEnabled) {
+	    if (s_isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method RoleList.update()");
 	    }
  
@@ -137,7 +146,7 @@ public class RoleList extends ServiceBaseAction {
 	}
 	
 	public String delete() throws PhrescoException {
-	    if (isDebugEnabled) {
+	    if (s_isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method RoleList.delete()");
 	    }
 
@@ -163,7 +172,7 @@ public class RoleList extends ServiceBaseAction {
 	}
 		
 	public String validateForm() {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
             S_LOGGER.debug("Entering Method RoleList.validateForm()");
         }
 		
@@ -181,7 +190,7 @@ public class RoleList extends ServiceBaseAction {
 	}
 	
 	public String assign() {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method RolesList.assign()");
 		}
 		
@@ -189,7 +198,7 @@ public class RoleList extends ServiceBaseAction {
 	}
 	
 	public String assignSave() {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method RolesList.assignSave()");
 		}
 		
@@ -197,7 +206,7 @@ public class RoleList extends ServiceBaseAction {
 	}
 	
 	public String assignCancel() {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method RolesList.assignCancel()");
 		}
 		
@@ -234,14 +243,6 @@ public class RoleList extends ServiceBaseAction {
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-    
-	public String getCustomerId() {
-		return customerId;
-	}
-
-	public void setCustomerId(String customerId) {
-		this.customerId = customerId;
 	}
 	
 	public String getOldName() {
