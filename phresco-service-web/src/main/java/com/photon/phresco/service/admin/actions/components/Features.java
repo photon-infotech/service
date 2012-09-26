@@ -96,7 +96,7 @@ public class Features extends ServiceBaseAction {
         }
 	    
         setReqAttribute(REQ_FEATURES_HEADER, getText(KEY_I18N_FEATURE_MOD_ADD));
-        setReqAttribute(REQ_FEATURES_TYPE, REST_QUERY_TYPE_MODULE); //for handle in feature sub menu
+        setReqAttribute(REQ_FEATURES_TYPE, "FEATURE"); //for handle in feature sub menu
 	    return setTechnologiesInRequest();
 	}
 	
@@ -106,7 +106,7 @@ public class Features extends ServiceBaseAction {
         }
 	    
         setReqAttribute(REQ_FEATURES_HEADER, getText(KEY_I18N_FEATURE_JS_ADD));
-        setReqAttribute(REQ_FEATURES_TYPE, REST_QUERY_TYPE_JS); //for handle in feature sub menu
+        setReqAttribute(REQ_FEATURES_TYPE, "JAVASCRIPT"); //for handle in feature sub menu
 	    return setTechnologiesInRequest();
     }
 	
@@ -126,7 +126,7 @@ public class Features extends ServiceBaseAction {
     	return COMP_FEATURES_LIST;
     }
     
-    public String featuresWithList() {
+    public String listFeatures() {
     	if (isDebugEnabled) {
     		S_LOGGER.debug("Entering Method  Features.featurelist()");
     	}

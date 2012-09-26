@@ -49,7 +49,6 @@
 	</head>
 
 	<body class="lgnBg">
-		<div id="mainContainer">
 		<header>
 			<div class="header">
 				<div class="Logo">
@@ -112,7 +111,6 @@
 			 </div>
 		   </footer>
 		</div>
-		</div>
 	</body>
 </html>
 
@@ -127,8 +125,9 @@
 					if (data.errorFound !== undefined && data.errorFound) {
 						$("#errorMsg").text(data.errorMsg);
 					} else {
-						$('#mainContainer').empty();
-						$('#mainContainer').append(data);
+						document.open();
+						document.write(data);
+						document.close();
 					}
 				}
 			});

@@ -83,7 +83,7 @@
             <result name="featuresList">/admin/pages/components/feature/technology.jsp</result>
         </action>
 
-        <action name="listFeatures" class="com.photon.phresco.service.admin.actions.components.Features" method="featuresWithList">
+        <action name="listFeatures" class="com.photon.phresco.service.admin.actions.components.Features" method="listFeatures">
             <result name="featuresList">/admin/pages/components/feature/list.jsp</result>
             <result name="dependency">/admin/pages/components/feature/dependency.jsp</result>
         </action>
