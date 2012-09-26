@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -32,68 +33,67 @@ import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
 
-public class RoleList extends ServiceBaseAction { 
+public class Roles extends ServiceBaseAction { 
 	
-	private static final long serialVersionUID = 6801037145464060759L;
-	private static final Logger S_LOGGER = Logger.getLogger(RoleList.class);
-	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
+    private static final long serialVersionUID = 1L;
+    
+    private static final Logger S_LOGGER = Logger.getLogger(Roles.class);
+	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
-	private String name = null;
-	private String nameError = null;
-	private boolean errorFound = false;
-	private String description = null;
-	private String oldName = null;
-	private String fromPage = null;
-	private String customerId = null;
-	private String roleId = null;
+	private String name = "";
+	private String description = "";
+	
+	private String nameError = "";
+    private boolean errorFound = false;
+	
+	private String oldName = "";
+	
+	private String fromPage = "";
+	
+	private String roleId = "";
 	
 	public String list() throws PhrescoException {
-		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method RolesList.list()");
+		if (s_isDebugEnabled) {
+			S_LOGGER.debug("Entering Method Roles.list()");
 		}
 		
 		try {
 			List<Role> roleList = getServiceManager().getRoles();
-			getHttpRequest().setAttribute(REQ_ROLE_LIST, roleList);
+			setReqAttribute(REQ_ROLE_LIST, roleList);
 		} catch (PhrescoException e) {
-//			new LogErrorReport(e, ROLE_LIST_EXCEPTION);
-			
-			return LOG_ERROR;	
+		    return showErrorPopup(e, EXCEPTION_ROLE_LIST);
 		}
 
 		return ADMIN_ROLE_LIST;	
 	}
 	
 	public String add() {
-		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method RolesList.add()");
+		if (s_isDebugEnabled) {
+			S_LOGGER.debug("Entering Method Roles.add()");
 		}
 		
 		return ADMIN_ROLE_ADD;	
 	}
 	
 	public String edit() throws PhrescoException {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entering Method RoleList.edit()");
+	    if (s_isDebugEnabled) {
+	        S_LOGGER.debug("Entering Method Roles.edit()");
 	    }
 		
 		try {
 		    Role role = getServiceManager().getRole(roleId);
-			getHttpRequest().setAttribute(REQ_ROLE_ROLE , role);
-			getHttpRequest().setAttribute(REQ_FROM_PAGE, EDIT);
+			setReqAttribute(REQ_ROLE_ROLE , role);
+			setReqAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (PhrescoException e) {
-//			new LogErrorReport(e, ROLE_EDIT_EXCEPTION);
-			
-			return LOG_ERROR;	
+		    return showErrorPopup(e, EXCEPTION_ROLE_EDIT);
 		}
-
 		
 		return ADMIN_ROLE_ADD;
 	}
 	
 	public String save() throws PhrescoException {
-		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method RolesList.save()");
+		if (s_isDebugEnabled) {
+			S_LOGGER.debug("Entering Method Roles.save()");
 		}
 		
 		try  {
@@ -103,47 +103,41 @@ public class RoleList extends ServiceBaseAction {
 			role.setDescription(description);
 			roleList.add(role);
 			ClientResponse clientResponse = getServiceManager().createRoles(roleList);
-			if(clientResponse.getStatus() != ServiceConstants.RES_CODE_200){
+			if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
 				addActionError(getText(ROLE_NOT_ADDED, Collections.singletonList(name)));
 			} else {
 				addActionMessage(getText(ROLE_ADDED, Collections.singletonList(name)));
 			}	
 		} catch (PhrescoException e) {
-//			new LogErrorReport(e, ROLE_SAVE_EXCEPTION);
-			
-			return LOG_ERROR;	
+		    return showErrorPopup(e, EXCEPTION_ROLE_SAVE);
 		}
-
 		
 		return  list();
 	}
 	
 	public String update() throws PhrescoException {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entering Method RoleList.update()");
+	    if (s_isDebugEnabled) {
+	        S_LOGGER.debug("Entering Method Roles.update()");
 	    }
  
 		try {
 			Role role = new Role(roleId, name, description);
 			getServiceManager().updateRole(role, roleId);
 		} catch (PhrescoException e) {
-//			new LogErrorReport(e, ROLE_UPDATE_EXCEPTION);
-			
-			return LOG_ERROR;	
+		    return showErrorPopup(e, EXCEPTION_ROLE_UPDATE);
 		}
-
 
 		return list();
 	}
 	
 	public String delete() throws PhrescoException {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entering Method RoleList.delete()");
+	    if (s_isDebugEnabled) {
+	        S_LOGGER.debug("Entering Method Roles.delete()");
 	    }
 
 		try {
 			String[] roleIds = getHttpRequest().getParameterValues(REQ_ROLE_ID);
-			if (roleIds != null) {
+			if (ArrayUtils.isNotEmpty(roleIds)) {
 				for (String roleId : roleIds) {
 					ClientResponse clientResponse = getServiceManager().deleteRole(roleId);
 					if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
@@ -153,21 +147,20 @@ public class RoleList extends ServiceBaseAction {
 				addActionMessage(getText(ROLE_DELETED));
 			}
 		} catch (PhrescoException e) {
-//			new LogErrorReport(e, ROLE_DELETE_EXCEPTION);
-			
-			return LOG_ERROR;	
+		    return showErrorPopup(e, EXCEPTION_ROLE_DELETE);
 		}
-
 
 		return list();
 	}
 		
 	public String validateForm() {
-		if (isDebugEnabled) {
-            S_LOGGER.debug("Entering Method RoleList.validateForm()");
+		if (s_isDebugEnabled) {
+            S_LOGGER.debug("Entering Method Roles.validateForm()");
         }
 		
 		boolean isError = false;
+		
+		//Empty validation for name
 		if (StringUtils.isEmpty(name)) {
 			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY));
 			isError = true;
@@ -181,7 +174,7 @@ public class RoleList extends ServiceBaseAction {
 	}
 	
 	public String assign() {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method RolesList.assign()");
 		}
 		
@@ -189,7 +182,7 @@ public class RoleList extends ServiceBaseAction {
 	}
 	
 	public String assignSave() {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method RolesList.assignSave()");
 		}
 		
@@ -197,7 +190,7 @@ public class RoleList extends ServiceBaseAction {
 	}
 	
 	public String assignCancel() {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method RolesList.assignCancel()");
 		}
 		
@@ -234,14 +227,6 @@ public class RoleList extends ServiceBaseAction {
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-    
-	public String getCustomerId() {
-		return customerId;
-	}
-
-	public void setCustomerId(String customerId) {
-		this.customerId = customerId;
 	}
 	
 	public String getOldName() {

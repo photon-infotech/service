@@ -175,11 +175,11 @@ public interface ServiceUIConstants {
 	String EXCEPTION_CUSTOMERS_LIST = "Customers list";
 	String EXCEPTION_CUSTOMERS_VALIDATE = "Customers validateForm";
     
-	String ROLE_DELETE_EXCEPTION = "Role delete";
-	String ROLE_UPDATE_EXCEPTION = "Role update";
-	String ROLE_SAVE_EXCEPTION = "Role save";
-	String ROLE_EDIT_EXCEPTION = "Role edit";
-	String ROLE_LIST_EXCEPTION = "Role list";
+	String EXCEPTION_ROLE_DELETE = "Role delete";
+	String EXCEPTION_ROLE_UPDATE = "Role update";
+	String EXCEPTION_ROLE_SAVE = "Role save";
+	String EXCEPTION_ROLE_EDIT = "Role edit";
+	String EXCEPTION_ROLE_LIST = "Role list";
 	
 	String PERMISSION_LIST_EXCEPTION = "Permission list";
 	String PERMISSION_DELETE_EXCEPTION = "Permission delete";

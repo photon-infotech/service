@@ -43,7 +43,7 @@ public class Customers extends ServiceBaseAction  {
 	private static final long serialVersionUID = 6801037145464060759L;
 	
 	private static final Logger S_LOGGER = Logger.getLogger(Customers.class);
-	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
+	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
 	private String customerId = "";
 	
@@ -75,8 +75,13 @@ public class Customers extends ServiceBaseAction  {
 	
 	private String oldName = "";
 
+    /**
+     * To get the all the customers from the DB
+     * @return List of Customer
+     * @throws PhrescoException
+     */
     public String list() throws PhrescoException {
-	    if (isDebugEnabled) {
+	    if (s_isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Customers.list()");
 	    }
 		
@@ -90,16 +95,27 @@ public class Customers extends ServiceBaseAction  {
 		return ADMIN_CUSTOMER_LIST;	
 	}
 	
+	/**
+	 * To return the page to add customer 
+	 * @return
+	 * @throws PhrescoException
+	 */
 	public String add() throws PhrescoException {
-	    if (isDebugEnabled) {
+	    if (s_isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Customers.add()");
 	    }
 		
 		return ADMIN_CUSTOMER_ADD;
 	}
 	
+	/**
+	 * To return the edit page with the details of the selected customer
+	 * @param customerId
+	 * @return
+	 * @throws PhrescoException
+	 */
 	public String edit() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Customers.edit()");
 		}
 
@@ -115,8 +131,13 @@ public class Customers extends ServiceBaseAction  {
 		return ADMIN_CUSTOMER_ADD;
 	}
 	
+	/**
+	 * To create a customer with the provided details
+	 * @return List of customers
+	 * @throws PhrescoException
+	 */
 	public String save() throws PhrescoException {
-	    if (isDebugEnabled) {
+	    if (s_isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Customers.save()");
 	    }
 	    
@@ -136,8 +157,14 @@ public class Customers extends ServiceBaseAction  {
 		return list();
 	}
 
+	/**
+	 * To update the details of the selected customer
+	 * @param cutomerId
+	 * @return List of customers
+	 * @throws PhrescoException
+	 */
 	public String update() throws PhrescoException {
-	    if (isDebugEnabled) {
+	    if (s_isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Customers.update()");
 	    }
 
@@ -150,6 +177,10 @@ public class Customers extends ServiceBaseAction  {
 		return list();
 	}
 	
+	/**
+	 * To the customer object with the given details
+	 * @return customer object
+	 */
 	private Customer createCustomer() {
         Customer customer = new Customer();
         if (StringUtils.isNotEmpty(getFromPage())) {
@@ -173,8 +204,14 @@ public class Customers extends ServiceBaseAction  {
         return customer;
     }
 	
+	/**
+	 * To delete the selected customers
+	 * @param List of customerIds
+	 * @return list of customers
+	 * @throws PhrescoException
+	 */
 	public String delete() throws PhrescoException {
-	    if (isDebugEnabled) {
+	    if (s_isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Customers.delete()");
 	    }
 		
@@ -196,14 +233,19 @@ public class Customers extends ServiceBaseAction  {
 		return list();
 	}
 	
+	/**
+	 * To validate the form values passed from the jsp
+	 * @return vaidation true/false
+	 * @throws PhrescoException
+	 */
 	public String validateForm() throws PhrescoException {
-	    if (isDebugEnabled) {
+	    if (s_isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Customers.validateForm()");
         }
 	    
 	    try {
     		boolean isError = false;
-    		if (StringUtils.isEmpty(getName())) {
+    		if (StringUtils.isEmpty(getName())) { //Empty validation for name
     			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY));
     			isError = true;
     		} else if (StringUtils.isEmpty(getFromPage()) || (!getName().equals(getOldName()))) {
@@ -220,11 +262,13 @@ public class Customers extends ServiceBaseAction  {
     			}
     		}
     		
+    		//Empty validation for email
     		if (StringUtils.isEmpty(getEmail())) {
     			setMailError(getText(KEY_I18N_ERR_EMAIL_EMPTY));
     			isError = true;
     		} 
     		
+    		//EmailId format validation
     		if (StringUtils.isNotEmpty(getEmail())) {
     	   		Pattern p = Pattern.compile("^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
     	   		Matcher m = p.matcher(getEmail());
@@ -235,31 +279,37 @@ public class Customers extends ServiceBaseAction  {
     	   		}
     	   	}
     		
+    		//Empty validation for address
     		if (StringUtils.isEmpty(getAddress())) {
     			setAddressError(getText(KEY_I18N_ERR_ADDRS_EMPTY));
     			isError = true;
     		} 
     		
+    		//Empty validation for zip code
     		if (StringUtils.isEmpty(getZipcode())) {
     			setZipError(getText(KEY_I18N_ERR_ZIPCODE_EMPTY));
     			isError = true;
     		} 
     		
+    		//Empty validation for contact number
     		if (StringUtils.isEmpty(getNumber())) {
     			setNumError(getText(KEY_I18N_ERR_CONTNUM_EMPTY));
     			isError = true;
     		} 
     		
+    		//Empty validation for fax
     		if (StringUtils.isEmpty(getFax())) {
     			setFaxError(getText(KEY_I18N_ERR_FAXNUM_EMPTY));
     			isError = true;
     		} 
     		
+    		//Empty validation for country
     		if (StringUtils.isEmpty(getCountry())) {
     			setConError(getText(KEY_I18N_ERR_COUN_EMPTY));
     			isError = true;
     		} 
     		
+    		//Empty validation for license type
     		if (StringUtils.isEmpty(getLicence())) {
     			setLicenError(getText(KEY_I18N_ERR_LICEN_EMPTY));
     			isError = true;
