@@ -32,6 +32,7 @@
 	String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
 	
 	//For edit
+	String id = "";
 	String name = "";
 	String description = "";
 	String emailId = "";
@@ -45,6 +46,9 @@
 	Date validFrom = null;
 	Date validUpto = null;
 	if (customer != null) {
+	    if (StringUtils.isNotEmpty(customer.getId())) {
+			id = customer.getId();
+		}
 		if (StringUtils.isNotEmpty(customer.getName())) {
 			name = customer.getName();
 		}
@@ -71,7 +75,7 @@
 		} 
 		if (StringUtils.isNotEmpty(customer.getHelpText())) {
 			helpText = customer.getHelpText();
-		} 
+		}
 		if (StringUtils.isNotEmpty(customer.getRepoInfo().getReleaseRepoURL())) {
 			repoUrl = customer.getRepoInfo().getReleaseRepoURL();
 		}
@@ -456,16 +460,10 @@
 			</label>
 			<div class="controls">
 				<select id="select01" name="licence">
-				<% if(StringUtils.isNotEmpty(fromPage)) { 
-				   LicenseType licenseType = customer.getType();
-				%>
-				      <option><%= licenseType  %></option> 
-				<% } else {%>
 					<option value="">- select -</option>
-					<option value="5">Silver</option>
-					<option value="10">Gold</option>
-					<option value="15">Platinum</option>
-				<% } %>
+					<option value="<%= LicenseType.TYPE_BRONZE %>"><%= LicenseType.TYPE_BRONZE %></option>
+					<option value="<%= LicenseType.TYPE_SILVER %>"><%= LicenseType.TYPE_SILVER %></option>
+					<option value="<%= LicenseType.TYPE_GOLD %>"><%= LicenseType.TYPE_GOLD %></option>
 				</select>
 				<span class="help-inline" id="licenError"></span>
 			</div>
@@ -491,15 +489,18 @@
 			</div>
 		</div>
 
-		<div class="control-group">
-			<label class="control-label labelbold">
+		<% if (StringUtils.isNotEmpty(fromPage)) { %>
+			<div class="control-group">
+				<label class="control-label labelbold">
 					<s:text name='lbl.hdr.adm.cust.url'/>
-			</label>
-			<div class="controls">
-				<input id="repUrl" class="datealign" type="text" name="repoURL"
-				    value="<%= repoUrl %>">
+				</label>
+				<div class="controls">
+					<label class="control-label labelbold" style="width: auto;">
+						<%= repoUrl %>
+					</label>
+				</div>
 			</div>
-		</div>
+		<% } %>
 	</div>
 
 	<div class="bottom_button">
@@ -516,8 +517,8 @@
 	
 	<!-- Hidden Fields -->
 	<input type="hidden" name="fromPage" value="<%= StringUtils.isNotEmpty(fromPage) ? fromPage : "" %>"/>
-	<input type="hidden" name="customerId" value="<%= customer != null ? customer.getId() : "" %>"/>
-	<input type="hidden" name="oldName" value="<%= customer != null ? customer.getName() : "" %>"/>
+	<input type="hidden" name="customerId" value="<%= id %>"/>
+	<input type="hidden" name="oldName" value="<%= name %>"/>
 </form>
 
 <script type="text/javascript">
@@ -575,7 +576,6 @@
 				buttonImage : "images/calendar.gif",
 				buttonImageOnly : true
 			});
-	
 		});
 	});
 	
