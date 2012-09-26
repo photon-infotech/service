@@ -50,6 +50,7 @@ import org.springframework.stereotype.Component;
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.Technology;
+import com.photon.phresco.commons.model.WebService;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.exception.PhrescoWebServiceException;
 import com.photon.phresco.service.api.Converter;
@@ -245,6 +246,293 @@ public class ComponentService extends DbService {
 		return Response.status(Response.Status.OK).build();
 	}
 	
+	/**
+	 * Returns the list of technologies
+	 * @return
+	 */
+	@GET
+	@Path (REST_API_TECHNOLOGIES)
+	@Produces (MediaType.APPLICATION_JSON)
+	public Response findTechnologies(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.findTechnologies() " + customerId);
+	    }
+	    
+	    try {
+			Query query = createCustomerIdQuery(customerId);
+		    List<TechnologyDAO> techDAOList = mongoOperation.find(TECHNOLOGIES_COLLECTION_NAME, query, TechnologyDAO.class);
+		    
+		    List<Technology> techList = new ArrayList<Technology>(techDAOList.size() * 2);
+			Converter<TechnologyDAO, Technology> technologyConverter = 
+		          (Converter<TechnologyDAO, Technology>) ConvertersFactory.getConverter(TechnologyDAO.class);
+
+			for (TechnologyDAO technologyDAO : techDAOList) {
+				System.out.println("techDAO " + technologyDAO);
+				Technology technology = technologyConverter.convertDAOToObject(technologyDAO, mongoOperation);
+				techList.add(technology);
+			}
+			
+			//if empty send error message
+			if (techList.isEmpty()) {
+				return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();	
+			}
+			
+			return Response.status(Response.Status.OK).entity(techList).build();
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00005, TECHNOLOGIES_COLLECTION_NAME);
+		}
+    	 
+	}
+	
+	/**
+	 * Creates the list of technologies
+	 * @param technologies
+	 * @throws IOException 
+	 * @throws PhrescoException 
+	 */
+	@POST
+	@Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
+	@Path (REST_API_TECHNOLOGIES)
+	public Response createTechnologies(MultiPart multiPart) throws PhrescoException, IOException {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.createTechnologies(List<Technology> technologies)");
+	    }
+	    
+	    Map<Technology, List<BodyPart>> map = new HashMap<Technology, List<BodyPart>>(); 
+	    List<BodyPart> techs = new ArrayList<BodyPart>();
+	    List<BodyPart> entities = new ArrayList<BodyPart>();
+	    
+	    //To separete the object and binary file
+	    List<BodyPart> bodyParts = multiPart.getBodyParts();
+	    for (BodyPart bodyPart : bodyParts) {
+	        if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
+	            techs.add(bodyPart);
+	        } else {
+	            entities.add(bodyPart);
+	        }
+        }
+	    
+	    //To map the binary file with corresponding object
+	    List<BodyPart> foundBodyPart = null;
+	    for (BodyPart tech : techs) {
+	        foundBodyPart = new ArrayList<BodyPart>();
+            for (BodyPart bodyPart : entities) {
+                if (tech.getContentDisposition().getFileName().equals(bodyPart.getContentDisposition().getFileName())) {
+                    foundBodyPart.add(bodyPart);
+                }
+            }
+            
+            map.put(tech.getEntityAs(Technology.class), foundBodyPart);
+        } 
+	   
+	   //Iterate the content map for upload binaries
+       Set<Technology> keySet = map.keySet();
+	   for (Technology technology : keySet) {
+	       List<BodyPart> list = map.get(technology);
+	       createBinary(technology, list);
+	   }
+	        
+	   return Response.status(Response.Status.OK).build();
+	}
+	
+	private void createBinary(Technology technology, List<BodyPart> list) throws PhrescoException {
+
+		List<ArtifactGroupDAO> artifactGroups = new ArrayList<ArtifactGroupDAO>();
+		List<com.photon.phresco.commons.model.ArtifactInfo> artifactInfos = new ArrayList<com.photon.phresco.commons.model.ArtifactInfo>();
+		
+		Converter<ArtifactGroupDAO, ArtifactGroup> artifactConverter = 
+	            (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
+		
+		for (BodyPart bodyPart : list) {
+			
+			//check if this is archetype
+            ContentDisposition disposition = bodyPart.getContentDisposition();
+			Type contentType = Content.Type.valueOf(disposition.getType());
+
+            //Assuming there will be only one customer will be provided here for 2.0.0
+            //Need to handle multiple customer in future
+			String customerId = technology.getCustomerIds().get(0);
+			
+			BodyPartEntity bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
+			ArtifactGroup artifactinfo = technology.getArchetypeInfo();
+			if (!Content.Type.ARCHETYPE.equals(contentType)) {
+                artifactinfo = ServerUtil.getArtifactinfo(bodyPartEntity.getInputStream());
+            }
+			
+			//convert Artifact Group
+			ArtifactGroupDAO artfGrpDAO = artifactConverter.convertObjectToDAO(artifactinfo);
+			artifactGroups.add(artfGrpDAO);
+			
+			File appJarFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null);
+            uploadBinary(artifactinfo, appJarFile, customerId);
+            FileUtil.delete(appJarFile);
+        }
+		
+
+		Converter<TechnologyDAO, Technology> technologyConverter = 
+	          (Converter<TechnologyDAO, Technology>) ConvertersFactory.getConverter(TechnologyDAO.class);
+		TechnologyDAO techDAO = technologyConverter.convertObjectToDAO(technology);
+		
+        mongoOperation.insertList(ARTIFACT_INFO_COLLECTION_NAME, artifactInfos);
+        mongoOperation.insertList(ARTIFACT_GROUP_COLLECTION_NAME, artifactGroups);
+        mongoOperation.save(TECHNOLOGIES_COLLECTION_NAME, techDAO);
+    }
+	
+	
+    /**
+     * Upload binaries using the given artifact info
+     * @param archetypeInfo
+     * @param artifactFile
+     * @param customerId
+     * @return
+     * @throws PhrescoException
+     */
+    private boolean uploadBinary(ArtifactGroup archetypeInfo, File artifactFile, String customerId) throws PhrescoException {
+        File pomFile = ServerUtil.createPomFile(archetypeInfo);
+        
+        //Assuming there will be only one version for the artifactGroup
+        List<com.photon.phresco.commons.model.ArtifactInfo> versions = archetypeInfo.getVersions();
+        com.photon.phresco.commons.model.ArtifactInfo artifactInfo = versions.get(0);
+        
+		ArtifactInfo info = new ArtifactInfo(archetypeInfo.getGroupId(), archetypeInfo.getArtifactId(), archetypeInfo.getClassifier(), 
+                archetypeInfo.getPackaging(), artifactInfo.getVersion());
+		
+        info.setPomFile(pomFile);
+        boolean addArtifact = true;
+        //TODO:Need to upload the content into the repository
+//        boolean addArtifact = repositoryManager.addArtifact(info, artifactFile, customerId);
+        FileUtil.delete(pomFile);
+        return addArtifact;
+    }
+    
+
+
+    /**
+	 * Updates the list of technologies
+	 * @param technologies
+	 * @return
+	 */
+	@PUT
+	@Consumes (MediaType.APPLICATION_JSON)
+	@Produces (MediaType.APPLICATION_JSON)
+	@Path (REST_API_TECHNOLOGIES)
+	public Response updateTechnologies(List<Technology> technologies) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.updateTechnologies(List<Technology> technologies)");
+	    }
+		
+		try {
+			for (Technology tech : technologies) {
+				Technology techInfo = mongoOperation.findOne(TECHNOLOGIES_COLLECTION_NAME, 
+				        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(tech.getId())), Technology.class);
+				if (techInfo != null) {
+					mongoOperation.save(TECHNOLOGIES_COLLECTION_NAME , tech);
+				}
+			}
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
+		}
+		
+		return Response.status(Response.Status.OK).entity(technologies).build();
+	}
+	
+	/**
+	 * Deletes the list of technologies
+	 * @param technologies
+	 * @throws PhrescoException 
+	 */
+	@DELETE
+	@Path (REST_API_TECHNOLOGIES)
+	public void deleteTechnologies(List<Technology> technologies) throws PhrescoException {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.deleteTechnologies(List<WebService> technologies)");
+	    }
+		
+		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
+		S_LOGGER.error("PhrescoException Is" + phrescoException.getErrorMessage());
+		throw phrescoException;
+	}
+	
+	
+	/**
+	 * Get the technology by id for the given parameter
+	 * @param id
+	 * @return
+	 */
+	@GET
+	@Produces (MediaType.APPLICATION_JSON)
+	@Path (REST_API_TECHNOLOGIES + REST_API_PATH_ID)
+	public Response getTechnology(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.getTechnology(String id)" + id);
+	    }
+		
+		try {
+			Technology technology = mongoOperation.findOne(TECHNOLOGIES_COLLECTION_NAME, 
+			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), Technology.class);
+			if (technology != null) {
+				return Response.status(Response.Status.OK).entity(technology).build();
+			} 
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00005, TECHNOLOGIES_COLLECTION_NAME);
+		}
+		
+		return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
+	}
+	
+//	/**
+//	 * Updates the technology given by the parameter
+//	 * @param id
+//	 * @param technology
+//	 * @return
+//	 */
+//	@PUT
+//	@Consumes (MediaType.APPLICATION_JSON)
+//	@Produces (MediaType.APPLICATION_JSON)
+//	@Path (REST_API_TECHNOLOGIES + REST_API_PATH_ID)
+//	public Response updateTechnology(@PathParam(REST_API_PATH_PARAM_ID) String id , Technology technology) {
+//	    if (isDebugEnabled) {
+//	        S_LOGGER.debug("Entered into ComponentService.getTechnology(String id, Technology technology)" + id);
+//	    }
+//		
+//		try {
+//			if (id.equals(technology.getId())) {
+//				mongoOperation.save(TECHNOLOGIES_COLLECTION_NAME, technology);
+//				return Response.status(Response.Status.OK).entity(technology).build();
+//			} 
+//		} catch (Exception e) {
+//			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
+//		}
+//		
+//		return Response.status(Response.Status.BAD_REQUEST).entity(ERROR_MSG_ID_NOT_EQUAL).build();
+//	}
+	
+	/**
+	 * Deletes the server by id for the given parameter
+	 * @param id
+	 * @return 
+	 */
+	@DELETE
+	@Path (REST_API_TECHNOLOGIES + REST_API_PATH_ID)
+	public Response deleteTechnology(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.deleteTechnology(String id)" + id);
+	    }
+		
+		try {
+			mongoOperation.remove(TECHNOLOGIES_COLLECTION_NAME, 
+			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), Technology.class);
+			//TODO:Need to check usage before deletion
+			//TODO:Need to remove dependent objects
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
+		}
+		
+		return Response.status(Response.Status.OK).build();
+	}
+	
+    
+    
 //	/**
 //	 * Returns the list of settings
 //	 * @return
@@ -879,801 +1167,177 @@ public class ComponentService extends DbService {
 //		
 //		return Response.status(Response.Status.OK).build();
 //	}
-//	
-//	/**
-//	 * Returns the list of servers
-//	 * @return
-//	 */
-//	@GET
-//	@Path (REST_API_SERVERS)
-//	@Produces (MediaType.APPLICATION_JSON)
-//	public Response findServers(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.findServers()" + customerId);
-//	    }
-//		
-//		List<Server> serverList = new ArrayList<Server>();
-//		try {
-//			if (!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
-//				serverList= mongoOperation.find(SERVERS_COLLECTION_NAME, 
-//				        new Query(Criteria.where (REST_QUERY_CUSTOMERID).is(customerId)), Server.class);
-//			}
-//			serverList.addAll(mongoOperation.find(SERVERS_COLLECTION_NAME, 
-//			        new Query(Criteria.where(REST_QUERY_CUSTOMERID)
-//			        .is(DEFAULT_CUSTOMER_NAME)), Server.class));
-//			return Response.status(Response.Status.OK).entity(serverList).build();
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00005, SERVERS_COLLECTION_NAME);
-//		}
-//	}
-//	
-//	/**
-//	 * Creates the list of servers
-//	 * @param servers
-//	 * @return 
-//	 */
-//	@POST
-//	@Consumes (MediaType.APPLICATION_JSON)
-//	@Path (REST_API_SERVERS)
-//	public Response createServers(List<Server> servers) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.createServers(List<Server> servers)");
-//	    }
-//		
-//		try {
-//			mongoOperation.insertList(SERVERS_COLLECTION_NAME , servers);
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00005, INSERT);
-//		}
-//		
-//		return Response.status(Response.Status.CREATED).build();
-//	}
-//	
-//	/**
-//	 * Updates the list of servers
-//	 * @param servers
-//	 * @return
-//	 */
-//	@PUT
-//	@Consumes (MediaType.APPLICATION_JSON)
-//	@Produces (MediaType.APPLICATION_JSON)
-//	@Path (REST_API_SERVERS)
-//	public Response updateServers(List<Server> servers) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.updateServers(List<Server> servers)");
-//	    }
-//		
-//		try {
-//			for (Server server : servers) {
-//				Server serverInfo = mongoOperation.findOne(SERVERS_COLLECTION_NAME , 
-//				        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(server.getId())), Server.class);
-//				if (serverInfo != null) {
-//					mongoOperation.save(SERVERS_COLLECTION_NAME , server);
-//				}
-//			}
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
-//		}
-//		
-//		return Response.status(Response.Status.OK).entity(servers).build();
-//	}
-//	
-//	/**
-//	 * Deletes the list of servers
-//	 * @param servers
-//	 * @throws PhrescoException 
-//	 */
-//	@DELETE
-//	@Path (REST_API_SERVERS)
-//	public void deleteServers(List<Server> servers) throws PhrescoException {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.deleteServers(List<Server> servers)");
-//	    }
-//		
-//		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-//		S_LOGGER.error("PhrescoException Is" + phrescoException.getErrorMessage());
-//		throw phrescoException;
-//	}
-//	
-//	/**
-//	 * Get the server by id for the given parameter
-//	 * @param id
-//	 * @return
-//	 */
-//	@GET
-//	@Produces (MediaType.APPLICATION_JSON)
-//	@Path (REST_API_SERVERS + REST_API_PATH_ID)
-//	public Response getServer(@PathParam(REST_API_PATH_PARAM_ID) String id) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.getServer(String id)" + id);
-//	    }
-//
-//	    try {
-//			Server server = mongoOperation.findOne(SERVERS_COLLECTION_NAME, 
-//			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), Server.class);
-//			if (server != null ) {
-//				return  Response.status(Response.Status.OK).entity(server).build();
-//			} 
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00005, SERVERS_COLLECTION_NAME);
-//		}
-//		
-//		return Response.status(Response.Status.OK).entity(ERROR_MSG_NOT_FOUND).build();
-//	}
-//	
-//	/**
-//	 * Updates the server given by the parameter
-//	 * @param id
-//	 * @param server
-//	 * @return
-//	 */
-//	@PUT
-//	@Consumes (MediaType.APPLICATION_JSON)
-//	@Produces (MediaType.APPLICATION_JSON)
-//	@Path (REST_API_SERVERS + REST_API_PATH_ID)
-//	public Response updateServer(@PathParam(REST_API_PATH_PARAM_ID) String id , Server server) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.updateServer(String id, Server server)" + id);
-//	    }
-//		
-//		try {
-//			if (id.equals(server.getId())) {
-//				mongoOperation.save(SERVERS_COLLECTION_NAME, server);
-//				return Response.status(Response.Status.OK).entity(server).build();
-//			} 
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
-//		}
-//		
-//		return Response.status(Response.Status.OK).entity(ERROR_MSG_ID_NOT_EQUAL).build();
-//	}
-//	
-//	/**
-//	 * Deletes the server by id for the given parameter
-//	 * @param id
-//	 * @return 
-//	 */
-//	@DELETE
-//	@Path (REST_API_SERVERS + REST_API_PATH_ID)
-//	public Response deleteServer(@PathParam(REST_API_PATH_PARAM_ID) String id) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.deleteServer(String id)" + id);
-//	    }
-//		
-//		try {
-//			mongoOperation.remove(SERVERS_COLLECTION_NAME, 
-//			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), Server.class);
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
-//		}
-//		
-//		return Response.status(Response.Status.OK).build();
-//	}
-//	
-//	/**
-//	 * Returns the list of databases
-//	 * @return
-//	 */
-//	@GET
-//	@Path (REST_API_DATABASES)
-//	@Produces (MediaType.APPLICATION_JSON)
-//	public Response findDatabases(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.deleteServer(String id)");
-//	    }
-//		
-//		List<Database> databaseList = new ArrayList<Database>();
-//		try {
-//			if (!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
-//				databaseList= mongoOperation.find(DATABASES_COLLECTION_NAME, 
-//				        new Query(Criteria.where (REST_QUERY_CUSTOMERID).is(customerId)), Database.class);
-//			}
-//			databaseList.addAll(mongoOperation.find(DATABASES_COLLECTION_NAME, 
-//			        new Query(Criteria.where(REST_QUERY_CUSTOMERID)
-//			        .is(DEFAULT_CUSTOMER_NAME)), Database.class));
-//			
-//			return  Response.status(Response.Status.OK).entity(databaseList).build();
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00005, DATABASES_COLLECTION_NAME);
-//		}
-//	}
-//	
-//	
-//	/**
-//	 * Creates the list of databases
-//	 * @param databases
-//	 * @return 
-//	 */
-//	@POST
-//	@Consumes (MediaType.APPLICATION_JSON)
-//	@Path (REST_API_DATABASES)
-//	public Response createDatabases(List<Database> databases) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.createDatabases(List<Database> databases)");
-//	    }
-//		
-//		try {
-//			mongoOperation.insertList(DATABASES_COLLECTION_NAME , databases);
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
-//		}
-//		
-//		return Response.status(Response.Status.OK).build();
-//	}
-//	
-//	/**
-//	 * Updates the list of databases
-//	 * @param databases
-//	 * @return
-//	 */
-//	@PUT
-//	@Consumes (MediaType.APPLICATION_JSON)
-//	@Produces (MediaType.APPLICATION_JSON)
-//	@Path (REST_API_DATABASES)
-//	public Response updateDatabases(List<Database> databases) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.updateDatabases(List<Database> databases)");
-//	    }
-//		
-//		try {
-//			for (Database dataBase : databases) {
-//				Database dataBaseInfo = mongoOperation.findOne(DATABASES_COLLECTION_NAME , 
-//				        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(dataBase.getId())), Database.class);
-//				if (dataBaseInfo != null) {
-//					mongoOperation.save(DATABASES_COLLECTION_NAME , dataBase);
-//				}
-//			}
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
-//		}
-//		
-//		return Response.status(Response.Status.OK).entity(databases).build();
-//	}
-//	
-//	/**
-//	 * Deletes the list of databases
-//	 * @param databases
-//	 * @throws PhrescoException 
-//	 */
-//	@DELETE
-//	@Path (REST_API_DATABASES)
-//	public void deleteDatabases(List<Database> databases) throws PhrescoException {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.deleteDatabases(List<Database> databases)");
-//	    }
-//		
-//		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-//		S_LOGGER.error("PhrescoException Is" + phrescoException.getErrorMessage());
-//		throw phrescoException;
-//	}
-//	
-//	/**
-//	 * Get the database by id for the given parameter
-//	 * @param id
-//	 * @return
-//	 */
-//	@GET
-//	@Produces (MediaType.APPLICATION_JSON)
-//	@Path (REST_API_DATABASES + REST_API_PATH_ID)
-//	public Response getDatabase(@PathParam(REST_API_PATH_PARAM_ID) String id) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.getDatabase(String id)" + id);
-//	    }
-//		
-//		try {
-//			Database database = mongoOperation.findOne(DATABASES_COLLECTION_NAME, 
-//			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), Database.class);
-//			if (database != null) {
-//				return Response.status(Response.Status.OK).entity(database).build();
-//			} 
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00005, DATABASES_COLLECTION_NAME);
-//		}
-//		
-//		return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
-//	}
-//	
-//	/**
-//	 * Updates the database given by the parameter
-//	 * @param id
-//	 * @param database
-//	 * @return
-//	 */
-//	@PUT
-//	@Consumes (MediaType.APPLICATION_JSON)
-//	@Produces (MediaType.APPLICATION_JSON)
-//	@Path (REST_API_DATABASES + REST_API_PATH_ID)
-//	public Response updateDatabase(@PathParam(REST_API_PATH_PARAM_ID) String id , Database database) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.updateDatabase(String id, Database database)" + id);
-//	    }
-//		
-//		try {
-//			if (id.equals(database.getId())) {
-//				mongoOperation.save(DATABASES_COLLECTION_NAME, database);
-//				return Response.status(Response.Status.OK).entity(database).build(); 
-//			} 
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
-//		}
-//		
-//		return Response.status(Response.Status.BAD_REQUEST).entity(ERROR_MSG_ID_NOT_EQUAL).build();
-//	}
-//	
-//	/**
-//	 * Deletes the server by id for the given parameter
-//	 * @param id
-//	 * @return 
-//	 */
-//	@DELETE
-//	@Path (REST_API_DATABASES + REST_API_PATH_ID)
-//	public Response deleteDatabase(@PathParam(REST_API_PATH_PARAM_ID) String id) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.deleteDatabase(String id)" + id);
-//	    }
-//		
-//		try {
-//			mongoOperation.remove(DATABASES_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), Database.class);
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
-//		}
-//		
-//		return Response.status(Response.Status.OK).build();
-//	}
-//	
-//	/**
-//	 * Returns the list of webservices
-//	 * @return
-//	 */
-//	@GET
-//	@Path (REST_API_WEBSERVICES)
-//	@Produces (MediaType.APPLICATION_JSON)
-//	public Response findWebServices(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.findWebServices()");
-//	    }
-//		
-//		List<WebService> webServiceList = new ArrayList<WebService>();
-//		try {
-//			if (!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
-//				webServiceList= mongoOperation.find(WEBSERVICES_COLLECTION_NAME, 
-//				        new Query(Criteria.where (REST_QUERY_CUSTOMERID).is(customerId)), WebService.class);
-//			}
-//			webServiceList.addAll(mongoOperation.find(WEBSERVICES_COLLECTION_NAME, 
-//			        new Query(Criteria.where(REST_QUERY_CUSTOMERID)
-//			        .is(DEFAULT_CUSTOMER_NAME)), WebService.class));
-//			
-//			return  Response.status(Response.Status.OK).entity(webServiceList).build();
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00005, WEBSERVICES_COLLECTION_NAME);
-//		}
-//	}
-//	
-//	/**
-//	 * Creates the list of webservices
-//	 * @param webServices
-//	 * @return 
-//	 */
-//	@POST
-//	@Consumes (MediaType.APPLICATION_JSON)
-//	@Path (REST_API_WEBSERVICES)
-//	public Response createWebServices(List<WebService> webServices) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.createWebServices(List<WebService> webServices)");
-//	    }
-//		
-//		try {
-//			mongoOperation.insertList(WEBSERVICES_COLLECTION_NAME , webServices);
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
-//		}
-//		
-//		return Response.status(Response.Status.OK).build();
-//	}
-//	
-//	/**
-//	 * Updates the list of webservices
-//	 * @param webServices
-//	 * @return
-//	 */
-//	@PUT
-//	@Consumes (MediaType.APPLICATION_JSON)
-//	@Produces (MediaType.APPLICATION_JSON)
-//	@Path (REST_API_WEBSERVICES)
-//	public Response updateWebServices(List<WebService> webServices) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.updateWebServices(List<WebService> webServices)");
-//	    }
-//		
-//		try {
-//			for (WebService webService : webServices) {
-//				WebService webServiceInfo = mongoOperation.findOne(WEBSERVICES_COLLECTION_NAME , 
-//				        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(webService.getId())), WebService.class);
-//				if (webServiceInfo != null) {
-//					mongoOperation.save(WEBSERVICES_COLLECTION_NAME , webService);
-//				}
-//			}
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
-//		}
-//		
-//		return Response.status(Response.Status.OK).entity(webServices).build();
-//	}
-//	
-//	/**
-//	 * Deletes the list of webservices
-//	 * @param webServices
-//	 * @throws PhrescoException 
-//	 */
-//	@DELETE
-//	@Path (REST_API_WEBSERVICES)
-//	public void deleteWebServices(List<WebService> webServices) throws PhrescoException {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.deleteWebServices(List<WebService> webServices)");
-//	    }
-//		
-//		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-//		S_LOGGER.error("PhrescoException Is" + phrescoException.getErrorMessage());
-//		throw phrescoException;
-//	}
-//	
-//	/**
-//	 * Get the database by id for the given parameter
-//	 * @param id
-//	 * @return
-//	 */
-//	@GET
-//	@Produces (MediaType.APPLICATION_JSON)
-//	@Path (REST_API_WEBSERVICES + REST_API_PATH_ID)
-//	public Response getWebService(@PathParam(REST_API_PATH_PARAM_ID) String id) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.getWebService(String id)" + id);
-//	    }
-//		
-//		try {
-//			WebService webService = mongoOperation.findOne(WEBSERVICES_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), WebService.class);
-//			if (webService != null) {
-//				return Response.status(Response.Status.OK).entity(webService).build();
-//			} 
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00005, WEBSERVICES_COLLECTION_NAME);
-//		}
-//		
-//		return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
-//	}
-//	
-//	/**
-//	 * Updates the database given by the parameter
-//	 * @param id
-//	 * @param webService
-//	 * @return
-//	 */
-//	@PUT
-//	@Consumes (MediaType.APPLICATION_JSON)
-//	@Produces (MediaType.APPLICATION_JSON)
-//	@Path (REST_API_WEBSERVICES + REST_API_PATH_ID)
-//	public Response updateWebService(@PathParam(REST_API_PATH_PARAM_ID) String id , WebService webService) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.updateWebService(String id, WebService webService)" + id);
-//	    }
-//		
-//		try {
-//			if (id.equals(webService.getId())) {
-//				mongoOperation.save(WEBSERVICES_COLLECTION_NAME, webService);
-//				return Response.status(Response.Status.OK).entity(webService).build();
-//			} 
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
-//		}
-//		
-//		return Response.status(Response.Status.BAD_REQUEST).entity(ERROR_MSG_ID_NOT_EQUAL).build();
-//	}
-//	
-//	/**
-//	 * Deletes the server by id for the given parameter
-//	 * @param id
-//	 * @return 
-//	 */
-//	@DELETE
-//	@Path (REST_API_WEBSERVICES + REST_API_PATH_ID)
-//	public Response deleteWebService(@PathParam(REST_API_PATH_PARAM_ID) String id) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.deleteWebService(String id)" + id);
-//	    }
-//		
-//		try {
-//			mongoOperation.remove(WEBSERVICES_COLLECTION_NAME, 
-//			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), WebService.class);
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
-//		}
-//		
-//		return Response.status(Response.Status.OK).build();
-//	}
-//	
+
 	/**
-	 * Returns the list of technologies
+	 * Returns the list of webservices
 	 * @return
 	 */
 	@GET
-	@Path (REST_API_TECHNOLOGIES)
+	@Path (REST_API_WEBSERVICES)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findTechnologies(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
+	public Response findWebServices(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.findTechnologies()");
+	        S_LOGGER.debug("Entered into ComponentService.findWebServices()");
 	    }
-	    
-	    try {
-		    System.out.println("findTechnlogies " + customerId);
-	
-			Query query = createCustomerIdQuery(customerId);
-		    List<TechnologyDAO> techDAOList = mongoOperation.find(TECHNOLOGIES_COLLECTION_NAME, query, TechnologyDAO.class);
-		    
-		    List<Technology> techList = new ArrayList<Technology>(techDAOList.size() * 2);
-			Converter<TechnologyDAO, Technology> technologyConverter = 
-		          (Converter<TechnologyDAO, Technology>) ConvertersFactory.getConverter(TechnologyDAO.class);
-
-			for (TechnologyDAO technologyDAO : techDAOList) {
-				System.out.println("techDAO " + technologyDAO);
-				Technology technology = technologyConverter.convertDAOToObject(technologyDAO, mongoOperation);
-				techList.add(technology);
+		
+		List<WebService> webServiceList = new ArrayList<WebService>();
+		try {
+			if (!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
+				webServiceList= mongoOperation.find(WEBSERVICES_COLLECTION_NAME, 
+				        new Query(Criteria.where (REST_QUERY_CUSTOMERID).is(customerId)), WebService.class);
 			}
+			webServiceList.addAll(mongoOperation.find(WEBSERVICES_COLLECTION_NAME, 
+			        new Query(Criteria.where(REST_QUERY_CUSTOMERID)
+			        .is(DEFAULT_CUSTOMER_NAME)), WebService.class));
 			
-			//if empty send error message
-			if (techList.isEmpty()) {
-				return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();	
-			}
-			
-			return Response.status(Response.Status.OK).entity(techList).build();
+			return  Response.status(Response.Status.OK).entity(webServiceList).build();
 		} catch (Exception e) {
-			throw new PhrescoWebServiceException(e, EX_PHEX00005, TECHNOLOGIES_COLLECTION_NAME);
+			throw new PhrescoWebServiceException(e, EX_PHEX00005, WEBSERVICES_COLLECTION_NAME);
 		}
-    	 
 	}
 	
 	/**
-	 * Creates the list of technologies
-	 * @param technologies
-	 * @throws IOException 
-	 * @throws PhrescoException 
+	 * Creates the list of webservices
+	 * @param webServices
+	 * @return 
 	 */
 	@POST
-	@Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
-	@Path (REST_API_TECHNOLOGIES)
-	public Response createTechnologies(MultiPart multiPart) throws PhrescoException, IOException {
+	@Consumes (MediaType.APPLICATION_JSON)
+	@Path (REST_API_WEBSERVICES)
+	public Response createWebServices(List<WebService> webServices) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.createTechnologies(List<Technology> technologies)");
+	        S_LOGGER.debug("Entered into ComponentService.createWebServices(List<WebService> webServices)");
 	    }
-	    
-	    Map<Technology, List<BodyPart>> map = new HashMap<Technology, List<BodyPart>>(); 
-	    List<BodyPart> techs = new ArrayList<BodyPart>();
-	    List<BodyPart> entities = new ArrayList<BodyPart>();
-	    
-	    //To separete the object and binary file
-	    List<BodyPart> bodyParts = multiPart.getBodyParts();
-	    for (BodyPart bodyPart : bodyParts) {
-	        if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
-	            techs.add(bodyPart);
-	        } else {
-	            entities.add(bodyPart);
-	        }
-        }
-	    
-	    //To map the binary file with corresponding object
-	    List<BodyPart> foundBodyPart = null;
-	    for (BodyPart tech : techs) {
-	        foundBodyPart = new ArrayList<BodyPart>();
-            for (BodyPart bodyPart : entities) {
-                if (tech.getContentDisposition().getFileName().equals(bodyPart.getContentDisposition().getFileName())) {
-                    foundBodyPart.add(bodyPart);
-                }
-            }
-            
-            map.put(tech.getEntityAs(Technology.class), foundBodyPart);
-        } 
-	   
-	   //Iterate the content map for upload binaries
-       Set<Technology> keySet = map.keySet();
-	   for (Technology technology : keySet) {
-	       List<BodyPart> list = map.get(technology);
-	       createBinary(technology, list);
-	   }
-	        
-	   return Response.status(Response.Status.OK).build();
+		
+		try {
+			mongoOperation.insertList(WEBSERVICES_COLLECTION_NAME , webServices);
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
+		}
+		
+		return Response.status(Response.Status.OK).build();
 	}
 	
-	private void createBinary(Technology technology, List<BodyPart> list) throws PhrescoException {
-
-		List<ArtifactGroupDAO> artifactGroups = new ArrayList<ArtifactGroupDAO>();
-		List<com.photon.phresco.commons.model.ArtifactInfo> artifactInfos = new ArrayList<com.photon.phresco.commons.model.ArtifactInfo>();
+	/**
+	 * Updates the list of webservices
+	 * @param webServices
+	 * @return
+	 */
+	@PUT
+	@Consumes (MediaType.APPLICATION_JSON)
+	@Produces (MediaType.APPLICATION_JSON)
+	@Path (REST_API_WEBSERVICES)
+	public Response updateWebServices(List<WebService> webServices) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.updateWebServices(List<WebService> webServices)");
+	    }
 		
-		Converter<ArtifactGroupDAO, ArtifactGroup> artifactConverter = 
-	            (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
+		try {
+			for (WebService webService : webServices) {
+				WebService webServiceInfo = mongoOperation.findOne(WEBSERVICES_COLLECTION_NAME , 
+				        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(webService.getId())), WebService.class);
+				if (webServiceInfo != null) {
+					mongoOperation.save(WEBSERVICES_COLLECTION_NAME , webService);
+				}
+			}
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
+		}
 		
-		for (BodyPart bodyPart : list) {
-			
-			//check if this is archetype
-            ContentDisposition disposition = bodyPart.getContentDisposition();
-			Type contentType = Content.Type.valueOf(disposition.getType());
-
-            //Assuming there will be only one customer will be provided here for 2.0.0
-            //Need to handle multiple customer in future
-			String customerId = technology.getCustomerIds().get(0);
-			
-			BodyPartEntity bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
-			ArtifactGroup artifactinfo = technology.getArchetypeInfo();
-			if (!Content.Type.ARCHETYPE.equals(contentType)) {
-                artifactinfo = ServerUtil.getArtifactinfo(bodyPartEntity.getInputStream());
-            }
-			
-			//convert Artifact Group
-			ArtifactGroupDAO artfGrpDAO = artifactConverter.convertObjectToDAO(artifactinfo);
-			artifactGroups.add(artfGrpDAO);
-			
-			File appJarFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null);
-            uploadBinary(artifactinfo, appJarFile, customerId);
-            FileUtil.delete(appJarFile);
-        }
-		
-
-		Converter<TechnologyDAO, Technology> technologyConverter = 
-	          (Converter<TechnologyDAO, Technology>) ConvertersFactory.getConverter(TechnologyDAO.class);
-		TechnologyDAO techDAO = technologyConverter.convertObjectToDAO(technology);
-		
-        mongoOperation.insertList(ARTIFACT_INFO_COLLECTION_NAME, artifactInfos);
-        mongoOperation.insertList(ARTIFACT_GROUP_COLLECTION_NAME, artifactGroups);
-        mongoOperation.save(TECHNOLOGIES_COLLECTION_NAME, techDAO);
-    }
+		return Response.status(Response.Status.OK).entity(webServices).build();
+	}
 	
-	
-    /**
-     * Upload binaries using the given artifact info
-     * @param archetypeInfo
-     * @param artifactFile
-     * @param customerId
-     * @return
-     * @throws PhrescoException
-     */
-    private boolean uploadBinary(ArtifactGroup archetypeInfo, File artifactFile, String customerId) throws PhrescoException {
-        File pomFile = ServerUtil.createPomFile(archetypeInfo);
-        
-        //Assuming there will be only one version for the artifactGroup
-        List<com.photon.phresco.commons.model.ArtifactInfo> versions = archetypeInfo.getVersions();
-        com.photon.phresco.commons.model.ArtifactInfo artifactInfo = versions.get(0);
-        
-		ArtifactInfo info = new ArtifactInfo(archetypeInfo.getGroupId(), archetypeInfo.getArtifactId(), archetypeInfo.getClassifier(), 
-                archetypeInfo.getPackaging(), artifactInfo.getVersion());
+	/**
+	 * Deletes the list of webservices
+	 * @param webServices
+	 * @throws PhrescoException 
+	 */
+	@DELETE
+	@Path (REST_API_WEBSERVICES)
+	public void deleteWebServices(List<WebService> webServices) throws PhrescoException {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.deleteWebServices(List<WebService> webServices)");
+	    }
 		
-        info.setPomFile(pomFile);
-        boolean addArtifact = true;
-        //TODO:Need to upload the content into the repository
-//        boolean addArtifact = repositoryManager.addArtifact(info, artifactFile, customerId);
-        FileUtil.delete(pomFile);
-        return addArtifact;
-    }
-    
-//
-//    /**
-//	 * Updates the list of technologies
-//	 * @param technologies
-//	 * @return
-//	 */
-//	@PUT
-//	@Consumes (MediaType.APPLICATION_JSON)
-//	@Produces (MediaType.APPLICATION_JSON)
-//	@Path (REST_API_TECHNOLOGIES)
-//	public Response updateTechnologies(List<Technology> technologies) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.updateTechnologies(List<Technology> technologies)");
-//	    }
-//		
-//		try {
-//			for (Technology tech : technologies) {
-//				Technology techInfo = mongoOperation.findOne(TECHNOLOGIES_COLLECTION_NAME , 
-//				        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(tech.getId())), Technology.class);
-//				if (techInfo != null) {
-//					mongoOperation.save(TECHNOLOGIES_COLLECTION_NAME , tech);
-//				}
-//			}
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
-//		}
-//		
-//		return Response.status(Response.Status.OK).entity(technologies).build();
-//	}
-//	
-//	/**
-//	 * Deletes the list of technologies
-//	 * @param technologies
-//	 * @throws PhrescoException 
-//	 */
-//	@DELETE
-//	@Path (REST_API_TECHNOLOGIES)
-//	public void deleteTechnologies(List<WebService> technologies) throws PhrescoException {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.deleteTechnologies(List<WebService> technologies)");
-//	    }
-//		
-//		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-//		S_LOGGER.error("PhrescoException Is" + phrescoException.getErrorMessage());
-//		throw phrescoException;
-//	}
-//	
-//	/**
-//	 * Get the technology by id for the given parameter
-//	 * @param id
-//	 * @return
-//	 */
-//	@GET
-//	@Produces (MediaType.APPLICATION_JSON)
-//	@Path (REST_API_TECHNOLOGIES + REST_API_PATH_ID)
-//	public Response getTechnology(@PathParam(REST_API_PATH_PARAM_ID) String id) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.getTechnology(String id)" + id);
-//	    }
-//		
-//		try {
-//			Technology technology = mongoOperation.findOne(TECHNOLOGIES_COLLECTION_NAME, 
-//			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), Technology.class);
-//			if (technology != null) {
-//				return Response.status(Response.Status.OK).entity(technology).build();
-//			} 
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00005, TECHNOLOGIES_COLLECTION_NAME);
-//		}
-//		
-//		return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
-//	}
-//	
-//	/**
-//	 * Updates the technology given by the parameter
-//	 * @param id
-//	 * @param technology
-//	 * @return
-//	 */
-//	@PUT
-//	@Consumes (MediaType.APPLICATION_JSON)
-//	@Produces (MediaType.APPLICATION_JSON)
-//	@Path (REST_API_TECHNOLOGIES + REST_API_PATH_ID)
-//	public Response updateTechnology(@PathParam(REST_API_PATH_PARAM_ID) String id , Technology technology) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.getTechnology(String id, Technology technology)" + id);
-//	    }
-//		
-//		try {
-//			if (id.equals(technology.getId())) {
-//				mongoOperation.save(TECHNOLOGIES_COLLECTION_NAME, technology);
-//				return Response.status(Response.Status.OK).entity(technology).build();
-//			} 
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
-//		}
-//		
-//		return Response.status(Response.Status.BAD_REQUEST).entity(ERROR_MSG_ID_NOT_EQUAL).build();
-//	}
-//	
-//	/**
-//	 * Deletes the server by id for the given parameter
-//	 * @param id
-//	 * @return 
-//	 */
-//	@DELETE
-//	@Path (REST_API_TECHNOLOGIES + REST_API_PATH_ID)
-//	public Response deleteTechnology(@PathParam(REST_API_PATH_PARAM_ID) String id) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.deleteTechnology(String id)" + id);
-//	    }
-//		
-//		try {
-//			mongoOperation.remove(TECHNOLOGIES_COLLECTION_NAME, 
-//			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), Technology.class);
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
-//		}
-//		
-//		return Response.status(Response.Status.OK).build();
-//	}
-//	
+		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
+		S_LOGGER.error("PhrescoException Is" + phrescoException.getErrorMessage());
+		throw phrescoException;
+	}
+	
+	/**
+	 * Get the database by id for the given parameter
+	 * @param id
+	 * @return
+	 */
+	@GET
+	@Produces (MediaType.APPLICATION_JSON)
+	@Path (REST_API_WEBSERVICES + REST_API_PATH_ID)
+	public Response getWebService(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.getWebService(String id)" + id);
+	    }
+		
+		try {
+			WebService webService = mongoOperation.findOne(WEBSERVICES_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), WebService.class);
+			if (webService != null) {
+				return Response.status(Response.Status.OK).entity(webService).build();
+			} 
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00005, WEBSERVICES_COLLECTION_NAME);
+		}
+		
+		return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
+	}
+	
+	/**
+	 * Updates the database given by the parameter
+	 * @param id
+	 * @param webService
+	 * @return
+	 */
+	@PUT
+	@Consumes (MediaType.APPLICATION_JSON)
+	@Produces (MediaType.APPLICATION_JSON)
+	@Path (REST_API_WEBSERVICES + REST_API_PATH_ID)
+	public Response updateWebService(@PathParam(REST_API_PATH_PARAM_ID) String id , WebService webService) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.updateWebService(String id, WebService webService)" + id);
+	    }
+		
+		try {
+			if (id.equals(webService.getId())) {
+				mongoOperation.save(WEBSERVICES_COLLECTION_NAME, webService);
+				return Response.status(Response.Status.OK).entity(webService).build();
+			} 
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
+		}
+		
+		return Response.status(Response.Status.BAD_REQUEST).entity(ERROR_MSG_ID_NOT_EQUAL).build();
+	}
+	
+	/**
+	 * Deletes the server by id for the given parameter
+	 * @param id
+	 * @return 
+	 */
+	@DELETE
+	@Path (REST_API_WEBSERVICES + REST_API_PATH_ID)
+	public Response deleteWebService(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.deleteWebService(String id)" + id);
+	    }
+		
+		try {
+			mongoOperation.remove(WEBSERVICES_COLLECTION_NAME, 
+			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), WebService.class);
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
+		}
+		
+		return Response.status(Response.Status.OK).build();
+	}
+
 //	/**
 //     * Returns the list of downloadInfo
 //     * @return
