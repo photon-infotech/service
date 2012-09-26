@@ -20,14 +20,16 @@
 package com.photon.phresco.service.admin.actions.components;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.commons.model.ApplicationType;
+import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
@@ -38,14 +40,16 @@ public class ApplicationTypes extends ServiceBaseAction {
 	private static final Logger S_LOGGER = Logger.getLogger(ApplicationTypes.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 
-	private String name = null;
-	private String description = null;
-	private String nameError = null;
-	private boolean errorFound = false;
-	private String fromPage = null;
-	private String appTypeId = null;
-	private String oldName = null;
-	private String customerId = null;
+	private String customerId = "";
+	
+	private String name = "";
+	private String description = "";
+	
+	private String appTypeId = "";
+	private String oldName = "";
+	
+	private String nameError = "";
+    private boolean errorFound = false;
 
     public String list() throws PhrescoException {
 	    if (isDebugEnabled) {
@@ -98,10 +102,10 @@ public class ApplicationTypes extends ServiceBaseAction {
 			ApplicationType appType = new ApplicationType();
 			appType.setName(name);
 			appType.setDescription(description);
-			appType.setId(customerId);
+			appType.setCustomerIds(Arrays.asList(customerId));
 			appTypes.add(appType);
 			ClientResponse clientResponse = getServiceManager().createApplicationTypes(appTypes, customerId);
-			if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200 && clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
+			if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200 && clientResponse.getStatus() != ServiceConstants.RES_CODE_201) {
 				addActionError(getText(APPLNTYPES_NOT_ADDED, Collections.singletonList(name)));
 			} else {
 				addActionMessage(getText(APPLNTYPES_ADDED, Collections.singletonList(name)));
@@ -122,8 +126,8 @@ public class ApplicationTypes extends ServiceBaseAction {
 			ApplicationType appType = new ApplicationType();
 			appType.setName(name);
 			appType.setDescription(description);
+			appType.setCustomerIds(Arrays.asList(customerId));
 			appType.setId(appTypeId);
-			appType.setId(customerId);
 			getServiceManager().updateApplicationType(appType, appTypeId, customerId);
 		} catch(Exception e)  {
 			throw new PhrescoException(e);
@@ -139,7 +143,7 @@ public class ApplicationTypes extends ServiceBaseAction {
 
 		try {
 			String[] appTypeIds = getHttpRequest().getParameterValues(REQ_APP_TYPEID);
-			if (appTypeIds != null) {
+			if (ArrayUtils.isNotEmpty(appTypeIds)) {
 				for (String appTypeId : appTypeIds) {
 					ClientResponse clientResponse = getServiceManager().deleteApplicationType(appTypeId, customerId);
 					if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
@@ -211,14 +215,6 @@ public class ApplicationTypes extends ServiceBaseAction {
 
 	public void setAppTypeId(String appTypeId) {
 		this.appTypeId = appTypeId;
-	}
-
-	public String getFromPage() {
-		return fromPage;
-	}
-
-	public void setFromPage(String fromPage) {
-		this.fromPage = fromPage;
 	}
 
 	public String getOldName() {
