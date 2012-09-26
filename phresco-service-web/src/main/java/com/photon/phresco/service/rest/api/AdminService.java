@@ -50,12 +50,11 @@ import com.photon.phresco.exception.PhrescoWebServiceException;
 import com.photon.phresco.service.api.DbService;
 import com.photon.phresco.util.ServiceConstants;
 
-
 @Component
 @Path(ServiceConstants.REST_API_ADMIN)
 public class AdminService extends DbService {
 	
-	private static final Logger S_LOGGER= Logger.getLogger(AdminService.class);
+	private static final Logger S_LOGGER = Logger.getLogger(AdminService.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
     public AdminService() throws PhrescoException {

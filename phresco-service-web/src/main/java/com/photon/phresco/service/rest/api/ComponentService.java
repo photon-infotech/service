@@ -41,7 +41,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
@@ -49,6 +48,8 @@ import org.springframework.stereotype.Component;
 
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.DownloadInfo;
+import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.commons.model.SettingsTemplate;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.commons.model.WebService;
@@ -576,7 +577,7 @@ public class ComponentService extends DbService {
 		}
 		
 		try {
-			mongoOperation.insertList(SETTINGS_COLLECTION_NAME , settings);
+			mongoOperation.insertList(SETTINGS_COLLECTION_NAME, settings);
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
 		}
@@ -999,202 +1000,199 @@ public class ComponentService extends DbService {
 		return Response.status(Response.Status.OK).build();
 	}
 	
-//	/**
-//	 * Returns the list of pilots
-//	 * @return
-//	 */
-//	@GET
-//	@Path (REST_API_PILOTS)
-//	@Produces (MediaType.APPLICATION_JSON)
-//	public Response findPilots(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.findPilots()" + customerId);
-//	    }
-//	    List<ProjectInfo> pilotsList = new ArrayList<ProjectInfo>();
-//		try {
-//		    if(!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
-//    			pilotsList = mongoOperation.find(PILOTS_COLLECTION_NAME ,
-//    			        new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)), ProjectInfo.class);
-//		    }
-//			pilotsList.addAll(mongoOperation.find(PILOTS_COLLECTION_NAME ,
-//                    new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)), ProjectInfo.class));
-//			return Response.status(Response.Status.OK).entity(pilotsList).build();
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00005, PILOTS_COLLECTION_NAME);
-//		}
-//	}
-//	
-//	/**
-//     * Creates the list of pilots
-//     * @param projectInfos
-//     * @return 
-//     * @throws PhrescoException 
-//     */
-//    @POST
-//    @Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
-//    @Path (REST_API_PILOTS)
-//    public Response createPilots(MultiPart pilotInfo) throws PhrescoException {
-//        if (isDebugEnabled) {
-//            S_LOGGER.debug("Entered into ComponentService.createPilots(List<ProjectInfo> projectInfos)");
-//        }
-//        
-//        ProjectInfo projectInfo = null;
-//        BodyPartEntity bodyPartEntity = null;
-//        File pilotFile = null;
-//        
-//        List<BodyPart> bodyParts = pilotInfo.getBodyParts();
-//        if(CollectionUtils.isNotEmpty(bodyParts)) {
-//            for (BodyPart bodyPart : bodyParts) {
-//                if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
-//                    projectInfo = new ProjectInfo();
-//                    projectInfo = bodyPart.getEntityAs(ProjectInfo.class);
-//                } else {
-//                    bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
-//                }
-//            }
-//        }
-//        
-//        if(bodyPartEntity != null) {
-//            pilotFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null);
-//        }
-//        
+	/**
+	 * Returns the list of pilots
+	 * @return
+	 */
+	@GET
+	@Path (REST_API_PILOTS)
+	@Produces (MediaType.APPLICATION_JSON)
+	public Response findPilots(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.findPilots()" + customerId);
+	    }
+	    List<ProjectInfo> pilotsList = new ArrayList<ProjectInfo>();
+		try {
+		    if(!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
+    			pilotsList = mongoOperation.find(PILOTS_COLLECTION_NAME ,
+    			        new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)), ProjectInfo.class);
+		    }
+			pilotsList.addAll(mongoOperation.find(PILOTS_COLLECTION_NAME ,
+                    new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)), ProjectInfo.class));
+			return Response.status(Response.Status.OK).entity(pilotsList).build();
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00005, PILOTS_COLLECTION_NAME);
+		}
+	}
+	
+	/**
+     * Creates the list of pilots
+     * @param projectInfos
+     * @return 
+     * @throws PhrescoException 
+     */
+    @POST
+    @Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
+    @Path (REST_API_PILOTS)
+    public Response createPilots(MultiPart pilotInfo) throws PhrescoException {
+        if (isDebugEnabled) {
+            S_LOGGER.debug("Entered into ComponentService.createPilots(List<ProjectInfo> projectInfos)");
+        }
+        
+        ProjectInfo projectInfo = null;
+        BodyPartEntity bodyPartEntity = null;
+        File pilotFile = null;
+        
+        List<BodyPart> bodyParts = pilotInfo.getBodyParts();
+        if(CollectionUtils.isNotEmpty(bodyParts)) {
+            for (BodyPart bodyPart : bodyParts) {
+                if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
+                    projectInfo = new ProjectInfo();
+                    projectInfo = bodyPart.getEntityAs(ProjectInfo.class);
+                } else {
+                    bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
+                }
+            }
+        }
+        
+        if(bodyPartEntity != null) {
+            pilotFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null);
+        }
+        
+        
+        //TODO:Need to handle uploading of Binaries into repository
 //        boolean uploadBinary = uploadBinary(projectInfo.getArchetypeInfo(), 
 //                pilotFile, projectInfo.getCustomerId());
 //        if(uploadBinary) {
-//            projectInfo.setProjectURL(createContentURL(projectInfo.getArchetypeInfo()));
+////            projectInfo.setProjectURL(createContentURL(projectInfo.getArchetypeInfo()));
 //            mongoOperation.save(PILOTS_COLLECTION_NAME, projectInfo);
 //        }
-//        FileUtil.delete(pilotFile);
-//        
-//        return Response.status(Response.Status.CREATED).build();
-//    }
-//    
-//    private String createContentURL(ArchetypeInfo archetypeInfo) {
-//        String groupId = archetypeInfo.getGroupId().replace(".", "/");
-//        return groupId + "/" + archetypeInfo.getArtifactId() + "/" + archetypeInfo.getVersion() + "/" +
-//                archetypeInfo.getArtifactId() + "-" + archetypeInfo.getVersion() + "." + archetypeInfo.getPackaging();
-//    }
-//	
-//	/**
-//	 * Updates the list of pilots
-//	 * @param projectInfos
-//	 * @return
-//	 */
-//	@PUT
-//	@Consumes (MediaType.APPLICATION_JSON)
-//	@Produces (MediaType.APPLICATION_JSON)
-//	@Path (REST_API_PILOTS)
-//	public Response updatePilots(List<ProjectInfo> pilots) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.updatePilots(List<ProjectInfo> pilots)");
-//	    }
-//		
-//		try {
-//			for (ProjectInfo pilot : pilots) {
-//				ProjectInfo projectInfo = mongoOperation.findOne(PILOTS_COLLECTION_NAME , 
-//				        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(pilot.getId())), ProjectInfo.class);
-//				if (projectInfo != null) {
-//					mongoOperation.save(PILOTS_COLLECTION_NAME, pilot);
-//				}
-//			}
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
-//		}
-//		
-//		return Response.status(Response.Status.OK).entity(pilots).build();
-//	}
-//	
-//	/**
-//	 * Deletes the list of pilots
-//	 * @param pilots
-//	 * @throws PhrescoException 
-//	 */
-//	@DELETE
-//	@Path (REST_API_PILOTS)
-//	public void deletePilots(List<ProjectInfo> pilots) throws PhrescoException {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.deletePilots(List<ProjectInfo> pilots)");
-//	    }
-//		
-//		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-//		S_LOGGER.error("PhrescoException Is" + phrescoException.getErrorMessage());
-//		throw phrescoException;
-//	}
-//	
-//	/**
-//	 * Get the pilot by id for the given parameter
-//	 * @param id
-//	 * @return
-//	 */
-//	@GET
-//	@Produces (MediaType.APPLICATION_JSON)
-//	@Path (REST_API_PILOTS + REST_API_PATH_ID)
-//	public Response getPilot(@PathParam(REST_API_PATH_PARAM_ID) String id) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.getPilot(String id)" + id);
-//	    }
-//		
-//		try {
-//			ProjectInfo projectInfo = mongoOperation.findOne(PILOTS_COLLECTION_NAME, 
-//			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ProjectInfo.class);
-//			if (projectInfo != null) {
-//				return Response.status(Response.Status.OK).entity(projectInfo).build();
-//			}
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00005, PILOTS_COLLECTION_NAME);
-//		}
-//		
-//		return Response.status(Response.Status.OK).build();
-//	}
-//	
-//	/**
-//	 * Updates the pilot given by the parameter
-//	 * @param id
-//	 * @param pilot
-//	 * @return
-//	 */
-//	@PUT
-//	@Consumes (MediaType.APPLICATION_JSON)
-//	@Produces (MediaType.APPLICATION_JSON)
-//	@Path (REST_API_PILOTS + REST_API_PATH_ID)
-//	public Response updatePilot(@PathParam(REST_API_PATH_PARAM_ID) String id , ProjectInfo pilot) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.updatePilot(String id, ProjectInfo pilot)" + id); 
-//	    }
-//		
-//		try {
-//			if (id.equals(pilot.getId())) {
-//				mongoOperation.save(PILOTS_COLLECTION_NAME, pilot);
-//				return  Response.status(Response.Status.OK).entity(pilot).build();
-//			}
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
-//		}
-//		
-//		return Response.status(Response.Status.NO_CONTENT).entity(pilot).build();
-//	}
-//	
-//	/**
-//	 * Deletes the pilot by id for the given parameter
-//	 * @param id
-//	 * @return 
-//	 */
-//	@DELETE
-//	@Path (REST_API_PILOTS + REST_API_PATH_ID)
-//	public Response deletePilot(@PathParam(REST_API_PATH_PARAM_ID) String id) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.deletePilot(String id)" + id);
-//	    }
-//		
-//		try {
-//			mongoOperation.remove(PILOTS_COLLECTION_NAME, 
-//			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ProjectInfo.class);
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
-//		}
-//		
-//		return Response.status(Response.Status.OK).build();
-//	}
+        
+        FileUtil.delete(pilotFile);
+        
+        return Response.status(Response.Status.CREATED).build();
+    }
+    
+	/**
+	 * Updates the list of pilots
+	 * @param projectInfos
+	 * @return
+	 */
+	@PUT
+	@Consumes (MediaType.APPLICATION_JSON)
+	@Produces (MediaType.APPLICATION_JSON)
+	@Path (REST_API_PILOTS)
+	public Response updatePilots(List<ProjectInfo> pilots) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.updatePilots(List<ProjectInfo> pilots)");
+	    }
+		
+		try {
+			for (ProjectInfo pilot : pilots) {
+				ProjectInfo projectInfo = mongoOperation.findOne(PILOTS_COLLECTION_NAME , 
+				        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(pilot.getId())), ProjectInfo.class);
+				if (projectInfo != null) {
+					mongoOperation.save(PILOTS_COLLECTION_NAME, pilot);
+				}
+			}
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
+		}
+		
+		return Response.status(Response.Status.OK).entity(pilots).build();
+	}
+	
+	/**
+	 * Deletes the list of pilots
+	 * @param pilots
+	 * @throws PhrescoException 
+	 */
+	@DELETE
+	@Path (REST_API_PILOTS)
+	public void deletePilots(List<ProjectInfo> pilots) throws PhrescoException {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.deletePilots(List<ProjectInfo> pilots)");
+	    }
+		
+		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
+		S_LOGGER.error("PhrescoException Is" + phrescoException.getErrorMessage());
+		throw phrescoException;
+	}
+	
+	/**
+	 * Get the pilot by id for the given parameter
+	 * @param id
+	 * @return
+	 */
+	@GET
+	@Produces (MediaType.APPLICATION_JSON)
+	@Path (REST_API_PILOTS + REST_API_PATH_ID)
+	public Response getPilot(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.getPilot(String id)" + id);
+	    }
+		
+		try {
+			ProjectInfo projectInfo = mongoOperation.findOne(PILOTS_COLLECTION_NAME, 
+			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ProjectInfo.class);
+			if (projectInfo != null) {
+				return Response.status(Response.Status.OK).entity(projectInfo).build();
+			}
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00005, PILOTS_COLLECTION_NAME);
+		}
+		
+		return Response.status(Response.Status.OK).build();
+	}
+	
+	/**
+	 * Updates the pilot given by the parameter
+	 * @param id
+	 * @param pilot
+	 * @return
+	 */
+	@PUT
+	@Consumes (MediaType.APPLICATION_JSON)
+	@Produces (MediaType.APPLICATION_JSON)
+	@Path (REST_API_PILOTS + REST_API_PATH_ID)
+	public Response updatePilot(@PathParam(REST_API_PATH_PARAM_ID) String id , ProjectInfo pilot) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.updatePilot(String id, ProjectInfo pilot)" + id); 
+	    }
+		
+		try {
+			if (id.equals(pilot.getId())) {
+				mongoOperation.save(PILOTS_COLLECTION_NAME, pilot);
+				return  Response.status(Response.Status.OK).entity(pilot).build();
+			}
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
+		}
+		
+		return Response.status(Response.Status.NO_CONTENT).entity(pilot).build();
+	}
+	
+	/**
+	 * Deletes the pilot by id for the given parameter
+	 * @param id
+	 * @return 
+	 */
+	@DELETE
+	@Path (REST_API_PILOTS + REST_API_PATH_ID)
+	public Response deletePilot(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.deletePilot(String id)" + id);
+	    }
+		
+		try {
+			mongoOperation.remove(PILOTS_COLLECTION_NAME, 
+			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ProjectInfo.class);
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
+		}
+		
+		return Response.status(Response.Status.OK).build();
+	}
 
 	/**
 	 * Returns the list of webservices
@@ -1366,191 +1364,191 @@ public class ComponentService extends DbService {
 		return Response.status(Response.Status.OK).build();
 	}
 
-//	/**
-//     * Returns the list of downloadInfo
-//     * @return
-//     */
-//    @GET
-//    @Path (REST_API_DOWNLOADS)
-//    @Produces (MediaType.APPLICATION_JSON)
-//    public Response findDownloadInfo() {
-//        if (isDebugEnabled) {
-//            S_LOGGER.debug("Entered into AdminService.findDownloadInfo()");
-//        }
-//        
-//        try {
-//            List<DownloadInfo> downloadList = mongoOperation.getCollection(DOWNLOAD_COLLECTION_NAME , DownloadInfo.class);
-//            if (downloadList != null) {
-//                return Response.status(Response.Status.OK).entity(downloadList).build();
-//            } 
-//        } catch (Exception e) {
-//            throw new PhrescoWebServiceException(e, EX_PHEX00006, DOWNLOAD_COLLECTION_NAME);
-//        }
-//        
-//        return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
-//    }
-//
-//    /**
-//     * Creates the list of downloads
-//     * @param downloads
-//     * @return 
-//     * @throws PhrescoException 
-//     */
-//    @POST
-//    @Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
-//    @Path (REST_API_DOWNLOADS)
-//    public Response createDownloads(MultiPart downloadPart) throws PhrescoException {
-//        if (isDebugEnabled) {
-//            S_LOGGER.debug("Entered into ComponentService.createModules(List<ModuleGroup> modules)");
-//        }
-//        
-//        DownloadInfo downloadInfo = null;
-//        BodyPartEntity bodyPartEntity = null;
-//        File downloadFile = null;
-//        
-//        List<BodyPart> bodyParts = downloadPart.getBodyParts();
-//        if(CollectionUtils.isNotEmpty(bodyParts)) {
-//            for (BodyPart bodyPart : bodyParts) {
-//                if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
-//                    downloadInfo = new DownloadInfo();
-//                    downloadInfo = bodyPart.getEntityAs(DownloadInfo.class);
-//                } else {
-//                    bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
-//                }
-//            }
-//        }
-//        
-//        if(bodyPartEntity != null) {
-//            downloadFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null);
-//        }
-//        
-//        boolean uploadBinary = uploadBinary(downloadInfo.getArchetypeInfo(), 
-//                downloadFile, downloadInfo.getCustomerId());
-//        if(uploadBinary) {
-//            downloadInfo.setDownloadURL(createContentURL(downloadInfo.getArchetypeInfo()));
-//            mongoOperation.save(DOWNLOAD_COLLECTION_NAME, downloadInfo);
-//        }
-//        FileUtil.delete(downloadFile);
-//        return Response.status(Response.Status.CREATED).build();
-//    }
-//
-//    /**
-//     * Updates the list of downloadInfos
-//     * @param downloads
-//     * @return
-//     */
-//    @PUT
-//    @Consumes (MediaType.APPLICATION_JSON)
-//    @Produces (MediaType.APPLICATION_JSON)
-//    @Path (REST_API_DOWNLOADS)
-//    public Response updateDownloadInfo(List<DownloadInfo> downloads) {
-//        if (isDebugEnabled) {
-//            S_LOGGER.debug("Entered into AdminService.updateDownloadInfo(List<DownloadInfo> downloads)");
-//        }
-//        
-//        try {
-//            for (DownloadInfo download : downloads) {
-//                DownloadInfo downloadInfo = mongoOperation.findOne(DOWNLOAD_COLLECTION_NAME , 
-//                        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(download.getId())), DownloadInfo.class);
-//                if (downloadInfo  != null) {
-//                    mongoOperation.save(DOWNLOAD_COLLECTION_NAME, download);
-//                }
-//            }
-//        } catch (Exception e) {
-//            throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
-//        }
-//        
-//        return Response.status(Response.Status.OK).entity(downloads).build();
-//    }
-//
-//    /**
-//     * Deletes the list of DownloadInfo
-//     * @param downloadInfos
-//     * @throws PhrescoException 
-//     */
-//    @DELETE
-//    @Path (REST_API_DOWNLOADS)
-//    public void deleteDownloadInfo(List<DownloadInfo> downloadInfos) throws PhrescoException {
-//        if (isDebugEnabled) {
-//            S_LOGGER.debug("Entered into AdminService.deleteDownloadInfo(List<DownloadInfo> downloadInfos)");
-//        }
-//        
-//        PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-//        S_LOGGER.error("PhrescoException Is"  + phrescoException.getErrorMessage());
-//        throw phrescoException;
-//    }
-//
-//    /**
-//     * Get the downloadInfo by id for the given parameter
-//     * @param id
-//     * @return
-//     */
-//    @GET
-//    @Produces (MediaType.APPLICATION_JSON)
-//    @Path (REST_API_DOWNLOADS + REST_API_PATH_ID)
-//    public Response getDownloadInfo(@PathParam(REST_API_PATH_PARAM_ID) String id) {
-//        if (isDebugEnabled) {
-//            S_LOGGER.debug("Entered into AdminService.getDownloadInfo(String id)" + id);
-//        }
-//        
-//        try {
-//            DownloadInfo downloadInfo = mongoOperation.findOne(DOWNLOAD_COLLECTION_NAME, 
-//                    new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), DownloadInfo.class);
-//            if (downloadInfo != null) {
-//                return Response.status(Response.Status.OK).entity(downloadInfo).build();
-//            } 
-//        } catch (Exception e) {
-//            throw new PhrescoWebServiceException(e, EX_PHEX00005, DOWNLOAD_COLLECTION_NAME);
-//        }
-//        
-//        return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
-//    }
-//    
-//    /**
-//     * Updates the list of downloadInfo by id
-//     * @param downloadInfos
-//     * @return
-//     */
-//    @PUT
-//    @Consumes (MediaType.APPLICATION_JSON)
-//    @Produces (MediaType.APPLICATION_JSON)
-//    @Path (REST_API_DOWNLOADS + REST_API_PATH_ID)
-//    public Response updateDownloadInfo(@PathParam(REST_API_PATH_PARAM_ID) String id , DownloadInfo downloadInfo) {
-//        if (isDebugEnabled) {
-//            S_LOGGER.debug("Entered into AdminService.updateDownloadInfo(String id , DownloadInfo downloadInfos)" + id);
-//        }
-//        
-//        try {
-//            if (id.equals(downloadInfo.getId())) {
-//                mongoOperation.save(DOWNLOAD_COLLECTION_NAME, downloadInfo);
-//                return Response.status(Response.Status.OK).entity(downloadInfo).build();
-//            } 
-//        } catch (Exception e) {
-//            throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
-//        }
-//        
-//        return Response.status(Response.Status.BAD_REQUEST).entity(ERROR_MSG_ID_NOT_EQUAL).build();
-//    }
-//    
-//    /**
-//     * Deletes the user by id for the given parameter
-//     * @param id
-//     * @return 
-//     */
-//    @DELETE
-//    @Path (REST_API_DOWNLOADS + REST_API_PATH_ID)
-//    public Response deleteDownloadInfo(@PathParam(REST_API_PATH_PARAM_ID) String id) {
-//        if (isDebugEnabled) {
-//            S_LOGGER.debug("Entered into AdminService.deleteDownloadInfo(String id)" + id);
-//        }
-//        
-//        try {\
-//            mongoOperation.remove(DOWNLOAD_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), DownloadInfo.class);
-//        } catch (Exception e) {
-//            throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
-//        }
-//        
-//        return Response.status(Response.Status.OK).build();
-//    }
+	/**
+     * Returns the list of downloadInfo
+     * @return
+     */
+    @GET
+    @Path (REST_API_DOWNLOADS)
+    @Produces (MediaType.APPLICATION_JSON)
+    public Response findDownloadInfo() {
+        if (isDebugEnabled) {
+            S_LOGGER.debug("Entered into AdminService.findDownloadInfo()");
+        }
+        
+        try {
+            List<DownloadInfo> downloadList = mongoOperation.getCollection(DOWNLOAD_COLLECTION_NAME, DownloadInfo.class);
+            if (downloadList != null) {
+                return Response.status(Response.Status.OK).entity(downloadList).build();
+            } 
+        } catch (Exception e) {
+            throw new PhrescoWebServiceException(e, EX_PHEX00006, DOWNLOAD_COLLECTION_NAME);
+        }
+        
+        return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
+    }
+    
+
+    /**
+     * Creates the list of downloads
+     * @param downloads
+     * @return 
+     * @throws PhrescoException 
+     */
+    @POST
+    @Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
+    @Path (REST_API_DOWNLOADS)
+    public Response createDownloads(MultiPart downloadPart) throws PhrescoException {
+        if (isDebugEnabled) {
+            S_LOGGER.debug("Entered into ComponentService.createModules(List<ModuleGroup> modules)");
+        }
+        
+        DownloadInfo downloadInfo = null;
+        BodyPartEntity bodyPartEntity = null;
+        File downloadFile = null;
+        
+        List<BodyPart> bodyParts = downloadPart.getBodyParts();
+        if(CollectionUtils.isNotEmpty(bodyParts)) {
+            for (BodyPart bodyPart : bodyParts) {
+                if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
+                    downloadInfo = new DownloadInfo();
+                    downloadInfo = bodyPart.getEntityAs(DownloadInfo.class);
+                } else {
+                    bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
+                }
+            }
+        }
+        
+        if(bodyPartEntity != null) {
+            downloadFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null);
+        }
+        
+        boolean uploadBinary = uploadBinary(downloadInfo, downloadFile);
+        if(uploadBinary) {
+            mongoOperation.save(DOWNLOAD_COLLECTION_NAME, downloadInfo);
+        }
+        
+        FileUtil.delete(downloadFile);
+        return Response.status(Response.Status.CREATED).build();
+    }
+
+    /**
+     * Updates the list of downloadInfos
+     * @param downloads
+     * @return
+     */
+    @PUT
+    @Consumes (MediaType.APPLICATION_JSON)
+    @Produces (MediaType.APPLICATION_JSON)
+    @Path (REST_API_DOWNLOADS)
+    public Response updateDownloadInfo(List<DownloadInfo> downloads) {
+        if (isDebugEnabled) {
+            S_LOGGER.debug("Entered into AdminService.updateDownloadInfo(List<DownloadInfo> downloads)");
+        }
+        
+        try {
+            for (DownloadInfo download : downloads) {
+                DownloadInfo downloadInfo = mongoOperation.findOne(DOWNLOAD_COLLECTION_NAME, 
+                        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(download.getId())), DownloadInfo.class);
+                if (downloadInfo  != null) {
+                    mongoOperation.save(DOWNLOAD_COLLECTION_NAME, download);
+                }
+            }
+        } catch (Exception e) {
+            throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
+        }
+        
+        return Response.status(Response.Status.OK).entity(downloads).build();
+    }
+
+    /**
+     * Deletes the list of DownloadInfo
+     * @param downloadInfos
+     * @throws PhrescoException 
+     */
+    @DELETE
+    @Path (REST_API_DOWNLOADS)
+    public void deleteDownloadInfo(List<DownloadInfo> downloadInfos) throws PhrescoException {
+        if (isDebugEnabled) {
+            S_LOGGER.debug("Entered into AdminService.deleteDownloadInfo(List<DownloadInfo> downloadInfos)");
+        }
+        
+        PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
+        S_LOGGER.error("PhrescoException Is"  + phrescoException.getErrorMessage());
+        throw phrescoException;
+    }
+
+    /**
+     * Get the downloadInfo by id for the given parameter
+     * @param id
+     * @return
+     */
+    @GET
+    @Produces (MediaType.APPLICATION_JSON)
+    @Path (REST_API_DOWNLOADS + REST_API_PATH_ID)
+    public Response getDownloadInfo(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+        if (isDebugEnabled) {
+            S_LOGGER.debug("Entered into AdminService.getDownloadInfo(String id)" + id);
+        }
+        
+        try {
+            DownloadInfo downloadInfo = mongoOperation.findOne(DOWNLOAD_COLLECTION_NAME, 
+                    new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), DownloadInfo.class);
+            if (downloadInfo != null) {
+                return Response.status(Response.Status.OK).entity(downloadInfo).build();
+            } 
+        } catch (Exception e) {
+            throw new PhrescoWebServiceException(e, EX_PHEX00005, DOWNLOAD_COLLECTION_NAME);
+        }
+        
+        return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
+    }
+    
+    /**
+     * Updates the list of downloadInfo by id
+     * @param downloadInfos
+     * @return
+     */
+    @PUT
+    @Consumes (MediaType.APPLICATION_JSON)
+    @Produces (MediaType.APPLICATION_JSON)
+    @Path (REST_API_DOWNLOADS + REST_API_PATH_ID)
+    public Response updateDownloadInfo(@PathParam(REST_API_PATH_PARAM_ID) String id , DownloadInfo downloadInfo) {
+        if (isDebugEnabled) {
+            S_LOGGER.debug("Entered into AdminService.updateDownloadInfo(String id , DownloadInfo downloadInfos)" + id);
+        }
+        
+        try {
+            if (id.equals(downloadInfo.getId())) {
+                mongoOperation.save(DOWNLOAD_COLLECTION_NAME, downloadInfo);
+                return Response.status(Response.Status.OK).entity(downloadInfo).build();
+            } 
+        } catch (Exception e) {
+            throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
+        }
+        
+        return Response.status(Response.Status.BAD_REQUEST).entity(ERROR_MSG_ID_NOT_EQUAL).build();
+    }
+    
+    /**
+     * Deletes the user by id for the given parameter
+     * @param id
+     * @return 
+     */
+    @DELETE
+    @Path (REST_API_DOWNLOADS + REST_API_PATH_ID)
+    public Response deleteDownloadInfo(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+        if (isDebugEnabled) {
+            S_LOGGER.debug("Entered into AdminService.deleteDownloadInfo(String id)" + id);
+        }
+        
+        try {
+            mongoOperation.remove(DOWNLOAD_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), DownloadInfo.class);
+        } catch (Exception e) {
+            throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
+        }
+        
+        return Response.status(Response.Status.OK).build();
+    }
     
 }
