@@ -130,6 +130,9 @@ public interface ServiceUIConstants {
     String REQ_FEATURES_MOD_GRP = "moduleGroup";
     String FEATURES_CORE = "core";
     String REQ_FEATURES_TYPE = "type";
+    String REQ_FEATURES_TYPE_JAVASCRIPT = "JAVASCRIPT";
+    String REQ_FEATURES_TYPE_FEATURE = "FEATURE";
+
     String REQ_FEATURES_MODULE = "module";
     String REQ_FEATURES_HEADER = "header";
     String REQ_FEATURES_SELECTED_MODULEID = "selectedModuleId";

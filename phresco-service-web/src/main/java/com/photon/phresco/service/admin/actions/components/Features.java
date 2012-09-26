@@ -49,7 +49,7 @@ import com.sun.jersey.multipart.MultiPart;
 
 public class Features extends ServiceBaseAction {
 
-	private static final long serialVersionUID = 6801037145464060759L;
+    private static final long serialVersionUID = 6801037145464060759L;
 	private static final Logger S_LOGGER = Logger.getLogger(Features.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
@@ -96,7 +96,7 @@ public class Features extends ServiceBaseAction {
         }
 	    
         setReqAttribute(REQ_FEATURES_HEADER, getText(KEY_I18N_FEATURE_MOD_ADD));
-        setReqAttribute(REQ_FEATURES_TYPE, "FEATURE"); //for handle in feature sub menu
+        setReqAttribute(REQ_FEATURES_TYPE, REQ_FEATURES_TYPE_FEATURE); //for handle in feature sub menu
 	    return setTechnologiesInRequest();
 	}
 	
@@ -106,7 +106,7 @@ public class Features extends ServiceBaseAction {
         }
 	    
         setReqAttribute(REQ_FEATURES_HEADER, getText(KEY_I18N_FEATURE_JS_ADD));
-        setReqAttribute(REQ_FEATURES_TYPE, "JAVASCRIPT"); //for handle in feature sub menu
+        setReqAttribute(REQ_FEATURES_TYPE, REQ_FEATURES_TYPE_JAVASCRIPT); //for handle in feature sub menu
 	    return setTechnologiesInRequest();
     }
 	
