@@ -41,7 +41,6 @@ import com.photon.phresco.commons.model.RequiredOption;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
-import com.photon.phresco.service.admin.commons.LogErrorReport;
 import com.photon.phresco.service.client.api.Content;
 import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
@@ -86,7 +85,7 @@ public class Features extends ServiceBaseAction {
     		S_LOGGER.debug("Entering Method  Features.menu()");
     	}
 
-		getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+		setReqAttribute(REQ_CUST_CUSTOMER_ID, customerId);
 		featureByteArray = null;
 
     	return COMP_FEATURES_LIST;
@@ -108,7 +107,7 @@ public class Features extends ServiceBaseAction {
     		getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
     		featureByteArray = null;
     	} catch (PhrescoException e) {
-    		new LogErrorReport(e, FEATURE_LIST_EXCEPTION);
+//    		new LogErrorReport(e, FEATURE_LIST_EXCEPTION);
     		
     		return LOG_ERROR;
     	}
@@ -129,7 +128,7 @@ public class Features extends ServiceBaseAction {
     		    return COMP_FEATURES_DEPENDENCY;
     		}
     	} catch (PhrescoException e) {
-    		new LogErrorReport(e, FEATURE_LIST_EXCEPTION);
+//    		new LogErrorReport(e, FEATURE_LIST_EXCEPTION);
     		
     		return LOG_ERROR;
     	}
@@ -156,7 +155,7 @@ public class Features extends ServiceBaseAction {
                         getText(KEY_I18N_FEATURE_JS_ADD));
             }
         } catch (Exception e) {
-            new LogErrorReport(e, FEATURE_ADD_EXCEPTION);
+//            new LogErrorReport(e, FEATURE_ADD_EXCEPTION);
             
             return LOG_ERROR;
         }
@@ -183,7 +182,7 @@ public class Features extends ServiceBaseAction {
 				getHttpRequest().setAttribute(REQ_FEATURES_HEADER, getText(KEY_I18N_FEATURE_JS_EDIT));
 			}
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, FEATURE_EDIT_EXCEPTION);
+//			new LogErrorReport(e, FEATURE_EDIT_EXCEPTION);
     		
 			return LOG_ERROR;
 		}
@@ -215,7 +214,7 @@ public class Features extends ServiceBaseAction {
 				addActionMessage(getText(FEATURE_UPDATED, Collections.singletonList(name)));
 			}
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, FEATURE_SAVE_EXCEPTION);
+//			new LogErrorReport(e, FEATURE_SAVE_EXCEPTION);
     		
 			return LOG_ERROR;
 		} 
@@ -249,7 +248,7 @@ public class Features extends ServiceBaseAction {
                 addActionMessage(getText(FEATURE_ADDED, Collections.singletonList(name)));
             }
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, FEATURE_UPDATE_EXCEPTION);
+//			new LogErrorReport(e, FEATURE_UPDATE_EXCEPTION);
     	
 			return LOG_ERROR;
 		}
@@ -331,7 +330,7 @@ public class Features extends ServiceBaseAction {
 				addActionMessage(getText(FEATURE_DELETED));
 			}
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, FEATURE_DELETE_EXCEPTION);
+//			new LogErrorReport(e, FEATURE_DELETE_EXCEPTION);
 			
     		return LOG_ERROR;
 		}

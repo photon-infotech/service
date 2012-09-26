@@ -167,12 +167,13 @@ public interface ServiceUIConstants {
     String REQ_LOG_REPORT = "logReport";
     String LOG_ERROR = "logError";
     
-    
-    String CUSTOMERS_DELETE_EXCEPTION = "Customers delete";
-	String CUSTOMERS_UPDATE_EXCEPTION = "Customers update";
-	String CUSTOMERS_SAVE_EXCEPTION = "Customers save";
-	String CUSTOMERS_ADD_EXCEPTION = "Customers add";
-	String CUSTOMERS_LIST_EXCEPTION = "Customers list";
+    String EXCEPTION_LOGIN = "Login Authenticate";
+    String EXCEPTION_CUSTOMERS_DELETE = "Customers delete";
+	String EXCEPTION_CUSTOMERS_UPDATE = "Customers update";
+	String EXCEPTION_CUSTOMERS_SAVE = "Customers save";
+	String EXCEPTION_CUSTOMERS_ADD = "Customers add";
+	String EXCEPTION_CUSTOMERS_LIST = "Customers list";
+	String EXCEPTION_CUSTOMERS_VALIDATE = "Customers validateForm";
     
 	String ROLE_DELETE_EXCEPTION = "Role delete";
 	String ROLE_UPDATE_EXCEPTION = "Role update";

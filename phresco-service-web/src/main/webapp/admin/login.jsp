@@ -37,16 +37,9 @@
 		<script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
 		<script type="text/javascript" src="js/jquery-ui-1.8.18.custom.min.js"></script>
 		
-		<!-- right panel scroll bar -->
-		<script type="text/javascript" src="js/home.js"></script>
-		<script type="text/javascript" src="js/main.js"></script>
-		
 		<!-- commons.js -->
 		<script type="text/javascript" src="js/common.js"></script>
 	   
-		<!-- document resizer -->
-		<script type="text/javascript" src="js/windowResizer.js"></script>
-
 		<script type="text/javascript">
 			$(document).ready(function() {
 				showWelcomeImage();
@@ -75,7 +68,7 @@
 			<div class="lgnintro_container_left">
 			<h1 class="l_align"><s:text name="lbl.login"/></h1><h1 class="lp_align"></h1>    
 			   
-				<form name="login" action="login" method="post" class="marginBottomZero">
+				<form name="login" action="#" method="post" class="marginBottomZero">
 					<!--  UserName starts -->
 					<div class="clearfix">
 						 <label class="labellg"><s:text name="lbl.login.username"/></label>
@@ -102,11 +95,8 @@
 					<div class="clearfix">
 						<div class="input lgnBtnLabel">
 							<input type="hidden" name="loginFirst" value="false"> 
-							<input type="submit" value="Login" class="btn btn-primary lgnBtn">
-							<%
-	                        	String loginError = (String)request.getAttribute(ServiceUIConstants.REQ_LOGIN_ERROR);
-	                    	%>
-							&nbsp;&nbsp;&nbsp;<div class="lgnError"><%= StringUtils.isNotEmpty(loginError) ? loginError : "" %></div>
+							<input type="button" id="submit" value="<s:text name='lbl.login'/>" class="btn btn-primary lgnBtn">
+							&nbsp;&nbsp;&nbsp;<div id="errorMsg" class="lgnError"></div>
 						</div>
 					</div>
 				</form>
@@ -123,3 +113,24 @@
 		</div>
 	</body>
 </html>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("input[id=submit]").click(function() {
+			$.ajax({
+				url : "authenticate",
+				data : $('form').serialize(),
+				type : "POST",
+				success : function(data) {
+					if (data.errorFound !== undefined && data.errorFound) {
+						$("#errorMsg").text(data.errorMsg);
+					} else {
+						$('body').empty();
+						$('body').html(data);
+					}
+				}
+			});
+		});
+	});
+	
+</script>

@@ -35,8 +35,6 @@ import com.photon.phresco.commons.model.SettingsTemplate;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
-import com.photon.phresco.service.admin.commons.LogErrorReport;
-import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
 
@@ -68,7 +66,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 			getHttpRequest().setAttribute(REQ_CONFIG_TEMPLATES, configTemplates);
 			getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, CONFIG_TEMP_LIST_EXCEPTION);
+//			new LogErrorReport(e, CONFIG_TEMP_LIST_EXCEPTION);
 			
 			return LOG_ERROR;	
 		}
@@ -85,7 +83,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 			List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
 			getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, CONFIG_TEMP_ADD_EXCEPTION);
+//			new LogErrorReport(e, CONFIG_TEMP_ADD_EXCEPTION);
 			
 			return LOG_ERROR;	
 		}
@@ -105,7 +103,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 			getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
 			getHttpRequest().setAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, CONFIG_TEMP_EDIT_EXCEPTION);
+//			new LogErrorReport(e, CONFIG_TEMP_EDIT_EXCEPTION);
 			
 			return LOG_ERROR;	
 		}
@@ -137,7 +135,7 @@ public class ConfigTemplates extends ServiceBaseAction {
             	addActionMessage(getText(CONFIGTEMPLATE_ADDED, Collections.singletonList(name)));
             }
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, CONFIG_TEMP_SAVE_EXCEPTION);
+//			new LogErrorReport(e, CONFIG_TEMP_SAVE_EXCEPTION);
 			
 			return LOG_ERROR;	
 		}
@@ -162,7 +160,7 @@ public class ConfigTemplates extends ServiceBaseAction {
             settingTemplate.setProperties(createPropertyTemplates());
     		getServiceManager().updateConfigTemp(settingTemplate, configId, customerId);
     	} catch (PhrescoException e) {
-			new LogErrorReport(e, CONFIG_TEMP_UPDATE_EXCEPTION);
+//			new LogErrorReport(e, CONFIG_TEMP_UPDATE_EXCEPTION);
 			
 			return LOG_ERROR;	
 		}
@@ -243,7 +241,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 				addActionMessage(getText(CONFIGTEMPLATE_DELETED));
 			}
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, CONFIG_TEMP_DELETE_EXCEPTION);
+//			new LogErrorReport(e, CONFIG_TEMP_DELETE_EXCEPTION);
 			
 			return LOG_ERROR;	
 		}

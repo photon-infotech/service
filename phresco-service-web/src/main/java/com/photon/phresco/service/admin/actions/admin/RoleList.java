@@ -29,7 +29,6 @@ import org.apache.log4j.Logger;
 import com.photon.phresco.commons.model.Role;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
-import com.photon.phresco.service.admin.commons.LogErrorReport;
 import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
 
@@ -57,7 +56,7 @@ public class RoleList extends ServiceBaseAction {
 			List<Role> roleList = getServiceManager().getRoles();
 			getHttpRequest().setAttribute(REQ_ROLE_LIST, roleList);
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, ROLE_LIST_EXCEPTION);
+//			new LogErrorReport(e, ROLE_LIST_EXCEPTION);
 			
 			return LOG_ERROR;	
 		}
@@ -83,7 +82,7 @@ public class RoleList extends ServiceBaseAction {
 			getHttpRequest().setAttribute(REQ_ROLE_ROLE , role);
 			getHttpRequest().setAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, ROLE_EDIT_EXCEPTION);
+//			new LogErrorReport(e, ROLE_EDIT_EXCEPTION);
 			
 			return LOG_ERROR;	
 		}
@@ -110,7 +109,7 @@ public class RoleList extends ServiceBaseAction {
 				addActionMessage(getText(ROLE_ADDED, Collections.singletonList(name)));
 			}	
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, ROLE_SAVE_EXCEPTION);
+//			new LogErrorReport(e, ROLE_SAVE_EXCEPTION);
 			
 			return LOG_ERROR;	
 		}
@@ -128,7 +127,7 @@ public class RoleList extends ServiceBaseAction {
 			Role role = new Role(roleId, name, description);
 			getServiceManager().updateRole(role, roleId);
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, ROLE_UPDATE_EXCEPTION);
+//			new LogErrorReport(e, ROLE_UPDATE_EXCEPTION);
 			
 			return LOG_ERROR;	
 		}
@@ -154,7 +153,7 @@ public class RoleList extends ServiceBaseAction {
 				addActionMessage(getText(ROLE_DELETED));
 			}
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, ROLE_DELETE_EXCEPTION);
+//			new LogErrorReport(e, ROLE_DELETE_EXCEPTION);
 			
 			return LOG_ERROR;	
 		}

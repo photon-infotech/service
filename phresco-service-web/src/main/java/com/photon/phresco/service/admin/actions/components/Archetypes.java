@@ -35,14 +35,12 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import com.google.gson.Gson;
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
-import com.photon.phresco.service.admin.commons.LogErrorReport;
 import com.photon.phresco.service.client.api.Content;
 import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.ServiceConstants;
@@ -99,7 +97,7 @@ public class Archetypes extends ServiceBaseAction {
 			getHttpRequest().setAttribute(REQ_ARCHE_TYPES, technologies);
 			getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, ARCHETYPE_LIST_EXCEPTION);
+//			new LogErrorReport(e, ARCHETYPE_LIST_EXCEPTION);
 			
 			return LOG_ERROR;
 		}
@@ -121,7 +119,7 @@ public class Archetypes extends ServiceBaseAction {
 			List<ApplicationType> appTypes = getServiceManager().getApplicationTypes(customerId);
 			getHttpRequest().setAttribute(REQ_APP_TYPES, appTypes);
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, ARCHETYPE_ADD_EXCEPTION);
+//			new LogErrorReport(e, ARCHETYPE_ADD_EXCEPTION);
 			
 			return LOG_ERROR;
 		}
@@ -141,7 +139,7 @@ public class Archetypes extends ServiceBaseAction {
 			List<ApplicationType> appTypes = getServiceManager().getApplicationTypes(customerId);
 			getHttpRequest().setAttribute(REQ_APP_TYPES, appTypes);
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, ARCHETYPE_EDIT_EXCEPTION);
+//			new LogErrorReport(e, ARCHETYPE_EDIT_EXCEPTION);
 			
 			return LOG_ERROR;	
 		}
@@ -222,7 +220,7 @@ public class Archetypes extends ServiceBaseAction {
 				addActionMessage(getText(ARCHETYPE_ADDED, Collections.singletonList(name)));
 			}
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, ARCHETYPE_SAVE_EXCEPTION);
+//			new LogErrorReport(e, ARCHETYPE_SAVE_EXCEPTION);
 			
 			return LOG_ERROR;	
 		} 
@@ -302,7 +300,7 @@ public class Archetypes extends ServiceBaseAction {
 			
 			getServiceManager().updateArcheType(technology, techId, customerId);
 		} catch(PhrescoException e) {
-			new LogErrorReport(e, ARCHETYPE_UPDATE_EXCEPTION);
+//			new LogErrorReport(e, ARCHETYPE_UPDATE_EXCEPTION);
 			
 			return LOG_ERROR;	
 		}
@@ -327,7 +325,7 @@ public class Archetypes extends ServiceBaseAction {
 				addActionMessage(getText(ARCHETYPE_DELETED));
 			}
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, ARCHETYPE_DELETE_EXCEPTION);
+//			new LogErrorReport(e, ARCHETYPE_DELETE_EXCEPTION);
 			
 			return LOG_ERROR;	
 		}

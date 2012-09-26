@@ -29,7 +29,6 @@ import org.apache.log4j.Logger;
 import com.photon.phresco.commons.model.Property;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
-import com.photon.phresco.service.admin.commons.LogErrorReport;
 import com.sun.jersey.api.client.ClientResponse;
 
 public class GlobalUrl extends ServiceBaseAction { 
@@ -57,7 +56,7 @@ public class GlobalUrl extends ServiceBaseAction {
     		getHttpRequest().setAttribute(REQ_GLOBURL_URL, globalUrl);
     		getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
     	} catch (PhrescoException e) {
-			new LogErrorReport(e, GLOBAL_URL_LIST_EXCEPTION);
+//			new LogErrorReport(e, GLOBAL_URL_LIST_EXCEPTION);
 			
 			return LOG_ERROR;	
 		}
@@ -84,7 +83,7 @@ public class GlobalUrl extends ServiceBaseAction {
 			  getHttpRequest().setAttribute(REQ_GLOBURL_URL , globalUrl);
 			  getHttpRequest().setAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, GLOBAL_URL_EDIT_EXCEPTION);
+//			new LogErrorReport(e, GLOBAL_URL_EDIT_EXCEPTION);
 			
 			return LOG_ERROR;	
 		}
@@ -112,7 +111,7 @@ public class GlobalUrl extends ServiceBaseAction {
 			    addActionMessage(getText(URL_ADDED, Collections.singletonList(name)));
 			}
 		}  catch (PhrescoException e) {
-			new LogErrorReport(e, GLOBAL_URL_SAVE_EXCEPTION);
+//			new LogErrorReport(e, GLOBAL_URL_SAVE_EXCEPTION);
 			
 			return LOG_ERROR;	
 		}
@@ -133,7 +132,7 @@ public class GlobalUrl extends ServiceBaseAction {
 			//globalUrl.setUrl(url);
 			getServiceManager().updateGlobalUrl(globalUrl, globalurlId, customerId);
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, GLOBAL_URL_UPDATE_EXCEPTION);
+//			new LogErrorReport(e, GLOBAL_URL_UPDATE_EXCEPTION);
 			
 			return LOG_ERROR;	
 		}
@@ -158,7 +157,7 @@ public class GlobalUrl extends ServiceBaseAction {
 				addActionMessage(getText(URL_DELETED));
 			}
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, GLOBAL_URL_DELETE_EXCEPTION);
+//			new LogErrorReport(e, GLOBAL_URL_DELETE_EXCEPTION);
 			
 			return LOG_ERROR;	
 		}

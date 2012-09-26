@@ -71,5 +71,11 @@ $(document).ready(function() {
 		 params = params.concat("js");
 		loadContent("technologiesList", $('#formMenu'), $("#feature_tab"), params);
 	});
+
+	function highlightMenu(selectedTab, unselectedTab) {
+		unselected.removeClass("selected");
+		unselected.addClass("selected");
+		selectedTab.addClass("unselected");
+	}
 });
 </script>

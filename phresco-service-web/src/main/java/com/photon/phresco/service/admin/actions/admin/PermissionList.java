@@ -26,7 +26,6 @@ import org.apache.log4j.Logger;
 import com.photon.phresco.commons.model.Permission;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
-import com.photon.phresco.service.admin.commons.LogErrorReport;
 import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
 
@@ -45,7 +44,7 @@ public class PermissionList extends ServiceBaseAction {
 			List<Permission> permissions = getServiceManager().getPermissions();
 			getHttpRequest().setAttribute(REQ_PERMISSIONS_LIST, permissions);
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, PERMISSION_LIST_EXCEPTION);
+//			new LogErrorReport(e, PERMISSION_LIST_EXCEPTION);
 
 			return LOG_ERROR;
 		}
@@ -70,7 +69,7 @@ public class PermissionList extends ServiceBaseAction {
 				addActionMessage(getText(PERMISSION_DELETED));
 			}
 		} catch (PhrescoException e) {
-			new LogErrorReport(e, PERMISSION_DELETE_EXCEPTION);
+//			new LogErrorReport(e, PERMISSION_DELETE_EXCEPTION);
 			
 			return LOG_ERROR;	
 		}
