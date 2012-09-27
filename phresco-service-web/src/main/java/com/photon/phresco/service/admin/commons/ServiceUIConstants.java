@@ -171,6 +171,12 @@ public interface ServiceUIConstants {
     String REQ_LOG_REPORT = "logReport";
     String LOG_ERROR = "logError";
     
+    String EXCEPTION_APPTYPES_LIST = "Application types list";
+    String EXCEPTION_APPTYPES_EDIT = "Application types edit";
+    String EXCEPTION_APPTYPES_SAVE = "Application types save";
+    String EXCEPTION_APPTYPES_UPDATE = "Application types update";
+    String EXCEPTION_APPTYPES_DELETE = "Application types delete";
+    
     String EXCEPTION_LOGIN = "Login Authenticate";
     String EXCEPTION_CUSTOMERS_DELETE = "Customers delete";
 	String EXCEPTION_CUSTOMERS_UPDATE = "Customers update";
@@ -302,12 +308,9 @@ public interface ServiceUIConstants {
     String COMPONENT_DELETED = "succ.component.delete";
     String COMPONENT_NOT_DELETED = "fail.component.delete" ;
     
-    String APPLNTYPES_ADDED = "succ.appType.add";
-    String APPLNTYPES_NOT_ADDED = "fail.appType.add";
-    String APPLNTYPES_UPDATED = "succ.appType.update";
-    String APPLNTYPES_NOT_UPDATED = "fail.appType.update";
-    String APPLNTYPES_DELETED = "succ.appType.delete";
-    String APPLNTYPES_NOT_DELETED = "fail.appType.delete" ;
+    String APPTYPES_ADDED = "succ.appType.add";
+    String APPTYPES_UPDATED = "succ.appType.update";
+    String APPTYPES_DELETED = "succ.appType.delete";
     
     String CONFIGTEMPLATE_ADDED = "succ.configtemplate.add";
     String CONFIGTEMPLATE_NOT_ADDED = "fail.configtemplate.add";

@@ -580,49 +580,49 @@
 	});
 	
 	function findError(data) {
-		if (data.nameError != undefined) {
+		if (!isBlank(data.nameError)) {
 			showError($("#nameControl"), $("#nameError"), data.nameError);
 		} else {
 			hideError($("#nameControl"), $("#nameError"));
 		}
 		
-		if (data.mailError != undefined) {
+		if (!isBlank(data.mailError)) {
 			showError($("#mailControl"), $("#mailError"), data.mailError);
 		} else {
 			hideError($("#mailControl"), $("#mailError"));
 		}
 		
-		if (data.addressError != undefined) {
+		if (!isBlank(data.addressError)) {
 			showError($("#addresControl"), $("#addresError"), data.addressError);
 		} else {
 			hideError($("#addresControl"), $("#addresError"));
 		}
 		
-		if (data.zipError != undefined) {
+		if (!isBlank(data.zipError)) {
 			showError($("#zipControl"), $("#zipError"), data.zipError);
 		} else {
 			hideError($("#zipControl"), $("#zipError"));
 		}
 		
-		if (data.numError != undefined) {
+		if (!isBlank(data.numError)) {
 			showError($("#numControl"), $("#numError"), data.numError);
 		} else {
 			hideError($("#numControl"), $("#numError"));
 		}
 		
-		if (data.faxError != undefined) {
+		if (!isBlank(data.faxError)) {
 			showError($("#faxControl"), $("#faxError"), data.faxError);
 		} else {
 			hideError($("#faxControl"), $("#faxError"));
 		}
 		
-		if (data.conError != undefined) {
+		if (!isBlank(data.conError)) {
 			showError($("#conControl"), $("#conError"), data.conError);
 		} else {
 			hideError($("#conControl"), $("#conError"));
 		}
 		
-		if (data.licenError != undefined) {
+		if (!isBlank(data.licenError)) {
 			showError($("#licenControl"), $("#licenError"), data.licenError);
 		} else {
 			hideError($("#licenControl"), $("#licenError"));

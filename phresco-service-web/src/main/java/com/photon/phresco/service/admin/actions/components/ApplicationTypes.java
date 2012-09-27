@@ -31,13 +31,13 @@ import org.apache.log4j.Logger;
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
-import com.sun.jersey.api.client.ClientResponse;
 
 public class ApplicationTypes extends ServiceBaseAction { 
 
 	private static final long serialVersionUID = 6801037145464060759L;
+	
 	private static final Logger S_LOGGER = Logger.getLogger(ApplicationTypes.class);
-	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
+	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
 
 	private String customerId = "";
 	
@@ -52,8 +52,8 @@ public class ApplicationTypes extends ServiceBaseAction {
     private String nameError = "";
     private boolean errorFound = false;
 
-    public String list() throws PhrescoException {
-	    if (isDebugEnabled) {
+    public String list() {
+	    if (s_isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method ApplicationTypes.list()");
 	    }
 
@@ -61,15 +61,15 @@ public class ApplicationTypes extends ServiceBaseAction {
 		    List<ApplicationType> applicationTypes = getServiceManager().getApplicationTypes(getCustomerId());
 		    setReqAttribute(REQ_APP_TYPES, applicationTypes);
 		    setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
-		} catch (Exception e) {
-			throw new PhrescoException(e);
+		} catch (PhrescoException e) {
+		    return showErrorPopup(e, EXCEPTION_APPTYPES_LIST);
 		}
 
 		return COMP_APPTYPE_LIST;
 	}
 
 	public String add() {
-	    if (isDebugEnabled) {
+	    if (s_isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method ApplicationTypes.add()");
 	    }
 	    
@@ -78,8 +78,8 @@ public class ApplicationTypes extends ServiceBaseAction {
 		return COMP_APPTYPE_ADD;
 	}
 
-	public String edit() throws PhrescoException {
-	    if (isDebugEnabled) {
+	public String edit() {
+	    if (s_isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method ApplicationTypes.edit()");
 	    }
 		
@@ -87,63 +87,58 @@ public class ApplicationTypes extends ServiceBaseAction {
 		    ApplicationType appType = getServiceManager().getApplicationType(getAppTypeId(), getCustomerId());
 		    setReqAttribute(REQ_APP_TYPE, appType);
 		    setReqAttribute(REQ_FROM_PAGE, EDIT);
-		} catch (Exception e) {
-		    throw new PhrescoException(e);
+		} catch (PhrescoException e) {
+		    return showErrorPopup(e, EXCEPTION_APPTYPES_EDIT);
 		}
 		
 		return COMP_APPTYPE_ADD;
 	}
 
-	public String save() throws PhrescoException {
-	    if (isDebugEnabled) {
+	public String save() {
+	    if (s_isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method ApplicationTypes.save()");
 	    }
 		
 		try {
 		    List<ApplicationType> appTypes = new ArrayList<ApplicationType>();
 			appTypes.add(createAppType());
-			ClientResponse clientResponse = getServiceManager().createApplicationTypes(appTypes, getCustomerId());
-			if (clientResponse.getStatus() != RES_CODE_200 && clientResponse.getStatus() != RES_CODE_201) {
-				addActionError(getText(APPLNTYPES_NOT_ADDED, Collections.singletonList(getName())));
-			} else {
-				addActionMessage(getText(APPLNTYPES_ADDED, Collections.singletonList(getName())));
-			}
-		}catch (Exception e) {
-			throw new PhrescoException(e);
-		}
+			getServiceManager().createApplicationTypes(appTypes, getCustomerId());
+			addActionMessage(getText(APPTYPES_ADDED, Collections.singletonList(getName())));
+		} catch (PhrescoException e) {
+            return showErrorPopup(e, EXCEPTION_APPTYPES_SAVE);
+        }
 		
-		return  list();
+		return list();
 	}
 
-	public String update() throws PhrescoException {
-	    if (isDebugEnabled) {
+	public String update() {
+	    if (s_isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Apptypes.update()");
 	    }
 
 		try {
 			ApplicationType appType = createAppType();
 			getServiceManager().updateApplicationType(appType, getAppTypeId(), getCustomerId());
-		} catch(Exception e)  {
-			throw new PhrescoException(e);
-		}
+			addActionMessage(getText(APPTYPES_UPDATED, Collections.singletonList(getName())));
+		} catch (PhrescoException e) {
+            return showErrorPopup(e, EXCEPTION_APPTYPES_UPDATE);
+        }
 
 		return list();
 	}
 
-    private ApplicationType createAppType() {
+    private ApplicationType createAppType() throws PhrescoException {
         ApplicationType appType = new ApplicationType();
+        appType.setId(getAppTypeId());
         appType.setName(getName());
         appType.setDescription(getDescription());
         appType.setCustomerIds(Arrays.asList(getCustomerId()));
-        if (StringUtils.isNotEmpty(getFromPage())) {
-            appType.setId(getAppTypeId());
-        }
         
         return appType;
     }
 
 	public String delete() throws PhrescoException {
-	    if (isDebugEnabled) {
+	    if (s_isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method AppType.delete()");
 	    }
 
@@ -151,22 +146,19 @@ public class ApplicationTypes extends ServiceBaseAction {
 			String[] appTypeIds = getHttpRequest().getParameterValues(REQ_APP_TYPEID);
 			if (ArrayUtils.isNotEmpty(appTypeIds)) {
 				for (String appTypeId : appTypeIds) {
-					ClientResponse clientResponse = getServiceManager().deleteApplicationType(appTypeId, getCustomerId());
-					if (clientResponse.getStatus() != RES_CODE_200) {
-						addActionError(getText(APPLNTYPES_NOT_DELETED));
-					}
+					getServiceManager().deleteApplicationType(appTypeId, getCustomerId());
 				}
-				addActionMessage(getText(APPLNTYPES_DELETED));
+				addActionMessage(getText(APPTYPES_DELETED));
 			}
-		} catch (Exception e) {
-			throw new PhrescoException(e);
+		} catch (PhrescoException e) {
+		    return showErrorPopup(e, EXCEPTION_APPTYPES_DELETE);
 		}
 
 		return list();
 	}
 
 	public String validateForm() {
-	    if (isDebugEnabled) {
+	    if (s_isDebugEnabled) {
             S_LOGGER.debug("Entering Method AppType.validateForm()");
         }
 

@@ -35,7 +35,6 @@ import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.Customer.LicenseType;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
-import com.sun.jersey.api.client.ClientResponse;
 
 public class Customers extends ServiceBaseAction  { 
 	
@@ -143,12 +142,8 @@ public class Customers extends ServiceBaseAction  {
 		try {
 			List<Customer> customers = new ArrayList<Customer>();
 			customers.add(createCustomer());
-			ClientResponse clientResponse = getServiceManager().createCustomers(customers);
-			if (clientResponse.getStatus() != RES_CODE_200) {
-				addActionError(getText(CUSTOMER_NOT_ADDED, Collections.singletonList(getName())));
-			} else {
-				addActionMessage(getText(CUSTOMER_ADDED, Collections.singletonList(getName())));
-			}
+			getServiceManager().createCustomers(customers);
+			addActionMessage(getText(CUSTOMER_ADDED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
 		    return showErrorPopup(e, EXCEPTION_CUSTOMERS_SAVE);
 		}
@@ -182,9 +177,7 @@ public class Customers extends ServiceBaseAction  {
 	 */
 	private Customer createCustomer() {
         Customer customer = new Customer();
-        if (StringUtils.isNotEmpty(getFromPage())) {
-            customer.setId(getCustomerId());
-        }
+        customer.setId(getCustomerId());
         customer.setName(getName());
         customer.setDescription(getDescription());
         customer.setEmailId(getEmail());
@@ -218,10 +211,7 @@ public class Customers extends ServiceBaseAction  {
 			String[] customerIds = getHttpRequest().getParameterValues(REQ_CUST_CUSTOMER_ID);
 			if (ArrayUtils.isNotEmpty(customerIds)) {
 				for (String customerId : customerIds) {
-			    	ClientResponse clientResponse = getServiceManager().deleteCustomer(customerId);
-			    	if (clientResponse.getStatus() != RES_CODE_200) {
-			        	addActionError(getText(CUSTOMER_NOT_DELETED));
-			        }
+			    	getServiceManager().deleteCustomer(customerId);
 				}
 				addActionMessage(getText(CUSTOMER_DELETED));
 			}
