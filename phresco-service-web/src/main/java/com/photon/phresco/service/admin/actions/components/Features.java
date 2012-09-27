@@ -45,7 +45,6 @@ import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.client.api.Content;
 import com.photon.phresco.service.model.FileInfo;
 import com.photon.phresco.service.util.ServerUtil;
-import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.MultiPart;
@@ -89,7 +88,7 @@ public class Features extends ServiceBaseAction {
     		S_LOGGER.debug("Entering Method  Features.menu()");
     	}
 
-		setReqAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+		setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		featureByteArray = null;
     	return COMP_FEATURES_LIST;
     }
@@ -120,7 +119,7 @@ public class Features extends ServiceBaseAction {
     	}
     	
     	try {
-    		List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
+    		List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
     		setReqAttribute(REQ_ARCHE_TYPES, technologies);
     		featureByteArray = null;
     	} catch (PhrescoException e) {
@@ -136,9 +135,9 @@ public class Features extends ServiceBaseAction {
     	}
     	
     	try {
-    		List<ArtifactGroup> moduleGroup = getServiceManager().getModules(customerId, technology, type);
+    		List<ArtifactGroup> moduleGroup = getServiceManager().getModules(getCustomerId(), getTechnology(), getType());
     		setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
-    		setReqAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+    		setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
     		if (StringUtils.isNotEmpty(from)) {
     		    return COMP_FEATURES_DEPENDENCY;
     		}
@@ -155,12 +154,11 @@ public class Features extends ServiceBaseAction {
 		}
 		
 		try {
-            List<Technology> technologies = getServiceManager().getArcheTypes(
-                    customerId);
+            List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
             setReqAttribute(REQ_ARCHE_TYPES, technologies);
-            setReqAttribute(REQ_CUST_CUSTOMER_ID, customerId);
-            setReqAttribute(REQ_FEATURES_TYPE, type);
-            if (REQ_FEATURES_MODULE.equals(type)) {
+            setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
+            setReqAttribute(REQ_FEATURES_TYPE, getType());
+            if (REQ_FEATURES_MODULE.equals(getType())) {
                 getHttpRequest().setAttribute(REQ_FEATURES_HEADER,
                         getText(KEY_I18N_FEATURE_MOD_ADD));
             } else {
@@ -180,14 +178,14 @@ public class Features extends ServiceBaseAction {
 		}
 		
 		try {
-		    List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
+		    List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
 		    setReqAttribute(REQ_ARCHE_TYPES, technologies);
-		    ArtifactGroup moduleGroup = getServiceManager().getFeature(moduleGroupId, customerId);
+		    ArtifactGroup moduleGroup = getServiceManager().getFeature(getModuleGroupId(), getCustomerId());
 		    setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
-		    setReqAttribute(REQ_FEATURES_SELECTED_MODULEID, moduleId);
+		    setReqAttribute(REQ_FEATURES_SELECTED_MODULEID, getModuleId());
 		    setReqAttribute(REQ_FROM_PAGE, EDIT);
-		    setReqAttribute(REQ_CUST_CUSTOMER_ID, customerId);
-			if (REQ_FEATURES_MODULE.equals(type)) {
+		    setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
+			if (REQ_FEATURES_MODULE.equals(getType())) {
 				getHttpRequest().setAttribute(REQ_FEATURES_HEADER, getText(KEY_I18N_FEATURE_MOD_EDIT));
 			} else {
 				getHttpRequest().setAttribute(REQ_FEATURES_HEADER, getText(KEY_I18N_FEATURE_JS_EDIT));
@@ -209,18 +207,18 @@ public class Features extends ServiceBaseAction {
 			BodyPart jsonPart = new BodyPart();
 			jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
 			jsonPart.setEntity(createModuleGroup());
-			Content content = new Content(Content.Type.JSON, name, null, null, null, 0);
+			Content content = new Content(Content.Type.JSON, getName(), null, null, null, 0);
 			jsonPart.setContentDisposition(content);
 			multiPart.bodyPart(jsonPart);
 			InputStream featureIs = new ByteArrayInputStream(featureByteArray);
-			BodyPart binaryPart = getServiceManager().createBodyPart(name, Content.Type.JAR, featureIs);
+			BodyPart binaryPart = getServiceManager().createBodyPart(getName(), Content.Type.JAR, featureIs);
 			multiPart.bodyPart(binaryPart);
 			
-			ClientResponse clientResponse = getServiceManager().createFeatures(multiPart, customerId);
-			if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200 && clientResponse.getStatus() != ServiceConstants.RES_CODE_201) {
-				addActionError(getText(FEATURE_NOT_UPDATED, Collections.singletonList(name)));
+			ClientResponse clientResponse = getServiceManager().createFeatures(multiPart, getCustomerId());
+			if (clientResponse.getStatus() != RES_CODE_200 && clientResponse.getStatus() != RES_CODE_201) {
+				addActionError(getText(FEATURE_NOT_UPDATED, Collections.singletonList(getName())));
 			} else {
-				addActionMessage(getText(FEATURE_UPDATED, Collections.singletonList(name)));
+				addActionMessage(getText(FEATURE_UPDATED, Collections.singletonList(getName())));
 			}
 		} catch (PhrescoException e) {
 			showErrorPopup(e, EXCEPTION_FEATURE_SAVE);
@@ -239,20 +237,20 @@ public class Features extends ServiceBaseAction {
             BodyPart jsonPart = new BodyPart();
             jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
             jsonPart.setEntity(createModuleGroup());
-            Content content = new Content(Content.Type.JSON, name, null, null, null, 0);
+            Content content = new Content(Content.Type.JSON, getName(), null, null, null, 0);
             jsonPart.setContentDisposition(content);
             multiPart.bodyPart(jsonPart);
             if (featureByteArray != null) {
                 InputStream featureIs = new ByteArrayInputStream(featureByteArray);
-                BodyPart binaryPart = getServiceManager().createBodyPart(name, Content.Type.JAR, featureIs);
+                BodyPart binaryPart = getServiceManager().createBodyPart(getName(), Content.Type.JAR, featureIs);
                 multiPart.bodyPart(binaryPart);
             }
 			    
-			ClientResponse clientResponse = getServiceManager().updateFeature(multiPart, moduleGroupId, customerId);
-			if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200 && clientResponse.getStatus() != ServiceConstants.RES_CODE_201) {
-                addActionError(getText(FEATURE_NOT_ADDED, Collections.singletonList(name)));
+			ClientResponse clientResponse = getServiceManager().updateFeature(multiPart, getModuleGroupId(), getCustomerId());
+			if (clientResponse.getStatus() != RES_CODE_200 && clientResponse.getStatus() != RES_CODE_201) {
+                addActionError(getText(FEATURE_NOT_ADDED, Collections.singletonList(getName())));
             } else {
-                addActionMessage(getText(FEATURE_ADDED, Collections.singletonList(name)));
+                addActionMessage(getText(FEATURE_ADDED, Collections.singletonList(getName())));
             }
 		} catch (PhrescoException e) {
 			showErrorPopup(e, EXCEPTION_FEATURE_UPDATE);
@@ -276,14 +274,14 @@ public class Features extends ServiceBaseAction {
             moduleGroup = new ArtifactGroup();
             List<ArtifactInfo> modules = new ArrayList<ArtifactInfo>();
             ArtifactInfo module = new ArtifactInfo();
-            if (StringUtils.isNotEmpty(fromPage)) {
-                moduleGroup.setId(moduleGroupId);
+            if (StringUtils.isNotEmpty(getFromPage())) {
+                moduleGroup.setId(getModuleGroupId());
             }
-            moduleGroup.setName(name);
-            if (FEATURES_CORE.equals(moduleType)) {
-            	moduleCoreOption= new CoreOption(technology, true);
+            moduleGroup.setName(getName());
+            if (FEATURES_CORE.equals(getModuleType())) {
+            	moduleCoreOption= new CoreOption(getTechnology(), true);
             } else {
-            	moduleCoreOption= new CoreOption(technology, false);;
+            	moduleCoreOption= new CoreOption(getTechnology(), false);;
             }
             
             appliesTo.add(moduleCoreOption);
@@ -291,24 +289,24 @@ public class Features extends ServiceBaseAction {
             //TODO: Change the Data type : ARUN PRASANNA
 //            moduleGroup.setType(type);
             List<String> customerIds = new ArrayList<String>();
-            customerIds.add(customerId);
+            customerIds.add(getCustomerId());
            
             moduleGroup.setCustomerIds(customerIds);
-            moduleGroup.setArtifactId(artifactId);
-            moduleGroup.setGroupId(groupId);
-            module.setName(name);
-            module.setDescription(description);
+            moduleGroup.setArtifactId(getArtifactId());
+            moduleGroup.setGroupId(getGroupId());
+            module.setName(getName());
+            module.setDescription(getDescription());
             
-            if (StringUtils.isNotEmpty(defaultType)) {
-            	requiredOption = new RequiredOption(technology, true);
+            if (StringUtils.isNotEmpty(getDefaultType())) {
+            	requiredOption = new RequiredOption(getTechnology(), true);
             } else {
-            	requiredOption = new RequiredOption(technology, false);
+            	requiredOption = new RequiredOption(getTechnology(), false);
             }
             required.add(requiredOption);
             module.setAppliesTo(required);
             
-            module.setHelpText(helpText);
-            module.setVersion(version);
+            module.setHelpText(getHelpText());
+            module.setVersion(getVersion());
             modules.add(module);
             moduleGroup.setVersions(modules);
         } catch (Exception e) {
@@ -327,8 +325,8 @@ public class Features extends ServiceBaseAction {
 			String[] moduleGroups = getHttpRequest().getParameterValues(REQ_FEATURES_MOD_GRP);
 			if (ArrayUtils.isNotEmpty(moduleGroups)) {
 				for (String moduleGroup : moduleGroups) {
-					ClientResponse clientResponse = getServiceManager().deleteFeature(moduleGroup, customerId);
-					if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
+					ClientResponse clientResponse = getServiceManager().deleteFeature(moduleGroup, getCustomerId());
+					if (clientResponse.getStatus() != RES_CODE_200) {
 						addActionError(getText(FEATURE_NOT_DELETED));
 					}
 				}
@@ -391,38 +389,37 @@ public class Features extends ServiceBaseAction {
 		
 		try {
             boolean isError = false;
-            if (StringUtils.isEmpty(name)) {
+            if (StringUtils.isEmpty(getName())) {
                 setNameError(getText(KEY_I18N_ERR_NAME_EMPTY));
                 isError = true;
             }
-            if (!EDIT.equals(fromPage) && featureByteArray == null) {
+            if (!EDIT.equals(getFromPage()) && featureByteArray == null) {
                 setFileError(getText(KEY_I18N_ERR_APPLNJAR_EMPTY));
                 isError = true;
             } 
             if (featureByteArray != null) {
-                if (StringUtils.isEmpty(groupId)) {
+                if (StringUtils.isEmpty(getGroupId())) {
                     setGroupIdError(getText(KEY_I18N_ERR_GROUPID_EMPTY));
                     isError = true;
                 }
-                if (StringUtils.isEmpty(artifactId)) {
+                if (StringUtils.isEmpty(getArtifactId())) {
                     setArtifactIdError(getText(KEY_I18N_ERR_ARTIFACTID_EMPTY));
                     isError = true;
                 }
-                if (StringUtils.isEmpty(version)) {
+                if (StringUtils.isEmpty(getVersion())) {
                     setVerError(getText(KEY_I18N_ERR_VER_EMPTY));
                     isError = true;
                 }
-                if (StringUtils.isNotEmpty(version) && (StringUtils.isEmpty(fromPage) 
-                        || (!version.equals(oldVersion)))) {//To check whether the version already exist
-                    List<ArtifactGroup> moduleGroups = getServiceManager().getModules(customerId, technology, type);
-                    if (StringUtils.isNotEmpty(version)) {
+                if (StringUtils.isNotEmpty(getVersion()) && (StringUtils.isEmpty(getFromPage()) 
+                        || (!getVersion().equals(getOldVersion())))) {//To check whether the version already exist
+                    List<ArtifactGroup> moduleGroups = getServiceManager().getModules(getCustomerId(), getTechnology(), getType());
+                    if (StringUtils.isNotEmpty(getVersion())) {
                         for (ArtifactGroup moduleGroup : moduleGroups) {
                             List<ArtifactInfo> versions = moduleGroup.getVersions();
                             if (CollectionUtils.isNotEmpty(versions)) {
                                 for (ArtifactInfo module : versions) {
-                                    if (module.getName().equalsIgnoreCase(name)
-                                            && module.getVersion().equals(
-                                                    version)) {
+                                    if (module.getName().equalsIgnoreCase(getName())
+                                            && module.getVersion().equals(getVersion())) {
                                         setVerError(getText(KEY_I18N_ERR_VER_ALREADY_EXISTS));
                                         isError = true;
                                         break;
