@@ -41,8 +41,9 @@ import com.sun.jersey.api.client.ClientResponse;
 public class ConfigTemplates extends ServiceBaseAction { 
 	
 	private static final long serialVersionUID = 6801037145464060759L;
+	
 	private static final Logger S_LOGGER = Logger.getLogger(ConfigTemplates.class);
-	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
+	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
 	private String name = null;
 	private String description = null;
@@ -57,7 +58,7 @@ public class ConfigTemplates extends ServiceBaseAction {
     private String oldName = null;
     
 	public String list() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method ConfigTemplates.list()");
 		}
 		
@@ -66,14 +67,14 @@ public class ConfigTemplates extends ServiceBaseAction {
 			setReqAttribute(REQ_CONFIG_TEMPLATES, configTemplates);
 			setReqAttribute(REQ_CUST_CUSTOMER_ID, customerId);
 		} catch (PhrescoException e) {
-			showErrorPopup(e, CONFIG_TEMP_LIST_EXCEPTION);
+			return showErrorPopup(e, EXCEPTION_CONFIG_TEMP_LIST);
 		}
 		
 		return COMP_CONFIGTEMPLATE_LIST;
 	}
 	
 	public String add() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method ConfigTemplates.add()");
 		}
 		
@@ -81,14 +82,14 @@ public class ConfigTemplates extends ServiceBaseAction {
 			List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
 			setReqAttribute(REQ_ARCHE_TYPES, technologies);
 		} catch (PhrescoException e) {
-			showErrorPopup(e, CONFIG_TEMP_ADD_EXCEPTION);
+		    return showErrorPopup(e, EXCEPTION_CONFIG_TEMP_ADD);
 		}
 		
 		return COMP_CONFIGTEMPLATE_ADD;
 	}
 	
 	public String edit() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method ConfigTemplates.edit()");
 		}
 		
@@ -99,14 +100,14 @@ public class ConfigTemplates extends ServiceBaseAction {
 			setReqAttribute(REQ_ARCHE_TYPES, technologies);
 			setReqAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (PhrescoException e) {
-			showErrorPopup(e, CONFIG_TEMP_EDIT_EXCEPTION);
+		    return showErrorPopup(e, EXCEPTION_CONFIG_TEMP_EDIT);
 		}
 		
 		return COMP_CONFIGTEMPLATE_ADD;
 	}
 	
 	public String save() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method ConfigTemplates.save()");
 		}
 		
@@ -129,14 +130,14 @@ public class ConfigTemplates extends ServiceBaseAction {
             	addActionMessage(getText(CONFIGTEMPLATE_ADDED, Collections.singletonList(name)));
             }
 		} catch (PhrescoException e) {
-			showErrorPopup(e, CONFIG_TEMP_SAVE_EXCEPTION);
+		    return showErrorPopup(e, EXCEPTION_CONFIG_TEMP_SAVE);
 		}
 		
 		return  list();
 	}
 
 	public String update() throws PhrescoException {
-    	if (isDebugEnabled) {
+    	if (s_isDebugEnabled) {
     		S_LOGGER.debug("Entering Method  ConfigTemplates.update()");
     	}
     	
@@ -152,14 +153,14 @@ public class ConfigTemplates extends ServiceBaseAction {
             settingTemplate.setProperties(createPropertyTemplates());
     		getServiceManager().updateConfigTemp(settingTemplate, configId, customerId);
     	} catch (PhrescoException e) {
-    		showErrorPopup(e, CONFIG_TEMP_UPDATE_EXCEPTION);
+    	    return showErrorPopup(e, EXCEPTION_CONFIG_TEMP_UPDATE);
 		}
 
     	return list();
     }
 	
 	private List<PropertyTemplate> createPropertyTemplates() throws PhrescoException {
-        if (isDebugEnabled) {
+        if (s_isDebugEnabled) {
             S_LOGGER.debug("Entering Method ConfigTemplates.createPropertyTemplates()");
         }
         
@@ -213,13 +214,13 @@ public class ConfigTemplates extends ServiceBaseAction {
     }
 	
 	public String delete() throws PhrescoException {
-	    if (isDebugEnabled) {
+	    if (s_isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method ConfigTemplates.delete()");
 	    }
 
 		try {
 			String[] configIds = getHttpRequest().getParameterValues(REQ_CONFIG_ID);
-			if (configIds != null) {
+			if (ArrayUtils.isNotEmpty(configIds)) {
 				for (String configId : configIds) {
 					ClientResponse clientResponse = getServiceManager().deleteConfigTemp(configId, customerId);
 					if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
@@ -229,14 +230,14 @@ public class ConfigTemplates extends ServiceBaseAction {
 				addActionMessage(getText(CONFIGTEMPLATE_DELETED));
 			}
 		} catch (PhrescoException e) {
-			showErrorPopup(e, CONFIG_TEMP_DELETE_EXCEPTION);
+		    return showErrorPopup(e, EXCEPTION_CONFIG_TEMP_DELETE);
 		}
 
 		return list();
 	}
 	
 	public String validateForm() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method ConfigTemplates.validateForm()");
 		}
 

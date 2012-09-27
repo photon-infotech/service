@@ -48,8 +48,9 @@ import com.sun.jersey.multipart.MultiPart;
 public class PilotProjects extends ServiceBaseAction { 
 	
 	private static final long serialVersionUID = 6801037145464060759L;
+	
 	private static final Logger S_LOGGER = Logger.getLogger(PilotProjects.class);
-	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
+	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
 	private String name = null;
 	private String nameError = null;
@@ -70,7 +71,7 @@ public class PilotProjects extends ServiceBaseAction {
 	private static String pilotProJarName = null;
 
 	public String list() throws PhrescoException {
-        if (isDebugEnabled) {
+        if (s_isDebugEnabled) {
             S_LOGGER.debug("Entering Method PilotProjects.list()");
         }
 
@@ -79,7 +80,7 @@ public class PilotProjects extends ServiceBaseAction {
 			setReqAttribute(REQ_PILOT_PROJECTS, pilotProjects);
 			setReqAttribute(REQ_CUST_CUSTOMER_ID, customerId);
 		} catch (PhrescoException e) {
-			return showErrorPopup(e, PILOT_PROJECTS_LIST_EXCEPTION);
+			return showErrorPopup(e, EXCEPTION_PILOT_PROJECTS_LIST);
 		}
 		
 		//to clear file input stream and byte array
@@ -90,7 +91,7 @@ public class PilotProjects extends ServiceBaseAction {
 	}
 	
     public String add() throws PhrescoException {
-    	if (isDebugEnabled) {	
+    	if (s_isDebugEnabled) {	
     		S_LOGGER.debug("Entering Method PilotProjects.add()");
     	}
     	
@@ -98,14 +99,14 @@ public class PilotProjects extends ServiceBaseAction {
     		List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
     		setReqAttribute(REQ_ARCHE_TYPES, technologies);
     	} catch (PhrescoException e) {
-    		return showErrorPopup(e, PILOT_PROJECTS_ADD_EXCEPTION);
+    		return showErrorPopup(e, EXCEPTION_PILOT_PROJECTS_ADD);
 		}
     	
     	return COMP_PILOTPROJ_ADD;
     }
 	
     public String edit() throws PhrescoException {
-    	if (isDebugEnabled) {
+    	if (s_isDebugEnabled) {
     		S_LOGGER.debug("Entering Method PilotProjects.edit()");
     	}
 
@@ -114,14 +115,14 @@ public class PilotProjects extends ServiceBaseAction {
     		setReqAttribute(REQ_PILOT_PROINFO, pilotProjectInfo);
     		setReqAttribute(REQ_FROM_PAGE, EDIT);
     	} catch (PhrescoException e) {
-    		return showErrorPopup(e, PILOT_PROJECTS_EDIT_EXCEPTION);
+    		return showErrorPopup(e, EXCEPTION_PILOT_PROJECTS_EDIT);
 		}
 
     	return COMP_PILOTPROJ_ADD;
     }
     
     public String save() throws PhrescoException {
-    	if (isDebugEnabled) {
+    	if (s_isDebugEnabled) {
     		S_LOGGER.debug("Entering Method PilotProjects.save()");
     	}
     	
@@ -188,14 +189,14 @@ public class PilotProjects extends ServiceBaseAction {
     			addActionMessage(getText(PLTPROJ_ADDED, Collections.singletonList(name)));
     		}
     	} catch (PhrescoException e) {
-    		return showErrorPopup(e, PILOT_PROJECTS_SAVE_EXCEPTION);
+    		return showErrorPopup(e, EXCEPTION_PILOT_PROJECTS_SAVE);
 		}
 
     	return list();
     }
     
     public String update() throws PhrescoException {
-    	if (isDebugEnabled) {
+    	if (s_isDebugEnabled) {
     		S_LOGGER.debug("Entering Method  PilotProjects.update()");
     	}
 
@@ -265,14 +266,14 @@ public class PilotProjects extends ServiceBaseAction {
     		
     		getServiceManager().updatePilotProject(pilotProInfo, projectId, customerId);
     	} catch (PhrescoException e) {
-    		return showErrorPopup(e, PILOT_PROJECTS_UPDATE_EXCEPTION);
+    		return showErrorPopup(e, EXCEPTION_PILOT_PROJECTS_UPDATE);
 		}
 
     	return list();
     }
 	
     public String delete() throws PhrescoException {
-    	if (isDebugEnabled) {
+    	if (s_isDebugEnabled) {
     		S_LOGGER.debug("Entering Method PilotProjects.delete()");
     	}
 
@@ -288,14 +289,14 @@ public class PilotProjects extends ServiceBaseAction {
     			addActionMessage(getText(PLTPROJ_DELETED));
     		}
     	}catch (PhrescoException e) {
-    		return showErrorPopup(e, PILOT_PROJECTS_DELETE_EXCEPTION);
+    		return showErrorPopup(e, EXCEPTION_PILOT_PROJECTS_DELETE);
 		}
 
     	return list();
     }
     
     public String uploadFile() throws PhrescoException {
-    	if (isDebugEnabled) {
+    	if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  PilotProjects.uploadFile()");
 		}
     	
@@ -322,7 +323,7 @@ public class PilotProjects extends ServiceBaseAction {
 	}
 	
 	public void removeUploadedFile() {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  PilotProjects.removeUploadedFile()");
 		}
 		pilotProJarName = null;
@@ -330,7 +331,7 @@ public class PilotProjects extends ServiceBaseAction {
 	}
 	
     public String validateForm() throws PhrescoException {
-    	if (isDebugEnabled) {
+    	if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  PilotProjects.validateForm()");
 		}
     	

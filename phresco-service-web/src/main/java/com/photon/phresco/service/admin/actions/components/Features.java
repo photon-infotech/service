@@ -53,8 +53,9 @@ import com.sun.jersey.multipart.MultiPart;
 public class Features extends ServiceBaseAction {
 
     private static final long serialVersionUID = 6801037145464060759L;
+    
 	private static final Logger S_LOGGER = Logger.getLogger(Features.class);
-	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
+	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
 	private static byte[] featureByteArray = null;
 	
@@ -84,7 +85,7 @@ public class Features extends ServiceBaseAction {
 	private boolean errorFound = false;
     
 	public String menu() {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
     		S_LOGGER.debug("Entering Method  Features.menu()");
     	}
 
@@ -94,7 +95,7 @@ public class Features extends ServiceBaseAction {
     }
 	
 	public String modulesList() {
-	    if (isDebugEnabled) {
+	    if (s_isDebugEnabled) {
             S_LOGGER.debug("Entering Method  Features.modulesList()");
         }
 	    
@@ -104,7 +105,7 @@ public class Features extends ServiceBaseAction {
 	}
 	
 	public String jsLibList() {
-	    if (isDebugEnabled) {
+	    if (s_isDebugEnabled) {
             S_LOGGER.debug("Entering Method  Features.jsLibList()");
         }
 	    
@@ -114,7 +115,7 @@ public class Features extends ServiceBaseAction {
     }
 	
     private String setTechnologiesInRequest() {
-    	if (isDebugEnabled) {
+    	if (s_isDebugEnabled) {
     		S_LOGGER.debug("Entering Method  Features.list()");
     	}
     	
@@ -123,14 +124,14 @@ public class Features extends ServiceBaseAction {
     		setReqAttribute(REQ_ARCHE_TYPES, technologies);
     		featureByteArray = null;
     	} catch (PhrescoException e) {
-    	    return showErrorPopup(e, FEATURE_LIST_EXCEPTION);
+    	    return showErrorPopup(e, EXCEPTION_FEATURE_LIST);
     	}
     	
     	return COMP_FEATURES_LIST;
     }
     
     public String listFeatures() {
-    	if (isDebugEnabled) {
+    	if (s_isDebugEnabled) {
     		S_LOGGER.debug("Entering Method  Features.featurelist()");
     	}
     	
@@ -142,14 +143,14 @@ public class Features extends ServiceBaseAction {
     		    return COMP_FEATURES_DEPENDENCY;
     		}
     	} catch (PhrescoException e) {
-    	    return showErrorPopup(e, FEATURE_LIST_EXCEPTION);
+    	    return showErrorPopup(e, EXCEPTION_FEATURE_LIST);
     	}
     	
     	return COMP_FEATURES_LIST;
     }
 	
 	public String add() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Features.add()");
 		}
 		
@@ -167,14 +168,14 @@ public class Features extends ServiceBaseAction {
                         getText(KEY_I18N_FEATURE_JS_ADD));
             }
         } catch (PhrescoException e) {
-            return showErrorPopup(e, FEATURE_ADD_EXCEPTION);            
+            return showErrorPopup(e, EXCEPTION_FEATURE_ADD);            
         }
         
         return COMP_FEATURES_ADD;
 	}
 	
 	public String edit() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Features.edit()");
 		}
 		
@@ -192,14 +193,14 @@ public class Features extends ServiceBaseAction {
 				getHttpRequest().setAttribute(REQ_FEATURES_HEADER, getText(KEY_I18N_FEATURE_JS_EDIT));
 			}
 		} catch (PhrescoException e) {
-			showErrorPopup(e, FEATURE_EDIT_EXCEPTION);
+			showErrorPopup(e, EXCEPTION_FEATURE_EDIT);
 		}
 
 		return COMP_FEATURES_ADD;
 	}
 	
 	public String save() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Features.save()");
 		}
 		
@@ -222,14 +223,14 @@ public class Features extends ServiceBaseAction {
 				addActionMessage(getText(FEATURE_UPDATED, Collections.singletonList(name)));
 			}
 		} catch (PhrescoException e) {
-			showErrorPopup(e, FEATURE_SAVE_EXCEPTION);
+			showErrorPopup(e, EXCEPTION_FEATURE_SAVE);
 		} 
 
 		return setTechnologiesInRequest();
 	}
 	
 	public String update() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Features.update()");
 		}
 		
@@ -254,14 +255,14 @@ public class Features extends ServiceBaseAction {
                 addActionMessage(getText(FEATURE_ADDED, Collections.singletonList(name)));
             }
 		} catch (PhrescoException e) {
-			showErrorPopup(e, FEATURE_UPDATE_EXCEPTION);
+			showErrorPopup(e, EXCEPTION_FEATURE_UPDATE);
 		}
 		
 		return setTechnologiesInRequest();	
 	}
 	
 	private ArtifactGroup createModuleGroup() throws PhrescoException {
-	    if (isDebugEnabled) {
+	    if (s_isDebugEnabled) {
             S_LOGGER.debug("Entering Method  Features.createModuleGroup()");
         }
 	    
@@ -318,7 +319,7 @@ public class Features extends ServiceBaseAction {
     }
 	
 	public String delete() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Features.delete()");
 		}
 		
@@ -334,14 +335,14 @@ public class Features extends ServiceBaseAction {
 				addActionMessage(getText(FEATURE_DELETED));
 			}
 		} catch (PhrescoException e) {
-			showErrorPopup(e, FEATURE_DELETE_EXCEPTION);
+			showErrorPopup(e, EXCEPTION_FEATURE_DELETE);
 		}
 		
 		return setTechnologiesInRequest();
 	}
 	
 	public String uploadFile() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Features.uploadFile()");
 		}
 		
@@ -376,7 +377,7 @@ public class Features extends ServiceBaseAction {
 	}
 	
 	public void removeUploadedFile() {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Features.removeUploadedFile()");
 		}
 		
@@ -384,7 +385,7 @@ public class Features extends ServiceBaseAction {
 	}
 
 	public String validateForm() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Features.validateForm()");
 		}
 		

@@ -23,7 +23,9 @@ import com.photon.phresco.commons.model.ArtifactGroup;
 
 public class FileInfo extends ArtifactGroup {
 
-	private boolean isMavenJar;
+    private static final long serialVersionUID = 1L;
+    
+    private boolean isMavenJar;
 	private boolean success;
 	
 	public boolean isMavenJar() {

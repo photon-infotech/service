@@ -193,46 +193,47 @@ public interface ServiceUIConstants {
 	String GLOBAL_URL_EDIT_EXCEPTION = "GlobalUrl edit";
 	String GLOBAL_URL_LIST_EXCEPTION = "GlobalUrl list";
 	
-	String FEATURE_DELETE_EXCEPTION = "Feature delete";
-	String FEATURE_UPDATE_EXCEPTION = "Feature update";
-	String FEATURE_SAVE_EXCEPTION = "Feature save";
-	String FEATURE_EDIT_EXCEPTION = "Feature edit";
-	String FEATURE_LIST_EXCEPTION = "Feature list";
-	String FEATURE_ADD_EXCEPTION = "Feature add";
+	String EXCEPTION_FEATURE_DELETE = "Feature delete";
+	String EXCEPTION_FEATURE_UPDATE = "Feature update";
+	String EXCEPTION_FEATURE_SAVE = "Feature save";
+	String EXCEPTION_FEATURE_EDIT = "Feature edit";
+	String EXCEPTION_FEATURE_LIST = "Feature list";
+	String EXCEPTION_FEATURE_ADD = "Feature add";
 	
-	String COMPONENT_DELETE_EXCEPTION = "Component delete";
-	String COMPONENT_UPDATE_EXCEPTION = "Component update";
-	String COMPONENT_SAVE_EXCEPTION = "Component save";
-	String COMPONENT_EDIT_EXCEPTION = "Component edit";
-	String COMPONENT_LIST_EXCEPTION = "Component list";
+	String EXCEPTION_COMPONENT_DELETE = "Component delete";
+	String EXCEPTION_COMPONENT_UPDATE = "Component update";
+	String EXCEPTION_COMPONENT_SAVE = "Component save";
+	String EXCEPTION_COMPONENT_ADD = "Component add";
+	String EXCEPTION_COMPONENT_EDIT = "Component edit";
+	String EXCEPTION_COMPONENT_LIST = "Component list";
 	
-	String ARCHETYPE_DELETE_EXCEPTION = "Archetype delete";
-	String ARCHETYPE_UPDATE_EXCEPTION = "Archetype update";
-	String ARCHETYPE_SAVE_EXCEPTION = "Archetype save";
-	String ARCHETYPE_EDIT_EXCEPTION = "Archetype edit";
-	String ARCHETYPE_ADD_EXCEPTION = "Archetype add";
-	String ARCHETYPE_LIST_EXCEPTION = "Archetype list";
+	String EXCEPTION_ARCHETYPE_DELETE = "Archetype delete";
+	String EXCEPTION_ARCHETYPE_UPDATE = "Archetype update";
+	String EXCEPTION_ARCHETYPE_SAVE = "Archetype save";
+	String EXCEPTION_ARCHETYPE_EDIT = "Archetype edit";
+	String EXCEPTION_ARCHETYPE_ADD = "Archetype add";
+	String EXCEPTION_ARCHETYPE_LIST = "Archetype list";
 	
-	String CONFIG_TEMP_DELETE_EXCEPTION = "ConfigTemplate delete";
-	String CONFIG_TEMP_UPDATE_EXCEPTION = "ConfigTemplate update";
-	String CONFIG_TEMP_SAVE_EXCEPTION = "ConfigTemplate save";
-	String CONFIG_TEMP_EDIT_EXCEPTION = "ConfigTemplate edit";
-	String CONFIG_TEMP_ADD_EXCEPTION = "ConfigTemplate add";
-	String CONFIG_TEMP_LIST_EXCEPTION = "ConfigTemplate list";
+	String EXCEPTION_CONFIG_TEMP_DELETE = "ConfigTemplate delete";
+	String EXCEPTION_CONFIG_TEMP_UPDATE = "ConfigTemplate update";
+	String EXCEPTION_CONFIG_TEMP_SAVE = "ConfigTemplate save";
+	String EXCEPTION_CONFIG_TEMP_EDIT = "ConfigTemplate edit";
+	String EXCEPTION_CONFIG_TEMP_ADD = "ConfigTemplate add";
+	String EXCEPTION_CONFIG_TEMP_LIST = "ConfigTemplate list";
 	
-	String PILOT_PROJECTS_DELETE_EXCEPTION = "PilotProjects delete";
-	String PILOT_PROJECTS_UPDATE_EXCEPTION = "PilotProjects update";
-	String PILOT_PROJECTS_SAVE_EXCEPTION = "PilotProjects save";
-	String PILOT_PROJECTS_EDIT_EXCEPTION = "PilotProjects edit";
-	String PILOT_PROJECTS_ADD_EXCEPTION = "PilotProjects add";
-	String PILOT_PROJECTS_LIST_EXCEPTION = "PilotProjects list";
+	String EXCEPTION_PILOT_PROJECTS_DELETE = "PilotProjects delete";
+	String EXCEPTION_PILOT_PROJECTS_UPDATE = "PilotProjects update";
+	String EXCEPTION_PILOT_PROJECTS_SAVE = "PilotProjects save";
+	String EXCEPTION_PILOT_PROJECTS_EDIT = "PilotProjects edit";
+	String EXCEPTION_PILOT_PROJECTS_ADD = "PilotProjects add";
+	String EXCEPTION_PILOT_PROJECTS_LIST = "PilotProjects list";
 	
-	String DOWNLOADS_DELETE_EXCEPTION = "Downloads delete";
-	String DOWNLOADS_UPDATE_EXCEPTION = "Downloads update";
-	String DOWNLOADS_SAVE_EXCEPTION = "Downloads save";
-	String DOWNLOADS_EDIT_EXCEPTION = "Downloads edit";
-	String DOWNLOADS_ADD_EXCEPTION = "Downloads add";
-	String DOWNLOADS_LIST_EXCEPTION = "Downloads list";
+	String EXCEPTION_DOWNLOADS_DELETE = "Downloads delete";
+	String EXCEPTION_DOWNLOADS_UPDATE = "Downloads update";
+	String EXCEPTION_DOWNLOADS_SAVE = "Downloads save";
+	String EXCEPTION_DOWNLOADS_EDIT = "Downloads edit";
+	String EXCEPTION_DOWNLOADS_ADD = "Downloads add";
+	String EXCEPTION_DOWNLOADS_LIST = "Downloads list";
 	
 	/*****************************
      * I18N Keys Constants

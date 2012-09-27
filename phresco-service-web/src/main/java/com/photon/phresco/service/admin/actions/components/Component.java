@@ -29,6 +29,7 @@ import java.util.List;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -48,8 +49,9 @@ import com.sun.jersey.multipart.MultiPart;
 public class Component extends ServiceBaseAction {
 
 	private static final long serialVersionUID = 6801037145464060759L;
+	
 	private static final Logger S_LOGGER = Logger.getLogger(Features.class);
-	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
+	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
 	private String name = null;
 	private String nameError = null;
@@ -84,7 +86,7 @@ public class Component extends ServiceBaseAction {
 	private String appJarError = "";
 	
     public String list() {
-    	if (isDebugEnabled) {
+    	if (s_isDebugEnabled) {
     		S_LOGGER.debug("Entering Method  Component.list()");
     	}
     	
@@ -93,14 +95,14 @@ public class Component extends ServiceBaseAction {
     		List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
     		setReqAttribute(REQ_ARCHE_TYPES, technologies);
     	} catch (PhrescoException e){
-    		showErrorPopup(e, COMPONENT_LIST_EXCEPTION);
+    	    return showErrorPopup(e, EXCEPTION_COMPONENT_LIST);
     	}
     	
     	return COMP_COMPONENT_LIST;
     }
     
     public String componentWithList() {
-    	if (isDebugEnabled) {
+    	if (s_isDebugEnabled) {
     		S_LOGGER.debug("Entering Method  Component.componentlist()");
     	}
     	
@@ -112,26 +114,31 @@ public class Component extends ServiceBaseAction {
     		    return COMP_FEATURES_DEPENDENCY;
     		}
     	} catch (PhrescoException e){
-    		showErrorPopup(e, COMPONENT_LIST_EXCEPTION);
+    	    return showErrorPopup(e, EXCEPTION_COMPONENT_LIST);
     	}
     	
     	return COMP_COMPONENT_LIST;
     }
 	
 	public String add() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Component.add()");
 		}
+		
+		try {
 		
 		List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
 		setReqAttribute(REQ_ARCHE_TYPES, technologies);
 		setReqAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+		}catch (PhrescoException e) {
+		    return showErrorPopup(e, EXCEPTION_COMPONENT_ADD);
+		}
 	
 		return COMP_COMPONENT_ADD;
 	}
 	
 	public String edit() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Component.edit()");
 		}
 		
@@ -141,14 +148,14 @@ public class Component extends ServiceBaseAction {
 		    setReqAttribute(REQ_FROM_PAGE, EDIT);
 		    setReqAttribute(REQ_CUST_CUSTOMER_ID, customerId);
 		} catch (PhrescoException e) {
-			showErrorPopup(e, COMPONENT_EDIT_EXCEPTION);
+		    return showErrorPopup(e, EXCEPTION_COMPONENT_EDIT);
 		}
 
 		return COMP_COMPONENT_ADD;
 	}
 	
 	public String save() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Component.save()");
 		}
 		
@@ -173,14 +180,14 @@ public class Component extends ServiceBaseAction {
 				addActionMessage(getText(COMPONENT_ADDED, Collections.singletonList(name)));
 			}
 		} catch (PhrescoException e) {
-			showErrorPopup(e, COMPONENT_SAVE_EXCEPTION);    		
+		    return showErrorPopup(e, EXCEPTION_COMPONENT_SAVE);    		
 		} 
 
 		return list();
 	}
 	
 	private ArtifactGroup createModuleGroup() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Component.createModuleGroup()");
 		}
 
@@ -228,7 +235,7 @@ public class Component extends ServiceBaseAction {
 	}
 	
 	public String update() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Component.update()");
 		}
 		
@@ -249,20 +256,20 @@ public class Component extends ServiceBaseAction {
 			
 			getServiceManager().updateFeature(multiPart, techId, customerId);
 		} catch (PhrescoException e) {
-			showErrorPopup(e, COMPONENT_UPDATE_EXCEPTION);
+		    return showErrorPopup(e, EXCEPTION_COMPONENT_UPDATE);
 		}
 		
 		return list();	
 	}
 	
 	public String delete() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Component.delete()");
 		}
 		
 		try {
 			String[] techIds = getHttpRequest().getParameterValues(REST_QUERY_TECHID);
-			if (techIds != null) {
+			if (ArrayUtils.isNotEmpty(techIds)) {
 				for (String techId : techIds) {
 					ClientResponse clientResponse = getServiceManager().deleteFeature(techId, customerId);
 					if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
@@ -272,14 +279,14 @@ public class Component extends ServiceBaseAction {
 				addActionMessage(getText(COMPONENT_DELETED));
 			}
 		} catch (PhrescoException e) {
-			showErrorPopup(e, COMPONENT_DELETE_EXCEPTION);
+		    return showErrorPopup(e, EXCEPTION_COMPONENT_DELETE);
 		}
 		
 		return list();
 	}
 	
 	public String uploadFile() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Component.uploadFile()");
 		}
 		
@@ -294,7 +301,6 @@ public class Component extends ServiceBaseAction {
 	        writer.print(SUCCESS_TRUE);
 	        writer.flush();
 	        writer.close();
-	        
 		} catch (Exception e) {
 			getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
             writer.print(SUCCESS_FALSE);
@@ -305,7 +311,7 @@ public class Component extends ServiceBaseAction {
 	}
 	
 	public void removeUploadedFile() {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Component.removeUploadedFile()");
 		}
 		
@@ -314,7 +320,7 @@ public class Component extends ServiceBaseAction {
 	}
 
 	public String validateForm() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Component.validateForm()");
 		}
 		

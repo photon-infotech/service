@@ -32,6 +32,7 @@ import java.util.Map;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -55,8 +56,9 @@ import com.sun.jersey.multipart.MultiPart;
 public class Archetypes extends ServiceBaseAction { 
 
 	private static final long serialVersionUID = 6801037145464060759L;
+	
 	private static final Logger S_LOGGER = Logger.getLogger(Archetypes.class);
-	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
+	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
 	/* plugin and appln jar upload*/
 	private static Map<String, byte[]> pluginMap = new HashMap<String, byte[]>();
@@ -88,7 +90,7 @@ public class Archetypes extends ServiceBaseAction {
 	private String artifactId = "";
 	
 	public String list() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.list()");
 		}
 
@@ -99,7 +101,7 @@ public class Archetypes extends ServiceBaseAction {
 			setReqAttribute(REQ_ARCHE_TYPES, technologies);
 			setReqAttribute(REQ_CUST_CUSTOMER_ID, customerId);
 		} catch (PhrescoException e) {
-			showErrorPopup(e, ARCHETYPE_LIST_EXCEPTION);
+			return showErrorPopup(e, EXCEPTION_ARCHETYPE_LIST);
 		}
 		
 		/* To clear appln & plugin input streams */
@@ -111,7 +113,7 @@ public class Archetypes extends ServiceBaseAction {
 	}
 
 	public String add() throws PhrescoException {
-	    if (isDebugEnabled) {
+	    if (s_isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Archetypes.add()");
 	    }
 
@@ -119,14 +121,14 @@ public class Archetypes extends ServiceBaseAction {
 			List<ApplicationType> appTypes = getServiceManager().getApplicationTypes(customerId);
 			setReqAttribute(REQ_APP_TYPES, appTypes);
 		} catch (PhrescoException e) {
-			showErrorPopup(e, ARCHETYPE_ADD_EXCEPTION);
+		    return showErrorPopup(e, EXCEPTION_ARCHETYPE_ADD);
 		}
 
 		return COMP_ARCHETYPE_ADD;
 	}
 	
 	public String edit() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.edit()");
 		}
 
@@ -137,14 +139,14 @@ public class Archetypes extends ServiceBaseAction {
 			List<ApplicationType> appTypes = getServiceManager().getApplicationTypes(customerId);
 			setReqAttribute(REQ_APP_TYPES, appTypes);
 		} catch (PhrescoException e) {
-			showErrorPopup(e, ARCHETYPE_EDIT_EXCEPTION);
+		    return showErrorPopup(e, EXCEPTION_ARCHETYPE_EDIT);
 		}
 
 		return COMP_ARCHETYPE_ADD;
 	}
 	
 	public String save() throws PhrescoException {
-	    if (isDebugEnabled) {
+	    if (s_isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Archetypes.save()");
 	    }
 		
@@ -191,14 +193,14 @@ public class Archetypes extends ServiceBaseAction {
 				addActionMessage(getText(ARCHETYPE_ADDED, Collections.singletonList(name)));
 			}
 		} catch (PhrescoException e) {
-			showErrorPopup(e, ARCHETYPE_SAVE_EXCEPTION);
+		    return showErrorPopup(e, EXCEPTION_ARCHETYPE_SAVE);
 		} 
 		
 		return list();
 	}
 	
 	public String update() throws PhrescoException {
-	    if (isDebugEnabled) {
+	    if (s_isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Archetypes.update()");
 	    }
 
@@ -245,20 +247,20 @@ public class Archetypes extends ServiceBaseAction {
 			MultiPart multiPart = fileUpload(technology);
 			getServiceManager().updateArcheType(technology, techId, customerId);
 		} catch(PhrescoException e) {
-			showErrorPopup(e, ARCHETYPE_UPDATE_EXCEPTION);
+		    return showErrorPopup(e, EXCEPTION_ARCHETYPE_UPDATE);
 		}
 		
 		return list();
 	}
 
 	public String delete() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.delete()");
 		}
 
 		try {
 			String[] techTypeIds = getHttpRequest().getParameterValues(REQ_ARCHE_TECHID);
-			if (techTypeIds != null) {
+			if (ArrayUtils.isNotEmpty(techTypeIds)) {
 				for (String techId : techTypeIds) {
 					ClientResponse clientResponse = getServiceManager().deleteArcheType(techId, customerId);
 					if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
@@ -268,7 +270,7 @@ public class Archetypes extends ServiceBaseAction {
 				addActionMessage(getText(ARCHETYPE_DELETED));
 			}
 		} catch (PhrescoException e) {
-			showErrorPopup(e, ARCHETYPE_DELETE_EXCEPTION);
+		    return showErrorPopup(e, EXCEPTION_ARCHETYPE_DELETE);
 		}
 
 		return list();
@@ -322,7 +324,6 @@ public class Archetypes extends ServiceBaseAction {
 	        }
 	        writer.flush();
 	        writer.close();
-	        
 		} catch (Exception e) {
 			getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
             writer.print(SUCCESS_FALSE);
@@ -354,7 +355,7 @@ public class Archetypes extends ServiceBaseAction {
 	}
 	
 	public void removeUploadedJar() {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Archetypes.removeUploadedJar()");
 	    }
 		
@@ -368,7 +369,7 @@ public class Archetypes extends ServiceBaseAction {
 	}
 	
 	private MultiPart fileUpload(Technology technology) throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.fileUpload(MultiPart multiPart,Technology technology)");
 		}
 		
@@ -406,7 +407,7 @@ public class Archetypes extends ServiceBaseAction {
 	}
 	
 	public String validateForm() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.validateForm()");
 		}
 		
