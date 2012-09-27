@@ -31,7 +31,6 @@ import org.apache.log4j.Logger;
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
-import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
 
 public class ApplicationTypes extends ServiceBaseAction { 
@@ -48,7 +47,9 @@ public class ApplicationTypes extends ServiceBaseAction {
 	private String appTypeId = "";
 	private String oldName = "";
 	
-	private String nameError = "";
+	private String fromPage = "";
+	
+    private String nameError = "";
     private boolean errorFound = false;
 
     public String list() throws PhrescoException {
@@ -57,9 +58,9 @@ public class ApplicationTypes extends ServiceBaseAction {
 	    }
 
 		try {
-		    List<ApplicationType> applicationTypes = getServiceManager().getApplicationTypes(customerId);
+		    List<ApplicationType> applicationTypes = getServiceManager().getApplicationTypes(getCustomerId());
 		    setReqAttribute(REQ_APP_TYPES, applicationTypes);
-		    setReqAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+		    setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		} catch (Exception e) {
 			throw new PhrescoException(e);
 		}
@@ -71,7 +72,8 @@ public class ApplicationTypes extends ServiceBaseAction {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method ApplicationTypes.add()");
 	    }
-	    setReqAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+	    
+	    setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 	    
 		return COMP_APPTYPE_ADD;
 	}
@@ -82,7 +84,7 @@ public class ApplicationTypes extends ServiceBaseAction {
 	    }
 		
 		try {
-		    ApplicationType appType = getServiceManager().getApplicationType(appTypeId, customerId);
+		    ApplicationType appType = getServiceManager().getApplicationType(getAppTypeId(), getCustomerId());
 		    setReqAttribute(REQ_APP_TYPE, appType);
 		    setReqAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (Exception e) {
@@ -99,16 +101,12 @@ public class ApplicationTypes extends ServiceBaseAction {
 		
 		try {
 		    List<ApplicationType> appTypes = new ArrayList<ApplicationType>();
-			ApplicationType appType = new ApplicationType();
-			appType.setName(name);
-			appType.setDescription(description);
-			appType.setCustomerIds(Arrays.asList(customerId));
-			appTypes.add(appType);
-			ClientResponse clientResponse = getServiceManager().createApplicationTypes(appTypes, customerId);
-			if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200 && clientResponse.getStatus() != ServiceConstants.RES_CODE_201) {
-				addActionError(getText(APPLNTYPES_NOT_ADDED, Collections.singletonList(name)));
+			appTypes.add(createAppType());
+			ClientResponse clientResponse = getServiceManager().createApplicationTypes(appTypes, getCustomerId());
+			if (clientResponse.getStatus() != RES_CODE_200 && clientResponse.getStatus() != RES_CODE_201) {
+				addActionError(getText(APPLNTYPES_NOT_ADDED, Collections.singletonList(getName())));
 			} else {
-				addActionMessage(getText(APPLNTYPES_ADDED, Collections.singletonList(name)));
+				addActionMessage(getText(APPLNTYPES_ADDED, Collections.singletonList(getName())));
 			}
 		}catch (Exception e) {
 			throw new PhrescoException(e);
@@ -123,18 +121,26 @@ public class ApplicationTypes extends ServiceBaseAction {
 	    }
 
 		try {
-			ApplicationType appType = new ApplicationType();
-			appType.setName(name);
-			appType.setDescription(description);
-			appType.setCustomerIds(Arrays.asList(customerId));
-			appType.setId(appTypeId);
-			getServiceManager().updateApplicationType(appType, appTypeId, customerId);
+			ApplicationType appType = createAppType();
+			getServiceManager().updateApplicationType(appType, getAppTypeId(), getCustomerId());
 		} catch(Exception e)  {
 			throw new PhrescoException(e);
 		}
 
 		return list();
 	}
+
+    private ApplicationType createAppType() {
+        ApplicationType appType = new ApplicationType();
+        appType.setName(getName());
+        appType.setDescription(getDescription());
+        appType.setCustomerIds(Arrays.asList(getCustomerId()));
+        if (StringUtils.isNotEmpty(getFromPage())) {
+            appType.setId(getAppTypeId());
+        }
+        
+        return appType;
+    }
 
 	public String delete() throws PhrescoException {
 	    if (isDebugEnabled) {
@@ -145,8 +151,8 @@ public class ApplicationTypes extends ServiceBaseAction {
 			String[] appTypeIds = getHttpRequest().getParameterValues(REQ_APP_TYPEID);
 			if (ArrayUtils.isNotEmpty(appTypeIds)) {
 				for (String appTypeId : appTypeIds) {
-					ClientResponse clientResponse = getServiceManager().deleteApplicationType(appTypeId, customerId);
-					if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
+					ClientResponse clientResponse = getServiceManager().deleteApplicationType(appTypeId, getCustomerId());
+					if (clientResponse.getStatus() != RES_CODE_200) {
 						addActionError(getText(APPLNTYPES_NOT_DELETED));
 					}
 				}
@@ -165,7 +171,8 @@ public class ApplicationTypes extends ServiceBaseAction {
         }
 
 	    boolean isError = false;
-		if (StringUtils.isEmpty(name)) {			
+	    //Empty validation for name
+		if (StringUtils.isEmpty(getName())) {			
 		    setNameError(getText(KEY_I18N_ERR_NAME_EMPTY ));
 			isError = true;
 		}
@@ -231,5 +238,13 @@ public class ApplicationTypes extends ServiceBaseAction {
 
     public void setCustomerId(String customerId) {
         this.customerId = customerId;
+    }
+    
+    public String getFromPage() {
+        return fromPage;
+    }
+
+    public void setFromPage(String fromPage) {
+        this.fromPage = fromPage;
     }
 }
