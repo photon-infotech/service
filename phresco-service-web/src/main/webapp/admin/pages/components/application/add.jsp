@@ -121,7 +121,7 @@
 	});
 
 	function findError(data) {
-		if (data.nameError != undefined) {
+		if (!isBlank(data.nameError)) {
 			showError($("#nameControl"), $("#nameError"), data.nameError);
 		} else {
 			hideError($("#nameControl"), $("#nameError"));
