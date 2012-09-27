@@ -52,23 +52,23 @@ public class Component extends ServiceBaseAction {
 	private static final Logger S_LOGGER = Logger.getLogger(Features.class);
 	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
-	private String name = null;
-	private String nameError = null;
-	private String versError = null;
-	private String fileError = null;
+	private String name = "";
+	private String nameError = "";
+	private String versError = "";
+	private String fileError = "";
 	private boolean errorFound = false;
 	
-    private String customerId = null;
-    private String fromPage = null;
+    private String customerId = "";
+    private String fromPage = "";
     private String type = "component";
     
     private String artifactId = "";
     private String groupId = "";
     
 	private static byte[] componentByteArray = null;
-	private static String componentJarName = null;
+	private static String componentJarName = "";
     
-	private String description = null;
+	private String description = "";
 	private String helpText = "";
 	private String versions = "";
 	private String technology = "";

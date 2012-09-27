@@ -29,6 +29,7 @@ import java.util.List;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -40,7 +41,6 @@ import com.photon.phresco.commons.model.TechnologyInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.client.api.Content;
-import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.MultiPart;
@@ -52,21 +52,25 @@ public class PilotProjects extends ServiceBaseAction {
 	private static final Logger S_LOGGER = Logger.getLogger(PilotProjects.class);
 	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
-	private String name = null;
-	private String nameError = null;
-	private String fileError = null;
+	private String name = "";
+	private String description = "";
+    private String version = "";
+    private String groupId = "";
+    private String artifactId = "";
+    private String jarVersion = "";
+    
+	private String nameError = "";
+	private String fileError = "";
 	private boolean errorFound = false;
-	private String description = null;
-	private String version = null;
-	private String projectId = null;
 	
-	private String fromPage = null;
-	private String customerId = null;
-	private String groupId = null;
-	private String artifactId = null;
-	private String jarVersion = null;
-	private String techId = null;
-	private String oldName = null;
+	private String projectId = "";
+	private String fromPage = "";
+	
+	private String customerId = "";
+	
+	private String techId = "";
+	private String oldName = "";
+	
 	private static byte[] pilotProByteArray = null;
 	private static String pilotProJarName = null;
 
@@ -76,9 +80,9 @@ public class PilotProjects extends ServiceBaseAction {
         }
 
 		try {
-			List<ApplicationInfo> pilotProjects = getServiceManager().getPilotProjects(customerId);
+			List<ApplicationInfo> pilotProjects = getServiceManager().getPilotProjects(getCustomerId());
 			setReqAttribute(REQ_PILOT_PROJECTS, pilotProjects);
-			setReqAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+			setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		} catch (PhrescoException e) {
 			return showErrorPopup(e, EXCEPTION_PILOT_PROJECTS_LIST);
 		}
@@ -96,7 +100,7 @@ public class PilotProjects extends ServiceBaseAction {
     	}
     	
     	try {
-    		List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
+    		List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
     		setReqAttribute(REQ_ARCHE_TYPES, technologies);
     	} catch (PhrescoException e) {
     		return showErrorPopup(e, EXCEPTION_PILOT_PROJECTS_ADD);
@@ -111,8 +115,8 @@ public class PilotProjects extends ServiceBaseAction {
     	}
 
     	try {
-    		ApplicationInfo pilotProjectInfo = getServiceManager().getPilotProject(projectId, customerId);
-    		setReqAttribute(REQ_PILOT_PROINFO, pilotProjectInfo);
+    		ApplicationInfo applicationInfo = getServiceManager().getPilotProject(getProjectId(), getCustomerId());
+    		setReqAttribute(REQ_PILOT_PROINFO, applicationInfo);
     		setReqAttribute(REQ_FROM_PAGE, EDIT);
     	} catch (PhrescoException e) {
     		return showErrorPopup(e, EXCEPTION_PILOT_PROJECTS_EDIT);
@@ -127,66 +131,11 @@ public class PilotProjects extends ServiceBaseAction {
     	}
     	
     	try {
-    		MultiPart multiPart = new MultiPart();
-    		
-    		ApplicationInfo pilotProInfo = new ApplicationInfo();
-    		pilotProInfo.setName(name);
-    		pilotProInfo.setDescription(description);
-    		pilotProInfo.setVersion(version);
-    		//pilotProInfo.setTechId(techId);
-    		
-    		ArtifactGroup pilotContent = new ArtifactGroup();
-    		pilotContent.setGroupId(groupId);
-    		pilotContent.setArtifactId(artifactId);
-    		pilotContent.setPackaging("zip");
-    		List<String> customerIds = new ArrayList<String>();
-    		customerIds.add(customerId);
-    		pilotContent.setCustomerIds(customerIds);
-    		
-    		List<ArtifactInfo> jarVersions = new ArrayList<ArtifactInfo>();
-    		ArtifactInfo jarVersion = new ArtifactInfo();
-    		jarVersions.add(jarVersion);
-    		pilotContent.setVersions(jarVersions);
-    		
-    		pilotProInfo.setPilotContent(pilotContent);
-    		
-    	/*	pilotProInfo.setGroupId(groupId);
-    		pilotProInfo.setArtifactId(artifactId);
-    		pilotProInfo.setVersion(jarVersion);
-    		ArtifactInfo archetypeInfo = new ArtifactInfo(groupId, artifactId, jarVersion, "zip");
-    		pilotProInfo.setArchetypeInfo(archetypeInfo);*/
-    		
-    		TechnologyInfo techInfo = new TechnologyInfo();
-    		techInfo.setVersion(techId);
-    		pilotProInfo.setTechInfo(techInfo);
-    		
-    		
-    		/*Technology technology = new Technology();
-    		technology.setId(techId)
-    		ComponentService cs = new ComponentService();
-    		Response techName = cs.getTechnology(techId);
-    		technology = (Technology) techName.getEntity();
-    		technology.setName(technology.getName());
-    		pilotProInfo.setTechnology(technology);*/
-    		
-    		BodyPart jsonPart = new BodyPart();
-		    jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
-		    jsonPart.setEntity(pilotProInfo);
-		    Content content = new Content(Content.Type.JSON, name, null, null, null, 0);
-		    jsonPart.setContentDisposition(content);
-		    multiPart.bodyPart(jsonPart);
-		    
-		    if (StringUtils.isNotEmpty(pilotProJarName)) {
-				InputStream pilotProIs = new ByteArrayInputStream(pilotProByteArray);
-				BodyPart binaryPart2 = getServiceManager().createBodyPart(name, Content.Type.JAR, pilotProIs );
-		        multiPart.bodyPart(binaryPart2);
-			}
-		    
-    		ClientResponse clientResponse = getServiceManager().createPilotProjects(multiPart, customerId);
-    		if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200 && clientResponse.getStatus() != ServiceConstants.RES_CODE_201  ) {
-    			addActionError(getText(PLTPROJ_NOT_ADDED, Collections.singletonList(name)));
+    		ClientResponse clientResponse = getServiceManager().createPilotProjects(createMultiPart(), getCustomerId());
+    		if (clientResponse.getStatus() != RES_CODE_200 && clientResponse.getStatus() != RES_CODE_201  ) {
+    			addActionError(getText(PLTPROJ_NOT_ADDED, Collections.singletonList(getName())));
     		} else {
-    			addActionMessage(getText(PLTPROJ_ADDED, Collections.singletonList(name)));
+    			addActionMessage(getText(PLTPROJ_ADDED, Collections.singletonList(getName())));
     		}
     	} catch (PhrescoException e) {
     		return showErrorPopup(e, EXCEPTION_PILOT_PROJECTS_SAVE);
@@ -194,82 +143,66 @@ public class PilotProjects extends ServiceBaseAction {
 
     	return list();
     }
-    
+
     public String update() throws PhrescoException {
     	if (s_isDebugEnabled) {
     		S_LOGGER.debug("Entering Method  PilotProjects.update()");
     	}
 
     	try {
-    		MultiPart multiPart = new MultiPart();
-    		
-    		ApplicationInfo pilotProInfo = new ApplicationInfo();
-    		pilotProInfo.setId(projectId);
-    		pilotProInfo.setName(name);
-    		pilotProInfo.setDescription(description);
-    		pilotProInfo.setVersion(version);
-    		//pilotProInfo.setTechId(techId);
-    		
-    		
-    		/*pilotProInfo.setCustomerId(customerId);
-    		pilotProInfo.setGroupId(groupId);
-    		pilotProInfo.setArtifactId(artifactId);
-    		pilotProInfo.setVersion(jarVersion);*/
-    		ArtifactGroup pilotContent = new ArtifactGroup();
-    		pilotContent.setGroupId(groupId);
-    		pilotContent.setArtifactId(artifactId);
-    		pilotContent.setPackaging("zip");
-    		List<String> customerIds = new ArrayList<String>();
-    		customerIds.add(customerId);
-    		pilotContent.setCustomerIds(customerIds);
-    		
-    		List<ArtifactInfo> jarVersions = new ArrayList<ArtifactInfo>();
-    		ArtifactInfo jarVersion = new ArtifactInfo();
-    		jarVersions.add(jarVersion);
-    		pilotContent.setVersions(jarVersions);
-    		pilotProInfo.setPilotContent(pilotContent);
-    		
-    		/*TechnologyInfo techInfo = new TechnologyInfo();
-    		techInfo.setId(techId);
-    		ComponentService cs = new ComponentService();
-    		Response techName = cs.getTechnology(techId);
-    		techInfo = (TechnologyInfo)techName.getEntity();
-    		techInfo.setName(techInfo.getName());
-    		pilotProInfo.setTechInfo(techInfo);*/
-    		
-    		TechnologyInfo techInfo = new TechnologyInfo();
-    		techInfo.setVersion(techId);
-    		pilotProInfo.setTechInfo(techInfo);
-    		
-    		/*ArtifactInfo archetypeInfo = new ArtifactInfo(groupId, artifactId, jarVersion, "zip");
-    		pilotProInfo.setArchetypeInfo(archetypeInfo);
-    		Technology technology = new Technology();
-    		technology.setId(techId);
-    		ComponentService cs = new ComponentService();
-    		Response techName = cs.getTechnology(techId);
-    		technology = (Technology) techName.getEntity();
-    		technology.setName(technology.getName());
-    		pilotProInfo.setTechnology(technology);*/
-    		
-    		BodyPart jsonPart = new BodyPart();
-		    jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
-		    jsonPart.setEntity(pilotProInfo);
-		    Content content = new Content(Content.Type.JSON, name, null, null, null, 0);
-		    jsonPart.setContentDisposition(content);
-		    multiPart.bodyPart(jsonPart);
-		    
-		    if (StringUtils.isNotEmpty(pilotProJarName)) {
-				InputStream pilotProIs = new ByteArrayInputStream(pilotProByteArray);
-				BodyPart binaryPart2 = getServiceManager().createBodyPart(name, Content.Type.JAR, pilotProIs);
-		        multiPart.bodyPart(binaryPart2);
-			}
-    		
-    		getServiceManager().updatePilotProject(pilotProInfo, projectId, customerId);
+    		getServiceManager().updatePilotProject(createMultiPart(), getProjectId(), getCustomerId());
     	} catch (PhrescoException e) {
     		return showErrorPopup(e, EXCEPTION_PILOT_PROJECTS_UPDATE);
 		}
 
     	return list();
+    }
+    
+    private MultiPart createMultiPart() throws PhrescoException {
+        MultiPart multiPart = new MultiPart();
+        
+        ApplicationInfo pilotProInfo = new ApplicationInfo();
+        if (StringUtils.isNotEmpty(getFromPage())) {
+            pilotProInfo.setId(getProjectId());
+        }
+        pilotProInfo.setName(getName());
+        pilotProInfo.setDescription(getDescription());
+        pilotProInfo.setVersion(getVersion());
+        //pilotProInfo.setTechId(techId);
+        
+        ArtifactGroup pilotContent = new ArtifactGroup();
+        pilotContent.setGroupId(getGroupId());
+        pilotContent.setArtifactId(getArtifactId());
+        pilotContent.setPackaging("zip");
+        List<String> customerIds = new ArrayList<String>();
+        customerIds.add(getCustomerId());
+        pilotContent.setCustomerIds(customerIds);
+        
+        List<ArtifactInfo> jarVersions = new ArrayList<ArtifactInfo>();
+        ArtifactInfo jarVersion = new ArtifactInfo();
+        jarVersions.add(jarVersion);
+        pilotContent.setVersions(jarVersions);
+        
+        pilotProInfo.setPilotContent(pilotContent);
+        
+        TechnologyInfo techInfo = new TechnologyInfo();
+        techInfo.setVersion(getTechId());
+        pilotProInfo.setTechInfo(techInfo);
+        
+        BodyPart jsonPart = new BodyPart();
+        jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
+        jsonPart.setEntity(pilotProInfo);
+        Content content = new Content(Content.Type.JSON, getName(), null, null, null, 0);
+        jsonPart.setContentDisposition(content);
+        multiPart.bodyPart(jsonPart);
+        
+        if (StringUtils.isNotEmpty(pilotProJarName)) {
+            InputStream pilotProIs = new ByteArrayInputStream(pilotProByteArray);
+            BodyPart bodyPart = getServiceManager().createBodyPart(getName(), Content.Type.JAR, pilotProIs );
+            multiPart.bodyPart(bodyPart);
+        }
+        
+        return multiPart;
     }
 	
     public String delete() throws PhrescoException {
@@ -278,11 +211,11 @@ public class PilotProjects extends ServiceBaseAction {
     	}
 
     	try {
-    		String[] projectIds = getHttpRequest().getParameterValues("projectId");
-    		if (projectIds != null) {
-    			for (String projectID : projectIds) {
-    				ClientResponse clientResponse =getServiceManager().deletePilotProject(projectID, customerId);
-    				if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
+    		String[] projectIds = getHttpRequest().getParameterValues(REQ_PILOT_PROJ_ID);
+    		if (ArrayUtils.isNotEmpty(projectIds)) {
+    			for (String projectId : projectIds) {
+    				ClientResponse clientResponse =getServiceManager().deletePilotProject(projectId, getCustomerId());
+    				if (clientResponse.getStatus() != RES_CODE_200) {
     					addActionError(getText(PLTPROJ_NOT_DELETED));
     				}
     			}
@@ -326,6 +259,7 @@ public class PilotProjects extends ServiceBaseAction {
 		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  PilotProjects.removeUploadedFile()");
 		}
+		
 		pilotProJarName = null;
 		pilotProByteArray = null;
 	}
@@ -336,15 +270,16 @@ public class PilotProjects extends ServiceBaseAction {
 		}
     	
     	boolean isError = false;
-    	if (StringUtils.isEmpty(name)) {
+    	//Empty validation for name
+    	if (StringUtils.isEmpty(getName())) {
     		setNameError(getText(KEY_I18N_ERR_NAME_EMPTY ));
     		isError = true;
-    	} else if (StringUtils.isEmpty(fromPage) || (!name.equals(oldName))) {
+    	} else if (StringUtils.isEmpty(getFromPage()) || (!getName().equals(getOldName()))) {
     		//To check whether the name already exist (Technology wise)
-			List<ApplicationInfo> pilotProjInfos = getServiceManager().getPilotProjects(customerId);
+			List<ApplicationInfo> pilotProjInfos = getServiceManager().getPilotProjects(getCustomerId());
 			if (pilotProjInfos != null) {
 				for (ApplicationInfo pilotProjectInfo : pilotProjInfos) {
-					if (pilotProjectInfo.getTechInfo().getVersion().equals(techId) && pilotProjectInfo.getName().equalsIgnoreCase(name)) {
+					if (pilotProjectInfo.getTechInfo().getVersion().equals(getTechId()) && pilotProjectInfo.getName().equalsIgnoreCase(getName())) {
 						setNameError(getText(KEY_I18N_ERR_NAME_ALREADY_EXIST_TECH));
 			    		isError = true;
 			    		break;
@@ -475,6 +410,4 @@ public class PilotProjects extends ServiceBaseAction {
 	public void setVersion(String version) {
 		this.version = version;
 	}
-
-
 }

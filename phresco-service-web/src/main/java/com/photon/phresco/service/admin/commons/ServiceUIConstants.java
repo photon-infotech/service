@@ -121,6 +121,7 @@ public interface ServiceUIConstants {
      *****************************/ 
     String REQ_PILOT_PROJECTS = "pilotProjects";
     String REQ_PILOT_PROINFO = "pilotProjectInfo";
+    String REQ_PILOT_PROJ_ID = "projectId";
     
     
     /*****************************

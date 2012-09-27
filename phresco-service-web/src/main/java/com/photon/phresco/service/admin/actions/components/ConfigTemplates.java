@@ -35,27 +35,29 @@ import com.photon.phresco.commons.model.SettingsTemplate;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
-import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
 
-public class ConfigTemplates extends ServiceBaseAction { 
+public class ConfigTemplates extends ServiceBaseAction {
 	
 	private static final long serialVersionUID = 6801037145464060759L;
 	
 	private static final Logger S_LOGGER = Logger.getLogger(ConfigTemplates.class);
 	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
-	private String name = null;
-	private String description = null;
-	private String nameError = null;
-	private String applies = null;
-	private String applyError = null;
+	private String name = "";
+	private String description = "";
+	private List<Element> appliesTo = null;
+	
+	private String nameError = "";
+	private String applyError = "";
 	private boolean errorFound = false;
-    private String customerId = null;
-    private List<Element> appliesTo = null;
-    private String configId = null;
-    private String fromPage = null;
-    private String oldName = null;
+	
+    private String customerId = "";
+    
+    private String configId = "";
+    private String oldName = "";
+    
+    private String fromPage = "";
     
 	public String list() throws PhrescoException {
 		if (s_isDebugEnabled) {
@@ -63,9 +65,9 @@ public class ConfigTemplates extends ServiceBaseAction {
 		}
 		
 		try {
-			List<SettingsTemplate> configTemplates = getServiceManager().getconfigTemplates(customerId);
+			List<SettingsTemplate> configTemplates = getServiceManager().getconfigTemplates(getCustomerId());
 			setReqAttribute(REQ_CONFIG_TEMPLATES, configTemplates);
-			setReqAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+			setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		} catch (PhrescoException e) {
 			return showErrorPopup(e, EXCEPTION_CONFIG_TEMP_LIST);
 		}
@@ -79,7 +81,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 		}
 		
 		try {
-			List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
+			List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
 			setReqAttribute(REQ_ARCHE_TYPES, technologies);
 		} catch (PhrescoException e) {
 		    return showErrorPopup(e, EXCEPTION_CONFIG_TEMP_ADD);
@@ -94,9 +96,9 @@ public class ConfigTemplates extends ServiceBaseAction {
 		}
 		
 		try {
-		    SettingsTemplate configTemp = getServiceManager().getConfigTemplate(configId, customerId);
-		    setReqAttribute(REQ_CONFIG_TEMP , configTemp);
-			List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
+		    SettingsTemplate configTemp = getServiceManager().getConfigTemplate(getConfigId(), getCustomerId());
+		    setReqAttribute(REQ_CONFIG_TEMP, configTemp);
+			List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
 			setReqAttribute(REQ_ARCHE_TYPES, technologies);
 			setReqAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (PhrescoException e) {
@@ -113,21 +115,12 @@ public class ConfigTemplates extends ServiceBaseAction {
 		
 		try  {
 			List<SettingsTemplate> settingsTemplates = new ArrayList<SettingsTemplate>();
-			SettingsTemplate settingTemplate = new SettingsTemplate();
-            settingTemplate.setType(name);
-            settingTemplate.setDescription(description);
-            settingTemplate.setAppliesToTechs(appliesTo);
-            List<String> customerIds = new ArrayList<String>();
-            customerIds.add(customerId);
-            settingTemplate.setCustomerIds(customerIds);
-            settingTemplate.setProperties(createPropertyTemplates());
-            settingsTemplates.add(settingTemplate);
-            ClientResponse clientResponse = getServiceManager().createConfigTemplates(settingsTemplates, customerId);
-            if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200 
-                    && clientResponse.getStatus() != ServiceConstants.RES_CODE_201) {
-            	addActionError(getText(CONFIGTEMPLATE_NOT_ADDED, Collections.singletonList(name)));
+            settingsTemplates.add(createSettingsTemplate());
+            ClientResponse clientResponse = getServiceManager().createConfigTemplates(settingsTemplates, getCustomerId());
+            if (clientResponse.getStatus() != RES_CODE_200 && clientResponse.getStatus() != RES_CODE_201) {
+            	addActionError(getText(CONFIGTEMPLATE_NOT_ADDED, Collections.singletonList(getName())));
             } else {
-            	addActionMessage(getText(CONFIGTEMPLATE_ADDED, Collections.singletonList(name)));
+            	addActionMessage(getText(CONFIGTEMPLATE_ADDED, Collections.singletonList(getName())));
             }
 		} catch (PhrescoException e) {
 		    return showErrorPopup(e, EXCEPTION_CONFIG_TEMP_SAVE);
@@ -142,16 +135,7 @@ public class ConfigTemplates extends ServiceBaseAction {
     	}
     	
     	try {
-            SettingsTemplate settingTemplate = new SettingsTemplate();
-            settingTemplate.setType(name);
-            settingTemplate.setDescription(description);
-            settingTemplate.setAppliesToTechs(appliesTo);
-            List<String> customerIds = new ArrayList<String>();
-            customerIds.add(customerId);
-            settingTemplate.setCustomerIds(customerIds);
-            settingTemplate.setId(configId);
-            settingTemplate.setProperties(createPropertyTemplates());
-    		getServiceManager().updateConfigTemp(settingTemplate, configId, customerId);
+    		getServiceManager().updateConfigTemp(createSettingsTemplate(), getConfigId(), getCustomerId());
     	} catch (PhrescoException e) {
     	    return showErrorPopup(e, EXCEPTION_CONFIG_TEMP_UPDATE);
 		}
@@ -159,14 +143,22 @@ public class ConfigTemplates extends ServiceBaseAction {
     	return list();
     }
 	
-	private List<PropertyTemplate> createPropertyTemplates() throws PhrescoException {
+	private SettingsTemplate createSettingsTemplate() throws PhrescoException {
         if (s_isDebugEnabled) {
             S_LOGGER.debug("Entering Method ConfigTemplates.createPropertyTemplates()");
         }
         
-        List<PropertyTemplate> propertyTemplates;
+        SettingsTemplate settingTemplate = null;
         try {
-            propertyTemplates = new ArrayList<PropertyTemplate>();
+            settingTemplate = new SettingsTemplate();
+            settingTemplate.setType(getName());
+            settingTemplate.setDescription(getDescription());
+            settingTemplate.setAppliesToTechs(getAppliesTo());
+            settingTemplate.setCustomerIds(Arrays.asList(getCustomerId()));
+            if (StringUtils.isNotEmpty(getFromPage())) {
+                settingTemplate.setId(getConfigId());
+            }
+            List<PropertyTemplate> propertyTemplates = new ArrayList<PropertyTemplate>();
             String[] propTempKeys = getHttpRequest().getParameterValues(REQ_CONFIG_KEY);
             if (ArrayUtils.isNotEmpty(propTempKeys)) {
                 for (String propTempKey : propTempKeys) {
@@ -206,11 +198,12 @@ public class ConfigTemplates extends ServiceBaseAction {
                     propertyTemplates.add(propertyTemplate);
                 }
             }
+            settingTemplate.setProperties(propertyTemplates);
         } catch (Exception e) {
             throw new PhrescoException(e);
         }
         
-        return propertyTemplates;
+        return settingTemplate;
     }
 	
 	public String delete() throws PhrescoException {
@@ -222,8 +215,8 @@ public class ConfigTemplates extends ServiceBaseAction {
 			String[] configIds = getHttpRequest().getParameterValues(REQ_CONFIG_ID);
 			if (ArrayUtils.isNotEmpty(configIds)) {
 				for (String configId : configIds) {
-					ClientResponse clientResponse = getServiceManager().deleteConfigTemp(configId, customerId);
-					if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
+					ClientResponse clientResponse = getServiceManager().deleteConfigTemp(configId, getCustomerId());
+					if (clientResponse.getStatus() != RES_CODE_200) {
 						addActionError(getText(CONFIGTEMPLATE_NOT_DELETED));
 					}
 				}
@@ -242,15 +235,16 @@ public class ConfigTemplates extends ServiceBaseAction {
 		}
 
 		boolean isError = false;
-		if (StringUtils.isEmpty(name)) {
+		//Empty validation for name
+		if (StringUtils.isEmpty(getName())) {
 			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY ));
 			isError = true;
-		} else if(StringUtils.isEmpty(fromPage) || (!name.equals(oldName))) {
+		} else if(StringUtils.isEmpty(getFromPage()) || (!getName().equals(getOldName()))) {
 			// to check duplication of name
-			List<SettingsTemplate> configTemplates = getServiceManager().getconfigTemplates(customerId);
+			List<SettingsTemplate> configTemplates = getServiceManager().getconfigTemplates(getCustomerId());
 			if (CollectionUtils.isNotEmpty(configTemplates)) {
 				for (SettingsTemplate configTemplate : configTemplates) {
-					if (configTemplate.getType().equalsIgnoreCase(name)) {
+					if (configTemplate.getType().equalsIgnoreCase(getName())) {
 						setNameError(getText(KEY_I18N_ERR_NAME_ALREADY_EXIST));
 			    		isError = true;
 						break;
@@ -259,7 +253,8 @@ public class ConfigTemplates extends ServiceBaseAction {
 			}
 		}
 		
-		if (appliesTo == null) {
+		//Empty validation for applies to technology
+		if (getAppliesTo() == null) {
 			setApplyError(getText(KEY_I18N_ERR_APPLIES_EMPTY ));
 			isError = true;
 		}
@@ -285,14 +280,6 @@ public class ConfigTemplates extends ServiceBaseAction {
 
 	public void setNameError(String nameError) {
 		this.nameError = nameError;
-	}
-
-	public String getApplies() {
-		return applies;
-	}
-
-	public void setApplies(String applies) {
-		this.applies = applies;
 	}
 
 	public String getApplyError() {

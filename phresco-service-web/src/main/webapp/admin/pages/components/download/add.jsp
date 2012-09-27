@@ -18,12 +18,12 @@
   ###
   --%>
 
-<%@page import="java.util.ArrayList"%>
 <%@ taglib uri="/struts-tags" prefix="s" %>
 
 <%@ page import="java.util.List" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.apache.commons.collections.CollectionUtils"%>
+<%@ page import="java.util.ArrayList"%>
 
 <%@ page import="com.photon.phresco.commons.model.Technology"%>
 <%@ page import="com.photon.phresco.commons.model.DownloadInfo" %>
@@ -188,19 +188,20 @@
 				<div class="multilist-scroller multiselct" style="height: 95px; width:300px;" name="application">
 					<ul>
 						<li>
-							<input type="checkbox" name="application" value="all" id="checkAll" onclick="checkAllEvent(this, $('.platFormCheck'), true);" style="margin: 3px 8px 6px 0;">All
+							<input type="checkbox" name="platform" value="all" id="checkAll" onclick="checkAllEvent(this, $('.platFormCheck'), true);" 
+								style="margin: 3px 8px 6px 0;">All
 						</li>
 						<li>
-							<input type="checkbox" name="application" class="check platFormCheck" value="Windows" >Windows
+							<input type="checkbox" name="platform" class="check platFormCheck" value="Windows" >Windows
 						</li>
 						<li>
-							<input type="checkbox" name="application" class="check platFormCheck" value="Linux">Linux
+							<input type="checkbox" name="platform" class="check platFormCheck" value="Linux">Linux
 						</li>
 						<li>
-							<input type="checkbox" name="application" class="check platFormCheck" value="Mac">Mac
+							<input type="checkbox" name="platform" class="check platFormCheck" value="Mac">Mac
 						</li>
 						<li>
-							<input type="checkbox" name="application" class="check platFormCheck" value="Solaris">Solaris
+							<input type="checkbox" name="platform" class="check platFormCheck" value="Solaris">Solaris
 						</li>
 					</ul>
 				</div>

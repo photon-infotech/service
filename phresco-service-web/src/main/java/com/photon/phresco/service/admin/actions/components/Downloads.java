@@ -28,6 +28,7 @@ import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -44,7 +45,6 @@ import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.client.api.Content;
 import com.photon.phresco.service.model.FileInfo;
 import com.photon.phresco.service.util.ServerUtil;
-import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.MultiPart;
@@ -56,30 +56,31 @@ public class Downloads extends ServiceBaseAction {
 	private static final Logger S_LOGGER = Logger.getLogger(Downloads.class);
 	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
 
-	private String name = null;
-	private String nameError = null;
-	private String version = null;
-	private String verError = null;
-	private String application = null;
-	private String appltError = null;
-	private String group = null;
-	private String groupError = null;
-	private String fileError = null;
-	private boolean errorFound = false;
-	private String description=null;
-	private String id = null;
-	//private List<String> technology = null;
+	private String downloadId = "";
+	private String name = "";
+	private String version = "";
+	private String platform = "";
+	private String group = "";
+	private String description = "";
 	private String technology = "";
-	private String techError = null;
-	private String fromPage = null;
-	private String customerId = null;
-	private String oldVersion = null;
-	private String type = null; // type of the file uploaded (file or image) 
+	
+	private String nameError = "";
+	private String verError = "";
+	private String appltError = "";
+	private String groupError = "";
+	private String techError = "";
+	private String fileError = "";
+	private boolean errorFound = false;
+	
+	private String fromPage = "";
+	private String customerId = "";
+	private String oldVersion = "";
+	private String type = ""; // type of the file uploaded (file or image) 
    
 	private static byte[] downloadByteArray = null;
 	private static byte[] byteArray = null;
-	private static String downloadJarName = null;
-	private static String downloadImageName = null;
+	private static String downloadJarName = "";
+	private static String downloadImageName = "";
 
 	public String list() throws PhrescoException {
 		if (s_isDebugEnabled) {
@@ -87,9 +88,9 @@ public class Downloads extends ServiceBaseAction {
 		}
 		
 		try {
-			List<DownloadInfo> downloadInfo = getServiceManager().getDownloads(customerId);
+			List<DownloadInfo> downloadInfo = getServiceManager().getDownloads(getCustomerId());
 			setReqAttribute(REQ_DOWNLOAD_INFO, downloadInfo);
-			setReqAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+			setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		} catch (PhrescoException e) {
 			return showErrorPopup(e, EXCEPTION_DOWNLOADS_LIST);
 		}
@@ -109,7 +110,7 @@ public class Downloads extends ServiceBaseAction {
 		}
 		
 		try {
-			List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
+			List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
 			setReqAttribute(REQ_ARCHE_TYPES, technologies);
 		} catch (PhrescoException e) {
 			return showErrorPopup(e, EXCEPTION_DOWNLOADS_ADD);
@@ -124,10 +125,10 @@ public class Downloads extends ServiceBaseAction {
 		}
 		
 		try {
-			DownloadInfo downloadInfo = getServiceManager().getDownload(id, customerId);
+			DownloadInfo downloadInfo = getServiceManager().getDownload(getDownloadId(), getCustomerId());
 			setReqAttribute(REQ_DOWNLOAD_INFO, downloadInfo);
 			setReqAttribute(REQ_FROM_PAGE, EDIT);
-			List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
+			List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
 			setReqAttribute(REQ_ARCHE_TYPES, technologies);
 		} catch (PhrescoException e) {
 			return showErrorPopup(e, EXCEPTION_DOWNLOADS_EDIT);
@@ -142,54 +143,11 @@ public class Downloads extends ServiceBaseAction {
 		}
 
 		try {
-			MultiPart multiPart = new MultiPart();
-			
-			List<DownloadInfo> downloadInfo = new ArrayList<DownloadInfo>();
-			DownloadInfo download = new DownloadInfo();
-		
-			download.setName(name);
-			download.setDescription(description);
-			
-			List<String> customerIds = new ArrayList<String>();
-			customerIds.add(customerId);
-			download.setCustomerIds(customerIds);
-			
-			List<ArtifactInfo> downloadVersions = new ArrayList<ArtifactInfo>();
-			ArtifactInfo downloadVersion = new ArtifactInfo();
-			downloadVersion.setVersion(version);
-			downloadVersions.add(downloadVersion);
-			download.setVersions(downloadVersions);
-			//TODO Arunprasanna
-			List<CoreOption> appliesTo = new ArrayList<CoreOption>();
-			CoreOption coreOption = new CoreOption();
-			coreOption.setTechId(technology);
-			appliesTo.add(coreOption);
-	        download.setAppliesTo(appliesTo); 
-	        //download.setType(group);
-			
-			BodyPart jsonPart = new BodyPart();
-		    jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
-		    jsonPart.setEntity(download);
-		    Content content = new Content(Content.Type.JSON, name, null, null, null, 0);
-		    jsonPart.setContentDisposition(content);
-		    multiPart.bodyPart(jsonPart);
-		    if (StringUtils.isNotEmpty(downloadJarName)) {
-		    	InputStream downloadIs = new ByteArrayInputStream(downloadByteArray);
-				BodyPart binaryPart2 = getServiceManager().createBodyPart(name, Content.Type.JAR, downloadIs);
-		        multiPart.bodyPart(binaryPart2);
-			}
-			
-		    if(StringUtils.isNotEmpty(downloadImageName)){
-		    	InputStream downloadImage=new ByteArrayInputStream(byteArray);
-		    	BodyPart binaryPart = getServiceManager().createBodyPart(name, Content.Type.JAR, downloadImage);
-		        multiPart.bodyPart(binaryPart);
-		    }
-			downloadInfo.add(download);
-			ClientResponse clientResponse = getServiceManager().createDownloads(downloadInfo, customerId);
-			if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
-				addActionError(getText(DOWNLOAD_NOT_ADDED, Collections.singletonList(name)));
+			ClientResponse clientResponse = getServiceManager().createDownloads(getDownloadInfo(), getCustomerId());
+			if (clientResponse.getStatus() != RES_CODE_200) {
+				addActionError(getText(DOWNLOAD_NOT_ADDED, Collections.singletonList(getName())));
 			} else {
-				addActionMessage(getText(DOWNLOAD_ADDED, Collections.singletonList(name)));
+				addActionMessage(getText(DOWNLOAD_ADDED, Collections.singletonList(getName())));
 			}
 		} catch (PhrescoException e) {
 			return showErrorPopup(e, EXCEPTION_DOWNLOADS_SAVE);
@@ -197,62 +155,67 @@ public class Downloads extends ServiceBaseAction {
 		
 		return list();
 	}
-	
+
 	public String update() throws PhrescoException {
 		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Downloads.update()");
 		}
 
 		try {
-			MultiPart multiPart = new MultiPart();
-			
-			DownloadInfo download = new DownloadInfo();
-			List<String> versions = new ArrayList<String>();
-			versions.add(version);
-			download.setId(id);
-			download.setName(name);
-			download.setDescription(description);
-			List<String> customerIds = new ArrayList<String>();
-			customerIds.add(customerId);
-			download.setCustomerIds(customerIds);
-			
-			List<ArtifactInfo> downloadVersions = new ArrayList<ArtifactInfo>();
-			ArtifactInfo downloadVersion = new ArtifactInfo();
-			downloadVersion.setVersion(version);
-			downloadVersions.add(downloadVersion);
-			download.setVersions(downloadVersions);
-			//TODO Arunprasanna
-			List<CoreOption> appliesTo = new ArrayList<CoreOption>();
-			CoreOption coreOption = new CoreOption();
-			coreOption.setTechId(technology);
-			appliesTo.add(coreOption);
-			download.setAppliesTo(appliesTo);
-			//download.setType(group);
-			
-			BodyPart jsonPart = new BodyPart();
-		    jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
-		    jsonPart.setEntity(download);
-		    Content content = new Content(Content.Type.JSON, name, null, null, null, 0);
-		    jsonPart.setContentDisposition(content);
-		    multiPart.bodyPart(jsonPart);
-		    if (StringUtils.isNotEmpty(downloadJarName)) {
-		    	InputStream downloadIs = new ByteArrayInputStream(downloadByteArray);
-				BodyPart binaryPart2 = getServiceManager().createBodyPart(name, Content.Type.JAR, downloadIs);
-		        multiPart.bodyPart(binaryPart2);
-			}
-			
-		    if(StringUtils.isNotEmpty(downloadImageName)){
-		    	InputStream downloadImage=new ByteArrayInputStream(byteArray);
-		    	BodyPart binaryPart = getServiceManager().createBodyPart(name, Content.Type.JAR, downloadImage);
-		        multiPart.bodyPart(binaryPart);
-		    }
-			getServiceManager().updateDownload(download, id, customerId);
+			getServiceManager().updateDownload(getDownloadInfo(), getDownloadId(), getCustomerId());
 		} catch (PhrescoException e) {
 			return showErrorPopup(e, EXCEPTION_DOWNLOADS_UPDATE);
 		}
 
 		return list();
 	}
+	
+	 private MultiPart getDownloadInfo() throws PhrescoException {
+	        MultiPart multiPart = new MultiPart();
+	        
+	        DownloadInfo download = new DownloadInfo();
+	        if (StringUtils.isNotEmpty(getFromPage())) {
+	            download.setId(getDownloadId());
+	        }
+	        download.setName(getName());
+	        download.setDescription(getDescription());
+	        
+	        List<String> customerIds = new ArrayList<String>();
+	        customerIds.add(getCustomerId());
+	        download.setCustomerIds(customerIds);
+	        
+	        List<ArtifactInfo> downloadVersions = new ArrayList<ArtifactInfo>();
+	        ArtifactInfo downloadVersion = new ArtifactInfo();
+	        downloadVersion.setVersion(getVersion());
+	        downloadVersions.add(downloadVersion);
+	        download.setVersions(downloadVersions);
+	        //TODO Arunprasanna
+	        List<CoreOption> appliesTo = new ArrayList<CoreOption>();
+	        CoreOption coreOption = new CoreOption();
+	        coreOption.setTechId(getTechnology());
+	        appliesTo.add(coreOption);
+	        download.setAppliesTo(appliesTo); 
+	        //download.setType(group);
+	        
+	        BodyPart jsonPart = new BodyPart();
+	        jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
+	        jsonPart.setEntity(download);
+	        Content content = new Content(Content.Type.JSON, getName(), null, null, null, 0);
+	        jsonPart.setContentDisposition(content);
+	        multiPart.bodyPart(jsonPart);
+	        if (StringUtils.isNotEmpty(downloadJarName)) {
+	            InputStream downloadIs = new ByteArrayInputStream(downloadByteArray);
+	            BodyPart bodyPart = getServiceManager().createBodyPart(getName(), Content.Type.JAR, downloadIs);
+	            multiPart.bodyPart(bodyPart);
+	        }
+	        
+	        if(StringUtils.isNotEmpty(downloadImageName)){
+	            InputStream downloadImage=new ByteArrayInputStream(byteArray);
+	            BodyPart binaryPart = getServiceManager().createBodyPart(getName(), Content.Type.JAR, downloadImage);
+	            multiPart.bodyPart(binaryPart);
+	        }
+	        return multiPart;
+	    }
 
 	public String delete() throws PhrescoException {
 		if (s_isDebugEnabled) {
@@ -263,8 +226,8 @@ public class Downloads extends ServiceBaseAction {
 			String[] downloadIds = getHttpRequest().getParameterValues(REQ_DOWNLOAD_ID);
 			if (ArrayUtils.isNotEmpty(downloadIds)) {
 				for (String downloadId : downloadIds) {
-					ClientResponse clientResponse =getServiceManager().deleteDownloadInfo(downloadId, customerId);
-					if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
+					ClientResponse clientResponse =getServiceManager().deleteDownloadInfo(downloadId, getCustomerId());
+					if (clientResponse.getStatus() != RES_CODE_200) {
 						addActionError(getText(DOWNLOAD_NOT_DELETED));
 					}
 				}
@@ -300,7 +263,7 @@ public class Downloads extends ServiceBaseAction {
         		//fileInfo.setGroupId(groupId);
         		List<ArtifactInfo> versions = new ArrayList<ArtifactInfo>();
         		ArtifactInfo fileInfoversion = new ArtifactInfo();
-        		fileInfoversion.setVersion(version);
+        		fileInfoversion.setVersion(getVersion());
         		versions.add(fileInfoversion);
         		fileInfo.setVersions(versions);
         		fileInfo.setMavenJar(true);
@@ -348,7 +311,7 @@ public class Downloads extends ServiceBaseAction {
 			S_LOGGER.debug("Entering Method  Downloads.removeUploadedFile()");
 		}
 		
-		if(REQ_DOWNLOAD_UPLOAD_FILE.equals(type)) {
+		if(REQ_DOWNLOAD_UPLOAD_FILE.equals(getType())) {
 			downloadByteArray = null;
 			downloadJarName = null;
 		} else {
@@ -363,20 +326,21 @@ public class Downloads extends ServiceBaseAction {
 		}
 		
 		boolean isError = false;
-		if (StringUtils.isEmpty(name)) {
+		//Empty validation for name
+		if (StringUtils.isEmpty(getName())) {
 			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY));
 			isError = true;
 		}
 
-		if (StringUtils.isEmpty(version)) {
+		if (StringUtils.isEmpty(getVersion())) {//Empty validation for version
 			setVerError(getText(KEY_I18N_ERR_VER_EMPTY));
 			isError = true;
-		}  else if (StringUtils.isEmpty(fromPage) || (!version.equals(oldVersion))) {
+		}  else if (StringUtils.isEmpty(getFromPage()) || (!getVersion().equals(getOldVersion()))) {
 			//To check whether the version already exist
-			List<DownloadInfo> downloads = getServiceManager().getDownloads(customerId);
-			if (downloads != null) {
+			List<DownloadInfo> downloads = getServiceManager().getDownloads(getCustomerId());
+			if (CollectionUtils.isNotEmpty(downloads)) {
 				for (DownloadInfo download : downloads) {
-					if (download.getName().equalsIgnoreCase(name) && download.getVersions().equals(version)) {
+					if (download.getName().equalsIgnoreCase(getName()) && download.getVersions().equals(getVersion())) {
 						setVerError(getText(KEY_I18N_ERR_VER_ALREADY_EXISTS));
 						isError = true;
 						break;
@@ -384,18 +348,20 @@ public class Downloads extends ServiceBaseAction {
 				}
 			}
 		}
-
-		if (StringUtils.isEmpty(application)) {
+		//Empty validation for platform 
+		if (StringUtils.isEmpty(getPlatform())) {
 			setAppltError(getText(KEY_I18N_ERR_APPLNPLTF_EMPTY));
 			isError = true;
 		} 
 
-		if (StringUtils.isEmpty(group)) {
+		//Empty validation for group
+		if (StringUtils.isEmpty(getGroup())) {
 			setGroupError(getText(KEY_I18N_ERR_GROUP_EMPTY));
 			isError = true;
 		}
 		
-		if (technology == null) {
+		//Empty validation for technology
+		if (StringUtils.isNotEmpty(getTechnology())) {
 			setTechError(getText(KEY_I18N_ERR_TECH_EMPTY));
 			isError = true;
 		}
@@ -439,12 +405,12 @@ public class Downloads extends ServiceBaseAction {
 		this.verError = verError;
 	}
 
-	public String getApplication() {
-		return application;
+	public String getPlatform() {
+		return platform;
 	}
 
-	public void setApplication(String application) {
-		this.application = application;
+	public void setPlatform(String application) {
+		this.platform = application;
 	}
 
 	public String getAppltError() {
@@ -495,12 +461,12 @@ public class Downloads extends ServiceBaseAction {
 		this.description = description;
 	}
 
-	public String getId() {
-		return id;
+	public String getDownloadId() {
+		return downloadId;
 	}
 
-	public void setId(String id) {
-		this.id = id;
+	public void setDownloadId(String id) {
+		this.downloadId = id;
 	}
 
 	public String getFromPage() {
