@@ -389,29 +389,35 @@ public class Features extends ServiceBaseAction {
 		
 		try {
             boolean isError = false;
+            //Empty validation for name
             if (StringUtils.isEmpty(getName())) {
                 setNameError(getText(KEY_I18N_ERR_NAME_EMPTY));
                 isError = true;
             }
+            //Validate whether file is selected during add
             if (!EDIT.equals(getFromPage()) && featureByteArray == null) {
                 setFileError(getText(KEY_I18N_ERR_APPLNJAR_EMPTY));
                 isError = true;
-            } 
+            }
             if (featureByteArray != null) {
+                //Empty validation for groupId if file is selected
                 if (StringUtils.isEmpty(getGroupId())) {
                     setGroupIdError(getText(KEY_I18N_ERR_GROUPID_EMPTY));
                     isError = true;
                 }
+                //Empty validation for artifactId if file is selected
                 if (StringUtils.isEmpty(getArtifactId())) {
                     setArtifactIdError(getText(KEY_I18N_ERR_ARTIFACTID_EMPTY));
                     isError = true;
                 }
+                //Empty validation for version if file is selected
                 if (StringUtils.isEmpty(getVersion())) {
                     setVerError(getText(KEY_I18N_ERR_VER_EMPTY));
                     isError = true;
                 }
+                //To check whether the version already exist
                 if (StringUtils.isNotEmpty(getVersion()) && (StringUtils.isEmpty(getFromPage()) 
-                        || (!getVersion().equals(getOldVersion())))) {//To check whether the version already exist
+                        || (!getVersion().equals(getOldVersion())))) {
                     List<ArtifactGroup> moduleGroups = getServiceManager().getModules(getCustomerId(), getTechnology(), getType());
                     if (StringUtils.isNotEmpty(getVersion())) {
                         for (ArtifactGroup moduleGroup : moduleGroups) {

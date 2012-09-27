@@ -41,7 +41,6 @@ import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.client.api.Content;
-import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.MultiPart;
@@ -61,7 +60,6 @@ public class Component extends ServiceBaseAction {
 	
     private String customerId = null;
     private String fromPage = null;
-    private String techId = null;
     private String type = "component";
     
     private String artifactId = "";
@@ -91,8 +89,8 @@ public class Component extends ServiceBaseAction {
     	}
     	
     	try {
-      		getHttpRequest().setAttribute(REQ_CUST_CUSTOMER_ID, customerId);
-    		List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
+      		setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
+    		List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
     		setReqAttribute(REQ_ARCHE_TYPES, technologies);
     	} catch (PhrescoException e){
     	    return showErrorPopup(e, EXCEPTION_COMPONENT_LIST);
@@ -107,10 +105,10 @@ public class Component extends ServiceBaseAction {
     	}
     	
     	try {    		
-    		List<ArtifactGroup> moduleGroup = getServiceManager().getModules(customerId, techId, type);
+    		List<ArtifactGroup> moduleGroup = getServiceManager().getModules(getCustomerId(), getTechnology(), getType());
     		setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
-    		setReqAttribute(REQ_CUST_CUSTOMER_ID, customerId);
-    		if (StringUtils.isNotEmpty(from)) {
+    		setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
+    		if (StringUtils.isNotEmpty(getFrom())) {
     		    return COMP_FEATURES_DEPENDENCY;
     		}
     	} catch (PhrescoException e){
@@ -127,9 +125,9 @@ public class Component extends ServiceBaseAction {
 		
 		try {
 		
-		List<Technology> technologies = getServiceManager().getArcheTypes(customerId);
+		List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
 		setReqAttribute(REQ_ARCHE_TYPES, technologies);
-		setReqAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+		setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		}catch (PhrescoException e) {
 		    return showErrorPopup(e, EXCEPTION_COMPONENT_ADD);
 		}
@@ -143,10 +141,10 @@ public class Component extends ServiceBaseAction {
 		}
 		
 		try {
-		    ArtifactGroup moduleGroup = getServiceManager().getFeature(techId, customerId);
+		    ArtifactGroup moduleGroup = getServiceManager().getFeature(getTechnology(), getCustomerId());
 		    setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
 		    setReqAttribute(REQ_FROM_PAGE, EDIT);
-		    setReqAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+		    setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		} catch (PhrescoException e) {
 		    return showErrorPopup(e, EXCEPTION_COMPONENT_EDIT);
 		}
@@ -164,20 +162,20 @@ public class Component extends ServiceBaseAction {
 			BodyPart jsonPart = new BodyPart();
 			jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
 			jsonPart.setEntity(createModuleGroup());
-			Content content = new Content(Content.Type.JSON, name, null, null, null, 0);
+			Content content = new Content(Content.Type.JSON, getName(), null, null, null, 0);
 			jsonPart.setContentDisposition(content);
 			multiPart.bodyPart(jsonPart);
 			if (StringUtils.isNotEmpty(componentJarName)) {
 				InputStream featureIs = new ByteArrayInputStream(componentByteArray);
-				BodyPart binaryPart = getServiceManager().createBodyPart(name, Content.Type.JAR, featureIs);
+				BodyPart binaryPart = getServiceManager().createBodyPart(getName(), Content.Type.JAR, featureIs);
 				multiPart.bodyPart(binaryPart);
 			}
 			
-			ClientResponse clientResponse = getServiceManager().createFeatures(multiPart, customerId);
-			if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200 && clientResponse.getStatus() != ServiceConstants.RES_CODE_201) {
-				addActionError(getText(COMPONENT_NOT_ADDED, Collections.singletonList(name)));
+			ClientResponse clientResponse = getServiceManager().createFeatures(multiPart, getCustomerId());
+			if (clientResponse.getStatus() != RES_CODE_200 && clientResponse.getStatus() != RES_CODE_201) {
+				addActionError(getText(COMPONENT_NOT_ADDED, Collections.singletonList(getName())));
 			} else {
-				addActionMessage(getText(COMPONENT_ADDED, Collections.singletonList(name)));
+				addActionMessage(getText(COMPONENT_ADDED, Collections.singletonList(getName())));
 			}
 		} catch (PhrescoException e) {
 		    return showErrorPopup(e, EXCEPTION_COMPONENT_SAVE);    		
@@ -200,11 +198,11 @@ public class Component extends ServiceBaseAction {
 			moduleGroup = new ArtifactGroup();
 			List<ArtifactInfo> modules = new ArrayList<ArtifactInfo>();
 			ArtifactInfo module = new ArtifactInfo();
-			moduleGroup.setName(name);
-			if (FEATURES_CORE.equals(moduleType)) {
-				moduleCoreOption= new CoreOption(technology, true);
+			moduleGroup.setName(getName());
+			if (FEATURES_CORE.equals(getModuleType())) {
+				moduleCoreOption= new CoreOption(getTechnology(), true);
 			} else {
-				moduleCoreOption= new CoreOption(technology, false);;
+				moduleCoreOption= new CoreOption(getTechnology(), false);;
 			}
 			appliesTo.add(moduleCoreOption);
 			moduleGroup.setAppliesTo(appliesTo);
@@ -212,16 +210,16 @@ public class Component extends ServiceBaseAction {
 //			moduleGroup.setType(type);
 			List<String> customerIds = new ArrayList<String>();
 			moduleGroup.setCustomerIds(customerIds);
-			moduleGroup.setArtifactId(artifactId);
-			moduleGroup.setGroupId(groupId);
-			module.setName(name);
-			module.setDescription(description);
-			module.setHelpText(helpText);
-			module.setVersion(version);
-			if (StringUtils.isNotEmpty(defaultType)) {
-				requiredOption = new RequiredOption(technology, true);
+			moduleGroup.setArtifactId(getArtifactId());
+			moduleGroup.setGroupId(getGroupId());
+			module.setName(getName());
+			module.setDescription(getDescription());
+			module.setHelpText(getHelpText());
+			module.setVersion(getVersion());
+			if (StringUtils.isNotEmpty(getDefaultType())) {
+				requiredOption = new RequiredOption(getTechnology(), true);
 			} else {
-				requiredOption = new RequiredOption(technology, false);
+				requiredOption = new RequiredOption(getTechnology(), false);
 			}
 			required.add(requiredOption);
 			module.setAppliesTo(required);
@@ -244,17 +242,17 @@ public class Component extends ServiceBaseAction {
 			BodyPart jsonPart = new BodyPart();
 			jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
 			jsonPart.setEntity(createModuleGroup());
-			Content content = new Content(Content.Type.JSON, name, null, null, null, 0);
+			Content content = new Content(Content.Type.JSON, getName(), null, null, null, 0);
 			jsonPart.setContentDisposition(content);
 			multiPart.bodyPart(jsonPart);
 			    
 			if (StringUtils.isNotEmpty(componentJarName)) {
 				InputStream featureIs = new ByteArrayInputStream(componentByteArray);
-				BodyPart binaryPart2 = getServiceManager().createBodyPart(name, Content.Type.JAR, featureIs);
+				BodyPart binaryPart2 = getServiceManager().createBodyPart(getName(), Content.Type.JAR, featureIs);
 				multiPart.bodyPart(binaryPart2);
 			}
 			
-			getServiceManager().updateFeature(multiPart, techId, customerId);
+			getServiceManager().updateFeature(multiPart, getTechnology(), getCustomerId());
 		} catch (PhrescoException e) {
 		    return showErrorPopup(e, EXCEPTION_COMPONENT_UPDATE);
 		}
@@ -271,8 +269,8 @@ public class Component extends ServiceBaseAction {
 			String[] techIds = getHttpRequest().getParameterValues(REST_QUERY_TECHID);
 			if (ArrayUtils.isNotEmpty(techIds)) {
 				for (String techId : techIds) {
-					ClientResponse clientResponse = getServiceManager().deleteFeature(techId, customerId);
-					if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
+					ClientResponse clientResponse = getServiceManager().deleteFeature(techId, getCustomerId());
+					if (clientResponse.getStatus() != RES_CODE_200) {
 						addActionError(getText(COMPONENT_NOT_DELETED));
 					}
 				}
@@ -325,15 +323,19 @@ public class Component extends ServiceBaseAction {
 		}
 		
 		boolean isError = false;
-		if (StringUtils.isEmpty(name)) {
+		//Empty validation for name
+		if (StringUtils.isEmpty(getName())) {
 			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY));
 			isError = true;
 		} 
 		
-		if (StringUtils.isEmpty(version)) {
+		//Empty validation for version
+		if (StringUtils.isEmpty(getVersion())) {
 			setVersError(getText(KEY_I18N_ERR_VER_EMPTY));
 			isError = true;
 		}
+		
+		//Validate whether file is selected
 		if (componentByteArray == null) {
 		    setAppJarError(getText(KEY_I18N_ERR_APPLNJAR_EMPTY));
             isError = true;
@@ -420,14 +422,6 @@ public class Component extends ServiceBaseAction {
 		this.fromPage = fromPage;
 	}
 	
-	public String getTechId() {
-		return techId;
-	}
-
-	public void setTechId(String techId) {
-		this.techId = techId;
-	}
-
 	public String getDescription() {
 		return description;
 	}

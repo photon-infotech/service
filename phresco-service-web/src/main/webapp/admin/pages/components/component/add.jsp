@@ -259,7 +259,6 @@
 	<!-- Hidden Fields -->
 	<input type="hidden" name="customerId" value="<%= customerId %>"> 
 	<input type="hidden" name="fromPage" value="<%= StringUtils.isNotEmpty(fromPage) ? fromPage : "" %>"/>
-    <input type="hidden" name="techId" value="<%= moduleGroup != null ? moduleGroup.getId() : "" %>"/>
     <input type="hidden" name="oldName" value="<%= moduleGroup != null ? moduleGroup.getName() : "" %>"/>
 </form>
 
