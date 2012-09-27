@@ -19,12 +19,13 @@
  */
 package com.photon.phresco.service.admin.actions.admin;
 
-import com.opensymphony.xwork2.ActionSupport;
-import com.photon.phresco.service.admin.commons.ServiceActions;
+import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 
-public class AdminMenu extends ActionSupport implements ServiceActions { 
+public class AdminMenu extends ServiceBaseAction { 
 
-	public String getAdminMenu() {
+    private static final long serialVersionUID = 1L;
+
+    public String getAdminMenu() {
 		return ADMIN_MENU;	
 	}
 }

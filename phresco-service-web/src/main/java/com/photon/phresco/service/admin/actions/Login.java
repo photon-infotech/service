@@ -13,10 +13,13 @@ public class Login extends ServiceBaseAction {
 	private static final Logger S_LOGGER = Logger.getLogger(Login.class);
 	private static Boolean s_debugEnabled = S_LOGGER.isDebugEnabled();
 	
-	private String username = null;
-	private String password = null;
+	private String username = "";
+	private String password = "";
+	
 	private boolean loginFirst = true;
-	private boolean errorFound;
+	
+	private boolean errorFound = false;
+	
 	private String errorMsg;
 	
 	public String login() {
@@ -55,15 +58,15 @@ public class Login extends ServiceBaseAction {
 	    }
 		
 	    // Username and passwor empty field validation
-		if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
+		if (StringUtils.isEmpty(getUsername()) || StringUtils.isEmpty(getPassword())) {
 		    setErrorFound(true);
 		    setErrorMsg(getText(KEY_I18N_LOGIN_EMPTY_CRED));
 		    return SUCCESS;
 		}
 
 		try {
-	        String encodedPassword = ServerUtil.encryptString(password);
-		    User user = doLogin(username, encodedPassword);
+	        String encodedPassword = ServerUtil.encryptString(getPassword());
+		    User user = doLogin(getUsername(), encodedPassword);
 		    
 		    // username and password validation
 		    if (StringUtils.isEmpty(user.getDisplayName())) {

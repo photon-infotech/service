@@ -47,11 +47,11 @@ import com.photon.phresco.util.ServiceConstants;
 
 public class ServiceBaseAction extends ActionSupport implements ServiceActions, ServiceUIConstants, ServiceClientConstant, ServiceConstants {
 
-//	private static final Logger S_LOGGER = Logger.getLogger(ServiceBaseAction.class);
     private static final long serialVersionUID = 1L;
     
     private static ServiceManager serviceManager = null;
-    private String copyToClipboard = null;
+    
+    private String copyToClipboard = "";
     
     protected ServiceManager getServiceManager() {
 		return serviceManager;

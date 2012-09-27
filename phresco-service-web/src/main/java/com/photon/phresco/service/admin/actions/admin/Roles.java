@@ -30,7 +30,6 @@ import org.apache.log4j.Logger;
 import com.photon.phresco.commons.model.Role;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
-import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
 
 public class Roles extends ServiceBaseAction { 
@@ -81,7 +80,7 @@ public class Roles extends ServiceBaseAction {
 	    }
 		
 		try {
-		    Role role = getServiceManager().getRole(roleId);
+		    Role role = getServiceManager().getRole(getRoleId());
 			setReqAttribute(REQ_ROLE_ROLE , role);
 			setReqAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (PhrescoException e) {
@@ -99,14 +98,14 @@ public class Roles extends ServiceBaseAction {
 		try  {
 			List<Role> roleList = new ArrayList<Role>();
 			Role role = new Role();
-			role.setName(name);
-			role.setDescription(description);
+			role.setName(getName());
+			role.setDescription(getDescription());
 			roleList.add(role);
 			ClientResponse clientResponse = getServiceManager().createRoles(roleList);
-			if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
-				addActionError(getText(ROLE_NOT_ADDED, Collections.singletonList(name)));
+			if (clientResponse.getStatus() != RES_CODE_200) {
+				addActionError(getText(ROLE_NOT_ADDED, Collections.singletonList(getName())));
 			} else {
-				addActionMessage(getText(ROLE_ADDED, Collections.singletonList(name)));
+				addActionMessage(getText(ROLE_ADDED, Collections.singletonList(getName())));
 			}	
 		} catch (PhrescoException e) {
 		    return showErrorPopup(e, EXCEPTION_ROLE_SAVE);
@@ -121,8 +120,8 @@ public class Roles extends ServiceBaseAction {
 	    }
  
 		try {
-			Role role = new Role(roleId, name, description);
-			getServiceManager().updateRole(role, roleId);
+			Role role = new Role(getRoleId(), getName(), getDescription());
+			getServiceManager().updateRole(role, getRoleId());
 		} catch (PhrescoException e) {
 		    return showErrorPopup(e, EXCEPTION_ROLE_UPDATE);
 		}
@@ -140,7 +139,7 @@ public class Roles extends ServiceBaseAction {
 			if (ArrayUtils.isNotEmpty(roleIds)) {
 				for (String roleId : roleIds) {
 					ClientResponse clientResponse = getServiceManager().deleteRole(roleId);
-					if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
+					if (clientResponse.getStatus() != RES_CODE_200) {
 						addActionError(getText(ROLE_NOT_DELETED));
 					}
 				}
@@ -161,7 +160,7 @@ public class Roles extends ServiceBaseAction {
 		boolean isError = false;
 		
 		//Empty validation for name
-		if (StringUtils.isEmpty(name)) {
+		if (StringUtils.isEmpty(getName())) {
 			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY));
 			isError = true;
 		} 

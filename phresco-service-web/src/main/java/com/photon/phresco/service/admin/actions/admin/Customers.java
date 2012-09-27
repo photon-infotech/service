@@ -35,7 +35,6 @@ import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.Customer.LicenseType;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
-import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.ClientResponse;
 
 public class Customers extends ServiceBaseAction  { 
@@ -145,7 +144,7 @@ public class Customers extends ServiceBaseAction  {
 			List<Customer> customers = new ArrayList<Customer>();
 			customers.add(createCustomer());
 			ClientResponse clientResponse = getServiceManager().createCustomers(customers);
-			if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
+			if (clientResponse.getStatus() != RES_CODE_200) {
 				addActionError(getText(CUSTOMER_NOT_ADDED, Collections.singletonList(getName())));
 			} else {
 				addActionMessage(getText(CUSTOMER_ADDED, Collections.singletonList(getName())));
@@ -219,8 +218,8 @@ public class Customers extends ServiceBaseAction  {
 			String[] customerIds = getHttpRequest().getParameterValues(REQ_CUST_CUSTOMER_ID);
 			if (ArrayUtils.isNotEmpty(customerIds)) {
 				for (String customerId : customerIds) {
-			    	ClientResponse clientResponse =getServiceManager().deleteCustomer(customerId);
-			    	if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
+			    	ClientResponse clientResponse = getServiceManager().deleteCustomer(customerId);
+			    	if (clientResponse.getStatus() != RES_CODE_200) {
 			        	addActionError(getText(CUSTOMER_NOT_DELETED));
 			        }
 				}
