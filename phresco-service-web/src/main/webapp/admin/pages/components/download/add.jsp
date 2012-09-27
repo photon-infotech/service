@@ -107,7 +107,7 @@
 		                    									for (Technology technology : technologies) { 
 		                    										String checkedStr = "";
 		                    										if (downloadInfo != null) {
-		                    											List<Element> appliesTos = downloadInfo.getAppliesToTechs();
+		                    											List<String> appliesTos = downloadInfo.getAppliesToTechIds();
 		                    											if (appliesTos.contains(technology.getId())) {
 		                    												checkedStr = "checked";
 		                    											} else {
