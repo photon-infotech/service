@@ -861,17 +861,28 @@ public class ComponentService extends DbService {
     
 	
     private void saveModuleGroup(ArtifactGroup moduleGroup) throws PhrescoException {
-        List<com.photon.phresco.commons.model.ArtifactInfo> versions = moduleGroup.getVersions();
         Converter<ArtifactGroupDAO, ArtifactGroup> converter = 
             (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
         ArtifactGroupDAO moduleGroupDAO = converter.convertObjectToDAO(moduleGroup);
-        
-        for (com.photon.phresco.commons.model.ArtifactInfo module : versions) {
-            module.setArtifactGroupId(moduleGroupDAO.getId());
-            mongoOperation.save(ARTIFACT_INFO_COLLECTION_NAME, module);
+        List<com.photon.phresco.commons.model.ArtifactInfo> versions = moduleGroup.getVersions();
+        ArtifactGroupDAO moduleDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
+		        new Query(Criteria.where("name").is(moduleGroupDAO.getName())), ArtifactGroupDAO.class);
+        if(moduleDAO != null) {
+        	List<com.photon.phresco.commons.model.ArtifactInfo> info = mongoOperation.find(ARTIFACT_INFO_COLLECTION_NAME, 
+        			new Query(Criteria.where("artifactGroupId").is(moduleDAO.getId())), com.photon.phresco.commons.model.ArtifactInfo.class);
+        	info.addAll(versions);
+        	for (com.photon.phresco.commons.model.ArtifactInfo artifactInfo : info) {
+        		mongoOperation.save(ARTIFACT_INFO_COLLECTION_NAME, artifactInfo);
+			}
+        	
+        } else {
+	        for (com.photon.phresco.commons.model.ArtifactInfo module : versions) {
+	            module.setArtifactGroupId(moduleGroupDAO.getId());
+	            mongoOperation.save(ARTIFACT_INFO_COLLECTION_NAME, module);
+	        }
+	        
+	        mongoOperation.save(ARTIFACT_GROUP_COLLECTION_NAME, moduleGroupDAO);
         }
-        
-        mongoOperation.save(ARTIFACT_GROUP_COLLECTION_NAME, moduleGroupDAO);
     }
     
 
