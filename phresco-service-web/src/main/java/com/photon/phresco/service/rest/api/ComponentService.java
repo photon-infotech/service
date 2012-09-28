@@ -420,27 +420,26 @@ public class ComponentService extends DbService {
 	 * @return
 	 */
 	@PUT
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Produces (MediaType.APPLICATION_JSON)
+	@Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
 	@Path (REST_API_TECHNOLOGIES)
-	public Response updateTechnologies(List<Technology> technologies) {
+	public Response updateTechnologies(MultiPart multipart) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.updateTechnologies(List<Technology> technologies)");
 	    }
 		
 		try {
-			for (Technology tech : technologies) {
+			/*for (Technology tech : technologies) {
 				Technology techInfo = mongoOperation.findOne(TECHNOLOGIES_COLLECTION_NAME, 
 				        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(tech.getId())), Technology.class);
 				if (techInfo != null) {
 					mongoOperation.save(TECHNOLOGIES_COLLECTION_NAME , tech);
 				}
-			}
+			}*/
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
 		}
 		
-		return Response.status(Response.Status.OK).entity(technologies).build();
+		return Response.status(Response.Status.OK).entity(multipart).build();
 	}
 	
 	/**

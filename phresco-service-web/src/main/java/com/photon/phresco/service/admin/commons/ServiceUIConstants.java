@@ -71,6 +71,7 @@ public interface ServiceUIConstants {
     String REQ_IMAGE_JPG_EXTENSION = "jpg";
     String REQ_IMAGE_JPEG_EXTENSION = "jpeg";
     String REQ_IMAGE_PNG_EXTENSION = "png";
+    String REQ_JAR_FILE = "jar";
     
     
     /*****************************

@@ -292,22 +292,44 @@ function enableScreen() {
 }
 
 //To fill the pom details in the textbox if available while uploading the files
-function fillTextBoxes(responseJSON) {
-	$('#jarDetailsDiv').show();
-	if (responseJSON.mavenJar) {
-		disableEnableTextBox(responseJSON.groupId, responseJSON.artifactId, responseJSON.version, true)
+function fillTextBoxes(responseJSON, type, fileName) {
+	if(type === "pluginJar"){
+		$('#jarDetailsDivPopup').show();
 	} else {
-		disableEnableTextBox('', '', '', false)
+		$('#jarDetailsDiv').show();
+	}
+	if (responseJSON.mavenJar) {
+		disableEnableTextBox(responseJSON.groupId, responseJSON.artifactId, responseJSON.version, true, type, fileName);
+	} else {
+		disableEnableTextBox('', '', '', false, '', '');
 	}
 }
 
-function disableEnableTextBox(groupId, artifactId, jarVersion, isEnable) {
-	$('.groupId').val(groupId).attr('disabled', isEnable);
-	$('.artifactId').val(artifactId).attr('disabled', isEnable);
-	$('.jarVersion').val(jarVersion).attr('disabled', isEnable);
-	$('input[name=groupId]').val(groupId);
-	$('input[name=artifactId]').val(artifactId);
-	$('input[name=jarVersion]').val(jarVersion);
+function disableEnableTextBox(groupId, artifactId, jarVersion, isEnable, type, fileName) {
+	if(type === "pluginJar"){
+		var groupid = "grouId" ;
+		var artifId = "artifId" ;
+		var versnId = "versnId" ;
+		var fileDetParentDiv = $(document.createElement('div')).attr("id", fileName).attr("class","fileClass");
+		fileDetParentDiv.html("<div style='float: left; margin-right: 13px;'><label class='control-label labelbold' style='color:black;'> Group Id </label>" +
+				           "<div class='controls'><input id=" +groupid +" class='groupId' class='input-xlarge' maxlength='40' title='40 Characters only' type='text'  value='" + groupId +"' >" +
+				           "</div></div>"); 
+		fileDetParentDiv.append("<div style='float: left; margin-right: 7px;'> <label class='control-label labelbold' style='color:black;'> " +
+				              "Artifact Id </label><div class='controls'><input id='" +artifId +"'class='artifactId' class='input-xlarge'maxlength='40' title='40 Characters only' type='text' value='" + artifactId +"' >" +
+				              "</div></div>");
+		fileDetParentDiv.append("<div style='float: left; margin-right: 7px;'><label class='control-label labelbold' style='color:black;'> Version </label> "+
+		                   "<div class='controls'><input id='" +versnId +"'class='jarVersion' maxlength='30' title='30 Characters only' class='input-xlarge' type='text' value='" +jarVersion +"' > " +
+		                   "</div></div>");
+		fileDetParentDiv.append("</div>")
+		fileDetParentDiv.appendTo("#jarDetailsDivPopup");
+	} else {
+		$('.groupId').val(groupId).attr('disabled', isEnable);
+		$('.artifactId').val(artifactId).attr('disabled', isEnable);
+		$('.jarVersion').val(jarVersion).attr('disabled', isEnable);
+		$('input[name=groupId]').val(groupId);
+		$('input[name=artifactId]').val(artifactId);
+		$('input[name=jarVersion]').val(jarVersion);
+	}
 }
 
 function isiPad() {

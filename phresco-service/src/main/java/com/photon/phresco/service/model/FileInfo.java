@@ -19,25 +19,54 @@
  */
 package com.photon.phresco.service.model;
 
-import com.photon.phresco.commons.model.ArtifactGroup;
+public class FileInfo {
 
-public class FileInfo extends ArtifactGroup {
-
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
     
-    private boolean isMavenJar;
+    private boolean mavenJar;
+
 	private boolean success;
+	private String groupId;
+	private String artifactId;
+	private String version;
 	
-	public boolean isMavenJar() {
-		return isMavenJar;
-	}
-	public void setMavenJar(boolean isMavenJar) {
-		this.isMavenJar = isMavenJar;
-	}
 	public boolean isSuccess() {
 		return success;
 	}
+	
 	public void setSuccess(boolean success) {
 		this.success = success;
+	}
+	
+	public String getGroupId() {
+		return groupId;
+	}
+	
+	public void setGroupId(String groupId) {
+		this.groupId = groupId;
+	}
+	
+	public String getArtifactId() {
+		return artifactId;
+	}
+	
+	public void setArtifactId(String artifactId) {
+		this.artifactId = artifactId;
+	}
+	
+	public String getVersion() {
+		return version;
+	}
+	
+	public void setVersion(String version) {
+		this.version = version;
+	}
+	
+	public boolean isMavenJar() {
+		return mavenJar;
+	}
+
+	public void setMavenJar(boolean mavenJar) {
+		this.mavenJar = mavenJar;
 	}
 }

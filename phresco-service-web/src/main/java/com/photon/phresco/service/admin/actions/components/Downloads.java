@@ -265,7 +265,7 @@ public class Downloads extends ServiceBaseAction {
         		ArtifactInfo fileInfoversion = new ArtifactInfo();
         		fileInfoversion.setVersion(getVersion());
         		versions.add(fileInfoversion);
-        		fileInfo.setVersions(versions);
+        		//fileInfo.setVersions(versions);
         		fileInfo.setMavenJar(true);
         		fileInfo.setSuccess(true);
 	        	Gson gson = new Gson();

@@ -2109,6 +2109,10 @@ input[class*='sample'] {
     margin: 0;
 }
 
+#plugin-popup-file-uploader .qq-uploader ul li {
+	color:#000000;	
+	}
+
 .feat_modal-body {
 	height: 250px;
 }

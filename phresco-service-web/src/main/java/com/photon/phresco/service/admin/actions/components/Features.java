@@ -248,9 +248,9 @@ public class Features extends ServiceBaseAction {
 			    
 			ClientResponse clientResponse = getServiceManager().updateFeature(multiPart, getModuleGroupId(), getCustomerId());
 			if (clientResponse.getStatus() != RES_CODE_200 && clientResponse.getStatus() != RES_CODE_201) {
-                addActionError(getText(FEATURE_NOT_ADDED, Collections.singletonList(getName())));
+                addActionError(getText(FEATURE_NOT_UPDATED, Collections.singletonList(getName())));
             } else {
-                addActionMessage(getText(FEATURE_ADDED, Collections.singletonList(getName())));
+                addActionMessage(getText(FEATURE_UPDATED, Collections.singletonList(getName())));
             }
 		} catch (PhrescoException e) {
 			showErrorPopup(e, EXCEPTION_FEATURE_UPDATE);

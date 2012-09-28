@@ -83,7 +83,7 @@
 					<tbody>
 					<% if(CollectionUtils.isNotEmpty(globalUrls)) {
 						  for(Property globalUrl : globalUrls) {
-						
+						//TODO:Arunprasanna
 					%>
 						<tr>
 							<td class="checkboxwidth">
@@ -95,6 +95,7 @@
 								</a>
 							</td>
 							<td><%= StringUtils.isNotEmpty(globalUrl.getDescription()) ? globalUrl.getDescription() : "" %></td>
+							<td></td>
 							<%-- <td><%= StringUtils.isNotEmpty(globalUrl.getUrl()) ? globalUrl.getUrl() : "" %></td> --%>
 						</tr>
 						<%

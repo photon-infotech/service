@@ -195,6 +195,11 @@
             <result type="json" />
         </action>
         
+         <action name="uploadPopupPluginJar" class="com.photon.phresco.service.admin.actions.components.Archetypes" method="uploadPopupPluginJar">
+        	<result name="uploadPlugin">/admin/pages/components/archetype/uploadPluginJar.jsp</result>
+        	<result type="json" />
+        </action>
+        
         <action name="removeArchetypeJar" class="com.photon.phresco.service.admin.actions.components.Archetypes" method="removeUploadedJar">
             <result type="json" />
         </action>

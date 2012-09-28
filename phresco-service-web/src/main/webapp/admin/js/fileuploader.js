@@ -145,6 +145,9 @@ qq.setText = function(element, text){
 qq.setId = function(element, name){
 	element.setAttribute("id", name);
 };
+qq.setFileName = function(element, name){
+	element.setAttribute("fileName", name);
+};
 //
 // Selecting elements
 
@@ -251,7 +254,7 @@ var qq = qq || {};
 qq.FileUploaderBasic = function(o){
     this._options = {
         // set to true to see the server response
-        debug: false,
+        debug: true,
         action: 'sample',
         params: {},
         button: null,
@@ -264,10 +267,19 @@ qq.FileUploaderBasic = function(o){
         // events
         // return false to cancel submit
         onSubmit: function(id, fileName){
-        	jarError('', o.type);
+        	if(o.type === "pluginJar"){
+        		jarPopupError('', o.type);
+        	} else {
+        		jarError('', o.type);
+        	}
         },
         onProgress: function(id, fileName, loaded, total){
-        	jarError('', o.type);
+        	//jarError('', o.type);
+        	if(o.type === "pluginJar"){
+        		jarPopupError('', o.type);
+        	} else {
+        		jarError('', o.type);
+        	}
         },
         onComplete: function(id, fileName, responseJSON){
         			//To show the error msg if the uploaded jar is not a valid jar
@@ -279,16 +291,27 @@ qq.FileUploaderBasic = function(o){
         						}
         					}
         				});
-        				jarError(responseJSON.errorMsg, o.type);
+        				if(o.type === "pluginJar"){
+        					jarPopupError(responseJSON.errorMsg, o.type);
+        				} else {
+        					jarError(responseJSON.errorMsg, o.type);
+        				}
+        				//jarError(responseJSON.errorMsg, o.type);
         			} else {
-        				if (o.type === "applnJar" || o.type === "uploadFile" || o.type === "featureJar" || o.type === "pilotProZip") {
-        					fillTextBoxes(responseJSON);// To show the text box for groupId, artifactId and version 
+        				if (o.type === "applnJar" || o.type === "uploadFile" || o.type === "featureJar" || o.type === "pilotProZip" || o.type === "pluginJar") {
+        					fillTextBoxes(responseJSON, o.type, fileName);// To show the text box for groupId, artifactId and version 
     		        		enableDisableUpload();// To disable the upload button when a file is uploaded successfully
         				}
         				if(o.type === "uploadIcon") {
         					enableIconDisableUpload();// to disable the upload Icon Button when a image is uploaded successfully
         				}
-        				jarError('', o.type);// To empty the error msg if exists when the specified type of file is uploaded
+        				if(o.type === "pluginJar"){
+        					jarPopupError('', o.type);
+        				} else {
+        					jarError('', o.type);
+        				}
+        				
+        				//jarError('', o.type);// To empty the error msg if exists when the specified type of file is uploaded
         			}
 	        	},
         onCancel: function(id, fileName){},
@@ -301,7 +324,13 @@ qq.FileUploaderBasic = function(o){
             onLeave: "The files are being uploaded, if you leave now the upload will be cancelled."            
         },
         showMessage: function(message){
-        	jarError(message, o.type);// To show the error msg when a file is uploaded other than the specified type
+        	if(o.type === "pluginJar"){
+        		jarPopupError(message, o.type);
+        	} else {
+        		jarError(message, o.type);
+        	}
+        	
+        	//jarError(message, o.type);// To show the error msg when a file is uploaded other than the specified type
         }
     };
     qq.extend(this._options, o);
@@ -519,7 +548,7 @@ qq.FileUploader = function(o){
                 '<span class="qq-upload-size"></span>' +
                 '<a class="qq-upload-cancel" href="#">Cancel</a>' +
                 '<span class="qq-upload-failed-text">Failed</span>' +
-                '<img class="qq-upload-remove" src="images/delete.png" alt="Remove" tempAttr="'+ o.type +'" onclick="removeUploadedJar(this);"/>' +
+                '<img class="qq-upload-remove" src="images/delete.png" alt="Remove" tempAttr="'+ o.type +'"  onclick="removeUploadedJar(this);"/>' +
             '</li>',        
         
         classes: {
@@ -653,7 +682,8 @@ qq.extend(qq.FileUploader.prototype, {
         var fileElement = this._find(item, 'file');
         qq.setText(fileElement, fileName);
         var removeElement = this._find(item, 'remove');
-        qq.setId(removeElement, this._formatFileName(fileName));
+        //qq.setId(removeElement, this._formatFileName(fileName));
+        qq.setFileName(removeElement, fileName);
         this._find(item, 'size').style.display = 'none';        
 
         this._listElement.appendChild(item);
@@ -881,7 +911,7 @@ qq.UploadButton.prototype = {
  */
 qq.UploadHandlerAbstract = function(o){
     this._options = {
-        debug: false,
+        debug: true,
         action: urlAction,
         // maximum number of concurrent uploads        
         maxConnections: 999,
