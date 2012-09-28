@@ -479,11 +479,7 @@
         <!--- ADMIN ROLE ENDS-->
 			
 		<!-- ADMIN PERMISSION STARTS-->
-		<action name="permissionList" class="com.photon.phresco.service.admin.actions.admin.PermissionList" method="list">
-			<result name="permissionList">/admin/pages/admin/permission/list.jsp</result>
-        </action>
-           
-        <action name="permissionDelete" class="com.photon.phresco.service.admin.actions.admin.PermissionList" method="delete">
+		<action name="permissionList" class="com.photon.phresco.service.admin.actions.admin.PermissionsAction" method="list">
 			<result name="permissionList">/admin/pages/admin/permission/list.jsp</result>
         </action>
 		<!-- ADMIN PERMISSION ENDS-->
@@ -501,37 +497,37 @@
 		<!-- ADMIN VIDEO ENDS-->
 			
 		<!-- ADMIN GLOBALURL STARTS-->
-		<action name="globalurlList" class="com.photon.phresco.service.admin.actions.admin.GlobalUrl" method="list">
+		<action name="globalurlList" class="com.photon.phresco.service.admin.actions.admin.GlobalUrlAction" method="list">
 			<result name="globalurlList">/admin/pages/admin/globalurl/list.jsp</result>
         </action>
 		
-		<action name="globalurlAdd" class="com.photon.phresco.service.admin.actions.admin.GlobalUrl" method="add">
+		<action name="globalurlAdd" class="com.photon.phresco.service.admin.actions.admin.GlobalUrlAction" method="add">
 			<result name="globalurlAdd">/admin/pages/admin/globalurl/add.jsp</result>
         </action>
         
-        <action name="globalurlEdit" class="com.photon.phresco.service.admin.actions.admin.GlobalUrl" method="edit">
+        <action name="globalurlEdit" class="com.photon.phresco.service.admin.actions.admin.GlobalUrlAction" method="edit">
 			<result name="globalurlAdd">/admin/pages/admin/globalurl/add.jsp</result>
         </action>
 		
-		<action name="globalurlSave" class="com.photon.phresco.service.admin.actions.admin.GlobalUrl" method="save">
+		<action name="globalurlSave" class="com.photon.phresco.service.admin.actions.admin.GlobalUrlAction" method="save">
 			<result name="globalurlList">/admin/pages/admin/globalurl/list.jsp</result>
 			<result type="json" />
         </action>
         
-        <action name="globalurlUpdate" class="com.photon.phresco.service.admin.actions.admin.GlobalUrl" method="update">
+        <action name="globalurlUpdate" class="com.photon.phresco.service.admin.actions.admin.GlobalUrlAction" method="update">
             <result name="globalurlList">/admin/pages/admin/globalurl/list.jsp</result>
             <result type="json" />
         </action>
         
-        <action name="globalurlSaveValidate" class="com.photon.phresco.service.admin.actions.admin.GlobalUrl" method="validateForm">
+        <action name="globalurlSaveValidate" class="com.photon.phresco.service.admin.actions.admin.GlobalUrlAction" method="validateForm">
 			<result type="json" />
         </action>
         
-        <action name="globalurlUpdateValidate" class="com.photon.phresco.service.admin.actions.admin.GlobalUrl" method="validateForm">
+        <action name="globalurlUpdateValidate" class="com.photon.phresco.service.admin.actions.admin.GlobalUrlAction" method="validateForm">
 			<result type="json" />
         </action>
 		
-         <action name="globalurlDelete" class="com.photon.phresco.service.admin.actions.admin.GlobalUrl" method="delete">
+         <action name="globalurlDelete" class="com.photon.phresco.service.admin.actions.admin.GlobalUrlAction" method="delete">
             <result name="globalurlList">/admin/pages/admin/globalurl/list.jsp</result>
         </action>
 		<!-- ADMIN GLOBALURL ENDS-->

@@ -36,9 +36,12 @@ import com.photon.phresco.service.api.DbService;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.util.AuthenticationUtil;
+import com.photon.phresco.service.util.ServerConstants;
 import com.photon.phresco.util.Credentials;
 import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 
 @Path(ServiceConstants.REST_API_LOGIN)
@@ -48,47 +51,44 @@ public class LoginService extends DbService {
 		super();
 	}
 
-	@POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public User login(Credentials credentials) throws PhrescoException {
-		System.out.println("In Login Service");
-        User user = new User();
-        user.setLoginId("demo_user");
-        user.setEmail("demo_user@photon.in");
-        user.setFirstName("Demo");
-        user.setLastName("User");
-        user.setDisplayName("Demo User");
-        
-        AuthenticationUtil authTokenUtil = AuthenticationUtil.getInstance();
-        user.setToken(authTokenUtil.generateToken(credentials.getUsername()));
-        user.setPhrescoEnabled(true);
-        return user;
-	}
-	
-//	
 //	@POST
 //    @Produces(MediaType.APPLICATION_JSON)
 //    @Consumes(MediaType.APPLICATION_JSON)
 //    public User login(Credentials credentials) throws PhrescoException {
 //		System.out.println("In Login Service");
-//		Client client = Client.create();
-//		PhrescoServerFactory.initialize();
-//		RepositoryManager repoMgr = PhrescoServerFactory.getRepositoryManager();
-//		WebResource resource = client.resource(repoMgr.getAuthServiceURL() + ServerConstants.AUTHENTICATE);
-//		System.out.println("Auth Service URL " + repoMgr.getAuthServiceURL() + ServerConstants.AUTHENTICATE);
-//		
-//        resource.accept(MediaType.APPLICATION_JSON_TYPE);
-//        ClientResponse response = resource.type(MediaType.APPLICATION_JSON_TYPE).post(ClientResponse.class, credentials);
-//        GenericType<User> genericType = new GenericType<User>() {};
-//        User user = response.getEntity(genericType);
+//        User user = new User();
+//        user.setLoginId("demo_user");
+//        user.setEmail("demo_user@photon.in");
+//        user.setFirstName("Demo");
+//        user.setLastName("User");
+//        user.setDisplayName("Demo User");
+//        
 //        AuthenticationUtil authTokenUtil = AuthenticationUtil.getInstance();
 //        user.setToken(authTokenUtil.generateToken(credentials.getUsername()));
 //        user.setPhrescoEnabled(true);
-//        System.out.println("User " + user);
 //        return user;
-//        
-//        
+//	}
+	
+	
+	@POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public User login(Credentials credentials) throws PhrescoException {
+		Client client = Client.create();
+		PhrescoServerFactory.initialize();
+		RepositoryManager repoMgr = PhrescoServerFactory.getRepositoryManager();
+		WebResource resource = client.resource(repoMgr.getAuthServiceURL() + ServerConstants.AUTHENTICATE);
+		
+        resource.accept(MediaType.APPLICATION_JSON_TYPE);
+        ClientResponse response = resource.type(MediaType.APPLICATION_JSON_TYPE).post(ClientResponse.class, credentials);
+        GenericType<User> genericType = new GenericType<User>() {};
+        User user = response.getEntity(genericType);
+        AuthenticationUtil authTokenUtil = AuthenticationUtil.getInstance();
+        user.setToken(authTokenUtil.generateToken(credentials.getUsername()));
+        user.setPhrescoEnabled(true);
+        return user;
+        
+        
 //        UserDAO userDao = mongoOperation.findOne(ServiceConstants.USERDAO_COLLECTION_NAME, 
 //                new Query(Criteria.whereId().is(user.getName())), UserDAO.class);
 //        user.setId(user.getName());
@@ -105,7 +105,7 @@ public class LoginService extends DbService {
 //        for (CustomerDAO customerDAO : customerDAOs) {
 //            customers.add(customerConverter.convertDAOToObject(customerDAO, mongoOperation));
 //        }
-//        
+        
 //        AuthenticationUtil authTokenUtil = AuthenticationUtil.getInstance();
 //        convertedUser.setLoginId(credentials.getUsername());
 //        convertedUser.setToken(authTokenUtil.generateToken(credentials.getUsername()));
@@ -113,7 +113,7 @@ public class LoginService extends DbService {
 //        convertedUser.setPhrescoEnabled(user.isPhrescoEnabled());
 //        convertedUser.setCustomers(customers);
 //        return convertedUser;
-//    }
+    }
 	
 	@POST
     @Path("/import")

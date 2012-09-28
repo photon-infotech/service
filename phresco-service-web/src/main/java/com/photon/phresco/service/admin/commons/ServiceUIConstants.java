@@ -191,15 +191,15 @@ public interface ServiceUIConstants {
 	String EXCEPTION_ROLE_EDIT = "Role edit";
 	String EXCEPTION_ROLE_LIST = "Role list";
 	
-	String PERMISSION_LIST_EXCEPTION = "Permission list";
-	String PERMISSION_DELETE_EXCEPTION = "Permission delete";
+	String EXCEPTION_PERMISSION_LIST = "Permission list";
+	String EXCEPTION_PERMISSION_DELETE = "Permission delete";
 	
-	String GLOBAL_URL_DELETE_EXCEPTION = "GlobalUrl delete";
-	String GLOBAL_URL_UPDATE_EXCEPTION = "GlobalUrl update";
-	String GLOBAL_URL_SAVE_EXCEPTION = "GlobalUrl save";
-	String GLOBAL_URL_EDIT_EXCEPTION = "GlobalUrl edit";
-	String GLOBAL_URL_LIST_EXCEPTION = "GlobalUrl list";
-	
+	String EXCEPTION_GLOBAL_URL_DELETE = "GlobalUrl delete";
+	String EXCEPTION_GLOBAL_URL_UPDATE = "GlobalUrl update";
+	String EXCEPTION_GLOBAL_URL_SAVE = "GlobalUrl save";
+	String EXCEPTION_GLOBAL_URL_EDIT = "GlobalUrl edit";
+	String EXCEPTION_GLOBAL_URL_LIST = "GlobalUrl list";
+		
 	String EXCEPTION_FEATURE_DELETE = "Feature delete";
 	String EXCEPTION_FEATURE_UPDATE = "Feature update";
 	String EXCEPTION_FEATURE_SAVE = "Feature save";

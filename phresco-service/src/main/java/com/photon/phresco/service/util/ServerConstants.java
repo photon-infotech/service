@@ -58,7 +58,7 @@ public interface ServerConstants {
     String CONFIG_KEY_REPOSITORY_PATH = "repository.path";
 
     // Authentication Constants
-    String AUTHENTICATE = "/authenticate";
+    String AUTHENTICATE = "/ldap/authenticate";
 
     /*
      * Constants for LDAP properties
