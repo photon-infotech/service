@@ -46,6 +46,7 @@ import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
 import org.springframework.stereotype.Component;
 
+import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.DownloadInfo;
@@ -1011,15 +1012,10 @@ public class ComponentService extends DbService {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.findPilots()" + customerId);
 	    }
-	    List<ProjectInfo> pilotsList = new ArrayList<ProjectInfo>();
 		try {
-		    if(!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
-    			pilotsList = mongoOperation.find(PILOTS_COLLECTION_NAME ,
-    			        new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)), ProjectInfo.class);
-		    }
-			pilotsList.addAll(mongoOperation.find(PILOTS_COLLECTION_NAME ,
-                    new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)), ProjectInfo.class));
-			return Response.status(Response.Status.OK).entity(pilotsList).build();
+			Query query = createCustomerIdQuery(customerId);
+			List<ApplicationInfo> appInfos = mongoOperation.find(PILOTS_COLLECTION_NAME, query, ApplicationInfo.class);
+			return Response.status(Response.Status.OK).entity(appInfos).build();
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, PILOTS_COLLECTION_NAME);
 		}
@@ -1038,8 +1034,7 @@ public class ComponentService extends DbService {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into ComponentService.createPilots(List<ProjectInfo> projectInfos)");
         }
-        
-        ProjectInfo projectInfo = null;
+        ApplicationInfo applicationInfo = null;
         BodyPartEntity bodyPartEntity = null;
         File pilotFile = null;
         
@@ -1047,8 +1042,7 @@ public class ComponentService extends DbService {
         if(CollectionUtils.isNotEmpty(bodyParts)) {
             for (BodyPart bodyPart : bodyParts) {
                 if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
-                    projectInfo = new ProjectInfo();
-                    projectInfo = bodyPart.getEntityAs(ProjectInfo.class);
+                    applicationInfo = bodyPart.getEntityAs(ApplicationInfo.class);
                 } else {
                     bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
                 }
@@ -1065,12 +1059,12 @@ public class ComponentService extends DbService {
 //                pilotFile, projectInfo.getCustomerId());
 //        if(uploadBinary) {
 ////            projectInfo.setProjectURL(createContentURL(projectInfo.getArchetypeInfo()));
-//            mongoOperation.save(PILOTS_COLLECTION_NAME, projectInfo);
+            mongoOperation.save(PILOTS_COLLECTION_NAME, applicationInfo);
 //        }
         
         FileUtil.delete(pilotFile);
         
-        return Response.status(Response.Status.CREATED).build();
+        return Response.status(Response.Status.CREATED).entity(applicationInfo).build();
     }
     
 	/**
@@ -1082,15 +1076,15 @@ public class ComponentService extends DbService {
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_PILOTS)
-	public Response updatePilots(List<ProjectInfo> pilots) {
+	public Response updatePilots(List<ApplicationInfo> pilots) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.updatePilots(List<ProjectInfo> pilots)");
 	    }
 		
 		try {
-			for (ProjectInfo pilot : pilots) {
-				ProjectInfo projectInfo = mongoOperation.findOne(PILOTS_COLLECTION_NAME , 
-				        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(pilot.getId())), ProjectInfo.class);
+			for (ApplicationInfo pilot : pilots) {
+				ApplicationInfo projectInfo = mongoOperation.findOne(PILOTS_COLLECTION_NAME , 
+				        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(pilot.getId())), ApplicationInfo.class);
 				if (projectInfo != null) {
 					mongoOperation.save(PILOTS_COLLECTION_NAME, pilot);
 				}
@@ -1109,7 +1103,7 @@ public class ComponentService extends DbService {
 	 */
 	@DELETE
 	@Path (REST_API_PILOTS)
-	public void deletePilots(List<ProjectInfo> pilots) throws PhrescoException {
+	public void deletePilots(List<ApplicationInfo> pilots) throws PhrescoException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.deletePilots(List<ProjectInfo> pilots)");
 	    }
@@ -1133,10 +1127,10 @@ public class ComponentService extends DbService {
 	    }
 		
 		try {
-			ProjectInfo projectInfo = mongoOperation.findOne(PILOTS_COLLECTION_NAME, 
-			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ProjectInfo.class);
-			if (projectInfo != null) {
-				return Response.status(Response.Status.OK).entity(projectInfo).build();
+			ApplicationInfo appInfo = mongoOperation.findOne(PILOTS_COLLECTION_NAME, 
+			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ApplicationInfo.class);
+			if (appInfo != null) {
+				return Response.status(Response.Status.OK).entity(appInfo).build();
 			}
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, PILOTS_COLLECTION_NAME);
@@ -1155,7 +1149,7 @@ public class ComponentService extends DbService {
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_PILOTS + REST_API_PATH_ID)
-	public Response updatePilot(@PathParam(REST_API_PATH_PARAM_ID) String id , ProjectInfo pilot) {
+	public Response updatePilot(@PathParam(REST_API_PATH_PARAM_ID) String id , ApplicationInfo pilot) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.updatePilot(String id, ProjectInfo pilot)" + id); 
 	    }
@@ -1186,7 +1180,7 @@ public class ComponentService extends DbService {
 		
 		try {
 			mongoOperation.remove(PILOTS_COLLECTION_NAME, 
-			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ProjectInfo.class);
+			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ApplicationInfo.class);
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
 		}
