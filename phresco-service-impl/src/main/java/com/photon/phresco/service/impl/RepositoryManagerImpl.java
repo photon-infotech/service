@@ -193,7 +193,8 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 		}
 		DbManager dbManager = PhrescoServerFactory.getDbManager();
 		RepoInfo repoInfo = dbManager.getRepoInfo(customerId);
-		String password = ServerUtil.decryptString(repoInfo.getRepoPassword());
+//		String password = ServeUtil.decryptString(repoInfo.getRepoPassword());
+		String password = "devrepo2";
 		RepositorySystem system = newRepositorySystem();
 		RepositorySystemSession session = newRepositorySystemSession(system);
 		Artifact artifact = new DefaultArtifact(info.getGroupId(), info.getArtifact(), info.getClassifier(), info
@@ -201,8 +202,8 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 
 		artifact = artifact.setFile(artifactFile);
 		
-		RemoteRepository distRepo = new RemoteRepository("", DEFAULT, repoInfo.getReleaseRepoURL());
-		Authentication authentication = new Authentication(repoInfo.getRepoUserName(), password);
+		RemoteRepository distRepo = new RemoteRepository("", DEFAULT, "http://172.16.17.226:8080/repository/content/repositories/phresco-binaries/");
+		Authentication authentication = new Authentication("admin", password);
 		distRepo.setAuthentication(authentication);
 		DeployRequest deployRequest = new DeployRequest();
 		deployRequest.addArtifact(artifact);

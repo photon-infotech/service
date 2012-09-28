@@ -550,13 +550,8 @@ public class ComponentService extends DbService {
 	    }
 		
 		try {
-			List<SettingsTemplate> settingsList = new ArrayList<SettingsTemplate>();
-			settingsList.addAll(mongoOperation.find(SETTINGS_COLLECTION_NAME, 
-                    new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)), SettingsTemplate.class));
-			if(!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
-			    settingsList.addAll(mongoOperation.find(SETTINGS_COLLECTION_NAME, 
-			            new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)), SettingsTemplate.class));
-			}
+			Query query = createCustomerIdQuery(customerId);
+			List<SettingsTemplate> settingsList = mongoOperation.find(SETTINGS_COLLECTION_NAME, query, SettingsTemplate.class);
 			return Response.status(Response.Status.NO_CONTENT).entity(settingsList).build();
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, SETTINGS_COLLECTION_NAME);

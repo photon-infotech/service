@@ -63,15 +63,15 @@ import org.codehaus.plexus.util.StringUtils;
 import org.w3c.dom.Element;
 
 import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.ArtifactGroup.Type;
 import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.CoreOption;
 import com.photon.phresco.commons.model.RequiredOption;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.api.DbService;
+import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
-import com.photon.phresco.service.client.api.ServiceContext;
-import com.photon.phresco.service.client.api.ServiceManager;
 import com.photon.phresco.service.converters.ConvertersFactory;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
 import com.photon.phresco.util.ServiceConstants;
@@ -92,9 +92,8 @@ public class TechnologyDataGenerator extends DbService implements ServiceConstan
     static final Map<String, File> CONTENTS_HOME_MAP = new HashMap<String, File>(16);
     static final Map<String, String> SNO_AND_NAME_MAP = new HashMap<String, String>(16);
     static final Map<String, String[]> NAME_AND_DEP_MAP = new HashMap<String, String[]>(16);
-    public ServiceContext context = null;
-    public ServiceManager serviceManager = null;
     private static Map<String, ArtifactGroup> moduleMap = new HashMap<String, ArtifactGroup>();
+    private static Map<String, ArtifactInfo> depMap = new HashMap<String, ArtifactInfo>();
     RepositoryManager repManager = null;
     
     //For enable deploying artifacts
@@ -104,8 +103,8 @@ public class TechnologyDataGenerator extends DbService implements ServiceConstan
 
     public TechnologyDataGenerator(File inputRootDir, File outputRootDir, File binariesDir) throws PhrescoException {
         super();
-//        PhrescoServerFactory.initialize();
-//        repManager = PhrescoServerFactory.getRepositoryManager();
+        PhrescoServerFactory.initialize();
+        repManager = PhrescoServerFactory.getRepositoryManager();
         this.inputRootDir = inputRootDir;
         this.outputRootDir = outputRootDir;
         this.moduleBinariesDir = new File(binariesDir, "/technologies/");
@@ -119,22 +118,22 @@ public class TechnologyDataGenerator extends DbService implements ServiceConstan
      * Map To Hold The Technology Wise Features xls Files
      */
     private static void initInputExcelMap() {
-        INPUT_EXCEL_MAP.put(TechnologyTypes.PHP,"PHTN_PHRESCO_PHP.xls");
-        INPUT_EXCEL_MAP.put(TechnologyTypes.JAVA_WEBSERVICE,"PHTN_PHRESCO_Java-WebService.xls");
-	    INPUT_EXCEL_MAP.put(TechnologyTypes.HTML5_WIDGET,"PHTN_PHRESCO_Java-WebService.xls");
-	    INPUT_EXCEL_MAP.put(TechnologyTypes.HTML5_MOBILE_WIDGET,"PHTN_PHRESCO_Java-WebService.xls");
-	    INPUT_EXCEL_MAP.put(TechnologyTypes.HTML5_MULTICHANNEL_JQUERY_WIDGET,"PHTN_PHRESCO_Java-WebService.xls");
-	    INPUT_EXCEL_MAP.put(TechnologyTypes.PHP_DRUPAL7,"PHTN_PHRESCO_Drupal7.xls");
-	    INPUT_EXCEL_MAP.put(TechnologyTypes.SHAREPOINT,"PHTN_PHRESCO_Sharepoint.xls");
-	    INPUT_EXCEL_MAP.put(TechnologyTypes.ANDROID_NATIVE,"PHTN_PHRESCO_Andriod-Native.xls");
-	    INPUT_EXCEL_MAP.put(TechnologyTypes.IPHONE_NATIVE,"PHTN_PHRESCO_iPhone-Native.xls");
-	    INPUT_EXCEL_MAP.put(TechnologyTypes.IPHONE_HYBRID,"PHTN_PHRESCO_iPhone-Native.xls");
-	    INPUT_EXCEL_MAP.put(TechnologyTypes.NODE_JS_WEBSERVICE,"PHTN_PHRESCO_NodeJS-WebService.xls");
-	    INPUT_EXCEL_MAP.put(TechnologyTypes.ANDROID_HYBRID,"PHTN_PHRESCO_Andriod-Hybrid.xls");
-	    INPUT_EXCEL_MAP.put(TechnologyTypes.WORDPRESS, "PHTN_PHRESCO_Wordpress.xls");
+//        INPUT_EXCEL_MAP.put(TechnologyTypes.PHP,"PHTN_PHRESCO_PHP.xls");
+//        INPUT_EXCEL_MAP.put(TechnologyTypes.JAVA_WEBSERVICE,"PHTN_PHRESCO_Java-WebService.xls");
+//	    INPUT_EXCEL_MAP.put(TechnologyTypes.HTML5_WIDGET,"PHTN_PHRESCO_Java-WebService.xls");
+//	    INPUT_EXCEL_MAP.put(TechnologyTypes.HTML5_MOBILE_WIDGET,"PHTN_PHRESCO_Java-WebService.xls");
+//	    INPUT_EXCEL_MAP.put(TechnologyTypes.HTML5_MULTICHANNEL_JQUERY_WIDGET,"PHTN_PHRESCO_Java-WebService.xls");
+//        INPUT_EXCEL_MAP.put(TechnologyTypes.JAVA_STANDALONE,"PHTN_PHRESCO_Java-WebService.xls");
+//	    INPUT_EXCEL_MAP.put(TechnologyTypes.PHP_DRUPAL7,"PHTN_PHRESCO_Drupal7.xls");
+//	    INPUT_EXCEL_MAP.put(TechnologyTypes.SHAREPOINT,"PHTN_PHRESCO_Sharepoint.xls");
+//	    INPUT_EXCEL_MAP.put(TechnologyTypes.ANDROID_NATIVE,"PHTN_PHRESCO_Andriod-Native.xls");
+//	    INPUT_EXCEL_MAP.put(TechnologyTypes.IPHONE_NATIVE,"PHTN_PHRESCO_iPhone-Native.xls");
+//	    INPUT_EXCEL_MAP.put(TechnologyTypes.IPHONE_HYBRID,"PHTN_PHRESCO_iPhone-Native.xls");
+//	    INPUT_EXCEL_MAP.put(TechnologyTypes.NODE_JS_WEBSERVICE,"PHTN_PHRESCO_NodeJS-WebService.xls");
+//	    INPUT_EXCEL_MAP.put(TechnologyTypes.ANDROID_HYBRID,"PHTN_PHRESCO_Andriod-Hybrid.xls");
+//	    INPUT_EXCEL_MAP.put(TechnologyTypes.WORDPRESS, "PHTN_PHRESCO_Wordpress.xls");
 	    INPUT_EXCEL_MAP.put(TechnologyTypes.PHP_DRUPAL6, "PHTN_PHRESCO_Drupal6.xls");
-        INPUT_EXCEL_MAP.put(TechnologyTypes.JAVA_STANDALONE,"PHTN_PHRESCO_Java-WebService.xls");
-        INPUT_EXCEL_MAP.put(TechnologyTypes.PHP_DRUPAL6, "PHTN_PHRESCO_Drupal6.3.xls");
+//        INPUT_EXCEL_MAP.put(TechnologyTypes.PHP_DRUPAL6, "PHTN_PHRESCO_Drupal6.3.xls");
     }
 
     /**
@@ -189,46 +188,12 @@ public class TechnologyDataGenerator extends DbService implements ServiceConstan
         storeModuleInfo();
     }
 
-    /**
-     * Handle dependencies.
-     *
-     * @param modules
-     *            the modules
-     * @return the modules
-     * @throws PhrescoException 
-     */
-//  private Modules handleDependencies(Modules modules) {
-//      Modules modifiedModules = new Modules();
-//      List<Module> moduleList = modules.getModule();
-//      for (Module module : moduleList) {
-//          List<String> depModNameList = new ArrayList<String>();
-//          String modName = module.getId();
-//          String[] depList = NAME_AND_DEP_MAP.get(modName);
-//          if (depList == null) {
-//              modifiedModules.getModule().add(module);
-//              continue;
-//          }
-//          for (String dep : depList) {
-//              int depNo = (int) (Double.valueOf(dep).doubleValue());
-//              String depModName = SNO_AND_NAME_MAP.get(String.valueOf(depNo));
-//              depModNameList.add(depModName);
-//          }
-//
-//          if (!depModNameList.isEmpty()) {
-//              module.getDependentModules().addAll(depModNameList);
-//          }
-//
-//          modifiedModules.getModule().add(module);
-//      }
-//      return modifiedModules;
-//  }
 
     /**
      * To save the module details in Db
      * @throws PhrescoException
      */
     private void storeModuleInfo() throws PhrescoException {
-//      RestClient<ModuleGroup> applicationTypeClient = serviceManager.getRestClient(REST_API_COMPONENT + REST_API_MODULES);
       Set<String> keySet = moduleMap.keySet();
       List<ArtifactGroup> createdModules = new ArrayList<ArtifactGroup> ();
       for (String string : keySet) {
@@ -236,23 +201,24 @@ public class TechnologyDataGenerator extends DbService implements ServiceConstan
           createdModules.add(moduleGroup);
           convertAndStrore(moduleGroup);
       }
-//      ClientResponse response = applicationTypeClient.create(createdModules);
-//      System.out.println(response.getStatus());
       return;
     }
 
 
-    private void convertAndStrore(ArtifactGroup moduleGroup) throws PhrescoException {
-        List<ArtifactInfo> versions = moduleGroup.getVersions();
+    private void convertAndStrore(ArtifactGroup artifactGroup) throws PhrescoException {
+        List<ArtifactInfo> versions = artifactGroup.getVersions();
         List<String> versionIds = new ArrayList<String>();
-        
         Converter<ArtifactGroupDAO, ArtifactGroup> converter = 
             (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
-        ArtifactGroupDAO moduleGroupDAO = converter.convertObjectToDAO(moduleGroup);
+        ArtifactGroupDAO moduleGroupDAO = converter.convertObjectToDAO(artifactGroup);
         String id2 = moduleGroupDAO.getId();
         for (ArtifactInfo module : versions) {
         	versionIds.add(module.getId());
             module.setArtifactGroupId(id2);
+//            List<String> handleDependencies = handleDependencies(module);
+//            if(CollectionUtils.isNotEmpty(handleDependencies)) {
+//            	module.setDependencyIds(handleDependencies);
+//            }
             System.out.println(module);
             mongoOperation.save("ArtifactInfo", module);
         }
@@ -261,7 +227,26 @@ public class TechnologyDataGenerator extends DbService implements ServiceConstan
     }
 
 
-    /**
+    private List<String> handleDependencies(ArtifactInfo artifactGroup) {
+    	List<String> idsList = new ArrayList<String>();
+    	String[] moduleNos = NAME_AND_DEP_MAP.get(artifactGroup.getName());
+    	if(moduleNos != null) {
+    		for (String ids : moduleNos) {
+    			System.out.println("Entered");
+    			String string = SNO_AND_NAME_MAP.get(ids);
+    			System.out.println(string);
+    			String id = string + "_" + artifactGroup.getVersion();
+    			System.out.println(id);
+    			ArtifactInfo artifactInfo = depMap.get(id);
+    			System.out.println(id);
+    			idsList.add(artifactInfo.getId());
+    		}
+    	}
+    	return idsList;
+	}
+
+
+	/**
      * Create modulegroup by each row
      * @param techId
      * @param row
@@ -269,7 +254,7 @@ public class TechnologyDataGenerator extends DbService implements ServiceConstan
      */
     private void createModuleGroup(String techId, Row row) throws PhrescoException {
 
-        ArtifactGroup moduleGroup = new ArtifactGroup();
+        ArtifactGroup artifactGroup = new ArtifactGroup();
         
         Cell serialNo = row.getCell(0);
         if (serialNo == null || Cell.CELL_TYPE_BLANK == serialNo.getCellType()) {
@@ -299,13 +284,13 @@ public class TechnologyDataGenerator extends DbService implements ServiceConstan
         }
         
         int sNoInt = (int) serialNo.getNumericCellValue();
-        SNO_AND_NAME_MAP.put(String.valueOf(sNoInt), identifier);
+        SNO_AND_NAME_MAP.put(String.valueOf(sNoInt), name);
 
         Cell depCell = row.getCell(5);
         if (depCell != null && Cell.CELL_TYPE_BLANK != depCell.getCellType()) {
             String depModules = getValue(depCell);
             String[] depModuleIds = StringUtils.split(depModules,DELIMITER);
-            NAME_AND_DEP_MAP.put(identifier, depModuleIds);
+            NAME_AND_DEP_MAP.put(name, depModuleIds);
         }
         
         Cell helptextCell = row.getCell(10);
@@ -345,7 +330,7 @@ public class TechnologyDataGenerator extends DbService implements ServiceConstan
                 && Cell.CELL_TYPE_BLANK != imagenameCell.getCellType()) {
             
             String imageName = imagenameCell.getStringCellValue().trim();
-            moduleGroup.setImageURL(createImageUrl(techId, imageName));
+            artifactGroup.setImageURL(createImageUrl(techId, imageName));
             }
         
         Cell groupNameCell = row.getCell(14);
@@ -362,19 +347,19 @@ public class TechnologyDataGenerator extends DbService implements ServiceConstan
             artifactId = artifactCell.getStringCellValue();
         }
         
-        List<ArtifactInfo> versions = createModuleList(name, convertBoolean(core), 
-                convertBoolean(req), version, identifier, fileExt, techId, filePath, "", groupId, artifactId);
-        moduleGroup.setName(name);
+        List<ArtifactInfo> versions = createModuleList(name, convertBoolean(req), version, identifier, fileExt, 
+        		techId, filePath, "", groupId, artifactId);
+        artifactGroup.setName(name);
         
         if(org.apache.commons.lang.StringUtils.isNotEmpty(groupId)) {
-            moduleGroup.setGroupId(groupId);
+            artifactGroup.setGroupId(groupId);
         } else {
-            moduleGroup.setGroupId("modules." + techId + ".files");
+            artifactGroup.setGroupId("modules." + techId + ".files");
         }
         if(org.apache.commons.lang.StringUtils.isNotEmpty(artifactId)) {
-            moduleGroup.setArtifactId(artifactId);
+            artifactGroup.setArtifactId(artifactId);
         } else {
-            moduleGroup.setArtifactId(identifier + "_" + version);
+            artifactGroup.setArtifactId(identifier + "_" + version);
         }
         
         List<CoreOption> options = new ArrayList<CoreOption>();
@@ -385,21 +370,20 @@ public class TechnologyDataGenerator extends DbService implements ServiceConstan
             options.add(coreoption);
         }
         
-        moduleGroup.setDescription(docContent);
-        moduleGroup.setHelpText(helpText);
-        moduleGroup.setSystem(true);
-        moduleGroup.setType("module");
+        artifactGroup.setDescription(docContent);
+        artifactGroup.setHelpText(helpText);
+        artifactGroup.setSystem(true);
         List<String> customers = new ArrayList<String>();
         customers.add("photon");
-        moduleGroup.setCustomerIds(customers);
-        moduleGroup.setVersions(versions);
-        moduleGroup.setSystem(true);
-        moduleGroup.setAppliesTo(options);
-        makeMap(identifier, moduleGroup);
+        artifactGroup.setCustomerIds(customers);
+        artifactGroup.setVersions(versions);
+        artifactGroup.setSystem(true);
+        artifactGroup.setAppliesTo(options);
+        artifactGroup.setType(Type.FEATURE);
+        makeMap(name, artifactGroup);
     }
 
     private List<CoreOption> createCoreOptionsForJava(Boolean core) {
-    	System.out.println("Entred To createcore objects");
     	String javaList[] = new String[]{TechnologyTypes.JAVA_STANDALONE, TechnologyTypes.JAVA_WEBSERVICE, TechnologyTypes.HTML5, 
     			TechnologyTypes.HTML5_JQUERY_MOBILE_WIDGET, TechnologyTypes.HTML5_MOBILE_WIDGET,
     			TechnologyTypes.HTML5_MULTICHANNEL_JQUERY_WIDGET, TechnologyTypes.HTML5_WIDGET};
@@ -439,20 +423,23 @@ public class TechnologyDataGenerator extends DbService implements ServiceConstan
      * @return
      * @throws PhresrcoException
      */
-    private List<ArtifactInfo> createModuleList(String name, boolean core, boolean req, 
+    private List<ArtifactInfo> createModuleList(String name, boolean req, 
             String version, String id, String ext, String techId, String filePath, String imagePath,
             String groupId, String artifactId) throws PhrescoException {
         List<ArtifactInfo> modules = new ArrayList<ArtifactInfo>();
         ArtifactInfo module = new ArtifactInfo();
         module.setVersion(version);
+        module.setName(name);
         List<RequiredOption> requires = new ArrayList<RequiredOption>();
         RequiredOption option = new RequiredOption(techId, req);
         requires.add(option);
-        String moduleId = id + "_" + techId.replace("-", "_" + "_") + version;
+        String moduleId = id + "_" + techId.replace("-", "_") + version;
         module.setId(moduleId);
+        module.setAppliesTo(requires);
         modules.add(module);
-//        publishModule(techId, module, filePath, ext);
-//        publishImageFile(techId, module, imagePath);
+        publishModule(techId, name, groupId, artifactId, version, filePath, ext);
+        String depId = name + "_" + version;
+        depMap.put(depId, module);
         return modules;
     }
 
@@ -473,20 +460,6 @@ public class TechnologyDataGenerator extends DbService implements ServiceConstan
         }
     }
      
-    /**
-     * To create module content url
-     * @param techId
-     * @param version
-     * @param ext
-     * @param id
-     * @return
-     */
-    private String createContentURL(String techId, String version, String ext, String id) {
-        return "/modules/" + techId + "/files/" + id + "/"
-        + version + "/" + id + "-"
-        + version + "." + ext;
-    }
-    
     /**
      * To Convert the given string to boolean
      * @param strRequired
@@ -555,37 +528,6 @@ public class TechnologyDataGenerator extends DbService implements ServiceConstan
     }
     
     /**
-     * To publish the image file to repository
-     * @param tech
-     * @param module
-     * @param imagePath
-     * @throws PhrescoException
-     */
-    private void publishImageFile(String tech, ArtifactGroup module, String imagePath)
-            throws PhrescoException {
-        if(deploy == false) {
-            return;
-        }
-        
-        File root = CONTENTS_HOME_MAP.get(tech);
-        String groupId = "modules." + tech + ".files";
-        File imageFile = new File(root, imagePath);
-        System.out.println("Image path is" + imageFile.getPath());
-        if (!imageFile.exists()) {
-            System.out.println("Module not exist : " + module.getName()
-                    + " filePath: " + imagePath);
-            System.out.println("artifact.toString() " + imageFile.toString());
-            return;
-        }
-//        ArtifactInfo info = new ArtifactInfo(groupId, module.getId(), "",
-//                "png", module.getVersion());
-//        repManager.addArtifact(info, imageFile, "photon");
-        System.out.println("Module : " + module.getName() + " filePath: "
-                + imagePath + " added succesfully");
-    }
-    
-    
-    /**
      * tp publish the module content to repository
      * @param tech
      * @param module
@@ -593,29 +535,25 @@ public class TechnologyDataGenerator extends DbService implements ServiceConstan
      * @param ext
      * @throws PhrescoException
      */
-    private void publishModule(String tech, ArtifactGroup module, String fileURL,
+    private void publishModule(String tech, String name, String groupId, String artifactId, String version, String fileURL,
             String ext) throws PhrescoException {
         if(deploy == false) {
             return;
         }
-        
         File root = CONTENTS_HOME_MAP.get(tech);
-        String groupId = "modules." + tech + ".files";
         File artifact = new File(root, fileURL);
-//        File pomFile = createPomFile(module, ext, groupId);
+        File pomFile = createPomFile(groupId, artifactId, version, ext, groupId);
         if (!artifact.exists()) {
-            System.out.println("Module not exist : " + module.getName()
-                    + " filePath: " + fileURL);
             System.out.println("artifact.toString() " + artifact.toString());
             return;
         }
 
-//        ArtifactInfo info = new ArtifactInfo(groupId, module.getId(), "", ext,
-//                module.getVersion());
+        com.photon.phresco.service.model.ArtifactInfo info = new com.photon.phresco.service.model.ArtifactInfo(groupId, artifactId, "", ext,
+                version);
 //        info.setPomFile(pomFile);
-//        repManager.addArtifact(info, artifact, "photon");
-//        pomFile.delete();
-        System.out.println("Module : " + module.getName() + " filePath: "
+        repManager.addArtifact(info, artifact, "photon");
+        pomFile.delete();
+        System.out.println("Module : " + name + " filePath: "
                 + fileURL + " added succesfully");
     }
 
@@ -627,9 +565,9 @@ public class TechnologyDataGenerator extends DbService implements ServiceConstan
      * @return
      * @throws PhrescoException
      */
-    private File createPomFile(ArtifactInfo module, String ext, String groupId2)
+    private File createPomFile(String name, String groupId, String artifactId, String version, String ext)
             throws PhrescoException {
-        System.out.println("Creating Pom File For " + module.getName());
+        System.out.println("Creating Pom File For " + name);
         File file = new File(outputRootDir, "pom.xml");
         DocumentBuilderFactory domFactory = DocumentBuilderFactory
                 .newInstance();
@@ -644,17 +582,17 @@ public class TechnologyDataGenerator extends DbService implements ServiceConstan
             modelVersion.setTextContent("4.0.0");
             rootElement.appendChild(modelVersion);
 
-            Element groupId = newDoc.createElement("groupId");
-            groupId.setTextContent(groupId2);
-            rootElement.appendChild(groupId);
+            Element groupIdEle = newDoc.createElement("groupId");
+            groupIdEle.setTextContent(groupId);
+            rootElement.appendChild(groupIdEle);
 
-            Element artifactId = newDoc.createElement("artifactId");
-            artifactId.setTextContent(module.getId());
-            rootElement.appendChild(artifactId);
+            Element artifactIdEle = newDoc.createElement("artifactId");
+            artifactIdEle.setTextContent(artifactId);
+            rootElement.appendChild(artifactIdEle);
 
-            Element version = newDoc.createElement("version");
-            version.setTextContent(module.getVersion());
-            rootElement.appendChild(version);
+            Element versionEle = newDoc.createElement("version");
+            versionEle.setTextContent(version);
+            rootElement.appendChild(versionEle);
 
             Element packaging = newDoc.createElement("packaging");
             packaging.setTextContent(ext);
@@ -685,8 +623,7 @@ public class TechnologyDataGenerator extends DbService implements ServiceConstan
     }
     
     public static void main(String[] args) throws PhrescoException {
-    	System.out.println("Hi");
-    	File toolsHome = new File("/Users/jeb/work/projects/phresco/source/master/service/phresco-service-runner/delivery/tools");
+    	File toolsHome = new File("D:/work/phresco/MasterNew/servicenew/phresco-service-runner/delivery/tools");
         File binariesDir = new File("D:\\work\\phresco\\Phresco-binaries\\");
         File inputRootDir = new File(toolsHome, "files");
         File outputRootDir = new File(toolsHome, "repo");
