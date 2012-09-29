@@ -126,19 +126,21 @@ public interface ServiceUIConstants {
     
     
     /*****************************
-     * Download Request Constants
+     * Features Request Constants
      * String REQ_FEATURES_XXX
      *****************************/ 
     String REQ_FEATURES_MOD_GRP = "moduleGroup";
-    String FEATURES_CORE = "core";
     String REQ_FEATURES_TYPE = "type";
-    String REQ_FEATURES_TYPE_JAVASCRIPT = "JAVASCRIPT";
-    String REQ_FEATURES_TYPE_FEATURE = "FEATURE";
-
-    String REQ_FEATURES_MODULE = "module";
-    String REQ_FEATURES_HEADER = "header";
+    String REQ_FEATURES_TYPE_JS = "js";
+    String REQ_FEATURES_TYPE_MODULE = "module";
     String REQ_FEATURES_SELECTED_MODULEID = "selectedModuleId";
     
+    /*****************************
+     * Features Common Constants
+     * String FEATURES_XXX
+     *****************************/
+    String FEATURES_CORE = "core";
+    String FEATURES_DEPENDENT_MOD_IDS = "dependentModuleIds";
     
     /*****************************
      * Permissions Request Constants
@@ -207,6 +209,7 @@ public interface ServiceUIConstants {
 	String EXCEPTION_FEATURE_EDIT = "Feature edit";
 	String EXCEPTION_FEATURE_LIST = "Feature list";
 	String EXCEPTION_FEATURE_ADD = "Feature add";
+	String EXCEPTION_FEATURE_VALIDATE = "Feature validate";
 	
 	String EXCEPTION_COMPONENT_DELETE = "Component delete";
 	String EXCEPTION_COMPONENT_UPDATE = "Component update";
@@ -291,18 +294,9 @@ public interface ServiceUIConstants {
      * I18N Keys Constants
      * String KEY_I18N_FEATUR_XXX
      *****************************/	
-    
-    String KEY_I18N_FEATURE_MOD_ADD = "lbl.hdr.comp.featrs.mod.add";
-    String KEY_I18N_FEATURE_JS_ADD = "lbl.hdr.comp.featrs.js.add";
-    String KEY_I18N_FEATURE_MOD_EDIT = "lbl.hdr.comp.featrs.mod.edit";
-    String KEY_I18N_FEATURE_JS_EDIT = "lbl.hdr.comp.featrs.js.edit";
-    
     String FEATURE_ADDED = "succ.feature.add";
-    String FEATURE_NOT_ADDED = "fail.feature.add";
     String FEATURE_UPDATED = "succ.feature.update";
-    String FEATURE_NOT_UPDATED = "fail.feature.update";
     String FEATURE_DELETED = "succ.feature.delete";
-    String FEATURE_NOT_DELETED = "fail.feature.delete" ;
     
     String COMPONENT_ADDED = "succ.component.add";
     String COMPONENT_NOT_ADDED = "fail.component.add";

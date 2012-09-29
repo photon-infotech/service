@@ -34,7 +34,7 @@ function clickButton(button, tag) {
 	});
 }
 
-function loadContent(pageUrl, form, tag, additionalParams) {
+function loadContent(pageUrl, form, tag, additionalParams, callSuccessEvent) {
 	showLoadingIcon(tag);
 	var params = "";
 	if (form != undefined && form != "" && !isBlank(form.serialize())) {
@@ -50,8 +50,9 @@ function loadContent(pageUrl, form, tag, additionalParams) {
 		url : pageUrl,
 		data : params,
 		type : "POST",
+		dataType: "html",
 		success : function(data) {
-			loadData(data, tag);
+			loadData(data, tag, pageUrl, callSuccessEvent);
 		}
 	});
 }
@@ -93,15 +94,20 @@ function validate(pageUrl, form, tag, progressText, disabledDiv) {
 	});
 }
 
-function loadData(data, tag) {
+function loadData(data, tag, pageUrl, callSuccessEvent) {
 	//To load the login page if the user session is not available
-	if (data != undefined && data != "[object Object]" && !isBlank(data) && data.indexOf("Remember me") >= 0) {
+	if (data != undefined && data != "[object Object]" && data != "[object XMLDocument]" 
+		&& !isBlank(data) && data.indexOf("Remember me") >= 0) {
 		window.location.href = "logout.action";
 	} else {
-		tag.empty();
-		tag.html(data);
-		accordion();
-		setTimeOut();
+		if (callSuccessEvent != undefined && !isBlank(callSuccessEvent) && callSuccessEvent) {
+			successEvent(pageUrl, data);
+		} else {
+			tag.empty();
+			tag.html(data);
+			accordion();
+			setTimeOut();
+		}
 	}
 }
 
@@ -293,7 +299,7 @@ function enableScreen() {
 
 //To fill the pom details in the textbox if available while uploading the files
 function fillTextBoxes(responseJSON, type, fileName) {
-	if(type === "pluginJar"){
+	if (type === "pluginJar"){
 		$('#jarDetailsDivPopup').show();
 	} else {
 		$('#jarDetailsDiv').show();
@@ -306,7 +312,7 @@ function fillTextBoxes(responseJSON, type, fileName) {
 }
 
 function disableEnableTextBox(groupId, artifactId, jarVersion, isEnable, type, fileName) {
-	if(type === "pluginJar"){
+	if (type === "pluginJar") {
 		var groupid = "grouId" ;
 		var artifId = "artifId" ;
 		var versnId = "versnId" ;

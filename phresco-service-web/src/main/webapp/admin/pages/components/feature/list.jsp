@@ -30,6 +30,7 @@
 
 <% 
 	List<ArtifactGroup> moduleGroups = (List<ArtifactGroup>)request.getAttribute(ServiceUIConstants.REQ_FEATURES_MOD_GRP);
+	String type = (String) request.getAttribute(ServiceUIConstants.REQ_FEATURES_TYPE);
 %>
     
    <div class="featuresScrollDiv">
@@ -64,9 +65,11 @@
 		                <span class="siteaccordion closereg">
 		                	<span>
 	                			<% if (moduleGroup.isSystem()) { %>
-									<input type="checkbox" name="moduleGroup" value="<%= moduleGroup.getId() %>" disabled/>&nbsp;&nbsp;<%= moduleGroup.getName() %>&nbsp;&nbsp;
+									<input type="checkbox" name="moduleGroup" value="<%= moduleGroup.getId() %>" disabled/>
+									&nbsp;&nbsp;<%= moduleGroup.getName() %>&nbsp;&nbsp;
 								<% } else { %>
-			                		<input type="checkbox" class="check technology" name="moduleGroup" value="<%= moduleGroup.getId()%>" id="<%= moduleGroup.getId()%>checkBox" onclick="checkboxEvent();">
+			                		<input type="checkbox" class="check technology" name="moduleGroup" value="<%= moduleGroup.getId()%>" 
+			                			id="<%= moduleGroup.getId()%>checkBox" onclick="checkboxEvent();">
 			                		&nbsp;&nbsp;<%= moduleGroup.getName() %>&nbsp;&nbsp;
 	                			<% } %>
 		                	</span>
@@ -96,7 +99,7 @@
 												</td>
 												<td>
 													<a href="#" name="ModuleDesc" onclick="editFeature('<%= moduleGroup.getId() %>', '<%= module.getId() %>');" >
-														<%= module.getName() %>
+														<%= moduleGroup.getName() %>
 													</a>
 												</td>
 												<td><%= module.getVersion() %></td>
@@ -136,6 +139,6 @@
 	    params = params.concat(moduleGroupId);
 	    params = params.concat("&moduleId=");
 	    params = params.concat(moduleId);
-	    loadContent("featuresEdit", $('#formFeaturesList'), $('#feature_tab'), params);
+	    loadContent("<%= type %>Edit", $('#formFeaturesList'), $('#featureContainer'), params);
 	}
 </script>
