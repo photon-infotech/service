@@ -43,6 +43,7 @@ import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.client.api.Content;
+import com.photon.phresco.service.client.api.ServiceManager;
 import com.photon.phresco.service.model.FileInfo;
 import com.photon.phresco.service.util.ServerUtil;
 import com.sun.jersey.api.client.ClientResponse;
@@ -125,10 +126,11 @@ public class Downloads extends ServiceBaseAction {
 		}
 		
 		try {
-			DownloadInfo downloadInfo = getServiceManager().getDownload(getDownloadId(), getCustomerId());
-			setReqAttribute(REQ_DOWNLOAD_INFO, downloadInfo);
+			ServiceManager serviceManager = getServiceManager();
+            DownloadInfo downloadInfo = serviceManager.getDownload(getDownloadId(), getCustomerId());
+            List<Technology> technologies = serviceManager.getArcheTypes(getCustomerId());
 			setReqAttribute(REQ_FROM_PAGE, EDIT);
-			List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
+            setReqAttribute(REQ_DOWNLOAD_INFO, downloadInfo);
 			setReqAttribute(REQ_ARCHE_TYPES, technologies);
 		} catch (PhrescoException e) {
 			return showErrorPopup(e, EXCEPTION_DOWNLOADS_EDIT);
@@ -143,12 +145,8 @@ public class Downloads extends ServiceBaseAction {
 		}
 
 		try {
-			ClientResponse clientResponse = getServiceManager().createDownloads(getDownloadInfo(), getCustomerId());
-			if (clientResponse.getStatus() != RES_CODE_200) {
-				addActionError(getText(DOWNLOAD_NOT_ADDED, Collections.singletonList(getName())));
-			} else {
-				addActionMessage(getText(DOWNLOAD_ADDED, Collections.singletonList(getName())));
-			}
+			getServiceManager().createDownloads(getDownloadInfo(), getCustomerId());
+			addActionMessage(getText(DOWNLOAD_ADDED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
 			return showErrorPopup(e, EXCEPTION_DOWNLOADS_SAVE);
 		}
@@ -226,10 +224,7 @@ public class Downloads extends ServiceBaseAction {
 			String[] downloadIds = getHttpRequest().getParameterValues(REQ_DOWNLOAD_ID);
 			if (ArrayUtils.isNotEmpty(downloadIds)) {
 				for (String downloadId : downloadIds) {
-					ClientResponse clientResponse =getServiceManager().deleteDownloadInfo(downloadId, getCustomerId());
-					if (clientResponse.getStatus() != RES_CODE_200) {
-						addActionError(getText(DOWNLOAD_NOT_DELETED));
-					}
+					getServiceManager().deleteDownloadInfo(downloadId, getCustomerId());
 				}
 				addActionMessage(getText(DOWNLOAD_DELETED));
 			}
