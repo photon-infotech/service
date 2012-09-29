@@ -7,9 +7,14 @@ import org.junit.Test;
 import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
 
+import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.ArtifactGroup.Type;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.api.DbService;
+import com.photon.phresco.service.converters.ConvertersFactory;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
+import com.photon.phresco.service.model.ArtifactInfo;
 import com.photon.phresco.util.ServiceConstants;
 
 
@@ -583,12 +588,17 @@ public class ComponentServiceTest extends DbService implements ServiceConstants{
 //    }
 	
 	@Test
-	public void testListFind() {
-		List<String> ids = new ArrayList<String>();
-		ids.add("da2c3d98-7da9-4828-8b9d-8ba282eec958");
-		ids.add("87a51f94-0c70-40d8-b7a6-cf9620b657c9");
-		ids.add("f7a762de-5b2c-416f-8a2b-a6e9a9b85c24");
-		List<ArtifactGroupDAO> find = mongoOperation.find("ArtifactDAO", new Query(Criteria.whereId().in(ids)), ArtifactGroupDAO.class);
-		System.out.println(find.size());
+	public void testListFind() throws PhrescoException {
 	}
+	
+	private List<ArtifactGroup> convertDAOToModule(List<ArtifactGroupDAO> moduleDAOs) throws PhrescoException {
+		Converter<ArtifactGroupDAO, ArtifactGroup> artifactConverter = 
+            (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
+	    List<ArtifactGroup> modules = new ArrayList<ArtifactGroup>();
+	    for (ArtifactGroupDAO artifactGroupDAO : moduleDAOs) {
+			ArtifactGroup artifactGroup = artifactConverter.convertDAOToObject(artifactGroupDAO, mongoOperation);
+			modules.add(artifactGroup);
+		}
+        return modules;
+    }
 }

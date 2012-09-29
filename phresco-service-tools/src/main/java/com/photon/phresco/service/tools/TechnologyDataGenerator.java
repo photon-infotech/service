@@ -55,6 +55,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -133,7 +134,6 @@ public class TechnologyDataGenerator extends DbService implements ServiceConstan
 //	    INPUT_EXCEL_MAP.put(TechnologyTypes.ANDROID_HYBRID,"PHTN_PHRESCO_Andriod-Hybrid.xls");
 //	    INPUT_EXCEL_MAP.put(TechnologyTypes.WORDPRESS, "PHTN_PHRESCO_Wordpress.xls");
 	    INPUT_EXCEL_MAP.put(TechnologyTypes.PHP_DRUPAL6, "PHTN_PHRESCO_Drupal6.xls");
-//        INPUT_EXCEL_MAP.put(TechnologyTypes.PHP_DRUPAL6, "PHTN_PHRESCO_Drupal6.3.xls");
     }
 
     /**
@@ -220,10 +220,10 @@ public class TechnologyDataGenerator extends DbService implements ServiceConstan
 //            	module.setDependencyIds(handleDependencies);
 //            }
             System.out.println(module);
-            mongoOperation.save("ArtifactInfo", module);
+            mongoOperation.save(ARTIFACT_INFO_COLLECTION_NAME, module);
         }
         moduleGroupDAO.setVersionIds(versionIds);
-      mongoOperation.save("ArtifactDAO", moduleGroupDAO);
+      mongoOperation.save(ARTIFACT_GROUP_COLLECTION_NAME, moduleGroupDAO);
     }
 
 
@@ -307,7 +307,7 @@ public class TechnologyDataGenerator extends DbService implements ServiceConstan
         }
         
         String filePath = "";
-        String fileExt = "zip";
+        String fileExt = "jar";
         Cell filenameCell = row.getCell(13);
         if (filenameCell != null
                 && Cell.CELL_TYPE_BLANK != filenameCell.getCellType()) {
@@ -322,6 +322,8 @@ public class TechnologyDataGenerator extends DbService implements ServiceConstan
                 fileExt = "zip";
             } else if (filePath.endsWith(".jar")) {
                 fileExt = "jar";
+            } else if (filePath.endsWith(".zip")) {
+                fileExt = "zip";
             }
         }
         
@@ -370,7 +372,11 @@ public class TechnologyDataGenerator extends DbService implements ServiceConstan
             options.add(coreoption);
         }
         
+        String artifactGroupId = ID + name.toLowerCase();
+        
+        artifactGroup.setId(artifactGroupId);
         artifactGroup.setDescription(docContent);
+        artifactGroup.setPackaging(fileExt);
         artifactGroup.setHelpText(helpText);
         artifactGroup.setSystem(true);
         List<String> customers = new ArrayList<String>();

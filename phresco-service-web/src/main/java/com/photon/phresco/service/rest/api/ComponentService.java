@@ -50,7 +50,6 @@ import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.DownloadInfo;
-import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.commons.model.SettingsTemplate;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.commons.model.WebService;
@@ -799,13 +798,19 @@ public class ComponentService extends DbService {
      */
     @POST
     @Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
+    @Produces (MediaType.APPLICATION_JSON)
     @Path (REST_API_MODULES)
     public Response createModules(MultiPart moduleInfo) throws PhrescoException {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into ComponentService.createModules(List<ModuleGroup> modules)");
         }
-        
-        ArtifactGroup moduleGroup = null;
+        Response createFeatures = createOrUpdateFeatures(moduleInfo);
+        return createFeatures;
+    }
+    
+	
+    private Response createOrUpdateFeatures(MultiPart moduleInfo) throws PhrescoException {
+    	ArtifactGroup moduleGroup = null;
         BodyPartEntity bodyPartEntity = null;
         File moduleFile = null;
         List<BodyPart> bodyParts = moduleInfo.getBodyParts();
@@ -821,16 +826,22 @@ public class ComponentService extends DbService {
         }
         
         if (moduleGroup == null) {
-        	//TODO:Throw exception
+        }
+        
+        if(bodyPartEntity == null & moduleGroup != null) {
+        	saveModuleGroup(moduleGroup);
         }
         
         if (bodyPartEntity != null) {
             moduleFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null);
+            boolean uploadBinary = uploadBinary(moduleGroup, moduleFile);
+            if (uploadBinary) {
+            	saveModuleGroup(moduleGroup);
+            }
+            FileUtil.delete(moduleFile);
         }
         
-        boolean uploadBinary = uploadBinary(moduleGroup, moduleFile);
-        if (uploadBinary) {
-        	saveModuleGroup(moduleGroup);
+        
         	
         	//TODO:Old Logic, need to check with Kumar
         	//check if the module already exist
@@ -847,15 +858,11 @@ public class ComponentService extends DbService {
 //        	    saveModuleGroup(moduleGroup);
 //        	}
         	
-        }
         
-        FileUtil.delete(moduleFile);
+        return Response.status(Response.Status.CREATED).entity(moduleGroup).build();
+	}
 
-        return Response.status(Response.Status.CREATED).build();
-    }
-    
-	
-    private void saveModuleGroup(ArtifactGroup moduleGroup) throws PhrescoException {
+	private void saveModuleGroup(ArtifactGroup moduleGroup) throws PhrescoException {
         Converter<ArtifactGroupDAO, ArtifactGroup> converter = 
             (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
         ArtifactGroupDAO moduleGroupDAO = converter.convertObjectToDAO(moduleGroup);
@@ -885,29 +892,18 @@ public class ComponentService extends DbService {
 	 * Updates the list of modules
 	 * @param modules
 	 * @return
+	 * @throws PhrescoException 
 	 */
 	@PUT
-	@Consumes (MediaType.APPLICATION_JSON)
+	@Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_MODULES)
-	public Response updateModules(List<ArtifactGroup> modules) {
+	public Response updateModules(MultiPart multiPart) throws PhrescoException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.updateModules(List<ModuleGroup> modules)");
 	    }
-		
-		try {
-			for (ArtifactGroup moduleGroup : modules) {
-				ArtifactGroupDAO module = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME , 
-				        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(moduleGroup.getId())), ArtifactGroupDAO.class);
-				if (module != null) {
-					mongoOperation.save(ARTIFACT_GROUP_COLLECTION_NAME, moduleGroup);
-				}
-			}
-		} catch (Exception e) {
-			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
-		}
-		
-		return Response.status(Response.Status.OK).entity(modules).build();
+	    Response updateFeatures = createOrUpdateFeatures(multiPart);
+		return updateFeatures;
 	}
 	
 	/**
@@ -974,7 +970,7 @@ public class ComponentService extends DbService {
 		
 		try {
 			if (id.equals(module.getId())) {
-				mongoOperation.save(ARTIFACT_GROUP_COLLECTION_NAME, module);
+				saveModuleGroup(module);
 				return  Response.status(Response.Status.OK).entity(module).build();
 			}
 		} catch (Exception e) {
@@ -997,8 +993,17 @@ public class ComponentService extends DbService {
 	    }
 		
 		try {
-			mongoOperation.remove(ARTIFACT_GROUP_COLLECTION_NAME, 
-			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ArtifactGroupDAO.class);
+			ArtifactGroupDAO artifactGroupDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), 
+					ArtifactGroupDAO.class);
+			if(artifactGroupDAO != null) {
+				mongoOperation.remove(ARTIFACT_GROUP_COLLECTION_NAME, 
+				        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ArtifactGroupDAO.class);
+				List<String> versionIds = artifactGroupDAO.getVersionIds();
+				for (String versionId : versionIds) {
+					mongoOperation.remove(ARTIFACT_INFO_COLLECTION_NAME, 
+					        new Query(Criteria.whereId().is(versionId)));
+				}
+			}
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
 		}
@@ -1034,12 +1039,17 @@ public class ComponentService extends DbService {
      */
     @POST
     @Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
+    @Produces (MediaType.APPLICATION_JSON)
     @Path (REST_API_PILOTS)
     public Response createPilots(MultiPart pilotInfo) throws PhrescoException {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into ComponentService.createPilots(List<ProjectInfo> projectInfos)");
         }
-        ApplicationInfo applicationInfo = null;
+        return createOrUpdatePilots(pilotInfo);
+    }
+    
+	private Response createOrUpdatePilots(MultiPart pilotInfo) throws PhrescoException {
+		ApplicationInfo applicationInfo = null;
         BodyPartEntity bodyPartEntity = null;
         File pilotFile = null;
         
@@ -1056,49 +1066,39 @@ public class ComponentService extends DbService {
         
         if(bodyPartEntity != null) {
             pilotFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null);
+            mongoOperation.save(APPLICATION_INFO_COLLECTION_NAME, applicationInfo);
+            FileUtil.delete(pilotFile);
         }
         
-        
+        if(bodyPartEntity == null && applicationInfo != null) {
+        	mongoOperation.save(APPLICATION_INFO_COLLECTION_NAME, applicationInfo);
+        }
         //TODO:Need to handle uploading of Binaries into repository
 //        boolean uploadBinary = uploadBinary(projectInfo.getArchetypeInfo(), 
 //                pilotFile, projectInfo.getCustomerId());
 //        if(uploadBinary) {
 ////            projectInfo.setProjectURL(createContentURL(projectInfo.getArchetypeInfo()));
-            mongoOperation.save(PILOTS_COLLECTION_NAME, applicationInfo);
+            
 //        }
-        
-        FileUtil.delete(pilotFile);
-        
         return Response.status(Response.Status.CREATED).entity(applicationInfo).build();
-    }
-    
+	}
+
 	/**
 	 * Updates the list of pilots
 	 * @param projectInfos
 	 * @return
+	 * @throws PhrescoException 
 	 */
 	@PUT
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Produces (MediaType.APPLICATION_JSON)
+	@Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
+    @Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_PILOTS)
-	public Response updatePilots(List<ApplicationInfo> pilots) {
+	public Response updatePilots(MultiPart pilotInfo) throws PhrescoException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.updatePilots(List<ProjectInfo> pilots)");
 	    }
-		
-		try {
-			for (ApplicationInfo pilot : pilots) {
-				ApplicationInfo projectInfo = mongoOperation.findOne(PILOTS_COLLECTION_NAME , 
-				        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(pilot.getId())), ApplicationInfo.class);
-				if (projectInfo != null) {
-					mongoOperation.save(PILOTS_COLLECTION_NAME, pilot);
-				}
-			}
-		} catch (Exception e) {
-			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
-		}
-		
-		return Response.status(Response.Status.OK).entity(pilots).build();
+	    
+		return createOrUpdateFeatures(pilotInfo);
 	}
 	
 	/**
@@ -1132,13 +1132,13 @@ public class ComponentService extends DbService {
 	    }
 		
 		try {
-			ApplicationInfo appInfo = mongoOperation.findOne(PILOTS_COLLECTION_NAME, 
+			ApplicationInfo appInfo = mongoOperation.findOne(APPLICATION_INFO_COLLECTION_NAME, 
 			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ApplicationInfo.class);
 			if (appInfo != null) {
 				return Response.status(Response.Status.OK).entity(appInfo).build();
 			}
 		} catch (Exception e) {
-			throw new PhrescoWebServiceException(e, EX_PHEX00005, PILOTS_COLLECTION_NAME);
+			throw new PhrescoWebServiceException(e, EX_PHEX00005, APPLICATION_INFO_COLLECTION_NAME);
 		}
 		
 		return Response.status(Response.Status.OK).build();
@@ -1161,7 +1161,7 @@ public class ComponentService extends DbService {
 		
 		try {
 			if (id.equals(pilot.getId())) {
-				mongoOperation.save(PILOTS_COLLECTION_NAME, pilot);
+				mongoOperation.save(APPLICATION_INFO_COLLECTION_NAME, pilot);
 				return  Response.status(Response.Status.OK).entity(pilot).build();
 			}
 		} catch (Exception e) {
@@ -1184,7 +1184,7 @@ public class ComponentService extends DbService {
 	    }
 		
 		try {
-			mongoOperation.remove(PILOTS_COLLECTION_NAME, 
+			mongoOperation.remove(APPLICATION_INFO_COLLECTION_NAME, 
 			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ApplicationInfo.class);
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
