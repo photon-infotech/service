@@ -27,16 +27,25 @@
 
 <% 
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
+	String type = (String) request.getAttribute(ServiceUIConstants.REQ_FEATURES_TYPE);
 %>
 
 <form id="formMenu">
 	<div id="subTabcontent">
-		<div id="navigation">
-			<ul class="navigation_menu">
-				<li><a href="#" class="inactive" id="modulesList" name="featureTab"><s:text name='lbl.hdr.comp.featrs.modules'/></a></li>
-				<li><a href="#" class="inactive" id="jsLibList" name="featureTab"><s:text name='lbl.hdr.comp.featrs.jslib'/></a></li>
+		<nav>
+			<ul class="tabs subtabs">
+				<li class="subtabsLi">
+					<a href="#" class="active" id="modulesTechnologies" name="featureTab">
+						<s:label key="lbl.hdr.comp.featrs.modules" theme="simple"/>
+					</a>
+				</li>
+				<li>
+					<a href="#" class="inactive" id="jsLibTechnologies" name="featureTab">
+						<s:label key="lbl.hdr.comp.featrs.jslib" theme="simple"/>
+					</a>
+				</li>
 			</ul>
-		</div>
+		</nav>
 		
 		<div id="featureContainer" style="height:76%;">
 	
@@ -45,13 +54,21 @@
 	
 	<!-- Hidden Fields -->
     <input type="hidden" name="customerId" value="<%= customerId %>">
-    
 </form>
 
 <script type="text/javascript">
 	$(document).ready(function() {
+		//Handles the click event of the sub tabs
 		clickMenu($("a[name='featureTab']"), $("#featureContainer"));
-		loadContent("modulesList", $('#formMenu'), $("#featureContainer"));
+		
+		//To load the page by default. Condition is checked when this page is returned after save
+		<% if (ServiceUIConstants.REQ_FEATURES_TYPE_JS.equals(type)) { %>
+			loadContent("jsLibTechnologies", $('#formMenu'), $("#featureContainer"));
+		<% } else { %>
+			loadContent("modulesTechnologies", $('#formMenu'), $("#featureContainer"));
+		<% } %>
+		
+		//To activate the module menu by default
 		activateMenu($("#module"));
 	});
 </script>

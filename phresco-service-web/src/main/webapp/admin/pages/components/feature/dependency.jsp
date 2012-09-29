@@ -28,9 +28,11 @@
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
 
 <% 
-	List<ArtifactGroup> moduleGroups = (List<ArtifactGroup>)request.getAttribute(ServiceUIConstants.REQ_FEATURES_MOD_GRP);
+	List<ArtifactGroup> moduleGroups = (List<ArtifactGroup>) request.getAttribute(ServiceUIConstants.REQ_FEATURES_MOD_GRP);
+	List<String> dependentModuleIds = (List<String>) session.getAttribute(ServiceUIConstants.FEATURES_DEPENDENT_MOD_IDS);
 %>
-		
+
+<form id="formDependency">
 <div class="modal">
 	<div class="modal-header">
 		<a class="close" id="close">&times;</a>
@@ -52,9 +54,10 @@
 						%>
 			                <span class="siteaccordion closereg">
 			                	<span class="dependencySpan">
-			                		<input type="checkbox" name="moduleGroup" value="<%= moduleGroup.getId()%>" id="<%= moduleGroup.getId()%>checkBox">
+			                		<input type="checkbox" name="dependentModGroupId" value="<%= moduleGroup.getId()%>" 
+			                			id="<%= moduleGroup.getId()%>checkBox" class="floatLeft">
 			                		&nbsp;&nbsp;<%= moduleGroup.getName() %>&nbsp;&nbsp;
-			                		<p id="<%= moduleGroup.getId()%>version" class="version"></p>
+			                		<p id="<%= moduleGroup.getId()%>version" class="version floatRight"></p>
 			                	</span>
 			                </span>
 			                <div class="mfbox siteinnertooltiptxt hideContent">
@@ -63,7 +66,7 @@
 			                        	<table class="download_tbl">
 				                            <tbody>
 				                            <% 
-										    	List<ArtifactInfo> versions = moduleGroup.getVersions();
+				                            	List<ArtifactInfo> versions = moduleGroup.getVersions();
 										    	if (CollectionUtils.isNotEmpty(versions)) {
 													for (ArtifactInfo module : versions) {
 													    String descContent = "";
@@ -75,11 +78,21 @@
 														if (StringUtils.isNotEmpty(module.getHelpText())) { 
 														  	helpTextContent = module.getHelpText();
 														}
+														
+														//To check the already selected dependent modules
+														String checkedStr = "";
+														if (CollectionUtils.isNotEmpty(dependentModuleIds)) {
+													        if (dependentModuleIds.contains(module.getVersion())) {
+													            checkedStr = "checked";
+													        } else {
+													            checkedStr = "";
+													        }
+														}
 											%>
 												<tr>
 													<td class="editFeatures_td1">
-														<input type="radio" class="module" name="<%= moduleGroup.getId() %>" value="<%= module.getVersion() %>" 
-															onclick="selectCheckBox('<%= moduleGroup.getId()%>', this);">
+														<input type="radio" class="module" name="<%= moduleGroup.getId() %>" value="<%= module.getVersion() %>"
+															<%= checkedStr %> onchange="selectCheckBox('<%= moduleGroup.getId()%>', this);">
 													</td>
 													<td class="fontColor"><%= moduleGroup.getName() %></td>
 													<td class="fontColor"><%= module.getVersion() %></td>
@@ -105,9 +118,10 @@
 	
 	<div class="modal-footer">
 		<a href="#" class="btn btn-primary" id="cancel"><s:label key="lbl.hdr.comp.cancel"/></a>
-	  	<a href="#" class="btn btn-primary"><s:label key="lbl.hdr.comp.ok"/></a>
+	  	<a href="#" class="btn btn-primary" id="saveDependency"><s:label key="lbl.hdr.comp.ok"/></a>
 	</div>
 </div>
+</form>
 
 <script language="JavaScript" type="text/javascript">
 	//To check whether the device is ipad or not and then apply jquery scrollbar
@@ -116,12 +130,13 @@
 	}
 	
 	$(document).ready(function() {
+		//To close the popup
 		$('#cancel, #close').click(function() {
 			showParentPage();
 		});
 		
-		//Check box click function
-		$('input[name="moduleGroup"]').click(function() {
+		//Check box click function to check the first radio button and show the selected version
+		$('input[name="dependentModGroupId"]').change(function() {
 			var modGrpId = $(this).val();
 			var isCheckboxChecked = $(this).is(":checked");
 			if (isCheckboxChecked) {
@@ -133,12 +148,31 @@
 				$("p[id='" + modGrpId + "version']").html("");
 			}
 		});
+		
+		//To save the selected dependency module ids
+		$('#saveDependency').click(function() {
+			showParentPage();
+			loadContent('saveDependentFeatures', $('#formDependency'), $('#popup_div'), '', true);
+		});
+		
+		//To check the selected modules group checkbox and show the selected version
+		$("input[type=radio]:checked").each(function() {
+			var version = $(this).val();
+			var moduleGroupId = $(this).attr('name');
+			$("p[id='" + moduleGroupId + "version']").html(version);
+			$("#" + moduleGroupId + "checkBox").prop("checked", true);
+		});
 	});
 	
-	//Radio button click function
+	//Radio button click function to check the checkbox and show the selected version
 	function selectCheckBox(moduleId, currentElement) {
 		var version = currentElement.value;
 		$("input[id='" + moduleId + "checkBox']").prop("checked", true);
 		$("p[id='" + moduleId + "version']").html(version);
+	}
+	
+	//To enable the page because the page will not be refreshed
+	function successEvent(url, data) {
+		showParentPage();
 	}
 </script>

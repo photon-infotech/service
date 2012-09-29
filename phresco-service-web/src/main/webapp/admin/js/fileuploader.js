@@ -291,7 +291,7 @@ qq.FileUploaderBasic = function(o){
         						}
         					}
         				});
-        				if(o.type === "pluginJar"){
+        				if (o.type === "pluginJar"){
         					jarPopupError(responseJSON.errorMsg, o.type);
         				} else {
         					jarError(responseJSON.errorMsg, o.type);
@@ -302,10 +302,10 @@ qq.FileUploaderBasic = function(o){
         					fillTextBoxes(responseJSON, o.type, fileName);// To show the text box for groupId, artifactId and version 
     		        		enableDisableUpload();// To disable the upload button when a file is uploaded successfully
         				}
-        				if(o.type === "uploadIcon") {
+        				if (o.type === "uploadIcon") {
         					enableIconDisableUpload();// to disable the upload Icon Button when a image is uploaded successfully
         				}
-        				if(o.type === "pluginJar"){
+        				if (o.type === "pluginJar"){
         					jarPopupError('', o.type);
         				} else {
         					jarError('', o.type);

@@ -28,19 +28,23 @@
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
 
 <% 
-	List<Technology> technologies = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
+	List<Technology> technologies = (List<Technology>) request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
 	String type = (String) request.getAttribute(ServiceUIConstants.REQ_FEATURES_TYPE);
-	String header = (String) request.getAttribute(ServiceUIConstants.REQ_FEATURES_HEADER);
-
 %>
 		
 <form id="formFeaturesList" class="form-horizontal customer_list">
 	<div class="operation">
 		<div class="featurelist_add">
-			<input type="button" id="featuresAdd" class="btn btn-primary" name="features_add" 
-				onclick="loadContent('featuresAdd', $('#formFeaturesList'), $('#featureContainer'));" 
-				value="<%= header%>"/>
+		<% if (ServiceUIConstants.REQ_FEATURES_TYPE_MODULE.equals(type)) { %>	
+			<input type="button" class="btn btn-primary" name="features_add" 
+				onclick="loadContent('moduleAdd', $('#formFeaturesList'), $('#featureContainer'));" 
+				value="<s:text name='lbl.hdr.comp.featrs.mod.add'/>"/>
+		<% } else if (ServiceUIConstants.REQ_FEATURES_TYPE_JS.equals(type)) { %>
+			<input type="button" class="btn btn-primary" name="features_add" 
+				onclick="loadContent('jsAdd', $('#formFeaturesList'), $('#featureContainer'));" 
+				value="<s:text name='lbl.hdr.comp.featrs.js.add'/>"/>
+		<% } %>
 			<input type="button" class="btn" id="del" disabled value="<s:text name='lbl.hdr.comp.delete'/>" 
 				onclick="showDeleteConfirmation('<s:text name='del.confirm.feature'/>');"/>
 		</div>
@@ -49,10 +53,10 @@
 			<s:text name='lbl.comp.featr.technology'/>
 			<select name="technology" id="tech_id">
 				<%
-					if (technologies != null) {
+					if (CollectionUtils.isNotEmpty(technologies)) {
 						for (Technology technology : technologies) {
 				%>
-							<option value="<%=technology.getId() %>"><%=technology.getName() %></option>
+							<option value="<%= technology.getId() %>"><%= technology.getName() %></option>
 				<%
 						}
 					}
@@ -85,10 +89,11 @@
 <script language="JavaScript" type="text/javascript">
 	$(document).ready(function() {
 		featurelist();
-	});
-	
-	$('#tech_id').change(function() {
-		featurelist();
+		
+		//To get the list based on the selected technology
+		$('#tech_id').change(function() {
+			featurelist();
+		});
 	});
 	
 	// This method calling from confirm_dialog.jsp
@@ -97,7 +102,8 @@
     	loadContent('featuresDelete', $('#formFeaturesList'), $('#feature_tab'));
     }
 	
+	//To list the features based on the type
     function featurelist() {
-    	loadContent('listFeatures', $('#formFeaturesList'), $('#feature_list'));
+		loadContent('<%= type %>List', $('#formFeaturesList'), $('#feature_list'));
     }
 </script>
