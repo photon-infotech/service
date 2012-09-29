@@ -866,6 +866,14 @@ public class ComponentService extends DbService {
         Converter<ArtifactGroupDAO, ArtifactGroup> converter = 
             (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
         ArtifactGroupDAO moduleGroupDAO = converter.convertObjectToDAO(moduleGroup);
+        
+        List<com.photon.phresco.commons.model.ArtifactInfo> versions = moduleGroup.getVersions();
+        List<String> versionIds = new ArrayList<String>();
+        
+        for (com.photon.phresco.commons.model.ArtifactInfo info : versions) {
+			versionIds.add(info.getId());
+		}
+        
         ArtifactGroupDAO moduleDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
 		        new Query(Criteria.where("name").is(moduleGroupDAO.getName())), ArtifactGroupDAO.class);
         if(moduleDAO != null) {
@@ -885,7 +893,8 @@ public class ComponentService extends DbService {
 	            module.setArtifactGroupId(moduleGroupDAO.getId());
 	            mongoOperation.save(ARTIFACT_INFO_COLLECTION_NAME, module);
 	        }
-
+	        
+	        moduleGroupDAO.setVersionIds(versionIds);
 	        mongoOperation.save(ARTIFACT_GROUP_COLLECTION_NAME, moduleGroupDAO);
         }
     }
