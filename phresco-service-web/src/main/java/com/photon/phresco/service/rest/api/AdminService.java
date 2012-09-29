@@ -19,6 +19,8 @@
  */
 package com.photon.phresco.service.rest.api;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -39,16 +41,25 @@ import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
 import org.springframework.stereotype.Component;
 
+import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.Permission;
 import com.photon.phresco.commons.model.Property;
 import com.photon.phresco.commons.model.Role;
 import com.photon.phresco.commons.model.User;
 import com.photon.phresco.commons.model.VideoInfo;
+import com.photon.phresco.commons.model.VideoType;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.exception.PhrescoWebServiceException;
 import com.photon.phresco.service.api.DbService;
+import com.photon.phresco.service.model.ArtifactInfo;
+import com.photon.phresco.service.util.ServerUtil;
+import com.photon.phresco.util.FileUtil;
 import com.photon.phresco.util.ServiceConstants;
+import com.sun.jersey.multipart.BodyPart;
+import com.sun.jersey.multipart.BodyPartEntity;
+import com.sun.jersey.multipart.MultiPart;
+import com.sun.jersey.multipart.MultiPartMediaTypes;
 
 @Component
 @Path(ServiceConstants.REST_API_ADMIN)
@@ -254,51 +265,136 @@ public class AdminService extends DbService {
 	 * Creates the list of videos
 	 * @param videos
 	 * @return 
+	 * @throws PhrescoException 
 	 */
 	@POST
-	@Consumes (MediaType.APPLICATION_JSON)
+	@Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
 	@Path (REST_API_VIDEOS)
-	public Response createVideo(List<VideoInfo> videos) {
+	public Response createVideo(MultiPart videosinfo) throws PhrescoException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.createVideo(List<VideoInfo> videos)");
 	    }
-		
-		try {
-			mongoOperation.insertList(VIDEOS_COLLECTION_NAME , videos);
-		} catch (Exception e) {
-			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
+	    return createOrUpdateVideo(videosinfo);
+	}
+
+	private Response createOrUpdateVideo(MultiPart videosinfo)
+			throws PhrescoException {
+		VideoInfo video = null;
+		BodyPartEntity bodyPartEntity = null;
+		File videoFile = null;
+		List<BodyPart> bodyParts = videosinfo.getBodyParts();
+
+		if (CollectionUtils.isNotEmpty(bodyParts)) {
+			for (BodyPart bodyPart : bodyParts) {
+				if (bodyPart.getMediaType().equals(
+						MediaType.APPLICATION_JSON_TYPE)) {
+					video = bodyPart.getEntityAs(VideoInfo.class);
+				} else {
+					bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
+				}
+			}
+		}
+
+		if (video == null) {
+			// TODO:Throw exception
+		}
+
+		if (bodyPartEntity != null) {
+			videoFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null);
 		}
 		
-		return Response.status(Response.Status.OK).build();
+		if(bodyPartEntity != null) {
+			List<VideoType> videoTypeList = video.getVideoList();
+			VideoType videoType = videoTypeList.get(0);
+			ArtifactGroup artifactGroup = videoType.getArtifactGroup();
+			if (artifactGroup != null) {
+				boolean uploadBinary = uploadBinary(video.getVideoList().get(0).getArtifactGroup(), videoFile);
+				if (uploadBinary) {
+					saveVideos(video);
+				}
+			}
+		}
+		
+		if(bodyPartEntity == null && video != null) {
+			saveVideos(video);
+		}
+		
+		return Response.status(Response.Status.OK).entity(video).build();
+	}
+
+	private void saveVideos(VideoInfo video) {
+		String newVersion = video.getVideoList().get(0).getArtifactGroup().getVersions().get(0).getVersion();
+		VideoInfo videoInfo = mongoOperation.findOne(VIDEOS_COLLECTION_NAME, 
+		        new Query(Criteria.where("id").is(video.getId())), VideoInfo.class);
+		List<VideoType> videoTypeList=video.getVideoList();  
+		List<com.photon.phresco.commons.model.ArtifactInfo> versions = videoTypeList.get(0).getArtifactGroup().getVersions();
+		
+		if (videoInfo != null) {
+			List<VideoType> videoTypeLists = videoInfo.getVideoList();
+			VideoType videoTypes = videoTypeLists.get(0);
+			ArtifactGroup artifactGroup = videoTypes.getArtifactGroup();
+			List<com.photon.phresco.commons.model.ArtifactInfo> versions2 = artifactGroup.getVersions();
+			
+			versions2.addAll(versions);
+			artifactGroup.setVersions(versions2);
+			videoTypes.setArtifactGroup(artifactGroup);
+			
+			videoTypeLists.set(0, videoTypes);
+			videoInfo.setVideoList(videoTypeLists);
+			mongoOperation.save(VIDEOS_COLLECTION_NAME , videoInfo);
+		} 
+		else {
+			mongoOperation.save(VIDEOS_COLLECTION_NAME , video);
+		}
+		
+		
+	}
+
+	private List<String> getVersion(VideoInfo video) {
+		List<com.photon.phresco.commons.model.ArtifactInfo> versions = video.getVideoList().get(0).getArtifactGroup().getVersions();
+		List<String> versionList  = new ArrayList<String>();
+		for (com.photon.phresco.commons.model.ArtifactInfo artifactInfo : versions) {
+			versionList.add(artifactInfo.getVersion());
+		}
+		return versionList;
+	}
+
+	private boolean uploadBinary(ArtifactGroup archetypeInfo, File videoFile) throws PhrescoException {
+		
+        File pomFile = ServerUtil.createPomFile(archetypeInfo);
+        
+        //Assuming there will be only one version for the artifactGroup
+        List<com.photon.phresco.commons.model.ArtifactInfo> versions = archetypeInfo.getVersions();
+        com.photon.phresco.commons.model.ArtifactInfo artifactInfo = versions.get(0);
+        
+		ArtifactInfo info = new ArtifactInfo(archetypeInfo.getGroupId(), archetypeInfo.getArtifactId(), archetypeInfo.getClassifier(), 
+                archetypeInfo.getPackaging(), artifactInfo.getVersion());
+		
+        info.setPomFile(pomFile);
+        boolean addArtifact = true;
+        
+        List<String> customerIds = archetypeInfo.getCustomerIds();
+        //TODO:Need to upload the content into the repository
+//        boolean addArtifact = repositoryManager.addArtifact(info, artifactFile, customerId);
+        FileUtil.delete(pomFile);
+        return addArtifact;
 	}
 
 	/**
 	 * Updates the list of Videos
 	 * @param videos
 	 * @return
+	 * @throws PhrescoException 
 	 */
 	@PUT
-	@Consumes (MediaType.APPLICATION_JSON)
+	@Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_VIDEOS)
-	public Response updateVideos(List<VideoInfo> videos) {
+	public Response updateVideos(MultiPart videos) throws PhrescoException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.updateVideos(List<VideoInfo> videos)");
 	    }
-		
-		try {
-			for (VideoInfo video : videos) {
-				VideoInfo videoInfo = mongoOperation.findOne(VIDEOS_COLLECTION_NAME , 
-				        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(video.getId())), VideoInfo.class);
-				if (videoInfo  != null) {
-					mongoOperation.save(VIDEOS_COLLECTION_NAME, video);
-				}
-			}
-		} catch (Exception e) {
-			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
-		}
-		
-		return Response.status(Response.Status.OK).entity(videos).build();
+		return createOrUpdateVideo(videos);
 	}
 
 	/**
