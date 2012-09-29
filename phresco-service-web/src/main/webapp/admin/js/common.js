@@ -74,7 +74,7 @@ function clickSave(pageUrl, params, tag, progressText) {
 
 function validate(pageUrl, form, tag, progressText, disabledDiv) {
 	if (disabledDiv != undefined && disabledDiv != "") {
-		disabledDiv.removeAttr("disabled");
+		enableDivCtrls(disabledDiv);
 	}
 	var params = "";
 	if (form != undefined && !isBlank(form)) {
@@ -383,4 +383,8 @@ function disableCtrl(control) {
 //To enable the given control
 function enableCtrl(control) {
 	control.removeAttr("disabled");
+}
+
+function enableDivCtrls(disabledDiv) {
+	disabledDiv.removeAttr("disabled");
 }

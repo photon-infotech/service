@@ -1033,10 +1033,10 @@ public class ComponentService extends DbService {
 	    }
 		try {
 			Query query = createCustomerIdQuery(customerId);
-			List<ApplicationInfo> appInfos = mongoOperation.find(PILOTS_COLLECTION_NAME, query, ApplicationInfo.class);
+			List<ApplicationInfo> appInfos = mongoOperation.find(APPLICATION_INFO_COLLECTION_NAME, query, ApplicationInfo.class);
 			return Response.status(Response.Status.OK).entity(appInfos).build();
 		} catch (Exception e) {
-			throw new PhrescoWebServiceException(e, EX_PHEX00005, PILOTS_COLLECTION_NAME);
+			throw new PhrescoWebServiceException(e, EX_PHEX00005, APPLICATION_INFO_COLLECTION_NAME);
 		}
 	}
 	
@@ -1054,6 +1054,7 @@ public class ComponentService extends DbService {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into ComponentService.createPilots(List<ProjectInfo> projectInfos)");
         }
+
         return createOrUpdatePilots(pilotInfo);
     }
     

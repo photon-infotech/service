@@ -22,6 +22,7 @@
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.apache.commons.collections.CollectionUtils" %>
 <%@ page import="java.util.List"%>
+<%@page import="java.util.ArrayList"%>
 
 <%@ page import="com.photon.phresco.commons.model.SettingsTemplate" %>
 <%@ page import="com.photon.phresco.commons.model.PropertyTemplate" %>
@@ -94,10 +95,10 @@
 			</label>
 			<div class="controls">
 					<div class="typeFields" id="typefield">
-					<div class="multilist-scroller multiselct" style="height:95px; width:300px;" name="appliesTo">
+					<div class="multilist-scroller multiselct" id="appliesToDiv">
 					<ul>
 						<li>
-							<input type="checkbox" value="all" id="checkAllAuto" name="appliesTo" onclick="checkAllEvent(this,$('.applsChk'), true);" style="margin: 3px 8px 6px 0;">All
+							<input type="checkbox" value="all" id="checkAllAuto" name="" onclick="checkAllEvent(this,$('.applsChk'), true);" style="margin: 3px 8px 6px 0;">All
 						</li>
 
 						<%
@@ -108,7 +109,11 @@
 															// TODO:Arunprasanna
  															List<Element> appliesTos = settingsTemplate.getAppliesToTechs();
  															if (CollectionUtils.isNotEmpty(appliesTos)) {
- 																if (appliesTos.contains(technology.getId())) {
+ 																List<String> techIds = new ArrayList<String>();
+ 																for (Element appliesTo : appliesTos) {
+ 																	techIds.add(appliesTo.getId());
+ 																}
+ 																if (techIds.contains(technology.getId())) {
  																	checkedStr = "checked";
  																} else {
  																	checkedStr = "";
@@ -193,14 +198,13 @@
 											<td class="psblevalue" id="1_psblMulDiv" style="display:none;">
 												<select type="text" placeholder="<s:text name='place.hldr.configTemp.add.possible.values'/>" 
 													class="propTempTxt psblSelect" id="1_psblMul"></select>
-												<input type="hidden" class="1"/>
 												<a data-toggle="modal" href="#myModal"><img class="addiconAlign imagealign" temp="1" src="images/add_icon.png"/ 
 													onclick="addPsblValPopup(this);"></a>
 											</td>
+											<input type="hidden" class="1"/>
 											<td class="psblevalue" id="1_psblSinglDiv">
 												<input type="text" placeholder="<s:text name='place.hldr.configTemp.add.possible.values'/>" 
 													class="propTempTxt psblSngl" id="1_psblSingl">
-												<input type="hidden" class="1"/>
 												<a data-toggle="modal" href="#myModal"><img class="addiconAlign imagealign" temp="1" 
 													src="images/add_icon.png"/ onclick="addPsblValPopup(this);"/></a>
 											</td>
@@ -268,15 +272,14 @@
 													<td class="psblevalue" id='<%= dynamicId + "_psblSinglDiv" %>' style="display:none">
 														<input type="text" placeholder="<s:text name='place.hldr.configTemp.add.possible.values'/>" 
 															class="propTempTxt psblSngl" id='<%= dynamicId + "_psblSingl" %>'>
-														<input type="hidden" class='<%= dynamicId %>'>	
 														<a data-toggle="modal" href="#myModal"><img class="addiconAlign imagealign" temp='<%= dynamicId %>' 
 															src="images/add_icon.png"/ onclick="addPsblValPopup(this);"/></a>
 													</td>
+													<input type="hidden" class='<%= dynamicId %>'>
 													<td class="psblevalue" id='<%= dynamicId + "_psblMulDiv" %>' style="display:none">
 														<select type="text" placeholder="<s:text name='place.hldr.configTemp.add.possible.values'/>" 
 															class="propTempTxt psblSelect" id='<%= dynamicId + "_psblMul" %>'>
 														</select>
-														<input type="hidden" class='<%= dynamicId %>'/>
 														<a data-toggle="modal" href="#myModal"><img class="addiconAlign imagealign" temp='<%= dynamicId %>' 
 															src="images/add_icon.png" onclick="addPsblValPopup(this);"></a>
 													</td>
@@ -476,7 +479,7 @@
 		$("#addValues").click(function() {
 			var textComboVal = $("#txtCombo").val();
 			var alreadyExists = false;
-			if ($("#txtCombo").val().trim() === "") {
+			if ($("#txtCombo").val().replace(/\s/g, "") === "") {
 				$("#errMsg").html("Please enter Key");
 				alreadyExists = true;
 			}
@@ -489,7 +492,7 @@
 				}
 			});
 			
-			if (!alreadyExists && textComboVal.trim() !== "") {
+			if (!alreadyExists && textComboVal.replace(/\s/g, "") !== "") {
 				$("#txtCombo").val("");
 				$("#valuesCombo").append($('<option name='+ textComboVal +'></option>').attr("value", textComboVal).text(textComboVal));				
 			}
@@ -552,23 +555,21 @@
 	 	var newPropTempRow = $(document.createElement('tr')).attr("id", trId);
 	 	newPropTempRow.html("<td class='textwidth'><input type='text' id='"+ keyId +"' class='key' name='propTempKey' value='' "+
 	 			" temp='"+ keyTmpName +"' placeholder='<s:text name='place.hldr.configTemp.add.key'/>' onblur='updateRowInputNames(this)'></td>" + 
-				"<td class='textwidth'> <input type='text' id = '"+ nameId +"' placeholder='<s:text name='place.hldr.configTemp.add.name'/>' value='' placeholder='' maxlength='30'" +
-	 			" class='propyName'></td>" +
-	 			"<td class='textwidth'><select id='"+ typeId +"' class = 'select typewidth'><option value='String'>String</option> " + 
-	 			"<option value='Integer'>Integer</option><option value='Password'>Password</option></select></td>"  +
-	 			"<td class='psblevalue' id='"+ psblMulDivId +"' style='display:none;'><select type='text' placeholder='<s:text name='place.hldr.configTemp.add.possible.values'/>'" + 
-	 			" class='propTempTxt psblSelect' id='"+ psblValMultipleId +"'></select>"+
-	 			"<input type='hidden' class='"+ keyId +"'/><a data-toggle='modal' href='#myModal'> " + 
-	 			"<img class='addIcon imagealign' temp='"+ keyId +"' src='images/add_icon.png' onclick='addPsblValPopup(this);'/></a></td>" +
-	 			"<td class='psblevalue' id='"+ psblSinglDivId +"'><input type='text' placeholder='<s:text name='place.hldr.configTemp.add.possible.values'/>' " +
-	 			" class='propTempTxt psblSngl' id='"+ psblValSingleId +"'>" + 
-	 			"<input type='hidden' class='"+ keyId +"'/><a data-toggle='modal' href='#myModal'><img class='addIcon imagealign' temp='"+ keyId +"' " +
-	 			"src='images/add_icon.png' onclick='addPsblValPopup(this);'/></a></td>" +
-	 			"<td class='hlpText'><input type='text' id='"+ helpTextId +"' placeholder='<s:text name='place.hldr.configTemp.add.help.text'/>' " + 
-	 			"name='helpText' class='propTempTxt hlpTxt'></td> <td class='mandatoryfld'><input type='checkbox' value='true' id='"+ mandChckId +"'></td>" +
-	 			"<td class='multiplefld'><input type='checkbox' value='true' id='"+ mulChckId +"'></td>" +
-	 			"<td class='imagewidth'><a ><img class='add imagealign' temp='"+ keyId +"' src='images/add_icon.png' onclick='addconfig(this);'></a></td>" + 
-	 			"<td><img class = 'del imagealign' src='images/minus_icon.png' onclick='removeTag(this);'></td>")
+				"<td class='textwidth'> <input type='text' id = '"+ nameId +"' placeholder='<s:text name='place.hldr.configTemp.add.name'/>' " + 
+				" value='' placeholder='' maxlength='30' class='propyName'></td><td class='textwidth'><select id='"+ typeId +"' " + 
+				"class = 'select typewidth'><option value='String'>String</option><option value='Integer'>Integer</option><option value='Password'>" + 
+				"Password</option></select></td><td class='psblevalue' id='"+ psblMulDivId +"' style='display:none;'><select type='text' " + 
+				"placeholder='<s:text name='place.hldr.configTemp.add.possible.values'/>'class='propTempTxt psblSelect' id='"+ psblValMultipleId +"'>" + 
+				"</select><a data-toggle='modal' href='#myModal'><img class='addIcon imagealign' temp='"+ keyId +"' src='images/add_icon.png'" + 
+				"onclick='addPsblValPopup(this);'/></a></td><input type='hidden' class='"+ keyId +"'/><td class='psblevalue' id='"+ psblSinglDivId +"'>" + 
+				"<input type='text' placeholder='<s:text name='place.hldr.configTemp.add.possible.values'/>'class='propTempTxt psblSngl' " + 
+				"id='"+ psblValSingleId +"'><a data-toggle='modal' href='#myModal'><img class='addIcon imagealign' temp='"+ keyId +"' " +
+	 			"src='images/add_icon.png' onclick='addPsblValPopup(this);'/></a></td><td class='hlpText'><input type='text' id='"+ helpTextId +"' " + 
+	 			"placeholder='<s:text name='place.hldr.configTemp.add.help.text'/>' name='helpText' class='propTempTxt hlpTxt'></td>" + 
+	 			"<td class='mandatoryfld'><input type='checkbox' value='true' id='"+ mandChckId +"'></td><td class='multiplefld'> " + 
+	 			"<input type='checkbox' value='true' id='"+ mulChckId +"'></td><td class='imagewidth'><a ><img class='add imagealign' " + 
+	 			" temp='"+ keyId +"' src='images/add_icon.png' onclick='addconfig(this);'></a></td><td><img class = 'del imagealign'" + 
+	 			"src='images/minus_icon.png' onclick='removeTag(this);'></td>")
 	 	newPropTempRow.appendTo("#propTempTbody");		
 		counter++;
 	}
@@ -583,108 +584,116 @@
 		$("#errMsg").empty();
 		$("#valuesCombo").empty();
 		$("#hiddenKey").val($(obj).attr("temp"));
-		
+
 		//to populate already added possible values in popup
 		var keyClass = $(obj).attr("temp");
 		var psblValSep = new Array();
 		var values = $("." + keyClass).val();
 		if (values !== undefined && values !== "") {
 			psblValSep = values.split(",");
-			for (var i=0; i < psblValSep.length; i++) {
-				$("#valuesCombo").append($('<option name='+ psblValSep[i] +'></option>').attr("value", psblValSep[i]).text(psblValSep[i]));
-			}	
+			for ( var i = 0; i < psblValSep.length; i++) {
+				$("#valuesCombo").append(
+						$('<option name='+ psblValSep[i] +'></option>').attr(
+								"value", psblValSep[i]).text(psblValSep[i]));
+			}
 		}
 	}
-	
+
 	function updateRowInputNames(obj) {
 		//to check duplications of entered key value
 		var keyClass = $(obj).attr("class");
-		$("."+keyClass).each(function(){
-			if($(obj).attr("temp") !== $(this).attr("temp") && $(obj).val() === $(this).val()) {
+		$("." + keyClass).each(function() {
+			if ($(obj).attr("temp") !== $(this).attr("temp")
+					&& $(obj).val() === $(this).val()) {
 				$(obj).val("");
-				showError($("#"+ $(obj).attr("id") +"_configdynamiadd"));
+				showError($("#" + $(obj).attr("id")
+						+ "_configdynamiadd"));
 				return false;
 			}
 		});
-		
+
 		//to set names of input fields of current prop template row
-		if ($(obj).val().trim() !== "") {
+		if ($(obj).val().replace(/\s/g, "") !== "") {
 			var id = $(obj).attr("id");
-			var proptempName =  $(obj).val() + "_propTempName";
-			var typeName =  $(obj).val() + "_type";
-		 	var psblVal = $(obj).val() + "_psblVal";
-		 	var helpTextName =  $(obj).val() + "_helpText";
-		 	var mandChckName =  $(obj).val() + "_propMand";
-			var mulChckName =  $(obj).val() + "_propMul";
-			
-			$("#"+ id +"_propTempName").attr("name", proptempName);
-			$("#"+ id +"_type").attr("name", typeName);
-			$("."+id).attr("name", psblVal);
-			$("#"+ id +"_helpText").attr("name", helpTextName);
-			$("#"+ id +"_propMand").attr("name", mandChckName);
-			$("#"+ id +"_propMul").attr("name", mulChckName);
-		} 
+			var proptempName = $(obj).val() + "_propTempName";
+			var typeName = $(obj).val() + "_type";
+			var psblVal = $(obj).val() + "_psblVal";
+			var helpTextName = $(obj).val() + "_helpText";
+			var mandChckName = $(obj).val() + "_propMand";
+			var mulChckName = $(obj).val() + "_propMul";
+
+			$("#" + id + "_propTempName").attr("name", proptempName);
+			$("#" + id + "_type").attr("name", typeName);
+			$("." + id).attr("name", psblVal);
+			$("#" + id + "_helpText").attr("name", helpTextName);
+			$("#" + id + "_propMand").attr("name", mandChckName);
+			$("#" + id + "_propMul").attr("name", mulChckName);
+		}
 	}
 	
 	//for edit -- to change names of property template input fields
 	function updateRowInputNamesInEdit() {
 		$(".key").each(function() {
-				var id = $(this).attr("id");
-				var proptempName =  $(this).val() + "_propTempName";
-				var typeName =  $(this).val() + "_type";
-			 	var psblVal = $(this).val() + "_psblVal";
-			 	var helpTextName =  $(this).val() + "_helpText";
-			 	var mandChckName =  $(this).val() + "_propMand";
-				var mulChckName =  $(this).val() + "_propMul";
-				
-				$("#"+ id +"_propTempName").attr("name", proptempName);
-				$("#"+ id +"_type").attr("name", typeName);
-				$("."+ id).attr("name", psblVal);
-				$("#"+ id +"_helpText").attr("name", helpTextName);
-				$("#"+ id +"_propMand").attr("name", mandChckName);
-				$("#"+ id +"_propMul").attr("name", mulChckName);
+			var id = $(this).attr("id");
+			var proptempName = $(this).val() + "_propTempName";
+			var typeName = $(this).val() + "_type";
+			var psblVal = $(this).val() + "_psblVal";
+			var helpTextName = $(this).val() + "_helpText";
+			var mandChckName = $(this).val() + "_propMand";
+			var mulChckName = $(this).val() + "_propMul";
+
+			$("#" + id + "_propTempName").attr("name", proptempName);
+			$("#" + id + "_type").attr("name", typeName);
+			$("." + id).attr("name", psblVal);
+			$("#" + id + "_helpText").attr("name", helpTextName);
+			$("#" + id + "_propMand").attr("name", mandChckName);
+			$("#" + id + "_propMul").attr("name", mulChckName);
 		});
 	}
-	
+
 	//for edit -- to preselect type select box value in property template 
 	function selectType(type, id) {
-		$("#"+ id + "_type > option").each(function(){
-			if($(this).val() === type) {
-				$("#"+ id + "_type  option[value='"+ type +"']").attr("selected", "selected");	
+		$("#" + id + "_type > option").each(function() {
+			if ($(this).val() === type) {
+				$("#" + id + "_type  option[value='" + type + "']")
+						.attr("selected", "selected");
 				return false;
 			}
 		});
 	}
-	
+
 	function validatePropTempKey(pageUrl, progressText) {
 		var redirect = true;
 		$(".key").each(function() {
-			if ($(this).val().trim() === "") {
-				$("#"+$(this).attr("id")).focus();
+			if ($(this).val().replace(/\s/g, "") === "") {
+				$("#" + $(this).attr("id")).focus();
 				redirect = false;
 				return false;
-			} 
+			}
 		});
-		if ($("#configname").val().trim() === "" ) {
-			showError($("#nameControl"), $("#nameError"), '<s:text name='err.msg.name.empty'/>');
+		if ($("#configname").val().replace(/\s/g, "") === "") {
+			showError($("#nameControl"), $("#nameError"),
+					'<s:text name='err.msg.name.empty'/>');
 		} else {
 			hideError($("#nameControl"), $("#nameError"));
 		}
 		if ($("input[name='appliesTo']:checked").length === 0) {
-			showError($("#applyControl"), $("#applyError"), '<s:text name='err.msg.applies.empty'/>');
+			showError($("#applyControl"), $("#applyError"),
+					'<s:text name='err.msg.applies.empty'/>');
 		} else {
 			hideError($("#applyControl"), $("#applyError"));
 		}
-		
+
 		if (redirect) {
-			validate(pageUrl, $('#formConfigTempAdd'), $('#subcontainer'),  progressText);
-		} 
+			validate(pageUrl, $('#formConfigTempAdd'), $('#subcontainer'),
+					progressText, $('#appliesToDiv :input'));
+		}
 	}
-	
+
 	// To check for the special character in configname
-    $('#configname').bind('input propertychange', function (e) {
-        var configname = $(this).val();
-        configname = checkForSplChr(configname);
-        $(this).val(configname);
-    });
+	$('#configname').bind('input propertychange', function(e) {
+		var configname = $(this).val();
+		configname = checkForSplChr(configname);
+		$(this).val(configname);
+	});
 </script>

@@ -37,6 +37,7 @@ public interface ServiceUIConstants {
 	String MAVEN_JAR_FALSE = "{\"mavenJar\": false,\"success\": true}";
 	String INVALID_ARCHETYPE_JAR = "{\"isJarTypeValid\": false,\"errorMsg\": \"Not a valid application jar\"}";
 	String INVALID_PLUGIN_JAR = "{\"isJarTypeValid\": false,\"errorMsg\": \"Not a valid plugin jar\"}";
+	String CSV_PATTERN = "\\s*,\\s*";
     
     
 	/*****************************
@@ -308,10 +309,8 @@ public interface ServiceUIConstants {
     String APPTYPES_DELETED = "succ.appType.delete";
     
     String CONFIGTEMPLATE_ADDED = "succ.configtemplate.add";
-    String CONFIGTEMPLATE_NOT_ADDED = "fail.configtemplate.add";
+    String CONFIGTEMPLATE_UPDATED = "succ.configtemplate.update";
     String CONFIGTEMPLATE_DELETED = "succ.configtemplate.delete";
-    String CONFIGTEMPLATE_NOT_DELETED = "fail.configtemplate.delete" ;
-    
     
     String ARCHETYPE_ADDED = "succ.archetype.add";
     String ARCHETYPE_NOT_ADDED = "fail.archetype.add";
