@@ -269,7 +269,6 @@ public class ComponentService extends DbService {
 		          (Converter<TechnologyDAO, Technology>) ConvertersFactory.getConverter(TechnologyDAO.class);
 
 			for (TechnologyDAO technologyDAO : techDAOList) {
-				System.out.println("techDAO " + technologyDAO);
 				Technology technology = technologyConverter.convertDAOToObject(technologyDAO, mongoOperation);
 				techList.add(technology);
 			}
@@ -719,8 +718,6 @@ public class ComponentService extends DbService {
 			Criteria criteria = Criteria.where(DB_COLUMN_ARTIFACT_GROUP_TYPE).is(ArtifactGroup.Type.valueOf(type));
 			custIdQuery = custIdQuery.addCriteria(criteria);
 			
-			System.out.println(custIdQuery.getQueryObject());
-			
 			//TODO: Need to add more filter for techId
 			
 			List<ArtifactGroupDAO> moduleDAOs = mongoOperation.find(ARTIFACT_GROUP_COLLECTION_NAME, custIdQuery, ArtifactGroupDAO.class);
@@ -867,10 +864,10 @@ public class ComponentService extends DbService {
             (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
         ArtifactGroupDAO moduleGroupDAO = converter.convertObjectToDAO(moduleGroup);
         
-        List<com.photon.phresco.commons.model.ArtifactInfo> versions = moduleGroup.getVersions();
+        List<com.photon.phresco.commons.model.ArtifactInfo> moduleGroupVersions = moduleGroup.getVersions();
         List<String> versionIds = new ArrayList<String>();
         
-        for (com.photon.phresco.commons.model.ArtifactInfo info : versions) {
+        for (com.photon.phresco.commons.model.ArtifactInfo info : moduleGroupVersions) {
 			versionIds.add(info.getId());
 		}
         
