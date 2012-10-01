@@ -29,8 +29,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.MediaType;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -43,12 +41,9 @@ import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
-import com.photon.phresco.service.client.api.Content;
 import com.photon.phresco.service.client.api.ServiceManager;
 import com.photon.phresco.service.model.FileInfo;
 import com.photon.phresco.service.util.ServerUtil;
-import com.sun.jersey.multipart.BodyPart;
-import com.sun.jersey.multipart.MultiPart;
 
 
 
@@ -147,34 +142,62 @@ public class Archetypes extends ServiceBaseAction {
 	}
 	
 	public String save() throws PhrescoException {
-	    if (s_isDebugEnabled) {
-	        S_LOGGER.debug("Entering Method Archetypes.save()");
-	    }
-		
+		if (s_isDebugEnabled) {
+			S_LOGGER.debug("Entering Method Archetypes.save()");
+		}
+
 		try {
-		    MultiPart multiPart = getTechnologyAsMultipart();
-			getServiceManager().createArcheTypes(multiPart, getCustomerId());
-			addActionError(getText(ARCHETYPE_ADDED, Collections.singletonList(getName())));
+			Technology technology = getTechnology();
+			InputStream technoIs = null;
+			//save application jar files
+			if(s_applnByteArray != null){
+				technoIs = new ByteArrayInputStream(s_applnByteArray);
+			} 
+			//save plugin jar files
+			if(s_pluginMap != null) {
+				Iterator iter = s_pluginMap.keySet().iterator();
+				while (iter.hasNext()) {
+					String key = (String) iter.next();
+					byte[] byteArray = (byte[]) s_pluginMap.get(key);
+					technoIs = new ByteArrayInputStream(byteArray);
+				}
+			}
+			getServiceManager().createArcheTypes(technology, technoIs, getCustomerId());
+			addActionMessage(getText(ARCHETYPE_ADDED, Collections.singletonList(name)));
 		} catch (PhrescoException e) {
-		    return showErrorPopup(e, EXCEPTION_ARCHETYPE_SAVE);
+			return showErrorPopup(e, EXCEPTION_ARCHETYPE_SAVE);
 		} 
-		
+
 		return list();
 	}
 	
 	public String update() throws PhrescoException {
-	    if (s_isDebugEnabled) {
-	        S_LOGGER.debug("Entering Method Archetypes.update()");
-	    }
+		if (s_isDebugEnabled) {
+			S_LOGGER.debug("Entering Method Archetypes.update()");
+		}
 
 		try {
-		    MultiPart multiPart = getTechnologyAsMultipart();
-			getServiceManager().updateArcheType(multiPart, getTechId(), getCustomerId());
-            addActionError(getText(ARCHETYPE_UPDATED, Collections.singletonList(getName())));
-		} catch(PhrescoException e) {
-		    return showErrorPopup(e, EXCEPTION_ARCHETYPE_UPDATE);
+			Technology technology = getTechnology();
+			InputStream technoIs = null;
+			//update application jar files
+			if(s_applnByteArray != null){
+				technoIs = new ByteArrayInputStream(s_applnByteArray);
+			} 
+			//update plugin jar files
+			if(s_pluginMap != null) {
+				Iterator iter = s_pluginMap.keySet().iterator();
+				while (iter.hasNext()) {
+					String key = (String) iter.next();
+					byte[] byteArray = (byte[]) s_pluginMap.get(key);
+					technoIs = new ByteArrayInputStream(byteArray);
+				}
+				getServiceManager().updateArcheType(technology, technoIs, getCustomerId());
+				addActionError(getText(ARCHETYPE_UPDATED, Collections.singletonList(getName())));
+			}
+		}catch(PhrescoException e) {
+			return showErrorPopup(e, EXCEPTION_ARCHETYPE_UPDATE);
 		}
-		
+
 		return list();
 	}
 
@@ -182,10 +205,13 @@ public class Archetypes extends ServiceBaseAction {
      * @return
      * @throws PhrescoException
      */
-    private MultiPart getTechnologyAsMultipart() throws PhrescoException {
+    private Technology getTechnology() throws PhrescoException {
+    	if (s_isDebugEnabled) {
+			S_LOGGER.debug("Entering Method Archetypes.getTechnology()");
+		}
+    	
         Technology technology = new Technology();
         technology.setName(getName());
-        technology.setId(getTechId());
         technology.setDescription(getDescription());
         technology.setAppTypeId(getApptype());
         
@@ -210,11 +236,7 @@ public class Archetypes extends ServiceBaseAction {
         techVersions.add(getTechVersion());
         technology.setTechVersions(techVersions);
         
-        //ArchetypeInfo archetypeInfo = new ArchetypeInfo(groupId, artifactId, version, "jar");
-        //technology.setArchetypeInfo(archetypeInfo);
-
-        MultiPart multiPart = fileUpload(technology);
-        return multiPart;
+        return technology;
     }
 
 	public String delete() throws PhrescoException {
@@ -239,18 +261,25 @@ public class Archetypes extends ServiceBaseAction {
 	}
 	
 	public String uploadJar() throws PhrescoException {
+		if (s_isDebugEnabled) {
+			S_LOGGER.debug("Entering Method Archetypes.uploadJar()");
+		}
+		
 		String type = getHttpRequest().getParameter(REQ_JAR_TYPE);
 		if (REQ_PLUGIN_JAR.equals(type)) {
-			//uploadPluginJar();
-			uploadPopupPluginJar();
+			uploadPluginJar();
 		} else {
-			uploadApplnJar();
+			uploadAppJar();
 		}
 		
 		return SUCCESS;
 	}
 	
-	public String uploadApplnJar() throws PhrescoException {
+	public String uploadAppJar() throws PhrescoException {
+		if (s_isDebugEnabled) {
+			S_LOGGER.debug("Entering Method Archetypes.uploadAppJar()");
+		}
+		
 		PrintWriter writer = null;
 		try {
             writer = getHttpResponse().getWriter();
@@ -293,7 +322,11 @@ public class Archetypes extends ServiceBaseAction {
 		return SUCCESS;
 	}
 	
-	public String uploadPopupPluginJar() throws PhrescoException {
+	public String uploadPluginJar() throws PhrescoException {
+		if (s_isDebugEnabled) {
+			S_LOGGER.debug("Entering Method Archetypes.uploadPluginJar()");
+		}
+		
 		if (StringUtils.isNotEmpty(uploadPlugin)) {
 			return uploadPlugin;
 		}
@@ -321,8 +354,6 @@ public class Archetypes extends ServiceBaseAction {
 	        	writer.print(MAVEN_JAR_FALSE);
 	        }
         	s_pluginMap.put(jarName, byteArray);
-	        //writer.print(SUCCESS_TRUE);
-	        //getHttpResponse().setStatus(getHttpResponse().SC_OK);
 	        writer.flush();
 	        writer.close();
 		} catch (Exception e) {
@@ -333,27 +364,6 @@ public class Archetypes extends ServiceBaseAction {
 		
 		return SUCCESS;
 	}
-	
-	/*public String uploadPluginJar() throws PhrescoException {
-		PrintWriter writer = null;
-		try {
-			writer = getHttpResponse().getWriter();
-	        String jarName = getHttpRequest().getHeader(X_FILE_NAME);
-	        InputStream is = getHttpRequest().getInputStream();
-	        byte[] byteArray = IOUtils.toByteArray(is);
-	        s_pluginMap.put(jarName, byteArray);
-	        writer.print(SUCCESS_TRUE);
-	        getHttpResponse().setStatus(getHttpResponse().SC_OK);
-	        writer.flush();
-	        writer.close();
-		} catch (Exception e) {
-			getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
-            writer.print(SUCCESS_FALSE);
-			throw new PhrescoException(e);
-		}
-		
-		return SUCCESS;
-	}*/
 	
 	public void removeUploadedJar() {
 		if (s_isDebugEnabled) {
@@ -367,44 +377,6 @@ public class Archetypes extends ServiceBaseAction {
 			s_applnJarName = null;
 			s_applnByteArray = null;
 		}
-	}
-	
-	private MultiPart fileUpload(Technology technology) throws PhrescoException {
-		if (s_isDebugEnabled) {
-			S_LOGGER.debug("Entering Method Archetypes.fileUpload(MultiPart multiPart,Technology technology)");
-		}
-		
-		MultiPart multiPart = null;
-		try {
-			multiPart = new MultiPart();
-			BodyPart jsonPart = new BodyPart();
-			jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
-			jsonPart.setEntity(technology);
-			Content content = new Content(Content.Type.JSON, getName(), null, null, null, 0);
-			jsonPart.setContentDisposition(content);
-			multiPart.bodyPart(jsonPart);
-
-			if (!s_pluginMap.isEmpty()) {
-				Iterator iter = s_pluginMap.keySet().iterator();
-				while (iter.hasNext()) {
-					String key = (String) iter.next();
-					byte[] byteArray = (byte[]) s_pluginMap.get(key);
-					InputStream pluginJarIs = new ByteArrayInputStream(byteArray);
-					BodyPart binaryPart = getServiceManager().createBodyPart(getName(), Content.Type.JAR, pluginJarIs);
-					multiPart.bodyPart(binaryPart);
-				}
-			}
-
-			if (StringUtils.isNotEmpty(s_applnJarName)) {
-				InputStream applnIs = new ByteArrayInputStream(s_applnByteArray);
-				BodyPart binaryPart2 = getServiceManager().createBodyPart(getName(), Content.Type.JAR, applnIs);
-				multiPart.bodyPart(binaryPart2);
-			}
-		} catch(Exception e) {
-			throw new PhrescoException(e);
-		}
-
-		return multiPart;
 	}
 	
 	public String validateForm() throws PhrescoException {

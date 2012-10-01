@@ -51,11 +51,13 @@
 		if (StringUtils.isNotEmpty(technology.getDescription())) {
 			desc = technology.getDescription();
 		}
-		
-		List<ArtifactInfo> technoVersions= technology.getArchetypeInfo().getVersions();
-		for(ArtifactInfo technoVersion : technoVersions){
-			versions = technoVersion.getVersion();
-		}
+/* 
+		List<ArtifactInfo> technoVersions = technology.getArchetypeInfo().getVersions();
+		if (CollectionUtils.isNotEmpty(technoVersions)) {
+			for (ArtifactInfo technoVersion : technoVersions) {
+				versions = technoVersion.getVersion();
+			}
+		} */
 		/* if (CollectionUtils.isNotEmpty(technology.getVersions())) {
 			versions = technology.getVersions();
 		} */
@@ -124,8 +126,8 @@
 				class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.technologVersion' />
 			</label>
 			<div class="controls">
-				<input id="version" placeholder='<s:text name="place.hldr.archetype.add.technologyVersion"/>' class="input-xlarge" 
-					type="text" name="techVersion" value="<%= techVersion %>" maxlength="30" title="30 Characters only">
+				<input id="techVersion" placeholder='<s:text name="place.hldr.archetype.add.technologyVersion"/>' class="input-xlarge" 
+					type="text" name="techVersion" value="<%= CollectionUtils.isNotEmpty(techVersion) ? techVersion : "" %>" maxlength="30" title="30 Characters only">
 				<span class="help-inline" id="techvernError"></span>
 			</div>
 		</div>  
@@ -212,18 +214,14 @@
 			<span class="help-inline fileError" id="fileError"></span>
 		</div>
 		
-		<div class="control-group" id="pluginControl">
-			<label class="control-label labelbold"> <s:text
+		<div class="control-group" >
+		<label class="control-label labelbold"> <s:text
 					name='lbl.hdr.comp.plugindependencies' /> </label>
-			<div class="controls" style="float: left; margin-left: 3%;">
-				<div id="plugin-file-uploader" class="file-uploader">
-					<noscript>
-						<p>Please enable JavaScript to use file uploader.</p>
-						<!-- or put a simple form for upload here -->
-					</noscript> 
-				</div>
+			<div class="controls">
+				<input type="button" class="btn btn-primary" value="Upload PluginJar" 
+					onclick="uploadPluginJar();" />
 			</div>
-			<span class="help-inline pluginError" id="pluginError"></span>
+			<%-- <span class="help-inline pluginError" id="pluginError"></span> --%>
 		</div>
 	</div>
 
@@ -257,9 +255,10 @@
 	<input type="hidden" name="techId" value="<%= technology != null ? technology.getId() : "" %>"/>
 	<input type="hidden" name="oldName" value="<%= technology != null ? technology.getName() : "" %>"/>
 	<input type="hidden" name="customerId" value="<%= customerId %>">
-	<input type="hidden" name="groupId">
+	<input type="hidden" name="uploadPlugin" value="uploadPlugin">
+	<!-- <input type="hidden" name="groupId">
 	<input type="hidden" name="artifactId">
-	<input type="hidden" name="jarVersion">
+	<input type="hidden" name="jarVersion"> -->
 	
 </form>
 
@@ -292,9 +291,9 @@
         });
      
         // To remove the plugin jar file field
-        $('.del').live('click', function() {
+        /* $('.del').live('click', function() {
             $(this).parent().parent().remove();
-        });
+        }); */
     });
 
     function findError(data) {
@@ -331,10 +330,7 @@
 	function jarError(data, type) {
 		var controlObj;
 		var msgObj;
-		if (type == "pluginJar") {
-			controlObj = $("#pluginControl");
-			msgObj = $("#pluginError");
-		} else if (type == "applnJar") {
+		if (type == "applnJar") {
 			controlObj = $("#appFileControl");
 			msgObj = $("#fileError");
 		}
@@ -357,18 +353,6 @@
             params: {type: 'applnJar'}, 
             debug: true
         });
-		 
-		var pluginUploader = new qq.FileUploader({
-           	element: document.getElementById('plugin-file-uploader'),
-           	action: 'uploadJar',
-           	multiple: true,
-           	allowedExtensions : ["jar"],
-           	type: 'pluginJar',
-           	buttonLabel: '<s:text name="lbl.comp.arhtyp.upload" />',
-           	typeError : '<s:text name="err.invalid.jar.selection" />',
-			params: {type: 'pluginJar'}, 
-           	debug: true
-		});
    	}
    
 	function removeUploadedJar(obj) {
@@ -398,5 +382,12 @@
 			$('#appln-file-uploader').find("input[type='file']").attr('disabled', false);
 			$('#appln-file-uploader').find($(".btn")).removeClass("disabled").addClass("btn-primary qq-upload-button");
 		}
+	}
+	
+	function uploadPluginJar() {
+		$('#popup_div').show();
+		$('#popup_div').empty();
+		disableScreen();
+		loadContent('uploadPluginJar', $('#formArcheTypeAdd'), $('#popup_div'));
 	}
 </script>

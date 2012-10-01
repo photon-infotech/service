@@ -18,17 +18,31 @@
   ###
   --%>
 <%@ taglib uri="/struts-tags" prefix="s" %>
+  
+<%@ page import="java.util.List"%>
+<%@ page import="org.apache.commons.collections.CollectionUtils"%>
+<%@ page import="org.apache.commons.lang.StringUtils"%>
 
-<script language="JavaScript" type="text/javascript">
+<%@ page import="com.photon.phresco.commons.model.User" %> 
+<%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
 
-</script>
+<%
+   List<User> userList = (List<User>)request.getAttribute(ServiceUIConstants.REQ_USER_LIST);
+   System.out.println("UserList " +userList);
+%>
 
-<form class="form-horizontal customer_list">
+<form class="form-horizontal customer_list" id="userListForm">
 	<div class="operation" id="operation">
-		<input type="button" id="featuresAdd" class="btn btn-primary" name="features_add" value="<s:text name='lbl.hdr.adm.usrlst'/>"/>
+		<input type="button" id="featuresAdd" class="btn btn-primary" name="features_add" onclick="syncUsers();" value="<s:text name='lbl.hdr.adm.usrlst'/>"/>
 		<input type="button" id="del" class="btn" disabled value="<s:text name='lbl.hdr.adm.delete'/>"/>
 	</div>
-	
+	<%
+		if (CollectionUtils.isNotEmpty(userList)) {
+	%>
+	<div class="alert alert-block">
+		<s:text name='alert.msg.users.not.available' />
+	</div>
+	<% } else { %>
 	<div class="table_div">
 		<div class="fixed-table-container">
 			<div class="header-background"> </div>
@@ -55,76 +69,29 @@
 								</th>
 							</tr>
 						</thead>
-			
+			            <%
+			            	if(CollectionUtils.isNotEmpty(userList)) {
+			            		for(User user : userList) {
+			            %>
 						<tbody>
 						<tr>
 							<td class="checkboxwidth">
 								<input type="checkbox" class="check" name="check"  onclick="checkboxEvent();">
 							</td>
 							<td>
-								<a>Smith</a>
+								<a><%= StringUtils.isNotEmpty(user.getName()) ? user.getName() :"" %></a>
 							</td>
-							<td class="emailalign">smith@gmail.com</td>
-							<td>active</td>
-							<td  class = "tablealign">
-								<a data-toggle="modal" href="#myModal"><input type="button" class="btn btn-primary addiconAlign" value="Roles"></a>
-							</td>
-						</tr>
-						<tr>
-							<td>
-								<input type="checkbox" class="check" name="check" onclick="checkboxEvent();">
-							</td>
-							<td>
-								<a>David</a>
-							</td>
-							<td>david.s@gmail.com</td>
-							<td>active</td>
-							<td  class = "tablealign">
-								<a data-toggle="modal" href="#myModal"><input type="button" class="btn btn-primary addiconAlign" value="Roles"></a>
-							</td>
-						</tr>
-						<tr>
-							<td>
-								<input type="checkbox" class="check" name="check" onclick="checkboxEvent();">
-							</td>
-							<td>
-								<a>John</a>
-							</td>
-							<td>john@ymail.com</td>
-							<td>active</td>
-							<td  class = "tablealign">
-								<a data-toggle="modal" href="#myModal"><input type="button" class="btn btn-primary addiconAlign" value="Roles"></a>
-							</td>
-						</tr>
-						
-						<tr>
-							<td>
-								<input type="checkbox" class="check" name="check" onclick="checkboxEvent();">
-							</td>
-							<td>
-								<a>Peter</a>
-							</td>
-							<td>peter@yahoo.com</td>
-							<td>active</td>
-							<td  class = "tablealign">
-								<a data-toggle="modal" href="#myModal"><input type="button" class="btn btn-primary addiconAlign" value="Roles"></a>
-							</td>
-						</tr>
-						
-						<tr>
-							<td>
-								<input type="checkbox" class="check" name="check" onclick="checkboxEvent();">
-							</td>
-							<td>
-								<a>Will Smith</a>
-							</td>
-							<td>willsmith@gmail.com</td>
+							<td class="emailalign"><%= StringUtils.isNotEmpty(user.getEmail()) ? user.getEmail() :"" %></td>
 							<td>active</td>
 							<td  class = "tablealign">
 								<a data-toggle="modal" href="#myModal"><input type="button" class="btn btn-primary addiconAlign" value="Roles"></a>
 							</td>
 						</tr>
 					</tbody>
+				  <% 	
+					     }
+			          }
+			      %>
 				</table>
 				
 								
@@ -170,6 +137,7 @@
 			</div>
 		</div>
 	</div>
+	<% } %>
 </form>
 
 <script type="text/javascript">
@@ -300,5 +268,10 @@
 		if (NS4) {
 			history.go(0);
 		}
+	}
+	
+	function syncUsers() {
+		alert('sync');
+		loadContent("syncUser", $('#userListForm'), $('#popup_div'));
 	}
 </script>

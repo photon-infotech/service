@@ -19,8 +19,12 @@
  */
 package com.photon.phresco.service.admin.actions.admin;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 
+import com.photon.phresco.commons.model.User;
+import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 
 public class Users extends ServiceBaseAction { 
@@ -31,10 +35,22 @@ public class Users extends ServiceBaseAction {
     private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
 
     public String list() {
-        if (s_isDebugEnabled) {
-            S_LOGGER.debug("Entering Method Users.list()");
-        }
-        
-		return ADMIN_USER_LIST;	
-	}
+    	if (s_isDebugEnabled) {
+    		S_LOGGER.debug("Entering Method Users.list()");
+    	}
+
+    	try {
+    		List<User> userList = getServiceManager().getUsers();
+    		setReqAttribute(REQ_USER_LIST, userList);
+    	} catch (PhrescoException e) {
+    		return showErrorPopup(e, EXCEPTION_USERS_LIST);
+    	}
+
+    	return ADMIN_USER_LIST;	
+    }
+    
+    public String syncUsers(){
+    	
+    	return "";
+    }
 }

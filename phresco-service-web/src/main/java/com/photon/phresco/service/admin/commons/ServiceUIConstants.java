@@ -91,6 +91,12 @@ public interface ServiceUIConstants {
     String REQ_CUST_CUSTOMERS = "customers";
     String REQ_CUST_CUSTOMER_ID = "customerId";
     
+    /*****************************
+     * Users Request Constants
+     * String REQ_USER_XXX
+     *****************************/ 
+    String REQ_USER_LIST = "userList";
+    
     
     /*****************************
      * ConfigTemp Request Constants
@@ -196,6 +202,8 @@ public interface ServiceUIConstants {
 	String EXCEPTION_CUSTOMERS_ADD = "Customers add";
 	String EXCEPTION_CUSTOMERS_LIST = "Customers list";
 	String EXCEPTION_CUSTOMERS_VALIDATE = "Customers validateForm";
+	
+	String EXCEPTION_USERS_LIST = "User list";
     
 	String EXCEPTION_ROLE_DELETE = "Role delete";
 	String EXCEPTION_ROLE_UPDATE = "Role update";
