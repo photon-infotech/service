@@ -36,13 +36,18 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
 import com.google.gson.Gson;
+import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.DownloadInfo;
 import com.photon.phresco.commons.model.PlatformType;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.api.DbService;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
+import com.photon.phresco.service.converters.ConvertersFactory;
+import com.photon.phresco.service.dao.ArtifactGroupDAO;
+import com.photon.phresco.service.dao.DownloadsDAO;
 
 public class SoftwareDownloadGenerator extends DbService {
 
@@ -106,7 +111,6 @@ public class SoftwareDownloadGenerator extends DbService {
 		HSSFSheet downLoadInfoSheet = workbook.getSheet(DOWNLOADS);
 
 		Iterator<Row> rowIterator = downLoadInfoSheet.iterator();
-		List<DownloadInfo> infos = new ArrayList<DownloadInfo>();
 		DownloadInfo info = null;
 		for (int i = 0; i < noofRows; i++) {
 			rowIterator.next();
@@ -114,15 +118,38 @@ public class SoftwareDownloadGenerator extends DbService {
 		while (rowIterator.hasNext()) {
 			Row row = rowIterator.next();
 			info = createDownloadInfo(row);
-			mongoOperation.save(DOWNLOAD_COLLECTION_NAME, info);
-			infos.add(info);
-			uploadSoftwareFileToRepository(info);
+			saveDownloads(info);
+			uploadSoftwareFileToRepository(info.getArtifactGroup());
 		}
-		System.out.println(new Gson().toJson(infos));
 	}
 
-//	// To Deploy Files Set Java VM Argument As -Xmx1300m -Xms300m
-	private void uploadSoftwareFileToRepository(DownloadInfo info) throws PhrescoException {
+	private void saveDownloads(DownloadInfo info) throws PhrescoException {
+		Converter<DownloadsDAO, DownloadInfo> downlodConverter = 
+			(Converter<DownloadsDAO, DownloadInfo>) ConvertersFactory.getConverter(DownloadsDAO.class);
+		DownloadsDAO downloadDAO = downlodConverter.convertObjectToDAO(info);
+		ArtifactGroup artifactGroup = info.getArtifactGroup();
+		saveArtifactGroup(artifactGroup);
+		mongoOperation.save(DOWNLOAD_COLLECTION_NAME, downloadDAO);
+	}
+	
+	private void saveArtifactGroup(ArtifactGroup artifactGroup) throws PhrescoException {
+        List<ArtifactInfo> versions = artifactGroup.getVersions();
+        List<String> versionIds = new ArrayList<String>();
+        Converter<ArtifactGroupDAO, ArtifactGroup> converter = 
+            (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
+        ArtifactGroupDAO moduleGroupDAO = converter.convertObjectToDAO(artifactGroup);
+        String id2 = moduleGroupDAO.getId();
+        for (ArtifactInfo module : versions) {
+        	versionIds.add(module.getId());
+            module.setArtifactGroupId(id2);
+            mongoOperation.save(ARTIFACT_INFO_COLLECTION_NAME, module);
+        }
+        moduleGroupDAO.setVersionIds(versionIds);
+      mongoOperation.save(ARTIFACT_GROUP_COLLECTION_NAME, moduleGroupDAO);
+    }
+	
+	//	// To Deploy Files Set Java VM Argument As -Xmx1300m -Xms300m
+	private void uploadSoftwareFileToRepository(ArtifactGroup info) throws PhrescoException {
 	    if(deployArtifacts == false) {
             return;
         }
@@ -149,6 +176,8 @@ public class SoftwareDownloadGenerator extends DbService {
     		name = getValue(cell);
     		info.setName(name);
     	}
+		
+		String id = "downloads_" + name.toLowerCase().replace(" ", "-");
 		
 		if(next.getCell(2) != null) {
     		Cell cell = next.getCell(2);
@@ -201,25 +230,30 @@ public class SoftwareDownloadGenerator extends DbService {
 		String groupId = "";
 		String artifactId  = "";
 		String packaging = "zip";
+		
+		ArtifactGroup artifactGroup = new ArtifactGroup();
 		if(next.getCell(9) != null) {
     		Cell cell = next.getCell(9);
     		packaging = getValue(cell);
-    		info.setPackaging(packaging);
+    		artifactGroup.setPackaging(packaging);
     		groupId = "downloads.files";
     		artifactId  = name.toLowerCase().replace(" ", "");
     	}
 		
 		List<ArtifactInfo> createArticatInfo = createArticatInfo(versions, info.getId(), size);
 		
-		info.setVersions(createArticatInfo);
-		info.setGroupId(groupId);
-		info.setArtifactId(artifactId);
-		info.setPackaging(packaging);
-		info.setDescription(description);
+		artifactGroup.setId(id);
+		artifactGroup.setVersions(createArticatInfo);
+		artifactGroup.setGroupId(groupId);
+		artifactGroup.setArtifactId(artifactId);
+		artifactGroup.setPackaging(packaging);
+		artifactGroup.setDescription(description);
+		info.setId(id);
 		info.setSystem(true);
 		List<String> customerIds = new ArrayList<String>();
 		customerIds.add("photon");
 		info.setCustomerIds(customerIds);
+		info.setArtifactGroup(artifactGroup);
 		
 		return info;
 

@@ -64,6 +64,7 @@ import com.photon.phresco.service.client.api.Content;
 import com.photon.phresco.service.client.api.Content.Type;
 import com.photon.phresco.service.converters.ConvertersFactory;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
+import com.photon.phresco.service.dao.DownloadsDAO;
 import com.photon.phresco.service.dao.TechnologyDAO;
 import com.photon.phresco.service.model.ArtifactInfo;
 import com.photon.phresco.service.util.ServerUtil;
@@ -1394,11 +1395,17 @@ public class ComponentService extends DbService {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.findDownloadInfo()");
         }
-        
+        List<DownloadInfo> downloads = new ArrayList<DownloadInfo>();
         try {
-            List<DownloadInfo> downloadList = mongoOperation.getCollection(DOWNLOAD_COLLECTION_NAME, DownloadInfo.class);
+            List<DownloadsDAO> downloadList = mongoOperation.getCollection(DOWNLOAD_COLLECTION_NAME, DownloadsDAO.class);
             if (downloadList != null) {
-                return Response.status(Response.Status.OK).entity(downloadList).build();
+            	Converter<DownloadsDAO, DownloadInfo> downloadConverter = 
+            		(Converter<DownloadsDAO, DownloadInfo>) ConvertersFactory.getConverter(DownloadsDAO.class);
+            	for (DownloadsDAO downloadsDAO : downloadList) {
+					DownloadInfo downloadInfo = downloadConverter.convertDAOToObject(downloadsDAO, mongoOperation);
+					downloads.add(downloadInfo);
+				}
+                return Response.status(Response.Status.OK).entity(downloads).build();
             } 
         } catch (Exception e) {
             throw new PhrescoWebServiceException(e, EX_PHEX00006, DOWNLOAD_COLLECTION_NAME);
@@ -1422,7 +1429,11 @@ public class ComponentService extends DbService {
             S_LOGGER.debug("Entered into ComponentService.createModules(List<ModuleGroup> modules)");
         }
         
-        DownloadInfo downloadInfo = null;
+        return createOrUpdateDownloads(downloadPart);
+    }
+    
+    private Response createOrUpdateDownloads(MultiPart downloadPart) throws PhrescoException {
+    	DownloadInfo downloadInfo = null;
         BodyPartEntity bodyPartEntity = null;
         File downloadFile = null;
         
@@ -1440,17 +1451,31 @@ public class ComponentService extends DbService {
         
         if(bodyPartEntity != null) {
             downloadFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null);
+            boolean uploadBinary = uploadBinary(downloadInfo.getArtifactGroup(), downloadFile);
+            if(uploadBinary) {
+                saveDownloads(downloadInfo);
+            }
+            saveDownloads(downloadInfo);
+            FileUtil.delete(downloadFile);
         }
         
-        boolean uploadBinary = uploadBinary(downloadInfo, downloadFile);
-        if(uploadBinary) {
-            mongoOperation.save(DOWNLOAD_COLLECTION_NAME, downloadInfo);
+        if(bodyPartEntity == null && downloadInfo != null) {
+        	saveDownloads(downloadInfo);
         }
         
-        FileUtil.delete(downloadFile);
         return Response.status(Response.Status.CREATED).build();
-    }
+		
+	}
 
+	private void saveDownloads(DownloadInfo info) throws PhrescoException {
+		Converter<DownloadsDAO, DownloadInfo> downlodConverter = 
+			(Converter<DownloadsDAO, DownloadInfo>) ConvertersFactory.getConverter(DownloadsDAO.class);
+		DownloadsDAO downloadDAO = downlodConverter.convertObjectToDAO(info);
+		ArtifactGroup artifactGroup = info.getArtifactGroup();
+		saveModuleGroup(artifactGroup);
+		mongoOperation.save(DOWNLOAD_COLLECTION_NAME, downloadDAO);
+	}
+    
     /**
      * Updates the list of downloadInfos
      * @param downloads
