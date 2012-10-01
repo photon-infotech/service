@@ -41,6 +41,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
@@ -867,35 +868,44 @@ public class ComponentService extends DbService {
         List<com.photon.phresco.commons.model.ArtifactInfo> moduleGroupVersions = moduleGroup.getVersions();
         List<String> versionIds = new ArrayList<String>();
         
-        for (com.photon.phresco.commons.model.ArtifactInfo info : moduleGroupVersions) {
-			versionIds.add(info.getId());
-		}
-        
         ArtifactGroupDAO moduleDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
-		        new Query(Criteria.where("name").is(moduleGroupDAO.getName())), ArtifactGroupDAO.class);
+		        new Query(Criteria.where("id").is(moduleGroupDAO.getId())), ArtifactGroupDAO.class);
+        com.photon.phresco.commons.model.ArtifactInfo newVersion = moduleGroup.getVersions().get(0);
+        
         if(moduleDAO != null) {
+        	versionIds.addAll(moduleDAO.getVersionIds());
         	List<com.photon.phresco.commons.model.ArtifactInfo> info = mongoOperation.find(ARTIFACT_INFO_COLLECTION_NAME, 
         			new Query(Criteria.where("artifactGroupId").is(moduleDAO.getId())), com.photon.phresco.commons.model.ArtifactInfo.class);
-        	List<com.photon.phresco.commons.model.ArtifactInfo> versions = new ArrayList<com.photon.phresco.commons.model.ArtifactInfo>();
-        	com.photon.phresco.commons.model.ArtifactInfo version = moduleGroup.getVersions().get(0);
-        	version.setArtifactGroupId(moduleDAO.getId());
-        	versions.add(version);
-        	info.addAll(versions);
-        	for (com.photon.phresco.commons.model.ArtifactInfo artifactInfo : info) {
-        		mongoOperation.save(ARTIFACT_INFO_COLLECTION_NAME, artifactInfo);
-			}
         	
-        } else {
-	        for (com.photon.phresco.commons.model.ArtifactInfo module : moduleGroup.getVersions()) {
-	            module.setArtifactGroupId(moduleGroupDAO.getId());
-	            mongoOperation.save(ARTIFACT_INFO_COLLECTION_NAME, module);
-	        }
-	        
-	        moduleGroupDAO.setVersionIds(versionIds);
-	        mongoOperation.save(ARTIFACT_GROUP_COLLECTION_NAME, moduleGroupDAO);
+        	List<com.photon.phresco.commons.model.ArtifactInfo> versions = new ArrayList<com.photon.phresco.commons.model.ArtifactInfo>();
+        	newVersion.setArtifactGroupId(moduleDAO.getId());
+        	versions.add(newVersion);
+        	info.addAll(versions);
+        	
+        	String id = checkVersionAvailable(info, newVersion.getVersion());
+        	if(id == newVersion.getId()) {
+        		versionIds.add(newVersion.getId());
+        	}
+			newVersion.setId(id);
+    		mongoOperation.save(ARTIFACT_INFO_COLLECTION_NAME, newVersion);
+        }  else {
+        		versionIds.add(newVersion.getId());
+        		newVersion.setArtifactGroupId(moduleGroupDAO.getId());
+                mongoOperation.save(ARTIFACT_INFO_COLLECTION_NAME, newVersion);
         }
+        
+        moduleGroupDAO.setVersionIds(versionIds);
+        mongoOperation.save(ARTIFACT_GROUP_COLLECTION_NAME, moduleGroupDAO);
     }
-    
+
+	private String checkVersionAvailable(List<com.photon.phresco.commons.model.ArtifactInfo> info, String version) {
+		for (com.photon.phresco.commons.model.ArtifactInfo artifactInfo : info) {
+			if(artifactInfo.getVersion().equals(version)) {
+				return artifactInfo.getId();
+			}
+		}
+		return null;
+	}
 
 	/**
 	 * Updates the list of modules
@@ -1108,7 +1118,7 @@ public class ComponentService extends DbService {
 	        S_LOGGER.debug("Entered into ComponentService.updatePilots(List<ProjectInfo> pilots)");
 	    }
 	    
-		return createOrUpdateFeatures(pilotInfo);
+		return createOrUpdatePilots(pilotInfo);
 	}
 	
 	/**
