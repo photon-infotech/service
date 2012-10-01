@@ -152,6 +152,13 @@ public interface ServiceUIConstants {
     
     
     /*****************************
+     * Role Request Constants
+     * String REQ_VIDEO_XXX
+     *****************************/ 
+    String REQ_VIDEO_FILE_TYPE = "type";
+    String REQ_VIDEO_UPLOAD = "uploadVideo";
+    
+    /*****************************
      * GlobalUrl Request Constants
      * String REQ_GLOBURL_XXX
      *****************************/ 
@@ -320,10 +327,8 @@ public interface ServiceUIConstants {
     String ARCHETYPE_NOT_DELETED = "fail.archetype.delete" ;
     
     String PLTPROJ_ADDED = "succ.pltproj.add";
-    String PLTPROJ_NOT_ADDED = "fail.pltproj.add";
+    String PLTPROJ_UPDATED = "succ.pltproj.updated";
     String PLTPROJ_DELETED = "succ.pltproj.delete";
-    String PLTPROJ_NOT_DELETED = "fail.pltproj.delete";
-    
     
     String CUSTOMER_ADDED = "succ.customer.add";
     String CUSTOMER_UPDATED = "succ.customer.update";

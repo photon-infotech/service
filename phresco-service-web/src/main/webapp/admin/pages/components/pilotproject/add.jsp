@@ -32,7 +32,7 @@
 <% 
     ApplicationInfo pilotProjectInfo = (ApplicationInfo)request.getAttribute(ServiceUIConstants.REQ_PILOT_PROINFO); 
 	String fromPage = (String)request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE); 
-	List<Technology> technologys = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
+	List<Technology> technologies = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
 
 	//For edit
@@ -79,18 +79,18 @@
 				<s:text name='lbl.hdr.comp.desc'/>
 			</label>
 			<div class="controls">
-				<textarea id="pilotDesc" placeholder="<s:text name='place.hldr.pilot.add.desc'/>" value="<%= description %>" 
-					maxlength="150" title="150 Characters only" class="input-xlarge" type="text" name="description"></textarea>
+				<textarea id="pilotDesc" placeholder="<s:text name='place.hldr.pilot.add.desc'/>"  
+					maxlength="150" title="150 Characters only" class="input-xlarge" type="text" name="description"><%= description %></textarea>
 			</div>
 		</div>
 		
-		<div class="control-group" id="nameControl">
+		<div class="control-group" id="versionControl">
 			<label class="control-label labelbold">
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.version'/>
 			</label>
 			<div class="controls">
 				<input id="versionname" placeholder="<s:text name='place.hldr.pilot.add.version'/>" value="<%= version %>" maxlength="30" title="30 Characters only" class="input-xlarge" type="text" name="version">
-				<span class="help-inline" id="nameError"></span>
+				<span class="help-inline" id="versionError"></span>
 			</div>
 		</div>
 
@@ -99,25 +99,25 @@
 				class="mandatory">*</span>&nbsp;<s:text name="Technology" /> </label>
 			<div class="controls">
 				<select id="multiSelect" name="techId" id="tech">
-					
-				 	<% if(StringUtils.isNotEmpty(fromPage)) { //for edit 
-				 	     
-				 	        List<CoreOption> techIds = pilotProjectInfo.getPilotContent().getAppliesTo();
-				 	         for(CoreOption techId : techIds){
-				 	     
-				 	%>
-							<option value="<%= pilotProjectInfo.getTechInfo().getVersion() %>"><%= techId.getTechId() %></option>
-					<%     }
-					     } else { // for add %>		
-						<% if (technologys != null) {
-								for (Technology technology : technologys) { 
-							%>
-									<option value="<%=technology.getId() %>"><%=technology.getName() %></option>
-							<%
-									}
-								}
-							%>
-					<% } %>		
+				 	<%
+				 	String techId = "";
+				 	if(StringUtils.isNotEmpty(fromPage)) { 
+				 		techId = pilotProjectInfo.getTechInfo().getVersion();
+				   	}
+				 	if (technologies != null) {
+				 		String selectedStr = "";
+						for (Technology technology : technologies) { 
+							if (techId.equals(technology.getId())) {
+								selectedStr = "selected";
+							} else {
+								selectedStr = "";
+							}
+					%>
+						<option value="<%=technology.getId() %>" <%= selectedStr %>><%=technology.getName() %></option>
+					<%
+							}
+						}
+					%>
 				</select><span class="help-inline applyerror" id="techError"></span>
 			</div>
 		</div>
@@ -222,13 +222,17 @@
 	});
 
 	function findError(data) {
-		if (data.nameError != undefined) {
+		if (!isBlank(data.nameError)) {
 			showError($("#nameControl"), $("#nameError"), data.nameError);
 		} else {
 			hideError($("#nameControl"), $("#nameError"));
 		}
-		 
-		if (data.fileError != undefined) {
+		if (!isBlank(data.verError)) {
+			showError($("#versionControl"), $("#versionError"), data.verError);
+		} else {
+			hideError($("#versionControl"), $("#versionError"));
+		}
+		if (!isBlank(data.fileError)) {
 			showError($("#pilotProFileControl"), $("#pilotProFileError"), data.fileError);
 		} else {
 			hideError($("#pilotProFileControl"), $("#pilotProFileError"));

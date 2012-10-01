@@ -26,8 +26,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.ws.rs.core.MediaType;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -41,9 +39,7 @@ import com.photon.phresco.commons.model.TechnologyInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.client.api.Content;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.multipart.BodyPart;
-import com.sun.jersey.multipart.MultiPart;
+import com.photon.phresco.service.client.api.ServiceManager;
 
 public class PilotProjects extends ServiceBaseAction { 
 	
@@ -60,6 +56,7 @@ public class PilotProjects extends ServiceBaseAction {
     private String jarVersion = "";
     
 	private String nameError = "";
+	private String verError = "";
 	private String fileError = "";
 	private boolean errorFound = false;
 	
@@ -71,9 +68,13 @@ public class PilotProjects extends ServiceBaseAction {
 	private String techId = "";
 	private String oldName = "";
 	
-	private static byte[] pilotProByteArray = null;
-	private static String pilotProJarName = null;
-
+	private static byte[] s_pilotProByteArray = null;
+	
+	 /**
+     * To get all Pilot Projects form DB
+     * @return List of Pilot Projects
+     * @throws PhrescoException
+     */
 	public String list() throws PhrescoException {
         if (s_isDebugEnabled) {
             S_LOGGER.debug("Entering Method PilotProjects.list()");
@@ -88,12 +89,16 @@ public class PilotProjects extends ServiceBaseAction {
 		}
 		
 		//to clear file input stream and byte array
-		pilotProJarName = null;
-		pilotProByteArray = null;
+		s_pilotProByteArray = null;
 		
 		return COMP_PILOTPROJ_LIST;
 	}
 	
+	 /**
+     * To return to the page to add Pilot projects
+     * @return 
+     * @throws PhrescoException
+     */
     public String add() throws PhrescoException {
     	if (s_isDebugEnabled) {	
     		S_LOGGER.debug("Entering Method PilotProjects.add()");
@@ -109,14 +114,21 @@ public class PilotProjects extends ServiceBaseAction {
     	return COMP_PILOTPROJ_ADD;
     }
 	
+    /**
+	 * To return the edit page with the details of the selected Pilot Projects
+	 * @return
+	 * @throws PhrescoException
+	 */
     public String edit() throws PhrescoException {
     	if (s_isDebugEnabled) {
     		S_LOGGER.debug("Entering Method PilotProjects.edit()");
     	}
-
     	try {
-    		ApplicationInfo applicationInfo = getServiceManager().getPilotProject(getProjectId(), getCustomerId());
+    		ServiceManager serviceManager = getServiceManager();
+			ApplicationInfo applicationInfo = serviceManager.getPilotProject(getProjectId(), getCustomerId());
     		setReqAttribute(REQ_PILOT_PROINFO, applicationInfo);
+    		List<Technology> technologies = serviceManager.getArcheTypes(getCustomerId());
+    		setReqAttribute(REQ_ARCHE_TYPES, technologies);
     		setReqAttribute(REQ_FROM_PAGE, EDIT);
     	} catch (PhrescoException e) {
     		return showErrorPopup(e, EXCEPTION_PILOT_PROJECTS_EDIT);
@@ -125,32 +137,40 @@ public class PilotProjects extends ServiceBaseAction {
     	return COMP_PILOTPROJ_ADD;
     }
     
+    /**
+	 * To create a pilot projects with the provided details
+	 * @return List of pilot projects
+	 * @throws PhrescoException
+	 */
     public String save() throws PhrescoException {
     	if (s_isDebugEnabled) {
     		S_LOGGER.debug("Entering Method PilotProjects.save()");
     	}
     	
     	try {
-    		ClientResponse clientResponse = getServiceManager().createPilotProjects(createMultiPart(), getCustomerId());
-    		if (clientResponse.getStatus() != RES_CODE_200 && clientResponse.getStatus() != RES_CODE_201  ) {
-    			addActionError(getText(PLTPROJ_NOT_ADDED, Collections.singletonList(getName())));
-    		} else {
-    			addActionMessage(getText(PLTPROJ_ADDED, Collections.singletonList(getName())));
-    		}
+    		InputStream pilotProIs = new ByteArrayInputStream(s_pilotProByteArray);
+    		getServiceManager().createPilotProjects(createPilotProj(), pilotProIs, getCustomerId());
+			addActionMessage(getText(PLTPROJ_ADDED, Collections.singletonList(getName())));
     	} catch (PhrescoException e) {
     		return showErrorPopup(e, EXCEPTION_PILOT_PROJECTS_SAVE);
 		}
 
     	return list();
     }
-
+    
+    /**
+	 * To update the pilot projects with the provided details
+	 * @return List of pilot projects
+	 * @throws PhrescoException
+	 */
     public String update() throws PhrescoException {
     	if (s_isDebugEnabled) {
     		S_LOGGER.debug("Entering Method  PilotProjects.update()");
     	}
-
     	try {
-    		getServiceManager().updatePilotProject(createMultiPart(), getProjectId(), getCustomerId());
+    		InputStream pilotProIs = new ByteArrayInputStream(s_pilotProByteArray);
+    		getServiceManager().updatePilotProject(createPilotProj(), pilotProIs, getProjectId(), getCustomerId());
+    		addActionMessage(getText(PLTPROJ_UPDATED, Collections.singletonList(getName())));
     	} catch (PhrescoException e) {
     		return showErrorPopup(e, EXCEPTION_PILOT_PROJECTS_UPDATE);
 		}
@@ -158,25 +178,22 @@ public class PilotProjects extends ServiceBaseAction {
     	return list();
     }
     
-    private MultiPart createMultiPart() throws PhrescoException {
-        MultiPart multiPart = new MultiPart();
-        
+    private ApplicationInfo createPilotProj() throws PhrescoException {
         ApplicationInfo pilotProInfo = new ApplicationInfo();
-        if (StringUtils.isNotEmpty(getFromPage())) {
-            pilotProInfo.setId(getProjectId());
+        if (StringUtils.isNotEmpty(fromPage)) { 
+        	pilotProInfo.setId(getProjectId());
         }
         pilotProInfo.setName(getName());
         pilotProInfo.setDescription(getDescription());
         pilotProInfo.setVersion(getVersion());
-        //pilotProInfo.setTechId(techId);
         
         ArtifactGroup pilotContent = new ArtifactGroup();
         pilotContent.setGroupId(getGroupId());
         pilotContent.setArtifactId(getArtifactId());
-        pilotContent.setPackaging("zip");
+        pilotContent.setPackaging(Content.Type.ZIP.name());
         List<String> customerIds = new ArrayList<String>();
         customerIds.add(getCustomerId());
-        pilotContent.setCustomerIds(customerIds);
+        pilotProInfo.setCustomerIds(customerIds);
         
         List<ArtifactInfo> jarVersions = new ArrayList<ArtifactInfo>();
         ArtifactInfo jarVersion = new ArtifactInfo();
@@ -189,35 +206,24 @@ public class PilotProjects extends ServiceBaseAction {
         techInfo.setVersion(getTechId());
         pilotProInfo.setTechInfo(techInfo);
         
-        BodyPart jsonPart = new BodyPart();
-        jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
-        jsonPart.setEntity(pilotProInfo);
-        Content content = new Content(Content.Type.JSON, getName(), null, null, null, 0);
-        jsonPart.setContentDisposition(content);
-        multiPart.bodyPart(jsonPart);
-        
-        if (StringUtils.isNotEmpty(pilotProJarName)) {
-            InputStream pilotProIs = new ByteArrayInputStream(pilotProByteArray);
-            BodyPart bodyPart = getServiceManager().createBodyPart(getName(), Content.Type.JAR, pilotProIs );
-            multiPart.bodyPart(bodyPart);
-        }
-        
-        return multiPart;
+        return pilotProInfo;
     }
 	
+    /**
+	 * To delete selected pilot projects 
+	 * @return List of pilot projects
+	 * @throws PhrescoException
+	 */
     public String delete() throws PhrescoException {
     	if (s_isDebugEnabled) {
     		S_LOGGER.debug("Entering Method PilotProjects.delete()");
     	}
-
+    	
     	try {
     		String[] projectIds = getHttpRequest().getParameterValues(REQ_PILOT_PROJ_ID);
     		if (ArrayUtils.isNotEmpty(projectIds)) {
     			for (String projectId : projectIds) {
-    				ClientResponse clientResponse =getServiceManager().deletePilotProject(projectId, getCustomerId());
-    				if (clientResponse.getStatus() != RES_CODE_200) {
-    					addActionError(getText(PLTPROJ_NOT_DELETED));
-    				}
+    				getServiceManager().deletePilotProject(projectId, getCustomerId());
     			}
     			addActionMessage(getText(PLTPROJ_DELETED));
     		}
@@ -228,47 +234,51 @@ public class PilotProjects extends ServiceBaseAction {
     	return list();
     }
     
+    /**
+	 * To upload file
+	 * @return
+	 * @throws PhrescoException
+	 */
     public String uploadFile() throws PhrescoException {
     	if (s_isDebugEnabled) {
-			S_LOGGER.debug("Entering Method  PilotProjects.uploadFile()");
-		}
-    	
+    	S_LOGGER.debug("Entering Method PilotProjects.uploadFile()");
+    	}
+
     	PrintWriter writer = null;
-		try {
-            writer = getHttpResponse().getWriter();
-	        pilotProJarName = getHttpRequest().getHeader(X_FILE_NAME);
-	        if (pilotProJarName.endsWith(REQ_JAR_FILE_EXTENSION) || pilotProJarName.endsWith(REQ_ZIP_FILE_EXTENSION) 
-	        		|| pilotProJarName.endsWith(REQ_TAR_GZ_FILE_EXTENSION)) {
-	        	InputStream is = getHttpRequest().getInputStream();
-	        	pilotProByteArray = IOUtils.toByteArray(is);
-	            getHttpResponse().setStatus(getHttpResponse().SC_OK);
-	            writer.print(SUCCESS_TRUE);
-		        writer.flush();
-		        writer.close();
-	        }
-		} catch (Exception e) {
-			getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
-            writer.print(SUCCESS_FALSE);
-			throw new PhrescoException(e);
-		}
-		
-		return SUCCESS;
-	}
+    	try {
+    		writer = getHttpResponse().getWriter();
+    		InputStream is = getHttpRequest().getInputStream();
+    		s_pilotProByteArray = IOUtils.toByteArray(is);
+    		getHttpResponse().setStatus(getHttpResponse().SC_OK);
+    		writer.print(SUCCESS_TRUE);
+    		writer.flush();
+    		writer.close();
+    	} catch (Exception e) {
+    		getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
+    		writer.print(SUCCESS_FALSE);
+    		throw new PhrescoException(e);
+    	}
+
+    	return SUCCESS;
+    }
 	
+    /**
+	 * To remove uploaded file
+	 * @return
+	 * @throws PhrescoException
+	 */
 	public void removeUploadedFile() {
 		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  PilotProjects.removeUploadedFile()");
 		}
 		
-		pilotProJarName = null;
-		pilotProByteArray = null;
+		s_pilotProByteArray = null;
 	}
 	
     public String validateForm() throws PhrescoException {
     	if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  PilotProjects.validateForm()");
 		}
-    	
     	boolean isError = false;
     	//Empty validation for name
     	if (StringUtils.isEmpty(getName())) {
@@ -287,7 +297,13 @@ public class PilotProjects extends ServiceBaseAction {
 				}	
 			}
     	}
-    	if (StringUtils.isEmpty(pilotProJarName) || pilotProJarName == null) {
+    	//empty validation for version
+    	if (StringUtils.isEmpty(getVersion())) {
+    		setVerError(getText(KEY_I18N_ERR_VER_EMPTY ));
+    		isError = true;
+    	}
+    	//empty validation for fileupload
+    	if (s_pilotProByteArray == null) {
     		setFileError(getText(KEY_I18N_ERR_PLTPROJ_EMPTY));
     		isError = true;
     	}
@@ -409,5 +425,13 @@ public class PilotProjects extends ServiceBaseAction {
 
 	public void setVersion(String version) {
 		this.version = version;
+	}
+
+	public String getVerError() {
+		return verError;
+	}
+
+	public void setVerError(String verError) {
+		this.verError = verError;
 	}
 }

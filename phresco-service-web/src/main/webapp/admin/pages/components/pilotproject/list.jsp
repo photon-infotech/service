@@ -28,6 +28,7 @@
 <%@ page import="com.photon.phresco.commons.model.CoreOption" %>
 <%@ page import="com.photon.phresco.commons.model.ApplicationInfo"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
+<%@ page import="com.photon.phresco.commons.model.TechnologyInfo"%>
 
 <%
 	List<ApplicationInfo> pilotProjectInfo = (List<ApplicationInfo>) request.getAttribute(ServiceUIConstants.REQ_PILOT_PROJECTS);
@@ -103,12 +104,9 @@
 										<a href="#" onclick="editPilotProject('<%=proInfo.getId() %>');" name="edit" id=""><%=proInfo.getName()%></a>
 									</td>
 									<td><%= StringUtils.isNotEmpty(proInfo.getDescription()) ? proInfo.getDescription() : ""%></td>
-									<% 
-										List<CoreOption> techIds = proInfo.getPilotContent().getAppliesTo();
-						 	         	for(CoreOption techId : techIds){
+									<%  TechnologyInfo techId = proInfo.getTechInfo();
 									%>
-									<td><%= techId.getTechId() %></td>
-									<% } %>
+									<td><%= techId.getVersion() %></td>
 								</tr>
 						<%			
 								}
