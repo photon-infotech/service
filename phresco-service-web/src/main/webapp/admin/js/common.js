@@ -50,7 +50,6 @@ function loadContent(pageUrl, form, tag, additionalParams, callSuccessEvent) {
 		url : pageUrl,
 		data : params,
 		type : "POST",
-		dataType: "html",
 		success : function(data) {
 			loadData(data, tag, pageUrl, callSuccessEvent);
 		}

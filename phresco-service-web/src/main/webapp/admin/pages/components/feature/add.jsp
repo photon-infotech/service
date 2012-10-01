@@ -37,6 +37,7 @@
     String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
     String type = (String) request.getAttribute(ServiceUIConstants.REQ_FEATURES_TYPE);
     String selectedModuleId = (String) request.getAttribute(ServiceUIConstants.REQ_FEATURES_SELECTED_MODULEID);
+    String selectedTechnology = (String) request.getAttribute(ServiceUIConstants.FEATURES_SELECTED_TECHNOLOGY);
     
   	//For edit
   	String moduleId = "";
@@ -46,10 +47,12 @@
     String version = "";
     String groupId = "";
     String artifactId = "";
-    String selectedTechnology = "";
     boolean isDefaultModule = false;
+    boolean isCoreModule = false;
     boolean isSystem = false;
 	if (moduleGroup != null) {
+	    name = moduleGroup.getName();
+	    
 	    List<ArtifactInfo> modules = moduleGroup.getVersions();
 	    ArtifactInfo selectedModule = null;
 	    if (CollectionUtils.isNotEmpty(modules)) {
@@ -60,13 +63,16 @@
 	            }
 	        }
 	        moduleId = selectedModule.getId();
-			name = selectedModule.getName();
 			
-			List<RequiredOption> isDefaults = selectedModule.getAppliesTo();
-			
-			for(RequiredOption isDefault : isDefaults) {
-			    isDefaultModule = isDefault.isRequired();
-			}
+	        //To get whether the selected module is default for the currently selected technology
+	        List<RequiredOption> requiredOptions = selectedModule.getAppliesTo();
+	        if (CollectionUtils.isNotEmpty(requiredOptions)) {
+				for(RequiredOption requiredOption : requiredOptions) {
+				    if (requiredOption.getTechId().equals(selectedTechnology)) {
+				    	isDefaultModule = requiredOption.isRequired();
+				    }
+				}
+	        }
 			
 			if (selectedModule.getDescription() != null) {
 				description = selectedModule.getDescription();
@@ -76,10 +82,15 @@
 			}
 	    }
 		
-	    List<CoreOption> selectedTechnologies = moduleGroup.getAppliesTo();
-	     for(CoreOption selectedTech : selectedTechnologies){
-	    	 selectedTechnology = selectedTech.getTechId();
-	     }
+	  	//To get whether the selected module is core for the currently selected technology
+	    List<CoreOption> coreOptions = moduleGroup.getAppliesTo();
+	    if (CollectionUtils.isNotEmpty(coreOptions)) {
+			for (CoreOption coreOption : coreOptions) {
+		    	if (coreOption.getTechId().equals(selectedTechnology)) {
+		    	    isCoreModule = coreOption.isCore();
+		    	}
+		    }
+	    }
 		
 		isSystem = moduleGroup.isSystem();
 	}
@@ -153,7 +164,7 @@
 			<div class="controls">
 				<select name="technology">
 				<%
-					if (technologies != null) {
+					if (CollectionUtils.isNotEmpty(technologies)) {
 					    String selectedStr = "";
 						for (Technology technology : technologies) {
 						    if (technology.getId().equals(selectedTechnology)) {
@@ -179,8 +190,8 @@
 				</label>
 				<div class="controls">
 					<select name="moduleType" id="type">
-				        <option value="core">Core Module</option>
-				        <option value="custom">Custom Module</option>
+				        <option value="core"><s:text name="lbl.comp.featr.type.core" /></option>
+				        <option value="custom"><s:text name="lbl.comp.featr.type.custom" /></option>
 	     		 	</select>
 				</div>
 			</div>
