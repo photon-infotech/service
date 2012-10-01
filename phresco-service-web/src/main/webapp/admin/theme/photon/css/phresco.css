@@ -831,6 +831,14 @@ a {
 /* header ends */
 
 /* navigation tab starts */
+.subtabs {
+    height: 24px;
+    margin-left: 0 !important;
+}
+
+.subtabsLi {
+	margin-left: 84px;	
+}
 
 .tabs, .pills {
     margin: 0 0 1px 7px;
@@ -2084,7 +2092,7 @@ input[class*='sample'] {
 }
 
 .psblSngl {
-	width: 77%;
+	width: 78%;
 }
 .propyName {
 	width: 100%;
@@ -2111,7 +2119,7 @@ input[class*='sample'] {
 
 #plugin-popup-file-uploader .qq-uploader ul li {
 	color:#000000;	
-	}
+}
 
 .feat_modal-body {
 	height: 250px;
@@ -2160,8 +2168,8 @@ input[class*='sample'] {
 
 .multiselct {
 	overflow-y: auto; 
-	height: 100%;
-	width: 100%; 
+	height: 95px;
+	width: 290px; 
 	background-color: #fff; 
 	border-radius: 3px;
 	width: 301px;
@@ -2206,4 +2214,13 @@ input[class*='sample'] {
 
 .dependencySpan {
 	height: 23px;
+	width: 77% !important;
+}
+
+.floatLeft {
+	float: left;	
+}
+
+.floatRight {
+	float: right;	
 }

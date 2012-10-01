@@ -24,19 +24,18 @@
 <%@ page import="org.apache.commons.collections.CollectionUtils"%>
 
 <%@ page import="com.photon.phresco.commons.model.ArtifactInfo" %>
-<%@ page import=" com.photon.phresco.commons.model.ArtifactGroup" %>
+<%@ page import="com.photon.phresco.commons.model.ArtifactGroup" %>
 <%@ page import="com.photon.phresco.commons.model.Technology" %>
 <%@ page import="com.photon.phresco.commons.model.CoreOption" %>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
 <%@ page import="com.photon.phresco.commons.model.RequiredOption"%>
 
 <%
-    ArtifactGroup moduleGroup = (ArtifactGroup)request.getAttribute(ServiceUIConstants.REQ_FEATURES_MOD_GRP); 
-    List<Technology> technologies = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
+    ArtifactGroup moduleGroup = (ArtifactGroup) request.getAttribute(ServiceUIConstants.REQ_FEATURES_MOD_GRP); 
+    List<Technology> technologies = (List<Technology>) request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
     String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
     String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
     String type = (String) request.getAttribute(ServiceUIConstants.REQ_FEATURES_TYPE);
-    String header = (String) request.getAttribute(ServiceUIConstants.REQ_FEATURES_HEADER);
     String selectedModuleId = (String) request.getAttribute(ServiceUIConstants.REQ_FEATURES_SELECTED_MODULEID);
     
   	//For edit
@@ -87,9 +86,31 @@
 %>
 
 <form id="formFeatureAdd" class="form-horizontal customer_list" method="post" enctype="multipart/form-data">
-	<h4 class="hdr">
-		<%= header %>
-	</h4>	
+
+	<%
+		if (ServiceUIConstants.REQ_FEATURES_TYPE_MODULE.equals(type)) {
+		    if (StringUtils.isEmpty(fromPage)) {
+	%>
+				<h4 class="hdr"><s:text name='lbl.hdr.comp.featrs.mod.add'/></h4>
+	<%
+		    } else {
+	%>
+				<h4 class="hdr"><s:text name='lbl.hdr.comp.featrs.mod.edit'/></h4>
+	<% 		
+			}
+		} else if (ServiceUIConstants.REQ_FEATURES_TYPE_JS.equals(type)) {
+			if (StringUtils.isEmpty(fromPage)) {
+	%>
+				<h4 class="hdr"><s:text name='lbl.hdr.comp.featrs.js.add'/></h4>
+	<%
+			} else {
+	%>
+				<h4 class="hdr"><s:text name='lbl.hdr.comp.featrs.js.edit'/></h4>
+	<% 		
+			}
+		}
+	%>
+	
 	<div class="content_feature">
 		<div class="control-group" id="nameControl">
 			<label class="control-label labelbold">
@@ -151,17 +172,19 @@
 			</div>
 		</div>
 		
-		<div class="control-group" id="moduleSelection">
-			<label class="control-label labelbold">
-				<span class="mandatory">*</span>&nbsp;<s:text name="lbl.comp.featr.module.type" />
-			</label>
-			<div class="controls">
-				<select name="moduleType" id="type">
-			        <option value="core">Core Module</option>
-			        <option value="custom">Custom Module</option>
-     		 	</select>
+		<% if (ServiceUIConstants.REQ_FEATURES_TYPE_MODULE.equals(type)) { %>
+			<div class="control-group" id="moduleSelection">
+				<label class="control-label labelbold">
+					<span class="mandatory">*</span>&nbsp;<s:text name="lbl.comp.featr.module.type" />
+				</label>
+				<div class="controls">
+					<select name="moduleType" id="type">
+				        <option value="core">Core Module</option>
+				        <option value="custom">Custom Module</option>
+	     		 	</select>
+				</div>
 			</div>
-		</div>
+		<% } %>
 		
 		<div class="control-group">
 			<label class="control-label labelbold">
@@ -236,8 +259,7 @@
 				<s:text name='lbl.hdr.comp.dependency'/>
 			</label>
 			<div class="controls">
-				<input type="button" class="btn btn-primary" value="Select Dependency" 
-					onclick="getFeatures();" />
+				<input type="button" class="btn btn-primary" value="Select Dependency" onclick="getFeatures();" />
 			</div>
 		</div>
 	</div>
@@ -253,14 +275,14 @@
 		%>
      	<% if (StringUtils.isNotEmpty(fromPage)) { %>
 	     	<input type="button" id="featuresUpdate" class="btn <%= disabledClass %>" <%= disabled %> 
-				onclick="validate('featuresUpdate', $('#formFeatureAdd'), $('#feature_tab'), 'Updating Feature', $('#jarDetailsDiv :input'));"
+				onclick="validate('<%= type %>Update', $('#formFeatureAdd'), $('#featureContainer'), 'Updating Feature', $('#jarDetailsDiv :input'));"
 				value="<s:text name='lbl.hdr.comp.update' />"/> 
      	<% } else { %>
 	     	<input type="button" id="featuresSave" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.save'/>" 
-				onclick="validate('featuresSave', $('#formFeatureAdd'), $('#feature_tab'), 'Creating Feature', $('#jarDetailsDiv :input'));"/> 
+				onclick="validate('<%= type %>Save', $('#formFeatureAdd'), $('#featureContainer'), 'Creating Feature', $('#jarDetailsDiv :input'));"/> 
 		<% } %>
-		<input type="button" id="featuresCancel" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.cancel'/>"
-		onclick="loadContent('featuresMenu', $('#formFeatureAdd'), $('#feature_tab'));" />
+		<input type="button" id="<%= type %>Cancel" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.cancel'/>"
+			onclick="loadContent('featuresMenu', $('#formFeatureAdd'), $('#featureContainer'));" />
 	</div>
 	
 	<!-- Hidden Fields -->
@@ -316,15 +338,6 @@
 	            $("p[id='" + name + "']").html(version);
 	        }
 	    });
-	    
-	    $('#type').change(function() {
-			var selectVal = $('#type :selected').val();
-			if (selectVal == 'module') {
-				$('#moduleSelection').show();
-			} else {
-				$('#moduleSelection').hide();
-			}
-		});
 	    
 	    $("input[type=radio]").change(function() {
 			var name = $(this).attr('name');
@@ -424,8 +437,7 @@
 			url : "removeFeatureJar",
 			data : params,
 			type : "POST",
-			success : function(data) {
-			}
+			success : function(data) {}
 		});
 		jarError('', type);
 		enableDisableUpload();
@@ -445,10 +457,11 @@
 		}
 	} 
 	
+	// to get the features to add the dependencies
 	function getFeatures() {
 		$('#popup_div').empty();
 		$('#popup_div').show();
 		disableScreen();
-		loadContent('listFeatures', $('#formFeatureAdd'), $('#popup_div'));
+		loadContent('<%= type %>ListDependency', $('#formFeatureAdd'), $('#popup_div'));
 	}
 </script>

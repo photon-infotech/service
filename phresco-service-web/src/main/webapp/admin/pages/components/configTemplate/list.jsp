@@ -89,7 +89,7 @@
 										List<Element> applsTos = configTemplate.getAppliesToTechs();
 										String appliesTos = "";
 										for(Element applsTo : applsTos) {
-											appliesTos = appliesTos + applsTo + ",";
+											appliesTos = appliesTos + applsTo.getId() + ",";
 										}
 										appliesTos  = appliesTos.substring(0, appliesTos.length() - 1);
 							%>
@@ -161,7 +161,7 @@
     }
  	
     function textTrim(obj) {
-        var val = $(obj).text();
+        var val = $(obj).text().replace(/\s/g, "");
         $(obj).attr("title", val);
         var len = val.length;
         if(len > 50) {

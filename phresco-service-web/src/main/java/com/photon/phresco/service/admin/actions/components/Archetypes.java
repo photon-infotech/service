@@ -44,10 +44,9 @@ import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.client.api.Content;
+import com.photon.phresco.service.client.api.ServiceManager;
 import com.photon.phresco.service.model.FileInfo;
 import com.photon.phresco.service.util.ServerUtil;
-import com.photon.phresco.util.ServiceConstants;
-import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.MultiPart;
 
@@ -134,10 +133,11 @@ public class Archetypes extends ServiceBaseAction {
 		}
 
 		try {
-			Technology technology = getServiceManager().getArcheType(getTechId(), getCustomerId());
-			setReqAttribute(REQ_ARCHE_TYPE,  technology);
+		    ServiceManager serviceManager = getServiceManager();
+			Technology technology = serviceManager.getArcheType(getTechId(), getCustomerId());
+            List<ApplicationType> appTypes = serviceManager.getApplicationTypes(getCustomerId());
 			setReqAttribute(REQ_FROM_PAGE, EDIT);
-			List<ApplicationType> appTypes = getServiceManager().getApplicationTypes(getCustomerId());
+            setReqAttribute(REQ_ARCHE_TYPE,  technology);
 			setReqAttribute(REQ_APP_TYPES, appTypes);
 		} catch (PhrescoException e) {
 		    return showErrorPopup(e, EXCEPTION_ARCHETYPE_EDIT);
@@ -152,46 +152,9 @@ public class Archetypes extends ServiceBaseAction {
 	    }
 		
 		try {
-	    	Technology technology = new Technology();
-	        technology.setName(getName());
-	        technology.setDescription(getDescription());
-	        technology.setAppTypeId(getApptype());
-	        
-	        ArtifactGroup artifactGroup = new ArtifactGroup();
-	        artifactGroup.setArtifactId(getArtifactId());
-	        artifactGroup.setGroupId(getGroupId());
-	        artifactGroup.setPackaging(REQ_JAR_FILE);
-	        
-	        List<ArtifactInfo> artifactVersion = new ArrayList<ArtifactInfo>();
-	        ArtifactInfo artifactInfo = new ArtifactInfo();
-	        artifactInfo.setVersion(getVersion());
-	        artifactVersion.add(artifactInfo);
-	        artifactGroup.setVersions(artifactVersion);
-	        technology.setArchetypeInfo(artifactGroup);
-	        
-	       /* technology.setVersions(versions);
-	        technology.setVersionComment(versionComment);*/
-	        
-	        List<String> techVersions = new ArrayList<String>();
-	        techVersions.add(getTechVersion());
-	        technology.setTechVersions(techVersions);
-	        
-	        List<String> customerIds = new ArrayList<String>();
-	        customerIds.add(getCustomerId());
-	        technology.setCustomerIds(customerIds);
-	        
-	       //  ArchetypeInfo archetypeInfo = new ArchetypeInfo(groupId, artifactId, version, "jar");
-	       // jar is Packaging
-	        
-	       // technology.setArchetypeInfo(archetypeInfo);
-	        
-	        MultiPart multiPart = fileUpload(technology);
-			ClientResponse clientResponse = getServiceManager().createArcheTypes(multiPart, getCustomerId());
-			if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200 && clientResponse.getStatus() != ServiceConstants.RES_CODE_201) {
-				addActionError(getText(ARCHETYPE_NOT_ADDED, Collections.singletonList(getName())));
-			} else {
-				addActionMessage(getText(ARCHETYPE_ADDED, Collections.singletonList(getName())));
-			}
+		    MultiPart multiPart = getTechnologyAsMultipart();
+			getServiceManager().createArcheTypes(multiPart, getCustomerId());
+			addActionError(getText(ARCHETYPE_ADDED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
 		    return showErrorPopup(e, EXCEPTION_ARCHETYPE_SAVE);
 		} 
@@ -205,60 +168,54 @@ public class Archetypes extends ServiceBaseAction {
 	    }
 
 		try {
-			
-		    Technology technology = new Technology();
-			/*List<String> appTypes = new ArrayList<String>();
-			appTypes.add(apptype);
-			List<String> versions = new ArrayList<String>();
-			versions.add(version);
-		
-			technology.setId(techId);
-			technology.setAppTypeId(apptype);*/
-		    
-		    technology.setName(getName());
-		    technology.setId(getTechId());
-	        technology.setDescription(getDescription());
-	        technology.setAppTypeId(getApptype());
-	        
-	        ArtifactGroup artifactGroup = new ArtifactGroup();
-	        artifactGroup.setArtifactId(getArtifactId());
-	        artifactGroup.setGroupId(getGroupId());
-	        artifactGroup.setPackaging(REQ_JAR_FILE);
-	        
-	        List<ArtifactInfo> artifactVersion = new ArrayList<ArtifactInfo>();
-	        ArtifactInfo artifactInfo = new ArtifactInfo();
-	        artifactInfo.setVersion(getVersion());
-	        artifactVersion.add(artifactInfo);
-	        artifactGroup.setVersions(artifactVersion);
-	        technology.setArchetypeInfo(artifactGroup);
-		    
-			
-			List<String> customerIds = new ArrayList<String>();
-			customerIds.add(getCustomerId());
-			technology.setCustomerIds(customerIds);
-			
-			List<String> techVersions = new ArrayList<String>();
-			techVersions.add(getTechVersion());
-			technology.setTechVersions(techVersions);
-			
-			//ArchetypeInfo archetypeInfo = new ArchetypeInfo(groupId, artifactId, version, "jar");
-			//technology.setArchetypeInfo(archetypeInfo);
-
-			MultiPart multiPart = fileUpload(technology);
-			ClientResponse clientResponse = getServiceManager().updateArcheType(multiPart, getTechId(), getCustomerId());
-			if (clientResponse.getStatus() != RES_CODE_200 && clientResponse.getStatus() != RES_CODE_201) {
-                addActionError(getText(ARCHETYPE_NOT_UPDATED, Collections.singletonList(getName())));
-            } else {
-                addActionMessage(getText(ARCHETYPE_UPDATED, Collections.singletonList(getName())));
-            }
-			
-			
+		    MultiPart multiPart = getTechnologyAsMultipart();
+			getServiceManager().updateArcheType(multiPart, getTechId(), getCustomerId());
+            addActionError(getText(ARCHETYPE_UPDATED, Collections.singletonList(getName())));
 		} catch(PhrescoException e) {
 		    return showErrorPopup(e, EXCEPTION_ARCHETYPE_UPDATE);
 		}
 		
 		return list();
 	}
+
+    /**
+     * @return
+     * @throws PhrescoException
+     */
+    private MultiPart getTechnologyAsMultipart() throws PhrescoException {
+        Technology technology = new Technology();
+        technology.setName(getName());
+        technology.setId(getTechId());
+        technology.setDescription(getDescription());
+        technology.setAppTypeId(getApptype());
+        
+        ArtifactGroup artifactGroup = new ArtifactGroup();
+        artifactGroup.setArtifactId(getArtifactId());
+        artifactGroup.setGroupId(getGroupId());
+        artifactGroup.setPackaging(REQ_JAR_FILE);
+        
+        List<ArtifactInfo> artifactVersion = new ArrayList<ArtifactInfo>();
+        ArtifactInfo artifactInfo = new ArtifactInfo();
+        artifactInfo.setVersion(getVersion());
+        artifactVersion.add(artifactInfo);
+        artifactGroup.setVersions(artifactVersion);
+        technology.setArchetypeInfo(artifactGroup);
+        
+        
+        List<String> customerIds = new ArrayList<String>();
+        customerIds.add(getCustomerId());
+        technology.setCustomerIds(customerIds);
+        
+        List<String> techVersions = new ArrayList<String>();
+        techVersions.add(getTechVersion());
+        technology.setTechVersions(techVersions);
+        
+        //ArchetypeInfo archetypeInfo = new ArchetypeInfo(groupId, artifactId, version, "jar");
+        //technology.setArchetypeInfo(archetypeInfo);
+
+        MultiPart multiPart = fileUpload(technology);
+        return multiPart;
+    }
 
 	public String delete() throws PhrescoException {
 		if (s_isDebugEnabled) {
@@ -268,11 +225,9 @@ public class Archetypes extends ServiceBaseAction {
 		try {
 			String[] techTypeIds = getHttpRequest().getParameterValues(REQ_ARCHE_TECHID);
 			if (ArrayUtils.isNotEmpty(techTypeIds)) {
+                ServiceManager serviceManager = getServiceManager();
 				for (String techId : techTypeIds) {
-					ClientResponse clientResponse = getServiceManager().deleteArcheType(techId, getCustomerId());
-					if (clientResponse.getStatus() != ServiceConstants.RES_CODE_200) {
-						addActionError(getText(ARCHETYPE_NOT_DELETED));
-					}
+                    serviceManager.deleteArcheType(techId, getCustomerId());
 				}
 				addActionMessage(getText(ARCHETYPE_DELETED));
 			}
@@ -318,7 +273,6 @@ public class Archetypes extends ServiceBaseAction {
 	        		fileInfo.setSuccess(true);
 	        		Gson gson = new Gson();
 	        		String json = gson.toJson(fileInfo);
-	        		System.out.println("JSON VALUE " +json);
 	        		writer.print(json);
 	        	} else {
 	        		writer.print(MAVEN_JAR_FALSE);
