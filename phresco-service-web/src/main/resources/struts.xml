@@ -119,12 +119,18 @@
 		
 		<action name="moduleSave" class="com.photon.phresco.service.admin.actions.components.Features" method="saveModules">
             <result name="featuresList">/admin/pages/components/feature/menu.jsp</result>
-            <result type="json" />
         </action>
         
         <action name="jsSave" class="com.photon.phresco.service.admin.actions.components.Features" method="saveJSLibs">
             <result name="featuresList">/admin/pages/components/feature/menu.jsp</result>
-            <result type="json" />
+        </action>
+        
+        <action name="moduleUpdate" class="com.photon.phresco.service.admin.actions.components.Features" method="updateModule">
+            <result name="featuresList">/admin/pages/components/feature/menu.jsp</result>
+        </action>
+        
+        <action name="jsUpdate" class="com.photon.phresco.service.admin.actions.components.Features" method="updateJSLib">
+            <result name="featuresList">/admin/pages/components/feature/menu.jsp</result>
         </action>
         
         <action name="uploadFeatureFile" class="com.photon.phresco.service.admin.actions.components.Features" method="uploadFile">
@@ -135,17 +141,12 @@
             <result type="json" />
         </action>
         
-        <action name="featuresEdit" class="com.photon.phresco.service.admin.actions.components.Features" method="edit">
-            <result name="featuresAdd">/admin/pages/components/feature/add.jsp</result>
+        <action name="moduleDelete" class="com.photon.phresco.service.admin.actions.components.Features" method="deleteModules">
+            <result name="featuresList">/admin/pages/components/feature/menu.jsp</result>
         </action>
         
-        <action name="featuresUpdate" class="com.photon.phresco.service.admin.actions.components.Features" method="update">
-            <result name="featuresList">/admin/pages/components/feature/list.jsp</result>
-            <result type="json" />
-        </action>
-        
-        <action name="featuresDelete" class="com.photon.phresco.service.admin.actions.components.Features" method="delete">
-            <result name="featuresList">/admin/pages/components/feature/list.jsp</result>
+        <action name="jsDelete" class="com.photon.phresco.service.admin.actions.components.Features" method="deleteJSLibs">
+            <result name="featuresList">/admin/pages/components/feature/menu.jsp</result>
         </action>
         
         <action name="moduleSaveValidate" class="com.photon.phresco.service.admin.actions.components.Features" method="validateForm">
@@ -166,7 +167,6 @@
 		<!-- COMPONENT FEATURES ENDS-->
 		
 		<!--COMPONENT START-->
-		
 		<action name="componentList" class="com.photon.phresco.service.admin.actions.components.Component" method="list">
             <result name="componentList">/admin/pages/components/component/list.jsp</result>
         </action>

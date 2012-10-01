@@ -46,7 +46,6 @@ import com.photon.phresco.service.client.api.Content;
 import com.photon.phresco.service.client.api.ServiceManager;
 import com.photon.phresco.service.model.FileInfo;
 import com.photon.phresco.service.util.ServerUtil;
-import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.MultiPart;
 
@@ -201,17 +200,17 @@ public class Downloads extends ServiceBaseAction {
 	        Content content = new Content(Content.Type.JSON, getName(), null, null, null, 0);
 	        jsonPart.setContentDisposition(content);
 	        multiPart.bodyPart(jsonPart);
-	        if (StringUtils.isNotEmpty(downloadJarName)) {
-	            InputStream downloadIs = new ByteArrayInputStream(downloadByteArray);
-	            BodyPart bodyPart = getServiceManager().createBodyPart(getName(), Content.Type.JAR, downloadIs);
-	            multiPart.bodyPart(bodyPart);
-	        }
-	        
-	        if(StringUtils.isNotEmpty(downloadImageName)){
-	            InputStream downloadImage=new ByteArrayInputStream(byteArray);
-	            BodyPart binaryPart = getServiceManager().createBodyPart(getName(), Content.Type.JAR, downloadImage);
-	            multiPart.bodyPart(binaryPart);
-	        }
+//	        if (StringUtils.isNotEmpty(downloadJarName)) {
+//	            InputStream downloadIs = new ByteArrayInputStream(downloadByteArray);
+//	            BodyPart bodyPart = getServiceManager().createBodyPart(getName(), Content.Type.JAR, downloadIs);
+//	            multiPart.bodyPart(bodyPart);
+//	        }
+//	        
+//	        if(StringUtils.isNotEmpty(downloadImageName)){
+//	            InputStream downloadImage=new ByteArrayInputStream(byteArray);
+//	            BodyPart binaryPart = getServiceManager().createBodyPart(getName(), Content.Type.JAR, downloadImage);
+//	            multiPart.bodyPart(binaryPart);
+//	        }
 	        return multiPart;
 	    }
 
