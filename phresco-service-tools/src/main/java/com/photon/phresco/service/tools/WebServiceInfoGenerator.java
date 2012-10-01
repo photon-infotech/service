@@ -12,7 +12,6 @@ import com.photon.phresco.util.TechnologyTypes;
 
 public class WebServiceInfoGenerator extends DbService implements ServiceConstants {
     
-	
     public WebServiceInfoGenerator() {
     	super();
     }
@@ -20,7 +19,7 @@ public class WebServiceInfoGenerator extends DbService implements ServiceConstan
     private List<WebService> createWebServices() {
         List<WebService> webServices = new ArrayList<WebService>();
         webServices.add(createWebService("restjson", "REST/JSON", "1.0", "REST JSON web services"));
-        webServices.add(createWebService("restjson", "REST/XML", "1.0", "REST XML web services"));
+        webServices.add(createWebService("restxml", "REST/XML", "1.0", "REST XML web services"));
         webServices.add(createWebService("soap1.0", "SOAP", "1.0", "SOAP web services"));
         webServices.add(createWebService("saop2.0", "SOAP", "2.0", "SOAP web services"));
         return webServices;
@@ -30,6 +29,10 @@ public class WebServiceInfoGenerator extends DbService implements ServiceConstan
     	WebService webService = new WebService();
     	webService.setId(id);
     	webService.setName(name);
+    	webService.setVersion(version);
+    	webService.setAppliesToTechs(createTechs());
+    	webService.setDescription(description);
+    	webService.setSystem(true);
     	return webService;
     }
     

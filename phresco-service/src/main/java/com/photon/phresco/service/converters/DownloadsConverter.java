@@ -43,6 +43,7 @@ public class DownloadsConverter implements Converter<DownloadsDAO, DownloadInfo>
 		downloadsDAO.setPlatform(downloadInfo.getPlatform());
 		downloadsDAO.setStatus(downloadInfo.getStatus());
 		downloadsDAO.setSystem(downloadInfo.isSystem());
+		downloadsDAO.setCustomerIds(downloadInfo.getCustomerIds());
 		return downloadsDAO;
 	}
 	

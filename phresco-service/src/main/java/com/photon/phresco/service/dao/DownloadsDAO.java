@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.photon.phresco.commons.model.PlatformType;
 
-public class DownloadsDAO extends BaseDAO {
+public class DownloadsDAO extends CustomerBaseDAO {
 	
 	private static final long serialVersionUID = 1L;
 	private List<String> appliesToTechIds;
