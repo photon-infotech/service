@@ -142,6 +142,7 @@ public interface ServiceUIConstants {
      *****************************/
     String FEATURES_CORE = "core";
     String FEATURES_DEPENDENT_MOD_IDS = "dependentModuleIds";
+    String FEATURES_SELECTED_TECHNOLOGY = "selectedTechnology";
     
     /*****************************
      * Permissions Request Constants

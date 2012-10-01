@@ -81,5 +81,7 @@ public interface RepositoryManager {
     boolean isExist(String filePath, String customerId) throws PhrescoException;
     
     RepoInfo createCustomerRepository(String customerId) throws PhrescoException;
+    
+    String getLatestArtifact(String groupId, String artifactId) throws PhrescoException;
 
 }

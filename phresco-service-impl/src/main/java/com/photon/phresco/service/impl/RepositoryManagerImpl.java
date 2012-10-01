@@ -65,8 +65,12 @@ import org.sonatype.aether.deployment.DeploymentException;
 import org.sonatype.aether.repository.Authentication;
 import org.sonatype.aether.repository.LocalRepository;
 import org.sonatype.aether.repository.RemoteRepository;
+import org.sonatype.aether.resolution.VersionRangeRequest;
+import org.sonatype.aether.resolution.VersionRangeResolutionException;
+import org.sonatype.aether.resolution.VersionRangeResult;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.aether.util.artifact.SubArtifact;
+import org.sonatype.aether.version.Version;
 
 import com.google.gson.Gson;
 import com.photon.phresco.commons.model.ArtifactGroup;
@@ -134,7 +138,7 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 			throw new PhrescoException(e);
 		}
 	}
-	
+
 	public List<ArtifactGroup> getModules(String techId) throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method RepositoryManagerImpl.getModules(String techId)");
@@ -222,6 +226,31 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 		}
 
 		return true;
+	}
+	
+	@Override
+	public String getLatestArtifact(String groupId, String artifactId) throws PhrescoException {
+		
+		RepositorySystem system = newRepositorySystem();
+
+        RepositorySystemSession session = newRepositorySystemSession( system );
+
+        Artifact artifact = new DefaultArtifact( groupId + ":" + artifactId + ":[0,)" );
+
+        RemoteRepository distRepo = new RemoteRepository("", DEFAULT, "http://172.16.18.178:8080/nexus/content/repositories/releases/");
+
+        VersionRangeRequest rangeRequest = new VersionRangeRequest();
+        rangeRequest.setArtifact( artifact );
+        rangeRequest.addRepository( distRepo );
+
+        VersionRangeResult rangeResult;
+		try {
+			rangeResult = system.resolveVersionRange( session, rangeRequest );
+			Version newestVersion = rangeResult.getHighestVersion();
+			return newestVersion.toString();
+ 		} catch (VersionRangeResolutionException e) {
+			throw new PhrescoException(e);
+		}
 	}
 
 	@Override
@@ -483,4 +512,5 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
         String json = "";
         return OPEN_PHRASE + SLASH + REPO_OBJECT_ID + SLASH + COLON + json + CLOSE_PHRASE;
     }
+
 }

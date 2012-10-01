@@ -41,6 +41,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
@@ -63,6 +64,7 @@ import com.photon.phresco.service.client.api.Content;
 import com.photon.phresco.service.client.api.Content.Type;
 import com.photon.phresco.service.converters.ConvertersFactory;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
+import com.photon.phresco.service.dao.DownloadsDAO;
 import com.photon.phresco.service.dao.TechnologyDAO;
 import com.photon.phresco.service.model.ArtifactInfo;
 import com.photon.phresco.service.util.ServerUtil;
@@ -867,35 +869,44 @@ public class ComponentService extends DbService {
         List<com.photon.phresco.commons.model.ArtifactInfo> moduleGroupVersions = moduleGroup.getVersions();
         List<String> versionIds = new ArrayList<String>();
         
-        for (com.photon.phresco.commons.model.ArtifactInfo info : moduleGroupVersions) {
-			versionIds.add(info.getId());
-		}
-        
         ArtifactGroupDAO moduleDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
 		        new Query(Criteria.where("name").is(moduleGroupDAO.getName())), ArtifactGroupDAO.class);
+        
+        com.photon.phresco.commons.model.ArtifactInfo newVersion = moduleGroup.getVersions().get(0);
         if(moduleDAO != null) {
+        	moduleGroupDAO.setId(moduleDAO.getId());
+        	versionIds.addAll(moduleDAO.getVersionIds());
         	List<com.photon.phresco.commons.model.ArtifactInfo> info = mongoOperation.find(ARTIFACT_INFO_COLLECTION_NAME, 
         			new Query(Criteria.where("artifactGroupId").is(moduleDAO.getId())), com.photon.phresco.commons.model.ArtifactInfo.class);
-        	List<com.photon.phresco.commons.model.ArtifactInfo> versions = new ArrayList<com.photon.phresco.commons.model.ArtifactInfo>();
-        	com.photon.phresco.commons.model.ArtifactInfo version = moduleGroup.getVersions().get(0);
-        	version.setArtifactGroupId(moduleDAO.getId());
-        	versions.add(version);
-        	info.addAll(versions);
-        	for (com.photon.phresco.commons.model.ArtifactInfo artifactInfo : info) {
-        		mongoOperation.save(ARTIFACT_INFO_COLLECTION_NAME, artifactInfo);
-			}
         	
-        } else {
-	        for (com.photon.phresco.commons.model.ArtifactInfo module : moduleGroup.getVersions()) {
-	            module.setArtifactGroupId(moduleGroupDAO.getId());
-	            mongoOperation.save(ARTIFACT_INFO_COLLECTION_NAME, module);
-	        }
-	        
-	        moduleGroupDAO.setVersionIds(versionIds);
-	        mongoOperation.save(ARTIFACT_GROUP_COLLECTION_NAME, moduleGroupDAO);
+        	List<com.photon.phresco.commons.model.ArtifactInfo> versions = new ArrayList<com.photon.phresco.commons.model.ArtifactInfo>();
+        	newVersion.setArtifactGroupId(moduleDAO.getId());
+        	versions.add(newVersion);
+        	info.addAll(versions);
+        	
+        	String id = checkVersionAvailable(info, newVersion.getVersion());
+        	if(id == newVersion.getId()) {
+        		versionIds.add(newVersion.getId());
+        	}
+			newVersion.setId(id);
+    		mongoOperation.save(ARTIFACT_INFO_COLLECTION_NAME, newVersion);
+        }  else {
+        		versionIds.add(newVersion.getId());
+        		newVersion.setArtifactGroupId(moduleGroupDAO.getId());
+                mongoOperation.save(ARTIFACT_INFO_COLLECTION_NAME, newVersion);
         }
+        moduleGroupDAO.setVersionIds(versionIds);
+        mongoOperation.save(ARTIFACT_GROUP_COLLECTION_NAME, moduleGroupDAO);
     }
-    
+
+	private String checkVersionAvailable(List<com.photon.phresco.commons.model.ArtifactInfo> info, String version) {
+		for (com.photon.phresco.commons.model.ArtifactInfo artifactInfo : info) {
+			if(artifactInfo.getVersion().equals(version)) {
+				return artifactInfo.getId();
+			}
+		}
+		return null;
+	}
 
 	/**
 	 * Updates the list of modules
@@ -1108,7 +1119,7 @@ public class ComponentService extends DbService {
 	        S_LOGGER.debug("Entered into ComponentService.updatePilots(List<ProjectInfo> pilots)");
 	    }
 	    
-		return createOrUpdateFeatures(pilotInfo);
+		return createOrUpdatePilots(pilotInfo);
 	}
 	
 	/**
@@ -1380,15 +1391,22 @@ public class ComponentService extends DbService {
     @GET
     @Path (REST_API_DOWNLOADS)
     @Produces (MediaType.APPLICATION_JSON)
-    public Response findDownloadInfo() {
+    public Response findDownloadInfo(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.findDownloadInfo()");
         }
-        
+        List<DownloadInfo> downloads = new ArrayList<DownloadInfo>();
         try {
-            List<DownloadInfo> downloadList = mongoOperation.getCollection(DOWNLOAD_COLLECTION_NAME, DownloadInfo.class);
+        	Query query = createCustomerIdQuery(customerId);
+        	List<DownloadsDAO> downloadList = mongoOperation.find(DOWNLOAD_COLLECTION_NAME, query, DownloadsDAO.class);
             if (downloadList != null) {
-                return Response.status(Response.Status.OK).entity(downloadList).build();
+            	Converter<DownloadsDAO, DownloadInfo> downloadConverter = 
+            		(Converter<DownloadsDAO, DownloadInfo>) ConvertersFactory.getConverter(DownloadsDAO.class);
+            	for (DownloadsDAO downloadsDAO : downloadList) {
+					DownloadInfo downloadInfo = downloadConverter.convertDAOToObject(downloadsDAO, mongoOperation);
+					downloads.add(downloadInfo);
+				}
+                return Response.status(Response.Status.OK).entity(downloads).build();
             } 
         } catch (Exception e) {
             throw new PhrescoWebServiceException(e, EX_PHEX00006, DOWNLOAD_COLLECTION_NAME);
@@ -1406,13 +1424,18 @@ public class ComponentService extends DbService {
      */
     @POST
     @Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
+    @Produces (MediaType.APPLICATION_JSON)
     @Path (REST_API_DOWNLOADS)
     public Response createDownloads(MultiPart downloadPart) throws PhrescoException {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into ComponentService.createModules(List<ModuleGroup> modules)");
         }
         
-        DownloadInfo downloadInfo = null;
+        return createOrUpdateDownloads(downloadPart);
+    }
+    
+    private Response createOrUpdateDownloads(MultiPart downloadPart) throws PhrescoException {
+    	DownloadInfo downloadInfo = null;
         BodyPartEntity bodyPartEntity = null;
         File downloadFile = null;
         
@@ -1430,44 +1453,47 @@ public class ComponentService extends DbService {
         
         if(bodyPartEntity != null) {
             downloadFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null);
+            boolean uploadBinary = uploadBinary(downloadInfo.getArtifactGroup(), downloadFile);
+            if(uploadBinary) {
+                saveDownloads(downloadInfo);
+            }
+            saveDownloads(downloadInfo);
+            FileUtil.delete(downloadFile);
         }
         
-        boolean uploadBinary = uploadBinary(downloadInfo, downloadFile);
-        if(uploadBinary) {
-            mongoOperation.save(DOWNLOAD_COLLECTION_NAME, downloadInfo);
+        if(bodyPartEntity == null && downloadInfo != null) {
+        	saveDownloads(downloadInfo);
         }
         
-        FileUtil.delete(downloadFile);
-        return Response.status(Response.Status.CREATED).build();
-    }
+        return Response.status(Response.Status.CREATED).entity(downloadInfo).build();
+		
+	}
 
+	private void saveDownloads(DownloadInfo info) throws PhrescoException {
+		Converter<DownloadsDAO, DownloadInfo> downlodConverter = 
+			(Converter<DownloadsDAO, DownloadInfo>) ConvertersFactory.getConverter(DownloadsDAO.class);
+		DownloadsDAO downloadDAO = downlodConverter.convertObjectToDAO(info);
+		ArtifactGroup artifactGroup = info.getArtifactGroup();
+		saveModuleGroup(artifactGroup);
+		mongoOperation.save(DOWNLOAD_COLLECTION_NAME, downloadDAO);
+	}
+    
     /**
      * Updates the list of downloadInfos
      * @param downloads
      * @return
+     * @throws PhrescoException 
      */
     @PUT
-    @Consumes (MediaType.APPLICATION_JSON)
+    @Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
     @Produces (MediaType.APPLICATION_JSON)
     @Path (REST_API_DOWNLOADS)
-    public Response updateDownloadInfo(List<DownloadInfo> downloads) {
+    public Response updateDownloadInfo(MultiPart multiPart) throws PhrescoException {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.updateDownloadInfo(List<DownloadInfo> downloads)");
         }
         
-        try {
-            for (DownloadInfo download : downloads) {
-                DownloadInfo downloadInfo = mongoOperation.findOne(DOWNLOAD_COLLECTION_NAME, 
-                        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(download.getId())), DownloadInfo.class);
-                if (downloadInfo  != null) {
-                    mongoOperation.save(DOWNLOAD_COLLECTION_NAME, download);
-                }
-            }
-        } catch (Exception e) {
-            throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
-        }
-        
-        return Response.status(Response.Status.OK).entity(downloads).build();
+        return createOrUpdateDownloads(multiPart);
     }
 
     /**
@@ -1550,9 +1576,17 @@ public class ComponentService extends DbService {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.deleteDownloadInfo(String id)" + id);
         }
-        
         try {
-            mongoOperation.remove(DOWNLOAD_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), DownloadInfo.class);
+        DownloadsDAO findOne = mongoOperation.findOne(DOWNLOAD_COLLECTION_NAME, new Query(), DownloadsDAO.class);
+        String artifactGroupId = findOne.getArtifactGroupId();
+        
+        ArtifactGroup findGroupId=mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, new Query(), ArtifactGroup.class);
+        String groupId=findGroupId.getId();
+        List<com.photon.phresco.commons.model.ArtifactInfo> artifactInfo=findGroupId.getVersions();
+        String artifact = artifactInfo.get(0).getId();
+        mongoOperation.remove(ARTIFACT_INFO_COLLECTION_NAME, new Query(Criteria.where("id").is(artifact)), com.photon.phresco.commons.model.ArtifactInfo.class);
+        mongoOperation.remove(ARTIFACT_GROUP_COLLECTION_NAME, new Query(Criteria.where("id").is(groupId)), ArtifactGroup.class);
+        mongoOperation.remove(DOWNLOAD_COLLECTION_NAME, new Query(Criteria.where("id").is(id)), DownloadInfo.class);
         } catch (Exception e) {
             throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
         }

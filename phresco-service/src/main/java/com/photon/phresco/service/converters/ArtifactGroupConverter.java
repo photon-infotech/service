@@ -19,6 +19,7 @@
  */
 package com.photon.phresco.service.converters;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.document.mongodb.MongoOperations;
@@ -51,10 +52,10 @@ public class ArtifactGroupConverter implements Converter<ArtifactGroupDAO, Artif
         artifactGroup.setSystem(artifactGroupDAO.isSystem());
         artifactGroup.setType(artifactGroupDAO.getType());
         artifactGroup.setUsed(artifactGroupDAO.isUsed());
-        artifactGroupDAO.setAppliesTo(artifactGroupDAO.getAppliesTo());
+        artifactGroup.setAppliesTo(artifactGroupDAO.getAppliesTo());
         
         List<ArtifactInfo> versions = mongoOperation.find(ARTIFACT_INFO_COLLECTION_NAME, 
-                new Query(Criteria.where(DB_COLUMN_ARTIFACT_GROUP_ID).in(artifactGroupDAO.getId())), ArtifactInfo.class);
+                new Query(Criteria.where(DB_COLUMN_ARTIFACT_GROUP_ID).is(artifactGroupDAO.getId())), ArtifactInfo.class);
         artifactGroup.setVersions(versions);
         
         return artifactGroup;
@@ -70,7 +71,6 @@ public class ArtifactGroupConverter implements Converter<ArtifactGroupDAO, Artif
         artifactGroupDAO.setCustomerIds(artifactGroup.getCustomerIds());
         artifactGroupDAO.setDescription(artifactGroup.getDescription());
         artifactGroupDAO.setGroupId(artifactGroup.getGroupId());
-        artifactGroupDAO.setArtifactId(artifactGroup.getArtifactId());
         artifactGroupDAO.setImageURL(artifactGroup.getImageURL());
         artifactGroupDAO.setName(artifactGroup.getName());
         artifactGroupDAO.setPackaging(artifactGroup.getPackaging());
@@ -79,7 +79,17 @@ public class ArtifactGroupConverter implements Converter<ArtifactGroupDAO, Artif
         artifactGroupDAO.setUsed(artifactGroup.isUsed());
         artifactGroupDAO.setAppliesTo(artifactGroup.getAppliesTo());
         artifactGroupDAO.setHelpText(artifactGroup.getHelpText());
+//        List<ArtifactInfo> versions = artifactGroup.getVersions();
+//        artifactGroupDAO.setVersionIds(createVersionIds(versions));
         return artifactGroupDAO;
     }
+
+//	private List<String> createVersionIds(List<ArtifactInfo> versions) {
+//		List<String> versionIds = new ArrayList<String>();
+//		for (ArtifactInfo artifactInfo : versions) {
+//			versionIds.add(artifactInfo.getId());
+//		}
+//		return versionIds;
+//	}
 
 }

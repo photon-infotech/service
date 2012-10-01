@@ -89,6 +89,7 @@ public class Features extends ServiceBaseAction {
 
 		setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		featureByteArray = null;
+		
     	return COMP_FEATURES_LIST;
     }
 	
@@ -203,7 +204,7 @@ public class Features extends ServiceBaseAction {
     		S_LOGGER.debug("Entering Method  Features.featurelist()");
     	}
     	
-		List<ArtifactGroup> moduleGroup = getServiceManager().getModules(getCustomerId(), getTechnology(), type.name());
+		List<ArtifactGroup> moduleGroup = getServiceManager().getFeatures(getCustomerId(), getTechnology(), type.name());
 		setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
 		setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
     }
@@ -214,8 +215,8 @@ public class Features extends ServiceBaseAction {
         }
         
         try {
-            setReqAttribute(REQ_CUST_CUSTOMER_ID, customerId);
-            setReqAttribute(REQ_FEATURES_TYPE, type);
+            setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
+            setReqAttribute(REQ_FEATURES_TYPE, getType());
             setTechnologiesInRequest();
         } catch (PhrescoException e) {
             return showErrorPopup(e, EXCEPTION_FEATURE_ADD);            
@@ -230,8 +231,8 @@ public class Features extends ServiceBaseAction {
         }
         
         try {
-            setReqAttribute(REQ_CUST_CUSTOMER_ID, customerId);
-            setReqAttribute(REQ_FEATURES_TYPE, type);
+            setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
+            setReqAttribute(REQ_FEATURES_TYPE, getType());
             setTechnologiesInRequest();
         } catch (PhrescoException e) {
             return showErrorPopup(e, EXCEPTION_FEATURE_ADD);            
@@ -247,7 +248,9 @@ public class Features extends ServiceBaseAction {
 		
 		try {
 		    setTechnologiesInRequest();
-		    setEditModuleGroupInReq();
+		    setReqAttribute(REQ_FEATURES_TYPE, getType());
+		    setReqAttribute(FEATURES_SELECTED_TECHNOLOGY, getTechnology());
+		    setEditModuleGroupInReq(getTechnology(), Type.FEATURE);
 		} catch (PhrescoException e) {
 			showErrorPopup(e, EXCEPTION_FEATURE_EDIT);
 		}
@@ -262,7 +265,9 @@ public class Features extends ServiceBaseAction {
         
         try {
             setTechnologiesInRequest();
-            setEditModuleGroupInReq();
+            setReqAttribute(REQ_FEATURES_TYPE, getType());
+            setEditModuleGroupInReq(getTechnology(), Type.JAVASCRIPT);
+            setReqAttribute(FEATURES_SELECTED_TECHNOLOGY, getTechnology());
         } catch (PhrescoException e) {
             showErrorPopup(e, EXCEPTION_FEATURE_EDIT);
         }
@@ -270,8 +275,8 @@ public class Features extends ServiceBaseAction {
         return COMP_FEATURES_ADD;
     }
 
-    private void setEditModuleGroupInReq() throws PhrescoException {
-        ArtifactGroup moduleGroup = getServiceManager().getFeature(getModuleGroupId(), getCustomerId());
+    private void setEditModuleGroupInReq(String technology, Type type) throws PhrescoException {
+        ArtifactGroup moduleGroup = getServiceManager().getFeature(getModuleGroupId(), getCustomerId(), technology, type.name());
         setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
         setReqAttribute(REQ_FEATURES_SELECTED_MODULEID, getModuleId());
         setReqAttribute(REQ_FROM_PAGE, EDIT);
@@ -325,44 +330,45 @@ public class Features extends ServiceBaseAction {
     private void save(Type type) throws PhrescoException, IOException {
         try {
             ArtifactGroup moduleGroup = createModuleGroup(type);
-            InputStream featureIs = null;
+            InputStream inputStream = null;
             if (featureByteArray != null) {
-                featureIs = new ByteArrayInputStream(featureByteArray);
+                inputStream = new ByteArrayInputStream(featureByteArray);
             }
-            getServiceManager().createFeatures(moduleGroup, featureIs, getCustomerId());
-            addActionMessage(getText(FEATURE_UPDATED, Collections.singletonList(getName())));
-            setReqAttribute(REQ_FEATURES_TYPE, type);
+            getServiceManager().createFeatures(moduleGroup, inputStream, getCustomerId());
+            addActionMessage(getText(FEATURE_ADDED, Collections.singletonList(getName())));
         } catch (PhrescoException e) {
             throw new PhrescoException(e); 
         }
     }
     
-    public void updateModules() throws IOException {
+    public String updateModule() throws IOException {
         if (s_isDebugEnabled) {
-            S_LOGGER.debug("Entering Method  Features.updateModules()");
+            S_LOGGER.debug("Entering Method  Features.updateModule()");
         }
         
         try {
             update(Type.FEATURE);
             setTechnologiesInRequest();
-            modulesTechnologies();
         } catch (PhrescoException e) {
             showErrorPopup(e, EXCEPTION_FEATURE_SAVE);
         }
+        
+        return  modulesTechnologies();
     }
     
-    public void updateJSLibs() throws IOException {
+    public String updateJSLib() throws IOException {
         if (s_isDebugEnabled) {
-            S_LOGGER.debug("Entering Method  Features.updateJSLibs()");
+            S_LOGGER.debug("Entering Method  Features.updateJSLib()");
         }
         
         try {
             update(Type.JAVASCRIPT);
             setTechnologiesInRequest();
-            jsLibTechnologies();
         } catch (PhrescoException e) {
             showErrorPopup(e, EXCEPTION_FEATURE_SAVE);
         }
+        
+        return jsLibTechnologies();
     }
 
     private void update(Type type) throws PhrescoException, IOException {
@@ -372,12 +378,12 @@ public class Features extends ServiceBaseAction {
         
         try {
             ArtifactGroup moduleGroup = createModuleGroup(type);
-            InputStream featureIs = null;
+            InputStream inputStream = null;
             if (featureByteArray != null) {
-                featureIs = new ByteArrayInputStream(featureByteArray);
+                inputStream = new ByteArrayInputStream(featureByteArray);
             }
-            getServiceManager().createFeatures(moduleGroup, featureIs, getCustomerId());
-            addActionMessage(getText(FEATURE_UPDATED, Collections.singletonList(getName())));
+            getServiceManager().updateFeature(moduleGroup, inputStream, getCustomerId());
+            addActionMessage(getText(FEATURE_ADDED, Collections.singletonList(getName())));
         } catch (PhrescoException e) {
             throw new PhrescoException(e); 
         }
@@ -430,7 +436,7 @@ public class Features extends ServiceBaseAction {
         }
     }
 	
-	public void deleteModules() {
+	public String deleteModules() {
         if (s_isDebugEnabled) {
             S_LOGGER.debug("Entering Method  Features.deleteModules()");
         }
@@ -438,13 +444,14 @@ public class Features extends ServiceBaseAction {
         try {
             delete();
             setTechnologiesInRequest();
-            modulesTechnologies();
         } catch (PhrescoException e) {
             showErrorPopup(e, EXCEPTION_FEATURE_DELETE);
         }
+        
+        return modulesTechnologies();
     }
     
-    public void deleteJSLibs() {
+    public String deleteJSLibs() {
         if (s_isDebugEnabled) {
             S_LOGGER.debug("Entering Method  Features.deleteJSLibs()");
         }
@@ -452,10 +459,11 @@ public class Features extends ServiceBaseAction {
         try {
             delete();
             setTechnologiesInRequest();
-            jsLibTechnologies();
         } catch (PhrescoException e) {
             showErrorPopup(e, EXCEPTION_FEATURE_DELETE);
         }
+        
+        return jsLibTechnologies();
     }
     
 	private void delete() throws PhrescoException {
@@ -491,9 +499,7 @@ public class Features extends ServiceBaseAction {
         	ArtifactGroup artifactGroupInfo = ServerUtil.getArtifactinfo(new ByteArrayInputStream(tempFeaByteArray));
         	FileInfo fileInfo = new FileInfo();
             getHttpResponse().setStatus(getHttpResponse().SC_OK);
-            System.out.println("archetypeInfo:::" + artifactGroupInfo);
             if (artifactGroupInfo != null) {
-                System.out.println("inside if if in archetypeInfo != null...");
             	fileInfo.setMavenJar(true);
             	fileInfo.setSuccess(true);
             	fileInfo.setGroupId(artifactGroupInfo.getGroupId());
@@ -504,7 +510,6 @@ public class Features extends ServiceBaseAction {
                 String json = gson.toJson(fileInfo);
             	writer.print(json);
             } else {
-                System.out.println("inside else in archetypeInfo == null...");
             	writer.print(MAVEN_JAR_FALSE);
         	}
 	        writer.flush();
@@ -531,61 +536,59 @@ public class Features extends ServiceBaseAction {
 			S_LOGGER.debug("Entering Method  Features.validateForm()");
 		}
 		
-		try {
-            boolean isError = false;
-            //Empty validation for name
-            if (StringUtils.isEmpty(getName())) {
-                setNameError(getText(KEY_I18N_ERR_NAME_EMPTY));
+		boolean isError = false;
+        //Empty validation for name
+        if (StringUtils.isEmpty(getName())) {
+            setNameError(getText(KEY_I18N_ERR_NAME_EMPTY));
+            isError = true;
+        }
+        //Validate whether file is selected during add
+        if (/*!EDIT.equals(getFromPage()) &&*/ featureByteArray == null) {
+            setFileError(getText(KEY_I18N_ERR_APPLNJAR_EMPTY));
+            isError = true;
+        }
+        if (featureByteArray != null) {
+            //Empty validation for groupId if file is selected
+            if (StringUtils.isEmpty(getGroupId())) {
+                setGroupIdError(getText(KEY_I18N_ERR_GROUPID_EMPTY));
                 isError = true;
             }
-            //Validate whether file is selected during add
-            if (!EDIT.equals(getFromPage()) && featureByteArray == null) {
-                setFileError(getText(KEY_I18N_ERR_APPLNJAR_EMPTY));
+            //Empty validation for artifactId if file is selected
+            if (StringUtils.isEmpty(getArtifactId())) {
+                setArtifactIdError(getText(KEY_I18N_ERR_ARTIFACTID_EMPTY));
                 isError = true;
             }
-            if (featureByteArray != null) {
-                //Empty validation for groupId if file is selected
-                if (StringUtils.isEmpty(getGroupId())) {
-                    setGroupIdError(getText(KEY_I18N_ERR_GROUPID_EMPTY));
-                    isError = true;
-                }
-                //Empty validation for artifactId if file is selected
-                if (StringUtils.isEmpty(getArtifactId())) {
-                    setArtifactIdError(getText(KEY_I18N_ERR_ARTIFACTID_EMPTY));
-                    isError = true;
-                }
-                //Empty validation for version if file is selected
-                if (StringUtils.isEmpty(getVersion())) {
-                    setVerError(getText(KEY_I18N_ERR_VER_EMPTY));
-                    isError = true;
-                }
-                //To check whether the version already exist
-                if (StringUtils.isNotEmpty(getVersion()) && (StringUtils.isEmpty(getFromPage()) 
-                        || (!getVersion().equals(getOldVersion())))) {
-                    List<ArtifactGroup> moduleGroups = getServiceManager().getModules(getCustomerId(), getTechnology(), getType());
-                    if (StringUtils.isNotEmpty(getVersion())) {
-                        for (ArtifactGroup moduleGroup : moduleGroups) {
-                            List<ArtifactInfo> versions = moduleGroup.getVersions();
-                            if (CollectionUtils.isNotEmpty(versions)) {
-                                for (ArtifactInfo module : versions) {
-                                    if (module.getName().equalsIgnoreCase(getName())
-                                            && module.getVersion().equals(getVersion())) {
-                                        setVerError(getText(KEY_I18N_ERR_VER_ALREADY_EXISTS));
-                                        isError = true;
-                                        break;
-                                    }
+            //Empty validation for version if file is selected
+            if (StringUtils.isEmpty(getVersion())) {
+                setVerError(getText(KEY_I18N_ERR_VER_EMPTY));
+                isError = true;
+            }
+            //To check whether the version already exist
+            // TODO: Lohes(check must be done by querying the DB)
+            /*if (StringUtils.isNotEmpty(getVersion()) && (StringUtils.isEmpty(getFromPage()) 
+                    || (!getVersion().equals(getOldVersion())))) {
+                List<ArtifactGroup> moduleGroups = getServiceManager().getFeatures(getCustomerId(), getTechnology(), getType());
+                if (StringUtils.isNotEmpty(getVersion())) {
+                    for (ArtifactGroup moduleGroup : moduleGroups) {
+                        List<ArtifactInfo> versions = moduleGroup.getVersions();
+                        if (CollectionUtils.isNotEmpty(versions)) {
+                            for (ArtifactInfo module : versions) {
+                                if (module.getName().equalsIgnoreCase(getName())
+                                        && module.getVersion().equals(getVersion())) {
+                                    setVerError(getText(KEY_I18N_ERR_VER_ALREADY_EXISTS));
+                                    isError = true;
+                                    break;
                                 }
                             }
                         }
                     }
                 }
-            }
-            if (isError) {
-                setErrorFound(true);
-            }
-        } catch (PhrescoException e) {
-            showErrorPopup(e, EXCEPTION_FEATURE_VALIDATE);
+            }*/
         }
+        if (isError) {
+            setErrorFound(true);
+        }
+        
         return SUCCESS;
 	}
 
