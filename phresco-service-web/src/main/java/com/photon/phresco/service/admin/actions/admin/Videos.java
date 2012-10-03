@@ -54,7 +54,6 @@ public class Videos extends ServiceBaseAction {
 	private String groupId = "";
 	private String artifactId = "";
 	private String version = "";
-	private String fromPage = "";
 	private String videoId = "";
 	private String nameError = "";
 	private String videoError = "";
@@ -298,14 +297,6 @@ public class Videos extends ServiceBaseAction {
 
 	public void setVersion(String version) {
 		this.version = version;
-	}
-
-	public String getFromPage() {
-		return fromPage;
-	}
-
-	public void setFromPage(String fromPage) {
-		this.fromPage = fromPage;
 	}
 
 	public String getNameError() {

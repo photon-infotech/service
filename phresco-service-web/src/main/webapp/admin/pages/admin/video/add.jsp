@@ -25,6 +25,7 @@
 <%@ page import="java.util.List"%>
 <%@ page import="com.photon.phresco.commons.model.VideoInfo"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
+<%@ page import="com.opensymphony.xwork2.ActionSupport"%>
 
 <%
 	VideoInfo videoInfo = (VideoInfo) request.getAttribute(ServiceUIConstants.REQ_VIDEO_INFO);
@@ -32,24 +33,34 @@
 	
 	String name = "";
 	String description = "";
+	String progressTxt = "";
+	String pageUrl = "";
+	String buttonLbl = "";
+	String pageTitle = "";
+	
 	if (videoInfo != null) {
-		if (StringUtils.isNotEmpty(videoInfo.getName())) {
-			name = videoInfo.getName();
-		}
-		if (StringUtils.isNotEmpty(videoInfo.getDescription())) {
-			description = videoInfo.getDescription();
-		}
+		name = videoInfo.getName();
+		description = videoInfo.getDescription();
+	}
+	
+	ActionSupport as = new ActionSupport();
+	if (StringUtils.isNotEmpty(fromPage)) {
+		buttonLbl = as.getText(ServiceUIConstants.KEY_I18N_BUTTON_UPDATE);
+		pageUrl = ServiceUIConstants.REQ_VIDEO_UPDATE;
+		progressTxt = as.getText(ServiceUIConstants.KEY_I18N_VIDEO_UPDATING);
+		pageTitle = as.getText(ServiceUIConstants.KEY_I18N_VIDEO_TITLE_EDIT);
+	} else {
+		buttonLbl = as.getText(ServiceUIConstants.KEY_I18N_BUTTON_SAVE);
+		pageUrl = ServiceUIConstants.REQ_VIDEO_SAVE;
+		progressTxt = as.getText(ServiceUIConstants.KEY_I18N_VIDEO_CREATING);
+		pageTitle = as.getText(ServiceUIConstants.KEY_I18N_VIDEO_TITLE_ADD);
 	}
 	
 %>
 
 <form id="formVideoAdd" class="form-horizontal customer_list">
 	<h4 class="hdr">
-   <% if (StringUtils.isNotEmpty(fromPage)) { %> 
-		<s:label key="lbl.hdr.adm.vdoedit" theme="simple" />
-	<% } else { %>
-		<s:label key="lbl.hdr.adm.vdeoadd" theme="simple"/>	
-   <% } %>
+		<%= pageTitle %>
 	</h4>
 	
 	<div class="content_adder">
@@ -142,22 +153,14 @@
 	
 	
 	<div class="bottom_button">
-        <%
-            if (StringUtils.isNotEmpty(fromPage)) {
-        %>
-	            <input type="button" id="videoUpdate" class="btn btn-primary"  value="<s:text name='lbl.hdr.comp.update'/>"
-	                onclick="validate('videoUpdate', $('#formVideoAdd'), $('#subcontainer'), '<s:text name='lbl.prog.vdeo.update'/>');" />
-        <% } else { %>
-                <input type="button" id="videoSave" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.save'/>"
-                    onclick="validate('videoSave', $('#formVideoAdd'), $('#subcontainer'), '<s:text name='lbl.prog.vdeo.save'/>');" />
-        <% } %>
-        
+       	<input type="button" id="" class="btn btn-primary"  value='<%= buttonLbl %>'
+           onclick="validate('<%= pageUrl %>', $('#formVideoAdd'), $('#subcontainer'), '<%= progressTxt %>');" />
+  
 		<input type="button" id="videoCancel" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.cancel'/>" 
             onclick="loadContent('videoList', $('#formVideoAdd'), $('#subcontainer'));" />
     </div>
 	
 	<!-- Hidden Fields -->
-	<input type="hidden" name="fromPage" value="<%= StringUtils.isNotEmpty(fromPage) ? fromPage : "" %>"/>
 	<input type="hidden" name="videoId" value="<%=  videoInfo != null ?  videoInfo.getId() : "" %>"/>
 </form>
 
@@ -204,7 +207,7 @@
             element: document.getElementById('video-file-uploader'),
             action: 'uploadVideo',
             multiple: false,
-            allowedExtensions : ["mp4,ogg,ogv,webm"],
+            allowedExtensions : ["mp4","ogg","ogv","webm"],
             type: 'videoFile',
             buttonLabel: '<s:label key="lbl.adm.upload.vdeo" />',
             typeError : '<s:text name="err.invalid.vdeo.file" />',

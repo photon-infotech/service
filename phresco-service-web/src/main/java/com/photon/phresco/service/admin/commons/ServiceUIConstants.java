@@ -166,6 +166,8 @@ public interface ServiceUIConstants {
     String REQ_VIDEO_UPLOAD = "videoFile";
     String REQ_VIDEO_INFO = "videoInfo";
     
+    String REQ_VIDEO_SAVE = "videoSave";
+    String REQ_VIDEO_UPDATE = "videoUpdate";
     /*****************************
      * GlobalUrl Request Constants
      * String REQ_GLOBURL_XXX
@@ -316,6 +318,14 @@ public interface ServiceUIConstants {
     
     String KEY_I18N_ERR_VIDEO_EMPTY = "err.msg.vdeo.empty";
     String KEY_I18N_ERR_IMAGE_EMPTY = "err.msg.img.empty";
+    String KEY_I18N_VIDEO_UPDATING = "lbl.prog.vdeo.update";
+    String KEY_I18N_VIDEO_CREATING = "lbl.prog.vdeo.save";
+    
+    String KEY_I18N_BUTTON_SAVE = "lbl.hdr.comp.save";
+    String KEY_I18N_BUTTON_UPDATE = "lbl.hdr.comp.update";
+    String KEY_I18N_VIDEO_TITLE_ADD = "lbl.hdr.adm.vdeoadd";
+    String KEY_I18N_VIDEO_TITLE_EDIT = "lbl.hdr.adm.vdoedit";
+    
     
     /*****************************
      * I18N Keys Constants
