@@ -84,6 +84,7 @@ public class Archetypes extends ServiceBaseAction {
 	private String artifactId = "";
 	private String uploadPlugin = "";
 	
+	
 	public String list() throws PhrescoException {
 		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.list()");
@@ -175,7 +176,7 @@ public class Archetypes extends ServiceBaseAction {
 		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.update()");
 		}
-
+		
 		try {
 			Technology technology = getTechnology();
 			InputStream technoIs = null;
@@ -205,15 +206,38 @@ public class Archetypes extends ServiceBaseAction {
      * @return
      * @throws PhrescoException
      */
-    private Technology getTechnology() throws PhrescoException {
+    public Technology getTechnology() throws PhrescoException {
     	if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.getTechnology()");
+		}
+    	String key ="";
+    	List<ArtifactGroup> pluginInfos = new ArrayList<ArtifactGroup>();
+    	if(s_pluginMap != null) {
+			Iterator iter = s_pluginMap.keySet().iterator();
+			while (iter.hasNext()) {
+				key = (String) iter.next();
+			    artifactId = getHttpRequest().getParameter(key+"_artifactId");
+			    groupId = getHttpRequest().getParameter(key+"_groupId");
+			    version = getHttpRequest().getParameter(key+"_version");
+
+			    ArtifactGroup pluginInfo = new ArtifactGroup();
+			    pluginInfo.setArtifactId(getArtifactId());
+			    pluginInfo.setGroupId(getGroupId());
+			    
+			    List<ArtifactInfo> artifactVersions = new ArrayList<ArtifactInfo>();
+			    ArtifactInfo artifactVersion = new ArtifactInfo();
+			    artifactVersion.setVersion(getVersion());
+			    artifactVersions.add(artifactVersion);
+			    pluginInfo.setVersions(artifactVersions);
+			    pluginInfos.add(pluginInfo);
+			}
 		}
     	
         Technology technology = new Technology();
         technology.setName(getName());
         technology.setDescription(getDescription());
         technology.setAppTypeId(getApptype());
+        technology.setPlugins(pluginInfos);
         
         ArtifactGroup artifactGroup = new ArtifactGroup();
         artifactGroup.setArtifactId(getArtifactId());
@@ -588,5 +612,4 @@ public class Archetypes extends ServiceBaseAction {
 	public void setUploadPlugin(String uploadPlugin) {
 		this.uploadPlugin = uploadPlugin;
 	}
-	
 }

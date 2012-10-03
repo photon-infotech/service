@@ -62,11 +62,13 @@ public class TechnologyConverter implements Converter<TechnologyDAO, Technology>
         List<ArtifactGroupDAO> pluginsDAO = mongoOperation.find(ARTIFACT_GROUP_COLLECTION_NAME, 
         		new Query(Criteria.whereId().is(dao.getPluginIds().toArray())), ArtifactGroupDAO.class);
         List<ArtifactGroup> plugins = new ArrayList<ArtifactGroup>();
-        for (ArtifactGroupDAO artifactGroupDAO : pluginsDAO) {
-        	ArtifactGroup artifactGroup = artifactConverter.convertDAOToObject(artifactGroupDAO, mongoOperation);
-        	plugins.add(artifactGroup);
-		}
-        technology.setPlugins(plugins);
+        if(pluginsDAO != null) {
+        	for (ArtifactGroupDAO artifactGroupDAO : pluginsDAO) {
+            	ArtifactGroup artifactGroup = artifactConverter.convertDAOToObject(artifactGroupDAO, mongoOperation);
+            	plugins.add(artifactGroup);
+    		}
+            technology.setPlugins(plugins);
+        }
         return technology;
     }
 
@@ -84,7 +86,10 @@ public class TechnologyConverter implements Converter<TechnologyDAO, Technology>
         techDAO.setTechVersions(technology.getTechVersions());
         techDAO.setUsed(technology.isUsed());
         techDAO.setArchetypeGroupDAOId(technology.getArchetypeInfo().getId());
-        techDAO.setPluginIds(createPluginId(technology.getPlugins()));
+        List<ArtifactGroup> plugins = technology.getPlugins();
+        if(plugins != null) {
+        	techDAO.setPluginIds(createPluginId(plugins));
+        }
         return techDAO;
     }
 

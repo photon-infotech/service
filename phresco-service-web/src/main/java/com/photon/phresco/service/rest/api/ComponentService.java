@@ -332,17 +332,17 @@ public class ComponentService extends DbService {
             
             map.put(tech.getEntityAs(Technology.class), foundBodyPart);
         } 
-	   
+	    Response response = null;
 	   //Iterate the content map for upload binaries
        Set<Technology> keySet = map.keySet();
 	   for (Technology technology : keySet) {
 	       List<BodyPart> list = map.get(technology);
-	       createBinary(technology, list);
+	       response = createBinary(technology, list);
 	   }
-	   return Response.status(Response.Status.OK).build();
+	   return response;
 	}
 
-	private void createBinary(Technology technology, List<BodyPart> list) throws PhrescoException {
+	private Response createBinary(Technology technology, List<BodyPart> list) throws PhrescoException {
 
 		List<ArtifactGroupDAO> artifactGroups = new ArrayList<ArtifactGroupDAO>();
 		List<com.photon.phresco.commons.model.ArtifactInfo> artifactInfos = new ArrayList<com.photon.phresco.commons.model.ArtifactInfo>();
@@ -379,6 +379,7 @@ public class ComponentService extends DbService {
 		saveTechnology(technology);
         mongoOperation.insertList(ARTIFACT_INFO_COLLECTION_NAME, artifactInfos);
         mongoOperation.insertList(ARTIFACT_GROUP_COLLECTION_NAME, artifactGroups);
+        return Response.status(Response.Status.OK).entity(technology).build();
     }
 	
 	private void saveTechnology(Technology technology) throws PhrescoException {
@@ -391,8 +392,10 @@ public class ComponentService extends DbService {
     		mongoOperation.save(TECHNOLOGIES_COLLECTION_NAME, tech);
     	} else {
     		List<String> pluginIds = techDAO.getPluginIds();
-    		pluginIds.addAll(tech.getPluginIds());
-    		techDAO.setPluginIds(pluginIds);
+    		if(CollectionUtils.isNotEmpty(pluginIds)) {
+    			pluginIds.addAll(tech.getPluginIds());
+        		techDAO.setPluginIds(pluginIds);
+    		}
     		mongoOperation.save(TECHNOLOGIES_COLLECTION_NAME, techDAO);
     	}
 	}
@@ -436,6 +439,7 @@ public class ComponentService extends DbService {
 	 */
 	@PUT
 	@Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
+	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_TECHNOLOGIES)
 	public Response updateTechnologies(MultiPart multipart) throws PhrescoException {
 	    if (isDebugEnabled) {

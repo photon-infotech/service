@@ -319,13 +319,13 @@ function disableEnableTextBox(groupId, artifactId, jarVersion, isEnable, type, f
 		var versnId = "versnId" ;
 		var fileDetParentDiv = $(document.createElement('div')).attr("id", fileName).attr("class","fileClass");
 		fileDetParentDiv.html("<div style='float: left; margin-right: 13px;'><label class='control-label labelbold' style='color:black;'> Group Id </label>" +
-				           "<div class='controls'><input id=" +groupid +" class='groupId' class='input-xlarge' maxlength='40' title='40 Characters only' type='text'  value='" + groupId +"' >" +
+				           "<div class='controls'><input id='" +groupid +"' class='groupId' class='input-xlarge' name='"+fileName+"_groupId" +"' maxlength='40' title='40 Characters only' type='text'  value='" + groupId +"' >" +
 				           "</div></div>"); 
 		fileDetParentDiv.append("<div style='float: left; margin-right: 7px;'> <label class='control-label labelbold' style='color:black;'> " +
-				              "Artifact Id </label><div class='controls'><input id='" +artifId +"'class='artifactId' class='input-xlarge'maxlength='40' title='40 Characters only' type='text' value='" + artifactId +"' >" +
+				              "Artifact Id </label><div class='controls'><input id='" +artifId +"'class='artifactId' class='input-xlarge' name='"+fileName+"_artifactId" +"' maxlength='40' title='40 Characters only' type='text' value='" + artifactId +"' >" +
 				              "</div></div>");
 		fileDetParentDiv.append("<div style='float: left; margin-right: 7px;'><label class='control-label labelbold' style='color:black;'> Version </label> "+
-		                   "<div class='controls'><input id='" +versnId +"'class='jarVersion' maxlength='30' title='30 Characters only' class='input-xlarge' type='text' value='" +jarVersion +"' > " +
+		                   "<div class='controls'><input id='" +versnId +"'class='jarVersion' name='"+fileName+"_version" +"'  maxlength='30' title='30 Characters only' class='input-xlarge' type='text' value='" +jarVersion +"' > " +
 		                   "</div></div>");
 		fileDetParentDiv.append("</div>")
 		fileDetParentDiv.appendTo("#jarDetailsDivPopup");

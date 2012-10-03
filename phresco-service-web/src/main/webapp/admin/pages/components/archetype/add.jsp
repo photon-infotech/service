@@ -31,42 +31,31 @@
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
 
 <%
-	Technology technology = (Technology)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPE);
+	Technology technology = (Technology) request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPE);
 	String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
-	List<ApplicationType> appTypes = (List<ApplicationType>)request.getAttribute(ServiceUIConstants.REQ_APP_TYPES);
+	List<ApplicationType> appTypes = (List<ApplicationType>) request.getAttribute(ServiceUIConstants.REQ_APP_TYPES);
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
-	
+
 	//For edit
 	String name = "";
 	String desc = "";
-	String versions = "";
+	String version = "";
 	String versionComment = "";
 	List<String> techVersion = null;
 	boolean isSystem = false;
 	String appTypeId = "";
 	if (technology != null) {
-		if (StringUtils.isNotEmpty(technology.getName())) {
-			name = technology.getName();
-		}
-		if (StringUtils.isNotEmpty(technology.getDescription())) {
-			desc = technology.getDescription();
-		}
-/* 
-		List<ArtifactInfo> technoVersions = technology.getArchetypeInfo().getVersions();
+		name = technology.getName();
+		desc = technology.getDescription();
+		List<ArtifactInfo> technoVersions = technology
+				.getArchetypeInfo().getVersions();
 		if (CollectionUtils.isNotEmpty(technoVersions)) {
-			for (ArtifactInfo technoVersion : technoVersions) {
-				versions = technoVersion.getVersion();
+			for (ArtifactInfo versions : technoVersions) {
+				version = versions.getVersion();
 			}
-		} */
-		/* if (CollectionUtils.isNotEmpty(technology.getVersions())) {
-			versions = technology.getVersions();
-		} */
-		/* if (StringUtils.isNotEmpty(technology.getVersionComment())) {
-			versionComment = technology.getVersionComment();
-		} */
-		if (CollectionUtils.isNotEmpty(technology.getTechVersions())) {
-			techVersion = technology.getTechVersions();
 		}
+
+		techVersion = technology.getTechVersions();
 		isSystem = technology.isSystem();
 		appTypeId = technology.getAppTypeId();
 	}
@@ -115,7 +104,7 @@
 			</label>
 			<div class="controls">
 				<input id="version" placeholder='<s:text name="place.hldr.archetype.add.version"/>' class="input-xlarge" 
-					type="text" name="version" value="<%= StringUtils.isNotEmpty(versions) ? versions : "" %>" maxlength="30" 
+					type="text" name="version" value="<%= StringUtils.isNotEmpty(version) ? version : "" %>" maxlength="30" 
 					title="30 Characters only">
 				<span class="help-inline" id="verError"></span>
 			</div>
@@ -256,10 +245,6 @@
 	<input type="hidden" name="oldName" value="<%= technology != null ? technology.getName() : "" %>"/>
 	<input type="hidden" name="customerId" value="<%= customerId %>">
 	<input type="hidden" name="uploadPlugin" value="uploadPlugin">
-	<!-- <input type="hidden" name="groupId">
-	<input type="hidden" name="artifactId">
-	<input type="hidden" name="jarVersion"> -->
-	
 </form>
 
 <script type="text/javascript">
