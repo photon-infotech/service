@@ -51,6 +51,7 @@ import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.DownloadInfo;
+import com.photon.phresco.commons.model.PlatformType;
 import com.photon.phresco.commons.model.SettingsTemplate;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.commons.model.WebService;
@@ -1624,4 +1625,23 @@ public class ComponentService extends DbService {
         return Response.status(Response.Status.OK).build();
     }
     
+    /**
+	 * Returns the list of platforms available
+	 * @return
+	 */
+	@GET
+	@Path (REST_API_PLATFORMS)
+	@Produces (MediaType.APPLICATION_JSON)
+	public Response findPlatforms() {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.findPlatforms()");
+	    }
+		
+		try {
+			List<PlatformType> platformList = mongoOperation.getCollection(PLATFORMS_COLLECTION_NAME, PlatformType.class);
+			return Response.status(Response.Status.NO_CONTENT).entity(platformList).build();
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00005, SETTINGS_COLLECTION_NAME);
+		}
+	}
 }
