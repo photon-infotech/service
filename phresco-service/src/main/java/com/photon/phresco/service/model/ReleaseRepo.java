@@ -9,7 +9,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "data", propOrder = {
 
 })
-public class RepoData {
+public class ReleaseRepo {
     
     private String contentResourceURI;
     private String id;
@@ -27,11 +27,11 @@ public class RepoData {
     private boolean downloadRemoteIndexes;
     private String defaultLocalStorageUrl;
     
-    public RepoData() {
+    public ReleaseRepo() {
         
     }
 
-    public RepoData(String contentResourceURI, String id, String name, String provider, String providerRole, 
+    public ReleaseRepo(String contentResourceURI, String id, String name, String provider, String providerRole, 
             String format, String repoType, boolean exposed, String writePolicy, boolean browseable, 
             boolean indexable, int notFoundCacheTTL, String repoPolicy, boolean downloadRemoteIndexes) {
         this.contentResourceURI = contentResourceURI;

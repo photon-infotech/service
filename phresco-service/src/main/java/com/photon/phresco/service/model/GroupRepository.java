@@ -21,13 +21,19 @@
 
 package com.photon.phresco.service.model;
 
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
 @XmlRootElement
-public class Data {
+@XmlType(name = "data", propOrder = {
+
+})
+public class GroupRepository {
     
     private String contentResourceURI;
     private String id;
@@ -36,14 +42,14 @@ public class Data {
     private String format;
     private String repoType;
     private boolean exposed;
-//    private List<Repository> repositories;
+    private List<Repository> repositories;
     
-    public Data() {
+    public GroupRepository() {
         
     }
     
-    public Data(String contentResourceURI, String id, String name, String provider, String format, String repoType, 
-            boolean exposed) {
+    public GroupRepository(String contentResourceURI, String id, String name, String provider, String format, String repoType, 
+            boolean exposed, List<Repository> repositories) {
         this.contentResourceURI = contentResourceURI;
         this.id = id;
         this.name = name;
@@ -51,7 +57,7 @@ public class Data {
         this.format = format;
         this.repoType = repoType;
         this.exposed = exposed;
-//        this.repositories = repositories;
+        this.repositories = repositories;
     }
     
 
@@ -153,19 +159,19 @@ public class Data {
         this.exposed = exposed;
     }
 
-//    /**
-//     * @return
-//     */
-//    public List<Repository> getRepositories() {
-//        return repositories;
-//    }
-//
-//    /**
-//     * @param repositories
-//     */
-//    public void setRepositories(List<Repository> repositories) {
-//        this.repositories = repositories;
-//    }
+    /**
+     * @return
+     */
+    public List<Repository> getRepositories() {
+        return repositories;
+    }
+
+    /**
+     * @param repositories
+     */
+    public void setRepositories(List<Repository> repositories) {
+        this.repositories = repositories;
+    }
 
     public String toString() {
         return new ToStringBuilder(this,

@@ -80,8 +80,9 @@ import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.model.ArtifactInfo;
-import com.photon.phresco.service.model.Data;
-import com.photon.phresco.service.model.RepoData;
+import com.photon.phresco.service.model.GroupRepository;
+import com.photon.phresco.service.model.ReleaseRepo;
+import com.photon.phresco.service.model.Repository;
 import com.photon.phresco.service.model.ServerConfiguration;
 import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.ServiceConstants;
@@ -491,7 +492,7 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
     
     private String createReleaseRepoData(String customerId, String repoBaseURL, String repoType) {
         String repoId = customerId + repoType.toLowerCase();
-        RepoData data =  new RepoData(repoBaseURL + REPO_HOSTED_CONTENT + repoId, repoId, repoId, REPO_PROVIDER, REPO_PROVIDER_ROLE, 
+        ReleaseRepo data =  new ReleaseRepo(repoBaseURL + REPO_HOSTED_CONTENT + repoId, repoId, repoId, REPO_PROVIDER, REPO_PROVIDER_ROLE, 
                 REPO_PROVIDER, REPO_HOSTED, true, REPO_ALLOW_WRITE, true, true, NOT_FOUND_CACHE, repoType, false);
         String json = new Gson().toJson(data);
         return OPEN_PHRASE + SLASH + REPO_OBJECT_ID + SLASH + COLON + json + CLOSE_PHRASE;
@@ -501,15 +502,14 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
         String repoId = customerId + repoType.toLowerCase();
         String releaseId = customerId + REPO_RELEASE_NAME;
         String snapshotId = customerId + REPO_SNAPSHOT_NAME;
-//        List<Reposito> repositories = new ArrayList<Repository>();
-//        Repository repo = new Repository(releaseId, releaseId, repoBaseURL + LOCAL_REPO_GROUP + releaseId);
-//        repositories.add(repo);
-//        repo = new Repository(snapshotId, snapshotId, repoBaseURL + LOCAL_REPO_GROUP + snapshotId);
-//        repositories.add(repo);
-//        Data data =  new Data(repoBaseURL + REPO_GROUP_CONTENT + repoId, repoId, repoId, REPO_PROVIDER, 
-//                REPO_PROVIDER, REPO_HOSTED, true, repositories);
-//        String json = new Gson().toJson(data);
-        String json = "";
+        List<Repository> repositories = new ArrayList<Repository>();
+        Repository repo = new Repository(releaseId, releaseId, repoBaseURL + LOCAL_REPO_GROUP + releaseId);
+        repositories.add(repo);
+        repo = new Repository(snapshotId, snapshotId, repoBaseURL + LOCAL_REPO_GROUP + snapshotId);
+        repositories.add(repo);
+        GroupRepository data =  new GroupRepository(repoBaseURL + REPO_GROUP_CONTENT + repoId, repoId, repoId, REPO_PROVIDER, 
+                REPO_PROVIDER, REPO_HOSTED, true, repositories);
+        String json = new Gson().toJson(data);
         return OPEN_PHRASE + SLASH + REPO_OBJECT_ID + SLASH + COLON + json + CLOSE_PHRASE;
     }
 
