@@ -300,6 +300,8 @@ function enableScreen() {
 function fillTextBoxes(responseJSON, type, fileName) {
 	if (type === "pluginJar"){
 		$('#jarDetailsDivPopup').show();
+	} else if (type === "videoFile") {
+		$('#videoDetailsDiv').show();
 	} else {
 		$('#jarDetailsDiv').show();
 	}

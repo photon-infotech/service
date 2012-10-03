@@ -163,7 +163,8 @@ public interface ServiceUIConstants {
      * String REQ_VIDEO_XXX
      *****************************/ 
     String REQ_VIDEO_FILE_TYPE = "type";
-    String REQ_VIDEO_UPLOAD = "uploadVideo";
+    String REQ_VIDEO_UPLOAD = "videoFile";
+    String REQ_VIDEO_INFO = "videoInfo";
     
     /*****************************
      * GlobalUrl Request Constants
@@ -213,6 +214,12 @@ public interface ServiceUIConstants {
 	
 	String EXCEPTION_PERMISSION_LIST = "Permission list";
 	String EXCEPTION_PERMISSION_DELETE = "Permission delete";
+	
+	String EXCEPTION_VIDEO_DELETE = "Video delete";
+	String EXCEPTION_VIDEO_UPDATE = "Video update";
+	String EXCEPTION_VIDEO_SAVE = "Video save";
+	String EXCEPTION_VIDEO_EDIT = "Video edit";
+	String EXCEPTION_VIDEO_LIST = "Video list";
 	
 	String EXCEPTION_GLOBAL_URL_DELETE = "GlobalUrl delete";
 	String EXCEPTION_GLOBAL_URL_UPDATE = "GlobalUrl update";
@@ -307,6 +314,9 @@ public interface ServiceUIConstants {
     String KEY_I18N_ERR_GROUP_EMPTY = "err.msg.group.empty";
     String KEY_I18N_ERR_TECH_EMPTY = "err.msg.tech.empty";
     
+    String KEY_I18N_ERR_VIDEO_EMPTY = "err.msg.vdeo.empty";
+    String KEY_I18N_ERR_IMAGE_EMPTY = "err.msg.img.empty";
+    
     /*****************************
      * I18N Keys Constants
      * String KEY_I18N_FEATUR_XXX
@@ -353,6 +363,9 @@ public interface ServiceUIConstants {
     String ROLE_NOT_ADDED = "fail.role.add";
     String ROLE_DELETED = "succ.role.delete";
     String ROLE_NOT_DELETED = "fail.role.delete" ;
+    
+    String VIDEO_ADDED = "succ.vdeo.add";
+    String VIDEO_DELETED = "succ.vdeo.delete";
     
     String URL_ADDED = "succ.url.add";
     String URL_NOT_ADDED = "fail.url.add";

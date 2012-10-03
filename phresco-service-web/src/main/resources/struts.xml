@@ -537,8 +537,44 @@
 		<!-- ADMIN LDAP ENDS-->
 		
 		<!-- ADMIN VIDEO ENDS-->
-		<action name="video" class="com.photon.phresco.service.admin.actions.admin.VideoList" method="list">
+		<action name="videoList" class="com.photon.phresco.service.admin.actions.admin.Videos" method="list">
 			<result name="videoList">/admin/pages/admin/video/list.jsp</result>
+        </action>
+        
+        <action name="videoAdd" class="com.photon.phresco.service.admin.actions.admin.Videos" method="add">
+			<result name="videoAdd">/admin/pages/admin/video/add.jsp</result>
+        </action>
+        
+         <action name="videoEdit" class="com.photon.phresco.service.admin.actions.admin.Videos" method="edit">
+            <result name="videoAdd">/admin/pages/admin/video/add.jsp</result>
+        </action>
+        
+        <action name="videoDelete" class="com.photon.phresco.service.admin.actions.admin.Videos" method="delete">
+			<result name="videoList">/admin/pages/admin/video/list.jsp</result>
+        </action>
+        
+         <action name="videoSave" class="com.photon.phresco.service.admin.actions.admin.Videos" method="save">
+			<result name="videoList">/admin/pages/admin/video/list.jsp</result>
+        </action>
+        
+        <action name="videoUpdate" class="com.photon.phresco.service.admin.actions.admin.Videos" method="update">
+			<result name="videoList">/admin/pages/admin/video/list.jsp</result>
+        </action>
+        
+        <action name="videoSaveValidate" class="com.photon.phresco.service.admin.actions.admin.Videos" method="validateForm">
+			<result type="json" />
+        </action>
+        
+        <action name="videoUpdateValidate" class="com.photon.phresco.service.admin.actions.admin.Videos" method="validateForm">
+			<result type="json" />
+        </action>
+        
+        <action name="uploadVideo" class="com.photon.phresco.service.admin.actions.admin.Videos" method="uploadFile">
+			<result type="json" />
+        </action>
+        
+        <action name="removeVideo" class="com.photon.phresco.service.admin.actions.admin.Videos" method="removeUploadedFile">
+			<result type="json" />
         </action>
 		<!-- ADMIN VIDEO ENDS-->
 			

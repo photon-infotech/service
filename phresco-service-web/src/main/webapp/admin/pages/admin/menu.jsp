@@ -50,7 +50,7 @@
 			<s:label key="lbl.hdr.adm.ldapstng"  theme="simple"/></a>
 		</li>
 		<li>
-			<a id="video" class="inactive" name="adminTab" href="#">
+			<a id="videoList" class="inactive" name="adminTab" href="#">
 			<s:label key="lbl.hdr.adm.vdos"  theme="simple"/></a>
 		</li>
 		<li>

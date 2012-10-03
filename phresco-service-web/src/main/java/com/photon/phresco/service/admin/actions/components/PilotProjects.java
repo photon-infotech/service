@@ -148,8 +148,9 @@ public class PilotProjects extends ServiceBaseAction {
     	}
     	
     	try {
-    		InputStream pilotProIs = new ByteArrayInputStream(s_pilotProByteArray);
-    		getServiceManager().createPilotProjects(createPilotProj(), pilotProIs, getCustomerId());
+    		List<InputStream> inputStreams = new ArrayList<InputStream>();
+    		inputStreams.add(new ByteArrayInputStream(s_pilotProByteArray));
+    		getServiceManager().createPilotProjects(createPilotProj(), inputStreams, getCustomerId());
 			addActionMessage(getText(PLTPROJ_ADDED, Collections.singletonList(getName())));
     	} catch (PhrescoException e) {
     		return showErrorPopup(e, EXCEPTION_PILOT_PROJECTS_SAVE);
@@ -168,8 +169,9 @@ public class PilotProjects extends ServiceBaseAction {
     		S_LOGGER.debug("Entering Method  PilotProjects.update()");
     	}
     	try {
-    		InputStream pilotProIs = new ByteArrayInputStream(s_pilotProByteArray);
-    		getServiceManager().updatePilotProject(createPilotProj(), pilotProIs, getProjectId(), getCustomerId());
+    		List<InputStream> inputStreams = new ArrayList<InputStream>();
+    		inputStreams.add(new ByteArrayInputStream(s_pilotProByteArray));
+    		getServiceManager().updatePilotProject(createPilotProj(), inputStreams, getProjectId(), getCustomerId());
     		addActionMessage(getText(PLTPROJ_UPDATED, Collections.singletonList(getName())));
     	} catch (PhrescoException e) {
     		return showErrorPopup(e, EXCEPTION_PILOT_PROJECTS_UPDATE);

@@ -19,11 +19,40 @@
   --%>
 <%@ taglib uri="/struts-tags" prefix="s" %>
 
-<form class="form-horizontal customer_list">
+<%@ page import="org.apache.commons.collections.CollectionUtils"%>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="java.util.List"%>
+<%@ page import="com.photon.phresco.commons.model.VideoInfo"%>
+<%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
+
+<%
+	List<VideoInfo> videoInfos = (List<VideoInfo>) request.getAttribute(ServiceUIConstants.REQ_VIDEO_INFO);
+%>
+
+<form id="formVideoList" class="form-horizontal customer_list">
 	<div class="operation" id="operation">
-		<input type="button" id="videoAdd" class="btn" disabled name="ldap_add" value="<s:text name='lbl.hdr.adm.vdeoadd'/>"/>
-		<input type="button" id="del" class="btn" disabled value="<s:text name='lbl.hdr.adm.delete'/>"/>
+		<input type="button" id="videoAdd" class="btn btn-primary" name="video_add"
+			onclick="loadContent('videoAdd', $('#formVideoList'), $('#subcontainer'));" 
+					value="<s:text name='lbl.hdr.adm.vdeoadd'/>"/>
+		<input type="button" id="del" class="btn" disabled value="<s:text name='lbl.hdr.adm.delete'/>" 
+				onclick="showDeleteConfirmation('<s:text name='del.confirm.videos'/>');"/>
+		<s:if test="hasActionMessages()">
+			<div class="alert alert-success alert-message"  id="successmsg">
+				<s:actionmessage />
+			</div>
+		</s:if>
+		<s:if test="hasActionErrors()">
+			<div class="alert alert-error"  id="errormsg">
+				<s:actionerror />
+			</div>
+		</s:if>
 	</div>
+	
+	<% if (CollectionUtils.isEmpty(videoInfos)) { %>
+		<div class="alert alert-block">
+		    <s:text name='alert.msg.video.not.available'/>
+		</div>
+	<% } else { %>
 	
 	<div class="table_div">
 		<div class="fixed-table-container">
@@ -43,24 +72,37 @@
 								<th class="second">
 									<div class="th-inner tablehead"><s:label key="lbl.hdr.adm.vdeo.desc" theme="simple"/></div>
 								</th>
+								<%-- <th class="second">
+									<div class="th-inner tablehead"><s:label key="lbl.hdr.adm.vdeo.thumbnail" theme="simple"/></div>
+								</th> --%>
 							</tr>
 						</thead>
 			
 						<tbody>
-						<tr>
-							<td class="checkboxwidth">
-								<input type="checkbox" class="check" name="check"  onclick="checkboxEvent();">
-							</td>
-							<td>
-								<a>Video</a>
-							</td>
-							<td class="emailalign"></td>
-						</tr>
+						<% for (VideoInfo videoInfo : videoInfos) { %>
+							<tr>
+								<td class="checkboxwidth">
+									<input type="checkbox" class="check" name="videoId" value="<%= videoInfo.getId() %>" 
+									   onclick="checkboxEvent();" />
+								</td>
+								<td>
+									<a href="#" onclick="editVideo('<%= videoInfo.getId() %>');"><%= videoInfo.getName() %></a>
+								</td>
+								<td>
+									<%= StringUtils.isNotEmpty(videoInfo.getDescription()) ? videoInfo.getDescription() : "" %>
+								</td>
+								<!-- <td>
+									Sample Thumbnail
+								</td> -->
+								<td class="emailalign"></td>
+							</tr>
+						<% } %>
 					</tbody>
 				</table>
 			</div>
 		</div>
 	</div>
+	<% } %>
 </form>
 
 <script type="text/javascript">
@@ -72,4 +114,17 @@
 	$(document).ready(function() {
 		enableScreen();
 	});
+	
+	 /** To edit the pilot project **/
+    function editVideo(id) {
+        var params = "videoId=";
+        params = params.concat(id);
+        loadContent("videoEdit", $("#formVideoList"), $('#subcontainer'), params);
+    }
+	 
+ // This method calling from confirm_dialog.jsp
+    function continueDeletion() {
+    	confirmDialog('none','');
+    	loadContent('videoDelete', $('#formVideoList'), $('#subcontainer'));
+    } 
 </script>
