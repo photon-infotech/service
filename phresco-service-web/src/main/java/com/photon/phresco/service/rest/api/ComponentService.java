@@ -1106,12 +1106,18 @@ public class ComponentService extends DbService {
 	}
 	
 	private void saveApplicationInfo(ApplicationInfo applicationInfo) throws PhrescoException {
-		Converter<ApplicationInfoDAO, ApplicationInfo> appConverter = 
+		ApplicationInfoDAO applicationInfoDAOs = mongoOperation.findOne(APPLICATION_INFO_COLLECTION_NAME, new Query(Criteria.where("name").is(applicationInfo.getName())), ApplicationInfoDAO.class);
+		if(applicationInfoDAOs == null){
+			Converter<ApplicationInfoDAO, ApplicationInfo> appConverter = 
 			(Converter<ApplicationInfoDAO, ApplicationInfo>) ConvertersFactory.getConverter(ApplicationInfoDAO.class);
-		ApplicationInfoDAO applicationInfoDAO = appConverter.convertObjectToDAO(applicationInfo);
-		mongoOperation.save(APPLICATION_INFO_COLLECTION_NAME, applicationInfoDAO);
-		ArtifactGroup pilotContent = applicationInfo.getPilotContent();
-		saveModuleGroup(pilotContent);
+			ApplicationInfoDAO applicationInfoDAO = appConverter.convertObjectToDAO(applicationInfo);
+			mongoOperation.save(APPLICATION_INFO_COLLECTION_NAME, applicationInfoDAO);
+			ArtifactGroup pilotContent = applicationInfo.getPilotContent();
+			saveModuleGroup(pilotContent);
+		}else{
+			ArtifactGroup pilotContent = applicationInfo.getPilotContent();
+			saveModuleGroup(pilotContent);
+		}
 	}
 	
 	/**
@@ -1215,8 +1221,16 @@ public class ComponentService extends DbService {
 	    }
 		
 		try {
-			mongoOperation.remove(APPLICATION_INFO_COLLECTION_NAME, 
-			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ApplicationInfo.class);
+			ApplicationInfoDAO findOne = mongoOperation.findOne(APPLICATION_INFO_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ApplicationInfoDAO.class);
+	        String artifactGroupId = findOne.getArtifactGroupId();
+	        ArtifactGroupDAO artifactGroupDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
+	        		new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(artifactGroupId)), ArtifactGroupDAO.class);
+	        List<String> versionIds = artifactGroupDAO.getVersionIds();
+	        mongoOperation.remove(ARTIFACT_INFO_COLLECTION_NAME, 
+	        		new Query(Criteria.where(REST_API_PATH_PARAM_ID).in(versionIds.toArray())), com.photon.phresco.commons.model.ArtifactInfo.class);
+	        mongoOperation.remove(ARTIFACT_GROUP_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(artifactGroupId)), ArtifactGroupDAO.class);
+	        mongoOperation.remove(APPLICATION_INFO_COLLECTION_NAME, 
+			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ApplicationInfoDAO.class);
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
 		}
