@@ -41,6 +41,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.data.document.mongodb.query.Criteria;
+import org.springframework.data.document.mongodb.query.Query;
+
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactInfo;
@@ -77,7 +80,7 @@ public class ApptypeGenerator extends DbService implements ServiceConstants {
     private Map<String, ArtifactGroup> pluginMap = new HashMap<String, ArtifactGroup>();
     private Converter<ArtifactGroupDAO, ArtifactGroup> artifactConverter;
     
-    private String artifactVersion = "2.0.0.16000";
+    private String[] artifactVersion = new String[]{"2.0.0.16000", "2.0.0.17000"};
     
     public ApptypeGenerator() throws PhrescoException {
         super();
@@ -202,7 +205,7 @@ public class ApptypeGenerator extends DbService implements ServiceConstants {
     }
     
     public void publish() throws PhrescoException {
-        generateApptypes();
+//        generateApptypes();
 //        createWebAppTechs();
 //        createMobAppTechs();
         createWebServiceAppTechs();
@@ -215,10 +218,11 @@ public class ApptypeGenerator extends DbService implements ServiceConstants {
         technology.setName(name);
         technology.setSystem(true);
         technology.setCustomerIds(getDefaultCustomers());
-//        technology.setDescription(docMap.get(id));
-//        technology.setHelpText(docMap.get(id));
+        technology.setDescription(docMap.get(id));
+        technology.setHelpText(docMap.get(id));
         technology.setTechVersions(Arrays.asList(versions));
         technology.setArchetypeInfo(createArchetypeInfo(id, name));
+        technology.setPlugins(createPlugins(id));
         return technology;
     }
     
@@ -233,40 +237,31 @@ public class ApptypeGenerator extends DbService implements ServiceConstants {
         group.setName(name + "Technology Archetype");
         group.setSystem(true);
         List<ArtifactInfo> createArtifactInfo = createArtifactInfo(id);
-        System.out.println("ArtifactInfoSize Is" + createArtifactInfo.size());
         group.setVersions(createArtifactInfo);
         return group;
     }
 
     private List<ArtifactInfo> createArtifactInfo(String id) throws PhrescoException {
         List<ArtifactInfo> infos = new ArrayList<ArtifactInfo>();
-        ArtifactInfo artifactInfo = new ArtifactInfo();
-        artifactInfo.setSystem(true);
-        artifactInfo.setVersion(artifactVersion);
-        List<String> createDependencies = createDependencies(id, artifactVersion);
-        artifactInfo.setDependencies(createDependencies);
-        infos.add(artifactInfo);
+        for (String version : artifactVersion) {
+        	ArtifactInfo artifactInfo = new ArtifactInfo();
+            artifactInfo.setSystem(true);
+            artifactInfo.setVersion(version);
+            infos.add(artifactInfo);
+		}
+        System.out.println("Returning Size" + infos.size());
         return infos;
     }
 
-    private List<String> createDependencies(String id, String version) throws PhrescoException {
+    private List<ArtifactGroup> createPlugins(String id) throws PhrescoException {
+    	List<ArtifactGroup> groups = new ArrayList<ArtifactGroup>();
     	ArtifactGroup group = new ArtifactGroup();
     	ArtifactGroup artifactGroup = pluginMap.get(id);
     	group.setGroupId(artifactGroup.getGroupId());
     	group.setArtifactId(artifactGroup.getArtifactId());
-    	List<ArtifactInfo> infos = new ArrayList<ArtifactInfo>();
-    	ArtifactInfo articactInfo = new ArtifactInfo();
-    	articactInfo.setVersion(version);
-    	infos.add(articactInfo);
-    	group.setVersions(infos);
-    	
-    	ArtifactGroupDAO convertObjectToDAO = artifactConverter.convertObjectToDAO(artifactGroup);
-    	String daoId = convertObjectToDAO.getId();
-    	mongoOperation.save("ArtifactDAO", convertObjectToDAO);
-    	
-    	List<String> depIds = new ArrayList<String>();
-    	depIds.add(daoId);
-		return depIds;
+    	group.setVersions(createArtifactInfo(id));
+    	groups.add(group);
+		return groups;
 	}
 
 	private List<String> getDefaultCustomers() {
@@ -276,29 +271,48 @@ public class ApptypeGenerator extends DbService implements ServiceConstants {
     }
     
     private void saveTechnologies(List<Technology> techs) throws PhrescoException {
-        List<String> artifactInfoId = new ArrayList<String>();
-        List<String> artifactGroupId = new ArrayList<String>();
-        Converter<TechnologyDAO, Technology> technologyConverter = 
-          (Converter<TechnologyDAO, Technology>) ConvertersFactory.getConverter(TechnologyDAO.class);
         for (Technology technology : techs) {
-            ArtifactGroup archetypeInfo = technology.getArchetypeInfo();
-            ArtifactGroupDAO artifactGroupDAO = artifactConverter.convertObjectToDAO(archetypeInfo);
-            
-            List<ArtifactInfo> versions = archetypeInfo.getVersions();
-            for (ArtifactInfo artifactInfo : versions) {
-                artifactInfoId.add(artifactInfo.getId());
-                System.out.println(artifactInfo.getDependencies());
-                mongoOperation.save("ArtifactInfo", artifactInfo);
-            }
-            artifactGroupDAO.setVersionIds(artifactInfoId);
-            mongoOperation.save("ArtifactDAO", artifactGroupDAO);
-            
-            TechnologyDAO technologyDAO = technologyConverter.convertObjectToDAO(technology);
-            technologyDAO.setArchetypeGroupDAOId(artifactGroupDAO.getId());
-            technologyDAO.setDependencyIds(artifactGroupId);
-            mongoOperation.save("Technology", technologyDAO);
+        	saveInfo(technology);
+        	ArtifactGroup archetypeInfo = technology.getArchetypeInfo();
+        	convertAndStrore(archetypeInfo);
+        	List<ArtifactGroup> plugins = technology.getPlugins();
+        	for (ArtifactGroup artifactGroup : plugins) {
+        		System.out.println("Entered");
+        		convertAndStrore(artifactGroup);
+			}
+		}
+    }
+    
+    private void saveInfo(Technology technology) throws PhrescoException {
+    	Converter<TechnologyDAO, Technology> techConverter = 
+    		(Converter<TechnologyDAO, Technology>) ConvertersFactory.getConverter(TechnologyDAO.class);
+    	TechnologyDAO tech = techConverter.convertObjectToDAO(technology);
+    	TechnologyDAO techDAO = mongoOperation.findOne(TECHNOLOGIES_COLLECTION_NAME, 
+    			new Query(Criteria.where("name").is(tech.getName())), TechnologyDAO.class);
+    	if(techDAO == null) {
+    		mongoOperation.save(TECHNOLOGIES_COLLECTION_NAME, tech);
+    	} else {
+    		List<String> pluginIds = techDAO.getPluginIds();
+    		pluginIds.addAll(tech.getPluginIds());
+    		techDAO.setPluginIds(pluginIds);
+    		mongoOperation.save(TECHNOLOGIES_COLLECTION_NAME, techDAO);
+    	}
+	}
+
+    private void convertAndStrore(ArtifactGroup artifactGroup) throws PhrescoException {
+        List<ArtifactInfo> versions = artifactGroup.getVersions();
+        List<String> versionIds = new ArrayList<String>();
+        Converter<ArtifactGroupDAO, ArtifactGroup> converter = 
+            (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
+        ArtifactGroupDAO moduleGroupDAO = converter.convertObjectToDAO(artifactGroup);
+        String id2 = moduleGroupDAO.getId();
+        for (ArtifactInfo module : versions) {
+        	versionIds.add(module.getId());
+            module.setArtifactGroupId(id2);
+            mongoOperation.save(ARTIFACT_INFO_COLLECTION_NAME, module);
         }
-        
+        moduleGroupDAO.setVersionIds(versionIds);
+      mongoOperation.save(ARTIFACT_GROUP_COLLECTION_NAME, moduleGroupDAO);
     }
     
     public static void main(String[] args) throws PhrescoException {

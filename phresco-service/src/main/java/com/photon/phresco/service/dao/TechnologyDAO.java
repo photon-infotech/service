@@ -29,6 +29,7 @@ public class TechnologyDAO extends CustomerBaseDAO {
     private List<String> techVersions;
 	private String archetypeGroupDAOId;
 	private List<String> dependencyIds;
+	private List<String> pluginIds;
 	
 	public TechnologyDAO() {
 		super();
@@ -41,7 +42,6 @@ public class TechnologyDAO extends CustomerBaseDAO {
     public void setArchetypeGroupDAOId(String archetypeGroupDAOId) {
         this.archetypeGroupDAOId = archetypeGroupDAOId;
     }
-
 
     public List<String> getDependencyIds() {
         return dependencyIds;
@@ -66,5 +66,13 @@ public class TechnologyDAO extends CustomerBaseDAO {
     public void setDependencyIds(List<String> dependencyIds) {
         this.dependencyIds = dependencyIds;
     }
+
+	public List<String> getPluginIds() {
+		return pluginIds;
+	}
+
+	public void setPluginIds(List<String> pluginIds) {
+		this.pluginIds = pluginIds;
+	}
 
 }

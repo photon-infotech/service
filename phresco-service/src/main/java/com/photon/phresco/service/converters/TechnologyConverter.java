@@ -20,6 +20,9 @@
 
 package com.photon.phresco.service.converters;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.data.document.mongodb.MongoOperations;
 import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
@@ -47,21 +50,23 @@ public class TechnologyConverter implements Converter<TechnologyDAO, Technology>
         technology.setSystem(dao.isSystem());
         technology.setTechVersions(dao.getTechVersions());
         technology.setUsed(dao.isUsed());
-        
         String archetypeGroupDAOId = dao.getArchetypeGroupDAOId();
-        System.out.println("archetypeGroupDAOId " + archetypeGroupDAOId);
-        
         ArtifactGroupDAO artifactGrpDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
         		new Query(Criteria.whereId().is(archetypeGroupDAOId)), ArtifactGroupDAO.class);
-        System.out.println("artifactGrpDAO " + artifactGrpDAO);
-
+        Converter<ArtifactGroupDAO, ArtifactGroup> artifactConverter = 
+            (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
         if (artifactGrpDAO != null) { 
-			Converter<ArtifactGroupDAO, ArtifactGroup> artifactConverter = 
-		            (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
 	        ArtifactGroup artifactGroup = artifactConverter.convertDAOToObject(artifactGrpDAO, mongoOperation);
 	        technology.setArchetypeInfo(artifactGroup);
         }
-        
+        List<ArtifactGroupDAO> pluginsDAO = mongoOperation.find(ARTIFACT_GROUP_COLLECTION_NAME, 
+        		new Query(Criteria.whereId().is(dao.getPluginIds().toArray())), ArtifactGroupDAO.class);
+        List<ArtifactGroup> plugins = new ArrayList<ArtifactGroup>();
+        for (ArtifactGroupDAO artifactGroupDAO : pluginsDAO) {
+        	ArtifactGroup artifactGroup = artifactConverter.convertDAOToObject(artifactGroupDAO, mongoOperation);
+        	plugins.add(artifactGroup);
+		}
+        technology.setPlugins(plugins);
         return technology;
     }
 
@@ -78,10 +83,16 @@ public class TechnologyConverter implements Converter<TechnologyDAO, Technology>
         techDAO.setSystem(technology.isSystem());
         techDAO.setTechVersions(technology.getTechVersions());
         techDAO.setUsed(technology.isUsed());
-        
         techDAO.setArchetypeGroupDAOId(technology.getArchetypeInfo().getId());
-        
+        techDAO.setPluginIds(createPluginId(technology.getPlugins()));
         return techDAO;
     }
-	
+
+	private List<String> createPluginId(List<ArtifactGroup> plugins) {
+		List<String> ids = new ArrayList<String>();
+		for (ArtifactGroup artifactGroup : plugins) {
+			ids.add(artifactGroup.getId());
+		}
+		return ids;
+	}
 }

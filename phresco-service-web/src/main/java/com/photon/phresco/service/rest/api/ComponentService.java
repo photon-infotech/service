@@ -302,8 +302,11 @@ public class ComponentService extends DbService {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.createTechnologies(List<Technology> technologies)");
 	    }
-	    
-	    Map<Technology, List<BodyPart>> map = new HashMap<Technology, List<BodyPart>>(); 
+	   return saveOrUpdateTechnology(multiPart);
+	}
+	
+	private Response saveOrUpdateTechnology(MultiPart multiPart) throws PhrescoException {
+		Map<Technology, List<BodyPart>> map = new HashMap<Technology, List<BodyPart>>(); 
 	    List<BodyPart> techs = new ArrayList<BodyPart>();
 	    List<BodyPart> entities = new ArrayList<BodyPart>();
 	    
@@ -336,10 +339,9 @@ public class ComponentService extends DbService {
 	       List<BodyPart> list = map.get(technology);
 	       createBinary(technology, list);
 	   }
-	        
 	   return Response.status(Response.Status.OK).build();
 	}
-	
+
 	private void createBinary(Technology technology, List<BodyPart> list) throws PhrescoException {
 
 		List<ArtifactGroupDAO> artifactGroups = new ArrayList<ArtifactGroupDAO>();
@@ -374,16 +376,26 @@ public class ComponentService extends DbService {
             FileUtil.delete(appJarFile);
         }
 		
-
-		Converter<TechnologyDAO, Technology> technologyConverter = 
-	          (Converter<TechnologyDAO, Technology>) ConvertersFactory.getConverter(TechnologyDAO.class);
-		TechnologyDAO techDAO = technologyConverter.convertObjectToDAO(technology);
-		
+		saveTechnology(technology);
         mongoOperation.insertList(ARTIFACT_INFO_COLLECTION_NAME, artifactInfos);
         mongoOperation.insertList(ARTIFACT_GROUP_COLLECTION_NAME, artifactGroups);
-        mongoOperation.save(TECHNOLOGIES_COLLECTION_NAME, techDAO);
     }
 	
+	private void saveTechnology(Technology technology) throws PhrescoException {
+    	Converter<TechnologyDAO, Technology> techConverter = 
+    		(Converter<TechnologyDAO, Technology>) ConvertersFactory.getConverter(TechnologyDAO.class);
+    	TechnologyDAO tech = techConverter.convertObjectToDAO(technology);
+    	TechnologyDAO techDAO = mongoOperation.findOne(TECHNOLOGIES_COLLECTION_NAME, 
+    			new Query(Criteria.where("name").is(tech.getName())), TechnologyDAO.class);
+    	if(techDAO == null) {
+    		mongoOperation.save(TECHNOLOGIES_COLLECTION_NAME, tech);
+    	} else {
+    		List<String> pluginIds = techDAO.getPluginIds();
+    		pluginIds.addAll(tech.getPluginIds());
+    		techDAO.setPluginIds(pluginIds);
+    		mongoOperation.save(TECHNOLOGIES_COLLECTION_NAME, techDAO);
+    	}
+	}
 	
     /**
      * Upload binaries using the given artifact info
@@ -420,28 +432,17 @@ public class ComponentService extends DbService {
 	 * Updates the list of technologies
 	 * @param technologies
 	 * @return
+     * @throws PhrescoException 
 	 */
 	@PUT
 	@Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
 	@Path (REST_API_TECHNOLOGIES)
-	public Response updateTechnologies(MultiPart multipart) {
+	public Response updateTechnologies(MultiPart multipart) throws PhrescoException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.updateTechnologies(List<Technology> technologies)");
 	    }
 		
-		try {
-			/*for (Technology tech : technologies) {
-				Technology techInfo = mongoOperation.findOne(TECHNOLOGIES_COLLECTION_NAME, 
-				        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(tech.getId())), Technology.class);
-				if (techInfo != null) {
-					mongoOperation.save(TECHNOLOGIES_COLLECTION_NAME , tech);
-				}
-			}*/
-		} catch (Exception e) {
-			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
-		}
-		
-		return Response.status(Response.Status.OK).entity(multipart).build();
+		return saveOrUpdateTechnology(multipart);
 	}
 	
 	/**
