@@ -20,6 +20,7 @@
 package com.photon.phresco.service.rest.api;
 
 import java.io.File;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +42,8 @@ import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
 import org.springframework.stereotype.Component;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.Permission;
@@ -52,10 +55,17 @@ import com.photon.phresco.commons.model.VideoType;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.exception.PhrescoWebServiceException;
 import com.photon.phresco.service.api.DbService;
+import com.photon.phresco.service.api.PhrescoServerFactory;
+import com.photon.phresco.service.api.RepositoryManager;
+import com.photon.phresco.service.client.impl.ClientHelper;
 import com.photon.phresco.service.model.ArtifactInfo;
 import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.FileUtil;
 import com.photon.phresco.util.ServiceConstants;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.MultiPart;
@@ -534,7 +544,33 @@ public class AdminService extends DbService {
 		
 		return Response.status(Response.Status.OK).build();
 	}
+	
+	/**
+	 * Returns List Of users form LDAP
+	 * @param users
+	 * @return 
+	 * @throws PhrescoException 
+	 */
+	@POST
+	@Consumes (MediaType.APPLICATION_JSON)
+	@Produces (MediaType.APPLICATION_JSON)
+	@Path (REST_API_USERS_IMPORT)
+	public Response importUsers(User user) throws PhrescoException {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into AdminService.createUser(List<User> users)");
+	    }
+	    PhrescoServerFactory.initialize();
+        RepositoryManager repoMgr = PhrescoServerFactory.getRepositoryManager();
+    	Client client = ClientHelper.createClient();
+        WebResource resource = client.resource(repoMgr.getAuthServiceURL() + "/ldap/import");
+        resource.accept(MediaType.APPLICATION_JSON);
+        ClientResponse response = resource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, user);
+        GenericType<List<User>> genericType = new GenericType<List<User>>() {};
+        List<User> users = response.getEntity(genericType);
+		return Response.status(Response.Status.OK).entity(users).build();
+	}
 
+	
 	/**
 	 * Updates the list of Users
 	 * @param users

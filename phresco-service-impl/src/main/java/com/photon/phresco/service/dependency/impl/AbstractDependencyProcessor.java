@@ -234,7 +234,7 @@ public abstract class AbstractDependencyProcessor implements DependencyProcessor
 			
 			for (DownloadInfo db : databaseListTemp) {
 				databaseType = db.getName().toLowerCase();
-				List<ArtifactInfo> versions = db.getVersions();
+				List<ArtifactInfo> versions = db.getArtifactGroup().getVersions();
 				for (ArtifactInfo version : versions) {
 					String sqlPath = databaseType + File.separator + version.getVersion();
 					File sqlFolder = new File(path, sqlFolderPathMap.get(techId) + sqlPath);
