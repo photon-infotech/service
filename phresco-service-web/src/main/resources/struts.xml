@@ -232,6 +232,10 @@
             <result type="json" />
         </action>
         
+        <action name="technology" class="com.photon.phresco.service.admin.actions.components.Archetypes" method="save">
+            <result name="archetypesList">/admin/pages/components/archetype/list.jsp</result>
+        </action>
+        
          <action name="uploadPluginJar" class="com.photon.phresco.service.admin.actions.components.Archetypes" method="uploadPluginJar">
         	<result name="uploadPlugin">/admin/pages/components/archetype/uploadPluginJar.jsp</result>
         	<result type="json" />

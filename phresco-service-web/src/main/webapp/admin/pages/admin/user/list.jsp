@@ -28,7 +28,6 @@
 
 <%
    List<User> userList = (List<User>)request.getAttribute(ServiceUIConstants.REQ_USER_LIST);
-   System.out.println("UserList " +userList);
 %>
 
 <form class="form-horizontal customer_list" id="userListForm">
@@ -271,7 +270,6 @@
 	}
 	
 	function syncUsers() {
-		alert('sync');
 		loadContent("syncUser", $('#userListForm'), $('#popup_div'));
 	}
 </script>
