@@ -330,9 +330,9 @@ public class Features extends ServiceBaseAction {
     private void save(Type type) throws PhrescoException, IOException {
         try {
             ArtifactGroup moduleGroup = createModuleGroup(type);
-            InputStream inputStream = null;
+            List<InputStream> inputStream = new ArrayList<InputStream>();
             if (featureByteArray != null) {
-                inputStream = new ByteArrayInputStream(featureByteArray);
+                inputStream.add(new ByteArrayInputStream(featureByteArray));
             }
             getServiceManager().createFeatures(moduleGroup, inputStream, getCustomerId());
             addActionMessage(getText(FEATURE_ADDED, Collections.singletonList(getName())));
@@ -378,9 +378,9 @@ public class Features extends ServiceBaseAction {
         
         try {
             ArtifactGroup moduleGroup = createModuleGroup(type);
-            InputStream inputStream = null;
+            List<InputStream> inputStream = new ArrayList<InputStream>();
             if (featureByteArray != null) {
-                inputStream = new ByteArrayInputStream(featureByteArray);
+                inputStream.add(new ByteArrayInputStream(featureByteArray));
             }
             getServiceManager().updateFeature(moduleGroup, inputStream, getCustomerId());
             addActionMessage(getText(FEATURE_ADDED, Collections.singletonList(getName())));

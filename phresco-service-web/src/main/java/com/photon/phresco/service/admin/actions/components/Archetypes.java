@@ -149,10 +149,10 @@ public class Archetypes extends ServiceBaseAction {
 
 		try {
 			Technology technology = getTechnology();
-			InputStream technoIs = null;
+			List<InputStream> inputStreams = new ArrayList<InputStream>();
 			//save application jar files
 			if(s_applnByteArray != null){
-				technoIs = new ByteArrayInputStream(s_applnByteArray);
+				inputStreams.add(new ByteArrayInputStream(s_applnByteArray));
 			} 
 			//save plugin jar files
 			if(s_pluginMap != null) {
@@ -160,10 +160,10 @@ public class Archetypes extends ServiceBaseAction {
 				while (iter.hasNext()) {
 					String key = (String) iter.next();
 					byte[] byteArray = (byte[]) s_pluginMap.get(key);
-					technoIs = new ByteArrayInputStream(byteArray);
+					inputStreams.add(new ByteArrayInputStream(byteArray));
 				}
 			}
-			getServiceManager().createArcheTypes(technology, technoIs, getCustomerId());
+			getServiceManager().createArcheTypes(technology, inputStreams, getCustomerId());
 			addActionMessage(getText(ARCHETYPE_ADDED, Collections.singletonList(name)));
 		} catch (PhrescoException e) {
 			return showErrorPopup(e, EXCEPTION_ARCHETYPE_SAVE);
@@ -179,10 +179,10 @@ public class Archetypes extends ServiceBaseAction {
 		
 		try {
 			Technology technology = getTechnology();
-			InputStream technoIs = null;
+			List<InputStream> inputStreams = new ArrayList<InputStream>(); 
 			//update application jar files
 			if(s_applnByteArray != null){
-				technoIs = new ByteArrayInputStream(s_applnByteArray);
+				inputStreams.add(new ByteArrayInputStream(s_applnByteArray));
 			} 
 			//update plugin jar files
 			if(s_pluginMap != null) {
@@ -190,9 +190,9 @@ public class Archetypes extends ServiceBaseAction {
 				while (iter.hasNext()) {
 					String key = (String) iter.next();
 					byte[] byteArray = (byte[]) s_pluginMap.get(key);
-					technoIs = new ByteArrayInputStream(byteArray);
+					inputStreams.add(new ByteArrayInputStream(byteArray));
 				}
-				getServiceManager().updateArcheType(technology, technoIs, getCustomerId());
+				getServiceManager().updateArcheType(technology, inputStreams, getCustomerId());
 				addActionError(getText(ARCHETYPE_UPDATED, Collections.singletonList(getName())));
 			}
 		}catch(PhrescoException e) {
