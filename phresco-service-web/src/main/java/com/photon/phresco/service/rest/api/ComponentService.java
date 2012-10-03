@@ -1087,12 +1087,12 @@ public class ComponentService extends DbService {
         
         if(bodyPartEntity != null) {
             pilotFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null);
-            mongoOperation.save(APPLICATION_INFO_COLLECTION_NAME, applicationInfo);
+            saveApplicationInfo(applicationInfo);
             FileUtil.delete(pilotFile);
         }
         
         if(bodyPartEntity == null && applicationInfo != null) {
-        	mongoOperation.save(APPLICATION_INFO_COLLECTION_NAME, applicationInfo);
+        	saveApplicationInfo(applicationInfo);
         }
         //TODO:Need to handle uploading of Binaries into repository
 //        boolean uploadBinary = uploadBinary(projectInfo.getArchetypeInfo(), 
@@ -1103,7 +1103,16 @@ public class ComponentService extends DbService {
 //        }
         return Response.status(Response.Status.CREATED).entity(applicationInfo).build();
 	}
-
+	
+	private void saveApplicationInfo(ApplicationInfo applicationInfo) throws PhrescoException {
+		Converter<ApplicationInfoDAO, ApplicationInfo> appConverter = 
+			(Converter<ApplicationInfoDAO, ApplicationInfo>) ConvertersFactory.getConverter(ApplicationInfoDAO.class);
+		ApplicationInfoDAO applicationInfoDAO = appConverter.convertObjectToDAO(applicationInfo);
+		mongoOperation.save(APPLICATION_INFO_COLLECTION_NAME, applicationInfoDAO);
+		ArtifactGroup pilotContent = applicationInfo.getPilotContent();
+		saveModuleGroup(pilotContent);
+	}
+	
 	/**
 	 * Updates the list of pilots
 	 * @param projectInfos
