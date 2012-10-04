@@ -473,7 +473,7 @@
         </action>
 		<!--- ADMIN CUSTOMER ENDS-->
 		
-		<action name="userList" class="com.photon.phresco.service.admin.actions.admin.Users" method="syncUsers">
+		<action name="userList" class="com.photon.phresco.service.admin.actions.admin.Users" method="getSyncPage">
 			<result name="userList">/admin/pages/admin/user/sync.jsp</result>
         </action>
         

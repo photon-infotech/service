@@ -19,7 +19,7 @@
   --%>
 <%@ taglib uri="/struts-tags" prefix="s" %>
 
-<form class="form-horizontal customer_list">
+<form id="syncForm" class="form-horizontal customer_list">
 	<div class="operation" id="operation">
 		<input type="button" id="userSync" class="btn btn-primary" name="users_sync"  value="<s:text name='lbl.hdr.adm.usrlst'/>"/>
 		
@@ -27,6 +27,7 @@
 	
 		</div>
 	</div>
+	<input type="hidden" name="sync" value="true">
 </form>
 <script type="text/javascript">
 	
@@ -39,6 +40,6 @@
 	});
 
 	function syncUsers() {
-		loadContent("syncUsers", '', $('#userListContainer'));
+		loadContent("syncUsers", $("#syncForm"), $('#userListContainer'));
 	}
 </script>
