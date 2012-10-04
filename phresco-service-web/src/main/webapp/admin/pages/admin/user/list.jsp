@@ -31,18 +31,16 @@
 %>
 
 <form class="form-horizontal customer_list" id="userListForm">
-	<div class="operation" id="operation">
-		<input type="button" id="featuresAdd" class="btn btn-primary" name="features_add" onclick="syncUsers();" value="<s:text name='lbl.hdr.adm.usrlst'/>"/>
-		<input type="button" id="del" class="btn" disabled value="<s:text name='lbl.hdr.adm.delete'/>"/>
-	</div>
 	<%
-		if (CollectionUtils.isNotEmpty(userList)) {
+		if (CollectionUtils.isEmpty(userList)) {
 	%>
 	<div class="alert alert-block">
 		<s:text name='alert.msg.users.not.available' />
 	</div>
-	<% } else { %>
-	<div class="table_div">
+	<%
+		} else {
+	%>
+	<div class="table_div syncTable" >
 		<div class="fixed-table-container">
 			<div class="header-background"> </div>
 			<div class="fixed-table-container-inner">
@@ -87,10 +85,10 @@
 							</td>
 						</tr>
 					</tbody>
-				  <% 	
-					     }
-			          }
-			      %>
+					<%
+						}
+							}
+					%>
 				</table>
 				
 								
@@ -269,7 +267,4 @@
 		}
 	}
 	
-	function syncUsers() {
-		loadContent("syncUser", $('#userListForm'), $('#popup_div'));
-	}
 </script>
