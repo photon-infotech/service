@@ -34,23 +34,34 @@ public class Users extends ServiceBaseAction {
     private static final Logger S_LOGGER = Logger.getLogger(Customers.class);
     private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
 
-    public String list() {
+    public String getSyncPage() throws PhrescoException {
     	if (s_isDebugEnabled) {
-    		S_LOGGER.debug("Entering Method Users.list()");
+    		S_LOGGER.debug("Entering Method Users.getSyncPage()");
+    	}
+    	try {
+    		//Get UserList from LDAP 
+    		List<User> userSyncList = getServiceManager().getUsers();
+    		setReqAttribute(REQ_USER_LIST, userSyncList);
+    	} catch (PhrescoException e){
+    		return showErrorPopup(e, EXCEPTION_USERS_LIST);
+    	}
+    	
+    	return ADMIN_USER_LIST;
+    }
+    
+    public String syncUsers() {
+    	if (s_isDebugEnabled) {
+    		S_LOGGER.debug("Entering Method syncUsers.syncUsers()");
     	}
 
     	try {
-    		List<User> userList = getServiceManager().getUsers();
+    		//Get UserList from DB
+    		List<User> userList = getServiceManager().getUser();
     		setReqAttribute(REQ_USER_LIST, userList);
     	} catch (PhrescoException e) {
     		return showErrorPopup(e, EXCEPTION_USERS_LIST);
     	}
 
     	return ADMIN_USER_LIST;	
-    }
-    
-    public String syncUsers(){
-    	
-    	return "";
     }
 }

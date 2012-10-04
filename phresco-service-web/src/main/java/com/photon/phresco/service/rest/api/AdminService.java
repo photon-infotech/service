@@ -512,7 +512,7 @@ public class AdminService extends DbService {
 	    }
 		
 		try {
-			List<User> userList = mongoOperation.getCollection(USERDAO_COLLECTION_NAME, User.class);
+			List<User> userList = mongoOperation.getCollection(USERS_COLLECTION_NAME, User.class);
 			if (userList.isEmpty()) {
 				return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
 			}
@@ -537,7 +537,7 @@ public class AdminService extends DbService {
 	    }
 		
 		try {
-			mongoOperation.insertList(USERDAO_COLLECTION_NAME, users);
+			mongoOperation.insertList(USERS_COLLECTION_NAME, users);
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
 		}
@@ -567,6 +567,9 @@ public class AdminService extends DbService {
         ClientResponse response = resource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, user);
         GenericType<List<User>> genericType = new GenericType<List<User>>() {};
         List<User> users = response.getEntity(genericType);
+        
+        //To save the users into user table
+        mongoOperation.insertList(USERS_COLLECTION_NAME, users);
 		return Response.status(Response.Status.OK).entity(users).build();
 	}
 

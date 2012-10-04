@@ -20,10 +20,10 @@
 <%@ taglib uri="/struts-tags" prefix="s" %>
 
 <%@ page import="java.util.List" %>
-<%@ page import="org.apache.commons.collections.CollectionUtils"%>
-<%@ page import="org.apache.commons.lang.StringUtils"%>
+<%@ page import="org.apache.commons.collections.CollectionUtils" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 
-<%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
+<%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
 <%@ page import="com.photon.phresco.commons.model.Role" %>
 
 <% 
@@ -82,7 +82,8 @@
 					</thead>
 		
 					<tbody>
-					    <% if(CollectionUtils.isNotEmpty(roleLists)) { 
+					    <% 
+					       if(CollectionUtils.isNotEmpty(roleLists)) { 
 					          for(Role roleList : roleLists) {
 					    %>
 					 

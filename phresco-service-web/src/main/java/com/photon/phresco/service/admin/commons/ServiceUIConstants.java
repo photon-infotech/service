@@ -96,6 +96,7 @@ public interface ServiceUIConstants {
      * String REQ_USER_XXX
      *****************************/ 
     String REQ_USER_LIST = "userList";
+    String REQ_USER_SYNCLIST = "userSyncList";
     
     
     /*****************************
