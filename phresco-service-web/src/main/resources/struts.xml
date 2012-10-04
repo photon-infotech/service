@@ -24,7 +24,6 @@
 <struts>
 	<constant name="struts.custom.i18n.resources" value="service-messages" />
 	<constant name="struts.ui.theme" value="simple"/>
-	<!-- <constant name="struts.devMode" value="true" /> -->
 	
 	<package name="login" extends="struts-default, json-default">
 		<action name="login" class="com.photon.phresco.service.admin.actions.Login" method="login" >
@@ -167,12 +166,12 @@
 		<!-- COMPONENT FEATURES ENDS-->
 		
 		<!--COMPONENT START-->
-		<action name="componentList" class="com.photon.phresco.service.admin.actions.components.Component" method="list">
-            <result name="componentList">/admin/pages/components/component/list.jsp</result>
+		<action name="componentList" class="com.photon.phresco.service.admin.actions.components.Component" method="technologies">
+            <result name="componentList">/admin/pages/components/component/technology.jsp</result>
         </action>
         
-        <action name="listComponent" class="com.photon.phresco.service.admin.actions.components.Component" method="componentWithList">
-            <result name="componentList">/admin/pages/components/component/component_list.jsp</result>
+        <action name="listComponent" class="com.photon.phresco.service.admin.actions.components.Component" method="list">
+            <result name="componentList">/admin/pages/components/component/list.jsp</result>
         </action>
 		
 		<action name="componentAdd" class="com.photon.phresco.service.admin.actions.components.Component" method="add">
@@ -180,7 +179,7 @@
         </action>
 		
 		<action name="componentSave" class="com.photon.phresco.service.admin.actions.components.Component" method="save">
-            <result name="componentList">/admin/pages/components/component/list.jsp</result>
+            <result name="componentList">/admin/pages/components/component/technology.jsp</result>
             <result type="json" />
         </action>
         
@@ -188,7 +187,7 @@
             <result type="json" />
         </action>
         
-        <action name="removeComponentJar" class="com.photon.phresco.service.admin.actions.components.Component" method="removeUploadedFile">
+        <action name="removeComponentFile" class="com.photon.phresco.service.admin.actions.components.Component" method="removeComponentFile">
             <result type="json" />
         </action>
         
@@ -197,12 +196,12 @@
         </action>
         
         <action name="componentUpdate" class="com.photon.phresco.service.admin.actions.components.Component" method="update">
-            <result name="componentList">/admin/pages/components/component/list.jsp</result>
+            <result name="componentList">/admin/pages/components/component/technology.jsp</result>
             <result type="json" />
         </action>
         
         <action name="componentDelete" class="com.photon.phresco.service.admin.actions.components.Component" method="delete">
-            <result name="componentList">/admin/pages/components/component/list.jsp</result>
+            <result name="componentList">/admin/pages/components/component/technology.jsp</result>
         </action>
         
          <action name="componentSaveValidate" class="com.photon.phresco.service.admin.actions.components.Component" method="validateForm">
@@ -213,7 +212,13 @@
             <result type="json" />
         </action>
 		
-		<!--COMPONENT ENDS-->	
+		<action name="listConponentsDependency" class="com.photon.phresco.service.admin.actions.components.Component" method="listConponentsDependency">
+            <result name="componentList">/admin/pages/components/component/dependency.jsp</result>
+        </action>
+        
+        <action name="saveDependentComponents" class="com.photon.phresco.service.admin.actions.components.Component" method="saveDependentComponents" />
+		<!--COMPONENT ENDS-->
+			
 		<!-- COMPONENT ARCHETYPES STARTS-->
 		<action name="archetypesList" class="com.photon.phresco.service.admin.actions.components.Archetypes" method="list">
             <result name="archetypesList">/admin/pages/components/archetype/list.jsp</result>

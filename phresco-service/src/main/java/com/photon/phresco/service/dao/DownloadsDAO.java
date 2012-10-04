@@ -2,13 +2,11 @@ package com.photon.phresco.service.dao;
 
 import java.util.List;
 
-import com.photon.phresco.commons.model.PlatformType;
-
 public class DownloadsDAO extends CustomerBaseDAO {
 	
 	private static final long serialVersionUID = 1L;
 	private List<String> appliesToTechIds;
-	private List<PlatformType> platform;
+	private List<String> platformTypeIds;
 	private String category;
 	private String artifactGroupId;
 	
@@ -24,12 +22,12 @@ public class DownloadsDAO extends CustomerBaseDAO {
 		this.appliesToTechIds = appliesToTechIds;
 	}
 	
-	public List<PlatformType> getPlatform() {
-		return platform;
+	public List<String> getPlatformTypeIds() {
+		return platformTypeIds;
 	}
 	
-	public void setPlatform(List<PlatformType> platform) {
-		this.platform = platform;
+	public void setPlatform(List<String> platformTypeIds) {
+		this.platformTypeIds = platformTypeIds;
 	}
 	
 	public String getCategory() {

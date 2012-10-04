@@ -122,6 +122,7 @@ public interface ServiceUIConstants {
     String REQ_DOWNLOAD_INFO = "downloadInfo";
     String REQ_DOWNLOAD_ID = "downloadId";
     String REQ_DOWNLOAD_UPLOAD_FILE = "uploadFile";
+    String REQ_DOWNLOAD_PLATFORMS = "platforms";
     
     
     /*****************************
@@ -148,8 +149,20 @@ public interface ServiceUIConstants {
      * String FEATURES_XXX
      *****************************/
     String FEATURES_CORE = "core";
-    String FEATURES_DEPENDENT_MOD_IDS = "dependentModuleIds";
     String FEATURES_SELECTED_TECHNOLOGY = "selectedTechnology";
+    
+    /*****************************
+     * Features Session Constants
+     * String SESSION_COMP_XXX
+     *****************************/
+    String SESSION_FEATURES_DEPENDENT_MOD_IDS = "dependentModuleIds";
+    
+    
+    /*****************************
+     * Component Session Constants
+     * String SESSION_COMP_XXX
+     *****************************/
+    String SESSION_COMP_DEPENDENT_MOD_IDS = "compDependentModuleIds";
     
     /*****************************
      * Permissions Request Constants
@@ -244,6 +257,8 @@ public interface ServiceUIConstants {
 	String EXCEPTION_COMPONENT_ADD = "Component add";
 	String EXCEPTION_COMPONENT_EDIT = "Component edit";
 	String EXCEPTION_COMPONENT_LIST = "Component list";
+	String EXCEPTION_COMPONENT_LIST_DEPENDENCY = "Component listConponentsDependency";
+	String EXCEPTION_COMPONENT_UPLOAD_FILE = "Component uploadFile";
 	
 	String EXCEPTION_ARCHETYPE_DELETE = "Archetype delete";
 	String EXCEPTION_ARCHETYPE_UPDATE = "Archetype update";
@@ -385,9 +400,8 @@ public interface ServiceUIConstants {
     
     
     String DOWNLOAD_ADDED = "succ.download.add";
-    String DOWNLOAD_NOT_ADDED = "fail.download.add";
+    String DOWNLOAD_UPDATED = "succ.download.update";
     String DOWNLOAD_DELETED = "succ.download.delete";
-    String DOWNLOAD_NOT_DELETED = "fail.download.delete";
     
     //Email validation
     String INVALID_EMAIL = "err.msg.invalid.email";

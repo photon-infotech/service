@@ -24,7 +24,7 @@ public class DownloadsConverter implements Converter<DownloadsDAO, DownloadInfo>
 		downloadInfo.setDescription(dao.getDescription());
 		downloadInfo.setCreationDate(dao.getCreationDate());
 		downloadInfo.setName(dao.getName());
-		downloadInfo.setPlatform(dao.getPlatform());
+		downloadInfo.setPlatformTypeIds(dao.getPlatformTypeIds());
 		downloadInfo.setStatus(dao.getStatus());
 		downloadInfo.setArtifactGroup(createArtifactGroup(dao.getArtifactGroupId(), mongoOperation));
 		return downloadInfo;
@@ -40,7 +40,7 @@ public class DownloadsConverter implements Converter<DownloadsDAO, DownloadInfo>
 		downloadsDAO.setArtifactGroupId(downloadInfo.getArtifactGroup().getId());
 		downloadsDAO.setCategory(downloadInfo.getCategory());
 		downloadsDAO.setDescription(downloadInfo.getDescription());
-		downloadsDAO.setPlatform(downloadInfo.getPlatform());
+		downloadsDAO.setPlatform(downloadInfo.getPlatformTypeIds());
 		downloadsDAO.setStatus(downloadInfo.getStatus());
 		downloadsDAO.setSystem(downloadInfo.isSystem());
 		downloadsDAO.setCustomerIds(downloadInfo.getCustomerIds());

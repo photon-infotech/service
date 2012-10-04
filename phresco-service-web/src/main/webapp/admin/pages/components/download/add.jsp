@@ -17,46 +17,47 @@
   limitations under the License.
   ###
   --%>
-
 <%@ taglib uri="/struts-tags" prefix="s" %>
 
 <%@ page import="java.util.List" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.apache.commons.collections.CollectionUtils"%>
-<%@ page import="java.util.ArrayList"%>
 
 <%@ page import="com.photon.phresco.commons.model.Technology"%>
 <%@ page import="com.photon.phresco.commons.model.DownloadInfo" %>
-<%@ page import="com.photon.phresco.commons.model.ArtifactInfo" %>
-<%@ page import="com.photon.phresco.commons.model.Element" %>
-<%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %> 
+<%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
+<%@ page import="com.photon.phresco.commons.model.PlatformType" %>
+<%@ page import="com.photon.phresco.commons.model.ArtifactGroup"%>
+<%@ page import="com.photon.phresco.commons.model.ArtifactInfo"%>
 
 <%
+	String checkedStr = "";
+
     DownloadInfo downloadInfo = (DownloadInfo)request.getAttribute(ServiceUIConstants.REQ_DOWNLOAD_INFO);
     String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
     List<Technology> technologies = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
     String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
+    List<PlatformType> platforms = (List<PlatformType>) request.getAttribute(ServiceUIConstants.REQ_DOWNLOAD_PLATFORMS);
 
     //For edit
     String name = "";
     String description = "";
-    //List<String> version = new ArrayList<String>();
     String version = "";
+    List<String> downloadInfoPlatforms = null;
     if (downloadInfo != null) {
-    	if (StringUtils.isNotEmpty(downloadInfo.getName())) {
-    		name = downloadInfo.getName();
-    	}
-    	if (StringUtils.isNotEmpty(downloadInfo.getDescription())) {
-    		description = downloadInfo.getDescription();
-    	}
+   		name = downloadInfo.getName();
+   		description = downloadInfo.getDescription();
     	
-    	List<ArtifactInfo> artifactVersions = downloadInfo.getVersions();
-    	for(ArtifactInfo artifactVersion : artifactVersions){
-    		version = artifactVersion.getVersion();
-    	}
-    	/* if (CollectionUtils.isNotEmpty(downloadInfo.getVersions())) {
-    		version = downloadInfo.getVersion();
-    	} */
+   		//To get the versions
+   		ArtifactGroup artifactGroup = downloadInfo.getArtifactGroup();
+   		List<ArtifactInfo> artifactInfos = artifactGroup.getVersions();
+   		if (CollectionUtils.isNotEmpty(artifactInfos)) {
+   		    for (ArtifactInfo artifactInfo : artifactInfos) {
+   		     	version = artifactInfo.getVersion();
+   		    }
+   		}
+   		
+   		downloadInfoPlatforms = downloadInfo.getPlatformTypeIds();
     }
 %>
 
@@ -69,7 +70,7 @@
 	<% } %> 
 	</h4>
 	 
-	<div class="content_adder">
+	<div class="content_adder" id="downloadInputDiv">
 		<div class="control-group" id="nameControl">
 			<label class="control-label labelbold">
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.name'/>
@@ -86,34 +87,34 @@
 				<s:text name='lbl.hdr.adm.desc'/>
 			</label>
 			<div class="controls">
-				<textarea id="downloadDesc"  placeholder="<s:text name='place.hldr.download.add.desc'/>" class="input-xlarge" type="text"
-					maxlength="150" title="150 Characters only" value="<%= description %>" name="description"></textarea>
+				<textarea id="downloadDesc"  placeholder="<s:text name='place.hldr.download.add.desc'/>" class="input-xlarge"
+					maxlength="150" title="150 Characters only" name="description"><%= description %></textarea>
 			</div>
 		</div>
 		
 		<div class="control-group" id="techControl">
             <label class="control-label labelbold">
-                <span class="mandatory">*</span>&nbsp;<s:text name="Technology"/>
+                <span class="mandatory">*</span>&nbsp;<s:text name="lbl.hdr.comp.dwnld.technology"/>
             </label>
             <div class="controls">
             	<div class="typeFields" id="typefield">
-	                <div class="multilist-scroller multiselct" style="height: 95px; width:300px;" name="technology">
+	                <div class="multilist-scroller multiselct" style="height: 95px; width:300px;">
 		                <ul>
 							<li>
-								<input type="checkbox" name="technology" value="all" id="checkAllAuto" onclick="checkAllEvent(this, $('.techCheck'), true);" style="margin: 3px 8px 6px 0;">All
+								<input type="checkbox" id="checkAllAuto" onclick="checkAllEvent(this, $('.techCheck'), true);"
+									style="margin: 3px 8px 6px 0;">All
 							</li>
 		                    <%
-		                        if (technologies != null) {
-		                    									for (Technology technology : technologies) { 
-		                    										String checkedStr = "";
-		                    										if (downloadInfo != null) {
-		                    											List<String> appliesTos = downloadInfo.getAppliesToTechIds();
-		                    											if (appliesTos.contains(technology.getId())) {
-		                    												checkedStr = "checked";
-		                    											} else {
-		                    												checkedStr = "";
-		                    											}
-		                    										}
+		                        if (CollectionUtils.isNotEmpty(technologies)) {
+   									for (Technology technology : technologies) {
+   										if (downloadInfo != null) {
+   											List<String> appliesTos = downloadInfo.getAppliesToTechIds();
+   											if (appliesTos.contains(technology.getId())) {
+   												checkedStr = "checked";
+   											} else {
+   												checkedStr = "";
+   											}
+   										}
 		                    %>
 	                   			<li>
 									<input type="checkbox" name="technology" value="<%= technology.getId() %>"  <%= checkedStr %>
@@ -179,34 +180,41 @@
 			 <span class="help-inline fileError" id="fileError"></span>
 		</div>
 		
-		<div class="control-group" id="appltControl">
+		<div class="control-group" id="platformControl">
 			<label class="control-label labelbold">
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.dwnld.appltfrm'/>
 			</label>
 			<div class="controls">
 				<div class="typeFields" >
-				<div class="multilist-scroller multiselct" style="height: 95px; width:300px;" name="application">
+				<div class="multilist-scroller multiselct" style="height: 95px; width:300px;">
 					<ul>
 						<li>
-							<input type="checkbox" name="platform" value="all" id="checkAll" onclick="checkAllEvent(this, $('.platFormCheck'), true);" 
+							<input type="checkbox" id="checkAll" onclick="checkAllEvent(this, $('.platFormCheck'), true);" 
 								style="margin: 3px 8px 6px 0;">All
 						</li>
-						<li>
-							<input type="checkbox" name="platform" class="check platFormCheck" value="Windows" >Windows
-						</li>
-						<li>
-							<input type="checkbox" name="platform" class="check platFormCheck" value="Linux">Linux
-						</li>
-						<li>
-							<input type="checkbox" name="platform" class="check platFormCheck" value="Mac">Mac
-						</li>
-						<li>
-							<input type="checkbox" name="platform" class="check platFormCheck" value="Solaris">Solaris
-						</li>
+						<%
+							if (CollectionUtils.isNotEmpty(platforms)) {
+							    for (PlatformType platform : platforms) {
+							        if (CollectionUtils.isNotEmpty(downloadInfoPlatforms)) {
+											if (downloadInfoPlatforms.contains(platform.getId())) {
+												checkedStr = "checked";
+											} else {
+												checkedStr = "";
+											}
+										}
+						%>
+								<li>
+									<input type="checkbox" name="platform" class="check platFormCheck" value="<%= platform.getId() %>" <%= checkedStr %>>
+									<%= platform.getType() + platform.getBit() %>
+								</li>
+						<% 
+								}
+	    					}
+	    				%>
 					</ul>
 				</div>
 				</div>
-				<span class="help-inline applyerror" id="appltError"></span>
+				<span class="help-inline applyerror" id="platformError"></span>
 			</div>
 		</div>
 			
@@ -241,12 +249,13 @@
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.dwnld.group'/>
 			</label>	
 			<div class="controls">
-				<select id="group" name="group">
-					<option value="" onclick="javascript:hideDiv();">- select -</option>
-					<option value="Database" onclick="javascript:hideDiv();">Database</option>
-					<option value="Server" onclick="javascript:hideDiv();">Server</option>
-					<option value="Editor" onclick="javascript:hideDiv();">Editor</option>
-                    <option value="Others" onclick="javascript:showDiv();">Others</option>
+				<select id="category" name="category">
+					<option value="">- select -</option>
+					<option value="Server">Server</option>
+					<option value="Database">Database</option>
+					<option value="Editor">Editor</option>
+					<option value="Tools">Tools</option>
+                    <option value="Others">Others</option>
 				</select>
 				<span class="help-inline" id="groupError"></span>
 			</div>
@@ -267,20 +276,20 @@
 	<div class="bottom_button">
 		<% if (StringUtils.isNotEmpty(fromPage)) { %>
 			<input type="button" id="downloadUpdate" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.update'/>" 
-				onclick="validate('downloadUpdate', $('#formDownloadAdd'), $('#subcontainer'), 'Updating Download');" />	
+				onclick="validate('downloadUpdate', $('#formDownloadAdd'), $('#subcontainer'), 'Updating Download', $('#downloadInputDiv :input'));" />	
         <% } else { %>
 			<input type="button" id="downloadSave" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.save'/>"
-				onclick="validate('downloadSave', $('#formDownloadAdd'), $('#subcontainer'), 'Creating Download');" />
+				onclick="validate('downloadSave', $('#formDownloadAdd'), $('#subcontainer'), 'Creating Download', $('#downloadInputDiv :input'));" />
 		<% } %>
-		<input type="button" id="downloadCancel" class="btn btn-primary" onclick="loadContent('downloadList', $('#formDownloadAdd'), $('#subcontainer'));" value="<s:text name='lbl.hdr.comp.cancel'/>"/>
+		<input type="button" id="downloadCancel" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.cancel'/>"
+			onclick="loadContent('downloadList', $('#formDownloadAdd'), $('#subcontainer'));"/>
 	</div>
 	
 	<!-- Hidden Fields -->
     <input type="hidden" name="fromPage" value="<%= StringUtils.isNotEmpty(fromPage) ? fromPage : "" %>"/>
-    <input type="hidden" name="id" value="<%= downloadInfo != null ? downloadInfo.getId() : "" %>"/>
-    <input type="hidden" name="oldName" value="<%= downloadInfo != null ? downloadInfo.getName() : "" %>"/>
-    <input type="hidden" name="customerId" value="<%= customerId %>"> 
-    <input type="hidden" name="oldVersion" value="<%= downloadInfo != null ? downloadInfo.getVersions() : "" %>"/>
+    <input type="hidden" name="downloadId" value="<%= downloadInfo != null ? downloadInfo.getId() : "" %>"/>
+    <input type="hidden" name="oldName" value="<%= name %>"/>
+    <input type="hidden" name="customerId" value="<%= customerId %>">
 </form>
 
 <script type="text/javascript">
@@ -310,36 +319,36 @@
         
         // for edit - to show selected group while page loads 
         <% if (downloadInfo != null)  {%>
-       		 $("#group option[value='<%= downloadInfo.getType() %>']").attr('selected', 'selected');
+<%--        		 $("#group option[value='<%= downloadInfo.getType() %>']").attr('selected', 'selected'); --%>
        	<% } %>
 	});
 
 	function findError(data) {
-		if (data.nameError != undefined) {
+		if (!isBlank()) {
 			showError($("#nameControl"), $("#nameError"), data.nameError);
 		} else {
 			hideError($("#nameControl"), $("#nameError"));
 		}
 		
-		if (data.verError != undefined) {
+		if (!isBlank(data.verError)) {
 			showError($("#verControl"), $("#verError"), data.verError);
 		} else {
 			hideError($("#verControl"), $("#verError"));
 		}
 		
-		if (data.appltError != undefined) {
-			showError($("#appltControl"), $("#appltError"), data.appltError);
+		if (!isBlank(data.platformTypeError)) {
+			showError($("#platformControl"), $("#platformError"), data.platformTypeError);
 		} else {
-			hideError($("#appltControl"), $("#appltError"));
+			hideError($("#platformControl"), $("#platformError"));
 		}
 		
-		if (data.groupError != undefined) {
+		if (!isBlank(data.groupError)) {
 			showError($("#groupControl"), $("#groupError"), data.groupError);
 		} else {
 			hideError($("#groupControl"), $("#groupError"));
 		}
 		
-		if (data.techError != undefined) {
+		if (!isBlank( data.techError)) {
 			showError($("#techControl"), $("#techError"), data.techError);
 		} else {
 			hideError($("#techControl"), $("#techError"));

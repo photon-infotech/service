@@ -29,7 +29,7 @@
 
 <% 
 	List<ArtifactGroup> moduleGroups = (List<ArtifactGroup>) request.getAttribute(ServiceUIConstants.REQ_FEATURES_MOD_GRP);
-	List<String> dependentModuleIds = (List<String>) session.getAttribute(ServiceUIConstants.SESSION_FEATURES_DEPENDENT_MOD_IDS);
+	List<String> dependentModuleIds = (List<String>) session.getAttribute(ServiceUIConstants.SESSION_COMP_DEPENDENT_MOD_IDS);
 %>
 
 <form id="formDependency">
@@ -152,7 +152,7 @@
 		//To save the selected dependency module ids
 		$('#saveDependency').click(function() {
 			showParentPage();
-			loadContent('saveDependentFeatures', $('#formDependency'), $('#popup_div'), '', true);
+			loadContent('saveDependentComponents', $('#formDependency'), $('#popup_div'), '', true);
 		});
 		
 		//To check the selected modules group checkbox and show the selected version

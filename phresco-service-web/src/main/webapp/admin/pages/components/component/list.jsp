@@ -17,95 +17,105 @@
   limitations under the License.
   ###
   --%>
-
 <%@ taglib uri="/struts-tags" prefix="s" %>
 
 <%@ page import="java.util.List" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.apache.commons.collections.CollectionUtils"%>
 
-<%@ page import="com.photon.phresco.commons.model.Technology" %>
+<%@ page import="com.photon.phresco.commons.model.ArtifactInfo"%>
+<%@ page import="com.photon.phresco.commons.model.ArtifactGroup"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
 
 <% 
-	List<Technology> technologies = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
-	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
+	List<ArtifactGroup> moduleGroups = (List<ArtifactGroup>)request.getAttribute(ServiceUIConstants.REQ_FEATURES_MOD_GRP);
 %>
-		
-<form id="formComponentList" class="form-horizontal customer_list">
-	<div class="operation">
-		<div class="componentlist_add">
-			<input type="button" id="componentAdd" class="btn btn-primary" name="component_add" 
-				onclick="loadContent('componentAdd', $('#formComponentList'), $('#subcontainer'));" 
-				value="<s:text name='lbl.hdr.comp.component.add'/>"/>
-			<input type="button" class="btn" id="del" disabled value="<s:text name='lbl.hdr.comp.delete'/>" 
-				onclick="showDeleteConfirmation('<s:text name='del.confirm.component'/>');"/>
-		</div>
-		
-		<div class="componentlist_tech">
-			<s:text name='lbl.comp.component.technology'/>
-			<select name="techId" id="tech_id">
-				<%
-					if (technologies != null) {
-						for (Technology technology : technologies) {
-				%>
-							<option value="<%=technology.getId() %>"><%=technology.getName() %></option>
-				<%
-						}
-					}
-				%>
-			</select>
-		</div>
-		
-		<s:if test="hasActionMessages()">
-			<div class="alert alert-success alert-message alert_messagelist" id="successmsg">
-				<s:actionmessage />
-			</div>
-		</s:if>
-		
-		<s:if test="hasActionErrors()">
-			<div class="alert alert-error"  id="errormsg">
-				<s:actionerror />
-			</div>
-		</s:if>
-	</div>	
-	
-	<div class="componentlist_height" id="component_list">
-	
-	</div>
     
-	<!-- Hidden Fields -->
-    <input type="hidden" name="customerId" value="<%= customerId %>">
-</form>
+   <div class="componentScrollDiv">
+   	<% 
+		if (CollectionUtils.isEmpty(moduleGroups)) {
+	%>
+		<div class="alert alert-block">
+			<s:text name='alert.msg.component.not.available'/>
+		</div>
+	<% } else { %>		
+		<div class="theme_accordion_container jsLib_accordion_container">
+		    <section class="accordion_panel_wid">
+		        <div class="accordion_panel_inner">
+		            <section class="lft_menus_container">
+		            <%
+						for (ArtifactGroup moduleGroup : moduleGroups) {
+					%>
+		                <span class="siteaccordion closereg">
+		                	<span>
+		                		<input type="checkbox" class="" name="" value="<%= moduleGroup.getId()%>" id="<%= moduleGroup.getId()%>checkBox">
+		                		&nbsp;&nbsp;<%= moduleGroup.getName() %>&nbsp;&nbsp;
+		                	</span>
+		                </span>
+		                <div class="mfbox siteinnertooltiptxt hideContent">
+		                    <div class="scrollpanel">
+		                        <section class="scrollpanel_inner">
+		                        	<table class="download_tbl">
+			                            <tbody>
+			                            <% 
+									    	List<ArtifactInfo> versions = moduleGroup.getVersions();
+									    	if (CollectionUtils.isNotEmpty(versions)) {
+												for (ArtifactInfo module : versions) {
+													String descContent = "";
+													if (StringUtils.isNotEmpty(module.getDescription())) {
+													  	descContent = module.getDescription();
+													}
+													
+													String helpTextContent = "";
+													if (StringUtils.isNotEmpty(module.getHelpText())) { 
+													  	helpTextContent = module.getHelpText();
+													}
+										%>
+											<tr>
+												<td>
+													<input type="radio" name="<%= module.getId() %>" value="<%= module.getVersion() %>" >
+												</td>
+												<td>
+													<a href="#" name="ModuleDesc" onclick="editComponent('<%= moduleGroup.getId() %>', '<%= module.getId() %>');" >
+														<%= moduleGroup.getName() %>
+													</a>
+												</td>
+												<td><%= module.getVersion() %></td>
+											</tr>
+										<%	
+												}
+								    		} 
+										%>
+			                            </tbody>
+		                        	</table>
+		                        </section>
+		                    </div>
+		                </div>
+		                <% 		
+							}
+						%>	
+		            </section>  
+		        </div>
+		    </section>
+		</div>
+	<% } %>
+</div>
 
 <script language="JavaScript" type="text/javascript">
-
-	$(document).ready(function() {
-		componentlist();
-	});
-	
-	function editComponent(id) {
-	    var params = "techId=";
-	    params = params.concat(id);
-	    loadContent("componentEdit", $('#formComponentList'), $('#subcontainer'), params);
+	//To check whether the device is ipad or not and then apply jquery scrollbar
+	if (!isiPad()) {
+		$(".accordion_panel_inner").scrollbars();  
 	}
 	
-	// This method calling from confirm_dialog.jsp
-    function continueDeletion() {
-    	confirmDialog('none','');
-    	loadContent('componentDelete', $('#formComponentList'), $('#subcontainer'));
-    }
+	$(document).ready(function() {
+		enableScreen();
+	});
 	
-    function componentlist() {
-    	loadContent('listComponent', $('#formComponentList'), $('#component_list'));
-    	
-		$('#tech_id').change(function() {
-			loadContent('listComponent', $('#formComponentList'), $('#component_list'));
-		});
-    	
-		$('#type').change(function() {
-			loadContent('listComponent', $('#formComponentList'), $('#component_list'));
-		});
-    }
-    
+	function editComponent(moduleGroupId, moduleId) {
+		var params = "moduleGroupId=";
+	    params = params.concat(moduleGroupId);
+	    params = params.concat("&moduleId=");
+	    params = params.concat(moduleId);
+	    loadContent("componentEdit", $('#formComponentList'), $('#subcontainer'), params);
+	}
 </script>

@@ -53,7 +53,7 @@ public class Features extends ServiceBaseAction {
 	private static final Logger S_LOGGER = Logger.getLogger(Features.class);
 	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
-	private static byte[] featureByteArray = null;
+	private static byte[] s_featureByteArray = null;
 	
 	private String name = "";
 	private String customerId = "";
@@ -88,7 +88,7 @@ public class Features extends ServiceBaseAction {
     	}
 
 		setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
-		featureByteArray = null;
+		s_featureByteArray = null;
 		
     	return COMP_FEATURES_LIST;
     }
@@ -102,7 +102,7 @@ public class Features extends ServiceBaseAction {
             setReqAttribute(REQ_FEATURES_TYPE, REQ_FEATURES_TYPE_MODULE); //for handle in feature sub menu
     	    setTechnologiesInRequest();
     	    //To remove the selected dependent moduleIds from the session
-    	    removeSessionAttribute(FEATURES_DEPENDENT_MOD_IDS);
+    	    removeSessionAttribute(SESSION_FEATURES_DEPENDENT_MOD_IDS);
 	    } catch (PhrescoException e) {
 	        return showErrorPopup(e, EXCEPTION_FEATURE_LIST);
 	    }
@@ -119,7 +119,7 @@ public class Features extends ServiceBaseAction {
             setReqAttribute(REQ_FEATURES_TYPE, REQ_FEATURES_TYPE_JS);
     	    setTechnologiesInRequest();
             //To remove the selected dependent moduleIds from the session
-    	    removeSessionAttribute(FEATURES_DEPENDENT_MOD_IDS);
+    	    removeSessionAttribute(SESSION_FEATURES_DEPENDENT_MOD_IDS);
     	} catch (PhrescoException e) {
             return showErrorPopup(e, EXCEPTION_FEATURE_LIST);
         }
@@ -135,7 +135,7 @@ public class Features extends ServiceBaseAction {
     	try {
     		List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
     		setReqAttribute(REQ_ARCHE_TYPES, technologies);
-    		featureByteArray = null;
+    		s_featureByteArray = null;
     	} catch (PhrescoException e) {
     	    throw new PhrescoException(e);
     	}
@@ -294,7 +294,7 @@ public class Features extends ServiceBaseAction {
                 dependentModuleIds.add(getHttpRequest().getParameter(dependentModGroup));
             }
         }
-        setSessionAttribute(FEATURES_DEPENDENT_MOD_IDS, dependentModuleIds);
+        setSessionAttribute(SESSION_FEATURES_DEPENDENT_MOD_IDS, dependentModuleIds);
     }
 	
 	public String saveModules() throws IOException {
@@ -331,8 +331,8 @@ public class Features extends ServiceBaseAction {
         try {
             ArtifactGroup moduleGroup = createModuleGroup(type);
             List<InputStream> inputStream = new ArrayList<InputStream>();
-            if (featureByteArray != null) {
-                inputStream.add(new ByteArrayInputStream(featureByteArray));
+            if (s_featureByteArray != null) {
+                inputStream.add(new ByteArrayInputStream(s_featureByteArray));
             }
             getServiceManager().createFeatures(moduleGroup, inputStream, getCustomerId());
             addActionMessage(getText(FEATURE_ADDED, Collections.singletonList(getName())));
@@ -379,8 +379,8 @@ public class Features extends ServiceBaseAction {
         try {
             ArtifactGroup moduleGroup = createModuleGroup(type);
             List<InputStream> inputStream = new ArrayList<InputStream>();
-            if (featureByteArray != null) {
-                inputStream.add(new ByteArrayInputStream(featureByteArray));
+            if (s_featureByteArray != null) {
+                inputStream.add(new ByteArrayInputStream(s_featureByteArray));
             }
             getServiceManager().updateFeature(moduleGroup, inputStream, getCustomerId());
             addActionMessage(getText(FEATURE_ADDED, Collections.singletonList(getName())));
@@ -426,7 +426,7 @@ public class Features extends ServiceBaseAction {
             artifactInfo.setAppliesTo(required);
             
             //To set dependencies
-            artifactInfo.setDependencyIds((List<String>)getSessionAttribute(FEATURES_DEPENDENT_MOD_IDS));
+            artifactInfo.setDependencyIds((List<String>) getSessionAttribute(SESSION_FEATURES_DEPENDENT_MOD_IDS));
             
             artifactGroup.setVersions(Arrays.asList(artifactInfo));
             
@@ -494,7 +494,7 @@ public class Features extends ServiceBaseAction {
             writer = getHttpResponse().getWriter();
         	InputStream is = getHttpRequest().getInputStream();
         	byte[] tempFeaByteArray = IOUtils.toByteArray(is);
-    		featureByteArray = tempFeaByteArray;
+    		s_featureByteArray = tempFeaByteArray;
     		
         	ArtifactGroup artifactGroupInfo = ServerUtil.getArtifactinfo(new ByteArrayInputStream(tempFeaByteArray));
         	FileInfo fileInfo = new FileInfo();
@@ -528,7 +528,7 @@ public class Features extends ServiceBaseAction {
 			S_LOGGER.debug("Entering Method  Features.removeUploadedFile()");
 		}
 		
-		featureByteArray = null;
+		s_featureByteArray = null;
 	}
 
 	public String validateForm() throws PhrescoException {
@@ -543,11 +543,11 @@ public class Features extends ServiceBaseAction {
             isError = true;
         }
         //Validate whether file is selected during add
-        if (/*!EDIT.equals(getFromPage()) &&*/ featureByteArray == null) {
+        if (/*!EDIT.equals(getFromPage()) &&*/ s_featureByteArray == null) {
             setFileError(getText(KEY_I18N_ERR_APPLNJAR_EMPTY));
             isError = true;
         }
-        if (featureByteArray != null) {
+        if (s_featureByteArray != null) {
             //Empty validation for groupId if file is selected
             if (StringUtils.isEmpty(getGroupId())) {
                 setGroupIdError(getText(KEY_I18N_ERR_GROUPID_EMPTY));

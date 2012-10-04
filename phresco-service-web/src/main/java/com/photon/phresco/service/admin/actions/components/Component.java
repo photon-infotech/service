@@ -19,29 +19,34 @@
  */
 package com.photon.phresco.service.admin.actions.components;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-import javax.ws.rs.core.MediaType;
-
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.google.gson.Gson;
 import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.ArtifactGroup.Type;
 import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.CoreOption;
 import com.photon.phresco.commons.model.RequiredOption;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
-import com.photon.phresco.service.client.api.Content;
+import com.photon.phresco.service.client.api.ServiceManager;
+import com.photon.phresco.service.model.FileInfo;
+import com.photon.phresco.service.util.ServerUtil;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.multipart.BodyPart;
-import com.sun.jersey.multipart.MultiPart;
 
 public class Component extends ServiceBaseAction {
 
@@ -50,65 +55,61 @@ public class Component extends ServiceBaseAction {
 	private static final Logger S_LOGGER = Logger.getLogger(Features.class);
 	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
+	private static byte[] s_componentByteArray = null;
+	
 	private String name = "";
-	private String nameError = "";
-	private String versError = "";
-	private String fileError = "";
-	private boolean errorFound = false;
-	
     private String customerId = "";
-    private String fromPage = "";
-    private String type = "component";
-    
-    private String artifactId = "";
+    private String description = "";
+    private String helpText = "";
+    private String technology = "";
+    private String type = "";
     private String groupId = "";
+    private String artifactId = "";
+    private String version = "";
+    private String moduleType = "";
+    private String defaultType = "";
+    private String oldVersion = "";
+    private String moduleGroupId = "";
+    private String moduleId = "";
     
-	private static byte[] componentByteArray = null;
-	private static String componentJarName = "";
+    private List<String> dependentModGroupId = null;
     
-	private String description = "";
-	private String helpText = "";
-	private String versions = "";
-	private String technology = "";
+    private String fromPage = "";
+
+    private String nameError = "";
+    private String artifactIdError = "";
+    private String groupIdError = "";
+    private String fileError = "";
+    private String verError = "";
+    private boolean errorFound = false;
 	
-	private String version = "";
-   
-	private String verError = "";
-	private String oldVersion = "";
-	private String moduleType = "";
-	private String defaultType = "";
-	
-	private String from = "";
-	private String appJarError = "";
-	
-    public String list() {
+    public String technologies() {
     	if (s_isDebugEnabled) {
-    		S_LOGGER.debug("Entering Method  Component.list()");
+    		S_LOGGER.debug("Entering Method  Component.technologies()");
     	}
     	
     	try {
       		setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
     		List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
     		setReqAttribute(REQ_ARCHE_TYPES, technologies);
-    	} catch (PhrescoException e){
+    		//To remove the selected dependent component moduleIds from the session
+            removeSessionAttribute(SESSION_COMP_DEPENDENT_MOD_IDS);
+    	} catch (PhrescoException e) {
     	    return showErrorPopup(e, EXCEPTION_COMPONENT_LIST);
     	}
     	
     	return COMP_COMPONENT_LIST;
     }
     
-    public String componentWithList() {
+    public String list() {
     	if (s_isDebugEnabled) {
-    		S_LOGGER.debug("Entering Method  Component.componentlist()");
+    		S_LOGGER.debug("Entering Method  Component.list()");
     	}
     	
-    	try {    		
-    		List<ArtifactGroup> moduleGroup = getServiceManager().getFeatures(getCustomerId(), getTechnology(), getType());
-    		setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
+    	try {
+    	    List<ArtifactGroup> moduleGroup = getServiceManager().getFeatures(getCustomerId(), getTechnology(), Type.COMPONENT.name());
+            setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
     		setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
-    		if (StringUtils.isNotEmpty(getFrom())) {
-    		    return COMP_FEATURES_DEPENDENCY;
-    		}
     	} catch (PhrescoException e){
     	    return showErrorPopup(e, EXCEPTION_COMPONENT_LIST);
     	}
@@ -122,7 +123,6 @@ public class Component extends ServiceBaseAction {
 		}
 		
 		try {
-		
 		List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
 		setReqAttribute(REQ_ARCHE_TYPES, technologies);
 		setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
@@ -138,125 +138,107 @@ public class Component extends ServiceBaseAction {
 			S_LOGGER.debug("Entering Method  Component.edit()");
 		}
 		
-//		try {
-//		    ArtifactGroup moduleGroup = getServiceManager().getFeature(getTechnology(), getCustomerId());
-//		    setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
-//		    setReqAttribute(REQ_FROM_PAGE, EDIT);
-//		    setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
-//		} catch (PhrescoException e) {
-//		    return showErrorPopup(e, EXCEPTION_COMPONENT_EDIT);
-//		}
+		try {
+		    ServiceManager serviceManager = getServiceManager();
+		    ArtifactGroup moduleGroup = serviceManager.getFeature(getModuleGroupId(), getCustomerId(), getTechnology(), Type.COMPONENT.name());
+	        setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
+	        List<Technology> technologies = serviceManager.getArcheTypes(getCustomerId());
+	        setReqAttribute(REQ_ARCHE_TYPES, technologies);
+	        setReqAttribute(REQ_FEATURES_SELECTED_MODULEID, getModuleId());
+	        setReqAttribute(REQ_FROM_PAGE, EDIT);
+	        setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
+        } catch (PhrescoException e) {
+		    return showErrorPopup(e, EXCEPTION_COMPONENT_EDIT);
+		}
 
 		return COMP_COMPONENT_ADD;
 	}
 	
-	public String save() throws PhrescoException {
+	public String save() throws PhrescoException, IOException {
 		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Component.save()");
 		}
 		
 		try {
-			MultiPart multiPart = new MultiPart();
-			BodyPart jsonPart = new BodyPart();
-			jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
-			jsonPart.setEntity(createModuleGroup());
-			Content content = new Content(Content.Type.JSON, getName(), null, null, null, 0);
-			jsonPart.setContentDisposition(content);
-			multiPart.bodyPart(jsonPart);
-//			if (StringUtils.isNotEmpty(componentJarName)) {
-//				InputStream featureIs = new ByteArrayInputStream(componentByteArray);
-//				BodyPart binaryPart = getServiceManager().createBodyPart(Content.Type.JAR, getName(), featureIs);
-//				multiPart.bodyPart(binaryPart);
-//			}
-			
-//			ClientResponse clientResponse = getServiceManager().createFeatures(multiPart, getCustomerId());
-//			if (clientResponse.getStatus() != RES_CODE_200 && clientResponse.getStatus() != RES_CODE_201) {
-//				addActionError(getText(COMPONENT_NOT_ADDED, Collections.singletonList(getName())));
-//			} else {
-//				addActionMessage(getText(COMPONENT_ADDED, Collections.singletonList(getName())));
-//			}
+		    ArtifactGroup moduleGroup = createModuleGroup();
+            List<InputStream> inputStreams = new ArrayList<InputStream>();
+            if (s_componentByteArray != null) {
+                inputStreams.add(new ByteArrayInputStream(s_componentByteArray));
+            }
+            getServiceManager().createFeatures(moduleGroup, inputStreams, getCustomerId());
+			addActionMessage(getText(COMPONENT_ADDED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
 		    return showErrorPopup(e, EXCEPTION_COMPONENT_SAVE);    		
-		} 
+		}
 
-		return list();
+		return technologies();
 	}
+	
+	public String update() throws PhrescoException, IOException {
+        if (s_isDebugEnabled) {
+            S_LOGGER.debug("Entering Method  Component.update()");
+        }
+        
+        try {
+            ArtifactGroup moduleGroup = createModuleGroup();
+            List<InputStream> inputStreams = new ArrayList<InputStream>();
+            if (s_componentByteArray != null) {
+                inputStreams.add(new ByteArrayInputStream(s_componentByteArray));
+            }
+            getServiceManager().updateFeature(moduleGroup, inputStreams, getCustomerId());
+        } catch (PhrescoException e) {
+            return showErrorPopup(e, EXCEPTION_COMPONENT_UPDATE);
+        }
+        
+        return technologies();
+    }
 	
 	private ArtifactGroup createModuleGroup() throws PhrescoException {
-		if (s_isDebugEnabled) {
-			S_LOGGER.debug("Entering Method  Component.createModuleGroup()");
-		}
+        if (s_isDebugEnabled) {
+            S_LOGGER.debug("Entering Method  Features.createModuleGroup()");
+        }
+        
+        try {
+            ArtifactGroup artifactGroup = new ArtifactGroup();
+            artifactGroup.setName(getName());
+            if (StringUtils.isNotEmpty(getModuleGroupId())) {
+                artifactGroup.setId(getModuleGroupId());
+            }
+            artifactGroup.setDescription(getDescription());
+            artifactGroup.setGroupId(getGroupId());
+            artifactGroup.setArtifactId(getArtifactId());
+            artifactGroup.setType(Type.COMPONENT);
 
-		ArtifactGroup moduleGroup;
-		CoreOption moduleCoreOption;
-		RequiredOption requiredOption;
-		List<CoreOption> appliesTo = new ArrayList<CoreOption>();
-		List<RequiredOption> required = new ArrayList<RequiredOption>();
-		try {
-			moduleGroup = new ArtifactGroup();
-			List<ArtifactInfo> modules = new ArrayList<ArtifactInfo>();
-			ArtifactInfo module = new ArtifactInfo();
-			moduleGroup.setName(getName());
-			if (FEATURES_CORE.equals(getModuleType())) {
-				moduleCoreOption= new CoreOption(getTechnology(), true);
-			} else {
-				moduleCoreOption= new CoreOption(getTechnology(), false);;
-			}
-			appliesTo.add(moduleCoreOption);
-			moduleGroup.setAppliesTo(appliesTo);
-            //TODO:change the data type : ARUN PRASANNA
-//			moduleGroup.setType(type);
-			List<String> customerIds = new ArrayList<String>();
-			moduleGroup.setCustomerIds(customerIds);
-			moduleGroup.setArtifactId(getArtifactId());
-			moduleGroup.setGroupId(getGroupId());
-			module.setName(getName());
-			module.setDescription(getDescription());
-			module.setHelpText(getHelpText());
-			module.setVersion(getVersion());
-			if (StringUtils.isNotEmpty(getDefaultType())) {
-				requiredOption = new RequiredOption(getTechnology(), true);
-			} else {
-				requiredOption = new RequiredOption(getTechnology(), false);
-			}
-			required.add(requiredOption);
-			module.setAppliesTo(required);
-			modules.add(module);
-			moduleGroup.setVersions(modules);
-		} catch(Exception e) {
-			throw new PhrescoException(e);
-		}
-
-		return moduleGroup;
-	}
-	
-	public String update() throws PhrescoException {
-		if (s_isDebugEnabled) {
-			S_LOGGER.debug("Entering Method  Component.update()");
-		}
-		
-		try {
-			MultiPart multiPart = new MultiPart();			
-			BodyPart jsonPart = new BodyPart();
-			jsonPart.setMediaType(MediaType.APPLICATION_JSON_TYPE);
-			jsonPart.setEntity(createModuleGroup());
-			Content content = new Content(Content.Type.JSON, getName(), null, null, null, 0);
-			jsonPart.setContentDisposition(content);
-			multiPart.bodyPart(jsonPart);
-			    
-//			if (StringUtils.isNotEmpty(componentJarName)) {
-//				InputStream featureIs = new ByteArrayInputStream(componentByteArray);
-//				BodyPart binaryPart2 = getServiceManager().createBodyPart(Content.Type.JAR, getName(), featureIs);
-//				multiPart.bodyPart(binaryPart2);
-//			}
-			
-//			getServiceManager().updateFeature(multiPart, getTechnology(), getCustomerId());
-		} catch (PhrescoException e) {
-		    return showErrorPopup(e, EXCEPTION_COMPONENT_UPDATE);
-		}
-		
-		return list();	
-	}
+            // To set appliesto tech and core
+            List<CoreOption> appliesTo = new ArrayList<CoreOption>();
+            CoreOption moduleCoreOption = new CoreOption(getTechnology(), Boolean.parseBoolean(getModuleType()));
+            appliesTo.add(moduleCoreOption);
+            artifactGroup.setAppliesTo(appliesTo);
+            
+            artifactGroup.setCustomerIds(Arrays.asList(getCustomerId()));
+            
+            //To set the details of the version
+            ArtifactInfo artifactInfo = new ArtifactInfo();
+            artifactInfo.setDescription(getDescription());
+            artifactInfo.setHelpText(getHelpText());
+            artifactInfo.setVersion(getVersion());
+            
+            //To set whether the feature is default to the technology or not
+            List<RequiredOption> required = new ArrayList<RequiredOption>();
+            RequiredOption requiredOption = new RequiredOption(getTechnology(), Boolean.parseBoolean(getDefaultType()));
+            required.add(requiredOption);
+            artifactInfo.setAppliesTo(required);
+            
+            //To set dependencies
+            artifactInfo.setDependencyIds((List<String>) getSessionAttribute(SESSION_COMP_DEPENDENT_MOD_IDS));
+            
+            artifactGroup.setVersions(Arrays.asList(artifactInfo));
+            
+            return artifactGroup;
+        } catch (Exception e) {
+            throw new PhrescoException(e);
+        }
+    }
 	
 	public String delete() throws PhrescoException {
 		if (s_isDebugEnabled) {
@@ -278,42 +260,86 @@ public class Component extends ServiceBaseAction {
 		    return showErrorPopup(e, EXCEPTION_COMPONENT_DELETE);
 		}
 		
-		return list();
+		return technologies();
 	}
 	
-	public String uploadFile() throws PhrescoException {
-		if (s_isDebugEnabled) {
-			S_LOGGER.debug("Entering Method  Component.uploadFile()");
-		}
-		
-		PrintWriter writer = null;
-		try {
+	public String uploadFile() throws PhrescoException, IOException {
+        if (s_isDebugEnabled) {
+            S_LOGGER.debug("Entering Method  Features.uploadFile()");
+        }
+        
+        PrintWriter writer = null;
+        try {
             writer = getHttpResponse().getWriter();
-            componentJarName = getHttpRequest().getHeader(X_FILE_NAME);
-	       
-	        InputStream is = getHttpRequest().getInputStream();
-	        componentByteArray = IOUtils.toByteArray(is);
-	        getHttpResponse().setStatus(getHttpResponse().SC_OK);
-	        writer.print(SUCCESS_TRUE);
-	        writer.flush();
-	        writer.close();
-		} catch (Exception e) {
-			getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
+            InputStream is = getHttpRequest().getInputStream();
+            byte[] tempFeaByteArray = IOUtils.toByteArray(is);
+            s_componentByteArray = tempFeaByteArray;
+            
+            ArtifactGroup artifactGroupInfo = ServerUtil.getArtifactinfo(new ByteArrayInputStream(tempFeaByteArray));
+            FileInfo fileInfo = new FileInfo();
+            getHttpResponse().setStatus(getHttpResponse().SC_OK);
+            if (artifactGroupInfo != null) {
+                fileInfo.setMavenJar(true);
+                fileInfo.setSuccess(true);
+                fileInfo.setGroupId(artifactGroupInfo.getGroupId());
+                fileInfo.setArtifactId(artifactGroupInfo.getArtifactId());
+                List<ArtifactInfo> versions = artifactGroupInfo.getVersions();
+                fileInfo.setVersion(versions.get(0).getVersion());
+                Gson gson = new Gson();
+                String json = gson.toJson(fileInfo);
+                writer.print(json);
+            } else {
+                writer.print(MAVEN_JAR_FALSE);
+            }
+            writer.flush();
+            writer.close();
+        } catch (PhrescoException e) {
+            getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
             writer.print(SUCCESS_FALSE);
-			throw new PhrescoException(e);
-		}
-		
-		return SUCCESS;
-	}
+            return showErrorPopup(e, EXCEPTION_COMPONENT_UPLOAD_FILE);
+        }
+        
+        return SUCCESS;
+    }
 	
-	public void removeUploadedFile() {
+	public void removeComponentFile() {
 		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Component.removeUploadedFile()");
 		}
 		
-		componentByteArray = null;
-		componentJarName = null;
+		s_componentByteArray = null;
 	}
+	
+	public String listConponentsDependency() throws PhrescoException {
+        if (s_isDebugEnabled) {
+            S_LOGGER.debug("Entering Method  Features.featurelist()");
+        }
+        
+        try {
+            List<ArtifactGroup> moduleGroup = getServiceManager().getFeatures(
+                    getCustomerId(), getTechnology(), Type.COMPONENT.name());
+            setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
+            setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
+        } catch (PhrescoException e) {
+            return showErrorPopup(e, EXCEPTION_COMPONENT_LIST_DEPENDENCY);
+        }
+        
+        return COMP_COMPONENT_LIST;
+    }
+	
+	public void saveDependentComponents() {
+        if (s_isDebugEnabled) {
+            S_LOGGER.debug("Entering Method  Features.saveDependentFeatures()");
+        }
+        
+        List<String> dependentModuleIds = new ArrayList<String>(dependentModGroupId.size());
+        if (CollectionUtils.isNotEmpty(dependentModGroupId)) {
+            for (String dependentModGroup : dependentModGroupId) {
+                dependentModuleIds.add(getHttpRequest().getParameter(dependentModGroup));
+            }
+        }
+        setSessionAttribute(SESSION_COMP_DEPENDENT_MOD_IDS, dependentModuleIds);
+    }
 
 	public String validateForm() throws PhrescoException {
 		if (s_isDebugEnabled) {
@@ -321,214 +347,234 @@ public class Component extends ServiceBaseAction {
 		}
 		
 		boolean isError = false;
-		//Empty validation for name
-		if (StringUtils.isEmpty(getName())) {
-			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY));
-			isError = true;
-		} 
-		
-		//Empty validation for version
-		if (StringUtils.isEmpty(getVersion())) {
-			setVersError(getText(KEY_I18N_ERR_VER_EMPTY));
-			isError = true;
-		}
-		
-		//Validate whether file is selected
-		if (componentByteArray == null) {
-		    setAppJarError(getText(KEY_I18N_ERR_APPLNJAR_EMPTY));
+        //Empty validation for name
+        if (StringUtils.isEmpty(getName())) {
+            setNameError(getText(KEY_I18N_ERR_NAME_EMPTY));
             isError = true;
-		}
-		/*else if (StringUtils.isEmpty(fromPage) || (!version.equals(oldVersion))) {
-			//To check whether the version already exist
-			List<ModuleGroup> moduleGroups = getServiceManager().getFeatures(customerId);
-			if (CollectionUtils.isNotEmpty(versions)) {
-				for (ModuleGroup moduleGroup : moduleGroups) {
-				    List<Module> versions = moduleGroup.getVersions();
-				    if (CollectionUtils.isNotEmpty(versions)) {
-				        for (Module module : versions) {
-	                        if (module.getName().equalsIgnoreCase(name) && module.getVersion().equals(version)) {
-	                            setVerError(getText(KEY_I18N_ERR_VER_ALREADY_EXISTS));
-	                            isError = true;
-	                            break;
-	                        }
+        }
+        //Validate whether file is selected during add
+        if (/*!EDIT.equals(getFromPage()) &&*/ s_componentByteArray == null) {
+            setFileError(getText(KEY_I18N_ERR_APPLNJAR_EMPTY));
+            isError = true;
+        }
+        if (s_componentByteArray != null) {
+            //Empty validation for groupId if file is selected
+            if (StringUtils.isEmpty(getGroupId())) {
+                setGroupIdError(getText(KEY_I18N_ERR_GROUPID_EMPTY));
+                isError = true;
+            }
+            //Empty validation for artifactId if file is selected
+            if (StringUtils.isEmpty(getArtifactId())) {
+                setArtifactIdError(getText(KEY_I18N_ERR_ARTIFACTID_EMPTY));
+                isError = true;
+            }
+            //Empty validation for version if file is selected
+            if (StringUtils.isEmpty(getVersion())) {
+                setVerError(getText(KEY_I18N_ERR_VER_EMPTY));
+                isError = true;
+            }
+            //To check whether the version already exist
+            // TODO: Lohes(check must be done by querying the DB)
+            /*if (StringUtils.isNotEmpty(getVersion()) && (StringUtils.isEmpty(getFromPage()) 
+                    || (!getVersion().equals(getOldVersion())))) {
+                List<ArtifactGroup> moduleGroups = getServiceManager().getFeatures(getCustomerId(), getTechnology(), getType());
+                if (StringUtils.isNotEmpty(getVersion())) {
+                    for (ArtifactGroup moduleGroup : moduleGroups) {
+                        List<ArtifactInfo> versions = moduleGroup.getVersions();
+                        if (CollectionUtils.isNotEmpty(versions)) {
+                            for (ArtifactInfo module : versions) {
+                                if (module.getName().equalsIgnoreCase(getName())
+                                        && module.getVersion().equals(getVersion())) {
+                                    setVerError(getText(KEY_I18N_ERR_VER_ALREADY_EXISTS));
+                                    isError = true;
+                                    break;
+                                }
+                            }
                         }
-				    }
-				}
-			}
-		}*/
-		
-		if (isError) {
-			setErrorFound(true);
-		}
-		
-		return SUCCESS;
+                    }
+                }
+            }*/
+        }
+        if (isError) {
+            setErrorFound(true);
+        }
+        
+        return SUCCESS;
 	}
 
 	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	public String getNameError() {
-		return nameError;
-	}
-	
-	public void setNameError(String nameError) {
-		this.nameError = nameError;
-	}
-	
-	public String getVersError() {
-		return versError;
-	}
-
-	public void setVersError(String versError) {
-		this.versError = versError;
-	}
-
-	public String getFileError() {
-		return fileError;
-	}
-
-	public void setFileError(String fileError) {
-		this.fileError = fileError;
-	}
-
-	public boolean getErrorFound() {
-		return errorFound;
-	}
-
-	public void setErrorFound(boolean errorFound) {
-		this.errorFound = errorFound;
-	}
-	
-	public String getCustomerId() {
-		return customerId;
-	}
-
-	public void setCustomerId(String customerId) {
-		this.customerId = customerId;
-	}
-	
-	public String getFromPage() {
-		return fromPage;
-	}
-
-	public void setFromPage(String fromPage) {
-		this.fromPage = fromPage;
-	}
-	
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-	
-	public String getTechnology() {
-		return technology;
-	}
-
-	public void setTechnology(String technology) {
-		this.technology = technology;
-	}
-	
-	public String getVersion() {
-		return version;
-	}
-
-	public void setVersion(String version) {
-		this.version = version;
-	}
-	
-	public String getVerError() {
-		return verError;
-	}
-
-	public void setVerError(String verError) {
-		this.verError = verError;
-	}
-
-	public String getOldVersion() {
-		return oldVersion;
-	}
-
-	public void setOldVersion(String oldVersion) {
-		this.oldVersion = oldVersion;
-	}
-	
-	public String getArtifactId() {
-		return artifactId;
-	}
-
-	public void setArtifactId(String artifactId) {
-		this.artifactId = artifactId;
-	}
-
-	public String getGroupId() {
-		return groupId;
-	}
-
-	public void setGroupId(String groupId) {
-		this.groupId = groupId;
-	}
-	
-	public String getModuleType() {
-		return moduleType;
-	}
-
-	public void setModuleType(String moduleType) {
-		this.moduleType = moduleType;
-	}
-	
-	public String getDefaultType() {
-		return defaultType;
-	}
-
-	public void setDefaultType(String defaultType) {
-		this.defaultType = defaultType;
-	}
-
-	public String getHelpText() {
-		return helpText;
-	}
-
-	public void setHelpText(String helpText) {
-		this.helpText = helpText;
-	}
-	
-	public String getFrom() {
-        return from;
+        return name;
     }
 
-    public void setFrom(String from) {
-        this.from = from;
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    public String getNameError() {
+        return nameError;
+    }
+    
+    public void setNameError(String nameError) {
+        this.nameError = nameError;
+    }
+    
+    public String getFileError() {
+        return fileError;
     }
 
-	public String getAppJarError() {
-		return appJarError;
-	}
+    public void setFileError(String fileError) {
+        this.fileError = fileError;
+    }
 
-	public void setAppJarError(String appJarError) {
-		this.appJarError = appJarError;
-	}
-	
-	public String getVersions() {
-		return versions;
-	}
+    public boolean getErrorFound() {
+        return errorFound;
+    }
 
-	public void setVersions(String versions) {
-		this.versions = versions;
-	}
+    public void setErrorFound(boolean errorFound) {
+        this.errorFound = errorFound;
+    }
+    
+    public String getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
+    }
+    
+    public String getFromPage() {
+        return fromPage;
+    }
+
+    public void setFromPage(String fromPage) {
+        this.fromPage = fromPage;
+    }
+    
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+    
+    public String getTechnology() {
+        return technology;
+    }
+
+    public void setTechnology(String technology) {
+        this.technology = technology;
+    }
+    
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+    
+    public String getVerError() {
+        return verError;
+    }
+
+    public void setVerError(String verError) {
+        this.verError = verError;
+    }
+
+    public String getOldVersion() {
+        return oldVersion;
+    }
+
+    public void setOldVersion(String oldVersion) {
+        this.oldVersion = oldVersion;
+    }
+    
+    public String getArtifactId() {
+        return artifactId;
+    }
+
+    public void setArtifactId(String artifactId) {
+        this.artifactId = artifactId;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
+    
+    public String getModuleType() {
+        return moduleType;
+    }
+
+    public void setModuleType(String moduleType) {
+        this.moduleType = moduleType;
+    }
+    
+    public String getDefaultType() {
+        return defaultType;
+    }
+
+    public void setDefaultType(String defaultType) {
+        this.defaultType = defaultType;
+    }
+
+    public String getHelpText() {
+        return helpText;
+    }
+
+    public void setHelpText(String helpText) {
+        this.helpText = helpText;
+    }
+    
+    public String getModuleGroupId() {
+        return moduleGroupId;
+    }
+
+    public void setModuleGroupId(String moduleGroupId) {
+        this.moduleGroupId = moduleGroupId;
+    }
+    
+    public String getArtifactIdError() {
+        return artifactIdError;
+    }
+
+    public void setArtifactIdError(String artifactIdError) {
+        this.artifactIdError = artifactIdError;
+    }
+
+    public String getGroupIdError() {
+        return groupIdError;
+    }
+
+    public void setGroupIdError(String groupIdError) {
+        this.groupIdError = groupIdError;
+    }
+    
+    public String getModuleId() {
+        return moduleId;
+    }
+
+    public void setModuleId(String moduleId) {
+        this.moduleId = moduleId;
+    }
+    
+    public List<String> getDependentModGroupId() {
+        return dependentModGroupId;
+    }
+
+    public void setDependentModGroupId(List<String> dependentModGroupId) {
+        this.dependentModGroupId = dependentModGroupId;
+    }
 }

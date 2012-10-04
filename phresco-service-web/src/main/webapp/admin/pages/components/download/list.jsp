@@ -28,7 +28,7 @@
 <%@ page import="com.photon.phresco.commons.model.DownloadInfo" %>
 
 <% 
-	List<DownloadInfo> downloadInfo = (List<DownloadInfo>)request.getAttribute(ServiceUIConstants.REQ_DOWNLOAD_INFO); 
+	List<DownloadInfo> downloadInfos = (List<DownloadInfo>)request.getAttribute(ServiceUIConstants.REQ_DOWNLOAD_INFO); 
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
 %>
 
@@ -50,7 +50,7 @@
 		</s:if>
 	</div>
 	
-	<% if (CollectionUtils.isEmpty(downloadInfo)) { %>
+	<% if (CollectionUtils.isEmpty(downloadInfos)) { %>
 		<div class="alert alert-block">
 		    <s:text name='alert.msg.download.not.available'/>
 		</div>
@@ -64,7 +64,8 @@
 							<tr>
 								<th class="first">
 									<div class="th-inner">
-										<input type="checkbox" value="" id="checkAllAuto" class="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this,$('.dwnloadInfo'), false);">
+										<input type="checkbox" value="" id="checkAllAuto" class="checkAllAuto" name="checkAllAuto" 
+											onclick="checkAllEvent(this,$('.dwnloadInfo'), false);">
 									</div>
 								</th>
 								<th class="second">
@@ -77,15 +78,17 @@
 									<div class="th-inner tablehead"><s:label key="lbl.hdr.adm.dwnldlst.appltfrm" theme="simple"/></div>
 								</th>
 								<th class="third">
-									<div class="th-inner tablehead" style="margin-left:-80px;"><s:label key="lbl.hdr.adm.dwnldlst.ver"  theme="simple"/></div>
+									<div class="th-inner tablehead" style="margin-left:-80px;">
+										<s:label key="lbl.hdr.adm.dwnldlst.ver"  theme="simple"/>
+									</div>
 								</th>
 							</tr>
 						</thead>
 			
 						<tbody>
 				       	<% 
-							if (CollectionUtils.isNotEmpty(downloadInfo)) {
-								for (DownloadInfo download : downloadInfo) {
+							if (CollectionUtils.isNotEmpty(downloadInfos)) {
+								for (DownloadInfo download : downloadInfos) {
 				       	%>
 							<tr>
 								<td class="checkboxwidth">
@@ -98,9 +101,9 @@
 									<%= StringUtils.isNotEmpty(download.getDescription()) ? download.getDescription() : "" %>
 								</td>
 								<td>
-									<%= CollectionUtils.isNotEmpty(download.getPlatform()) ? download.getPlatform() : "" %>
+									<%=CollectionUtils.isNotEmpty(download.getPlatformTypeIds()) ? download.getPlatformTypeIds() : ""%>
 								</td>
-								<td><%= CollectionUtils.isNotEmpty(download.getVersions()) ? download.getVersions() : "" %></td>
+<%-- 								<td><%= CollectionUtils.isNotEmpty(download.getVersions()) ? download.getVersions() : "" %></td> --%>
 							</tr>
 						<%
 								}
@@ -129,7 +132,7 @@
 
     /** To edit the download **/
     function editDownload(id) {
-        var params = "id=";
+        var params = "downloadId=";
         params = params.concat(id);
         loadContent("downloadEdit", $("#formDownloadList"), $('#subcontainer'), params);
     }
