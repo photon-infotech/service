@@ -44,8 +44,10 @@ import org.springframework.stereotype.Component;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.Customer;
+import com.photon.phresco.commons.model.DownloadInfo;
 import com.photon.phresco.commons.model.Permission;
 import com.photon.phresco.commons.model.Property;
 import com.photon.phresco.commons.model.Role;
@@ -54,10 +56,17 @@ import com.photon.phresco.commons.model.VideoInfo;
 import com.photon.phresco.commons.model.VideoType;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.exception.PhrescoWebServiceException;
+import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.api.DbService;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.client.impl.ClientHelper;
+import com.photon.phresco.service.converters.ConvertersFactory;
+import com.photon.phresco.service.dao.ApplicationInfoDAO;
+import com.photon.phresco.service.dao.ArtifactGroupDAO;
+import com.photon.phresco.service.dao.DownloadsDAO;
+import com.photon.phresco.service.dao.VideoInfoDAO;
+import com.photon.phresco.service.dao.VideoTypeDAO;
 import com.photon.phresco.service.model.ArtifactInfo;
 import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.FileUtil;
@@ -332,41 +341,26 @@ public class AdminService extends DbService {
 		return Response.status(Response.Status.OK).entity(video).build();
 	}
 
-	private void saveVideos(VideoInfo video) {
-		String newVersion = video.getVideoList().get(0).getArtifactGroup().getVersions().get(0).getVersion();
-		VideoInfo videoInfo = mongoOperation.findOne(VIDEOS_COLLECTION_NAME, 
-		        new Query(Criteria.where("id").is(video.getId())), VideoInfo.class);
-		List<VideoType> videoTypeList=video.getVideoList();  
-		List<com.photon.phresco.commons.model.ArtifactInfo> versions = videoTypeList.get(0).getArtifactGroup().getVersions();
+	private void saveVideos(VideoInfo video) throws PhrescoException {
+		Converter<VideoInfoDAO, VideoInfo> converter = 
+	            (Converter<VideoInfoDAO, VideoInfo>) ConvertersFactory.getConverter(VideoInfoDAO.class);
+		VideoInfoDAO videoDAO = converter.convertObjectToDAO(video);
+		mongoOperation.save(VIDEODAO_COLLECTION_NAME, videoDAO);
+		Converter<VideoTypeDAO, VideoType> videoTypeConverter = 
+				(Converter<VideoTypeDAO, VideoType>)ConvertersFactory.getConverter(VideoTypeDAO.class);
+		VideoType videoType = video.getVideoList().get(0);
+		VideoTypeDAO videoTypeDAO = videoTypeConverter.convertObjectToDAO(videoType);
 		
-		if (videoInfo != null) {
-			List<VideoType> videoTypeLists = videoInfo.getVideoList();
-			VideoType videoTypes = videoTypeLists.get(0);
-			ArtifactGroup artifactGroup = videoTypes.getArtifactGroup();
-			List<com.photon.phresco.commons.model.ArtifactInfo> versions2 = artifactGroup.getVersions();
-			
-			versions2.addAll(versions);
-			artifactGroup.setVersions(versions2);
-			videoTypes.setArtifactGroup(artifactGroup);
-			
-			videoTypeLists.set(0, videoTypes);
-			videoInfo.setVideoList(videoTypeLists);
-			mongoOperation.save(VIDEOS_COLLECTION_NAME , videoInfo);
-		} 
-		else {
-			mongoOperation.save(VIDEOS_COLLECTION_NAME , video);
+		VideoTypeDAO findOne = mongoOperation.findOne(VIDEOTYPESDAO_COLLECTION_NAME, 
+				new Query(Criteria.where("name").is(videoTypeDAO.getName())), VideoTypeDAO.class);
+		if(findOne!=null){
+			videoTypeDAO.setArtifactGroupId(findOne.getArtifactGroupId());
+			videoTypeDAO.setId(findOne.getId());
 		}
-		
-		
-	}
-
-	private List<String> getVersion(VideoInfo video) {
-		List<com.photon.phresco.commons.model.ArtifactInfo> versions = video.getVideoList().get(0).getArtifactGroup().getVersions();
-		List<String> versionList  = new ArrayList<String>();
-		for (com.photon.phresco.commons.model.ArtifactInfo artifactInfo : versions) {
-			versionList.add(artifactInfo.getVersion());
-		}
-		return versionList;
+		ArtifactGroup artifactGroup = videoType.getArtifactGroup();
+		saveModuleGroup(artifactGroup);
+		mongoOperation.save(VIDEOTYPESDAO_COLLECTION_NAME, videoTypeDAO);
+		mongoOperation.save(VIDEODAO_COLLECTION_NAME, videoDAO);
 	}
 
 	private boolean uploadBinary(ArtifactGroup archetypeInfo, File videoFile) throws PhrescoException {
@@ -388,6 +382,53 @@ public class AdminService extends DbService {
 //        boolean addArtifact = repositoryManager.addArtifact(info, artifactFile, customerId);
         FileUtil.delete(pomFile);
         return addArtifact;
+	}
+	
+	private void saveModuleGroup(ArtifactGroup moduleGroup) throws PhrescoException {
+        Converter<ArtifactGroupDAO, ArtifactGroup> converter = 
+            (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
+        ArtifactGroupDAO moduleGroupDAO = converter.convertObjectToDAO(moduleGroup);
+        
+        List<com.photon.phresco.commons.model.ArtifactInfo> moduleGroupVersions = moduleGroup.getVersions();
+        List<String> versionIds = new ArrayList<String>();
+        
+        ArtifactGroupDAO moduleDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
+		        new Query(Criteria.where("name").is(moduleGroupDAO.getName())), ArtifactGroupDAO.class);
+        
+        com.photon.phresco.commons.model.ArtifactInfo newVersion = moduleGroup.getVersions().get(0);
+        if(moduleDAO != null) {
+        	moduleGroupDAO.setId(moduleDAO.getId());
+        	versionIds.addAll(moduleDAO.getVersionIds());
+        	List<com.photon.phresco.commons.model.ArtifactInfo> info = mongoOperation.find(ARTIFACT_INFO_COLLECTION_NAME, 
+        			new Query(Criteria.where("artifactGroupId").is(moduleDAO.getId())), com.photon.phresco.commons.model.ArtifactInfo.class);
+        	
+        	List<com.photon.phresco.commons.model.ArtifactInfo> versions = new ArrayList<com.photon.phresco.commons.model.ArtifactInfo>();
+        	newVersion.setArtifactGroupId(moduleDAO.getId());
+        	versions.add(newVersion);
+        	info.addAll(versions);
+        	
+        	String id = checkVersionAvailable(info, newVersion.getVersion());
+        	if(id == newVersion.getId()) {
+        		versionIds.add(newVersion.getId());
+        	}
+			newVersion.setId(id);
+    		mongoOperation.save(ARTIFACT_INFO_COLLECTION_NAME, newVersion);
+        }  else {
+        		versionIds.add(newVersion.getId());
+        		newVersion.setArtifactGroupId(moduleGroupDAO.getId());
+                mongoOperation.save(ARTIFACT_INFO_COLLECTION_NAME, newVersion);
+        }
+        moduleGroupDAO.setVersionIds(versionIds);
+        mongoOperation.save(ARTIFACT_GROUP_COLLECTION_NAME, moduleGroupDAO);
+    }
+
+	private String checkVersionAvailable(List<com.photon.phresco.commons.model.ArtifactInfo> info, String version) {
+		for (com.photon.phresco.commons.model.ArtifactInfo artifactInfo : info) {
+			if(artifactInfo.getVersion().equals(version)) {
+				return artifactInfo.getId();
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -490,15 +531,34 @@ public class AdminService extends DbService {
 	    }
 		
 		try {
-			mongoOperation.remove(VIDEOS_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), VideoInfo.class);
+			VideoInfoDAO videoInfoDAO = mongoOperation.findOne(VIDEODAO_COLLECTION_NAME, 
+					new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), VideoInfoDAO.class);
+			String videoListId = videoInfoDAO.getVideoListId();
+			VideoTypeDAO videoTypeDAO = mongoOperation.findOne(VIDEOTYPESDAO_COLLECTION_NAME, 
+					new Query(Criteria.where("videoInfoId").is(videoListId)), VideoTypeDAO.class);
+			String artifactGroupId = videoTypeDAO.getArtifactGroupId();
+			deleteArtifacts(artifactGroupId);
+			mongoOperation.remove(VIDEOTYPESDAO_COLLECTION_NAME, new Query(Criteria.where("videoInfoId").is(videoListId)),VideoType.class);
+			mongoOperation.remove(VIDEODAO_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), VideoInfo.class);
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
 		}
 		
 		return Response.status(Response.Status.OK).build();
 	}
-
 	
+	private boolean deleteArtifacts(String artifactGroupId) {
+		ArtifactGroupDAO artifactGroupDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
+				new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(artifactGroupId)), ArtifactGroupDAO.class);
+		List<String> versionIds = artifactGroupDAO.getVersionIds();
+		mongoOperation.remove(ARTIFACT_INFO_COLLECTION_NAME, 
+				new Query(Criteria.where(REST_API_PATH_PARAM_ID).in(versionIds.toArray())), 
+				com.photon.phresco.commons.model.ArtifactInfo.class);
+		mongoOperation.remove(ARTIFACT_GROUP_COLLECTION_NAME, 
+				new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(artifactGroupId)), ArtifactGroupDAO.class);
+	    return true;    
+	}
+
 	/**
 	 * Returns the list of users
 	 * @return
