@@ -190,15 +190,15 @@ public class Videos extends ServiceBaseAction {
 		}
 		String type = getHttpRequest().getParameter(REQ_VIDEO_FILE_TYPE);
 		if(REQ_VIDEO_UPLOAD.equals(type)) {
-			s_videoByteArray = getByteArray();
+			s_videoByteArray = getFileByteArray();
 		} else {
-			s_imgByteArray = getByteArray();
+			s_imgByteArray = getFileByteArray();
 		}
 
 		return SUCCESS;
 	}
 
-	private byte[] getByteArray() throws PhrescoException {
+	private byte[] getFileByteArray() throws PhrescoException {
 		PrintWriter writer = null;
 		byte[] byteArray = null;
 		try {

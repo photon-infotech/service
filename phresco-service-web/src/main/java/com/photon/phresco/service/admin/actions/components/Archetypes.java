@@ -29,12 +29,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import com.google.gson.Gson;
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactInfo;
@@ -42,7 +40,6 @@ import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.client.api.ServiceManager;
-import com.photon.phresco.service.model.FileInfo;
 import com.photon.phresco.service.util.ServerUtil;
 
 
@@ -83,7 +80,7 @@ public class Archetypes extends ServiceBaseAction {
 	private String groupId = "";
 	private String artifactId = "";
 	private String uploadPlugin = "";
-	
+	private boolean archType = false;
 	
 	public String list() throws PhrescoException {
 		if (s_isDebugEnabled) {
@@ -286,54 +283,30 @@ public class Archetypes extends ServiceBaseAction {
 	
 	public String uploadJar() throws PhrescoException {
 		if (s_isDebugEnabled) {
-			S_LOGGER.debug("Entering Method Archetypes.uploadJar()");
-		}
-		
-		String type = getHttpRequest().getParameter(REQ_JAR_TYPE);
-		if (REQ_PLUGIN_JAR.equals(type)) {
-			uploadPluginJar();
-		} else {
-			uploadAppJar();
-		}
-		
-		return SUCCESS;
-	}
-	
-	public String uploadAppJar() throws PhrescoException {
-		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.uploadAppJar()");
 		}
 		
 		PrintWriter writer = null;
 		try {
             writer = getHttpResponse().getWriter();
-	        s_applnJarName = getHttpRequest().getHeader(X_FILE_NAME);
-	     
-	        InputStream is = getHttpRequest().getInputStream();
-	        byte[] tempApplnByteArray = IOUtils.toByteArray(is);
-	        boolean isArchetypeJar = ServerUtil.validateArchetypeJar(new ByteArrayInputStream(tempApplnByteArray));
-	        if (isArchetypeJar) {
-	        	s_applnByteArray = tempApplnByteArray;
-	        	ArtifactGroup artifactGroupInfo = ServerUtil.getArtifactinfo(new ByteArrayInputStream(tempApplnByteArray));
-	        	FileInfo fileInfo = new FileInfo();
-	            List<ArtifactInfo> versions = artifactGroupInfo.getVersions();
-	        	getHttpResponse().setStatus(getHttpResponse().SC_OK);
-	        	if (artifactGroupInfo != null) {
-	        		fileInfo.setArtifactId(artifactGroupInfo.getArtifactId());
-		        	fileInfo.setGroupId(artifactGroupInfo.getGroupId());
-		        	fileInfo.setVersion(versions.get(0).getVersion());
-	        		fileInfo.setMavenJar(true);
-	        		fileInfo.setSuccess(true);
-	        		Gson gson = new Gson();
-	        		String json = gson.toJson(fileInfo);
-	        		writer.print(json);
+	        byte[] tempApplnByteArray = getByteArray();
+	        
+	        if (isArchType()) {
+	        	boolean isArchetypeJar = ServerUtil.validateArchetypeJar(new ByteArrayInputStream(tempApplnByteArray));
+	        	if (isArchetypeJar) {
+	        		s_applnJarName = fileName;
+	        		s_applnByteArray = tempApplnByteArray;
+	        		getArtifactGroupInfo(writer, tempApplnByteArray);
 	        	} else {
-	        		writer.print(MAVEN_JAR_FALSE);
+	        		s_applnJarName = null;
+	        		s_applnByteArray = null;
+	        		writer.print(INVALID_ARCHETYPE_JAR);
 	        	}
 	        } else {
-	        	s_applnJarName = null;
-	        	s_applnByteArray = null;
-	        	writer.print(INVALID_ARCHETYPE_JAR);
+	        	String jarName = fileName;
+	        	byte[] byteArray = tempApplnByteArray;
+	        	getArtifactGroupInfo(writer, tempApplnByteArray);
+	        	s_pluginMap.put(jarName, byteArray);
 	        }
 	        writer.flush();
 	        writer.close();
@@ -344,49 +317,15 @@ public class Archetypes extends ServiceBaseAction {
 		}
 		
 		return SUCCESS;
+		
 	}
-	
-	public String uploadPluginJar() throws PhrescoException {
+
+	public String showPluginJarPopup() {
 		if (s_isDebugEnabled) {
-			S_LOGGER.debug("Entering Method Archetypes.uploadPluginJar()");
-		}
+	        S_LOGGER.debug("Entering Method Archetypes.showPluginJarPopup()");
+	    }
 		
-		if (StringUtils.isNotEmpty(uploadPlugin)) {
-			return uploadPlugin;
-		}
-		
-		PrintWriter writer = null;
-		try {
-			writer = getHttpResponse().getWriter();
-	        String jarName = getHttpRequest().getHeader(X_FILE_NAME);
-	        InputStream is = getHttpRequest().getInputStream();
-	        byte[] byteArray = IOUtils.toByteArray(is);
-	        ArtifactGroup artifactGroupInfo = ServerUtil.getArtifactinfo(new ByteArrayInputStream(byteArray));
-	        getHttpResponse().setStatus(getHttpResponse().SC_OK);
-	        FileInfo fileInfo = new FileInfo();
-	        List<ArtifactInfo> versions = artifactGroupInfo.getVersions();
-	        if (artifactGroupInfo != null) {
-	        	fileInfo.setMavenJar(true);
-	        	fileInfo.setSuccess(true);
-	        	fileInfo.setArtifactId(artifactGroupInfo.getArtifactId());
-	        	fileInfo.setGroupId(artifactGroupInfo.getGroupId());
-	        	fileInfo.setVersion(versions.get(0).getVersion());
-	        	Gson gson = new Gson();
-	        	String json = gson.toJson(fileInfo);
-	        	writer.print(json);
-	        } else {
-	        	writer.print(MAVEN_JAR_FALSE);
-	        }
-        	s_pluginMap.put(jarName, byteArray);
-	        writer.flush();
-	        writer.close();
-		} catch (Exception e) {
-			getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
-            writer.print(SUCCESS_FALSE);
-			throw new PhrescoException(e);
-		}
-		
-		return SUCCESS;
+		return uploadPlugin;
 	}
 	
 	public void removeUploadedJar() {
@@ -611,5 +550,13 @@ public class Archetypes extends ServiceBaseAction {
 
 	public void setUploadPlugin(String uploadPlugin) {
 		this.uploadPlugin = uploadPlugin;
+	}
+
+	public void setArchType(boolean archType) {
+		this.archType = archType;
+	}
+
+	public boolean isArchType() {
+		return archType;
 	}
 }

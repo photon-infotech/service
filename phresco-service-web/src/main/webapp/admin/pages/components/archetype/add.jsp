@@ -335,7 +335,10 @@
             type: 'applnJar',
             buttonLabel: '<s:label key="lbl.comp.arhtyp.upload" />',
             typeError : '<s:text name="err.invalid.jar.selection" />',
-            params: {type: 'applnJar'}, 
+            params : {
+            	type: 'applnJar',
+            	archType : true
+            }, 
             debug: true
         });
    	}

@@ -241,9 +241,8 @@
             <result name="archetypesList">/admin/pages/components/archetype/list.jsp</result>
         </action>
         
-         <action name="uploadPluginJar" class="com.photon.phresco.service.admin.actions.components.Archetypes" method="uploadPluginJar">
+         <action name="uploadPluginJar" class="com.photon.phresco.service.admin.actions.components.Archetypes" method="showPluginJarPopup">
         	<result name="uploadPlugin">/admin/pages/components/archetype/uploadPluginJar.jsp</result>
-        	<result type="json" />
         </action>
         
         <action name="removeArchetypeJar" class="com.photon.phresco.service.admin.actions.components.Archetypes" method="removeUploadedJar">

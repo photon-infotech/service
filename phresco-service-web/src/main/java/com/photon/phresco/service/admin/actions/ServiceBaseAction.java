@@ -22,18 +22,25 @@ package com.photon.phresco.service.admin.actions;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.struts2.ServletActionContext;
 
+import com.google.gson.Gson;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionSupport;
+import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.LogInfo;
 import com.photon.phresco.commons.model.User;
 import com.photon.phresco.exception.PhrescoException;
@@ -43,6 +50,8 @@ import com.photon.phresco.service.client.api.ServiceClientConstant;
 import com.photon.phresco.service.client.api.ServiceContext;
 import com.photon.phresco.service.client.api.ServiceManager;
 import com.photon.phresco.service.client.factory.ServiceClientFactory;
+import com.photon.phresco.service.model.FileInfo;
+import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.ServiceConstants;
 
 public class ServiceBaseAction extends ActionSupport implements ServiceActions, ServiceUIConstants, ServiceClientConstant, ServiceConstants {
@@ -52,6 +61,9 @@ public class ServiceBaseAction extends ActionSupport implements ServiceActions, 
     private static ServiceManager serviceManager = null;
     
     private String copyToClipboard = "";
+    
+    protected String fileName = "";
+    protected byte[] byteArray = null;
     
     protected ServiceManager getServiceManager() {
 		return serviceManager;
@@ -102,6 +114,40 @@ public class ServiceBaseAction extends ActionSupport implements ServiceActions, 
             }
         }
         return LOG_ERROR;
+	}
+	
+	protected byte[] getByteArray() throws PhrescoException {
+    	PrintWriter writer = null;
+		try {
+            writer = getHttpResponse().getWriter();
+	        fileName = getHttpRequest().getHeader(X_FILE_NAME);
+        	InputStream is = getHttpRequest().getInputStream();
+        	byteArray = IOUtils.toByteArray(is);
+		} catch (Exception e) {
+			getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
+            writer.print(SUCCESS_FALSE);
+			throw new PhrescoException(e);
+		}
+		return byteArray;
+	}
+	
+	protected void getArtifactGroupInfo(PrintWriter writer, byte[] tempByteArray) throws PhrescoException {
+		ArtifactGroup artifactGroupInfo = ServerUtil.getArtifactinfo(new ByteArrayInputStream(tempByteArray));
+		FileInfo fileInfo = new FileInfo();
+		getHttpResponse().setStatus(getHttpResponse().SC_OK);
+		if (artifactGroupInfo != null) {
+			fileInfo.setArtifactId(artifactGroupInfo.getArtifactId());
+			fileInfo.setGroupId(artifactGroupInfo.getGroupId());
+			List<ArtifactInfo> versions = artifactGroupInfo.getVersions();
+			fileInfo.setVersion(versions.get(0).getVersion());
+			fileInfo.setMavenJar(true);
+			fileInfo.setSuccess(true);
+			Gson gson = new Gson();
+			String json = gson.toJson(fileInfo);
+			writer.print(json);
+		} else {
+			writer.print(MAVEN_JAR_FALSE);
+		}
 	}
 	
 	protected void setReqAttribute(String key, Object value) {

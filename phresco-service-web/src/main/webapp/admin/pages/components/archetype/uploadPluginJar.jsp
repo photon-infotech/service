@@ -122,14 +122,15 @@
 	function createPluginUploader() {
 		var pluginUploader = new qq.FileUploader({
 			element : document.getElementById('plugin-popup-file-uploader'),
-			action : 'uploadPluginJar',
+			action : 'uploadJar',
 			multiple : true,
 			allowedExtensions : [ "jar" ],
 			type : 'pluginJar',
 			buttonLabel : '<s:text name="lbl.comp.arhtyp.upload" />',
 			typeError : '<s:text name="err.invalid.jar.selection" />',
 			params : {
-				type : 'pluginJar'
+				type : 'pluginJar',
+				archType : false
 			},
 			debug : true
 		});
