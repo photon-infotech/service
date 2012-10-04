@@ -22,8 +22,7 @@
 <form class="form-horizontal customer_list">
 	<div class="operation" id="operation">
 		<input type="button" id="userSync" class="btn btn-primary" name="users_sync"  value="<s:text name='lbl.hdr.adm.usrlst'/>"/>
-		<input type="button" id="del" class="btn" disabled value="<s:text name='lbl.hdr.adm.delete'/>"/>
-	    
+		
 	    <div id="userListContainer" style="height:76%;">
 	
 		</div>
