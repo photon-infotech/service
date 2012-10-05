@@ -22,6 +22,11 @@ public class VideoTypeConverter implements Converter<VideoTypeDAO, VideoType>, S
 		videoType.setUrl(dao.getUrl());
 		videoType.setName(dao.getName());
 		videoType.setArtifactGroup(createArtifactGroup(dao.getArtifactGroupId(),mongoOperation));
+		videoType.setDescription(dao.getDescription());
+		videoType.setHelpText(dao.getHelpText());
+		videoType.setStatus(dao.getStatus());
+		videoType.setVideoInfoId(dao.getVideoInfoId());
+		videoType.setSystem(dao.isSystem());
 		return videoType;
 	}
 
@@ -33,6 +38,10 @@ public class VideoTypeConverter implements Converter<VideoTypeDAO, VideoType>, S
 		videoDAO.setUrl(videoType.getUrl());
 		videoDAO.setName(videoType.getName());
 		videoDAO.setArtifactGroupId(videoType.getArtifactGroup().getId());
+		videoDAO.setDescription(videoType.getDescription());
+		videoDAO.setHelpText(videoType.getHelpText());
+		videoDAO.setStatus(videoType.getStatus());
+		videoDAO.setSystem(videoType.isSystem());
 		return videoDAO;
 	}
 	
