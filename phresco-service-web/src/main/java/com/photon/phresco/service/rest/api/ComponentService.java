@@ -387,7 +387,7 @@ public class ComponentService extends DbService {
     		(Converter<TechnologyDAO, Technology>) ConvertersFactory.getConverter(TechnologyDAO.class);
     	TechnologyDAO tech = techConverter.convertObjectToDAO(technology);
     	TechnologyDAO techDAO = mongoOperation.findOne(TECHNOLOGIES_COLLECTION_NAME, 
-    			new Query(Criteria.where("name").is(tech.getName())), TechnologyDAO.class);
+    			new Query(Criteria.where(REST_API_NAME).is(tech.getName())), TechnologyDAO.class);
     	if(techDAO == null) {
     		mongoOperation.save(TECHNOLOGIES_COLLECTION_NAME, tech);
     	} else {
@@ -722,62 +722,15 @@ public class ComponentService extends DbService {
 	    }
 	    
 		try {
-			
-			Query custIdQuery = createCustomerIdQuery(customerId);
-			Criteria criteria = Criteria.where(DB_COLUMN_ARTIFACT_GROUP_TYPE).is(ArtifactGroup.Type.valueOf(type));
-			custIdQuery = custIdQuery.addCriteria(criteria);
-			
-			//TODO: Need to add more filter for techId
-			
-			List<ArtifactGroupDAO> moduleDAOs = mongoOperation.find(ARTIFACT_GROUP_COLLECTION_NAME, custIdQuery, ArtifactGroupDAO.class);
-		    List<ArtifactGroup> modules = convertDAOToModule(moduleDAOs);
+			Query query = createCustomerIdQuery(customerId);
+			Criteria criteria = Criteria.where(DB_COLUMN_ARTIFACT_GROUP_TYPE).is(type);
+			Criteria criteria1 = Criteria.where(DB_COLUMN_APPLIESTOTECHID).is(techId);
+			query = query.addCriteria(criteria);
+			query = query.addCriteria(criteria1);
+			List<ArtifactGroupDAO> artifactGroupDAOs = mongoOperation.find(ARTIFACT_GROUP_COLLECTION_NAME,
+					query, ArtifactGroupDAO.class);
+		    List<ArtifactGroup> modules = convertDAOToModule(artifactGroupDAOs);
 		    return Response.status(Response.Status.OK).entity(modules).build();
-		    
-//			List<ArtifactGroup> foundModules = new ArrayList<ArtifactGroup>();
-//			List<ArtifactGroupDAO> moduleDAOs = new ArrayList<ArtifactGroupDAO>();
-//			if(StringUtils.isEmpty(techId)) {
-//				if(!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
-//				    moduleDAOs = mongoOperation.find(MODULEDAO_COLLECTION_NAME,
-//								new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)), ArtifactGroupDAO.class);
-//				}
-//				moduleDAOs.addAll(mongoOperation.find(MODULEDAO_COLLECTION_NAME,
-//							new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)), ArtifactGroupDAO.class));
-//				foundModules = convertDAOToModule(moduleDAOs);
-//				return Response.status(Response.Status.OK).entity(foundModules).build();
-//			}
-//
-//			if(StringUtils.isNotEmpty(customerId) && type.equals(REST_QUERY_TYPE_MODULE)) {
-//				if (!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
-//				    moduleDAOs = mongoOperation.find(MODULEDAO_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)
-//								.and(REST_QUERY_TYPE).is(type).and(REST_QUERY_TECHID).is(techId)), ArtifactGroupDAO.class);
-//				}
-//				moduleDAOs.addAll(mongoOperation.find(MODULEDAO_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)
-//							.and(REST_QUERY_TYPE).is(type).and(REST_QUERY_TECHID).is(techId)), ArtifactGroupDAO.class));
-//				foundModules = convertDAOToModule(moduleDAOs);
-//				return Response.status(Response.Status.OK).entity(foundModules).build();
-//			}
-//
-//			if(StringUtils.isNotEmpty(customerId) && type.equals(REST_QUERY_TYPE_JS)) {
-//			    if (!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
-//			        moduleDAOs = mongoOperation.find(MODULEDAO_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)
-//								.and(REST_QUERY_TYPE).is(type).and(REST_QUERY_TECHID).is(techId)), ArtifactGroupDAO.class);
-//				}
-//			    moduleDAOs.addAll(mongoOperation.find(MODULEDAO_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)
-//							.and(REST_QUERY_TYPE).is(type).and(REST_QUERY_TECHID).is(techId)), ArtifactGroupDAO.class));
-//			    foundModules = convertDAOToModule(moduleDAOs);
-//				return Response.status(Response.Status.OK).entity(foundModules).build();
-//			}
-//
-//			if(StringUtils.isNotEmpty(customerId) && type.equals(REST_QUERY_TYPE_COMPONENT)) {
-//			    if (!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
-//			        moduleDAOs = mongoOperation.find(MODULEDAO_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)
-//								.and(REST_QUERY_TYPE).is(type).and(REST_QUERY_TECHID).is(techId)), ArtifactGroupDAO.class);
-//				}
-//			    moduleDAOs.addAll(mongoOperation.find(MODULEDAO_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(DEFAULT_CUSTOMER_NAME)
-//							.and(REST_QUERY_TYPE).is(type).and(REST_QUERY_TECHID).is(techId)), ArtifactGroupDAO.class));
-//				foundModules = convertDAOToModule(moduleDAOs);
-//				return Response.status(Response.Status.OK).entity(foundModules).build();
-//			}
 
 		} catch(Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, ARTIFACT_GROUP_COLLECTION_NAME);
@@ -877,14 +830,15 @@ public class ComponentService extends DbService {
         List<String> versionIds = new ArrayList<String>();
         
         ArtifactGroupDAO moduleDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
-		        new Query(Criteria.where("name").is(moduleGroupDAO.getName())), ArtifactGroupDAO.class);
+		        new Query(Criteria.where(REST_API_NAME).is(moduleGroupDAO.getName())), ArtifactGroupDAO.class);
         
         com.photon.phresco.commons.model.ArtifactInfo newVersion = moduleGroup.getVersions().get(0);
         if(moduleDAO != null) {
         	moduleGroupDAO.setId(moduleDAO.getId());
         	versionIds.addAll(moduleDAO.getVersionIds());
         	List<com.photon.phresco.commons.model.ArtifactInfo> info = mongoOperation.find(ARTIFACT_INFO_COLLECTION_NAME, 
-        			new Query(Criteria.where("artifactGroupId").is(moduleDAO.getId())), com.photon.phresco.commons.model.ArtifactInfo.class);
+        			new Query(Criteria.where(DB_COLUMN_ARTIFACT_GROUP_ID).is(moduleDAO.getId())), 
+        			com.photon.phresco.commons.model.ArtifactInfo.class);
         	
         	List<com.photon.phresco.commons.model.ArtifactInfo> versions = new ArrayList<com.photon.phresco.commons.model.ArtifactInfo>();
         	newVersion.setArtifactGroupId(moduleDAO.getId());
@@ -1020,7 +974,8 @@ public class ComponentService extends DbService {
 	    }
 		
 		try {
-			ArtifactGroupDAO artifactGroupDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), 
+			ArtifactGroupDAO artifactGroupDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
+					new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), 
 					ArtifactGroupDAO.class);
 			if(artifactGroupDAO != null) {
 				mongoOperation.remove(ARTIFACT_GROUP_COLLECTION_NAME, 
@@ -1112,7 +1067,8 @@ public class ComponentService extends DbService {
 	}
 	
 	private void saveApplicationInfo(ApplicationInfo applicationInfo) throws PhrescoException {
-		ApplicationInfoDAO applicationInfoDAOs = mongoOperation.findOne(APPLICATION_INFO_COLLECTION_NAME, new Query(Criteria.where("name").is(applicationInfo.getName())), ApplicationInfoDAO.class);
+		ApplicationInfoDAO applicationInfoDAOs = mongoOperation.findOne(APPLICATION_INFO_COLLECTION_NAME, 
+				new Query(Criteria.where(REST_API_NAME).is(applicationInfo.getName())), ApplicationInfoDAO.class);
 		if(applicationInfoDAOs == null){
 			Converter<ApplicationInfoDAO, ApplicationInfo> appConverter = 
 			(Converter<ApplicationInfoDAO, ApplicationInfo>) ConvertersFactory.getConverter(ApplicationInfoDAO.class);
@@ -1227,14 +1183,17 @@ public class ComponentService extends DbService {
 	    }
 		
 		try {
-			ApplicationInfoDAO findOne = mongoOperation.findOne(APPLICATION_INFO_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ApplicationInfoDAO.class);
+			ApplicationInfoDAO findOne = mongoOperation.findOne(APPLICATION_INFO_COLLECTION_NAME, 
+					new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ApplicationInfoDAO.class);
 	        String artifactGroupId = findOne.getArtifactGroupId();
 	        ArtifactGroupDAO artifactGroupDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
 	        		new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(artifactGroupId)), ArtifactGroupDAO.class);
 	        List<String> versionIds = artifactGroupDAO.getVersionIds();
 	        mongoOperation.remove(ARTIFACT_INFO_COLLECTION_NAME, 
-	        		new Query(Criteria.where(REST_API_PATH_PARAM_ID).in(versionIds.toArray())), com.photon.phresco.commons.model.ArtifactInfo.class);
-	        mongoOperation.remove(ARTIFACT_GROUP_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(artifactGroupId)), ArtifactGroupDAO.class);
+	        		new Query(Criteria.where(REST_API_PATH_PARAM_ID).in(versionIds.toArray())),
+	        		com.photon.phresco.commons.model.ArtifactInfo.class);
+	        mongoOperation.remove(ARTIFACT_GROUP_COLLECTION_NAME, 
+	        		new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(artifactGroupId)), ArtifactGroupDAO.class);
 	        mongoOperation.remove(APPLICATION_INFO_COLLECTION_NAME, 
 			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ApplicationInfoDAO.class);
 		} catch (Exception e) {
@@ -1354,7 +1313,8 @@ public class ComponentService extends DbService {
 	    }
 		
 		try {
-			WebService webService = mongoOperation.findOne(WEBSERVICES_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), WebService.class);
+			WebService webService = mongoOperation.findOne(WEBSERVICES_COLLECTION_NAME, 
+					new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), WebService.class);
 			if (webService != null) {
 				return Response.status(Response.Status.OK).entity(webService).build();
 			} 
@@ -1500,7 +1460,8 @@ public class ComponentService extends DbService {
 	}
 
 	private void saveDownloads(DownloadInfo info) throws PhrescoException {
-		DownloadsDAO downloadsDAO = mongoOperation.findOne(DOWNLOAD_COLLECTION_NAME, new Query(Criteria.where("name").is(info.getName())), DownloadsDAO.class);
+		DownloadsDAO downloadsDAO = mongoOperation.findOne(DOWNLOAD_COLLECTION_NAME, 
+				new Query(Criteria.where(REST_API_NAME).is(info.getName())), DownloadsDAO.class);
 		if(downloadsDAO == null) {
 			Converter<DownloadsDAO, DownloadInfo> downlodConverter = 
 					(Converter<DownloadsDAO, DownloadInfo>) ConvertersFactory.getConverter(DownloadsDAO.class);
@@ -1614,14 +1575,17 @@ public class ComponentService extends DbService {
             S_LOGGER.debug("Entered into AdminService.deleteDownloadInfo(String id)" + id);
         }
         try {
-        DownloadsDAO findOne = mongoOperation.findOne(DOWNLOAD_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), DownloadsDAO.class);
+        DownloadsDAO findOne = mongoOperation.findOne(DOWNLOAD_COLLECTION_NAME, 
+        		new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), DownloadsDAO.class);
         String artifactGroupId = findOne.getArtifactGroupId();
         ArtifactGroupDAO artifactGroupDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
         		new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(artifactGroupId)), ArtifactGroupDAO.class);
         List<String> versionIds = artifactGroupDAO.getVersionIds();
         mongoOperation.remove(ARTIFACT_INFO_COLLECTION_NAME, 
-        		new Query(Criteria.where(REST_API_PATH_PARAM_ID).in(versionIds.toArray())), com.photon.phresco.commons.model.ArtifactInfo.class);
-        mongoOperation.remove(ARTIFACT_GROUP_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(artifactGroupId)), ArtifactGroupDAO.class);
+        		new Query(Criteria.where(REST_API_PATH_PARAM_ID).in(versionIds.toArray())), 
+        		com.photon.phresco.commons.model.ArtifactInfo.class);
+        mongoOperation.remove(ARTIFACT_GROUP_COLLECTION_NAME, 
+        		new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(artifactGroupId)), ArtifactGroupDAO.class);
         mongoOperation.remove(DOWNLOAD_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), DownloadInfo.class);
         } catch (Exception e) {
             throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
