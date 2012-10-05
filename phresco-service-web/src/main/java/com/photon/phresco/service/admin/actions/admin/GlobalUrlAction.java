@@ -56,14 +56,6 @@ public class GlobalUrlAction extends ServiceBaseAction {
 			S_LOGGER.debug("Entering Method GlobalUrlAction.list()");
 		}
          
-		try {
-    		List<Property> globalUrl = getServiceManager().getGlobalUrls(getCustomerId());
-    		setReqAttribute(REQ_GLOBURL_URL, globalUrl);
-    		setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
-    	} catch (PhrescoException e) {
-    		return showErrorPopup(e, EXCEPTION_GLOBAL_URL_LIST);
-		}
-    	
 		return ADMIN_GLOBALURL_LIST;	
 	}
 	
