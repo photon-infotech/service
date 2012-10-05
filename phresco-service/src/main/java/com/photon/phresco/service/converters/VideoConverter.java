@@ -25,6 +25,10 @@ public class VideoConverter implements Converter<VideoInfoDAO, VideoInfo>, Servi
 		videoInfo.setImageurl(dao.getImageurl());
 		videoInfo.setName(dao.getName());
 		videoInfo.setVideoList(createVideoType(dao.getVideoListId(), mongoOperation));
+		videoInfo.setDescription(dao.getDescription());
+		videoInfo.setHelpText(dao.getHelpText());
+		videoInfo.setStatus(dao.getStatus());
+		videoInfo.setSystem(dao.isSystem());
 		return videoInfo;
 	}
 
@@ -36,6 +40,10 @@ public class VideoConverter implements Converter<VideoInfoDAO, VideoInfo>, Servi
 		videoDAO.setName(videoInfo.getName());
 		videoDAO.setImageurl(videoInfo.getImageurl());
 		videoDAO.setVideoListId(videoInfo.getVideoList().get(0).getVideoInfoId());
+		videoDAO.setDescription(videoInfo.getDescription());
+		videoDAO.setHelpText(videoInfo.getHelpText());
+		videoDAO.setStatus(videoInfo.getStatus());
+		videoDAO.setSystem(videoInfo.isSystem());
 		return videoDAO;
 	}
 

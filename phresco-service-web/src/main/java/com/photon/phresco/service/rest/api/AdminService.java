@@ -348,7 +348,8 @@ public class AdminService extends DbService {
 		mongoOperation.save(VIDEODAO_COLLECTION_NAME, videoDAO);
 		Converter<VideoTypeDAO, VideoType> videoTypeConverter = 
 				(Converter<VideoTypeDAO, VideoType>)ConvertersFactory.getConverter(VideoTypeDAO.class);
-		VideoType videoType = video.getVideoList().get(0);
+		List<VideoType> videoTypes = video.getVideoList();
+		for(VideoType videoType : videoTypes){
 		VideoTypeDAO videoTypeDAO = videoTypeConverter.convertObjectToDAO(videoType);
 		
 		VideoTypeDAO findOne = mongoOperation.findOne(VIDEOTYPESDAO_COLLECTION_NAME, 
@@ -360,6 +361,7 @@ public class AdminService extends DbService {
 		ArtifactGroup artifactGroup = videoType.getArtifactGroup();
 		saveModuleGroup(artifactGroup);
 		mongoOperation.save(VIDEOTYPESDAO_COLLECTION_NAME, videoTypeDAO);
+		}
 		mongoOperation.save(VIDEODAO_COLLECTION_NAME, videoDAO);
 	}
 
