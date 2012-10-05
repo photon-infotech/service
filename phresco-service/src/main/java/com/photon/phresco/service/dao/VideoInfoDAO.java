@@ -7,7 +7,7 @@ import com.photon.phresco.commons.model.VideoType;
 public class VideoInfoDAO extends CustomerBaseDAO {
 	
 	private String imageurl;
-	private String videoListId;
+	private List<String> videoListId;
 	
 	public String getImageurl() {
 		return imageurl;
@@ -17,11 +17,11 @@ public class VideoInfoDAO extends CustomerBaseDAO {
 		this.imageurl = imageurl;
 	}
 	
-	public String getVideoListId() {
+	public List<String> getVideoListId() {
 		return videoListId;
 	}
 	
-	public void setVideoListId(String videoListId) {
+	public void setVideoListId(List<String> videoListId) {
 		this.videoListId = videoListId;
 	}
 

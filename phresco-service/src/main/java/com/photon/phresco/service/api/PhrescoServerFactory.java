@@ -46,24 +46,23 @@ public class PhrescoServerFactory {
     private static final String ARCHETYPE_EXECUTOR_IMPL_CLASS = "com.photon.phresco.service.impl.ArchetypeExecutorImpl";
     private static final String REPOSITORY_MANAGER_IMPL_CLASS = "com.photon.phresco.service.impl.RepositoryManagerImpl";
 	private static final String DB_MANAGER_IMPL_CLASS = "com.photon.phresco.service.impl.DbManagerImpl";
-
+	private static final String DEPENDENCY_MANAGER_IMPL_CLASS = "com.photon.phresco.service.impl.DependencyManagerImpl";
+	
     private static final String SERVER_CONFIG_FILE = "server.config";
 
     private static RepositoryManager repositoryManager 	= null;
-    private static ArchetypeExecutor executor 			= null;
-    private static DocumentGenerator generator 			= null;
     private static ServerConfiguration serverConfig     = null;
 	private static TweetCacheManager tweetCacheManager 	= null;
 	private static DbManager dbManager = null;
+	private static DependencyManager dependencyManager = null;
 
     public static synchronized void initialize() throws PhrescoException {
         if (serverConfig == null) {
             serverConfig = new ServerConfiguration(SERVER_CONFIG_FILE);
 
             repositoryManager = (RepositoryManager) constructClass(REPOSITORY_MANAGER_IMPL_CLASS, serverConfig);
-            executor = (ArchetypeExecutor) constructClass(ARCHETYPE_EXECUTOR_IMPL_CLASS, serverConfig);
-            generator = (DocumentGenerator) constructClass(DOCUMENT_GENERATOR_IMPL_CLASS);
             dbManager = (DbManager) constructClass(DB_MANAGER_IMPL_CLASS);
+            dependencyManager = (DependencyManager) constructClass(DEPENDENCY_MANAGER_IMPL_CLASS);
 		//	tweetCacheManager = (TweetCacheManager)constructClass(TWITTER_CACHE_MANAGER_IMPL_CLASS, serverConfig);
         }
     }
@@ -98,19 +97,11 @@ public class PhrescoServerFactory {
         return dbManager;
     }
     
-    public static ArchetypeExecutor getArchetypeExecutor() {
-        return executor;
-    }
-
-    public static DocumentGenerator getDocumentGenerator() {
-        return generator;
-    }
-
-    public static ArchetypeExecutor getNewArchetypeExecutor() throws PhrescoException {
+    public static ArchetypeExecutor getArchetypeExecutor() throws PhrescoException {
         return (ArchetypeExecutor) constructClass(ARCHETYPE_EXECUTOR_IMPL_CLASS, serverConfig);
     }
 
-    public static DocumentGenerator getNewDocumentGenerator() throws PhrescoException {
+    public static DocumentGenerator getDocumentGenerator() throws PhrescoException {
         return (DocumentGenerator) constructClass(DOCUMENT_GENERATOR_IMPL_CLASS);
     }
 	
@@ -120,6 +111,10 @@ public class PhrescoServerFactory {
     
     public static ServerConfiguration getServerConfig() {
     	return serverConfig;
+    }
+    
+    public static DependencyManager getDependencyManager() {
+    	return dependencyManager;
     }
     
     public static void main(String[] args) throws PhrescoException {
