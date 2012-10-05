@@ -124,6 +124,7 @@ div.lgnBtnLabel {
 }
 
 .input-xlarge,input.xlarge,textarea.xlarge,select.xlarge {
+	height: auto;
 	width: 291px;
 }
 
@@ -754,7 +755,7 @@ a {
 }
 
 .headerInnerbottom img {
-	bottom: 8px;
+	bottom: -3px;
 	position: relative;
 	text-align: center;
 }
