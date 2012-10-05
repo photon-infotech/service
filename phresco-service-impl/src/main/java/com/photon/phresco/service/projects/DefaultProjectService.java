@@ -108,7 +108,7 @@ public class DefaultProjectService implements ProjectService, Constants {
 	public File updateDocumentProject(ApplicationInfo projectInfo) throws PhrescoException {
 		File tempPath = new File(Utility.getPhrescoTemp(), UUID.randomUUID().toString()+File.separator + projectInfo.getCode());
 		try {
-			PhrescoServerFactory.getNewDocumentGenerator().generate(projectInfo, tempPath);
+			PhrescoServerFactory.getDocumentGenerator().generate(projectInfo, tempPath);
 		} catch (Exception e) {
 			throw new PhrescoException(e);
 		}

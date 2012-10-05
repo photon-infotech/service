@@ -145,7 +145,7 @@ public abstract class AbstractDependencyProcessor implements DependencyProcessor
 	}
 	
 	protected List<ArtifactGroup> getSelectedArtifacts(List<String> selectedIds, String customerId) throws PhrescoException {
-		return getDbManager().findSelectedArtifacts(selectedIds, customerId);
+		return getDbManager().findSelectedArtifacts(selectedIds, customerId, "");
 	}
 	
 	/*
