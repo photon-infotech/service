@@ -1,10 +1,13 @@
 package com.photon.phresco.service.api;
 
+import java.util.List;
+
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ArtifactGroup;
-import com.photon.phresco.commons.model.ProjectInfo;
+import com.photon.phresco.commons.model.DownloadInfo;
 import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.commons.model.Technology;
+import com.photon.phresco.commons.model.WebService;
 import com.photon.phresco.exception.PhrescoException;
 
 public interface DbManager {
@@ -15,7 +18,7 @@ public interface DbManager {
      * @return
      * @throws PhrescoException
      */
-    ArtifactGroup getArtifactGroup(String techId) throws PhrescoException;
+    ArtifactGroup getArchetypeInfo(String techId, String customerId) throws PhrescoException;
     
     /**
      * Returns the project info based on techId and projectName
@@ -24,7 +27,7 @@ public interface DbManager {
      * @return
      * @throws PhrescoException
      */
-    ApplicationInfo getProjectInfo(String techId, String projectName) throws PhrescoException;
+    ApplicationInfo getProjectInfo(String pilotId, String customerId) throws PhrescoException;
     
     /**
      * Returns the documents for the given technology type
@@ -56,4 +59,13 @@ public interface DbManager {
     void updateCreatedProjects(ApplicationInfo projectInfo) throws PhrescoException;
     
     void updateUsedObjects(String collectionName, String criteriaKey, String criteriaValue) throws PhrescoException;
+    
+    List<ArtifactGroup> findSelectedArtifacts(List<String> ids, String customerId) throws PhrescoException;
+    
+    List<WebService> findSelectedWebservices(List<String> ids) throws PhrescoException;
+    
+    List<DownloadInfo> findSelectedServers(List<String> ids, String customerId) throws PhrescoException;
+    
+    List<DownloadInfo> findSelectedDatabases(List<String> ids, String customerId) throws PhrescoException;
+    
 }

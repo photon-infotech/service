@@ -36,11 +36,15 @@
 package com.photon.phresco.service.dependency.impl;
 
 import java.io.File;
+import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 
 import com.photon.phresco.commons.model.ApplicationInfo;
+import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.RepositoryManager;
 
 public class NodeJsWebservicesDependencyProcessor extends DefaultDependencyProcessor {
@@ -62,9 +66,13 @@ public class NodeJsWebservicesDependencyProcessor extends DefaultDependencyProce
 		S_LOGGER.debug("Entering Method NodeJsWebservicesDependencyProcessor.process(ProjectInfo info, File path)");
 		S_LOGGER.debug("process() Path=" + path.getPath());
 		
-		String id = info.getTechInfo().getVersion();
-		updatePOMWithModules(path, info.getSelectedModules(), id);
-		updatePOMWithPluginArtifact(path,info.getSelectedModules(), id);
+		String techId = info.getTechInfo().getVersion();
+		String customerId = getCustomerId(info);
+		if(CollectionUtils.isNotEmpty(info.getSelectedModules())) {
+			List<ArtifactGroup> selectedFeatures = getSelectedArtifacts(info.getSelectedModules(), customerId);
+			updatePOMWithModules(path, selectedFeatures, techId);
+			updatePOMWithPluginArtifact(path, selectedFeatures, techId);
+		}
 		createSqlFolder(info, path);
 		updateTestPom(path);
 	}

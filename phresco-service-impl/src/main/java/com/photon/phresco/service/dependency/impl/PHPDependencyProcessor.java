@@ -21,12 +21,16 @@
 package com.photon.phresco.service.dependency.impl;
 
 import java.io.File;
+import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.Element;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.util.ServerUtil;
@@ -51,35 +55,33 @@ public class PHPDependencyProcessor  extends AbstractJsLibDependencyProcessor {
     	S_LOGGER.debug("Entering Method PHPDependencyProcessor.process(ProjectInfo info, File path)");
     	S_LOGGER.debug("process() Path=" + path.getPath());
         S_LOGGER.debug("process() ProjectCode=" + info.getCode());
-
-            
-//            //copy pilot projects
-//            if(StringUtils.isNotBlank(info.getPilotProjectName())){
-////	            List<ProjectInfo> pilotProjects = getRepositoryManager().getPilotProjects(technology.getId());
-//	            if(CollectionUtils.isEmpty(pilotProjects)){
-//	                return;
-//	            }
-//	
-//	            for (ProjectInfo projectInfo : pilotProjects) {
-//	                List<String> urls = projectInfo.getPilotProjectUrls();
-//	                if(urls != null){
-//	                    for (String url : urls) {
-//	                        DependencyUtils.extractFiles(url, path);
-//	                    }
-//	                }
-//	            }
-//            }
-            ApplicationInfo projectInfo = PhrescoServerFactory.getDbManager().getProjectInfo(info.getTechInfo().getVersion(), info.getName());
+        	
+        	DbManager dbManager = getDbManager();
+        	Element pilotInfo = info.getPilotInfo();
+        	String id = pilotInfo.getId();
+        	String customerId = info.getCustomerIds().get(0);
+        	ApplicationInfo projectInfo = dbManager.getProjectInfo(id, customerId);
             ArtifactGroup pilotContent = projectInfo.getPilotContent();
+            
             String contentURL = ServerUtil.createContentURL(pilotContent.getGroupId(), pilotContent.getArtifactId(),
             		pilotContent.getVersions().get(0).getVersion(), pilotContent.getPackaging());
+            
             if(projectInfo != null) {
-                DependencyUtils.extractFiles(contentURL, path, "");
+                DependencyUtils.extractFiles(contentURL, path, customerId);
             }
-            String id = info.getTechInfo().getVersion();
-//            updatePOMWithModules(path, info.getSelectedModules(), id);
-//            updatePOMWithPluginArtifact(path,info.getSelectedModules(), id);
-//            extractJsLibraries(path, info.getSelectedJSLibs());
+            
+            String techId = info.getTechInfo().getVersion();
+            
+            if(CollectionUtils.isNotEmpty(info.getSelectedModules())) {
+            	List<ArtifactGroup> selectedArtifacts = getSelectedArtifacts(info.getSelectedModules(), customerId);
+            	updatePOMWithModules(path, selectedArtifacts, techId);
+                updatePOMWithPluginArtifact(path, selectedArtifacts, techId);
+            }
+            
+            if(CollectionUtils.isNotEmpty(info.getSelectedJSLibs())) {
+            	List<ArtifactGroup> selectedArtifacts = getSelectedArtifacts(info.getSelectedJSLibs(), customerId);
+            	extractJsLibraries(path, selectedArtifacts, customerId);
+            }
             createSqlFolder(info, path);
             updateTestPom(path);
     }

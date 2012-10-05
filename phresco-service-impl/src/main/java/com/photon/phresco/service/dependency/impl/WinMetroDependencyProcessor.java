@@ -36,10 +36,17 @@
 package com.photon.phresco.service.dependency.impl;
 
 import java.io.File;
+import java.util.List;
+
+import javax.xml.bind.JAXBException;
+
+import org.apache.commons.collections.CollectionUtils;
 
 import com.photon.phresco.commons.model.ApplicationInfo;
+import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.RepositoryManager;
+import com.phresco.pom.exception.PhrescoPomException;
 
 public class WinMetroDependencyProcessor extends AbstractJsLibDependencyProcessor {
 
@@ -49,14 +56,19 @@ public class WinMetroDependencyProcessor extends AbstractJsLibDependencyProcesso
 
 	@Override
 	public void process(ApplicationInfo info, File path) throws PhrescoException {
-//		super.process(info, path);
-//		try {
-//			updatePOMWithModules(path, info.getTechnology().getModules());
-//		} catch (JAXBException e) {
-//			e.printStackTrace();
-//		} catch (PhrescoPomException e) {
-//			e.printStackTrace();
-//		}
+		super.process(info, path);
+		
+		String customerId = getCustomerId(info);
+		try {
+			if(CollectionUtils.isNotEmpty(info.getSelectedModules())) {
+				List<ArtifactGroup> selectedFeatures = getSelectedArtifacts(info.getSelectedModules(), customerId);
+				updatePOMWithModules(path, selectedFeatures);
+			}
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		} catch (PhrescoPomException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	

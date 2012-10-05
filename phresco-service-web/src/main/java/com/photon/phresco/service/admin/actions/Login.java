@@ -69,7 +69,7 @@ public class Login extends ServiceBaseAction {
 		    User user = doLogin(getUsername(), encodedPassword);
 		    
 		    // username and password validation
-		    if (StringUtils.isEmpty(user.getDisplayName())) {
+		    if (!user.isValidLogin()) {
 		        setErrorFound(true);
 		        setErrorMsg(getText(KEY_I18N_ERROR_LOGIN));
 		        return SUCCESS;

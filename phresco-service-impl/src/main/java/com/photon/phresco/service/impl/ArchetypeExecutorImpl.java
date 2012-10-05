@@ -39,12 +39,17 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.ArtifactInfo;
+import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.ArchetypeExecutor;
+import com.photon.phresco.service.api.DbManager;
+import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.model.ServerConfiguration;
 import com.photon.phresco.service.util.ServerConstants;
 import com.photon.phresco.service.util.ServerUtil;
@@ -61,9 +66,12 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
     private static final String PHRESCO_FOLDER_NAME = "phresco";
     private static final String DOT_PHRESCO_FOLDER 	= "." + PHRESCO_FOLDER_NAME;
     private ServerConfiguration serverConfiguration; 
-
-    public ArchetypeExecutorImpl(ServerConfiguration serverConfiguration) {
+    private DbManager dbManager = null;
+    
+    public ArchetypeExecutorImpl(ServerConfiguration serverConfiguration) throws PhrescoException {
         this.serverConfiguration = serverConfiguration;
+        PhrescoServerFactory.initialize();
+        dbManager = PhrescoServerFactory.getDbManager();
     }
 
     public File execute(ApplicationInfo applicationInfo) throws PhrescoException {
@@ -116,38 +124,38 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 			S_LOGGER.debug("Entering Method ArchetypeExecutorImpl.buildCommandString(ProjectInfo info)");
 			S_LOGGER.debug("buildCommandString() ProjectCode=" + info.getCode());
 		}
+    	String customerId = info.getCustomerIds().get(0);
+    	if(StringUtils.isEmpty(customerId)) {
+    		throw new PhrescoException("Customer Id Should Not Be Null");
+    	}
     	
-//    	ArchetypeInfo archInfo = PhrescoServerFactory.getRepositoryManager().getArchetype(info);
-//    	Object archInfo = null;
-//    	//TEMP BUG - to be cleaned up
-//        if (archInfo == null) {
-//            throw new PhrescoException("Archetype not defined for " + info.getTechnology().getName());
-//        }
-
-        // For Thread-Safe,using StringBuffer instead of StringBuilder
+    	String techId = info.getTechInfo().getVersion();
+    	ArtifactGroup archetypeInfo = dbManager.getArchetypeInfo(techId, customerId);
+    	//TODO to sort version 
+    	ArtifactInfo artifactInfo = archetypeInfo.getVersions().get(0);
+    	String version = artifactInfo.getVersion();
+    	RepoInfo repoInfo = dbManager.getRepoInfo(customerId);
+    	
         StringBuffer commandStr = new StringBuffer();
-        
-        ArtifactGroup pilotContent = info.getPilotContent();
-        
         commandStr.append(Constants.MVN_COMMAND).append(Constants.STR_BLANK_SPACE)
                 .append(Constants.MVN_ARCHETYPE).append(STR_COLON).append(Constants.MVN_GOAL_GENERATE)
                 .append(Constants.STR_BLANK_SPACE)
-                .append(ARCHETYPE_ARCHETYPEGROUPID).append(Constants.STR_EQUALS).append(pilotContent.getGroupId())
+                .append(ARCHETYPE_ARCHETYPEGROUPID).append(Constants.STR_EQUALS).append(archetypeInfo.getGroupId())
                 .append(Constants.STR_BLANK_SPACE)
-                .append(ARCHETYPE_ARCHETYPEARTIFACTID).append(Constants.STR_EQUALS).append(pilotContent.getArtifactId())
+                .append(ARCHETYPE_ARCHETYPEARTIFACTID).append(Constants.STR_EQUALS).append(archetypeInfo.getArtifactId())
                 .append(Constants.STR_BLANK_SPACE)
-//                .append(ARCHETYPE_ARCHETYPEVERSION).append(Constants.STR_EQUALS).append(archetypeInfo.getVersion())
+                .append(ARCHETYPE_ARCHETYPEVERSION).append(Constants.STR_EQUALS).append(version)
                 .append(Constants.STR_BLANK_SPACE)
-//                .append(ARCHETYPE_GROUPID).append(Constants.STR_EQUALS).append(archetypeInfo.getProjectGroupId())
+                .append(ARCHETYPE_GROUPID).append(Constants.STR_EQUALS).append("com.photon.phresco")
                 .append(Constants.STR_BLANK_SPACE)
                 .append(ARCHETYPE_ARTIFACTID).append(Constants.STR_EQUALS).append(STR_DOUBLE_QUOTES).append(info.getCode()).append(STR_DOUBLE_QUOTES) //artifactId --> project name could have space in between
                 .append(Constants.STR_BLANK_SPACE)
-                .append(ARCHETYPE_VERSION).append(Constants.STR_EQUALS).append(pilotContent.getVersions().get(0))
+                .append(ARCHETYPE_VERSION).append(Constants.STR_EQUALS).append(info.getVersion())
                 .append(Constants.STR_BLANK_SPACE)
-                .append(ARCHETYPE_ARCHETYPEREPOSITORYURL).append(Constants.STR_EQUALS).append("http://172.16.18.178:8080/nexus/content/repositories/releases/archetypes/")
+                .append(ARCHETYPE_ARCHETYPEREPOSITORYURL).append(Constants.STR_EQUALS).append(repoInfo.getGroupRepoURL())
                 .append(Constants.STR_BLANK_SPACE)
                 .append(ARCHETYPE_INTERACTIVEMODE).append(Constants.STR_EQUALS).append(INTERACTIVE_MODE);
-
+        
         return commandStr.toString();
     }
 

@@ -23,10 +23,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.List;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -34,35 +32,25 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.FileUtils;
 
 import com.photon.phresco.commons.model.ApplicationInfo;
-import com.photon.phresco.commons.model.ApplicationType;
-import com.photon.phresco.commons.model.ArtifactGroup;
-import com.photon.phresco.commons.model.ArtifactInfo;
-import com.photon.phresco.commons.model.DownloadInfo;
-import com.photon.phresco.commons.model.ProjectInfo;
-import com.photon.phresco.commons.model.Technology;
-import com.photon.phresco.commons.model.TechnologyInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.DbManager;
-import com.photon.phresco.service.api.DbService;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.ProjectService;
 import com.photon.phresco.service.projects.ProjectServiceFactory;
 import com.photon.phresco.util.ArchiveUtil;
+import com.photon.phresco.util.ServiceConstants;
 import com.photon.phresco.util.ArchiveUtil.ArchiveType;
 import com.photon.phresco.util.FileUtil;
-import com.photon.phresco.util.ServiceConstants;
 
 /**
  * Phresco Service Class hosted at the URI path "/api"
  */
 
-@Path("/project")
+@Path(ServiceConstants.REST_API_PROJECT)
 public class PhrescoService {
 	private static final String ZIP = ".zip";
     private static final Logger S_LOGGER = Logger.getLogger(PhrescoService.class);
@@ -74,17 +62,11 @@ public class PhrescoService {
      dbManager = PhrescoServerFactory.getDbManager();
     }
 	
-	@GET
-	@Produces({ MediaType.APPLICATION_JSON })
-	public List<ApplicationType> getApplicationTypes() throws PhrescoException {
-		return null;
-	}
-
 	@POST
-	@Path("/create")
-	@Produces("application/zip")
+	@Path(ServiceConstants.REST_API_PROJECT_CREATE)
+	@Produces(ServiceConstants.MEDIATYPE_ZIP)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public StreamingOutput createProject(ApplicationInfo projectInfo) throws PhrescoException, IOException {
+	public StreamingOutput createProject(ApplicationInfo applicationInfo) throws PhrescoException, IOException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method PhrescoService.createProject(ProjectInfo projectInfo)");
 		}
@@ -92,10 +74,11 @@ public class PhrescoService {
 		File projectPath = null;
 		try {
 			if (isDebugEnabled) {
-				S_LOGGER.debug("createProject() ProjectInfo=" + projectInfo.getCode());
+				S_LOGGER.debug("createProject() ProjectInfo=" + applicationInfo.getCode());
 			}
-			ProjectService projectService = ProjectServiceFactory.getNewProjectService(projectInfo);
-			projectPath = projectService.createProject(projectInfo);
+			ProjectService projectService = ProjectServiceFactory.getNewProjectService(applicationInfo);
+			projectPath = projectService.createProject(applicationInfo);
+			
 			projectPathStr = projectPath.getPath();
 
 			if (isDebugEnabled) {
@@ -106,7 +89,7 @@ public class PhrescoService {
 			FileUtil.delete(projectPath);
 			ServiceOutput serviceOutput = new ServiceOutput(projectPathStr);
 			if(serviceOutput != null) {
-			    dbManager.storeCreatedProjects(projectInfo);
+			    dbManager.storeCreatedProjects(applicationInfo);
 			  //  updateUsedObjects(projectInfo);
 			}
 			
@@ -157,8 +140,8 @@ public class PhrescoService {
     }
 */
     @POST
-	@Path("/update")
-	@Produces("application/zip")
+	@Path(ServiceConstants.REST_API_PROJECT_UPDATE)
+	@Produces(ServiceConstants.MEDIATYPE_ZIP)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public StreamingOutput updateProject(ApplicationInfo appInfo) throws PhrescoException {
 		if (isDebugEnabled) {
@@ -188,8 +171,8 @@ public class PhrescoService {
 	}
 	
 	@POST
-	@Path("/updatedocs")
-	@Produces("application/zip")
+	@Path(ServiceConstants.REST_APP_UPDATEDOCS)
+	@Produces(ServiceConstants.MEDIATYPE_ZIP)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public StreamingOutput updateDoc(ApplicationInfo appInfo) throws PhrescoException {
 		if (isDebugEnabled) {

@@ -30,6 +30,14 @@ import org.springframework.data.document.mongodb.MongoOperations;
 import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
 
+import com.photon.phresco.commons.model.ApplicationInfo;
+import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.DownloadInfo;
+import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.service.converters.ConvertersFactory;
+import com.photon.phresco.service.dao.ApplicationInfoDAO;
+import com.photon.phresco.service.dao.ArtifactGroupDAO;
+import com.photon.phresco.service.dao.DownloadsDAO;
 import com.photon.phresco.util.ServiceConstants;
 
 public class DbService implements ServiceConstants {
@@ -62,5 +70,36 @@ public class DbService implements ServiceConstants {
 	    
 	    return query;
 	}
-
+	
+	protected List<ArtifactGroup> convertArtifactDAOs(List<ArtifactGroupDAO> artifactGroupDAOs) throws PhrescoException {
+		Converter<ArtifactGroupDAO, ArtifactGroup> converter = 
+			(Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
+		List<ArtifactGroup> artifactGroups = new ArrayList<ArtifactGroup>();
+		for (ArtifactGroupDAO artifactDAO : artifactGroupDAOs) {
+			artifactGroups.add(converter.convertDAOToObject(artifactDAO, mongoOperation));
+		}
+		return artifactGroups;
+	}
+	
+	protected List<DownloadInfo> convertDownloadDAOs(List<DownloadsDAO> downloadsDAOs) throws PhrescoException {
+		List<DownloadInfo> infos = new ArrayList<DownloadInfo>();
+		Converter<DownloadsDAO, DownloadInfo> converter = 
+			(Converter<DownloadsDAO, DownloadInfo>) ConvertersFactory.getConverter(DownloadsDAO.class);
+		for (DownloadsDAO downloadsDAO : downloadsDAOs) {
+			infos.add(converter.convertDAOToObject(downloadsDAO, mongoOperation));
+		}
+		return infos;
+	}
+	
+	protected ArtifactGroup convertArtifactDAO(ArtifactGroupDAO artifactGroupDAO) throws PhrescoException {
+		Converter<ArtifactGroupDAO, ArtifactGroup> converter = 
+			(Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
+		return converter.convertDAOToObject(artifactGroupDAO, mongoOperation);
+	}
+	
+	protected ApplicationInfo convertApplicationDAO(ApplicationInfoDAO applicationInfoDAO) throws PhrescoException {
+		Converter<ApplicationInfoDAO, ApplicationInfo> appConverter = 
+			(Converter<ApplicationInfoDAO, ApplicationInfo>) ConvertersFactory.getConverter(ApplicationInfoDAO.class);
+		return appConverter.convertDAOToObject(applicationInfoDAO, mongoOperation);
+	}
 }

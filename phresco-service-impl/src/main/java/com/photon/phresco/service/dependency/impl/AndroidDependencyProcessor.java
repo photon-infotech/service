@@ -50,6 +50,7 @@ import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.TechnologyInfo;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.pom.AndroidTestPOMUpdater;
@@ -88,42 +89,26 @@ public class AndroidDependencyProcessor extends AbstractJsLibDependencyProcessor
 			S_LOGGER.debug("process() ProjectCode=" + info.getCode());
 			S_LOGGER.debug("process() Path=" + path.getPath());
 		}
-		TechnologyInfo technology = info.getTechInfo();
-		// copy pilot projects
-//		if (StringUtils.isNotBlank(info.getPilotProjectName())) {
-//			List<ProjectInfo> pilotProjects = getRepositoryManager().getPilotProjects(technology.getId());
-//			if (CollectionUtils.isEmpty(pilotProjects)) {
-//				return;
-//			}
-//			for (ProjectInfo projectInfo : pilotProjects) {
-//				List<String> urls = projectInfo.getPilotProjectUrls();
-//				if (urls != null) {
-//					for (String url : urls) {
-//						DependencyUtils.extractFiles(url, path);
-//					}
-//				}
-//			}
-//		}
+		String technId = info.getTechInfo().getVersion();
+
+		DbManager dbManager = getDbManager();
+		String customerId = getCustomerId(info);
+		String pilotId = info.getPilotInfo().getId();
+		ApplicationInfo applicationInfo = dbManager.getProjectInfo(pilotId, customerId);
 		
-		//To Get Pilot Project
-		ApplicationInfo projectInfo = PhrescoServerFactory.getDbManager().
-		    getProjectInfo(technology.getVersion(), info.getPilotContent().getName());
-		ArtifactGroup pilotContent = projectInfo.getPilotContent();
+		ArtifactGroup pilotContent = applicationInfo.getPilotContent();
 		String createContentURL = ServerUtil.createContentURL(pilotContent.getGroupId(), pilotContent.getArtifactId(), 
 				pilotContent.getVersions().get(0).getVersion(), pilotContent.getPackaging());
-		if(projectInfo != null) {
-		    DependencyUtils.extractFiles(createContentURL, path, "");
+		if(applicationInfo != null) {
+		    DependencyUtils.extractFiles(createContentURL, path, customerId);
 		}
 		
 		updateAndroidVersion(path, info);
 		try {
-			//TODO : Get features using id from projectInfo
-			List<ArtifactGroup> modulesTemp = new ArrayList<ArtifactGroup>();
 			
-			
-	    	 List<ArtifactGroup> modules = modulesTemp;
-	    	 if((CollectionUtils.isNotEmpty(modules)) && modules != null) {
-	    		 updatePOMModules(path, modules);
+	    	 if((CollectionUtils.isNotEmpty(info.getSelectedModules()))) {
+	    		 List<ArtifactGroup> selectedFeatures = getSelectedArtifacts(info.getSelectedModules(), customerId);
+	    		 updatePOMModules(path, selectedFeatures);
 	    	 }
 		} catch (JAXBException e) {
 		    throw new PhrescoException(e);
@@ -131,10 +116,11 @@ public class AndroidDependencyProcessor extends AbstractJsLibDependencyProcessor
 		    throw new PhrescoException(e);
 		}
 		AndroidTestPOMUpdater.updatePOM(path);
-		if (technology.getVersion().equals(TechnologyTypes.ANDROID_HYBRID)) {
-			//TODO : Get features using id from projectInfo
-			List<ArtifactGroup> jsTemp = new ArrayList<ArtifactGroup>();
-			extractJsLibraries(path, jsTemp);
+		if (technId.equals(TechnologyTypes.ANDROID_HYBRID)) {
+			if(CollectionUtils.isNotEmpty(info.getSelectedJSLibs())) {
+				List<ArtifactGroup> jsLibs = getSelectedArtifacts(info.getSelectedJSLibs(), customerId);
+				extractJsLibraries(path, jsLibs, technId);
+			}
 		}
 		updateTestPom(path);
 	}

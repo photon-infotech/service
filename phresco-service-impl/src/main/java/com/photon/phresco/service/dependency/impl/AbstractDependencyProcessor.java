@@ -46,6 +46,7 @@ import com.photon.phresco.commons.model.DownloadInfo;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.commons.model.TechnologyInfo;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.DependencyProcessor;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
@@ -70,13 +71,14 @@ public abstract class AbstractDependencyProcessor implements DependencyProcessor
 	private static Map<String, String> testPomFiles = new HashMap<String, String>();
 
 	private RepositoryManager repoManager = null;
-
+	
 	static {
 		initDbPathAndTestPom();
 	}
 
 	/**
 	 * @param dependencyManager
+	 * @throws PhrescoException 
 	 */
 	public AbstractDependencyProcessor(RepositoryManager repoManager) {
 		this.repoManager = repoManager;
@@ -86,7 +88,12 @@ public abstract class AbstractDependencyProcessor implements DependencyProcessor
 	protected RepositoryManager getRepositoryManager() {
 		return repoManager;
 	}
-
+	
+	protected DbManager getDbManager() throws PhrescoException {
+		PhrescoServerFactory.initialize();
+		return PhrescoServerFactory.getDbManager();
+	}
+	
 	private static void initDbPathAndTestPom() {
 		//FIXME: this map needs to be removed and should go into respective subclasses
 		sqlFolderPathMap.put(TechnologyTypes.PHP, ServerConstants.SOURCE_SQL);
@@ -121,14 +128,24 @@ public abstract class AbstractDependencyProcessor implements DependencyProcessor
 
 	protected void extractPilots(ApplicationInfo info, File path,
 			TechnologyInfo techInfo) throws PhrescoException {
-		ApplicationInfo appInfo = PhrescoServerFactory.getDbManager().getProjectInfo(techInfo.getVersion(), info.getName());
+		
+		String customerId = getCustomerId(info);
+		String pilotId = info.getPilotContent().getId();
+		ApplicationInfo appInfo = getDbManager().getProjectInfo(pilotId, customerId);
         if(appInfo != null) {
         	ArtifactGroup pilotContent = appInfo.getPilotContent();
-        	String customerId= pilotContent.getCustomerIds().get(0);
         	String contentURL = ServerUtil.createContentURL(pilotContent.getGroupId(), pilotContent.getArtifactId(), 
         			pilotContent.getVersions().get(0).getVersion(), pilotContent.getPackaging());
             DependencyUtils.extractFiles(contentURL, path, customerId);
         }
+	}
+	
+	protected String getCustomerId(ApplicationInfo applicationInfo) {
+		return applicationInfo.getCustomerIds().get(0);
+	}
+	
+	protected List<ArtifactGroup> getSelectedArtifacts(List<String> selectedIds, String customerId) throws PhrescoException {
+		return getDbManager().findSelectedArtifacts(selectedIds, customerId);
 	}
 	
 	/*
@@ -261,21 +278,20 @@ public abstract class AbstractDependencyProcessor implements DependencyProcessor
 		return null;
 	}
 	
-	protected void updatePOMWithModules(File path, List<String> modules, String id) throws PhrescoException {
+	protected void updatePOMWithModules(File path, List<ArtifactGroup> modules, String id) throws PhrescoException {
 		if(CollectionUtils.isEmpty(modules)) {
 			return;
 		}
 		
-		//TODO : Get features using id from projectInfo
-		List<ArtifactGroup> modulesTemp = new ArrayList<ArtifactGroup>();
 		try {
 			File pomFile = new File(path, "pom.xml");
 			if (pomFile.exists()) {
 				PomProcessor processor = new PomProcessor(pomFile);
-				for (ArtifactGroup module : modulesTemp) {
+				for (ArtifactGroup module : modules) {
 					if (module != null) {
-						String groupId ="modules." + id + ".files";
-						processor.addDependency(groupId, module.getId(), module.getVersions()
+						String groupId = module.getGroupId();
+						String artifactId = module.getArtifactId();
+						processor.addDependency(groupId, artifactId, module.getVersions()
 								.get(0).getVersion(), "" ,"Zip" , "");
 					}
 				}
@@ -290,10 +306,8 @@ public abstract class AbstractDependencyProcessor implements DependencyProcessor
 		}
 	}
 	
-	protected void updatePOMWithPluginArtifact(File path, List<String> modules, String techId) throws PhrescoException {
+	protected void updatePOMWithPluginArtifact(File path, List<ArtifactGroup> modules, String techId) throws PhrescoException {
 		
-		//TODO : Get jslibraries from db using the given ids from project info
-		List<ArtifactGroup> databaseListTemp = new ArrayList<ArtifactGroup>();
 		try {
 			if(CollectionUtils.isEmpty(modules)) {
 				return;
@@ -305,10 +319,10 @@ public abstract class AbstractDependencyProcessor implements DependencyProcessor
 				DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
 				DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
 				Document doc = docBuilder.newDocument();
-				for (ArtifactGroup module : databaseListTemp) {
+				for (ArtifactGroup module : modules) {
 					if (module != null) {
-						String groupId ="modules." + techId + ".files";
-						String artifactId = module.getId();
+						String groupId = module.getGroupId();
+						String artifactId = module.getArtifactId();
 						String version = module.getVersions().get(0).getVersion();
 						configList = configList(pomFile, groupId, artifactId, version, doc, techId);
 					 processor.addExecutionConfiguration("org.apache.maven.plugins", "maven-dependency-plugin", "unpack-module", "validate", "unpack", configList, false, doc);

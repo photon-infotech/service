@@ -19,11 +19,11 @@
  */
 package com.photon.phresco.service.converters;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.document.mongodb.MongoOperations;
 import org.springframework.data.document.mongodb.query.Criteria;
+import org.springframework.data.document.mongodb.query.Order;
 import org.springframework.data.document.mongodb.query.Query;
 
 import com.photon.phresco.commons.model.ArtifactGroup;
@@ -54,8 +54,10 @@ public class ArtifactGroupConverter implements Converter<ArtifactGroupDAO, Artif
         artifactGroup.setUsed(artifactGroupDAO.isUsed());
         artifactGroup.setAppliesTo(artifactGroupDAO.getAppliesTo());
         
+        Query query = new Query(Criteria.where(DB_COLUMN_ARTIFACT_GROUP_ID).is(artifactGroupDAO.getId()));
+        query.sort().on(DB_COLUMN_CREATIONDATE, Order.DESCENDING);
         List<ArtifactInfo> versions = mongoOperation.find(ARTIFACT_INFO_COLLECTION_NAME, 
-                new Query(Criteria.where(DB_COLUMN_ARTIFACT_GROUP_ID).is(artifactGroupDAO.getId())), ArtifactInfo.class);
+        		query , ArtifactInfo.class);
         artifactGroup.setVersions(versions);
         
         return artifactGroup;

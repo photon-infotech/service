@@ -36,7 +36,6 @@
 package com.photon.phresco.service.dependency.impl;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.JAXBException;
@@ -46,7 +45,6 @@ import org.apache.log4j.Logger;
 
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ArtifactGroup;
-import com.photon.phresco.commons.model.TechnologyInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.util.TechnologyTypes;
@@ -64,31 +62,36 @@ public class HTML5DependencyProcessor extends AbstractJsLibDependencyProcessor {
 	public void process(ApplicationInfo applicationInfo, File path) throws PhrescoException {
 		S_LOGGER.debug("Entering Method HTML5DependencyProcessor.process(ProjectInfo info, File path)");
 		S_LOGGER.debug("process() Path=" + path.getPath());
-		TechnologyInfo techInfo = applicationInfo.getTechInfo();
-		updatePom(path, applicationInfo.getSelectedModules());
-		if (techInfo.getVersion().equals(TechnologyTypes.HTML5_MULTICHANNEL_JQUERY_WIDGET)) {
-			//TODO: get selected features from db using given ids from projectinfo
-			List<ArtifactGroup> jsTemp = new ArrayList<ArtifactGroup>();
-		    updatePOMWithJsLibs(path, jsTemp);
+		
+		String techId = applicationInfo.getTechInfo().getVersion();
+		String customerId = getCustomerId(applicationInfo);
+		
+		List<ArtifactGroup> selectedJsLibs = null;
+		if(CollectionUtils.isNotEmpty(applicationInfo.getSelectedModules())) {
+			List<ArtifactGroup> selectedFeatures = getSelectedArtifacts(applicationInfo.getSelectedModules(), customerId);
+			updatePom(path, selectedFeatures);
+		}
+		
+		if (techId.equals(TechnologyTypes.HTML5_MULTICHANNEL_JQUERY_WIDGET)) {
+			if(CollectionUtils.isNotEmpty(applicationInfo.getSelectedJSLibs())) {
+				selectedJsLibs = getSelectedArtifacts(applicationInfo.getSelectedJSLibs(), customerId);
+				updatePOMWithJsLibs(path, selectedJsLibs);
+			}
 		} else {
-			//TODO: get selected features from db using given ids from projectinfo
-			List<ArtifactGroup> modulesTemp = new ArrayList<ArtifactGroup>();
-		    extractJsLibraries(path, modulesTemp);
+			selectedJsLibs = getSelectedArtifacts(applicationInfo.getSelectedJSLibs(), customerId);
+		    extractJsLibraries(path, selectedJsLibs, customerId);
 		}
 		createSqlFolder(applicationInfo, path);
 		extractPilots(applicationInfo, path, applicationInfo.getTechInfo());
 		updateTestPom(path);
 	}
 
-	protected void updatePom(File path, List<String> modules)	throws PhrescoException {
-		//TODO: get selected features from db using given ids from projectinfo
-		List<ArtifactGroup> modulesTemp = new ArrayList<ArtifactGroup>();
-		
+	protected void updatePom(File path, List<ArtifactGroup> modules)	throws PhrescoException {
 		if(CollectionUtils.isEmpty(modules)) {
 			return;
 		}
 		try {
-			updatePOMWithModules(path, modulesTemp);
+			updatePOMWithModules(path, modules);
 		} catch (JAXBException e) {
 			throw new PhrescoException(e);
 		} catch (PhrescoPomException e) {

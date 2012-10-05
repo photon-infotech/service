@@ -49,7 +49,7 @@ public abstract class AbstractJsLibDependencyProcessor extends AbstractDependenc
 		return null;
 	}
 
-	protected void extractJsLibraries(File path, List<ArtifactGroup> jsLibraries) throws PhrescoException {
+	protected void extractJsLibraries(File path, List<ArtifactGroup> jsLibraries, String customerId) throws PhrescoException {
 		S_LOGGER.debug("Entering Method AbstractJsLibDependencyProcessor.extractJsLibraries(File path, List<TupleBean> jsLibraries)");
 		S_LOGGER.debug("extractJsLibraries() Filepath="+path.getPath());
 
@@ -57,6 +57,7 @@ public abstract class AbstractJsLibDependencyProcessor extends AbstractDependenc
 		if (CollectionUtils.isEmpty(jsLibraries)) {
 			return;
 		}
+		
 		File libPath = path;
 		String jsLibPathKey = getJsLibPathKey();
 		if(!StringUtils.isEmpty(jsLibPathKey)) {
@@ -70,7 +71,7 @@ public abstract class AbstractJsLibDependencyProcessor extends AbstractDependenc
                 if(module != null) {
                 	String contentURL = ServerUtil.createContentURL(moduleGroup.getGroupId(), moduleGroup.getArtifactId(), 
                 			module.getVersion(), moduleGroup.getPackaging());
-                    DependencyUtils.extractFiles(contentURL, libPath, "photon");
+                    DependencyUtils.extractFiles(contentURL, libPath, customerId);
                 }
             }
         }

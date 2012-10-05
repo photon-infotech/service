@@ -20,10 +20,13 @@
 package com.photon.phresco.service.dependency.impl;
 
 import java.io.File;
+import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 
 import com.photon.phresco.commons.model.ApplicationInfo;
+import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.RepositoryManager;
 
@@ -50,8 +53,12 @@ public class SharePointDependencyProcessor extends AbstractDependencyProcessor {
 		
 		super.process(info, path);
 		String id = info.getTechInfo().getVersion();
-		updatePOMWithModules(path, info.getSelectedModules(), id);
-		updatePOMWithPluginArtifact(path,info.getSelectedModules(), id);
+		String customerId = getCustomerId(info);
+		if(CollectionUtils.isNotEmpty(info.getSelectedModules())) {
+			List<ArtifactGroup> selectedFeatures = getSelectedArtifacts(info.getSelectedModules(), customerId);
+			updatePOMWithModules(path, selectedFeatures, id);
+			updatePOMWithPluginArtifact(path, selectedFeatures, id);
+		}
 		updateTestPom(path);
 	}
 }
