@@ -349,7 +349,7 @@ public class ComponentService extends DbService {
 		
 		Converter<ArtifactGroupDAO, ArtifactGroup> artifactConverter = 
 	            (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
-		
+		ArtifactGroup artifactinfo = null;
 		for (BodyPart bodyPart : list) {
 			
 			//check if this is archetype
@@ -357,7 +357,7 @@ public class ComponentService extends DbService {
 			Type contentType = Content.Type.valueOf(disposition.getType());
 			
 			BodyPartEntity bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
-			ArtifactGroup artifactinfo = technology.getArchetypeInfo();
+			artifactinfo = technology.getArchetypeInfo();
 			if (!Content.Type.ARCHETYPE.equals(contentType)) {
                 artifactinfo = ServerUtil.getArtifactinfo(bodyPartEntity.getInputStream());
             }
@@ -377,8 +377,7 @@ public class ComponentService extends DbService {
         }
 		
 		saveTechnology(technology);
-        mongoOperation.insertList(ARTIFACT_INFO_COLLECTION_NAME, artifactInfos);
-        mongoOperation.insertList(ARTIFACT_GROUP_COLLECTION_NAME, artifactGroups);
+		saveModuleGroup(artifactinfo);
         return Response.status(Response.Status.OK).entity(technology).build();
     }
 	
