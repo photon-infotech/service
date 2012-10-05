@@ -20,11 +20,13 @@
 
 <%@ taglib uri="/struts-tags" prefix="s" %>
 
-<%@ page import="org.apache.commons.collections.CollectionUtils"%>
 <%@ page import="java.util.List"%>
 
-<%@ page import="com.photon.phresco.commons.model.User"%>
+<%@ page import="org.apache.commons.collections.CollectionUtils"%>
+
+<%@ page import="com.photon.phresco.commons.model.ArtifactGroup.Type" %>
 <%@ page import="com.photon.phresco.commons.model.Customer"%>
+<%@ page import="com.photon.phresco.commons.model.User"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
 
 
@@ -53,7 +55,7 @@
 			<a href="#" class="active" name="compTab" id="featuresMenu"><s:label key="lbl.hdr.comp.featrs" theme="simple"/></a>
 		</li>
 		<li>
-			<a href="#" class="inactive" name="compTab" id="componentList"><s:label key="lbl.hdr.comp.component" theme="simple"/></a>
+			<a href="#" class="inactive" name="compTab" id="technologies" additionalParam="type=<%= Type.COMPONENT.name() %>"><s:label key="lbl.hdr.comp.component" theme="simple"/></a>
 		</li>
 		<li>
 			<a href="#" class="inactive" name="compTab" id="archetypesList"><s:label key="lbl.hdr.comp.arhtyp" theme="simple"/></a>

@@ -114,10 +114,21 @@
 	%>
 				<h4 class="hdr"><s:text name='lbl.hdr.comp.featrs.js.add'/></h4>
 	<%
-			} else {
+		} else {
 	%>
 				<h4 class="hdr"><s:text name='lbl.hdr.comp.featrs.js.edit'/></h4>
 	<% 		
+			}
+		} else if (ServiceUIConstants.REQ_FEATURES_TYPE_COMPONENT.equals(type)) {
+			if (StringUtils.isEmpty(fromPage)) {
+	%>
+				<h4 class="hdr"><s:text name='lbl.hdr.comp.component.add'/></h4>
+	<%
+			} else {
+	%>
+				<h4 class="hdr"><s:text name='lbl.hdr.comp.component.edit'/></h4>
+				
+	<%
 			}
 		}
 	%>
@@ -140,8 +151,7 @@
 			</label>
 			<div class="controls">
 				<textarea id="featureDesc" placeholder="<s:text name='place.hldr.feature.add.desc'/>" 
-				     maxlength="150" title="150 Characters only" class="input-xlarge" type="text" 
-				     name="description"><%= description %></textarea>
+				     maxlength="150" title="150 Characters only" class="input-xlarge" name="description"><%= description %></textarea>
 			</div>
 		</div>
 		
@@ -284,21 +294,47 @@
 				disabled = "disabled";
 			}
 		%>
-     	<% if (StringUtils.isNotEmpty(fromPage)) { %>
-	     	<input type="button" id="featuresUpdate" class="btn <%= disabledClass %>" <%= disabled %> 
-				onclick="validate('<%= type %>Update', $('#formFeatureAdd'), $('#featureContainer'), 'Updating Feature', $('#jarDetailsDiv :input'));"
-				value="<s:text name='lbl.hdr.comp.update' />"/> 
-     	<% } else { %>
-	     	<input type="button" id="featuresSave" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.save'/>" 
-				onclick="validate('<%= type %>Save', $('#formFeatureAdd'), $('#featureContainer'), 'Creating Feature', $('#jarDetailsDiv :input'));"/> 
+     	<% 
+     		if (StringUtils.isNotEmpty(fromPage)) {
+     		    if (ServiceUIConstants.REQ_FEATURES_TYPE_COMPONENT.equals(type)) {
+   		%>
+   					<input type="button" id="featuresUpdate" class="btn <%= disabledClass %>" <%= disabled %> 
+						onclick="validate('componentUpdate', $('#formFeatureAdd'), $('#subcontainer'), 'Updating Feature', $('#jarDetailsDiv :input'));"
+						value="<s:text name='lbl.hdr.comp.update' />"/>
+   		<%
+     		    } else {
+   		%>
+			     	<input type="button" id="featuresUpdate" class="btn <%= disabledClass %>" <%= disabled %> 
+						onclick="validate('featuresUpdate', $('#formFeatureAdd'), $('#featureContainer'), 'Updating Feature', $('#jarDetailsDiv :input'));"
+						value="<s:text name='lbl.hdr.comp.update' />"/> 
+     	<%
+     		    }
+     		} else {
+				if (ServiceUIConstants.REQ_FEATURES_TYPE_COMPONENT.equals(type)) {
+   		%>
+			     	<input type="button" id="featuresSave" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.save'/>" 
+						onclick="validate('componentSave', $('#formFeatureAdd'), $('#subcontainer'), 'Creating Feature', $('#jarDetailsDiv :input'));"/> 
+		<%
+				} else {
+	    %>
+	    			<input type="button" id="featuresSave" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.save'/>" 
+						onclick="validate('featuresSave', $('#formFeatureAdd'), $('#featureContainer'), 'Creating Feature', $('#jarDetailsDiv :input'));"/> 
+	    <%
+				}
+     		}
+		%>
+		
+		<% if (ServiceUIConstants.REQ_FEATURES_TYPE_COMPONENT.equals(type)) { %>
+			<input type="button" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.cancel'/>"
+				onclick="loadContent('technologies', $('#formFeatureAdd'), $('#subcontainer'));" />
+		<% } else { %>
+			<input type="button" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.cancel'/>"
+				onclick="loadContent('technologies', $('#formFeatureAdd'), $('#featureContainer'));" />
 		<% } %>
-		<input type="button" id="<%= type %>Cancel" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.cancel'/>"
-			onclick="loadContent('featuresMenu', $('#formFeatureAdd'), $('#featureContainer'));" />
 	</div>
 	
 	<!-- Hidden Fields -->
 	<input type="hidden" name="customerId" value="<%= customerId %>">
-	<input type="hidden" name="from" value="dependency">
 	<input type="hidden" name="fromPage" value="<%= StringUtils.isNotEmpty(fromPage) ? fromPage : "" %>"/>
     <input type="hidden" name="moduleGroupId" value="<%= moduleId %>"/>
     <input type="hidden" name="oldName" value="<%= name %>"/>
@@ -330,13 +366,15 @@
             $(this).val(version);
         });
        
+		//To check modulegroup checkbox and show the the selected version when the radio button in clicked
 		$("input[type=radio]").change(function() {
 	        var name = $(this).attr('name');
 	        $("input:checkbox[name='" + name + "']").prop("checked", true);
 	        var version = $("input:radio[name='" + name + "']").val();
 	        $("p[id='" + name + "']").html(version);
 	    });
-
+		
+		//To check the first radio button and show the the selected version when the modulegroup checkbox in clicked
 	    $("input[type=checkbox]").change(function() {
 	        var checkboxChecked = $(this).is(":checked");
 	        var name = $(this).attr('name');
@@ -349,28 +387,9 @@
 	            $("p[id='" + name + "']").html(version);
 	        }
 	    });
-	    
-	    $("input[type=radio]").change(function() {
-			var name = $(this).attr('name');
-			$("input:checkbox[name='" + name + "']").prop("checked", true);
-			var version = $("input:radio[name='" + name + "']").val();
-			$("p[id='" + name + "']").html(version);
-		});
-
-		$("input[type=checkbox]").change(function() {
-			var checkboxChecked = $(this).is(":checked");
-			var name = $(this).attr('name');
-			if (!checkboxChecked) {
-				$("input:radio[name='" + name + "']").prop("checked", false);
-				$("p[id='" + name + "']").empty();
-			} else {
-				$("input:radio[name='" + name + "']:first").prop("checked", true);
-				var version = $("input:radio[name='" + name + "']").val();
-				$("p[id='" + name + "']").html(version);
-			}
-		});
 	});
 
+	//To show the validation error
     function findError(data) {
         if (!isBlank(data.nameError)) {
             showError($("#nameControl"), $("#nameError"), data.nameError);
@@ -406,6 +425,7 @@
         }
     }
     
+	//To upload the file upload validation error
 	function jarError(data, type) {
 		var controlObj;
 		var msgObj;
@@ -420,6 +440,7 @@
 		}
 	}
 
+	//To create the file upload control
 	function createUploader() {
 		var featureUploader = new qq.FileUploader({
 			element : document.getElementById('feature-file-uploader'),
@@ -436,6 +457,7 @@
 		});
 	}
  
+	//To remove the uploaded file
 	function removeUploadedJar(obj) {
 		$('#jarDetailsDiv').hide();
 		$(obj).parent().remove();
@@ -454,6 +476,7 @@
 		enableDisableUpload();
 	}
 
+	//To restrict the no of files to be uploaded by disabling the upload button 
 	function enableDisableUpload() {
 		if ($('ul[temp="featureJar"] > li').length === 1) {
 			$('#feature-file-uploader').find("input[type='file']").attr(
@@ -473,6 +496,6 @@
 		$('#popup_div').empty();
 		$('#popup_div').show();
 		disableScreen();
-		loadContent('<%= type %>ListDependency', $('#formFeatureAdd'), $('#popup_div'));
+		loadContent('fetchFeaturesForDependency', $('#formFeatureAdd'), $('#popup_div'));
 	}
 </script>

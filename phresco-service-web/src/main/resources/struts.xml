@@ -74,62 +74,34 @@
             <result name="featuresList">/admin/pages/components/feature/menu.jsp</result>
         </action>
 		
-		<action name="modulesTechnologies" class="com.photon.phresco.service.admin.actions.components.Features" method="modulesTechnologies">
-            <result name="featuresList">/admin/pages/components/feature/technology.jsp</result>
-        </action>
-        
-		<action name="jsLibTechnologies" class="com.photon.phresco.service.admin.actions.components.Features" method="jsLibTechnologies">
+		<action name="technologies" class="com.photon.phresco.service.admin.actions.components.Features" method="technologies">
             <result name="featuresList">/admin/pages/components/feature/technology.jsp</result>
         </action>
 
-        <action name="moduleList" class="com.photon.phresco.service.admin.actions.components.Features" method="listModules">
+        <action name="listFeatures" class="com.photon.phresco.service.admin.actions.components.Features" method="listFeatures">
             <result name="featuresList">/admin/pages/components/feature/list.jsp</result>
         </action>
         
-        <action name="jsList" class="com.photon.phresco.service.admin.actions.components.Features" method="listJSLibs">
-            <result name="featuresList">/admin/pages/components/feature/list.jsp</result>
-        </action>
-        
-        <action name="moduleListDependency" class="com.photon.phresco.service.admin.actions.components.Features" method="listModulesDependency">
-            <result name="featuresList">/admin/pages/components/feature/dependency.jsp</result>
-        </action>
-        
-        <action name="jsListDependency" class="com.photon.phresco.service.admin.actions.components.Features" method="listJSLibsDependency">
+        <action name="fetchFeaturesForDependency" class="com.photon.phresco.service.admin.actions.components.Features" method="fetchFeaturesForDependency">
             <result name="featuresList">/admin/pages/components/feature/dependency.jsp</result>
         </action>
         
         <action name="saveDependentFeatures" class="com.photon.phresco.service.admin.actions.components.Features" method="saveDependentFeatures" />
 		
-		<action name="moduleAdd" class="com.photon.phresco.service.admin.actions.components.Features" method="addModules">
+		<action name="addFeatures" class="com.photon.phresco.service.admin.actions.components.Features" method="addFeatures">
             <result name="featuresAdd">/admin/pages/components/feature/add.jsp</result>
         </action>
         
-        <action name="jsAdd" class="com.photon.phresco.service.admin.actions.components.Features" method="addJSLibs">
-            <result name="featuresAdd">/admin/pages/components/feature/add.jsp</result>
-        </action>
-        
-        <action name="moduleEdit" class="com.photon.phresco.service.admin.actions.components.Features" method="editModule">
-            <result name="featuresAdd">/admin/pages/components/feature/add.jsp</result>
-        </action>
-        
-        <action name="jsEdit" class="com.photon.phresco.service.admin.actions.components.Features" method="editJSLib">
+        <action name="featurseEdit" class="com.photon.phresco.service.admin.actions.components.Features" method="edit">
             <result name="featuresAdd">/admin/pages/components/feature/add.jsp</result>
         </action>
 		
-		<action name="moduleSave" class="com.photon.phresco.service.admin.actions.components.Features" method="saveModules">
-            <result name="featuresList">/admin/pages/components/feature/menu.jsp</result>
+		<action name="featuresSave" class="com.photon.phresco.service.admin.actions.components.Features" method="save">
+            <result name="featuresList">/admin/pages/components/feature/technology.jsp</result>
         </action>
         
-        <action name="jsSave" class="com.photon.phresco.service.admin.actions.components.Features" method="saveJSLibs">
-            <result name="featuresList">/admin/pages/components/feature/menu.jsp</result>
-        </action>
-        
-        <action name="moduleUpdate" class="com.photon.phresco.service.admin.actions.components.Features" method="updateModule">
-            <result name="featuresList">/admin/pages/components/feature/menu.jsp</result>
-        </action>
-        
-        <action name="jsUpdate" class="com.photon.phresco.service.admin.actions.components.Features" method="updateJSLib">
-            <result name="featuresList">/admin/pages/components/feature/menu.jsp</result>
+        <action name="featuresUpdate" class="com.photon.phresco.service.admin.actions.components.Features" method="update">
+            <result name="featuresList">/admin/pages/components/feature/technology.jsp</result>
         </action>
         
         <action name="uploadFeatureFile" class="com.photon.phresco.service.admin.actions.components.Features" method="uploadFile">
@@ -140,83 +112,35 @@
             <result type="json" />
         </action>
         
-        <action name="moduleDelete" class="com.photon.phresco.service.admin.actions.components.Features" method="deleteModules">
+        <action name="featuresDelete" class="com.photon.phresco.service.admin.actions.components.Features" method="delete">
             <result name="featuresList">/admin/pages/components/feature/menu.jsp</result>
         </action>
         
-        <action name="jsDelete" class="com.photon.phresco.service.admin.actions.components.Features" method="deleteJSLibs">
-            <result name="featuresList">/admin/pages/components/feature/menu.jsp</result>
-        </action>
-        
-        <action name="moduleSaveValidate" class="com.photon.phresco.service.admin.actions.components.Features" method="validateForm">
+        <action name="featuresSaveValidate" class="com.photon.phresco.service.admin.actions.components.Features" method="validateForm">
             <result type="json" />
         </action>
         
-        <action name="jsSaveValidate" class="com.photon.phresco.service.admin.actions.components.Features" method="validateForm">
-            <result type="json" />
-        </action>
-        
-        <action name="moduleUpdateValidate" class="com.photon.phresco.service.admin.actions.components.Features" method="validateForm">
-            <result type="json" />
-        </action>
-        
-        <action name="jsUpdateValidate" class="com.photon.phresco.service.admin.actions.components.Features" method="validateForm">
+        <action name="featuresUpdateValidate" class="com.photon.phresco.service.admin.actions.components.Features" method="validateForm">
             <result type="json" />
         </action>
 		<!-- COMPONENT FEATURES ENDS-->
 		
 		<!--COMPONENT START-->
-		<action name="componentList" class="com.photon.phresco.service.admin.actions.components.Component" method="technologies">
-            <result name="componentList">/admin/pages/components/component/technology.jsp</result>
+        <action name="componentSave" class="com.photon.phresco.service.admin.actions.components.Features" method="save">
+            <result name="featuresList">/admin/pages/components/feature/technology.jsp</result>
         </action>
         
-        <action name="listComponent" class="com.photon.phresco.service.admin.actions.components.Component" method="list">
-            <result name="componentList">/admin/pages/components/component/list.jsp</result>
+        <action name="componentUpdate" class="com.photon.phresco.service.admin.actions.components.Features" method="update">
+            <result name="featuresList">/admin/pages/components/feature/menu.jsp</result>
         </action>
-		
-		<action name="componentAdd" class="com.photon.phresco.service.admin.actions.components.Component" method="add">
-            <result name="componentAdd">/admin/pages/components/component/add.jsp</result>
-        </action>
-		
-		<action name="componentSave" class="com.photon.phresco.service.admin.actions.components.Component" method="save">
-            <result name="componentList">/admin/pages/components/component/technology.jsp</result>
+        
+        <action name="componentSaveValidate" class="com.photon.phresco.service.admin.actions.components.Features" method="validateForm">
             <result type="json" />
         </action>
         
-        <action name="uploadComponentFile" class="com.photon.phresco.service.admin.actions.components.Component" method="uploadFile">
+        <action name="componentUpdateValidate" class="com.photon.phresco.service.admin.actions.components.Features" method="validateForm">
             <result type="json" />
         </action>
-        
-        <action name="removeComponentFile" class="com.photon.phresco.service.admin.actions.components.Component" method="removeComponentFile">
-            <result type="json" />
-        </action>
-        
-        <action name="componentEdit" class="com.photon.phresco.service.admin.actions.components.Component" method="edit">
-            <result name="componentAdd">/admin/pages/components/component/add.jsp</result>
-        </action>
-        
-        <action name="componentUpdate" class="com.photon.phresco.service.admin.actions.components.Component" method="update">
-            <result name="componentList">/admin/pages/components/component/technology.jsp</result>
-            <result type="json" />
-        </action>
-        
-        <action name="componentDelete" class="com.photon.phresco.service.admin.actions.components.Component" method="delete">
-            <result name="componentList">/admin/pages/components/component/technology.jsp</result>
-        </action>
-        
-         <action name="componentSaveValidate" class="com.photon.phresco.service.admin.actions.components.Component" method="validateForm">
-            <result type="json" />
-        </action>
-        
-         <action name="componentUpdateValidate" class="com.photon.phresco.service.admin.actions.components.Component" method="validateForm">
-            <result type="json" />
-        </action>
-		
-		<action name="listConponentsDependency" class="com.photon.phresco.service.admin.actions.components.Component" method="listConponentsDependency">
-            <result name="componentList">/admin/pages/components/component/dependency.jsp</result>
-        </action>
-        
-        <action name="saveDependentComponents" class="com.photon.phresco.service.admin.actions.components.Component" method="saveDependentComponents" />
 		<!--COMPONENT ENDS-->
 			
 		<!-- COMPONENT ARCHETYPES STARTS-->

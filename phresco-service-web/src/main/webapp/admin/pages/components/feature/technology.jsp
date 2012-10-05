@@ -27,7 +27,7 @@
 <%@ page import="com.photon.phresco.commons.model.Technology" %>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
 
-<% 
+<%
 	List<Technology> technologies = (List<Technology>) request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
 	String type = (String) request.getAttribute(ServiceUIConstants.REQ_FEATURES_TYPE);
@@ -38,13 +38,17 @@
 		<div class="featurelist_add">
 		<% if (ServiceUIConstants.REQ_FEATURES_TYPE_MODULE.equals(type)) { %>	
 			<input type="button" class="btn btn-primary" name="features_add" 
-				onclick="loadContent('moduleAdd', $('#formFeaturesList'), $('#featureContainer'));" 
+				onclick="loadContent('addFeatures', $('#formFeaturesList'), $('#featureContainer'));" 
 				value="<s:text name='lbl.hdr.comp.featrs.mod.add'/>"/>
 		<% } else if (ServiceUIConstants.REQ_FEATURES_TYPE_JS.equals(type)) { %>
 			<input type="button" class="btn btn-primary" name="features_add" 
-				onclick="loadContent('jsAdd', $('#formFeaturesList'), $('#featureContainer'));" 
+				onclick="loadContent('addFeatures', $('#formFeaturesList'), $('#featureContainer'));" 
 				value="<s:text name='lbl.hdr.comp.featrs.js.add'/>"/>
-		<% } %>
+		<% } else if (ServiceUIConstants.REQ_FEATURES_TYPE_COMPONENT.equals(type)) { %>
+			<input type="button" class="btn btn-primary" name="features_add" 
+				onclick="loadContent('addFeatures', $('#formFeaturesList'), $('#subcontainer'));" 
+				value="<s:text name='lbl.hdr.comp.component.add'/>"/>
+		<% } %>		
 			<input type="button" class="btn" id="del" disabled value="<s:text name='lbl.hdr.comp.delete'/>" 
 				onclick="showDeleteConfirmation('<s:text name='del.confirm.feature'/>');"/>
 		</div>
@@ -99,11 +103,11 @@
 	// This method calling from confirm_dialog.jsp
     function continueDeletion() {
     	confirmDialog('none', '');
-    	loadContent('<%= type %>Delete', $('#formFeaturesList'), $('#feature_list'));
+    	loadContent('featuresDelete', $('#formFeaturesList'), $('#feature_list'));
     }
 	
 	//To list the features based on the type
     function featurelist() {
-		loadContent('<%= type %>List', $('#formFeaturesList'), $('#feature_list'));
+		loadContent('listFeatures', $('#formFeaturesList'), $('#feature_list'));
     }
 </script>

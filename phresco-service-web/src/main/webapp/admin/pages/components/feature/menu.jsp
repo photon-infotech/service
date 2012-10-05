@@ -23,6 +23,7 @@
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.apache.commons.collections.CollectionUtils"%>
 
+<%@ page import="com.photon.phresco.commons.model.ArtifactGroup.Type" %>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
 
 <% 
@@ -35,12 +36,12 @@
 		<nav>
 			<ul class="tabs subtabs">
 				<li class="subtabsLi">
-					<a href="#" class="active" id="modulesTechnologies" name="featureTab">
+					<a href="#" class="active" id="technologies" name="featureTab" additionalParam="type=<%= Type.FEATURE.name() %>">
 						<s:label key="lbl.hdr.comp.featrs.modules" theme="simple"/>
 					</a>
 				</li>
 				<li>
-					<a href="#" class="inactive" id="jsLibTechnologies" name="featureTab">
+					<a href="#" class="inactive" id="technologies" name="featureTab" additionalParam="type=<%= Type.JAVASCRIPT.name() %>">
 						<s:label key="lbl.hdr.comp.featrs.jslib" theme="simple"/>
 					</a>
 				</li>
@@ -59,14 +60,10 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 		//Handles the click event of the sub tabs
-		clickMenu($("a[name='featureTab']"), $("#featureContainer"));
+		clickMenu($("a[name='featureTab']"), $("#featureContainer"), $('#formMenu'));
 		
 		//To load the page by default. Condition is checked when this page is returned after save
-		<% if (ServiceUIConstants.REQ_FEATURES_TYPE_JS.equals(type)) { %>
-			loadContent("jsLibTechnologies", $('#formMenu'), $("#featureContainer"));
-		<% } else { %>
-			loadContent("modulesTechnologies", $('#formMenu'), $("#featureContainer"));
-		<% } %>
+		loadContent("technologies", $('#formMenu'), $("#featureContainer"), "type=<%= Type.FEATURE.name() %>");
 		
 		//To activate the module menu by default
 		activateMenu($("#module"));

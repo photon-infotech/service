@@ -140,9 +140,11 @@ public interface ServiceUIConstants {
      *****************************/ 
     String REQ_FEATURES_MOD_GRP = "moduleGroup";
     String REQ_FEATURES_TYPE = "type";
-    String REQ_FEATURES_TYPE_JS = "js";
-    String REQ_FEATURES_TYPE_MODULE = "module";
+    String REQ_FEATURES_TYPE_JS = "JAVASCRIPT";
+    String REQ_FEATURES_TYPE_MODULE = "FEATURE";
+    String REQ_FEATURES_TYPE_COMPONENT = "COMPONENT";
     String REQ_FEATURES_SELECTED_MODULEID = "selectedModuleId";
+    
     
     /*****************************
      * Features Common Constants
@@ -150,6 +152,7 @@ public interface ServiceUIConstants {
      *****************************/
     String FEATURES_CORE = "core";
     String FEATURES_SELECTED_TECHNOLOGY = "selectedTechnology";
+    
     
     /*****************************
      * Features Session Constants

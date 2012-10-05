@@ -73,7 +73,6 @@ public class Features extends ServiceBaseAction {
     private List<String> dependentModGroupId = null;
     
     private String fromPage = "";
-    private String from = "";
 
 	private String nameError = "";
 	private String artifactIdError = "";
@@ -93,14 +92,15 @@ public class Features extends ServiceBaseAction {
     	return COMP_FEATURES_LIST;
     }
 	
-	public String modulesTechnologies() {
+	public String technologies() {
 	    if (s_isDebugEnabled) {
             S_LOGGER.debug("Entering Method  Features.modulesList()");
         }
 	    
 	    try {
-            setReqAttribute(REQ_FEATURES_TYPE, REQ_FEATURES_TYPE_MODULE); //for handle in feature sub menu
+            setReqAttribute(REQ_FEATURES_TYPE, getType()); //for handle in feature sub menu
     	    setTechnologiesInRequest();
+    	    setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
     	    //To remove the selected dependent moduleIds from the session
     	    removeSessionAttribute(SESSION_FEATURES_DEPENDENT_MOD_IDS);
 	    } catch (PhrescoException e) {
@@ -109,23 +109,6 @@ public class Features extends ServiceBaseAction {
 	    
 	    return COMP_FEATURES_LIST;
 	}
-	
-	public String jsLibTechnologies() {
-	    if (s_isDebugEnabled) {
-            S_LOGGER.debug("Entering Method  Features.jsLibList()");
-        }
-	    
-	    try {
-            setReqAttribute(REQ_FEATURES_TYPE, REQ_FEATURES_TYPE_JS);
-    	    setTechnologiesInRequest();
-            //To remove the selected dependent moduleIds from the session
-    	    removeSessionAttribute(SESSION_FEATURES_DEPENDENT_MOD_IDS);
-    	} catch (PhrescoException e) {
-            return showErrorPopup(e, EXCEPTION_FEATURE_LIST);
-        }
-	
-	    return COMP_FEATURES_LIST;
-    }
 	
     private void setTechnologiesInRequest() throws PhrescoException {
     	if (s_isDebugEnabled) {
@@ -141,79 +124,24 @@ public class Features extends ServiceBaseAction {
     	}
     }
     
-    public String listModules() {
-        if (s_isDebugEnabled) {
-            S_LOGGER.debug("Entering Method  Features.featurelist()");
-        }
-        
-        try {
-            listFeatures(Type.FEATURE);
-            setReqAttribute(REQ_FEATURES_TYPE, REQ_FEATURES_TYPE_MODULE);
-        } catch (PhrescoException e) {
-            return showErrorPopup(e, EXCEPTION_FEATURE_LIST);
-        }
-        
-        return COMP_FEATURES_LIST;
-    }
-    
-    public String listJSLibs() {
-        if (s_isDebugEnabled) {
-            S_LOGGER.debug("Entering Method  Features.featurelist()");
-        }
-        
-        try {
-            listFeatures(Type.JAVASCRIPT);
-            setReqAttribute(REQ_FEATURES_TYPE, REQ_FEATURES_TYPE_JS);
-        } catch (PhrescoException e) {
-            return showErrorPopup(e, EXCEPTION_FEATURE_LIST);
-        }
-        
-        return COMP_FEATURES_LIST;
-    }
-    
-    public String listModulesDependency() {
-        if (s_isDebugEnabled) {
-            S_LOGGER.debug("Entering Method  Features.featurelist()");
-        }
-        
-        try {
-            listFeatures(Type.FEATURE);
-        } catch (PhrescoException e) {
-            return showErrorPopup(e, EXCEPTION_FEATURE_LIST);
-        }
-        
-        return COMP_FEATURES_LIST;
-    }
-    
-    public String listJSLibsDependency() {
-        if (s_isDebugEnabled) {
-            S_LOGGER.debug("Entering Method  Features.featurelist()");
-        }
-        
-        try {
-            listFeatures(Type.JAVASCRIPT);
-        } catch (PhrescoException e) {
-            return showErrorPopup(e, EXCEPTION_FEATURE_LIST);
-        }
-        
-        return COMP_FEATURES_LIST;
-    }
-    
-    private void listFeatures(Type type) throws PhrescoException {
+    public String listFeatures() throws PhrescoException {
     	if (s_isDebugEnabled) {
     		S_LOGGER.debug("Entering Method  Features.featurelist()");
     	}
     	
-		List<ArtifactGroup> moduleGroup = getServiceManager().getFeatures(getCustomerId(), getTechnology(), type.name());
-		setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
+		List<ArtifactGroup> moduleGroups = getServiceManager().getFeatures(getCustomerId(), getTechnology(), Type.valueOf(getType()).name());
+		setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroups);
+		setReqAttribute(REQ_FEATURES_TYPE, getType());
 		setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
+		
+		return COMP_FEATURES_LIST;
     }
-	
-    public String addModules() {
+    
+    public String addFeatures() {
         if (s_isDebugEnabled) {
             S_LOGGER.debug("Entering Method  Features.addModules()");
         }
-        
+      
         try {
             setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
             setReqAttribute(REQ_FEATURES_TYPE, getType());
@@ -221,67 +149,24 @@ public class Features extends ServiceBaseAction {
         } catch (PhrescoException e) {
             return showErrorPopup(e, EXCEPTION_FEATURE_ADD);            
         }
-        
+      
         return COMP_FEATURES_ADD;
     }
     
-    public String addJSLibs() {
-        if (s_isDebugEnabled) {
-            S_LOGGER.debug("Entering Method  Features.addModules()");
-        }
-        
-        try {
-            setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
-            setReqAttribute(REQ_FEATURES_TYPE, getType());
-            setTechnologiesInRequest();
-        } catch (PhrescoException e) {
-            return showErrorPopup(e, EXCEPTION_FEATURE_ADD);            
-        }
-        
-        return COMP_FEATURES_ADD;
-    }
-	
-	public String editModule() {
-		if (s_isDebugEnabled) {
-			S_LOGGER.debug("Entering Method  Features.edit()");
-		}
-		
-		try {
-		    setTechnologiesInRequest();
-		    setReqAttribute(REQ_FEATURES_TYPE, getType());
-		    setReqAttribute(FEATURES_SELECTED_TECHNOLOGY, getTechnology());
-		    setEditModuleGroupInReq(getTechnology(), Type.FEATURE);
-		} catch (PhrescoException e) {
-			showErrorPopup(e, EXCEPTION_FEATURE_EDIT);
-		}
-
-		return COMP_FEATURES_ADD;
-	}
-	
-	public String editJSLib() {
-        if (s_isDebugEnabled) {
-            S_LOGGER.debug("Entering Method  Features.edit()");
-        }
-        
-        try {
-            setTechnologiesInRequest();
-            setReqAttribute(REQ_FEATURES_TYPE, getType());
-            setEditModuleGroupInReq(getTechnology(), Type.JAVASCRIPT);
-            setReqAttribute(FEATURES_SELECTED_TECHNOLOGY, getTechnology());
-        } catch (PhrescoException e) {
-            showErrorPopup(e, EXCEPTION_FEATURE_EDIT);
-        }
-
-        return COMP_FEATURES_ADD;
-    }
-
-    private void setEditModuleGroupInReq(String technology, Type type) throws PhrescoException {
-        ArtifactGroup moduleGroup = getServiceManager().getFeature(getModuleGroupId(), getCustomerId(), technology, type.name());
-        setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
-        setReqAttribute(REQ_FEATURES_SELECTED_MODULEID, getModuleId());
-        setReqAttribute(REQ_FROM_PAGE, EDIT);
-        setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
-    }
+    public String fetchFeaturesForDependency() {
+      if (s_isDebugEnabled) {
+          S_LOGGER.debug("Entering Method  Features.featurelist()");
+      }
+      
+      try {
+          List<ArtifactGroup> moduleGroups = getServiceManager().getFeatures(getCustomerId(), getTechnology(), Type.valueOf(getType()).name());
+          setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroups);
+      } catch (PhrescoException e) {
+          return showErrorPopup(e, EXCEPTION_FEATURE_LIST);
+      }
+      
+      return COMP_FEATURES_LIST;
+  }
     
     public void saveDependentFeatures() {
         if (s_isDebugEnabled) {
@@ -296,97 +181,64 @@ public class Features extends ServiceBaseAction {
         }
         setSessionAttribute(SESSION_FEATURES_DEPENDENT_MOD_IDS, dependentModuleIds);
     }
-	
-	public String saveModules() throws IOException {
-		if (s_isDebugEnabled) {
-			S_LOGGER.debug("Entering Method  Features.save()");
-		}
-		
-		try {
-			save(Type.FEATURE);
-			setTechnologiesInRequest();
-		} catch (PhrescoException e) {
-			showErrorPopup(e, EXCEPTION_FEATURE_SAVE);
-		}
-		
-		return modulesTechnologies();
-	}
-	
-	public String saveJSLibs() throws IOException {
-        if (s_isDebugEnabled) {
-            S_LOGGER.debug("Entering Method  Features.save()");
-        }
-        
+    
+    public String save() throws PhrescoException, IOException {
         try {
-            save(Type.JAVASCRIPT);
-            setTechnologiesInRequest();
-        } catch (PhrescoException e) {
-            showErrorPopup(e, EXCEPTION_FEATURE_SAVE);
-        }
-        
-        return jsLibTechnologies();
-    }
-
-    private void save(Type type) throws PhrescoException, IOException {
-        try {
-            ArtifactGroup moduleGroup = createModuleGroup(type);
+            ArtifactGroup moduleGroup = createModuleGroup(Type.valueOf(getType()));
             List<InputStream> inputStream = new ArrayList<InputStream>();
             if (s_featureByteArray != null) {
                 inputStream.add(new ByteArrayInputStream(s_featureByteArray));
             }
             getServiceManager().createFeatures(moduleGroup, inputStream, getCustomerId());
+            setTechnologiesInRequest();
             addActionMessage(getText(FEATURE_ADDED, Collections.singletonList(getName())));
         } catch (PhrescoException e) {
-            throw new PhrescoException(e); 
+            return showErrorPopup(e, EXCEPTION_FEATURE_SAVE);
         }
+        
+        return listFeatures();
     }
-    
-    public String updateModule() throws IOException {
-        if (s_isDebugEnabled) {
-            S_LOGGER.debug("Entering Method  Features.updateModule()");
-        }
-        
-        try {
-            update(Type.FEATURE);
-            setTechnologiesInRequest();
-        } catch (PhrescoException e) {
-            showErrorPopup(e, EXCEPTION_FEATURE_SAVE);
-        }
-        
-        return  modulesTechnologies();
-    }
-    
-    public String updateJSLib() throws IOException {
-        if (s_isDebugEnabled) {
-            S_LOGGER.debug("Entering Method  Features.updateJSLib()");
-        }
-        
-        try {
-            update(Type.JAVASCRIPT);
-            setTechnologiesInRequest();
-        } catch (PhrescoException e) {
-            showErrorPopup(e, EXCEPTION_FEATURE_SAVE);
-        }
-        
-        return jsLibTechnologies();
-    }
+	
+	public String edit() {
+		if (s_isDebugEnabled) {
+			S_LOGGER.debug("Entering Method  Features.edit()");
+		}
+		
+		try {
+		    setTechnologiesInRequest();
+		    ArtifactGroup moduleGroup = getServiceManager().getFeature(getModuleGroupId(), getCustomerId(), technology, Type.valueOf(getType()).name());
+	        setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
+	        setReqAttribute(REQ_FEATURES_TYPE, getType());
+            setReqAttribute(FEATURES_SELECTED_TECHNOLOGY, getTechnology());
+	        setReqAttribute(REQ_FEATURES_SELECTED_MODULEID, getModuleId());
+	        setReqAttribute(REQ_FROM_PAGE, EDIT);
+	        setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
+		} catch (PhrescoException e) {
+			showErrorPopup(e, EXCEPTION_FEATURE_EDIT);
+		}
 
-    private void update(Type type) throws PhrescoException, IOException {
+		return COMP_FEATURES_ADD;
+	}
+	
+    public String update() throws PhrescoException, IOException {
         if (s_isDebugEnabled) {
             S_LOGGER.debug("Entering Method Features.update()");
         }
         
         try {
-            ArtifactGroup moduleGroup = createModuleGroup(type);
+            ArtifactGroup moduleGroup = createModuleGroup(Type.valueOf(getType()));
             List<InputStream> inputStream = new ArrayList<InputStream>();
             if (s_featureByteArray != null) {
                 inputStream.add(new ByteArrayInputStream(s_featureByteArray));
             }
             getServiceManager().updateFeature(moduleGroup, inputStream, getCustomerId());
             addActionMessage(getText(FEATURE_ADDED, Collections.singletonList(getName())));
+            setTechnologiesInRequest();
         } catch (PhrescoException e) {
-            throw new PhrescoException(e); 
+            showErrorPopup(e, EXCEPTION_FEATURE_SAVE);
         }
+        
+        return listFeatures();
     }
 	
 	private ArtifactGroup createModuleGroup(Type type) throws PhrescoException {
@@ -397,7 +249,7 @@ public class Features extends ServiceBaseAction {
         try {
             ArtifactGroup artifactGroup = new ArtifactGroup();
             artifactGroup.setName(getName());
-            if (StringUtils.isNotEmpty(getFromPage())) {
+            if (StringUtils.isNotEmpty(getModuleGroupId())) {
                 artifactGroup.setId(getModuleGroupId());
             }
             artifactGroup.setDescription(getDescription());
@@ -435,54 +287,28 @@ public class Features extends ServiceBaseAction {
             throw new PhrescoException(e);
         }
     }
-	
-	public String deleteModules() {
-        if (s_isDebugEnabled) {
-            S_LOGGER.debug("Entering Method  Features.deleteModules()");
-        }
-        
-        try {
-            delete();
-            setTechnologiesInRequest();
-        } catch (PhrescoException e) {
-            showErrorPopup(e, EXCEPTION_FEATURE_DELETE);
-        }
-        
-        return modulesTechnologies();
-    }
     
-    public String deleteJSLibs() {
+    public String delete() throws PhrescoException {
         if (s_isDebugEnabled) {
             S_LOGGER.debug("Entering Method  Features.deleteJSLibs()");
         }
         
         try {
-            delete();
+            String[] moduleGroupIds = getHttpRequest().getParameterValues(REQ_FEATURES_MOD_GRP);
+            if (ArrayUtils.isNotEmpty(moduleGroupIds)) {
+                for (String moduleGroupId : moduleGroupIds) {
+                    System.out.println("moduleGroupId::" + moduleGroupId);
+                    getServiceManager().deleteFeature(moduleGroupId, getCustomerId());
+                }
+                addActionMessage(getText(FEATURE_DELETED));
+            }
             setTechnologiesInRequest();
         } catch (PhrescoException e) {
             showErrorPopup(e, EXCEPTION_FEATURE_DELETE);
         }
         
-        return jsLibTechnologies();
+        return listFeatures();
     }
-    
-	private void delete() throws PhrescoException {
-		if (s_isDebugEnabled) {
-			S_LOGGER.debug("Entering Method  Features.delete()");
-		}
-		
-		try {
-			String[] moduleGroupIds = getHttpRequest().getParameterValues(REQ_FEATURES_MOD_GRP);
-			if (ArrayUtils.isNotEmpty(moduleGroupIds)) {
-				for (String moduleGroupId : moduleGroupIds) {
-					getServiceManager().deleteFeature(moduleGroupId, getCustomerId());
-				}
-				addActionMessage(getText(FEATURE_DELETED));
-			}
-		} catch (PhrescoException e) {
-			throw new PhrescoException(e);
-		}
-	}
 	
 	public String uploadFile() throws PhrescoException {
 		if (s_isDebugEnabled) {
@@ -728,14 +554,6 @@ public class Features extends ServiceBaseAction {
 		this.helpText = helpText;
 	}
 	
-	public String getFrom() {
-        return from;
-    }
-
-    public void setFrom(String from) {
-        this.from = from;
-    }
-
 	public String getModuleGroupId() {
         return moduleGroupId;
     }

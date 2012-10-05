@@ -23,7 +23,8 @@ function clickMenu(menu, tag, form) {
 		inActivateAllMenu(menu);
 		activateMenu($(this));
 		var selectedMenu = $(this).attr("id");
-		loadContent(selectedMenu, form, tag);
+		var additionalParam = $(this).attr('additionalParam');
+		loadContent(selectedMenu, form, tag, additionalParam);
 	});
 }
 

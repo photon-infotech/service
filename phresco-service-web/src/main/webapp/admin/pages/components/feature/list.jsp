@@ -139,6 +139,6 @@
 	    params = params.concat(moduleGroupId);
 	    params = params.concat("&moduleId=");
 	    params = params.concat(moduleId);
-	    loadContent("<%= type %>Edit", $('#formFeaturesList'), $('#featureContainer'), params);
+	    loadContent("featurseEdit", $('#formFeaturesList'), $('#featureContainer'), params);
 	}
 </script>
