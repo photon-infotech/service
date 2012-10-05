@@ -18,7 +18,7 @@ public class VideoTypeConverter implements Converter<VideoTypeDAO, VideoType>, S
 	public VideoType convertDAOToObject(VideoTypeDAO dao,
 			MongoOperations mongoOperation) throws PhrescoException {
 		VideoType videoType = new VideoType();
-		videoType.setVideoInfoId(dao.getVideoInfoId());
+		videoType.setId(dao.getId());
 		videoType.setUrl(dao.getUrl());
 		videoType.setName(dao.getName());
 		videoType.setArtifactGroup(createArtifactGroup(dao.getArtifactGroupId(),mongoOperation));
@@ -34,6 +34,7 @@ public class VideoTypeConverter implements Converter<VideoTypeDAO, VideoType>, S
 	public VideoTypeDAO convertObjectToDAO(VideoType videoType)
 			throws PhrescoException {
 		VideoTypeDAO videoDAO = new VideoTypeDAO();
+		videoDAO.setId(videoType.getId());
 		videoDAO.setVideoInfoId(videoType.getVideoInfoId());
 		videoDAO.setUrl(videoType.getUrl());
 		videoDAO.setName(videoType.getName());
