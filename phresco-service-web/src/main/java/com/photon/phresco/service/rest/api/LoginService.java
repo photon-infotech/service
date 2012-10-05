@@ -81,6 +81,7 @@ public class LoginService extends DbService {
         AuthenticationUtil authTokenUtil = AuthenticationUtil.getInstance();
         user.setToken(authTokenUtil.generateToken(credentials.getUsername()));
         user.setPhrescoEnabled(true);
+        user.setValidLogin(true);
         return user;
         
         
