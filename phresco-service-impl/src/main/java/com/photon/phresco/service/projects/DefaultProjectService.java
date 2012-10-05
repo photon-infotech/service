@@ -43,6 +43,7 @@ import org.apache.log4j.Logger;
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.service.api.DependencyManager;
 import com.photon.phresco.service.api.DependencyProcessor;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.ProjectService;
@@ -66,17 +67,19 @@ public class DefaultProjectService implements ProjectService, Constants {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("createProject() ProjectInfo =" + projectInfo.getCode());
 		}
-		File filePath = PhrescoServerFactory.getNewArchetypeExecutor().execute(projectInfo);
+		File filePath = PhrescoServerFactory.getArchetypeExecutor().execute(projectInfo);
 		File[] listFiles = filePath.listFiles();
 		File projectPath = null;
 		if (listFiles.length > 0) {
 			projectPath = listFiles[0];
 		}
 		
-		DependencyProcessor dependencyProcessor = DependencyProcessorFactory.getDependencyProcessor(projectInfo);
-		if (dependencyProcessor != null) {
-			dependencyProcessor.process(projectInfo, projectPath);
-		}
+		DependencyManager dependencyManager = PhrescoServerFactory.getDependencyManager();
+		dependencyManager.configureProject(projectInfo, projectPath);
+//		DependencyProcessor dependencyProcessor = DependencyProcessorFactory.getDependencyProcessor(projectInfo);
+//		if (dependencyProcessor != null) {
+//			dependencyProcessor.process(projectInfo, projectPath);
+//		}
 ////
 //		PhrescoServerFactory.getNewDocumentGenerator().generate(projectInfo, projectPath);
 //
