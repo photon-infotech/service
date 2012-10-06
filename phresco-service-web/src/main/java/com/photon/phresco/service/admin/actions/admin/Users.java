@@ -19,7 +19,6 @@
  */
 package com.photon.phresco.service.admin.actions.admin;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -35,35 +34,33 @@ public class Users extends ServiceBaseAction {
     private static final Logger S_LOGGER = Logger.getLogger(Customers.class);
     private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
     
-    private String sync = "";
-    private boolean syncVal = false;
-
-	public String getSyncPage() throws PhrescoException {
+    public String fetchUsersFromDB() throws PhrescoException {
     	if (s_isDebugEnabled) {
-    		S_LOGGER.debug("Entering Method Users.getSyncPage()");
+    		S_LOGGER.debug("Entering Method Users.getUsersFromDB()");
     	}
-    	
+
     	try {
-    		List<User> userList = new ArrayList<User>();
-    	    syncVal = Boolean.parseBoolean(getSync());
-    		if(syncVal){
-    			userList = getServiceManager().getSyncUsers();
-    		} else {
-    			userList = getServiceManager().getUsersFromDB();
-    		}
+    		List<User> userList = getServiceManager().getUsersFromDB();
     		setReqAttribute(REQ_USER_LIST, userList);
     	} catch (PhrescoException e){
     		return showErrorPopup(e, EXCEPTION_USERS_LIST);
     	}
-    	
+
     	return ADMIN_USER_LIST;
     }
-    
-	public String getSync() {
-		return sync;
-	}
+	
+    public String syncUsers() throws PhrescoException {
+    	if (s_isDebugEnabled) {
+    		S_LOGGER.debug("Entering Method Users.getSyncUsers()");
+    	}
 
-	public void setSync(String sync) {
-		this.sync = sync;
-	}
+    	try {
+    		List<User> userList = getServiceManager().getSyncUsers();
+    		setReqAttribute(REQ_USER_LIST, userList);
+    	} catch (PhrescoException e){
+    		return showErrorPopup(e, EXCEPTION_USERS_LIST);
+    	}
+
+    	return ADMIN_USER_LIST;
+    }
 }

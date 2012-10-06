@@ -232,6 +232,9 @@ public class Archetypes extends ServiceBaseAction {
 		}
     	
         Technology technology = new Technology();
+        if (StringUtils.isNotEmpty(getTechId())) {
+        	technology.setId(getTechId());
+        }
         technology.setName(getName());
         technology.setDescription(getDescription());
         technology.setAppTypeId(getApptype());
