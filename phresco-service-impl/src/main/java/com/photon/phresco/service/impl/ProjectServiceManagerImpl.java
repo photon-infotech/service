@@ -44,11 +44,8 @@ import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.DependencyManager;
-import com.photon.phresco.service.api.DependencyProcessor;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.ProjectServiceManager;
-import com.photon.phresco.service.config.impl.ConfiguratorFactory;
-import com.photon.phresco.service.dependency.impl.DependencyProcessorFactory;
 import com.photon.phresco.util.Constants;
 import com.photon.phresco.util.Utility;
 
@@ -88,21 +85,20 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 //		if (isDebugEnabled) {
 //			S_LOGGER.info("Configure created application :" + projectInfo.getName());
 //		}
-		ConfiguratorFactory.getConfigurator(projectInfo).configure(projectInfo, projectPath);
 		return projectPath;
 	}
 
 	public File updateProject(ApplicationInfo projectInfo) throws PhrescoException {
 		File projectPath = new File(Utility.getPhrescoTemp(), UUID.randomUUID().toString()) ;
 		projectPath.mkdirs();
-		DependencyProcessor dependencyProcessor = DependencyProcessorFactory.getDependencyProcessor(projectInfo);
-		if (dependencyProcessor != null) {
-			dependencyProcessor.process(projectInfo, projectPath);
+		DependencyManager dependencyManager = PhrescoServerFactory.getDependencyManager();
+		if (dependencyManager != null) {
+			dependencyManager.configureProject(projectInfo, projectPath);
 		}
 		if (isDebugEnabled) {
 			S_LOGGER.info("successfully updated application :" + projectInfo.getName());
 		}
-		ConfiguratorFactory.getConfigurator(projectInfo).configure(projectInfo, projectPath);
+		
 		return projectPath;
 	}
 

@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.photon.phresco.commons.model.WebService;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.service.api.DbService;
+import com.photon.phresco.service.impl.DbService;
 import com.photon.phresco.util.ServiceConstants;
 import com.photon.phresco.util.TechnologyTypes;
 

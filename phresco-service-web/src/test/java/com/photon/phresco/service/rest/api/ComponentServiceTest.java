@@ -5,23 +5,35 @@ import java.util.List;
 
 import org.junit.Test;
 import org.springframework.data.document.mongodb.query.Criteria;
+import org.springframework.data.document.mongodb.query.Order;
 import org.springframework.data.document.mongodb.query.Query;
 
+import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ArtifactGroup;
-import com.photon.phresco.commons.model.ArtifactGroup.Type;
+import com.photon.phresco.commons.model.ArtifactInfo;
+import com.photon.phresco.commons.model.Customer;
+import com.photon.phresco.commons.model.DownloadInfo;
+import com.photon.phresco.commons.model.RepoInfo;
+import com.photon.phresco.commons.model.Role;
+import com.photon.phresco.commons.model.Status;
+import com.photon.phresco.commons.model.WebService;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.service.api.Converter;
-import com.photon.phresco.service.api.DbService;
-import com.photon.phresco.service.converters.ConvertersFactory;
+import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
-import com.photon.phresco.service.model.ArtifactInfo;
+import com.photon.phresco.service.dao.TechnologyDAO;
+import com.photon.phresco.service.impl.DbManagerImpl;
+import com.photon.phresco.service.impl.DbService;
+import com.photon.phresco.service.impl.DependencyManagerImpl;
+import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.ServiceConstants;
 
 
 public class ComponentServiceTest extends DbService implements ServiceConstants{
 	
+	DbManager dbManager = null;
 	public ComponentServiceTest() throws PhrescoException {
 		super();
+		dbManager = new DbManagerImpl();
 	}
 	
 //	@Ignore
@@ -586,19 +598,6 @@ public class ComponentServiceTest extends DbService implements ServiceConstants{
 ////        List<User> fromJson = gson.fromJson(response, type);
 ////        System.out.println(fromJson.size());
 //    }
+//	
 	
-	@Test
-	public void testListFind() throws PhrescoException {
-	}
-	
-	private List<ArtifactGroup> convertDAOToModule(List<ArtifactGroupDAO> moduleDAOs) throws PhrescoException {
-		Converter<ArtifactGroupDAO, ArtifactGroup> artifactConverter = 
-            (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
-	    List<ArtifactGroup> modules = new ArrayList<ArtifactGroup>();
-	    for (ArtifactGroupDAO artifactGroupDAO : moduleDAOs) {
-			ArtifactGroup artifactGroup = artifactConverter.convertDAOToObject(artifactGroupDAO, mongoOperation);
-			modules.add(artifactGroup);
-		}
-        return modules;
-    }
 }

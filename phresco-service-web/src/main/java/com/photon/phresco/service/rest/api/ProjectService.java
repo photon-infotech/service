@@ -40,11 +40,10 @@ import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.ProjectServiceManager;
-import com.photon.phresco.service.projects.ProjectServiceFactory;
 import com.photon.phresco.util.ArchiveUtil;
-import com.photon.phresco.util.ServiceConstants;
 import com.photon.phresco.util.ArchiveUtil.ArchiveType;
 import com.photon.phresco.util.FileUtil;
+import com.photon.phresco.util.ServiceConstants;
 
 /**
  * Phresco Service Class hosted at the URI path "/api"
@@ -76,7 +75,7 @@ public class ProjectService {
 			if (isDebugEnabled) {
 				S_LOGGER.debug("createProject() ProjectInfo=" + applicationInfo.getCode());
 			}
-			ProjectServiceManager projectService = ProjectServiceFactory.getNewProjectService(applicationInfo);
+			ProjectServiceManager projectService = PhrescoServerFactory.getProjectService(applicationInfo);
 			projectPath = projectService.createProject(applicationInfo);
 			
 			projectPathStr = projectPath.getPath();
@@ -150,7 +149,7 @@ public class ProjectService {
 		}
 		String projectPathStr = "";
 		try {
-			ProjectServiceManager projectService = ProjectServiceFactory.getProjectService(appInfo);
+			ProjectServiceManager projectService = PhrescoServerFactory.getProjectService(appInfo);
 			File projectPath = projectService.updateProject(appInfo);
 			projectPathStr = projectPath.getPath();
 			if (isDebugEnabled) {
@@ -181,7 +180,7 @@ public class ProjectService {
 		}
 		String projectPathStr = "";
 		try {
-			ProjectServiceManager projectService = ProjectServiceFactory.getProjectService(appInfo);
+			ProjectServiceManager projectService = PhrescoServerFactory.getProjectService(appInfo);
 			File projectPath = projectService.updateDocumentProject(appInfo);
 			projectPathStr = projectPath.getPath();
 			ArchiveUtil.createArchive(projectPathStr, projectPathStr + ZIP, ArchiveType.ZIP);

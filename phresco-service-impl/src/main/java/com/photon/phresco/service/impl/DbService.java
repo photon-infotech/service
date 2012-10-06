@@ -18,7 +18,7 @@
  * ###
  */
 
-package com.photon.phresco.service.api;
+package com.photon.phresco.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +34,8 @@ import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.DownloadInfo;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.service.api.Converter;
+import com.photon.phresco.service.api.MongoConfig;
 import com.photon.phresco.service.converters.ConvertersFactory;
 import com.photon.phresco.service.dao.ApplicationInfoDAO;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;

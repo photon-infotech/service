@@ -1,7 +1,7 @@
 package com.photon.phresco.service.rest.api;
 
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.service.api.DbService;
+import com.photon.phresco.service.impl.DbService;
 import com.photon.phresco.util.ServiceConstants;
 
 public class AdminServiceTest extends DbService implements ServiceConstants{

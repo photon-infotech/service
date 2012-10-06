@@ -70,11 +70,11 @@ import com.photon.phresco.commons.model.CoreOption;
 import com.photon.phresco.commons.model.RequiredOption;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.Converter;
-import com.photon.phresco.service.api.DbService;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.converters.ConvertersFactory;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
+import com.photon.phresco.service.impl.DbService;
 import com.photon.phresco.util.ServiceConstants;
 import com.photon.phresco.util.TechnologyTypes;
 

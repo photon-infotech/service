@@ -9,10 +9,10 @@ import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.TechnologyInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.Converter;
-import com.photon.phresco.service.api.DbService;
 import com.photon.phresco.service.converters.ConvertersFactory;
 import com.photon.phresco.service.dao.ApplicationInfoDAO;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
+import com.photon.phresco.service.impl.DbService;
 import com.photon.phresco.util.TechnologyTypes;
 
 public class PilotProjectInfoGenerator extends DbService {
