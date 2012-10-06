@@ -57,7 +57,6 @@ import com.photon.phresco.commons.model.VideoType;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.exception.PhrescoWebServiceException;
 import com.photon.phresco.service.api.Converter;
-import com.photon.phresco.service.api.DbService;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.client.impl.ClientHelper;
@@ -67,6 +66,7 @@ import com.photon.phresco.service.dao.ArtifactGroupDAO;
 import com.photon.phresco.service.dao.DownloadsDAO;
 import com.photon.phresco.service.dao.VideoInfoDAO;
 import com.photon.phresco.service.dao.VideoTypeDAO;
+import com.photon.phresco.service.impl.DbService;
 import com.photon.phresco.service.model.ArtifactInfo;
 import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.FileUtil;
@@ -267,11 +267,17 @@ public class AdminService extends DbService {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.findVideos()");
 	    }
-		
+		List<VideoInfo> videoInfos = new ArrayList<VideoInfo>();
 		try {
-			List<VideoInfo> videoList = mongoOperation.getCollection(VIDEOS_COLLECTION_NAME , VideoInfo.class);
+			List<VideoInfoDAO> videoList = mongoOperation.getCollection(VIDEODAO_COLLECTION_NAME , VideoInfoDAO.class);
 			if (videoList != null) {
-				return Response.status(Response.Status.OK).entity(videoList).build(); 
+				Converter<VideoInfoDAO, VideoInfo> videoInfoConverter = 
+						(Converter<VideoInfoDAO, VideoInfo>) ConvertersFactory.getConverter(VideoInfoDAO.class);
+				for (VideoInfoDAO videoInfoDAO : videoList) {
+					VideoInfo videoInfo = videoInfoConverter.convertDAOToObject(videoInfoDAO, mongoOperation);
+					videoInfos.add(videoInfo);
+				}
+				return Response.status(Response.Status.OK).entity(videoInfos).build(); 
 			}
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, VIDEOS_COLLECTION_NAME);
@@ -345,23 +351,26 @@ public class AdminService extends DbService {
 		Converter<VideoInfoDAO, VideoInfo> converter = 
 	            (Converter<VideoInfoDAO, VideoInfo>) ConvertersFactory.getConverter(VideoInfoDAO.class);
 		VideoInfoDAO videoDAO = converter.convertObjectToDAO(video);
-		mongoOperation.save(VIDEODAO_COLLECTION_NAME, videoDAO);
+//		mongoOperation.save(VIDEODAO_COLLECTION_NAME, videoDAO);
+		List<String> videoTypeIds = new ArrayList<String>();
 		Converter<VideoTypeDAO, VideoType> videoTypeConverter = 
 				(Converter<VideoTypeDAO, VideoType>)ConvertersFactory.getConverter(VideoTypeDAO.class);
 		List<VideoType> videoTypes = video.getVideoList();
 		for(VideoType videoType : videoTypes){
-		VideoTypeDAO videoTypeDAO = videoTypeConverter.convertObjectToDAO(videoType);
-		
-		VideoTypeDAO findOne = mongoOperation.findOne(VIDEOTYPESDAO_COLLECTION_NAME, 
-				new Query(Criteria.where(REST_API_NAME).is(videoTypeDAO.getName())), VideoTypeDAO.class);
-		if(findOne!=null){
-			videoTypeDAO.setArtifactGroupId(findOne.getArtifactGroupId());
-			videoTypeDAO.setId(findOne.getId());
+			videoTypeIds.add(videoType.getId());
+			VideoTypeDAO videoTypeDAO = videoTypeConverter.convertObjectToDAO(videoType);
+			
+			VideoTypeDAO findOne = mongoOperation.findOne(VIDEOTYPESDAO_COLLECTION_NAME, 
+					new Query(Criteria.where(REST_API_NAME).is(videoTypeDAO.getName())), VideoTypeDAO.class);
+			if(findOne!=null){
+				videoTypeDAO.setArtifactGroupId(findOne.getArtifactGroupId());
+				videoTypeDAO.setId(findOne.getId());
+			}
+			ArtifactGroup artifactGroup = videoType.getArtifactGroup();
+			saveModuleGroup(artifactGroup);
+			mongoOperation.save(VIDEOTYPESDAO_COLLECTION_NAME, videoTypeDAO);
 		}
-		ArtifactGroup artifactGroup = videoType.getArtifactGroup();
-		saveModuleGroup(artifactGroup);
-		mongoOperation.save(VIDEOTYPESDAO_COLLECTION_NAME, videoTypeDAO);
-		}
+		videoDAO.setVideoListId(videoTypeIds);
 		mongoOperation.save(VIDEODAO_COLLECTION_NAME, videoDAO);
 	}
 
@@ -482,13 +491,16 @@ public class AdminService extends DbService {
 	    }
 		
 		try {
-			VideoInfo videoInfo = mongoOperation.findOne(VIDEOS_COLLECTION_NAME, 
-			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), VideoInfo.class);
+			VideoInfoDAO videoInfo = mongoOperation.findOne(VIDEODAO_COLLECTION_NAME, 
+			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), VideoInfoDAO.class);
 			if (videoInfo != null) {
-				return Response.status(Response.Status.OK).entity(videoInfo).build();
-			} 
+				Converter<VideoInfoDAO, VideoInfo> videoInfoConverter = 
+						(Converter<VideoInfoDAO, VideoInfo>) ConvertersFactory.getConverter(VideoInfoDAO.class);
+					VideoInfo videoInfos = videoInfoConverter.convertDAOToObject(videoInfo, mongoOperation);
+				return Response.status(Response.Status.OK).entity(videoInfos).build(); 
+			}
 		} catch (Exception e) {
-			throw new PhrescoWebServiceException(e, EX_PHEX00005, VIDEOS_COLLECTION_NAME);
+			throw new PhrescoWebServiceException(e, EX_PHEX00005, VIDEODAO_COLLECTION_NAME);
 		}
 		
 		return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
@@ -536,14 +548,16 @@ public class AdminService extends DbService {
 		try {
 			VideoInfoDAO videoInfoDAO = mongoOperation.findOne(VIDEODAO_COLLECTION_NAME, 
 					new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), VideoInfoDAO.class);
-			String videoListId = videoInfoDAO.getVideoListId();
+			List<String> videoListId = videoInfoDAO.getVideoListId();
+			for(String videoTypeListId : videoListId){
 			VideoTypeDAO videoTypeDAO = mongoOperation.findOne(VIDEOTYPESDAO_COLLECTION_NAME, 
-					new Query(Criteria.where(DB_COLUMN_VIDEOINFOID).is(videoListId)), VideoTypeDAO.class);
+					new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(videoTypeListId)), VideoTypeDAO.class);
 			String artifactGroupId = videoTypeDAO.getArtifactGroupId();
 			deleteArtifacts(artifactGroupId);
 			mongoOperation.remove(VIDEOTYPESDAO_COLLECTION_NAME, 
-					new Query(Criteria.where(DB_COLUMN_VIDEOINFOID).is(videoListId)),VideoType.class);
+					new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(videoTypeListId)),VideoType.class);
 			mongoOperation.remove(VIDEODAO_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), VideoInfo.class);
+			}
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
 		}

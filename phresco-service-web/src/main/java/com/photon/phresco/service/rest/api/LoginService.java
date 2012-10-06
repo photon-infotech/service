@@ -27,10 +27,10 @@ import javax.ws.rs.core.MediaType;
 
 import com.photon.phresco.commons.model.User;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.service.api.DbService;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
-import com.photon.phresco.service.util.AuthenticationUtil;
+import com.photon.phresco.service.impl.DbService;
+import com.photon.phresco.service.rest.util.AuthenticationUtil;
 import com.photon.phresco.service.util.ServerConstants;
 import com.photon.phresco.util.Credentials;
 import com.photon.phresco.util.ServiceConstants;
@@ -81,6 +81,7 @@ public class LoginService extends DbService {
         AuthenticationUtil authTokenUtil = AuthenticationUtil.getInstance();
         user.setToken(authTokenUtil.generateToken(credentials.getUsername()));
         user.setPhrescoEnabled(true);
+        user.setValidLogin(true);
         return user;
         
         
