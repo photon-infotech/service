@@ -17,14 +17,14 @@
  * limitations under the License.
  * ###
  */
-package com.photon.phresco.service.interceptors;
+package com.photon.phresco.service.rest.interceptors;
 
 import java.net.URI;
 
 import org.apache.log4j.Logger;
 
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.service.util.AuthenticationUtil;
+import com.photon.phresco.service.rest.util.AuthenticationUtil;
 import com.photon.phresco.util.Constants;
 import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.spi.container.ContainerRequest;

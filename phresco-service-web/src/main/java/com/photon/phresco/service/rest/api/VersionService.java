@@ -17,7 +17,7 @@
  * limitations under the License.
  * ###
  */
-package com.photon.phresco.service;
+package com.photon.phresco.service.rest.api;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,10 +38,12 @@ import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.util.ServerConstants;
+import com.photon.phresco.util.ServiceConstants;
 
-@Path("/version")
+@Path(ServiceConstants.REST_API_VERSION)
 public class VersionService implements ServerConstants {
 	
+	private static final String VERSION_PATH = "{version}";
 	private static final String VERSION = "version";
 	private static final String STR_DOT = ".";
 	private static final String STR_HIPHEN = "-";
@@ -52,8 +54,8 @@ public class VersionService implements ServerConstants {
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 
 	@GET
-	@Path("{version}")
-	@Produces({ MediaType.APPLICATION_JSON })
+	@Path(VERSION_PATH)
+	@Produces({MediaType.APPLICATION_JSON})
 	public VersionInfo getVersionJSON(@PathParam(VERSION) String currentVersion) throws VersionRangeResolutionException, PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method VersionServic.getVersionJSON(@PathParam(version) String currentVersion)");

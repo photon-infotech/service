@@ -36,27 +36,28 @@
 package com.photon.phresco.service.projects;
 
 import com.photon.phresco.commons.model.ApplicationInfo;
-import com.photon.phresco.service.api.ProjectService;
+import com.photon.phresco.service.api.ProjectServiceManager;
+import com.photon.phresco.service.impl.ProjectServiceManagerImpl;
 
 public class ProjectServiceFactory {
 
 //	private static Map<String, ProjectService> projectServiceCache = new HashMap<String, ProjectService>();
 	
-	private static ProjectService SERVERINSTANCE = null;
+	private static ProjectServiceManager SERVERINSTANCE = null;
 
 	private ProjectServiceFactory(){
 		//prevent instantiation
 	}
 	
-	public static synchronized ProjectService getProjectService(ApplicationInfo appInfo) {
+	public static synchronized ProjectServiceManager getProjectService(ApplicationInfo appInfo) {
 		assert appInfo != null;
 		//irrespective of Technology return the DefaultProjectService. Change this when new Project Service is required.
 		if (SERVERINSTANCE == null) {
-			SERVERINSTANCE = new DefaultProjectService();
+			SERVERINSTANCE = new ProjectServiceManagerImpl();
 		}
 		return SERVERINSTANCE;
 	}
-	public static synchronized ProjectService getNewProjectService(ApplicationInfo appInfo) {
-		return new DefaultProjectService();
+	public static synchronized ProjectServiceManager getNewProjectService(ApplicationInfo appInfo) {
+		return new ProjectServiceManagerImpl();
 	}
 }

@@ -17,7 +17,7 @@
  * limitations under the License.
  * ###
  */
-package com.photon.phresco.service;
+package com.photon.phresco.service.rest.api;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -51,9 +51,9 @@ import com.photon.phresco.util.ServiceConstants;
  * Example resource class hosted at the URI path "/video"
  */
 @Path("/homepagevideos")
-public class HomePageService implements ServerConstants {
+public class VideoService implements ServerConstants {
 	private static final String FILE = "file";
-    private static final Logger S_LOGGER = Logger.getLogger(HomePageService.class);
+    private static final Logger S_LOGGER = Logger.getLogger(VideoService.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })

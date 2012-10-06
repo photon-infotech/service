@@ -1,4 +1,4 @@
-package com.photon.phresco.service.util;
+package com.photon.phresco.service.rest.util;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

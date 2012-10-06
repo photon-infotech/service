@@ -41,7 +41,7 @@
 		</init-param>
         <init-param>
   			<param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name>
-  			<param-value>com.photon.phresco.service.interceptors.SecurityInterceptor</param-value>
+  			<param-value>com.photon.phresco.service.rest.interceptors.SecurityInterceptor</param-value>
 		</init-param>
 		<init-param>
 			<param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>

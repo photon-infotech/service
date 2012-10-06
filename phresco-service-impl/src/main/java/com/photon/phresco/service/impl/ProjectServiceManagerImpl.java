@@ -33,7 +33,7 @@
  * Contributors:
  *     Photon - initial API and implementation
  ******************************************************************************/
-package com.photon.phresco.service.projects;
+package com.photon.phresco.service.impl;
 
 import java.io.File;
 import java.util.UUID;
@@ -46,14 +46,15 @@ import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.DependencyManager;
 import com.photon.phresco.service.api.DependencyProcessor;
 import com.photon.phresco.service.api.PhrescoServerFactory;
-import com.photon.phresco.service.api.ProjectService;
+import com.photon.phresco.service.api.ProjectServiceManager;
 import com.photon.phresco.service.config.impl.ConfiguratorFactory;
 import com.photon.phresco.service.dependency.impl.DependencyProcessorFactory;
 import com.photon.phresco.util.Constants;
 import com.photon.phresco.util.Utility;
 
-public class DefaultProjectService implements ProjectService, Constants {
-	private static final Logger S_LOGGER = Logger.getLogger(DefaultProjectService.class);
+public class ProjectServiceManagerImpl implements ProjectServiceManager, Constants {
+	
+	private static final Logger S_LOGGER = Logger.getLogger(ProjectServiceManagerImpl.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 
 	public synchronized File createProject(ApplicationInfo projectInfo) throws PhrescoException {

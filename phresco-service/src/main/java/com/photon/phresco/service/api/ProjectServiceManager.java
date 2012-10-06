@@ -47,7 +47,7 @@ import com.photon.phresco.exception.PhrescoException;
  * @author arunachalam_l
  *
  */
-public interface ProjectService {
+public interface ProjectServiceManager {
 	
 	/**
 	 * @param projectInfo

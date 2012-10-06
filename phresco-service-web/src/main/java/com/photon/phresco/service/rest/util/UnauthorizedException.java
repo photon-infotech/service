@@ -1,4 +1,4 @@
-package com.photon.phresco.service.util;
+package com.photon.phresco.service.rest.util;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;

@@ -39,7 +39,7 @@ import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.PhrescoServerFactory;
-import com.photon.phresco.service.api.ProjectService;
+import com.photon.phresco.service.api.ProjectServiceManager;
 import com.photon.phresco.service.projects.ProjectServiceFactory;
 import com.photon.phresco.util.ArchiveUtil;
 import com.photon.phresco.util.ServiceConstants;
@@ -51,15 +51,15 @@ import com.photon.phresco.util.FileUtil;
  */
 
 @Path(ServiceConstants.REST_API_PROJECT)
-public class PhrescoService {
+public class ProjectService {
 	private static final String ZIP = ".zip";
-    private static final Logger S_LOGGER = Logger.getLogger(PhrescoService.class);
+    private static final Logger S_LOGGER = Logger.getLogger(ProjectService.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	private DbManager dbManager = null;
 	
-	public PhrescoService() throws PhrescoException {
-     PhrescoServerFactory.initialize();
-     dbManager = PhrescoServerFactory.getDbManager();
+	public ProjectService() throws PhrescoException {
+		PhrescoServerFactory.initialize();
+		dbManager = PhrescoServerFactory.getDbManager();
     }
 	
 	@POST
@@ -76,7 +76,7 @@ public class PhrescoService {
 			if (isDebugEnabled) {
 				S_LOGGER.debug("createProject() ProjectInfo=" + applicationInfo.getCode());
 			}
-			ProjectService projectService = ProjectServiceFactory.getNewProjectService(applicationInfo);
+			ProjectServiceManager projectService = ProjectServiceFactory.getNewProjectService(applicationInfo);
 			projectPath = projectService.createProject(applicationInfo);
 			
 			projectPathStr = projectPath.getPath();
@@ -150,7 +150,7 @@ public class PhrescoService {
 		}
 		String projectPathStr = "";
 		try {
-			ProjectService projectService = ProjectServiceFactory.getProjectService(appInfo);
+			ProjectServiceManager projectService = ProjectServiceFactory.getProjectService(appInfo);
 			File projectPath = projectService.updateProject(appInfo);
 			projectPathStr = projectPath.getPath();
 			if (isDebugEnabled) {
@@ -181,7 +181,7 @@ public class PhrescoService {
 		}
 		String projectPathStr = "";
 		try {
-			ProjectService projectService = ProjectServiceFactory.getProjectService(appInfo);
+			ProjectServiceManager projectService = ProjectServiceFactory.getProjectService(appInfo);
 			File projectPath = projectService.updateDocumentProject(appInfo);
 			projectPathStr = projectPath.getPath();
 			ArchiveUtil.createArchive(projectPathStr, projectPathStr + ZIP, ArchiveType.ZIP);
