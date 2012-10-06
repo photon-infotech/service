@@ -31,7 +31,7 @@
 
 <form id="formPermissionList" class="form-horizontal customer_list">
 	<div class="operation" id="operation">
-		<input type="button" id="del" class="btn" disabled value="<s:text name='lbl.hdr.adm.delete'/>"
+		<input type="button" id="del" class="btn" disabled value="<s:text name='lbl.btn.del'/>"
 			onclick="showDeleteConfirmation('<s:text name='del.confirm.permission'/>');"/>
 	</div>
 	
@@ -49,7 +49,7 @@
 							</th>
 							<th class="second">
 								<div class="th-inner tablehead">
-								<s:label key="lbl.hdr.adm.prmlst.name" theme="simple"/></div>
+								<s:label key="lbl.name" theme="simple"/></div>
 							</th>
 							<th class="third">
 								<div class="th-inner tablehead"><s:label key="lbl.hdr.adm.prmlst.prms" theme="simple"/></div>

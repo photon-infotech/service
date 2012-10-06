@@ -22,7 +22,7 @@
 <form class="form-horizontal customer_list">
 	<div class="operation" id="operation">
 		<input type="button" id="ldapAdd" class="btn" disabled name="ldap_add" value="<s:text name='lbl.hdr.adm.ldapadd'/>"/>
-		<input type="button" id="del" class="btn" disabled value="<s:text name='lbl.hdr.adm.delete'/>"/>
+		<input type="button" id="del" class="btn" disabled value="<s:text name='lbl.btn.del'/>"/>
 	</div>
 	
 	<div class="table_div">
@@ -38,10 +38,10 @@
 									</div>
 								</th>
 								<th class="second">
-									<div class="th-inner tablehead"><s:label key="lbl.hdr.adm.ldaplst.name" theme="simple"/></div>
+									<div class="th-inner tablehead"><s:label key="lbl.name" theme="simple"/></div>
 								</th>
 								<th class="second">
-									<div class="th-inner tablehead"><s:label key="lbl.hdr.adm.ldaplst.desc" theme="simple"/></div>
+									<div class="th-inner tablehead"><s:label key="lbl.desc" theme="simple"/></div>
 								</th>
 							</tr>
 						</thead>

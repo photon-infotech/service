@@ -55,7 +55,7 @@
 	<div class="content_adder">
 		<div class="control-group" id="nameControl">
 			<label class="control-label labelbold">
-				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.name'/>
+				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.name'/>
 			</label>
 			<div class="controls">
 				<input id="globalUrlName" placeholder="<s:text name='place.hldr.globalurl.add.name'/>" value= "<%= name %>" maxlength="30" title="30 Characters only"
@@ -66,7 +66,7 @@
 		
 		<div class="control-group">
 			<label class="control-label labelbold">
-				<s:text name='lbl.hdr.adm.desc'/>
+				<s:text name='lbl.desc'/>
 			</label>
 			<div class="controls">
 				<textarea id="globalUrlDesc" placeholder="<s:text name='place.hldr.globalurl.add.desc'/>" value="<%= description %>" maxlength="150" title="150 Characters only"
@@ -91,15 +91,15 @@
 	  	<% if (StringUtils.isNotEmpty(fromPage)) { %>
 		<input type="button" id="globalurlUpdate" class="btn btn-primary"
 				onclick="validate('globalurlUpdate', $('#formGlobalUrlAdd'), $('#subcontainer'), 'Updating GlobalURL');" 
-		        value="<s:text name='lbl.hdr.comp.update'/>"/>
+		        value="<s:text name='lbl.btn.edit'/>"/>
     <% } else { %>		
 		<input type="button" id="globalurlSave" class="btn btn-primary"
 		        onclick="validate('globalurlSave', $('#formGlobalUrlAdd'), $('#subcontainer'), 'Creating GlobalURL');" 
-		        value="<s:text name='lbl.hdr.comp.save'/>"/>
+		        value="<s:text name='lbl.btn.add'/>"/>
 	<% } %> 
 		<input type="button" id="globalurlCancel" class="btn btn-primary" 
 		                   onclick="loadContent('globalurlList', $('#formGlobalUrlAdd'), $('#subcontainer'));" 
-		                         value="<s:text name='lbl.hdr.comp.cancel'/>"/>
+		                         value="<s:text name='lbl.btn.cancel'/>"/>
 	</div>
 	
 	<!-- Hidden Fields -->

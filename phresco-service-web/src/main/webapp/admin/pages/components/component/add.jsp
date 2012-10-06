@@ -270,13 +270,13 @@
 			}
 		%>
 		<% if (StringUtils.isNotEmpty(fromPage)) { %>
-			<input type="button" id="componentUpdate" class="btn <%= disabledClass %>" <%= disabled %> value="<s:text name='lbl.hdr.comp.update'/>" 
+			<input type="button" id="componentUpdate" class="btn <%= disabledClass %>" <%= disabled %> value="<s:text name='lbl.btn.edit'/>" 
 				onclick="validate('componentUpdate', $('#formComponentAdd'), $('#subcontainer'), 'Updating Component', $('#jarDetailsDiv :input'));"/> 
 		<% } else { %>
-			<input type="button" id="componentSave" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.save'/>" 
+			<input type="button" id="componentSave" class="btn btn-primary" value="<s:text name='lbl.btn.add'/>" 
 				onclick="validate('componentSave', $('#formComponentAdd'), $('#subcontainer'), 'Creating Component', $('#jarDetailsDiv :input'));"/> 
 		<% } %>
-		<input type="button" id="componentCancel" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.cancel'/>"
+		<input type="button" id="componentCancel" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>"
 			onclick="loadContent('componentList', $('#formComponentAdd'), $('#subcontainer'));" />
 	</div>
 	

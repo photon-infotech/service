@@ -1,96 +1,102 @@
 package com.photon.phresco.service.admin.actions;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.photon.phresco.commons.model.User;
-import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.service.util.ServerUtil;
 
 public class Login extends ServiceBaseAction {
 
 	private static final long serialVersionUID = -1858839078372821734L;
 	private static final Logger S_LOGGER = Logger.getLogger(Login.class);
-	private static Boolean s_debugEnabled = S_LOGGER.isDebugEnabled();
+	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
+	private static Boolean debugEnabled  = S_LOGGER.isDebugEnabled();
 	
-	private String username = "";
-	private String password = "";
-	
+	private String username = null;
+	private String password = null;
 	private boolean loginFirst = true;
 	
-	private boolean errorFound = false;
-	
-	private String errorMsg;
-	
 	public String login() {
-	    if (s_debugEnabled) {
+	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method  Login.login()");
 	    }
 	    
-	    User user = (User) getSessionAttribute(SESSION_USER_INFO);
+	    User user = (User) getHttpSession().getAttribute(SESSION_USER_INFO);
 	    if (user != null) {
 	    	return SUCCESS;
 	    }
+	    if (loginFirst) {
+	    	getHttpRequest().setAttribute(REQ_LOGIN_ERROR, "");
+        	return LOGIN_FAILURE;	
+		}
+		if (validateLogin()) {
+			return authenticate();
+		}
 		
 		return LOGIN_FAILURE;
 	}
 	
 	public String logout() {
-		if (s_debugEnabled) {
+		if (debugEnabled) {
 			S_LOGGER.debug("Entering Method  Login.logout()");
 		}
 		
-		removeSessionAttribute(SESSION_USER_INFO);
-		String errorTxt = (String) getSessionAttribute(REQ_LOGIN_ERROR);
+		getHttpSession().removeAttribute(SESSION_USER_INFO);
+		String errorTxt = (String) getHttpSession().getAttribute(REQ_LOGIN_ERROR);
 		if (StringUtils.isNotEmpty(errorTxt)) {
-			setReqAttribute(REQ_LOGIN_ERROR, getText(errorTxt));
+			getHttpRequest().setAttribute(REQ_LOGIN_ERROR, getText(errorTxt));
 		} else {
-			setReqAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_SUCCESS_LOGOUT));
+			getHttpRequest().setAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_SUCCESS_LOGOUT));
 		}
-		removeSessionAttribute(REQ_LOGIN_ERROR);
+		getHttpSession().removeAttribute(REQ_LOGIN_ERROR);
 		
         return SUCCESS;
     }
 	
-	public String authenticate() {
-	    if (s_debugEnabled) {
+	private String authenticate() {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entering Method  Login.authenticate()");
+	    }
+		
+		User user = null;
+		try {
+			byte[] encodeBase64 = Base64.encodeBase64(password.getBytes());
+			String encodedPassword = new String(encodeBase64);
+			
+			user = doLogin(username, encodedPassword);
+			if (StringUtils.isEmpty(user.getDisplayName())) {
+				getHttpRequest().setAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_ERROR_LOGIN));
+				
+				return LOGIN_FAILURE;
+			}
+			if (!user.isPhrescoEnabled()) {
+				getHttpRequest().setAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_ERROR_LOGIN_ACCESS_DENIED));
+				
+				return LOGIN_FAILURE;
+			}
+			getHttpSession().setAttribute(SESSION_USER_INFO, user);
+		} catch (Exception e) {
+			return LOGIN_FAILURE;
+		}
+			
+		return SUCCESS;
+	}
+
+	private boolean validateLogin() {
+	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method  Login.validateLogin()");
 	    }
 		
-	    // Username and passwor empty field validation
-		if (StringUtils.isEmpty(getUsername()) || StringUtils.isEmpty(getPassword())) {
-		    setErrorFound(true);
-		    setErrorMsg(getText(KEY_I18N_LOGIN_EMPTY_CRED));
-		    return SUCCESS;
+		if(StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
+			getHttpRequest().setAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_LOGIN_EMPTY_CRED));
+			return false;
 		}
-
-		try {
-	        String encodedPassword = ServerUtil.encryptString(getPassword());
-		    User user = doLogin(getUsername(), encodedPassword);
-		    
-		    // username and password validation
-		    if (!user.isValidLogin()) {
-		        setErrorFound(true);
-		        setErrorMsg(getText(KEY_I18N_ERROR_LOGIN));
-		        return SUCCESS;
-		    }
-		    
-		    // phresco enabled usename validation
-		    if (!user.isPhrescoEnabled()) {
-		        setErrorFound(true);
-		        setErrorMsg(getText(KEY_I18N_ERROR_LOGIN_ACCESS_DENIED));
-		        return SUCCESS;
-		    }
-		    
-		    // userInfo setting into the session if validated
-		    setSessionAttribute(SESSION_USER_INFO, user);
-		} catch (PhrescoException e) {
-		    return showErrorPopup(e, EXCEPTION_LOGIN);
-		}
-		return DASHBOARD_LIST;
+		
+		return true;
 	}
 	
-    public String getUsername() {
+	public String getUsername() {
 		return username;
 	}
 
@@ -113,21 +119,4 @@ public class Login extends ServiceBaseAction {
 	public void setLoginFirst(boolean loginFirst) {
 		this.loginFirst = loginFirst;
 	}
-
-	public boolean isErrorFound() {
-        return errorFound;
-	}
-
-	public void setErrorFound(boolean errorFound) {
-	    this.errorFound = errorFound;
-	}
-
-	public String getErrorMsg() {
-        return errorMsg;
-	}
-
-	public void setErrorMsg(String errorMsg) {
-	    this.errorMsg = errorMsg;
-	}
-
 }

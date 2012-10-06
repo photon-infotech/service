@@ -22,6 +22,8 @@
 
 <%@ page import="com.photon.phresco.commons.model.User"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
+
+<!DOCTYPE html>
 <html>
 	<head>
 		<title>Phresco</title>
@@ -31,10 +33,8 @@
 		
 		<link rel="stylesheet" href="css/bootstrap.css">
 		<link rel="stylesheet" href="theme/photon/css/phresco.css">
-        <link type="text/css" rel="stylesheet" class="changeme" id="theme">
-        
+		<link rel="stylesheet" href="" class="changeme" title="phresco">
 		<link rel="stylesheet" href="css/media-queries.css">
-		
 		<link rel="stylesheet" href="css/datepicker.css"> <!-- used for date picker-->
 		<link rel="stylesheet" href="css/jquery.ui.all.css"> <!-- used for date picker -->
  		<link rel="stylesheet" href="css/fileuploader.css"> <!-- used for file upload -->
@@ -43,22 +43,18 @@
 		<script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
 		<script type="text/javascript" src="js/jquery-ui-1.8.18.custom.min.js"></script>
 		
-		<!-- commons.js -->
-		<script type="text/javascript" src="js/common.js"></script>
-		
-		<!-- right panel scroll bar -->
-		<script type="text/javascript" src="js/home.js"></script>
-		<script type="text/javascript" src="js/main.js"></script>
-		
 		<!-- document resizer -->
 		<script type="text/javascript" src="js/windowResizer.js"></script>
-
+		
 		<script type="text/javascript" src="js/loading.js"></script>
 		
 		<!-- Pop Up box -->
 		<script type="text/javascript" src="js/bootstrap-modal.js"></script>
 		<script type="text/javascript" src="js/bootstrap-transition.js"></script>
 		
+		<!-- right panel scroll bar -->
+		<script type="text/javascript" src="js/home.js"></script>
+		<script type="text/javascript" src="js/common.js"></script>
 		
 		<!-- file upload -->
 		<script type="text/javascript" src="js/fileuploader.js"></script>
@@ -66,7 +62,7 @@
 		<!-- date picker -->
 		<script type="text/javascript" src="js/jquery.ui.datepicker.js"></script>
 	   	<script type="text/javascript" src="js/jquery.cookie.js"></script>
-
+		
 		<!-- Scrollbar -->
 		<script type="text/javascript" src="js/scrollbars.js"></script>
 		<script type="text/javascript" src="js/main.js"></script>
@@ -76,9 +72,9 @@
 		<script type="text/javascript" src="js/mousehold.js"></script>
 			
 		<script type="text/javascript">
-		   
+		    changeTheme(); 
+		
 		    $(document).ready(function() {
-		     	changeTheme(); 
 		    	enableScreen();
 		    	
 				$(".styles").click(function() {
@@ -182,6 +178,7 @@
 			</div>
 		</header>
 		<!-- Header Ends Here -->
+		
 		
 		<!-- Content Starts Here -->
 		<section class="main_wrapper">

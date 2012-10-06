@@ -39,7 +39,7 @@
 		            value="<s:text name='lbl.hdr.adm.rlelst.add'/>"/>
 		
 		<input type="button" id="del" class="btn" disabled value="<s:text 
-		        name='lbl.hdr.adm.delete'/>"  onclick="loadContent('roleDelete', $('#formRoleList'), $('#subcontainer'));"/>
+		        name='lbl.btn.del'/>"  onclick="loadContent('roleDelete', $('#formRoleList'), $('#subcontainer'));"/>
 		<s:if test="hasActionMessages()">
 			<div class="alert alert-success alert-message"  id="successmsg">
 				<s:actionmessage />
@@ -70,10 +70,10 @@
 								</div>
 							</th>
 							<th class="second">
-								<div class="th-inner tablehead"><s:label key="lbl.hdr.adm.rlelst.name" theme="simple"/></div>
+								<div class="th-inner tablehead"><s:label key="lbl.name" theme="simple"/></div>
 							</th>
 							<th class="third">
-								<div class="th-inner tablehead"><s:label key="lbl.hdr.adm.rlelst.desc" theme="simple"/></div>
+								<div class="th-inner tablehead"><s:label key="lbl.desc" theme="simple"/></div>
 							</th>
 							<th class="third">
 								<div class="th-inner tablehead"><s:label key="lbl.hdr.adm.rlelst.perm" theme="simple"/></div>
@@ -142,8 +142,8 @@
 						</div>
 					</div>
 					<div class="modal-footer">
-					  <a href="#" class="btn btn-primary" data-dismiss="modal"><s:label key="lbl.hdr.comp.cancel" theme="simple"/></a>
-					  <a href="#" class="btn btn-primary" data-dismiss="modal" ><s:label key="lbl.hdr.comp.ok" theme="simple"/></a>
+					  <a href="#" class="btn btn-primary" data-dismiss="modal"><s:label key="lbl.btn.cancel" theme="simple"/></a>
+					  <a href="#" class="btn btn-primary" data-dismiss="modal" ><s:label key="lbl.btn.ok" theme="simple"/></a>
 					</div>
 				</div>
 				

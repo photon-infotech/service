@@ -49,7 +49,7 @@
 				onclick="loadContent('addFeatures', $('#formFeaturesList'), $('#subcontainer'));" 
 				value="<s:text name='lbl.hdr.comp.component.add'/>"/>
 		<% } %>		
-			<input type="button" class="btn" id="del" disabled value="<s:text name='lbl.hdr.comp.delete'/>" 
+			<input type="button" class="btn" id="del" disabled value="<s:text name='lbl.btn.del'/>" 
 				onclick="showDeleteConfirmation('<s:text name='del.confirm.feature'/>');"/>
 		</div>
 		

@@ -45,7 +45,7 @@
 	<div class="content_adder">
 		<div class="control-group" id="nameControl">
 			<label class="control-label labelbold">
-				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.name'/>
+				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.name'/>
 			</label>
 			<div class="controls">
 				<input id="input01" placeholder="<s:text name='place.hldr.role.add.name'/>" class="input-xlarge" type="text" 
@@ -56,7 +56,7 @@
 		
 		<div class="control-group">
 			<label class="control-label labelbold">
-				<s:text name='lbl.hdr.adm.desc'/>
+				<s:text name='lbl.desc'/>
 			</label>
 			<div class="controls">
 				<input id="input01" placeholder="<s:text name='place.hldr.role.add.desc'/>" class="input-xlarge" type="text" 
@@ -67,13 +67,13 @@
 	
 	<div class="bottom_button">
 		<% if(StringUtils.isNotEmpty(fromPage)) { %>
-			<input type="button" id="roleUpdate" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.update'/>"
+			<input type="button" id="roleUpdate" class="btn btn-primary" value="<s:text name='lbl.btn.edit'/>"
 		 		onclick="validate('roleUpdate',$('#formRoleAdd'),$('#subcontainer'), '<s:text name='lbl.prog.role.update'/>');" />
 		<% } else { %> 
-			<input type="button" id="roleSave" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.save'/>"
+			<input type="button" id="roleSave" class="btn btn-primary" value="<s:text name='lbl.btn.add'/>"
 				onclick="validate('roleSave',$('#formRoleAdd'),$('#subcontainer'), '<s:text name='lbl.prog.role.save'/>');" />
 		<% } %>
-		<input type="button" id="roleCancel" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.cancel'/>" 
+		<input type="button" id="roleCancel" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>" 
 			onclick="loadContent('roleList', $('#formRoleAdd'), $('#subcontainer'));" />
 	</div>
 	

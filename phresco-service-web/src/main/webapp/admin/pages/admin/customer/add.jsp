@@ -99,7 +99,7 @@
 	<div class="content_adder">
 		<div class="control-group" id ="nameControl">
 			<label class="control-label labelbold">
-				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.name'/>
+				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.name'/>
 			</label>
 			<div class="controls">
 				<input id="custmname" placeholder="<s:text name='place.hldr.cust.add.name'/>" class="input-xlarge" name="name" type="text" 
@@ -110,7 +110,7 @@
 
 		<div class="control-group">
 			<label class="control-label labelbold">
-				<s:text name='lbl.hdr.adm.desc'/>
+				<s:text name='lbl.desc'/>
 			</label>
 			<div class="controls">
 				<textarea id="textarea" placeholder="<s:text name='place.hldr.cust.add.desc'/>" class="input-xlarge" rows="3" 
@@ -505,13 +505,13 @@
 
 	<div class="bottom_button">
 		<% if (StringUtils.isNotEmpty(fromPage)) { %>
-				<input type="button" id="customerUpdate" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.update'/>" 
+				<input type="button" id="customerUpdate" class="btn btn-primary" value="<s:text name='lbl.btn.edit'/>" 
 				    onclick="validate('customerUpdate', $('#formCustomerAdd'), $('#subcontainer'), 'Updating Customer');" />
 		<% } else { %>
-				<input type="button" id="customerSave" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.save'/>" 
+				<input type="button" id="customerSave" class="btn btn-primary" value="<s:text name='lbl.btn.add'/>" 
 				    onclick="validate('customerSave', $('#formCustomerAdd'), $('#subcontainer'), 'Creating Customer');" />
 		<% } %>
-		<input type="button" id="customerCancel" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.cancel'/>" 
+		<input type="button" id="customerCancel" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>" 
             onclick="loadContent('customerList', $('#formCustomerAdd'), $('#subcontainer'));" />
 	</div>
 	

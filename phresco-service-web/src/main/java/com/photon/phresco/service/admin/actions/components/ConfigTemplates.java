@@ -95,6 +95,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 		try {
 			List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
 			setReqAttribute(REQ_ARCHE_TYPES, technologies);
+			setReqAttribute(REQ_FROM_PAGE, ADD);
 		} catch (PhrescoException e) {
 		    return showErrorPopup(e, EXCEPTION_CONFIG_TEMP_ADD);
 		}
@@ -183,7 +184,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 			settingTemplate.setType(getName());
 			settingTemplate.setDescription(getDescription());
 			settingTemplate.setCustomerIds(Arrays.asList(getCustomerId()));
-			if (StringUtils.isNotEmpty(fromPage)) {
+			if (StringUtils.isNotEmpty(getConfigId())) {
 				settingTemplate.setId(getConfigId());
 			}
 			List<String> techIds = getAppliesTo();
@@ -268,7 +269,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 		if (StringUtils.isEmpty(getName())) {//Empty validation for name
 			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY ));
 			isError = true;
-		} else if(StringUtils.isEmpty(getFromPage()) || (!getName().equals(getOldName()))) {
+		} else if(ADD.equals(getFromPage()) || (!getName().equals(getOldName()))) {
 			// to check duplication of name
 			List<SettingsTemplate> configTemplates = getServiceManager().getconfigTemplates(getCustomerId());
 			if (CollectionUtils.isNotEmpty(configTemplates)) { //TODO: this should handled by query

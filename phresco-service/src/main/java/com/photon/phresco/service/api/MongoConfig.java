@@ -60,7 +60,7 @@ public class MongoConfig extends AbstractMongoConfiguration implements ServiceCo
 	public @Bean MongoTemplate mongoTemplate() throws PhrescoException {
 		MongoTemplate mongoTemplate = null;
 		try {
-			mongoTemplate = new MongoTemplate(mongo(), config.getDbName() , config.getDbCollection());
+			mongoTemplate = new MongoTemplate(mongo(), "phresco-dev" , config.getDbCollection());
 		}catch (MongoException e) {
 			throw new PhrescoException(e, EX_PHEX00003);
 		}

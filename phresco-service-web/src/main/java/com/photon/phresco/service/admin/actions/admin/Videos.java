@@ -81,7 +81,8 @@ public class Videos extends ServiceBaseAction {
 		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Videos.list()");
 		}
-
+		setReqAttribute(REQ_FROM_PAGE, ADD);
+		
 		return ADMIN_VIDEO_ADD;
 	}
 

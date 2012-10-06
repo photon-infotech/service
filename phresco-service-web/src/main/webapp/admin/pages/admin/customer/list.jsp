@@ -67,10 +67,10 @@
 									</div>
 								</th>
 								<th class="second">
-									<div class="th-inner tablehead"><s:label key="lbl.hdr.admim.cuslt.name" theme="simple"/></div>
+									<div class="th-inner tablehead"><s:label key="lbl.name" theme="simple"/></div>
 								</th>
 								<th class="third">
-									<div class="th-inner tablehead"><s:label key="lbl.hdr.admim.cuslt.desc" theme="simple"/></div>
+									<div class="th-inner tablehead"><s:label key="lbl.desc" theme="simple"/></div>
 								</th>
 								<th class="third">
 									<div class="th-inner tablehead"><s:label key="lbl.hdr.adm.cuslt.vldupto" theme="simple"/></div>

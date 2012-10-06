@@ -26,19 +26,16 @@
 	<constant name="struts.ui.theme" value="simple"/>
 	
 	<package name="login" extends="struts-default, json-default">
-		<action name="login" class="com.photon.phresco.service.admin.actions.Login" method="login" >
+		<action name="login" class="com.photon.phresco.service.admin.actions.Login"
+			method="login">
 			<result name="success">/admin/baselayout.jsp</result>
 			<result name="failure">/admin/login.jsp</result>
 		</action>
-		
-		<action name="authenticate" class="com.photon.phresco.service.admin.actions.Login" method="authenticate" >
-			<result type="json" />
-			<result name="dashboard">/admin/baselayout.jsp</result>
+
+		<action name="logout" class="com.photon.phresco.service.admin.actions.Login"
+			method="logout">
+			<result name="success">/admin/login.jsp</result>
 		</action>
-		
-		<action name="logout" class="com.photon.phresco.service.admin.actions.Login" method="logout">
-            <result name="success">/admin/login.jsp</result>
-        </action>
 	</package>
 	
     <package name="admin" extends="struts-default, json-default">

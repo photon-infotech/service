@@ -124,7 +124,6 @@ div.lgnBtnLabel {
 }
 
 .input-xlarge,input.xlarge,textarea.xlarge,select.xlarge {
-	height: auto;
 	width: 291px;
 }
 
@@ -755,7 +754,7 @@ a {
 }
 
 .headerInnerbottom img {
-	bottom: -3px;
+	bottom: 8px;
 	position: relative;
 	text-align: center;
 }
@@ -2073,6 +2072,8 @@ input[class *='sample'] {
 
 .keyMandtory {
 	float: right;
+	position: absolute !important;
+	margin-left: 3px !important;
 }
 
 .key {

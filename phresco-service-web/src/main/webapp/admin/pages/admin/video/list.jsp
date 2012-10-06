@@ -33,8 +33,8 @@
 	<div class="operation" id="operation">
 		<input type="button" id="videoAdd" class="btn btn-primary" name="video_add"
 			onclick="loadContent('videoAdd', $('#formVideoList'), $('#subcontainer'));" 
-					value="<s:text name='lbl.hdr.adm.vdeoadd'/>"/>
-		<input type="button" id="del" class="btn" disabled value="<s:text name='lbl.hdr.adm.delete'/>" 
+					value="<s:text name='lbl.hdr.video.add'/>"/>
+		<input type="button" id="del" class="btn" disabled value="<s:text name='lbl.btn.del'/>" 
 				onclick="showDeleteConfirmation('<s:text name='del.confirm.videos'/>');"/>
 		<s:if test="hasActionMessages()">
 			<div class="alert alert-success alert-message"  id="successmsg">
@@ -67,13 +67,13 @@
 									</div>
 								</th>
 								<th class="second">
-									<div class="th-inner tablehead"><s:label key="lbl.hdr.adm.vdeo.name" theme="simple"/></div>
+									<div class="th-inner tablehead"><s:label key="lbl.name" theme="simple"/></div>
 								</th>
 								<th class="second">
-									<div class="th-inner tablehead"><s:label key="lbl.hdr.adm.vdeo.desc" theme="simple"/></div>
+									<div class="th-inner tablehead"><s:label key="lbl.desc" theme="simple"/></div>
 								</th>
 								<%-- <th class="second">
-									<div class="th-inner tablehead"><s:label key="lbl.hdr.adm.vdeo.thumbnail" theme="simple"/></div>
+									<div class="th-inner tablehead"><s:label key="lbl.hdr.adm.video.thumbnail" theme="simple"/></div>
 								</th> --%>
 							</tr>
 						</thead>

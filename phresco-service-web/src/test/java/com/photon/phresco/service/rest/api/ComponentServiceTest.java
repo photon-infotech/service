@@ -4,31 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
-import org.springframework.data.document.mongodb.query.Criteria;
-import org.springframework.data.document.mongodb.query.Order;
-import org.springframework.data.document.mongodb.query.Query;
 
-import com.photon.phresco.commons.model.ApplicationInfo;
-import com.photon.phresco.commons.model.ArtifactGroup;
-import com.photon.phresco.commons.model.ArtifactInfo;
-import com.photon.phresco.commons.model.Customer;
-import com.photon.phresco.commons.model.DownloadInfo;
-import com.photon.phresco.commons.model.RepoInfo;
-import com.photon.phresco.commons.model.Role;
-import com.photon.phresco.commons.model.Status;
-import com.photon.phresco.commons.model.WebService;
+import com.photon.phresco.commons.model.Property;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.DbManager;
-import com.photon.phresco.service.dao.ArtifactGroupDAO;
-import com.photon.phresco.service.dao.TechnologyDAO;
 import com.photon.phresco.service.impl.DbManagerImpl;
-import com.photon.phresco.service.impl.DbService;
-import com.photon.phresco.service.impl.DependencyManagerImpl;
-import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.ServiceConstants;
 
 
-public class ComponentServiceTest extends DbService implements ServiceConstants{
+public class ComponentServiceTest extends DbManagerImpl implements ServiceConstants{
 	
 	DbManager dbManager = null;
 	public ComponentServiceTest() throws PhrescoException {
@@ -600,4 +584,19 @@ public class ComponentServiceTest extends DbService implements ServiceConstants{
 //    }
 //	
 	
+	@Test
+	public void testReports() {
+		System.out.println("Enterse to test case");
+		Property property = new Property();
+		List<String> customerIds = new ArrayList<String>();
+		customerIds.add("photon");
+		property.setDescription("Phresco Forum URL");
+		property.setCustomerIds(customerIds);
+		property.setId("phresco_forum");
+		property.setKey("phresco.forum.url");
+		property.setName("Phresco Forum URL");
+		property.setSystem(true);
+		property.setValue("http://172.16.18.86:7070/jforum");
+		mongoOperation.save("properties", property);
+	}
 }

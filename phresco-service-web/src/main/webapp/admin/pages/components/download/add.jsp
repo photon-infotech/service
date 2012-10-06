@@ -29,6 +29,7 @@
 <%@ page import="com.photon.phresco.commons.model.PlatformType" %>
 <%@ page import="com.photon.phresco.commons.model.ArtifactGroup"%>
 <%@ page import="com.photon.phresco.commons.model.ArtifactInfo"%>
+<%@ page import="com.photon.phresco.service.admin.actions.util.ServiceActionUtil"%>
 
 <%
 	String checkedStr = "";
@@ -38,7 +39,12 @@
     List<Technology> technologies = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
     String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
     List<PlatformType> platforms = (List<PlatformType>) request.getAttribute(ServiceUIConstants.REQ_DOWNLOAD_PLATFORMS);
-
+	
+    String title = ServiceActionUtil.getTitle(ServiceUIConstants.DOWNLOADS, fromPage);
+	String buttonLbl = ServiceActionUtil.getButtonLabel(fromPage);
+	String pageUrl = ServiceActionUtil.getPageUrl(ServiceUIConstants.DOWNLOADS, fromPage);
+	String progressTxt = ServiceActionUtil.getProgressTxt(ServiceUIConstants.DOWNLOADS, fromPage);
+	
     //For edit
     String name = "";
     String description = "";
@@ -63,17 +69,13 @@
 
 <form id="formDownloadAdd" class="form-horizontal customer_list">
 	<h4>
-	<% if (StringUtils.isNotEmpty(fromPage)) { %>
-		<s:label key="lbl.hdr.adm.dwnlad.edit.title" theme="simple"/>
-	<% } else { %>	
-		<s:label key="lbl.hdr.adm.dwnlad.add.title" theme="simple"/>
-	<% } %> 
+		<%= title %> 
 	</h4>
 	 
 	<div class="content_adder" id="downloadInputDiv">
 		<div class="control-group" id="nameControl">
 			<label class="control-label labelbold">
-				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.name'/>
+				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.name'/>
 			</label>
 			<div class="controls">
 				<input id="downloadName" placeholder="<s:text name='place.hldr.download.add.name'/>" 
@@ -84,7 +86,7 @@
 			
 		<div class="control-group">
 			<label class="control-label labelbold">
-				<s:text name='lbl.hdr.adm.desc'/>
+				<s:text name='lbl.desc'/>
 			</label>
 			<div class="controls">
 				<textarea id="downloadDesc"  placeholder="<s:text name='place.hldr.download.add.desc'/>" class="input-xlarge"
@@ -274,14 +276,9 @@
 	</div>
 
 	<div class="bottom_button">
-		<% if (StringUtils.isNotEmpty(fromPage)) { %>
-			<input type="button" id="downloadUpdate" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.update'/>" 
-				onclick="validate('downloadUpdate', $('#formDownloadAdd'), $('#subcontainer'), 'Updating Download', $('#downloadInputDiv :input'));" />	
-        <% } else { %>
-			<input type="button" id="downloadSave" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.save'/>"
-				onclick="validate('downloadSave', $('#formDownloadAdd'), $('#subcontainer'), 'Creating Download', $('#downloadInputDiv :input'));" />
-		<% } %>
-		<input type="button" id="downloadCancel" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.cancel'/>"
+		<input type="button" id="" class="btn btn-primary" value='<%= buttonLbl %>' 
+			onclick="validate('<%= pageUrl %>', $('#formDownloadAdd'), $('#subcontainer'), '<%= progressTxt %>', $('#downloadInputDiv :input'));" />	
+		<input type="button" id="downloadCancel" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>"
 			onclick="loadContent('downloadList', $('#formDownloadAdd'), $('#subcontainer'));"/>
 	</div>
 	

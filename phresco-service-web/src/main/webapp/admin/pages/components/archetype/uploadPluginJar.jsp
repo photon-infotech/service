@@ -47,8 +47,8 @@
 		</div>
 	</div>
 	<div class="modal-footer">
-		<a href="#" class="btn btn-primary" id="cancelPluginUpload"><s:label key="lbl.hdr.comp.cancel"/></a>
-	  	<a href="#" class="btn btn-primary" id="pluginUpload"><s:label key="lbl.hdr.comp.ok"/></a>
+		<a href="#" class="btn btn-primary" id="cancelPluginUpload"><s:label key="lbl.btn.cancel"/></a>
+	  	<a href="#" class="btn btn-primary" id="pluginUpload"><s:label key="lbl.btn.ok"/></a>
 	</div>	
 </div>
 </form>

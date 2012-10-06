@@ -37,7 +37,7 @@
             onclick="loadContent('globalurlAdd', $('#formGlobalUrlList'), $('#subcontainer'));" 
             	 disabled="disbaled" value="<s:text name='lbl.hdr.adm.urllst.title'/>"/>
 		              
-		<input type="button" class="btn" id="del" disabled value="<s:text name='lbl.hdr.comp.delete'/>"
+		<input type="button" class="btn" id="del" disabled value="<s:text name='lbl.btn.del'/>"
 			onclick="showDeleteConfirmation('<s:text name='del.confirm.globalURL'/>');"/>              
 		<s:if test="hasActionMessages()">
 			<div class="alert alert-success alert-message"  id="successmsg">
