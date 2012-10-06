@@ -308,7 +308,6 @@ qq.FileUploaderBasic = function(o){
         				if (o.type === "pluginJar"){
         					jarPopupError('', o.type);
         				} if (o.type === "videoFile") {
-        					fillTextBoxes(responseJSON, o.type, fileName);
         					enableDisableUpload("videoFile", "video-file-uploader");
         				} else if (o.type === "imageFile"){
         					enableDisableUpload("imageFile", "image-file-uploader");

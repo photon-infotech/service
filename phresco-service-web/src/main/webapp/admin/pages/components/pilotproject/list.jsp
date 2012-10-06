@@ -39,7 +39,7 @@
 	<div class="operation">
 		<input type="button" class="btn btn-primary" name="pilotproj_add" id="pilotprojAdd" 
 			onclick="loadContent('pilotprojAdd', $('#formPilotProjList'), $('#subcontainer'));" value="<s:text name='lbl.hdr.comp.pltprjt.add'/>" /> 
-		<input type="button" class="btn" id="del" disabled value="<s:text name='lbl.hdr.comp.delete'/>" 
+		<input type="button" class="btn" id="del" disabled value="<s:text name='lbl.btn.del'/>" 
 			onclick="showDeleteConfirmation('<s:text name='del.confirm.pilotes'/>');"/>
 		<s:if test="hasActionMessages()">
 			<div class="alert alert-success alert-message" id="successmsg">
@@ -71,12 +71,12 @@
 								</th>
 								<th class="second">
 									<div class="th-inner tablehead">
-										<s:label key="lbl.hdr.cmp.name" theme="simple" />
+										<s:label key="lbl.name" theme="simple" />
 									</div>
 								</th>
 								<th class="third">
 									<div class="th-inner tablehead">
-										<s:label key="lbl.hdr.cmp.desc" theme="simple" />
+										<s:label key="lbl.desc" theme="simple" />
 									</div>
 								</th>
 								<th class="third">

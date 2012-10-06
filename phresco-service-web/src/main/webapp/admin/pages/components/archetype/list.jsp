@@ -37,8 +37,8 @@
 	<div class="operation" id="operation">
 		<input type="button" id="archetypeAdd" class="btn btn-primary" name="archetype_add" 
 			onclick="loadContent('archetypeAdd', $('#formArchetypeList'), $('#subcontainer'));" 
-			value="<s:text name='lbl.hdr.comp.arhtyp.add'/>"/>
-		<input type="button" id="del" class="btn" disabled value="<s:text name='lbl.hdr.comp.delete'/>"
+			value="<s:text name='lbl.hdr.archetype.add'/>"/>
+		<input type="button" id="del" class="btn" disabled value="<s:text name='lbl.btn.del'/>"
 		 	onclick="showDeleteConfirmation('<s:text name='del.confirm.archetype'/>');"/>
 		<s:if test="hasActionMessages()">
 			<div class="alert alert-success alert-message"  id="successmsg">
@@ -70,13 +70,13 @@
 									</div>
 								</th>
 								<th class="second">
-									<div class="th-inner tablehead"><s:label key="lbl.hdr.cmp.name"  theme="simple"/></div>
+									<div class="th-inner tablehead"><s:label key="lbl.name"  theme="simple"/></div>
 								</th>
 								<th class="third">
-									<div class="th-inner tablehead"><s:label key="lbl.hdr.cmp.desc"  theme="simple"/></div>
+									<div class="th-inner tablehead"><s:label key="lbl.desc"  theme="simple"/></div>
 								</th>
 								<th class="third">
-									<div class="th-inner tablehead"><s:label key="lbl.hdr.comp.ver"  theme="simple"/></div>
+									<div class="th-inner tablehead"><s:label key="lbl.version"  theme="simple"/></div>
 								</th>
 								<th class="third">
 									<div class="th-inner tablehead"><s:label key="lbl.hdr.comp.apptype"  theme="simple"/></div>

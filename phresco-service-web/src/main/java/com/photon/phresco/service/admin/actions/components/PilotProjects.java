@@ -107,6 +107,7 @@ public class PilotProjects extends ServiceBaseAction {
     	try {
     		List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
     		setReqAttribute(REQ_ARCHE_TYPES, technologies);
+    		setReqAttribute(REQ_FROM_PAGE, ADD);
     	} catch (PhrescoException e) {
     		return showErrorPopup(e, EXCEPTION_PILOT_PROJECTS_ADD);
 		}
@@ -182,7 +183,7 @@ public class PilotProjects extends ServiceBaseAction {
     
     private ApplicationInfo createPilotProj() throws PhrescoException {
         ApplicationInfo pilotProInfo = new ApplicationInfo();
-        if (StringUtils.isNotEmpty(fromPage)) { 
+        if (StringUtils.isNotEmpty(getProjectId())) { 
         	pilotProInfo.setId(getProjectId());
         }
         pilotProInfo.setName(getName());
@@ -286,7 +287,7 @@ public class PilotProjects extends ServiceBaseAction {
     	if (StringUtils.isEmpty(getName())) {
     		setNameError(getText(KEY_I18N_ERR_NAME_EMPTY ));
     		isError = true;
-    	} else if (StringUtils.isEmpty(getFromPage()) || (!getName().equals(getOldName()))) {
+    	} else if (ADD.equals(getFromPage()) || (!getName().equals(getOldName()))) {
     		//To check whether the name already exist (Technology wise)
 			List<ApplicationInfo> pilotProjInfos = getServiceManager().getPilotProjects(getCustomerId());
 			if (pilotProjInfos != null) {

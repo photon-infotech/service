@@ -28,45 +28,40 @@
 <%@ page import="com.photon.phresco.commons.model.CoreOption"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
 <%@ page import="com.photon.phresco.commons.model.Technology"%>
-
-<% 
-    ApplicationInfo pilotProjectInfo = (ApplicationInfo)request.getAttribute(ServiceUIConstants.REQ_PILOT_PROINFO); 
+<%@ page import="com.photon.phresco.service.admin.actions.util.ServiceActionUtil"%>
+<%
+	ApplicationInfo pilotProjectInfo = (ApplicationInfo)request.getAttribute(ServiceUIConstants.REQ_PILOT_PROINFO); 
 	String fromPage = (String)request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE); 
 	List<Technology> technologies = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
 
+	String title = ServiceActionUtil.getTitle(ServiceUIConstants.PILOT_PROJECTS, fromPage);
+	String buttonLbl = ServiceActionUtil.getButtonLabel(fromPage);
+	String pageUrl = ServiceActionUtil.getPageUrl(ServiceUIConstants.PILOT_PROJECTS, fromPage);
+	String progressTxt = ServiceActionUtil.getProgressTxt(ServiceUIConstants.PILOT_PROJECTS, fromPage);
+	
 	//For edit
     String name = "";
 	String version = "";
     String description = "";
     boolean isSystem = false;
     if (pilotProjectInfo != null) {
-    	if (StringUtils.isNotEmpty(pilotProjectInfo.getName())) {
-    		name = pilotProjectInfo.getName();
-    	}
-    	if (StringUtils.isNotEmpty(pilotProjectInfo.getDescription())) {
-    		description = pilotProjectInfo.getDescription();
-    	}
-    	if (StringUtils.isNotEmpty(pilotProjectInfo.getVersion())) {
-    		version = pilotProjectInfo.getVersion();
-    	}
+   		name = pilotProjectInfo.getName();
+   		description = pilotProjectInfo.getDescription();
+   		version = pilotProjectInfo.getVersion();
     	isSystem = pilotProjectInfo.isSystem();
     }
 %>
 
 <form id="formPilotProAdd" class="form-horizontal customer_list">
 	<h4 class="hdr">
-	<% if (StringUtils.isNotEmpty(fromPage)) { %>
-		<s:label key="lbl.hdr.comp.edit.pltprjt.title" theme="simple"/>
-    <% } else { %>
-		<s:label key="lbl.hdr.comp.add.pltprjt.title" theme="simple"/>
-	<% } %> 
+		<%= title %> 
 	</h4>
 	
 	<div class="content_adder">
 		<div class="control-group" id="nameControl">
 			<label class="control-label labelbold">
-				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.name'/>
+				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.name'/>
 			</label>
 			<div class="controls">
 				<input id="pilotname" placeholder="<s:text name='place.hldr.pilot.add.name'/>" value="<%= name %>" maxlength="30" title="30 Characters only" class="input-xlarge" type="text" name="name">
@@ -86,7 +81,7 @@
 		
 		<div class="control-group" id="versionControl">
 			<label class="control-label labelbold">
-				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.version'/>
+				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.version'/>
 			</label>
 			<div class="controls">
 				<input id="versionname" placeholder="<s:text name='place.hldr.pilot.add.version'/>" value="<%= version %>" maxlength="30" title="30 Characters only" class="input-xlarge" type="text" name="version">
@@ -98,10 +93,10 @@
 			<label class="control-label labelbold"> <span
 				class="mandatory">*</span>&nbsp;<s:text name="Technology" /> </label>
 			<div class="controls">
-				<select id="multiSelect" name="techId" id="tech">
+				<select id="multiSelect" name="techId">
 				 	<%
 				 	String techId = "";
-				 	if(StringUtils.isNotEmpty(fromPage)) { 
+				 	if(ServiceUIConstants.EDIT.equals(fromPage)) { 
 				 		techId = pilotProjectInfo.getTechInfo().getVersion();
 				   	}
 				 	if (technologies != null) {
@@ -180,16 +175,11 @@
 			disabledClass = "btn-disabled";
 			disabled = "disabled";
 		} 
-	    if (StringUtils.isNotEmpty(fromPage)) { %>
-			<input type="button" id="pilotprojUpdate" class="btn <%= disabledClass %>" <%= disabled %> value="<s:text name='lbl.hdr.comp.update'/>"
-				onclick="validate('pilotprojUpdate', $('#formPilotProAdd'), $('#subcontainer'), 'Updating Pilotproject');" />
-		<%
-			} else {
-		%>
-			<input type="button" id="pilotprojSave" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.save'/>"
-				onclick="validate('pilotprojSave', $('#formPilotProAdd'), $('#subcontainer'), 'Creating Pilotproject');" />
-		<% } %>
-		<input type="button" id="pilotprojCancel" class="btn btn-primary" onclick="loadContent('pilotprojList', '', $('#subcontainer'));" value="<s:text name='lbl.hdr.comp.cancel'/>"/>
+	%>	
+		<input type="button" id="" class="btn <%= disabledClass %>" <%= disabled %> value='<%= buttonLbl %>'
+			onclick="validate('<%= pageUrl %>', $('#formPilotProAdd'), $('#subcontainer'), '<%= progressTxt %>');" />
+		<input type="button" id="pilotprojCancel" class="btn btn-primary" onclick="loadContent('pilotprojList', '', $('#subcontainer'));"
+			value="<s:text name='lbl.btn.cancel'/>"/>
 	</div>
 	
     <!-- Hidden Fields -->
@@ -209,8 +199,8 @@
 		enableScreen();
         createUploader();
         
-        <% if (StringUtils.isNotEmpty(fromPage)) { %>
-    	$("#tech").attr("disabled","disabled");
+        <% if (ServiceUIConstants.EDIT.equals(fromPage)) { %>
+    		//$("#multiSelect").attr("disabled","disabled");
     	<% } %>
         
      	// To check for the special character in name

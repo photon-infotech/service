@@ -26,6 +26,11 @@ public interface ServiceUIConstants {
      *****************************/ 
     String SQUARE_CLOSE = "]";
     String COMMA = ",";
+    String DOT = ".";
+    String LBL_HDR = "lbl.hdr.";
+    String LBL_BTN = "lbl.btn";
+    String LBL_URL = "lbl.pageurl.";
+    String LBL_PROG_TXT = "lbl.prog.txt.";
     String SQUARE_OPEN = "[";
     String ADD = "add";
     String REQ_FROM_PAGE = "fromPage";
@@ -39,6 +44,11 @@ public interface ServiceUIConstants {
 	String INVALID_PLUGIN_JAR = "{\"isJarTypeValid\": false,\"errorMsg\": \"Not a valid plugin jar\"}";
 	String CSV_PATTERN = "\\s*,\\s*";
     
+	String VIDEOS = "video";
+	String ARCHETYPES = "archetype";
+	String CONFIG_TEMPLATES = "configtemp";
+	String PILOT_PROJECTS = "pilot";
+	String DOWNLOADS = "download";
     
 	/*****************************
      * Login Request Constants

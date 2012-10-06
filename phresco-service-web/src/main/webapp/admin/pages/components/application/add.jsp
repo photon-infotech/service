@@ -82,14 +82,14 @@
             }
             if (StringUtils.isNotEmpty(fromPage)) {
         %>
-	            <input type="button" id="applicationUpdate" class="btn <%= disabledClass %>" <%= disabled %> value="<s:text name='lbl.hdr.comp.update'/>"
+	            <input type="button" id="applicationUpdate" class="btn <%= disabledClass %>" <%= disabled %> value="<s:text name='lbl.btn.edit'/>"
 	                onclick="validate('applicationUpdate', $('#formAppTypeAdd'), $('#subcontainer'), '<s:text name='lbl.prog.apptype.update'/>');" />
         <% } else { %>
-                <input type="button" id="applicationSave" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.save'/>"
+                <input type="button" id="applicationSave" class="btn btn-primary" value="<s:text name='lbl.btn.add'/>"
                     onclick="validate('applicationSave', $('#formAppTypeAdd'), $('#subcontainer'), '<s:text name='lbl.prog.apptype.save'/>');" />
         <% } %>
         
-		<input type="button" id="applicationCancel" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.cancel'/>" 
+		<input type="button" id="applicationCancel" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>" 
             onclick="loadContent('applntypesList', $('#formAppTypeAdd'), $('#subcontainer'));" />
     </div>
 	

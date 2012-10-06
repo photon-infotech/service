@@ -38,7 +38,7 @@
 		<input type="button" id="componentAdd" class="btn btn-primary" name="component_add" 
 				onclick="loadContent('componentAdd', $('#formComponentList'), $('#subcontainer'));" 
 				value="<s:text name='lbl.hdr.comp.component.add'/>"/>
-			<input type="button" class="btn" id="del" disabled value="<s:text name='lbl.hdr.comp.delete'/>" 
+			<input type="button" class="btn" id="del" disabled value="<s:text name='lbl.btn.del'/>" 
 				onclick="showDeleteConfirmation('<s:text name='del.confirm.component'/>');"/>
 		</div>
 		

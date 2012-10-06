@@ -29,47 +29,38 @@
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
 <%@ page import="com.photon.phresco.commons.model.Technology" %>
 <%@ page import="com.photon.phresco.commons.model.Element" %>
-
+<%@ page import="com.photon.phresco.service.admin.actions.util.ServiceActionUtil"%>
 <%
 	List<Technology> technologies = (List<Technology>) request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
 	String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
 	SettingsTemplate settingsTemplate = (SettingsTemplate) request.getAttribute(ServiceUIConstants.REQ_CONFIG_TEMP);
-
+	
+	String title = ServiceActionUtil.getTitle(ServiceUIConstants.CONFIG_TEMPLATES, fromPage);
+	String buttonLbl = ServiceActionUtil.getButtonLabel(fromPage);
+	String pageUrl = ServiceActionUtil.getPageUrl(ServiceUIConstants.CONFIG_TEMPLATES, fromPage);
+	String progressTxt = ServiceActionUtil.getProgressTxt(ServiceUIConstants.CONFIG_TEMPLATES, fromPage);
+	
 	//For edit
 	String name = "";
 	String desc = "";
 	boolean isSystem = false;
 	if (settingsTemplate != null) {
-		if (StringUtils.isNotEmpty(settingsTemplate.getType())) {
-			name = settingsTemplate.getType();
-		}
-		if (StringUtils.isNotEmpty(settingsTemplate.getDescription())) {
-			desc = settingsTemplate.getDescription();
-		}
+		name = settingsTemplate.getType();
+		desc = settingsTemplate.getDescription();
 		isSystem = settingsTemplate.isSystem();
 	}
 %>
 
 <form id="formConfigTempAdd" name="configForm" class="form-horizontal customer_list">
 	<h4 class="hdr">
-		<%
-			if (StringUtils.isNotEmpty(fromPage)) {
-		%>
-			<s:label key="lbl.hdr.comp.cnfigtmplt.edit" theme="simple"/>
-		<%
-			} else {
-		%>
-			<s:label key="lbl.hdr.comp.cnfigtmplte.add" theme="simple"/>   
-		<%
-   			}
-   		%>   
+		<%= title %>   
 	 </h4>	
 	
 	<div class="content_adder">
 		<div class="control-group" id="nameControl">
 			<label class="control-label labelbold">
-				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.name'/>
+				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.name'/>
 			</label>
 			
 			<div class="controls">
@@ -179,7 +170,7 @@
 							<div id="input1" class="clonedInput">
 								<tbody id="propTempTbody">
 									<!-- For add -->
-									<% if (StringUtils.isEmpty(fromPage)) { %>
+									<% if (ServiceUIConstants.ADD.equals(fromPage)) { %>
 										<tr class="1_configdynamiadd">
 											<td class="textwidth">
 												<input type="text" id="1" value="" placeholder="<s:text name='place.hldr.configTemp.add.key'/>" name="propTempKey"  
@@ -346,8 +337,8 @@
 							<div class="modal-footer">
 								<input type="hidden" id="hiddenKey"/>
 								<div class="errMsg" id="errMsg"></div>
-								<a href="#" class="btn btn-primary" data-dismiss="modal"><s:label key="lbl.hdr.comp.cancel" theme="simple"/></a>
-								<a href="#" id ="ok" class="btn btn-primary" data-dismiss="modal" ><s:label key="lbl.hdr.comp.ok" theme="simple"/></a>
+								<a href="#" class="btn btn-primary" data-dismiss="modal"><s:label key="lbl.btn.cancel" theme="simple"/></a>
+								<a href="#" id ="ok" class="btn btn-primary" data-dismiss="modal" ><s:label key="lbl.btn.ok" theme="simple"/></a>
 							</div>
 						</div>
 					</div>	
@@ -364,23 +355,13 @@
 			disabledClass = "btn-disabled";
 			disabled = "disabled";
 		}
-		if (StringUtils.isNotEmpty(fromPage)) {
 	%>
-		<input type="button" id="configtempUpdate" class="btn <%=disabledClass%>" <%=disabled%>
-				onclick="validatePropTempKey('configtempUpdate', 'Updating Config Template');" 
-		        value="<s:text name='lbl.hdr.comp.update'/>"/>
-    <%
-    	} else {
-    %>		
-		<input type="button" id="configtempSave" class="btn btn-primary"
-		        onclick="validatePropTempKey('configtempSave', 'Creating Config Template');" 
-		        value="<s:text name='lbl.hdr.comp.save'/>"/>
-	<%
-		}
-	%> 
+		<input type="button" id="" class="btn <%=disabledClass%>" <%=disabled%>
+				onclick="validatePropTempKey('<%= pageUrl %>', '<%= progressTxt %>');" 
+		        value='<%= buttonLbl %>'/>
 		<input type="button" id="configtempCancel" class="btn btn-primary" 
 		      onclick="loadContent('configtempList', $('#formConfigTempAdd'), $('#subcontainer'));" 
-		      value="<s:text name='lbl.hdr.comp.cancel'/>"/>
+		      value="<s:text name='lbl.btn.cancel'/>"/>
 	</div>
 	
 	<!-- Hidden Fields -->
@@ -402,7 +383,7 @@
 		
 		//for edit -- to dynamically populate possible values in property template fieldset 
 		<% 
-			if (StringUtils.isNotEmpty(fromPage)) {
+			if (ServiceUIConstants.EDIT.equals(fromPage)) {
 				int dynamicId = 1;
 				List<PropertyTemplate> propertyTemplates = settingsTemplate.getProperties();
 				if (CollectionUtils.isNotEmpty(propertyTemplates)) {
