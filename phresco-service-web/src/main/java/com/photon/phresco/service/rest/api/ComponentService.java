@@ -41,7 +41,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
@@ -72,6 +71,7 @@ import com.photon.phresco.service.model.ArtifactInfo;
 import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.FileUtil;
 import com.photon.phresco.util.ServiceConstants;
+import com.phresco.pom.site.Reports;
 import com.sun.jersey.core.header.ContentDisposition;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
@@ -1612,4 +1612,160 @@ public class ComponentService extends DbService {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, SETTINGS_COLLECTION_NAME);
 		}
 	}
+	
+	/**
+	 * Returns the list of Reports
+	 * @return
+	 */
+	@GET
+	@Path (REST_API_REPORTS)
+	@Produces (MediaType.APPLICATION_JSON)
+	public Response findReports(@QueryParam(REST_QUERY_TECHID) String techId) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.findReports(String techId)");
+	    }
+		try {
+			List<Reports> reports = mongoOperation.find(REPORTS_COLLECTION_NAME, 
+					new Query(Criteria.where(REST_QUERY_TECHID).is(techId)), Reports.class);
+			return  Response.status(Response.Status.OK).entity(reports).build();
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00005, WEBSERVICES_COLLECTION_NAME);
+		}
+	}
+	
+	/**
+	 * Creates the list of Reports
+	 * @param reports
+	 * @return 
+	 */
+	@POST
+	@Consumes (MediaType.APPLICATION_JSON)
+	@Path (REST_API_REPORTS)
+	public Response createReports(List<Reports> reports) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.createReports(List<Reports> reports)");
+	    }
+		
+		try {
+			mongoOperation.insertList(REPORTS_COLLECTION_NAME , reports);
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
+		}
+		
+		return Response.status(Response.Status.OK).build();
+	}
+	
+	/**
+	 * Updates the list of Reports
+	 * @param reports
+	 * @return
+	 */
+	@PUT
+	@Consumes (MediaType.APPLICATION_JSON)
+	@Produces (MediaType.APPLICATION_JSON)
+	@Path (REST_API_REPORTS)
+	public Response updateReports(List<Reports> reports) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.updateReports(List<Reports> reports)");
+	    }
+		
+		try {
+			for (Reports report : reports) {
+				mongoOperation.save(REPORTS_COLLECTION_NAME, report);
+			}
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
+		}
+		
+		return Response.status(Response.Status.OK).entity(reports).build();
+	}
+	
+	/**
+	 * Deletes the list of Reports
+	 * @param webServices
+	 * @throws PhrescoException 
+	 */
+	@DELETE
+	@Path (REST_API_REPORTS)
+	public void deleteReports(List<Reports> reports) throws PhrescoException {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.deleteReports(List<Reports> reports)");
+	    }
+		
+		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
+		S_LOGGER.error("PhrescoException Is" + phrescoException.getErrorMessage());
+		throw phrescoException;
+	}
+	
+	/**
+	 * Get the Reports by id for the given parameter
+	 * @param id
+	 * @return
+	 */
+	@GET
+	@Produces (MediaType.APPLICATION_JSON)
+	@Path (REST_API_REPORTS + REST_API_PATH_ID)
+	public Response getReports(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.getReports(String id)" + id);
+	    }
+		
+		try {
+			Reports reports = mongoOperation.findOne(REPORTS_COLLECTION_NAME, new Query(Criteria.whereId().is(id)), Reports.class);
+			if(reports != null) {
+				return Response.status(Response.Status.NO_CONTENT).entity(reports).build();
+			}
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00005, WEBSERVICES_COLLECTION_NAME);
+		}
+		
+		return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
+	}
+	
+	/**
+	 * Updates the reports given by the parameter
+	 * @param id
+	 * @param reports
+	 * @return
+	 */
+	@PUT
+	@Consumes (MediaType.APPLICATION_JSON)
+	@Produces (MediaType.APPLICATION_JSON)
+	@Path (REST_API_REPORTS + REST_API_PATH_ID)
+	public Response updateReports(@PathParam(REST_API_PATH_PARAM_ID) String id , Reports reports) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.updateReports(String id, Reports reports)" + id);
+	    }
+		
+		try {
+				mongoOperation.save(REPORTS_COLLECTION_NAME, reports);
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
+		}
+		
+		return Response.status(Response.Status.BAD_REQUEST).entity(reports).build();
+	}
+	
+	/**
+	 * Deletes the Reports by id for the given parameter
+	 * @param id
+	 * @return 
+	 */
+	@DELETE
+	@Path (REST_API_REPORTS + REST_API_PATH_ID)
+	public Response deleteReports(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.deleteReportse(String id)" + id);
+	    }
+		
+		try {
+			mongoOperation.remove(REPORTS_COLLECTION_NAME, 
+			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), Reports.class);
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
+		}
+		
+		return Response.status(Response.Status.OK).build();
+	}
+
 }

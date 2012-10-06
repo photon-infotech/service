@@ -104,6 +104,7 @@ public class Downloads extends ServiceBaseAction {
 		    setReqAttribute(REQ_DOWNLOAD_PLATFORMS, platforms);
 			List<Technology> technologies = serviceManager.getArcheTypes(getCustomerId());
 			setReqAttribute(REQ_ARCHE_TYPES, technologies);
+			setReqAttribute(REQ_FROM_PAGE, ADD);
 		} catch (PhrescoException e) {
 			return showErrorPopup(e, EXCEPTION_DOWNLOADS_ADD);
 		}
@@ -179,7 +180,7 @@ public class Downloads extends ServiceBaseAction {
 	 private DownloadInfo getDownloadInfo() throws PhrescoException {
         DownloadInfo downloadInfo = new DownloadInfo();
         //To set the id for update
-        if (StringUtils.isNotEmpty(getFromPage())) {
+        if (StringUtils.isNotEmpty(getDownloadId())) {
             downloadInfo.setId(getDownloadId());
         }
         downloadInfo.setName(getName());

@@ -35,8 +35,8 @@
 <form id="formDownloadList" class="customer_list">
 	<div class="operation" id="operation">
 		<input type="button" id="downloadAdd" class="btn btn-primary" name="download_add" 
-			onclick="loadContent('downloadAdd', $('#formDownloadList'), $('#subcontainer'));" value="<s:text name='lbl.hdr.adm.dwndllst.title'/>"/>
-		<input type="button" id="del" class="btn" disabled value="<s:text name='lbl.hdr.adm.delete'/>"
+			onclick="loadContent('downloadAdd', $('#formDownloadList'), $('#subcontainer'));" value="<s:text name='lbl.hdr.download.add'/>"/>
+		<input type="button" id="del" class="btn" disabled value="<s:text name='lbl.btn.del'/>"
 			onclick="showDeleteConfirmation('<s:text name='del.confirm.download'/>');"/>
 		<s:if test="hasActionMessages()">
 			<div class="alert alert-success alert-message"  id="successmsg">
@@ -69,10 +69,10 @@
 									</div>
 								</th>
 								<th class="second">
-									<div class="th-inner tablehead"><s:label key="lbl.hdr.adm.dwnldlst.name" theme="simple"/></div>
+									<div class="th-inner tablehead"><s:label key="lbl.name" theme="simple"/></div>
 								</th>
 								<th class="third">
-									<div class="th-inner tablehead"><s:label key="lbl.hdr.adm.dwnldlst.desc" theme="simple"/></div>
+									<div class="th-inner tablehead"><s:label key="lbl.desc" theme="simple"/></div>
 								</th>
 								<th class="third">
 									<div class="th-inner tablehead"><s:label key="lbl.hdr.adm.dwnldlst.appltfrm" theme="simple"/></div>

@@ -29,13 +29,19 @@
 <%@ page import="com.photon.phresco.commons.model.ArtifactGroup"%>
 <%@ page import="com.photon.phresco.commons.model.ArtifactInfo"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
+<%@ page import="com.photon.phresco.service.admin.actions.util.ServiceActionUtil"%>
 
 <%
 	Technology technology = (Technology) request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPE);
 	String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
 	List<ApplicationType> appTypes = (List<ApplicationType>) request.getAttribute(ServiceUIConstants.REQ_APP_TYPES);
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
-
+	
+	String title = ServiceActionUtil.getTitle(ServiceUIConstants.ARCHETYPES, fromPage);
+	String buttonLbl = ServiceActionUtil.getButtonLabel(fromPage);
+	String pageUrl = ServiceActionUtil.getPageUrl(ServiceUIConstants.ARCHETYPES, fromPage);
+	String progressTxt = ServiceActionUtil.getProgressTxt(ServiceUIConstants.ARCHETYPES, fromPage);
+	
 	//For edit
 	String name = "";
 	String desc = "";
@@ -48,11 +54,11 @@
 		name = technology.getName();
 		desc = technology.getDescription();
 		List<ArtifactInfo> technoVersions = technology
-				.getArchetypeInfo().getVersions();
+		.getArchetypeInfo().getVersions();
 		if (CollectionUtils.isNotEmpty(technoVersions)) {
-			for (ArtifactInfo versions : technoVersions) {
-				version = versions.getVersion();
-			}
+	for (ArtifactInfo versions : technoVersions) {
+		version = versions.getVersion();
+	}
 		}
 
 		techVersion = technology.getTechVersions();
@@ -63,22 +69,12 @@
 
 <form id="formArcheTypeAdd" class="form-horizontal customer_list">
 	<h4 class="hdr">
-		<%
-			if (StringUtils.isNotEmpty(fromPage)) {
-		%>
-			<s:label key="lbl.hdr.comp.arhtyp.edit.title"/>
-		<%
-			} else {
-		%>
-			<s:label key="lbl.hdr.comp.arhtyp.title"/>
-		<%
-			}
-		%>
+		<%= title %>
 	</h4>
 	<div class="content_adder">
 		<div class="control-group" id="nameControl">
 			<label class="control-label labelbold"> <span
-				class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.name' />
+				class="mandatory">*</span>&nbsp;<s:text name='lbl.name' />
 			</label>
 			<div class="controls">
 				<input id="archename" placeholder='<s:text name="place.hldr.archetype.add.name"/>' class="input-xlarge" type="text" 
@@ -100,7 +96,7 @@
 
 		<div class="control-group" id="verControl">
 			<label class="control-label labelbold"> <span
-				class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.version' />
+				class="mandatory">*</span>&nbsp;<s:text name='lbl.version' />
 			</label>
 			<div class="controls">
 				<input id="version" placeholder='<s:text name="place.hldr.archetype.add.version"/>' class="input-xlarge" 
@@ -222,20 +218,12 @@
 				disabledClass = "btn-disabled";
 				disabled = "disabled";
 			}
-
-			if (StringUtils.isNotEmpty(fromPage)) {
-		%>		
-				<input type="button" id="archetypeUpdate" class="btn <%= disabledClass %>" <%= disabled %>
-					onclick="validate('archetypeUpdate', $('#formArcheTypeAdd'), $('#subcontainer'), '<s:text name='lbl.prog.arche.update'/>');"
-					value="<s:text name='lbl.hdr.comp.update'/>" />
+		%>
+		<input type="button" id="" class="btn <%= disabledClass %>" <%= disabled %>
+			onclick="validate('<%= pageUrl %>', $('#formArcheTypeAdd'), $('#subcontainer'), '<%= progressTxt %>');"
+			value='<%= buttonLbl %>'/>
 		
-		<% } else { %>
-				<input type="button" id="archetypeSave" class="btn btn-primary"
-					onclick="validate('archetypeSave', $('#formArcheTypeAdd'), $('#subcontainer'), '<s:text name='lbl.prog.arche.save'/>');"
-					value="<s:text name='lbl.hdr.comp.save'/>" />
-		<% } %>
-		
-		<input type="button" id="archetypeCancel" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.cancel'/>" 
+		<input type="button" id="archetypeCancel" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>" 
             onclick="loadContent('archetypesList', $('#formArcheTypeAdd'), $('#subcontainer'));"/>
 	</div>
 	

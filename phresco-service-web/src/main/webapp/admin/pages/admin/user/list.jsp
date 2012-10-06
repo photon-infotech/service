@@ -53,7 +53,7 @@
 									</div>
 								</th>
 								<th class="second">
-									<div class="th-inner tablehead"><s:label key="lbl.hdr.adm.usrlst.name" theme="simple"/></div>
+									<div class="th-inner tablehead"><s:label key="lbl.name" theme="simple"/></div>
 								</th>
 								<th class="third">
 									<div class="th-inner tablehead"><s:label key="lbl.hdr.adm.usrlst.mail" theme="simple"/></div>
@@ -127,8 +127,8 @@
 						</div>
 					</div>
 					<div class="modal-footer">
-					  <a href="#" class="btn btn-primary" data-dismiss="modal"><s:label key="lbl.hdr.comp.cancel" theme="simple"/></a>
-					  <a href="#" class="btn btn-primary" data-dismiss="modal" ><s:label key="lbl.hdr.comp.ok" theme="simple"/></a>
+					  <a href="#" class="btn btn-primary" data-dismiss="modal"><s:label key="lbl.btn.cancel" theme="simple"/></a>
+					  <a href="#" class="btn btn-primary" data-dismiss="modal" ><s:label key="lbl.btn.ok" theme="simple"/></a>
 					</div>
 				</div>
 			</div>

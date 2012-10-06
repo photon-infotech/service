@@ -58,7 +58,7 @@ public class DocumentGeneratorTest extends AbstractPhrescoTest {
     }
 
     @Ignore
-    public final void testGenerate() {
+    public final void testGenerate() throws PhrescoException {
 //		fail("Not yet implemented"); // TODO
 
         ProjectInfo info = new ProjectInfo();
@@ -94,7 +94,7 @@ public class DocumentGeneratorTest extends AbstractPhrescoTest {
     }
 
     @Ignore
-    public final void testGenerateWithNoDocuments(){
+    public final void testGenerateWithNoDocuments() throws PhrescoException{
         ProjectInfo info = new ProjectInfo();
         info.setName("DocTest123");
 //        info.setVersion("1.0");

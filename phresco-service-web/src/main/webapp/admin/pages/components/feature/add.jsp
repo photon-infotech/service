@@ -300,24 +300,24 @@
    		%>
    					<input type="button" id="featuresUpdate" class="btn <%= disabledClass %>" <%= disabled %> 
 						onclick="validate('componentUpdate', $('#formFeatureAdd'), $('#subcontainer'), 'Updating Feature', $('#jarDetailsDiv :input'));"
-						value="<s:text name='lbl.hdr.comp.update' />"/>
+						value="<s:text name='lbl.btn.edit' />"/>
    		<%
      		    } else {
    		%>
 			     	<input type="button" id="featuresUpdate" class="btn <%= disabledClass %>" <%= disabled %> 
 						onclick="validate('featuresUpdate', $('#formFeatureAdd'), $('#featureContainer'), 'Updating Feature', $('#jarDetailsDiv :input'));"
-						value="<s:text name='lbl.hdr.comp.update' />"/> 
+						value="<s:text name='lbl.btn.edit' />"/> 
      	<%
      		    }
      		} else {
 				if (ServiceUIConstants.REQ_FEATURES_TYPE_COMPONENT.equals(type)) {
    		%>
-			     	<input type="button" id="featuresSave" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.save'/>" 
+			     	<input type="button" id="featuresSave" class="btn btn-primary" value="<s:text name='lbl.btn.add'/>" 
 						onclick="validate('componentSave', $('#formFeatureAdd'), $('#subcontainer'), 'Creating Feature', $('#jarDetailsDiv :input'));"/> 
 		<%
 				} else {
 	    %>
-	    			<input type="button" id="featuresSave" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.save'/>" 
+	    			<input type="button" id="featuresSave" class="btn btn-primary" value="<s:text name='lbl.btn.add'/>" 
 						onclick="validate('featuresSave', $('#formFeatureAdd'), $('#featureContainer'), 'Creating Feature', $('#jarDetailsDiv :input'));"/> 
 	    <%
 				}
@@ -325,10 +325,10 @@
 		%>
 		
 		<% if (ServiceUIConstants.REQ_FEATURES_TYPE_COMPONENT.equals(type)) { %>
-			<input type="button" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.cancel'/>"
+			<input type="button" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>"
 				onclick="loadContent('technologies', $('#formFeatureAdd'), $('#subcontainer'));" />
 		<% } else { %>
-			<input type="button" class="btn btn-primary" value="<s:text name='lbl.hdr.comp.cancel'/>"
+			<input type="button" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>"
 				onclick="loadContent('technologies', $('#formFeatureAdd'), $('#featureContainer'));" />
 		<% } %>
 	</div>

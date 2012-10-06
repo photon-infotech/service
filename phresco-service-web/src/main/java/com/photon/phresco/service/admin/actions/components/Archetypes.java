@@ -113,6 +113,7 @@ public class Archetypes extends ServiceBaseAction {
 		try {
 			List<ApplicationType> appTypes = getServiceManager().getApplicationTypes(getCustomerId());
 			setReqAttribute(REQ_APP_TYPES, appTypes);
+			setReqAttribute(REQ_FROM_PAGE, ADD);
 		} catch (PhrescoException e) {
 		    return showErrorPopup(e, EXCEPTION_ARCHETYPE_ADD);
 		}
@@ -351,7 +352,7 @@ public class Archetypes extends ServiceBaseAction {
 		if (StringUtils.isEmpty(getName())) {
 			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY ));
 			isError = true;
-		} else if (StringUtils.isEmpty(getFromPage()) || (!getName().equals(getOldName()))) {
+		} else if (ADD.equals(getFromPage()) || (!getName().equals(getOldName()))) {
 			// To check whether the name already exist (Application type wise)
 			List<Technology> archetypes = getServiceManager().getArcheTypes(getCustomerId());
 			if (archetypes != null) {

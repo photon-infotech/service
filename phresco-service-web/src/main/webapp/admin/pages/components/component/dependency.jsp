@@ -117,8 +117,8 @@
 	</div>
 	
 	<div class="modal-footer">
-		<a href="#" class="btn btn-primary" id="cancel"><s:label key="lbl.hdr.comp.cancel"/></a>
-	  	<a href="#" class="btn btn-primary" id="saveDependency"><s:label key="lbl.hdr.comp.ok"/></a>
+		<a href="#" class="btn btn-primary" id="cancel"><s:label key="lbl.btn.cancel"/></a>
+	  	<a href="#" class="btn btn-primary" id="saveDependency"><s:label key="lbl.btn.ok"/></a>
 	</div>
 </div>
 </form>

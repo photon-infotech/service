@@ -42,7 +42,7 @@ clickButton($("#permissionCancel"), $("#subcontainer"));
 								</div>
 							</th>
 							<th class="second">
-								<div class="th-inner tablehead"><s:label key="lbl.hdr.adm.rles.asgnprm.name" theme="simple"/></div>
+								<div class="th-inner tablehead"><s:label key="lbl.name" theme="simple"/></div>
 							</th>
 							<th class="third" style="padding-left:19px;">
 								<div class="th-inner tablehead"><s:label key="lbl.hdr.adm.rles.asgnprm.dvlpr" theme="simple"/></div>
