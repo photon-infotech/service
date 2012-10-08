@@ -103,7 +103,7 @@
 									<td>
 										<a href="#" onclick="editPilotProject('<%=proInfo.getId() %>');" name="edit" id=""><%=proInfo.getName()%></a>
 									</td>
-									<td><%= StringUtils.isNotEmpty(proInfo.getDescription()) ? proInfo.getDescription() : ""%></td>
+									<td class="descwidth"><%= StringUtils.isNotEmpty(proInfo.getDescription()) ? proInfo.getDescription() : ""%></td>
 									<%  TechnologyInfo techId = proInfo.getTechInfo();
 									%>
 									<td><%= techId.getVersion() %></td>

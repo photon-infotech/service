@@ -49,11 +49,12 @@
     String name = "";
     String description = "";
     String version = "";
+    String category = "";
     List<String> downloadInfoPlatforms = null;
     if (downloadInfo != null) {
    		name = downloadInfo.getName();
    		description = downloadInfo.getDescription();
-    	
+   		category = downloadInfo.getCategory();
    		//To get the versions
    		ArtifactGroup artifactGroup = downloadInfo.getArtifactGroup();
    		List<ArtifactInfo> artifactInfos = artifactGroup.getVersions();
@@ -315,9 +316,8 @@
         });
         
         // for edit - to show selected group while page loads 
-        <% if (downloadInfo != null)  {%>
-<%--        		 $("#group option[value='<%= downloadInfo.getType() %>']").attr('selected', 'selected'); --%>
-       	<% } %>
+       		 $("#category option[value='<%= category %>']").attr('selected', 'selected'); 
+      
 	});
 
 	function findError(data) {
@@ -455,4 +455,5 @@
 					.addClass("btn-primary qq-upload-button");
 		}
 	}
+	
 </script>

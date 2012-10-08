@@ -40,8 +40,8 @@
 	<%
 		} else {
 	%>
-	<div class="table_div syncTable" >
-		<div class="fixed-table-container">
+	<div class="table_div" >
+		<div class="fixed-table-container" style="height : 500px !important;">
 			<div class="header-background"> </div>
 			<div class="fixed-table-container-inner">
 				<table cellspacing="0" class="zebra-striped">
@@ -78,8 +78,8 @@
 							<td>
 								<a><%= StringUtils.isNotEmpty(user.getName()) ? user.getName() :"" %></a>
 							</td>
-							<td class="emailalign"><%= StringUtils.isNotEmpty(user.getEmail()) ? user.getEmail() :"" %></td>
-							<td>active</td>
+							<td class="emailalign"><%= StringUtils.isNotEmpty(user.getEmail()) ? user.getEmail() : "" %></td>
+							<td class="userwidth"><%= user.getStatus()!= null ? user.getStatus() : "" %></td>
 							<td  class = "tablealign">
 								<a data-toggle="modal" href="#myModal"><input type="button" class="btn btn-primary addiconAlign" value="Roles"></a>
 							</td>

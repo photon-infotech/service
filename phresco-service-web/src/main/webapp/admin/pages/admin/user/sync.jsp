@@ -23,23 +23,17 @@
 	<div class="operation" id="operation">
 		<input type="button" id="userSync" class="btn btn-primary" name="users_sync"  value="<s:text name='lbl.hdr.adm.usrlst'/>"/>
 		
-	    <div id="userListContainer" style="height:76%;">
+	    <div id="userListContainer" class="syncTable">
 	
 		</div>
 	</div>
-	<input type="hidden" name="sync" value="true">
 </form>
 <script type="text/javascript">
-	
 	$(document).ready(function() {
-		syncUsers();
-
-		$('#userSync').click(function() {
-			syncUsers();
-		});
+		loadContent("fetchUsersFromDB", $("#syncForm"), $('#userListContainer'));
 	});
-
-	function syncUsers() {
+	
+	$('#userSync').click(function() {
 		loadContent("syncUsers", $("#syncForm"), $('#userListContainer'));
-	}
+	});
 </script>

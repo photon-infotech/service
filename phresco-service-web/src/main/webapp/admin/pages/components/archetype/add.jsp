@@ -50,18 +50,20 @@
 	List<String> techVersion = null;
 	boolean isSystem = false;
 	String appTypeId = "";
+	String techVer = "";
 	if (technology != null) {
 		name = technology.getName();
 		desc = technology.getDescription();
 		List<ArtifactInfo> technoVersions = technology
-		.getArchetypeInfo().getVersions();
+				.getArchetypeInfo().getVersions();
 		if (CollectionUtils.isNotEmpty(technoVersions)) {
-	for (ArtifactInfo versions : technoVersions) {
-		version = versions.getVersion();
-	}
+			for (ArtifactInfo versions : technoVersions) {
+				version = versions.getVersion();
+			}
 		}
 
 		techVersion = technology.getTechVersions();
+		techVer  = techVersion.toString().replace("[", "").replace("]", "");
 		isSystem = technology.isSystem();
 		appTypeId = technology.getAppTypeId();
 	}
@@ -112,7 +114,7 @@
 			</label>
 			<div class="controls">
 				<input id="techVersion" placeholder='<s:text name="place.hldr.archetype.add.technologyVersion"/>' class="input-xlarge" 
-					type="text" name="techVersion" value="<%= CollectionUtils.isNotEmpty(techVersion) ? techVersion : "" %>" maxlength="30" title="30 Characters only">
+					type="text" name="techVersion" value="<%= StringUtils.isNotEmpty(techVer) ? techVer : "" %>" maxlength="30" title="30 Characters only">
 				<span class="help-inline" id="techvernError"></span>
 			</div>
 		</div>  
@@ -270,7 +272,7 @@
     });
 
     function findError(data) {
-        if (data.nameError != undefined) {
+        if (!isBlank(data.nameError)) {
             showError($("#nameControl"), $("#nameError"), data.nameError);
         } else {
             hideError($("#nameControl"), $("#nameError"));
@@ -282,18 +284,18 @@
             hideError($("#verControl"), $("#verError"));
         }
         
-        if (data.techvernError != undefined) {
+        if (!isBlank(data.techvernError)) {
             showError($("#techverControl"), $("#techvernError"), data.techvernError);
         } else {
             hideError($("#techverControl"), $("#techvernError"));
         }
         
-        if (data.appError != undefined) {
+        if (!isBlank(data.appError)) {
             showError($("#appControl"), $("#appError"), data.appError);
         } else {
             hideError($("#appControl"), $("#appError"));
         }
-        if (data.fileError != undefined) {
+        if (!isBlank(data.fileError)) {
             showError($("#appFileControl"), $("#fileError"), data.fileError);
         } else {
             hideError($("#appFileControl"), $("#fileError"));

@@ -1,4 +1,4 @@
-package com.photon.phresco.service.rest.interceptors;
+package com.photon.phresco.service.admin.actions.interceptors;
 
 import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.interceptor.Interceptor;
@@ -18,7 +18,7 @@ public class SessionValidatorInterceptor extends ServiceBaseAction implements In
 	public String intercept(ActionInvocation invocation) throws Exception {
 		User user = (User) getHttpSession().getAttribute(SESSION_USER_INFO);
 		if (user == null) {
-			getHttpSession().setAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_SESSION_EXPIRED));
+			setSessionAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_SESSION_EXPIRED));
 			return SUCCESS;
 		}
 		

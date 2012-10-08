@@ -34,7 +34,7 @@
 	<div class="operation" id="operation">
 		<input type="button" id="customerAdd" class="btn btn-primary" name="customer_add" value="<s:text name='lbl.hdr.adm.cust.add'/>" 
 		      onclick="loadContent('customerAdd', $('#formCustomerList'), $('#subcontainer'));"/>
-		<input type="button"  id="del"  class="btn del" class="btn btn-primary" disabled value="<s:text name='lbl.hdr.adm.delete'/>" 
+		<input type="button"  id="del"  class="btn del" class="btn btn-primary" disabled value="<s:text name='lbl.btn.del'/>" 
 		      onclick="showDeleteConfirmation('<s:text name='del.confirm.customers'/>');"/>
 		<s:if test="hasActionMessages()">
 			<div class="alert alert-success alert-message"  id="successmsg">

@@ -160,14 +160,4 @@
     	loadContent('configtempDelete', $('#formConfigTempList'), $('#subcontainer'));
     }
  	
-    function textTrim(obj) {
-        var val = $(obj).text().replace(/\s/g, "");
-        $(obj).attr("title", val);
-        var len = val.length;
-        if(len > 50) {
-            val = val.substr(0, 50) + "...";
-            return val;
-        }
-        return val;
-    }
 </script>
