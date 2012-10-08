@@ -40,7 +40,7 @@
 	
     <package name="admin" extends="struts-default, json-default">
 		<interceptors>
-			<interceptor name="sessionValidatorInterceptor" class="com.photon.phresco.service.interceptors.SessionValidatorInterceptor">
+			<interceptor name="sessionValidatorInterceptor" class="com.photon.phresco.service.admin.actions.interceptors.SessionValidatorInterceptor">
 			</interceptor>
 		
 			<interceptor-stack name="interceptorStack">

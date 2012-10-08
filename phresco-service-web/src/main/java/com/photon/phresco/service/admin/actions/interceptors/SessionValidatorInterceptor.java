@@ -1,4 +1,4 @@
-package com.photon.phresco.service.rest.interceptors;
+package com.photon.phresco.service.admin.actions.interceptors;
 
 import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.interceptor.Interceptor;
