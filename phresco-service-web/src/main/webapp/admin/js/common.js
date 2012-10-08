@@ -364,6 +364,18 @@ function copyToClipboard(data) {
 	});
 }
 
+//trim the long content
+function textTrim(obj) {
+    var val = $(obj).text();
+    $(obj).attr("title", val);
+    var len = val.length;
+    if(len > 50) {
+        val = val.substr(0, 50) + "...";
+        return val;
+    }
+    return val;
+}
+
 $(document).keydown(function(e) {
     // ESCAPE key pressed
 	if (e.keyCode == 27) {
