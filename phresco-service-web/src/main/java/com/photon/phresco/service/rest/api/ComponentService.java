@@ -41,6 +41,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
@@ -54,7 +55,6 @@ import com.photon.phresco.commons.model.PlatformType;
 import com.photon.phresco.commons.model.Property;
 import com.photon.phresco.commons.model.SettingsTemplate;
 import com.photon.phresco.commons.model.Technology;
-import com.photon.phresco.commons.model.TechnologyOptions;
 import com.photon.phresco.commons.model.WebService;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.exception.PhrescoWebServiceException;
@@ -261,14 +261,21 @@ public class ComponentService extends DbService {
 	@GET
 	@Path (REST_API_TECHNOLOGIES)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findTechnologies(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
+	public Response findTechnologies(@QueryParam(REST_QUERY_CUSTOMERID) String customerId, @QueryParam(REST_QUERY_APPTYPEID) String appTypeId) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.findTechnologies() " + customerId);
 	    }
 	    
 	    try {
+	        List<TechnologyDAO> techDAOList = new ArrayList<TechnologyDAO>();
 			Query query = createCustomerIdQuery(customerId);
-		    List<TechnologyDAO> techDAOList = mongoOperation.find(TECHNOLOGIES_COLLECTION_NAME, query, TechnologyDAO.class);
+		   
+			if(StringUtils.isNotEmpty(appTypeId)) {
+			    query.addCriteria(Criteria.where(REST_QUERY_APPTYPEID).is(appTypeId));
+			    techDAOList = mongoOperation.find(TECHNOLOGIES_COLLECTION_NAME, query, TechnologyDAO.class);
+		    } else {
+		        techDAOList = mongoOperation.find(TECHNOLOGIES_COLLECTION_NAME, query, TechnologyDAO.class);
+		    }
 		    
 		    List<Technology> techList = new ArrayList<Technology>(techDAOList.size() * 2);
 			Converter<TechnologyDAO, Technology> technologyConverter = 
@@ -1001,13 +1008,19 @@ public class ComponentService extends DbService {
 	@GET
 	@Path (REST_API_PILOTS)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findPilots(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
+	public Response findPilots(@QueryParam(REST_QUERY_CUSTOMERID) String customerId, @QueryParam(REST_QUERY_TECHID) String techId) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.findPilots()" + customerId);
 	    }
 		try {
+		    List<ApplicationInfoDAO> appInfos = new ArrayList<ApplicationInfoDAO>();
 			Query query = createCustomerIdQuery(customerId);
-			List<ApplicationInfo> appInfos = mongoOperation.find(APPLICATION_INFO_COLLECTION_NAME, query, ApplicationInfo.class);
+			if (StringUtils.isNotEmpty(techId)) {
+                query.addCriteria(Criteria.where("techInfo.version").is(techId));
+                appInfos = mongoOperation.find(APPLICATION_INFO_COLLECTION_NAME, query, ApplicationInfoDAO.class);
+            } else {
+                appInfos = mongoOperation.find(APPLICATION_INFO_COLLECTION_NAME, query, ApplicationInfoDAO.class);
+            }
 			return Response.status(Response.Status.OK).entity(appInfos).build();
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, APPLICATION_INFO_COLLECTION_NAME);
