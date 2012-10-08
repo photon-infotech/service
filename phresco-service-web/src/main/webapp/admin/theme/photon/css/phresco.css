@@ -2223,6 +2223,10 @@ input[class *='sample'] {
    width: 35%;
 }
 
+.userwidth {
+   width: 19%;
+}
+
 div[class *='syncTable']  {
 	margin-top: 4px;
 }

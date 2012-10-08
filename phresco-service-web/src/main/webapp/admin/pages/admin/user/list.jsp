@@ -79,8 +79,7 @@
 								<a><%= StringUtils.isNotEmpty(user.getName()) ? user.getName() :"" %></a>
 							</td>
 							<td class="emailalign"><%= StringUtils.isNotEmpty(user.getEmail()) ? user.getEmail() : "" %></td>
-							<td>Active</td>
-							<%-- <td><%= user.getStatus()!= null ? user.getStatus() : "" %></td> --%>
+							<td class="userwidth"><%= user.getStatus()!= null ? user.getStatus() : "" %></td>
 							<td  class = "tablealign">
 								<a data-toggle="modal" href="#myModal"><input type="button" class="btn btn-primary addiconAlign" value="Roles"></a>
 							</td>
