@@ -47,7 +47,7 @@ public class MongoConfig extends AbstractMongoConfiguration implements ServiceCo
 	public @Bean Mongo mongo() throws PhrescoException {
 		Mongo mongo = null;
 		try {
-			mongo = new Mongo("172.16.17.227", config.getDbPort());
+			mongo = new Mongo(config.getDbHost(), config.getDbPort());
 		} catch (UnknownHostException e) {
 			throw new PhrescoException(e, EX_PHEX00002);
 		} catch (MongoException e) {
@@ -60,7 +60,7 @@ public class MongoConfig extends AbstractMongoConfiguration implements ServiceCo
 	public @Bean MongoTemplate mongoTemplate() throws PhrescoException {
 		MongoTemplate mongoTemplate = null;
 		try {
-			mongoTemplate = new MongoTemplate(mongo(), "phresco-dev" , config.getDbCollection());
+			mongoTemplate = new MongoTemplate(mongo(), config.getDbName() , config.getDbCollection());
 		}catch (MongoException e) {
 			throw new PhrescoException(e, EX_PHEX00003);
 		}
