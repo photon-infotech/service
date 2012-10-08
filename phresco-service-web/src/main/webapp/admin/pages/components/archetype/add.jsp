@@ -71,17 +71,7 @@
 
 <form id="formArcheTypeAdd" class="form-horizontal customer_list">
 	<h4 class="hdr">
-		<%
-			if (StringUtils.isNotEmpty(fromPage)) {
-		%>
-			<s:label key="lbl.hdr.comp.arhtyp.edit.title"/>
-		<%
-			} else {
-		%>
-			<s:label key="lbl.hdr.comp.arhtyp.title"/>
-		<%
-			}
-		%>
+		<%= title %>
 	</h4>
 	<div class="content_adder">
 		<div class="control-group" id="nameControl">

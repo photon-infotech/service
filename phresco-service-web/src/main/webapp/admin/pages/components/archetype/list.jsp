@@ -103,7 +103,7 @@
 											<%= StringUtils.isNotEmpty(technology.getName()) ? technology.getName() : "" %>
                                         </a>
 									</td>
-									<td class="desclabel-width">
+									<td id="desc" class="desclabel-width">
 										<%= StringUtils.isNotEmpty(technology.getDescription()) ? technology.getDescription() : "" %>
 									</td>	
 									
@@ -150,6 +150,9 @@
 	$(document).ready(function() {
 		toDisableCheckAll();
 		enableScreen();
+	 	 $("td[id = 'desc']").text(function(index) {
+	        return textTrim($(this));
+	    }); 
 	});
 
     function editTech(id) {
@@ -163,4 +166,5 @@
     	confirmDialog('none','');
     	loadContent('archetypeDelete', $('#formArchetypeList'), $('#subcontainer'));
     }
+    
 </script>

@@ -92,9 +92,9 @@
 								<input type="checkbox" class="check" name="roleId"  value="<%= roleList.getId() %>" onclick="checkboxEvent();">
 							</td>
 							<td  class="namelabel-width">
-								<a href="#" onclick="editRole('<%= roleList.getId() %>');"><%= roleList.getName() %></a>
+								<a href="#" onclick="editRole('<%= roleList.getId() %>');"><%= StringUtils.isNotEmpty(roleList.getName()) ? roleList.getName() : "" %></a>
 							</td>
-							<td class="namelabel-width"><%= roleList.getDescription()%></td>
+							<td class="namelabel-width"><%= StringUtils.isNotEmpty(roleList.getDescription()) ? roleList.getDescription() : "" %></td>
 							<td>
 								<a data-toggle="modal" href="#myModal"><input type="button" class="btn btn-primary addiconAlign" value="Assign Permission"></a>
 							</td>

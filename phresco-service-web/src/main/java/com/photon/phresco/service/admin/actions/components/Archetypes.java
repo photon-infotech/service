@@ -191,7 +191,7 @@ public class Archetypes extends ServiceBaseAction {
 					inputStreams.add(new ByteArrayInputStream(byteArray));
 				}
 				getServiceManager().updateArcheType(technology, inputStreams, getCustomerId());
-				addActionError(getText(ARCHETYPE_UPDATED, Collections.singletonList(getName())));
+				addActionMessage(getText(ARCHETYPE_UPDATED, Collections.singletonList(getName())));
 			}
 		}catch(PhrescoException e) {
 			return showErrorPopup(e, EXCEPTION_ARCHETYPE_UPDATE);
@@ -208,6 +208,7 @@ public class Archetypes extends ServiceBaseAction {
     	if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.getTechnology()");
 		}
+    	
     	String key ="";
     	List<ArtifactGroup> pluginInfos = new ArrayList<ArtifactGroup>();
     	if(s_pluginMap != null) {
