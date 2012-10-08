@@ -51,7 +51,7 @@
 		</li>
 		<li>
 			<a id="videoList" class="inactive" name="adminTab" href="#">
-			<s:label key="lbl.hdr.adm.vdos"  theme="simple"/></a>
+			<s:label key="lbl.hdr.adm.videos"  theme="simple"/></a>
 		</li>
 		<li>
 			<a id="globalurlList" class="inactive" name="adminTab" href="#">
