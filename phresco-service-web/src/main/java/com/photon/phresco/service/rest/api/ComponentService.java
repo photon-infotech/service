@@ -51,8 +51,10 @@ import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.DownloadInfo;
 import com.photon.phresco.commons.model.PlatformType;
+import com.photon.phresco.commons.model.Property;
 import com.photon.phresco.commons.model.SettingsTemplate;
 import com.photon.phresco.commons.model.Technology;
+import com.photon.phresco.commons.model.TechnologyOptions;
 import com.photon.phresco.commons.model.WebService;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.exception.PhrescoWebServiceException;
@@ -1713,7 +1715,7 @@ public class ComponentService extends DbService {
 		try {
 			Reports reports = mongoOperation.findOne(REPORTS_COLLECTION_NAME, new Query(Criteria.whereId().is(id)), Reports.class);
 			if(reports != null) {
-				return Response.status(Response.Status.NO_CONTENT).entity(reports).build();
+				return Response.status(Response.Status.OK).entity(reports).build();
 			}
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, WEBSERVICES_COLLECTION_NAME);
@@ -1767,5 +1769,177 @@ public class ComponentService extends DbService {
 		
 		return Response.status(Response.Status.OK).build();
 	}
-
+	
+	/**
+	 * Returns the list of Properties
+	 * @return
+	 */
+	@GET
+	@Path (REST_API_PROPERTY)
+	@Produces (MediaType.APPLICATION_JSON)
+	public Response findProperties() {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.findProperties()");
+	    }
+		try {
+			List<Property> properties = mongoOperation.getCollection(PROPERTIES_COLLECTION_NAME, Property.class);
+			return  Response.status(Response.Status.OK).entity(properties).build();
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00005, WEBSERVICES_COLLECTION_NAME);
+		}
+	}
+	
+	/**
+	 * Creates the list of Properties
+	 * @param properties
+	 * @return 
+	 */
+	@POST
+	@Consumes (MediaType.APPLICATION_JSON)
+	@Path (REST_API_PROPERTY)
+	public Response createProperties(List<Property> properties) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.createProperties(List<Property> properties)");
+	    }
+		
+		try {
+			mongoOperation.insertList(PROPERTIES_COLLECTION_NAME , properties);
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
+		}
+		
+		return Response.status(Response.Status.OK).build();
+	}
+	
+	/**
+	 * Updates the list of Properties
+	 * @param reports
+	 * @return
+	 */
+	@PUT
+	@Consumes (MediaType.APPLICATION_JSON)
+	@Produces (MediaType.APPLICATION_JSON)
+	@Path (REST_API_PROPERTY)
+	public Response updateProperties(List<Property> properties) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.updateProperties(List<Property> properties)");
+	    }
+		
+		try {
+			for (Property property : properties) {
+				mongoOperation.save(PROPERTIES_COLLECTION_NAME, property);
+			}
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
+		}
+		
+		return Response.status(Response.Status.OK).entity(properties).build();
+	}
+	
+	/**
+	 * Deletes the list of Properties
+	 * @param properties
+	 * @throws PhrescoException 
+	 */
+	@DELETE
+	@Path (REST_API_PROPERTY)
+	public void deleteProperties(List<Property> properties) throws PhrescoException {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.deleteProperties(List<Property> properties)");
+	    }
+		
+		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
+		S_LOGGER.error("PhrescoException Is" + phrescoException.getErrorMessage());
+		throw phrescoException;
+	}
+	
+	/**
+	 * Get the Property by id for the given parameter
+	 * @param id
+	 * @return
+	 */
+	@GET
+	@Produces (MediaType.APPLICATION_JSON)
+	@Path (REST_API_PROPERTY + REST_API_PATH_ID)
+	public Response getProperty(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.getProperty(String id)" + id);
+	    }
+		
+		try {
+			Property property = mongoOperation.findOne(PROPERTIES_COLLECTION_NAME, new Query(Criteria.whereId().is(id)), Property.class);
+			if(property != null) {
+				return Response.status(Response.Status.OK).entity(property).build();
+			}
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00005, WEBSERVICES_COLLECTION_NAME);
+		}
+		
+		return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
+	}
+	
+	/**
+	 * Updates the property given by the parameter
+	 * @param id
+	 * @param property
+	 * @return
+	 */
+	@PUT
+	@Consumes (MediaType.APPLICATION_JSON)
+	@Produces (MediaType.APPLICATION_JSON)
+	@Path (REST_API_PROPERTY + REST_API_PATH_ID)
+	public Response updateProperty(@PathParam(REST_API_PATH_PARAM_ID) String id , Property property) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.updateProperty(String id, Property property)" + id);
+	    }
+		
+		try {
+			mongoOperation.save(PROPERTIES_COLLECTION_NAME, property);
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
+		}
+		
+		return Response.status(Response.Status.BAD_REQUEST).entity(property).build();
+	}
+	
+	/**
+	 * Deletes the Property by id for the given parameter
+	 * @param id
+	 * @return 
+	 */
+	@DELETE
+	@Path (REST_API_PROPERTY + REST_API_PATH_ID)
+	public Response deleteProperty(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.deleteProperty(String id)" + id);
+	    }
+		
+		try {
+			mongoOperation.remove(PROPERTIES_COLLECTION_NAME, 
+			        new Query(Criteria.whereId().is(id)), Property.class);
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
+		}
+		
+		return Response.status(Response.Status.OK).build();
+	}
+	
+	/**
+	 * Returns the list of Technologyoptions
+	 * @return
+	 */
+	@GET
+	@Path (REST_API_OPTIONS)
+	@Produces (MediaType.APPLICATION_JSON)
+	public Response findOptions() {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.findOptions()");
+	    }
+		try {
+			List<TechnologyOptions> techOptions = mongoOperation.getCollection(OPTIONS_COLLECTION_NAME, TechnologyOptions.class);
+			return  Response.status(Response.Status.OK).entity(techOptions).build();
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00005, OPTIONS_COLLECTION_NAME);
+		}
+	}
 }

@@ -22,6 +22,8 @@ package com.photon.phresco.service.dao;
 
 import java.util.List;
 
+import com.photon.phresco.commons.model.TechnologyOptions;
+
 public class TechnologyDAO extends CustomerBaseDAO {
 	
     private static final long serialVersionUID = 1L;
@@ -30,6 +32,7 @@ public class TechnologyDAO extends CustomerBaseDAO {
 	private String archetypeGroupDAOId;
 	private List<String> dependencyIds;
 	private List<String> pluginIds;
+	private List<TechnologyOptions> options;
 	
 	public TechnologyDAO() {
 		super();
@@ -73,6 +76,14 @@ public class TechnologyDAO extends CustomerBaseDAO {
 
 	public void setPluginIds(List<String> pluginIds) {
 		this.pluginIds = pluginIds;
+	}
+
+	public List<TechnologyOptions> getOptions() {
+		return options;
+	}
+
+	public void setOptions(List<TechnologyOptions> options) {
+		this.options = options;
 	}
 
 }
