@@ -46,7 +46,7 @@
 	String desc = "";
 	boolean isSystem = false;
 	if (settingsTemplate != null) {
-		name = settingsTemplate.getType();
+		name = settingsTemplate.getName();
 		desc = settingsTemplate.getDescription();
 		isSystem = settingsTemplate.isSystem();
 	}
