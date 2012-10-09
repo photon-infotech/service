@@ -274,7 +274,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 			List<SettingsTemplate> configTemplates = getServiceManager().getconfigTemplates(getCustomerId());
 			if (CollectionUtils.isNotEmpty(configTemplates)) { //TODO: this should handled by query
 				for (SettingsTemplate configTemplate : configTemplates) {
-					if (configTemplate.getType().equalsIgnoreCase(getName())) {
+					if (configTemplate.getName().equalsIgnoreCase(getName())) {
 						setNameError(getText(KEY_I18N_ERR_NAME_ALREADY_EXIST));
 			    		isError = true;
 						break;
