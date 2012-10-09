@@ -202,12 +202,13 @@ public class ApptypeGenerator extends DbService implements ServiceConstants {
         List<Technology> techs = new ArrayList<Technology>();
         techs.add(createTechnology(TechnologyTypes.JAVA_WEBSERVICE, "Java Web Service", new String[]{"1.6", "1.5"}, "apptype-web-services"));
         techs.add(createTechnology(TechnologyTypes.NODE_JS_WEBSERVICE, "Node JS Web Service", new String[]{"6.14","6.11", "6.8","6.7", "6.1"}, "apptype-web-services"));
+        saveTechnologies(techs);
     }
     
     public void publish() throws PhrescoException {
-//        generateApptypes();
-//        createWebAppTechs();
-//        createMobAppTechs();
+        generateApptypes();
+        createWebAppTechs();
+        createMobAppTechs();
         createWebServiceAppTechs();
     }
     
