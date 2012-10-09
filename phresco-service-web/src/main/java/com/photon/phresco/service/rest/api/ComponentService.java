@@ -1232,14 +1232,7 @@ public class ComponentService extends DbService {
 		
 		List<WebService> webServiceList = new ArrayList<WebService>();
 		try {
-			if (!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
-				webServiceList= mongoOperation.find(WEBSERVICES_COLLECTION_NAME, 
-				        new Query(Criteria.where (REST_QUERY_CUSTOMERID).is(customerId)), WebService.class);
-			}
-			webServiceList.addAll(mongoOperation.find(WEBSERVICES_COLLECTION_NAME, 
-			        new Query(Criteria.where(REST_QUERY_CUSTOMERID)
-			        .is(DEFAULT_CUSTOMER_NAME)), WebService.class));
-			
+			webServiceList.addAll(mongoOperation.getCollection(WEBSERVICES_COLLECTION_NAME, WebService.class));
 			return  Response.status(Response.Status.OK).entity(webServiceList).build();
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, WEBSERVICES_COLLECTION_NAME);
