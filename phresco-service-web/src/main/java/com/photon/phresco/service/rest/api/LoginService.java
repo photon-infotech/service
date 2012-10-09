@@ -19,12 +19,16 @@
  */
 package com.photon.phresco.service.rest.api;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.User;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.PhrescoServerFactory;
@@ -82,6 +86,7 @@ public class LoginService extends DbService {
         user.setToken(authTokenUtil.generateToken(credentials.getUsername()));
         user.setPhrescoEnabled(true);
         user.setValidLogin(true);
+        user.setCustomerIds(createCustomerIds());
         return user;
         
         
@@ -111,4 +116,12 @@ public class LoginService extends DbService {
 //        return convertedUser;
     }
 	
+	 private List<String> createCustomerIds() {
+     	List<String> customerIds = new ArrayList<String>();
+     	List<Customer> customers = mongoOperation.getCollection(CUSTOMERS_COLLECTION_NAME, Customer.class);
+     	for (Customer customer : customers) {
+				customerIds.add(customer.getId());
+			}
+ 		return customerIds;
+ 	}
 }

@@ -26,8 +26,7 @@
 	<constant name="struts.ui.theme" value="simple"/>
 	
 	<package name="login" extends="struts-default, json-default">
-		<action name="login" class="com.photon.phresco.service.admin.actions.Login"
-			method="login">
+		<action name="login" class="com.photon.phresco.service.admin.actions.Login" method="login">
 			<result name="success">/admin/baselayout.jsp</result>
 			<result name="failure">/admin/login.jsp</result>
 		</action>
