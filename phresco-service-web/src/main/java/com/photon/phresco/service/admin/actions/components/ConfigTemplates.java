@@ -181,7 +181,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 		SettingsTemplate settingTemplate = null;
 		try {
 			settingTemplate = new SettingsTemplate();
-			settingTemplate.setType(getName());
+			settingTemplate.setName(getName());
 			settingTemplate.setDescription(getDescription());
 			settingTemplate.setCustomerIds(Arrays.asList(getCustomerId()));
 			if (StringUtils.isNotEmpty(getConfigId())) {

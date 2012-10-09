@@ -106,7 +106,7 @@
 										</td>
 										<td class="nameConfig">
 											<a href="#" onclick="editConfigTemp('<%= configTemplate.getId() %>');" name="edit" id="" >
-												<%= StringUtils.isNotEmpty(configTemplate.getType()) ? configTemplate.getType() : "" %>
+												<%= StringUtils.isNotEmpty(configTemplate.getName()) ? configTemplate.getName() : "" %>
 											</a>
 										</td>
 										<td class="descConfig">
