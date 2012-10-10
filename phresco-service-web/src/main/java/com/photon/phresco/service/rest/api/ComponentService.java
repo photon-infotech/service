@@ -381,7 +381,7 @@ public class ComponentService extends DbService {
 			String customerId = technology.getCustomerIds().get(0);
 			artifactinfo.setCustomerIds(technology.getCustomerIds());
 			
-			File appJarFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null);
+			File appJarFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null,artifactinfo.getPackaging());
             uploadBinary(artifactinfo, appJarFile);
             FileUtil.delete(appJarFile);
         }
@@ -429,11 +429,10 @@ public class ComponentService extends DbService {
                 archetypeInfo.getPackaging(), artifactInfo.getVersion());
 		
         info.setPomFile(pomFile);
-        boolean addArtifact = true;
         
         List<String> customerIds = archetypeInfo.getCustomerIds();
-        //TODO:Need to upload the content into the repository
-//        boolean addArtifact = repositoryManager.addArtifact(info, artifactFile, customerId);
+        String customerId = archetypeInfo.getCustomerIds().get(0);
+        boolean addArtifact = repositoryManager.addArtifact(info, artifactFile, customerId);
         FileUtil.delete(pomFile);
         return addArtifact;
     }
@@ -801,31 +800,13 @@ public class ComponentService extends DbService {
         }
         
         if (bodyPartEntity != null) {
-            moduleFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null);
+            moduleFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null,moduleGroup.getPackaging());
             boolean uploadBinary = uploadBinary(moduleGroup, moduleFile);
             if (uploadBinary) {
             	saveModuleGroup(moduleGroup);
             }
             FileUtil.delete(moduleFile);
         }
-        
-        
-        	
-        	//TODO:Old Logic, need to check with Kumar
-        	//check if the module already exist
-        	//This query should be done based on artifactId, groupId
-//        	ArtifactGroupDAO foundModuleGroup = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
-//        			new Query(Criteria.where("name").is(moduleGroup.getName())), ArtifactGroupDAO.class);
-//        	
-//        	if (foundModuleGroup != null) {
-//        		List<String> versions = foundModuleGroup.getVersionIds();
-//        		versions.add(module.getId());
-//        		foundModuleGroup.setVersions(versions);
-//        		saveModuleGroup(foundModuleGroup);
-//        	} else {
-//        	    saveModuleGroup(moduleGroup);
-//        	}
-        	
         
         return Response.status(Response.Status.CREATED).entity(moduleGroup).build();
 	}
@@ -1013,16 +994,27 @@ public class ComponentService extends DbService {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.findPilots()" + customerId);
 	    }
+	    List<ApplicationInfo> applicationInfos = new ArrayList<ApplicationInfo>();
 		try {
 		    List<ApplicationInfoDAO> appInfos = new ArrayList<ApplicationInfoDAO>();
 			Query query = createCustomerIdQuery(customerId);
+			Converter<ApplicationInfoDAO, ApplicationInfo> pilotConverter = 
+            		(Converter<ApplicationInfoDAO, ApplicationInfo>) ConvertersFactory.getConverter(ApplicationInfoDAO.class);
 			if (StringUtils.isNotEmpty(techId)) {
                 query.addCriteria(Criteria.where("techInfo.version").is(techId));
                 appInfos = mongoOperation.find(APPLICATION_INFO_COLLECTION_NAME, query, ApplicationInfoDAO.class);
+                for (ApplicationInfoDAO applicationInfoDAO : appInfos) {
+	               	 ApplicationInfo applicationInfo = pilotConverter.convertDAOToObject(applicationInfoDAO, mongoOperation);
+	               	 applicationInfos.add(applicationInfo);
+					}
             } else {
                 appInfos = mongoOperation.find(APPLICATION_INFO_COLLECTION_NAME, query, ApplicationInfoDAO.class);
+                for (ApplicationInfoDAO applicationInfoDAO : appInfos) {
+                	 ApplicationInfo applicationInfo = pilotConverter.convertDAOToObject(applicationInfoDAO, mongoOperation);
+                	 applicationInfos.add(applicationInfo);
+				}
             }
-			return Response.status(Response.Status.OK).entity(appInfos).build();
+			return Response.status(Response.Status.OK).entity(applicationInfos).build();
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, APPLICATION_INFO_COLLECTION_NAME);
 		}
@@ -1063,21 +1055,19 @@ public class ComponentService extends DbService {
         }
         
         if(bodyPartEntity != null) {
-            pilotFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null);
-            saveApplicationInfo(applicationInfo);
-            FileUtil.delete(pilotFile);
+        	 pilotFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null, 
+             		applicationInfo.getPilotContent().getPackaging());
+             boolean uploadBinary = uploadBinary(applicationInfo.getPilotContent(), pilotFile);
+             if(uploadBinary) {
+             	saveApplicationInfo(applicationInfo);
+             } 
+             FileUtil.delete(pilotFile);
         }
+       
         
         if(bodyPartEntity == null && applicationInfo != null) {
         	saveApplicationInfo(applicationInfo);
         }
-        //TODO:Need to handle uploading of Binaries into repository
-//        boolean uploadBinary = uploadBinary(projectInfo.getArchetypeInfo(), 
-//                pilotFile, projectInfo.getCustomerId());
-//        if(uploadBinary) {
-////            projectInfo.setProjectURL(createContentURL(projectInfo.getArchetypeInfo()));
-            
-//        }
         return Response.status(Response.Status.CREATED).entity(applicationInfo).build();
 	}
 	
@@ -1443,19 +1433,18 @@ public class ComponentService extends DbService {
                 if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
                     downloadInfo = new DownloadInfo();
                     downloadInfo = bodyPart.getEntityAs(DownloadInfo.class);
-                } else {
+                } else if(bodyPart.getMediaType().equals(MediaType.APPLICATION_OCTET_STREAM_TYPE)){
                     bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
                 }
             }
         }
-        
+
         if(bodyPartEntity != null) {
-            downloadFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null);
+            downloadFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null,downloadInfo.getArtifactGroup().getPackaging());
             boolean uploadBinary = uploadBinary(downloadInfo.getArtifactGroup(), downloadFile);
             if(uploadBinary) {
                 saveDownloads(downloadInfo);
             }
-            saveDownloads(downloadInfo);
             FileUtil.delete(downloadFile);
         }
         

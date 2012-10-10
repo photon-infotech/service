@@ -45,6 +45,7 @@ import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.Permission;
 import com.photon.phresco.commons.model.Property;
+import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.commons.model.Role;
 import com.photon.phresco.commons.model.User;
 import com.photon.phresco.commons.model.VideoInfo;
@@ -61,6 +62,7 @@ import com.photon.phresco.service.dao.VideoInfoDAO;
 import com.photon.phresco.service.dao.VideoTypeDAO;
 import com.photon.phresco.service.impl.DbService;
 import com.photon.phresco.service.model.ArtifactInfo;
+import com.photon.phresco.service.model.ServerConfiguration;
 import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.FileUtil;
 import com.photon.phresco.util.ServiceConstants;
@@ -79,9 +81,12 @@ public class AdminService extends DbService {
 	
 	private static final Logger S_LOGGER = Logger.getLogger(AdminService.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
+	private RepositoryManager repositoryManager = null;
 	
     public AdminService() throws PhrescoException {
     	super();
+    	PhrescoServerFactory.initialize();
+    	repositoryManager = PhrescoServerFactory.getRepositoryManager();
     }
     
     /**
@@ -118,9 +123,12 @@ public class AdminService extends DbService {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.createCustomer(List<Customer> customer)");
         }
-        
     	try {
-	        mongoOperation.insertList(CUSTOMERDAO_COLLECTION_NAME, customers);
+    		for(Customer customer : customers){
+		        RepoInfo repoInfo = repositoryManager.createCustomerRepository(customer.getId());
+		        customer.setRepoInfo(repoInfo);
+		        mongoOperation.insert(CUSTOMERDAO_COLLECTION_NAME, customer);
+    		}
     	} catch (Exception e) {
     		throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
 		}
@@ -317,18 +325,16 @@ public class AdminService extends DbService {
 			// TODO:Throw exception
 		}
 
-		if (bodyPartEntity != null) {
-			videoFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null);
-		}
-		
 		if(bodyPartEntity != null) {
+			videoFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null, video.getVideoList().get(0).getArtifactGroup().getPackaging());
 			List<VideoType> videoTypeList = video.getVideoList();
-			VideoType videoType = videoTypeList.get(0);
-			ArtifactGroup artifactGroup = videoType.getArtifactGroup();
-			if (artifactGroup != null) {
-				boolean uploadBinary = uploadBinary(video.getVideoList().get(0).getArtifactGroup(), videoFile);
-				if (uploadBinary) {
-					saveVideos(video);
+			for (VideoType videoType : videoTypeList) {
+					ArtifactGroup artifactGroup = videoType.getArtifactGroup();
+				if (artifactGroup != null) {
+					boolean uploadBinary = uploadBinary(artifactGroup, videoFile);
+					if (uploadBinary) {
+						saveVideos(video);
+					}
 				}
 			}
 		}
@@ -367,7 +373,7 @@ public class AdminService extends DbService {
 		mongoOperation.save(VIDEODAO_COLLECTION_NAME, videoDAO);
 	}
 
-	private boolean uploadBinary(ArtifactGroup archetypeInfo, File videoFile) throws PhrescoException {
+	private boolean uploadBinary(ArtifactGroup archetypeInfo, File artifactFile) throws PhrescoException {
 		
         File pomFile = ServerUtil.createPomFile(archetypeInfo);
         
@@ -379,11 +385,9 @@ public class AdminService extends DbService {
                 archetypeInfo.getPackaging(), artifactInfo.getVersion());
 		
         info.setPomFile(pomFile);
-        boolean addArtifact = true;
-        
         List<String> customerIds = archetypeInfo.getCustomerIds();
-        //TODO:Need to upload the content into the repository
-//        boolean addArtifact = repositoryManager.addArtifact(info, artifactFile, customerId);
+        String customerId = archetypeInfo.getCustomerIds().get(0);
+        boolean addArtifact = repositoryManager.addArtifact(info, artifactFile, customerId);
         FileUtil.delete(pomFile);
         return addArtifact;
 	}
@@ -503,26 +507,17 @@ public class AdminService extends DbService {
 	 * Updates the list of video bu Id
 	 * @param videoInfo
 	 * @return
+	 * @throws PhrescoException 
 	 */
 	@PUT
-	@Consumes (MediaType.APPLICATION_JSON)
+	@Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_VIDEOS + REST_API_PATH_ID)
-	public Response updateVideo(@PathParam(REST_API_PATH_PARAM_ID) String id , VideoInfo videoInfo) {
+	public Response updateVideo(@PathParam(REST_API_PATH_PARAM_ID) String id , MultiPart videoInfo) throws PhrescoException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.updateVideo(String id , VideoInfo videoInfo)" + id);
 	    }
-		
-		try {
-			if (id.equals(videoInfo.getId())) {
-				mongoOperation.save(VIDEOS_COLLECTION_NAME, videoInfo);
-				return Response.status(Response.Status.OK).entity(videoInfo).build();
-			} 
-		} catch (Exception e) {
-			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
-		}
-		 
-		return Response.status(Response.Status.BAD_REQUEST).entity(ERROR_MSG_ID_NOT_EQUAL).build();
+				return createOrUpdateVideo(videoInfo);
 	}
 
 	

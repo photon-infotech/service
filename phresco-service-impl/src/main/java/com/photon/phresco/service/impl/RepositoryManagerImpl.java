@@ -101,7 +101,7 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 //	private static final String JAXB_PACKAGE_NAME = "com.photon.phresco.service.jaxb";
 	private static final int HTTP_NOT_FOUND = 404;
 	private static final String LOCAL_REPO = "../temp/target/local-repo";
-
+	
 	private ServerConfiguration config = null;
 
 	// TODO:Add ehcaching
@@ -198,8 +198,10 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 		}
 		DbManager dbManager = PhrescoServerFactory.getDbManager();
 		RepoInfo repoInfo = dbManager.getRepoInfo(customerId);
-//		String password = ServeUtil.decryptString(repoInfo.getRepoPassword());
-		String password = "devrepo2";
+		if(repoInfo == null) {
+			throw new PhrescoException("Repo Information Not Available........");
+		}
+		String password = ServerUtil.decryptString(repoInfo.getRepoPassword());
 		RepositorySystem system = newRepositorySystem();
 		RepositorySystemSession session = newRepositorySystemSession(system);
 		Artifact artifact = new DefaultArtifact(info.getGroupId(), info.getArtifact(), info.getClassifier(), info
@@ -207,8 +209,8 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 
 		artifact = artifact.setFile(artifactFile);
 		
-		RemoteRepository distRepo = new RemoteRepository("", DEFAULT, "http://172.16.17.226:8080/repository/content/repositories/phresco-binaries/");
-		Authentication authentication = new Authentication("admin", password);
+		RemoteRepository distRepo = new RemoteRepository("", DEFAULT, repoInfo.getReleaseRepoURL());
+		Authentication authentication = new Authentication(repoInfo.getRepoUserName(), password);
 		distRepo.setAuthentication(authentication);
 		DeployRequest deployRequest = new DeployRequest();
 		deployRequest.addArtifact(artifact);
@@ -513,4 +515,25 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
         return OPEN_PHRASE + SLASH + REPO_OBJECT_ID + SLASH + COLON + json + CLOSE_PHRASE;
     }
 
+	@Override
+	public boolean deleteArtifact(String customerId, ArtifactGroup artifactGroup)
+			throws PhrescoException {
+		PhrescoServerFactory.initialize();
+		DbManager dbManager = PhrescoServerFactory.getDbManager();
+		RepoInfo repoInfo = dbManager.getRepoInfo(customerId);
+		Client client = new Client();
+        client.addFilter(new HTTPBasicAuthFilter(repoInfo.getRepoUserName(), repoInfo.getRepoPassword()));
+        WebResource resource = client.resource(repoInfo.getBaseRepoURL() + REPO_LOCAL + 
+        		customerId + REPOTYPE_RELEASE.toLowerCase() + CONTENT + createFileUrl(artifactGroup));
+        ClientResponse response = resource.delete(ClientResponse.class);
+        if(response.getStatus() == 204) {
+        	return true;
+        }
+		return false;
+	}
+
+	private String createFileUrl(ArtifactGroup artifactGroup) {
+		return artifactGroup.getGroupId().replace(DOT, FORWARD_SLASH) + FORWARD_SLASH + artifactGroup.getArtifactId() + FORWARD_SLASH + 
+				artifactGroup.getVersions().get(0).getVersion();
+	}
 }
