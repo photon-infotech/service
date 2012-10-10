@@ -214,92 +214,93 @@ public interface ServiceUIConstants {
     
     /*****************************
      * Error Report
+     * I18N Keys Constants
      * String REQ_LOG_REPORT
      *****************************/ 
     String REQ_LOG_REPORT = "logReport";
     String LOG_ERROR = "logError";
     
-    String EXCEPTION_APPTYPES_LIST = "Application types list";
-    String EXCEPTION_APPTYPES_EDIT = "Application types edit";
-    String EXCEPTION_APPTYPES_SAVE = "Application types save";
-    String EXCEPTION_APPTYPES_UPDATE = "Application types update";
-    String EXCEPTION_APPTYPES_DELETE = "Application types delete";
+    String EXCEPTION_LOGIN = "excep.hdr.admin.cust.login";
+    String EXCEPTION_CUSTOMERS_DELETE = "excep.hdr.admin.cust.delete";
+	String EXCEPTION_CUSTOMERS_UPDATE = "excep.hdr.admin.cust.update";
+	String EXCEPTION_CUSTOMERS_SAVE = "excep.hdr.admin.cust.save";
+	String EXCEPTION_CUSTOMERS_ADD = "excep.hdr.admin.cust.add";
+	String EXCEPTION_CUSTOMERS_LIST = "excep.hdr.admin.cust.list";
+	String EXCEPTION_CUSTOMERS_VALIDATE = "excep.hdr.admin.cust.validate";
+	
+	String EXCEPTION_USERS_LIST = "excep.hdr.admin.user.list";
     
-    String EXCEPTION_LOGIN = "Login Authenticate";
-    String EXCEPTION_CUSTOMERS_DELETE = "Customers delete";
-	String EXCEPTION_CUSTOMERS_UPDATE = "Customers update";
-	String EXCEPTION_CUSTOMERS_SAVE = "Customers save";
-	String EXCEPTION_CUSTOMERS_ADD = "Customers add";
-	String EXCEPTION_CUSTOMERS_LIST = "Customers list";
-	String EXCEPTION_CUSTOMERS_VALIDATE = "Customers validateForm";
+	String EXCEPTION_ROLE_DELETE = "excep.hdr.admin.role.delete";
+	String EXCEPTION_ROLE_UPDATE = "excep.hdr.admin.role.update";
+	String EXCEPTION_ROLE_SAVE = "excep.hdr.admin.role.save";
+	String EXCEPTION_ROLE_EDIT = "excep.hdr.admin.role.edit";
+	String EXCEPTION_ROLE_LIST = "excep.hdr.admin.role.list";
 	
-	String EXCEPTION_USERS_LIST = "User list";
-    
-	String EXCEPTION_ROLE_DELETE = "Role delete";
-	String EXCEPTION_ROLE_UPDATE = "Role update";
-	String EXCEPTION_ROLE_SAVE = "Role save";
-	String EXCEPTION_ROLE_EDIT = "Role edit";
-	String EXCEPTION_ROLE_LIST = "Role list";
+	String EXCEPTION_PERMISSION_LIST = "excep.hdr.admin.asgnprm.list";
+	String EXCEPTION_PERMISSION_DELETE = "excep.hdr.admin.asgnprm.delete";
 	
-	String EXCEPTION_PERMISSION_LIST = "Permission list";
-	String EXCEPTION_PERMISSION_DELETE = "Permission delete";
+	String EXCEPTION_VIDEO_DELETE = "excep.hdr.admin.video.delete";
+	String EXCEPTION_VIDEO_UPDATE = "excep.hdr.admin.video.update";
+	String EXCEPTION_VIDEO_SAVE = "excep.hdr.admin.video.save";
+	String EXCEPTION_VIDEO_EDIT = "excep.hdr.admin.video.edit";
+	String EXCEPTION_VIDEO_LIST = "excep.hdr.admin.video.list";
 	
-	String EXCEPTION_VIDEO_DELETE = "Video delete";
-	String EXCEPTION_VIDEO_UPDATE = "Video update";
-	String EXCEPTION_VIDEO_SAVE = "Video save";
-	String EXCEPTION_VIDEO_EDIT = "Video edit";
-	String EXCEPTION_VIDEO_LIST = "Video list";
+	String EXCEPTION_GLOBAL_URL_DELETE = "excep.hdr.admin.glblurl.delete";
+	String EXCEPTION_GLOBAL_URL_UPDATE = "excep.hdr.admin.glblurl.update";
+	String EXCEPTION_GLOBAL_URL_SAVE = "excep.hdr.admin.glblurl.save";
+	String EXCEPTION_GLOBAL_URL_EDIT = "excep.hdr.admin.glblurl.edit";
+	String EXCEPTION_GLOBAL_URL_LIST = "excep.hdr.admin.glblurl.list";
 	
-	String EXCEPTION_GLOBAL_URL_DELETE = "GlobalUrl delete";
-	String EXCEPTION_GLOBAL_URL_UPDATE = "GlobalUrl update";
-	String EXCEPTION_GLOBAL_URL_SAVE = "GlobalUrl save";
-	String EXCEPTION_GLOBAL_URL_EDIT = "GlobalUrl edit";
-	String EXCEPTION_GLOBAL_URL_LIST = "GlobalUrl list";
-		
-	String EXCEPTION_FEATURE_DELETE = "Feature delete";
-	String EXCEPTION_FEATURE_UPDATE = "Feature update";
-	String EXCEPTION_FEATURE_SAVE = "Feature save";
-	String EXCEPTION_FEATURE_EDIT = "Feature edit";
-	String EXCEPTION_FEATURE_LIST = "Feature list";
-	String EXCEPTION_FEATURE_ADD = "Feature add";
+	String EXCEPTION_FEATURE_DELETE = "excep.hdr.comp.feature.delete";
+	String EXCEPTION_FEATURE_UPDATE = "excep.hdr.comp.feature.update";
+	String EXCEPTION_FEATURE_SAVE = "excep.hdr.comp.feature.save";
+	String EXCEPTION_FEATURE_EDIT = "excep.hdr.comp.feature.edit";
+	String EXCEPTION_FEATURE_LIST = "excep.hdr.comp.feature.list";
+	String EXCEPTION_FEATURE_ADD = "excep.hdr.comp.feature.add";
 	String EXCEPTION_FEATURE_VALIDATE = "Feature validate";
 	
-	String EXCEPTION_COMPONENT_DELETE = "Component delete";
-	String EXCEPTION_COMPONENT_UPDATE = "Component update";
-	String EXCEPTION_COMPONENT_SAVE = "Component save";
-	String EXCEPTION_COMPONENT_ADD = "Component add";
-	String EXCEPTION_COMPONENT_EDIT = "Component edit";
-	String EXCEPTION_COMPONENT_LIST = "Component list";
-	String EXCEPTION_COMPONENT_LIST_DEPENDENCY = "Component listConponentsDependency";
-	String EXCEPTION_COMPONENT_UPLOAD_FILE = "Component uploadFile";
+	String EXCEPTION_COMPONENT_DELETE = "excep.hdr.comp.compon.delete";
+	String EXCEPTION_COMPONENT_UPDATE = "excep.hdr.comp.compon.update";
+	String EXCEPTION_COMPONENT_SAVE = "excep.hdr.comp.compon.save";
+	String EXCEPTION_COMPONENT_ADD = "excep.hdr.comp.compon.add";
+	String EXCEPTION_COMPONENT_EDIT = "excep.hdr.comp.compon.edit";
+	String EXCEPTION_COMPONENT_LIST = "excep.hdr.comp.compon.list";
+	String EXCEPTION_COMPONENT_LIST_DEPENDENCY = "excep.hdr.comp.compon.dependency";
+	String EXCEPTION_COMPONENT_UPLOAD_FILE = "excep.hdr.comp.compon.uploadfile";
 	
-	String EXCEPTION_ARCHETYPE_DELETE = "Archetype delete";
-	String EXCEPTION_ARCHETYPE_UPDATE = "Archetype update";
-	String EXCEPTION_ARCHETYPE_SAVE = "Archetype save";
-	String EXCEPTION_ARCHETYPE_EDIT = "Archetype edit";
-	String EXCEPTION_ARCHETYPE_ADD = "Archetype add";
-	String EXCEPTION_ARCHETYPE_LIST = "Archetype list";
+	String EXCEPTION_ARCHETYPE_DELETE = "excep.hdr.comp.archetype.delete";
+	String EXCEPTION_ARCHETYPE_UPDATE = "excep.hdr.comp.archetype.update";
+	String EXCEPTION_ARCHETYPE_SAVE = "excep.hdr.comp.archetype.save";
+	String EXCEPTION_ARCHETYPE_EDIT = "excep.hdr.comp.archetype.edit";
+	String EXCEPTION_ARCHETYPE_ADD = "excep.hdr.comp.archetype.add";
+	String EXCEPTION_ARCHETYPE_LIST = "excep.hdr.comp.archetype.list";
 	
-	String EXCEPTION_CONFIG_TEMP_DELETE = "ConfigTemplate delete";
-	String EXCEPTION_CONFIG_TEMP_UPDATE = "ConfigTemplate update";
-	String EXCEPTION_CONFIG_TEMP_SAVE = "ConfigTemplate save";
-	String EXCEPTION_CONFIG_TEMP_EDIT = "ConfigTemplate edit";
-	String EXCEPTION_CONFIG_TEMP_ADD = "ConfigTemplate add";
-	String EXCEPTION_CONFIG_TEMP_LIST = "ConfigTemplate list";
+	String EXCEPTION_APPTYPES_LIST = "excep.hdr.comp.appln.list";
+	String EXCEPTION_APPTYPES_EDIT = "excep.hdr.comp.appln.edit";
+	String EXCEPTION_APPTYPES_SAVE = "excep.hdr.comp.appln.save";
+	String EXCEPTION_APPTYPES_UPDATE = "excep.hdr.comp.appln.update";
+	String EXCEPTION_APPTYPES_DELETE = "excep.hdr.comp.appln.delete";
 	
-	String EXCEPTION_PILOT_PROJECTS_DELETE = "PilotProjects delete";
-	String EXCEPTION_PILOT_PROJECTS_UPDATE = "PilotProjects update";
-	String EXCEPTION_PILOT_PROJECTS_SAVE = "PilotProjects save";
-	String EXCEPTION_PILOT_PROJECTS_EDIT = "PilotProjects edit";
-	String EXCEPTION_PILOT_PROJECTS_ADD = "PilotProjects add";
-	String EXCEPTION_PILOT_PROJECTS_LIST = "Exception in PilotProjects List";
+	String EXCEPTION_CONFIG_TEMP_DELETE = "excep.hdr.comp.configtemp.delete";
+	String EXCEPTION_CONFIG_TEMP_UPDATE = "excep.hdr.comp.configtemp.update";
+	String EXCEPTION_CONFIG_TEMP_SAVE = "excep.hdr.comp.configtemp.save";
+	String EXCEPTION_CONFIG_TEMP_EDIT = "excep.hdr.comp.configtemp.edit";
+	String EXCEPTION_CONFIG_TEMP_ADD = "excep.hdr.comp.configtemp.add";
+	String EXCEPTION_CONFIG_TEMP_LIST = "excep.hdr.comp.configtemp.list";
 	
-	String EXCEPTION_DOWNLOADS_DELETE = "Downloads delete";
-	String EXCEPTION_DOWNLOADS_UPDATE = "Downloads update";
-	String EXCEPTION_DOWNLOADS_SAVE = "Downloads save";
-	String EXCEPTION_DOWNLOADS_EDIT = "Downloads edit";
-	String EXCEPTION_DOWNLOADS_ADD = "Downloads add";
-	String EXCEPTION_DOWNLOADS_LIST = "Downloads list";
+	String EXCEPTION_PILOT_PROJECTS_DELETE = "excep.hdr.comp.pilotpro.delete";
+	String EXCEPTION_PILOT_PROJECTS_UPDATE = "excep.hdr.comp.pilotpro.update";
+	String EXCEPTION_PILOT_PROJECTS_SAVE = "excep.hdr.comp.pilotpro.save";
+	String EXCEPTION_PILOT_PROJECTS_EDIT = "excep.hdr.comp.pilotpro.edit";
+	String EXCEPTION_PILOT_PROJECTS_ADD = "excep.hdr.comp.pilotpro.add";
+	String EXCEPTION_PILOT_PROJECTS_LIST = "excep.hdr.comp.pilotpro.list";
+	
+	String EXCEPTION_DOWNLOADS_DELETE = "excep.hdr.comp.download.delete";
+	String EXCEPTION_DOWNLOADS_UPDATE = "excep.hdr.comp.download.update";
+	String EXCEPTION_DOWNLOADS_SAVE = "excep.hdr.comp.download.save";
+	String EXCEPTION_DOWNLOADS_EDIT = "excep.hdr.comp.download.edit";
+	String EXCEPTION_DOWNLOADS_ADD = "excep.hdr.comp.download.add";
+	String EXCEPTION_DOWNLOADS_LIST = "excep.hdr.comp.download.list";
 	
 	/*****************************
      * I18N Keys Constants
@@ -358,7 +359,6 @@ public interface ServiceUIConstants {
     
     /*****************************
      * I18N Keys Constants
-     * String KEY_I18N_FEATUR_XXX
      *****************************/	
     String FEATURE_ADDED = "succ.feature.add";
     String FEATURE_UPDATED = "succ.feature.update";

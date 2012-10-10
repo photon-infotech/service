@@ -50,6 +50,7 @@
     boolean isDefaultModule = false;
     boolean isCoreModule = false;
     boolean isSystem = false;
+    boolean showArtifactGroup = false;
 	if (moduleGroup != null) {
 	    name = moduleGroup.getName();
 	    
@@ -94,6 +95,10 @@
 		
 		isSystem = moduleGroup.isSystem();
 	}
+	if (ServiceUIConstants.REQ_FEATURES_TYPE_MODULE.equals(type)) {
+		showArtifactGroup = true;
+	}
+	
 %>
 
 <form id="formFeatureAdd" class="form-horizontal customer_list" method="post" enctype="multipart/form-data">
@@ -102,31 +107,31 @@
 		if (ServiceUIConstants.REQ_FEATURES_TYPE_MODULE.equals(type)) {
 		    if (StringUtils.isEmpty(fromPage)) {
 	%>
-				<h4 class="hdr"><s:text name='lbl.hdr.comp.featrs.mod.add'/></h4>
+				<h4 class="hdr headerFeat"><s:text name='lbl.hdr.comp.featrs.mod.add'/></h4>
 	<%
 		    } else {
 	%>
-				<h4 class="hdr"><s:text name='lbl.hdr.comp.featrs.mod.edit'/></h4>
+				<h4 class="hdr headerFeat"><s:text name='lbl.hdr.comp.featrs.mod.edit'/></h4>
 	<% 		
 			}
 		} else if (ServiceUIConstants.REQ_FEATURES_TYPE_JS.equals(type)) {
 			if (StringUtils.isEmpty(fromPage)) {
 	%>
-				<h4 class="hdr"><s:text name='lbl.hdr.comp.featrs.js.add'/></h4>
+				<h4 class="hdr headerFeat"><s:text name='lbl.hdr.comp.featrs.js.add'/></h4>
 	<%
 		} else {
 	%>
-				<h4 class="hdr"><s:text name='lbl.hdr.comp.featrs.js.edit'/></h4>
+				<h4 class="hdr headerFeat"><s:text name='lbl.hdr.comp.featrs.js.edit'/></h4>
 	<% 		
 			}
 		} else if (ServiceUIConstants.REQ_FEATURES_TYPE_COMPONENT.equals(type)) {
 			if (StringUtils.isEmpty(fromPage)) {
 	%>
-				<h4 class="hdr"><s:text name='lbl.hdr.comp.component.add'/></h4>
+				<h4 class="hdr headerFeat"><s:text name='lbl.hdr.comp.component.add'/></h4>
 	<%
 			} else {
 	%>
-				<h4 class="hdr"><s:text name='lbl.hdr.comp.component.edit'/></h4>
+				<h4 class="hdr headerFeat"><s:text name='lbl.hdr.comp.component.edit'/></h4>
 				
 	<%
 			}
@@ -224,6 +229,8 @@
 		
 		<!-- POM details starts -->
 		<div id="jarDetailsDiv" class="hideContent">
+		
+		<% if (showArtifactGroup) { %>
 			<div class="control-group" id="groupIdControl">
 				<label class="control-label labelbold">
 					<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.groupid'/>
@@ -245,6 +252,8 @@
 						<span class="help-inline" id="artifactIdError"></span>
 				</div>
 			</div>
+			
+			<% } %>
 			
 			<div class="control-group" id="verControl">
 				<label class="control-label labelbold">

@@ -32,10 +32,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import com.photon.phresco.commons.model.ArtifactGroup;
-import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.VideoInfo;
-import com.photon.phresco.commons.model.VideoType;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.client.api.ServiceManager;
@@ -51,9 +48,6 @@ public class Videos extends ServiceBaseAction {
 
 	private String name = "";
 	private String description = "";
-	private String groupId = "";
-	private String artifactId = "";
-	private String version = "";
 	private String videoId = "";
 	private String nameError = "";
 	private String videoError = "";
@@ -68,7 +62,7 @@ public class Videos extends ServiceBaseAction {
 			List<VideoInfo> videoInfos = getServiceManager().getVideoInfos();
 			setReqAttribute(REQ_VIDEO_INFO, videoInfos);
 		} catch (PhrescoException e) {
-			return showErrorPopup(e, EXCEPTION_VIDEO_LIST);
+			return showErrorPopup(e, getText(EXCEPTION_VIDEO_LIST));
 		}
 
 		s_videoByteArray = null;
@@ -96,7 +90,7 @@ public class Videos extends ServiceBaseAction {
 			setReqAttribute(REQ_VIDEO_INFO, videoInfo);
 			setReqAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (PhrescoException e) {
-			return showErrorPopup(e, EXCEPTION_VIDEO_EDIT);
+			return showErrorPopup(e, getText(EXCEPTION_VIDEO_EDIT));
 		}
 
 		return ADMIN_VIDEO_ADD;
@@ -112,7 +106,7 @@ public class Videos extends ServiceBaseAction {
 			getServiceManager().createVideos(createVideoInstance(), inputStreams);
 			addActionMessage(getText(VIDEO_ADDED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
-			return showErrorPopup(e, EXCEPTION_VIDEO_SAVE);
+			return showErrorPopup(e, getText(EXCEPTION_VIDEO_SAVE));
 		}
 
 		return list();
@@ -129,7 +123,7 @@ public class Videos extends ServiceBaseAction {
 			getServiceManager().updateVideo(createVideoInstance(), inputStreams, getVideoId());
 			addActionMessage(getText(PLTPROJ_UPDATED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
-			return showErrorPopup(e, EXCEPTION_VIDEO_UPDATE);
+			return showErrorPopup(e, getText(EXCEPTION_VIDEO_UPDATE));
 		}
 
 		return list();
@@ -143,27 +137,8 @@ public class Videos extends ServiceBaseAction {
 
 		videoInfo.setName(getName());
 		videoInfo.setDescription(getDescription());
-
-
-		List<VideoType> videoList =new ArrayList<VideoType>();
-		VideoType vType=new VideoType();
-
-		ArtifactGroup artifactGroup = new ArtifactGroup();
-		artifactGroup.setGroupId(getGroupId());
-		artifactGroup.setArtifactId(getArtifactId());
-		List<ArtifactInfo> artifactInfos =new ArrayList<ArtifactInfo>();
-		ArtifactInfo artiInfo=new ArtifactInfo();
-		artiInfo.setVersion(getVersion());
-//    	long fileSize=8;
-//    	artiInfo.setFileSize(fileSize);
-		artifactInfos.add(artiInfo);
-		artifactGroup.setVersions(artifactInfos);
-		vType.setArtifactGroup(artifactGroup);
-		videoList.add(vType);
-
-		videoInfo.setVideoList(videoList);
+		
 		return videoInfo;
-
 	}	 
 
 	public String delete() throws PhrescoException {
@@ -179,7 +154,7 @@ public class Videos extends ServiceBaseAction {
 				addActionMessage(getText(VIDEO_DELETED));
 			}
 		}catch (PhrescoException e) {
-			return showErrorPopup(e, EXCEPTION_VIDEO_DELETE);
+			return showErrorPopup(e, getText(EXCEPTION_VIDEO_DELETE));
 		}
 
 		return list();
@@ -274,30 +249,6 @@ public class Videos extends ServiceBaseAction {
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	public String getGroupId() {
-		return groupId;
-	}
-
-	public void setGroupId(String groupId) {
-		this.groupId = groupId;
-	}
-
-	public String getArtifactId() {
-		return artifactId;
-	}
-
-	public void setArtifactId(String artifactId) {
-		this.artifactId = artifactId;
-	}
-
-	public String getVersion() {
-		return version;
-	}
-
-	public void setVersion(String version) {
-		this.version = version;
 	}
 
 	public String getNameError() {

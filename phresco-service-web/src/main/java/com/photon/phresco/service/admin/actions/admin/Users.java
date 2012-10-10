@@ -43,7 +43,7 @@ public class Users extends ServiceBaseAction {
     		List<User> userList = getServiceManager().getUsersFromDB();
     		setReqAttribute(REQ_USER_LIST, userList);
     	} catch (PhrescoException e){
-    		return showErrorPopup(e, EXCEPTION_USERS_LIST);
+    		return showErrorPopup(e, getText(EXCEPTION_USERS_LIST));
     	}
 
     	return ADMIN_USER_LIST;
@@ -58,7 +58,7 @@ public class Users extends ServiceBaseAction {
     		List<User> userList = getServiceManager().getSyncUsers();
     		setReqAttribute(REQ_USER_LIST, userList);
     	} catch (PhrescoException e){
-    		return showErrorPopup(e, EXCEPTION_USERS_LIST);
+    		return showErrorPopup(e, getText(EXCEPTION_USERS_LIST));
     	}
 
     	return ADMIN_USER_LIST;

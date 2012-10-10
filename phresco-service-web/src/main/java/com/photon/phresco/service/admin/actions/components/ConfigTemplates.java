@@ -76,7 +76,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 			setReqAttribute(REQ_CONFIG_TEMPLATES, configTemplates);
 			setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		} catch (PhrescoException e) {
-			return showErrorPopup(e, EXCEPTION_CONFIG_TEMP_LIST);
+			return showErrorPopup(e, getText(EXCEPTION_CONFIG_TEMP_LIST));
 		}
 		
 		return COMP_CONFIGTEMPLATE_LIST;
@@ -97,7 +97,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 			setReqAttribute(REQ_ARCHE_TYPES, technologies);
 			setReqAttribute(REQ_FROM_PAGE, ADD);
 		} catch (PhrescoException e) {
-		    return showErrorPopup(e, EXCEPTION_CONFIG_TEMP_ADD);
+		    return showErrorPopup(e, getText(EXCEPTION_CONFIG_TEMP_ADD));
 		}
 		
 		return COMP_CONFIGTEMPLATE_ADD;
@@ -121,7 +121,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 			setReqAttribute(REQ_ARCHE_TYPES, technologies);
 			setReqAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (PhrescoException e) {
-		    return showErrorPopup(e, EXCEPTION_CONFIG_TEMP_EDIT);
+		    return showErrorPopup(e, getText(EXCEPTION_CONFIG_TEMP_EDIT));
 		}
 		
 		return COMP_CONFIGTEMPLATE_ADD;
@@ -143,7 +143,7 @@ public class ConfigTemplates extends ServiceBaseAction {
             getServiceManager().createConfigTemplates(settingsTemplates, getCustomerId());
         	addActionMessage(getText(CONFIGTEMPLATE_ADDED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
-		    return showErrorPopup(e, EXCEPTION_CONFIG_TEMP_SAVE);
+		    return showErrorPopup(e, getText(EXCEPTION_CONFIG_TEMP_SAVE));
 		}
 		
 		return  list();
@@ -163,7 +163,7 @@ public class ConfigTemplates extends ServiceBaseAction {
     		getServiceManager().updateConfigTemp(createSettingsTemplateInstance(), getConfigId(), getCustomerId());
     		addActionMessage(getText(CONFIGTEMPLATE_UPDATED, Collections.singletonList(getName())));
     	} catch (PhrescoException e) {
-    	    return showErrorPopup(e, EXCEPTION_CONFIG_TEMP_UPDATE);
+    	    return showErrorPopup(e, getText(EXCEPTION_CONFIG_TEMP_UPDATE));
 		}
 
     	return list();
@@ -249,7 +249,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 			addActionMessage(getText(CONFIGTEMPLATE_DELETED));
 			}
 		} catch (PhrescoException e) {
-		    return showErrorPopup(e, EXCEPTION_CONFIG_TEMP_DELETE);
+		    return showErrorPopup(e, getText(EXCEPTION_CONFIG_TEMP_DELETE));
 		}
 
 		return list();

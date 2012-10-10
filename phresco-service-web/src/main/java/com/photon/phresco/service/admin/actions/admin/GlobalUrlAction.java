@@ -79,7 +79,7 @@ public class GlobalUrlAction extends ServiceBaseAction {
 			  setReqAttribute(REQ_GLOBURL_URL , globalUrl);
 			  setReqAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (PhrescoException e) {
-			return showErrorPopup(e, EXCEPTION_GLOBAL_URL_EDIT);
+			return showErrorPopup(e, getText(EXCEPTION_GLOBAL_URL_EDIT));
 		}
 		
 		return ADMIN_GLOBALURL_ADD;
@@ -97,7 +97,7 @@ public class GlobalUrlAction extends ServiceBaseAction {
 			getServiceManager().createGlobalUrl(globalURLs, getCustomerId());
 			addActionMessage(getText(URL_ADDED, Collections.singletonList(getName())));
 		}  catch (PhrescoException e) {
-			return showErrorPopup(e, EXCEPTION_GLOBAL_URL_SAVE);
+			return showErrorPopup(e, getText(EXCEPTION_GLOBAL_URL_SAVE));
 		}
 
 		return  list();
@@ -120,7 +120,7 @@ public class GlobalUrlAction extends ServiceBaseAction {
 		try {
 			getServiceManager().updateGlobalUrl(createGlobalURL(), getGlobalurlId(), getCustomerId());
 		} catch (PhrescoException e) {
-			return showErrorPopup(e, EXCEPTION_GLOBAL_URL_UPDATE);
+			return showErrorPopup(e, getText(EXCEPTION_GLOBAL_URL_UPDATE));
 		}
 		
 		return list();
@@ -141,7 +141,7 @@ public class GlobalUrlAction extends ServiceBaseAction {
 				addActionMessage(getText(URL_DELETED));
 			}
 		} catch (PhrescoException e) {
-			return showErrorPopup(e, EXCEPTION_GLOBAL_URL_DELETE);
+			return showErrorPopup(e, getText(EXCEPTION_GLOBAL_URL_DELETE));
 		}
 
 		return list();

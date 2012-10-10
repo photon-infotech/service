@@ -62,7 +62,7 @@ public class ApplicationTypes extends ServiceBaseAction {
 		    setReqAttribute(REQ_APP_TYPES, applicationTypes);
 		    setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		} catch (PhrescoException e) {
-		    return showErrorPopup(e, EXCEPTION_APPTYPES_LIST);
+		    return showErrorPopup(e, getText(EXCEPTION_APPTYPES_LIST));
 		}
 
 		return COMP_APPTYPE_LIST;
@@ -88,7 +88,7 @@ public class ApplicationTypes extends ServiceBaseAction {
 		    setReqAttribute(REQ_APP_TYPE, appType);
 		    setReqAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (PhrescoException e) {
-		    return showErrorPopup(e, EXCEPTION_APPTYPES_EDIT);
+		    return showErrorPopup(e, getText(EXCEPTION_APPTYPES_EDIT));
 		}
 		
 		return COMP_APPTYPE_ADD;
@@ -105,7 +105,7 @@ public class ApplicationTypes extends ServiceBaseAction {
 			getServiceManager().createApplicationTypes(appTypes, getCustomerId());
 			addActionMessage(getText(APPTYPES_ADDED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
-            return showErrorPopup(e, EXCEPTION_APPTYPES_SAVE);
+            return showErrorPopup(e, getText(EXCEPTION_APPTYPES_SAVE));
         }
 		
 		return list();
@@ -121,7 +121,7 @@ public class ApplicationTypes extends ServiceBaseAction {
 			getServiceManager().updateApplicationType(appType, getAppTypeId(), getCustomerId());
 			addActionMessage(getText(APPTYPES_UPDATED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
-            return showErrorPopup(e, EXCEPTION_APPTYPES_UPDATE);
+            return showErrorPopup(e, getText(EXCEPTION_APPTYPES_UPDATE));
         }
 
 		return list();
@@ -151,7 +151,7 @@ public class ApplicationTypes extends ServiceBaseAction {
 				addActionMessage(getText(APPTYPES_DELETED));
 			}
 		} catch (PhrescoException e) {
-		    return showErrorPopup(e, EXCEPTION_APPTYPES_DELETE);
+		    return showErrorPopup(e, getText(EXCEPTION_APPTYPES_DELETE));
 		}
 
 		return list();

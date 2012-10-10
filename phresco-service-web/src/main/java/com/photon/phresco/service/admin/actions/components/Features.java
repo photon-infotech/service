@@ -104,7 +104,7 @@ public class Features extends ServiceBaseAction {
     	    //To remove the selected dependent moduleIds from the session
     	    removeSessionAttribute(SESSION_FEATURES_DEPENDENT_MOD_IDS);
 	    } catch (PhrescoException e) {
-	        return showErrorPopup(e, EXCEPTION_FEATURE_LIST);
+	        return showErrorPopup(e, getText(EXCEPTION_FEATURE_LIST));
 	    }
 	    
 	    return COMP_FEATURES_LIST;
@@ -147,7 +147,7 @@ public class Features extends ServiceBaseAction {
             setReqAttribute(REQ_FEATURES_TYPE, getType());
             setTechnologiesInRequest();
         } catch (PhrescoException e) {
-            return showErrorPopup(e, EXCEPTION_FEATURE_ADD);            
+            return showErrorPopup(e, getText(EXCEPTION_FEATURE_ADD));            
         }
       
         return COMP_FEATURES_ADD;
@@ -162,7 +162,7 @@ public class Features extends ServiceBaseAction {
           List<ArtifactGroup> moduleGroups = getServiceManager().getFeatures(getCustomerId(), getTechnology(), Type.valueOf(getType()).name());
           setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroups);
       } catch (PhrescoException e) {
-          return showErrorPopup(e, EXCEPTION_FEATURE_LIST);
+          return showErrorPopup(e, getText(EXCEPTION_FEATURE_LIST));
       }
       
       return COMP_FEATURES_LIST;
@@ -193,7 +193,7 @@ public class Features extends ServiceBaseAction {
             setTechnologiesInRequest();
             addActionMessage(getText(FEATURE_ADDED, Collections.singletonList(getName())));
         } catch (PhrescoException e) {
-            return showErrorPopup(e, EXCEPTION_FEATURE_SAVE);
+            return showErrorPopup(e, getText(EXCEPTION_FEATURE_SAVE));
         }
         
         return listFeatures();
@@ -214,7 +214,7 @@ public class Features extends ServiceBaseAction {
 	        setReqAttribute(REQ_FROM_PAGE, EDIT);
 	        setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		} catch (PhrescoException e) {
-			showErrorPopup(e, EXCEPTION_FEATURE_EDIT);
+			showErrorPopup(e, getText(EXCEPTION_FEATURE_EDIT));
 		}
 
 		return COMP_FEATURES_ADD;
@@ -235,7 +235,7 @@ public class Features extends ServiceBaseAction {
             addActionMessage(getText(FEATURE_ADDED, Collections.singletonList(getName())));
             setTechnologiesInRequest();
         } catch (PhrescoException e) {
-            showErrorPopup(e, EXCEPTION_FEATURE_SAVE);
+            showErrorPopup(e, getText(EXCEPTION_FEATURE_SAVE));
         }
         
         return listFeatures();
@@ -297,14 +297,13 @@ public class Features extends ServiceBaseAction {
             String[] moduleGroupIds = getHttpRequest().getParameterValues(REQ_FEATURES_MOD_GRP);
             if (ArrayUtils.isNotEmpty(moduleGroupIds)) {
                 for (String moduleGroupId : moduleGroupIds) {
-                    System.out.println("moduleGroupId::" + moduleGroupId);
                     getServiceManager().deleteFeature(moduleGroupId, getCustomerId());
                 }
                 addActionMessage(getText(FEATURE_DELETED));
             }
             setTechnologiesInRequest();
         } catch (PhrescoException e) {
-            showErrorPopup(e, EXCEPTION_FEATURE_DELETE);
+            showErrorPopup(e, getText(EXCEPTION_FEATURE_DELETE));
         }
         
         return listFeatures();

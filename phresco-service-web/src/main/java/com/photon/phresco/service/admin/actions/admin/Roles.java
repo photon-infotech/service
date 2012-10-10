@@ -60,7 +60,7 @@ public class Roles extends ServiceBaseAction {
 			List<Role> roleList = getServiceManager().getRoles();
 			setReqAttribute(REQ_ROLE_LIST, roleList);
 		} catch (PhrescoException e) {
-		    return showErrorPopup(e, EXCEPTION_ROLE_LIST);
+		    return showErrorPopup(e, getText(EXCEPTION_ROLE_LIST));
 		}
 
 		return ADMIN_ROLE_LIST;	
@@ -84,7 +84,7 @@ public class Roles extends ServiceBaseAction {
 			setReqAttribute(REQ_ROLE_ROLE , role);
 			setReqAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (PhrescoException e) {
-		    return showErrorPopup(e, EXCEPTION_ROLE_EDIT);
+		    return showErrorPopup(e, getText(EXCEPTION_ROLE_EDIT));
 		}
 		
 		return ADMIN_ROLE_ADD;
@@ -108,7 +108,7 @@ public class Roles extends ServiceBaseAction {
 				addActionMessage(getText(ROLE_ADDED, Collections.singletonList(getName())));
 			}	
 		} catch (PhrescoException e) {
-		    return showErrorPopup(e, EXCEPTION_ROLE_SAVE);
+		    return showErrorPopup(e, getText(EXCEPTION_ROLE_SAVE));
 		}
 		
 		return  list();
@@ -123,7 +123,7 @@ public class Roles extends ServiceBaseAction {
 			Role role = new Role(getRoleId(), getName(), getDescription());
 			getServiceManager().updateRole(role, getRoleId());
 		} catch (PhrescoException e) {
-		    return showErrorPopup(e, EXCEPTION_ROLE_UPDATE);
+		    return showErrorPopup(e, getText(EXCEPTION_ROLE_UPDATE));
 		}
 
 		return list();
@@ -146,7 +146,7 @@ public class Roles extends ServiceBaseAction {
 				addActionMessage(getText(ROLE_DELETED));
 			}
 		} catch (PhrescoException e) {
-		    return showErrorPopup(e, EXCEPTION_ROLE_DELETE);
+		    return showErrorPopup(e, getText(EXCEPTION_ROLE_DELETE));
 		}
 
 		return list();

@@ -83,7 +83,7 @@ public class Downloads extends ServiceBaseAction {
 			setReqAttribute(REQ_DOWNLOAD_INFO, downloadInfo);
 			setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		} catch (PhrescoException e) {
-			return showErrorPopup(e, EXCEPTION_DOWNLOADS_LIST);
+			return showErrorPopup(e, getText(EXCEPTION_DOWNLOADS_LIST));
 		}
 
 		//to clear file inpustreams
@@ -106,7 +106,7 @@ public class Downloads extends ServiceBaseAction {
 			setReqAttribute(REQ_ARCHE_TYPES, technologies);
 			setReqAttribute(REQ_FROM_PAGE, ADD);
 		} catch (PhrescoException e) {
-			return showErrorPopup(e, EXCEPTION_DOWNLOADS_ADD);
+			return showErrorPopup(e, getText(EXCEPTION_DOWNLOADS_ADD));
 		}
 		
 		return COMP_DOWNLOAD_ADD;
@@ -127,7 +127,7 @@ public class Downloads extends ServiceBaseAction {
             setReqAttribute(REQ_DOWNLOAD_PLATFORMS, platforms);
 			setReqAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (PhrescoException e) {
-			return showErrorPopup(e, EXCEPTION_DOWNLOADS_EDIT);
+			return showErrorPopup(e, getText(EXCEPTION_DOWNLOADS_EDIT));
 		}
 
 		return COMP_DOWNLOAD_ADD;
@@ -149,7 +149,7 @@ public class Downloads extends ServiceBaseAction {
 			getServiceManager().createDownloads(getDownloadInfo(), inputStreams, getCustomerId());
 			addActionMessage(getText(DOWNLOAD_ADDED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
-			return showErrorPopup(e, EXCEPTION_DOWNLOADS_SAVE);
+			return showErrorPopup(e, getText(EXCEPTION_DOWNLOADS_SAVE));
 		}
 		
 		return list();
@@ -171,7 +171,7 @@ public class Downloads extends ServiceBaseAction {
 			getServiceManager().updateDownload(getDownloadInfo(), inputStreams, getCustomerId());
 			addActionMessage(getText(DOWNLOAD_ADDED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
-			return showErrorPopup(e, EXCEPTION_DOWNLOADS_UPDATE);
+			return showErrorPopup(e, getText(EXCEPTION_DOWNLOADS_UPDATE));
 		}
 
 		return list();
@@ -187,7 +187,7 @@ public class Downloads extends ServiceBaseAction {
         downloadInfo.setDescription(getDescription());
         downloadInfo.setCustomerIds(Arrays.asList(getCustomerId()));
         downloadInfo.setAppliesToTechIds(getTechnology()); //To set applies to technology
-
+        
         //To set applies to platform types
         List<String> platformTypeIds = new ArrayList<String>(getPlatform().size());
         if (CollectionUtils.isNotEmpty(getPlatform())) {
@@ -224,7 +224,7 @@ public class Downloads extends ServiceBaseAction {
 				addActionMessage(getText(DOWNLOAD_DELETED));
 			}
 		} catch (PhrescoException e) {
-			return showErrorPopup(e, EXCEPTION_DOWNLOADS_DELETE);
+			return showErrorPopup(e, getText(EXCEPTION_DOWNLOADS_DELETE));
 		}
 
 		return list();

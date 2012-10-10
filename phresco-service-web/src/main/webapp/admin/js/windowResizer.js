@@ -51,6 +51,11 @@ $(document).ready(function() {
 		$(".scroll-line").css("height", newHeight_contentAdder - 70);
 		$(".scroll-bar").css("height", newHeight_contentAdder - 10);
 		
+		$(".multilist-scroller .scroll-line").css("position", "static");
+		$(".multilist-scroller .scroll-bar").css("height", "82px");
+		$(".multilist-scroller .scroll-bar").css("top", "7px");
+
+		
 		var newHeight_formHoriz = $(".form-horizontal").height();
 		$(".content_adder").css("height", newHeight_formHoriz - 70);
 		

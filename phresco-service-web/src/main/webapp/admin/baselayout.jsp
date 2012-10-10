@@ -34,7 +34,7 @@
 		<link rel="stylesheet" href="css/bootstrap.css">
 		<link rel="stylesheet" href="theme/photon/css/phresco.css">
 		<link rel="stylesheet" href="" class="changeme" title="phresco">
-		<link rel="stylesheet" href="css/media-queries.css">
+		<link rel="stylesheet" href="theme/photon/css/media-queries.css">
 		<link rel="stylesheet" href="css/datepicker.css"> <!-- used for date picker-->
 		<link rel="stylesheet" href="css/jquery.ui.all.css"> <!-- used for date picker -->
  		<link rel="stylesheet" href="css/fileuploader.css"> <!-- used for file upload -->
@@ -120,6 +120,10 @@
 	    
 	    <div id="progressBar" class="progress active progress_bar">
 		    <div id="progress-bar" class="bar progress_text"></div>
+		</div>
+		
+		<div id="loadingIconDiv" class="hideContent"> 
+			<img class="loadingIcon" id="loadingIconImg" src="" />
 		</div>
 		
 		<!-- Header Starts Here -->
@@ -267,7 +271,7 @@
 		<!-- Footer Ends Here -->
 		
 		<!-- Delete confirmation dialog starts -->
-		<%@ include file="pages/confirm_dialog.jsp" %>
+		<%@ include file="pages/confirmDialog.jsp" %>
 		<!-- Delete confirmation dialog ends -->
 		
 		<!-- Popup Starts-->

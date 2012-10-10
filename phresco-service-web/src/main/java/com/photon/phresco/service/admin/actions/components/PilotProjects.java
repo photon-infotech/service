@@ -85,7 +85,7 @@ public class PilotProjects extends ServiceBaseAction {
 			setReqAttribute(REQ_PILOT_PROJECTS, pilotProjects);
 			setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		} catch (PhrescoException e) {
-			return showErrorPopup(e, EXCEPTION_PILOT_PROJECTS_LIST);
+			return showErrorPopup(e, getText(EXCEPTION_PILOT_PROJECTS_LIST));
 		}
 		
 		//to clear file input stream and byte array
@@ -109,7 +109,7 @@ public class PilotProjects extends ServiceBaseAction {
     		setReqAttribute(REQ_ARCHE_TYPES, technologies);
     		setReqAttribute(REQ_FROM_PAGE, ADD);
     	} catch (PhrescoException e) {
-    		return showErrorPopup(e, EXCEPTION_PILOT_PROJECTS_ADD);
+    		return showErrorPopup(e, getText(EXCEPTION_PILOT_PROJECTS_ADD));
 		}
     	
     	return COMP_PILOTPROJ_ADD;
@@ -132,7 +132,7 @@ public class PilotProjects extends ServiceBaseAction {
     		setReqAttribute(REQ_ARCHE_TYPES, technologies);
     		setReqAttribute(REQ_FROM_PAGE, EDIT);
     	} catch (PhrescoException e) {
-    		return showErrorPopup(e, EXCEPTION_PILOT_PROJECTS_EDIT);
+    		return showErrorPopup(e, getText(EXCEPTION_PILOT_PROJECTS_EDIT));
 		}
 
     	return COMP_PILOTPROJ_ADD;
@@ -154,7 +154,7 @@ public class PilotProjects extends ServiceBaseAction {
     		getServiceManager().createPilotProjects(createPilotProj(), inputStreams, getCustomerId());
 			addActionMessage(getText(PLTPROJ_ADDED, Collections.singletonList(getName())));
     	} catch (PhrescoException e) {
-    		return showErrorPopup(e, EXCEPTION_PILOT_PROJECTS_SAVE);
+    		return showErrorPopup(e, getText(EXCEPTION_PILOT_PROJECTS_SAVE));
 		}
 
     	return list();
@@ -175,7 +175,7 @@ public class PilotProjects extends ServiceBaseAction {
     		getServiceManager().updatePilotProject(createPilotProj(), inputStreams, getProjectId(), getCustomerId());
     		addActionMessage(getText(PLTPROJ_UPDATED, Collections.singletonList(getName())));
     	} catch (PhrescoException e) {
-    		return showErrorPopup(e, EXCEPTION_PILOT_PROJECTS_UPDATE);
+    		return showErrorPopup(e, getText(EXCEPTION_PILOT_PROJECTS_UPDATE));
 		}
 
     	return list();
@@ -231,7 +231,7 @@ public class PilotProjects extends ServiceBaseAction {
     			addActionMessage(getText(PLTPROJ_DELETED));
     		}
     	}catch (PhrescoException e) {
-    		return showErrorPopup(e, EXCEPTION_PILOT_PROJECTS_DELETE);
+    		return showErrorPopup(e, getText(EXCEPTION_PILOT_PROJECTS_DELETE));
 		}
 
     	return list();
