@@ -200,7 +200,7 @@
 				</label>
 				<div class="controls">
 					<select name="moduleType" id="type">
-				        <option value="core"><s:text name="lbl.comp.featr.type.core" /></option>
+				        <option value="core"><s:text name="lbl.comp.featr.type.external" /></option>
 				        <option value="custom"><s:text name="lbl.comp.featr.type.custom" /></option>
 	     		 	</select>
 				</div>

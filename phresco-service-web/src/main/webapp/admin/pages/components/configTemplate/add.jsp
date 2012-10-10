@@ -97,7 +97,7 @@
 										for (Technology technology : technologies) {
 													String checkedStr = "";
 														if (settingsTemplate != null) {
-															// TODO:Arunprasanna
+															
  															List<Element> appliesTos = settingsTemplate.getAppliesToTechs();
  															if (CollectionUtils.isNotEmpty(appliesTos)) {
  																List<String> techIds = new ArrayList<String>();
@@ -181,9 +181,10 @@
 											</td>
 											<td class="textwidth">
 												<select id="1_type" class = "select typewidth">
-													<option value="String">String</option>
-													<option value="Integer">Integer</option>
-													<option value="Password">Password</option>
+													<option value="String"><s:text name='lbl.hdr.comp.cnfigtmplt.string'/></option>
+													<option value="Number"><s:text name='lbl.hdr.comp.cnfigtmplt.number'/></option>
+													<option value="Password"><s:text name='lbl.hdr.comp.cnfigtmplt.password'/></option>
+													<option value="FileType"><s:text name='lbl.hdr.comp.cnfigtmplt.filetype'/></option>
 												</select>
 											</td>
 											<td class="psblevalue" id="1_psblMulDiv" style="display:none;">
@@ -255,9 +256,10 @@
 													</td>
 													<td class="textwidth">
 														<select id='<%= dynamicId + "_type" %>' class = "select typewidth">
-															<option value="String">String</option>
-															<option value="Integer">Integer</option>
-															<option value="Password">Password</option>
+															<option value="String"><s:text name='lbl.hdr.comp.cnfigtmplt.string'/></option>
+															<option value="Number"><s:text name='lbl.hdr.comp.cnfigtmplt.number'/></option>
+															<option value="Password"><s:text name='lbl.hdr.comp.cnfigtmplt.password'/></option>
+															<option value="FileType"><s:text name='lbl.hdr.comp.cnfigtmplt.filetype'/></option>
 														</select>
 													</td>
 													<td class="psblevalue" id='<%= dynamicId + "_psblSinglDiv" %>' style="display:none">

@@ -149,7 +149,8 @@ div.lgnBtnLabel {
 
 .bottom_button {
 	margin-right: 23px;
-	margin-top: 9px;
+	margin-top: 16px;
+	float: right;
 	text-align: right;
 }
 
@@ -2081,7 +2082,7 @@ input[class *='sample'] {
 }
 
 .psblSelect {
-	width: 78.2%;
+	width: 82.9%;
 }
 
 .psblSngl {

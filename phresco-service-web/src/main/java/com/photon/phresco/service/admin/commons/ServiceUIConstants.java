@@ -292,7 +292,7 @@ public interface ServiceUIConstants {
 	String EXCEPTION_PILOT_PROJECTS_SAVE = "PilotProjects save";
 	String EXCEPTION_PILOT_PROJECTS_EDIT = "PilotProjects edit";
 	String EXCEPTION_PILOT_PROJECTS_ADD = "PilotProjects add";
-	String EXCEPTION_PILOT_PROJECTS_LIST = "PilotProjects list";
+	String EXCEPTION_PILOT_PROJECTS_LIST = "Exception in PilotProjects List";
 	
 	String EXCEPTION_DOWNLOADS_DELETE = "Downloads delete";
 	String EXCEPTION_DOWNLOADS_UPDATE = "Downloads update";
