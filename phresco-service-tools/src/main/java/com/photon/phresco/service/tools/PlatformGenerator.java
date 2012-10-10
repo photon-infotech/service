@@ -18,16 +18,36 @@ public class PlatformGenerator extends DbService {
 	
 	private List<PlatformType> createPlatForm() {
 		List<PlatformType> types = new ArrayList<PlatformType>();
-		types.add(new PlatformType("Windows", 86));
-		types.add(new PlatformType("Windows", 64));
-		types.add(new PlatformType("Mac", 86));
-		types.add(new PlatformType("Mac", 64));
-		types.add(new PlatformType("Linux", 86));
-		types.add(new PlatformType("Linux", 64));
-		types.add(new PlatformType("Windows7", 86));
-		types.add(new PlatformType("Windows7", 64));
-		types.add(new PlatformType("Server", 86));
-		types.add(new PlatformType("Server", 64));
+		PlatformType platformType = new PlatformType("Windows", 86);
+		platformType.setId("Windows86");
+		types.add(platformType);
+		platformType = new PlatformType("Windows", 64);
+		platformType.setId("Windows64");
+		types.add(platformType);
+		platformType = new PlatformType("Mac", 86);
+		platformType.setId("Mac86");
+		types.add(platformType);
+		platformType = new PlatformType("Mac", 64);
+		platformType.setId("Mac64");
+		types.add(platformType);
+		platformType = new PlatformType("Linux", 86);
+		platformType.setId("Linux86");
+		types.add(platformType);
+		platformType = new PlatformType("Linux", 64);
+		platformType.setId("Linux64");
+		types.add(platformType);
+		platformType = new PlatformType("Windows7", 86);
+		platformType.setId("Windows786");
+		types.add(platformType);
+		platformType = new PlatformType("Windows7", 64);
+		platformType.setId("Windows764");
+		types.add(platformType);
+		platformType = new PlatformType("Server", 86);
+		platformType.setId("Server86");
+		types.add(platformType);
+		platformType = new PlatformType("Server", 64);
+		platformType.setId("Server64");
+		types.add(platformType);
 		return types;
 	}
 	
@@ -109,9 +129,9 @@ public class PlatformGenerator extends DbService {
 
 	private void publish() {
 		publishPlatforms();
-		publishProperties();
-		publishRoles();
-		publishTechnologyoptions();
+//		publishProperties();
+//		publishRoles();
+//		publishTechnologyoptions();
 	}
 	
 	public static void main(String[] args) {

@@ -55,7 +55,6 @@ public class ApplicationInfoConverter implements Converter<ApplicationInfoDAO, A
 		applicationInfoDAO.setSelectedWebservices(applicationInfo.getSelectedWebservices());
 		applicationInfoDAO.setSystem(applicationInfo.isSystem());
 		applicationInfoDAO.setTechInfo(applicationInfo.getTechInfo());
-		applicationInfoDAO.setVersion(applicationInfo.getVersion());
 		applicationInfoDAO.setCustomerIds(applicationInfo.getCustomerIds());
 		applicationInfoDAO.setArtifactGroupId(applicationInfo.getPilotContent().getId());
 		return applicationInfoDAO;

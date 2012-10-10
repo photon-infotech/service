@@ -54,38 +54,15 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 	private static final Logger S_LOGGER = Logger.getLogger(ProjectServiceManagerImpl.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 
-	public synchronized File createProject(ApplicationInfo projectInfo) throws PhrescoException {
+	public synchronized void createProject(ProjectInfo projectInfo, String tempFolderPath) throws PhrescoException {
 		// TODO:This code should be moved into server initialization
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method DefaultProjectService.createProject(ProjectInfo projectInfo)");
-		}
-		PhrescoServerFactory.initialize();
-
-		// find the archetype from the appType
-		if (isDebugEnabled) {
-			S_LOGGER.debug("createProject() ProjectInfo =" + projectInfo.getCode());
-		}
-		File filePath = PhrescoServerFactory.getArchetypeExecutor().execute(projectInfo);
-		File[] listFiles = filePath.listFiles();
-		File projectPath = null;
-		if (listFiles.length > 0) {
-			projectPath = listFiles[0];
+			S_LOGGER.debug("createProject() ProjectInfo =" + projectInfo.getProjectCode());
 		}
 		
-		DependencyManager dependencyManager = PhrescoServerFactory.getDependencyManager();
-		dependencyManager.configureProject(projectInfo, projectPath);
-//		DependencyProcessor dependencyProcessor = DependencyProcessorFactory.getDependencyProcessor(projectInfo);
-//		if (dependencyProcessor != null) {
-//			dependencyProcessor.process(projectInfo, projectPath);
-//		}
-////
-//		PhrescoServerFactory.getNewDocumentGenerator().generate(projectInfo, projectPath);
-//
-//		// Configure created application
-//		if (isDebugEnabled) {
-//			S_LOGGER.info("Configure created application :" + projectInfo.getName());
-//		}
-		return projectPath;
+		PhrescoServerFactory.initialize();
+		PhrescoServerFactory.getArchetypeExecutor().execute(projectInfo, tempFolderPath);
 	}
 
 	public File updateProject(ApplicationInfo projectInfo) throws PhrescoException {

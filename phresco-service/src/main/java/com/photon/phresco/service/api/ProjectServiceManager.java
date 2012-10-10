@@ -53,7 +53,7 @@ public interface ProjectServiceManager {
 	 * @param projectInfo
 	 * @param projectPath
 	 */
-	File createProject(ApplicationInfo projectInfo)  throws PhrescoException;
+	void createProject(ProjectInfo projectInfo, String tempFolderPath)  throws PhrescoException;
 	
 	/**
 	 * @param projectInfo

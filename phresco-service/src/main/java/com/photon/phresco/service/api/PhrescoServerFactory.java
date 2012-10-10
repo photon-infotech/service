@@ -38,6 +38,7 @@ package com.photon.phresco.service.api;
 import java.lang.reflect.Constructor;
 
 import com.photon.phresco.commons.model.ApplicationInfo;
+import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.model.ServerConfiguration;
 
@@ -106,7 +107,7 @@ public class PhrescoServerFactory {
         return (DocumentGenerator) constructClass(DOCUMENT_GENERATOR_IMPL_CLASS);
     }
     
-    public static synchronized ProjectServiceManager getProjectService(ApplicationInfo appInfo) throws PhrescoException {
+    public static synchronized ProjectServiceManager getProjectService() throws PhrescoException {
 		return (ProjectServiceManager) constructClass(PROJECT_SERVICE_MANAGER_IMPL_CLASS);
 	}
 	

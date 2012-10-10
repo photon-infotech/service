@@ -188,7 +188,7 @@ public class PilotProjects extends ServiceBaseAction {
         }
         pilotProInfo.setName(getName());
         pilotProInfo.setDescription(getDescription());
-        pilotProInfo.setVersion(getVersion());
+//        pilotProInfo.setVersion(getVersion());
         
         ArtifactGroup pilotContent = new ArtifactGroup();
         pilotContent.setGroupId(getGroupId());
