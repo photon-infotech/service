@@ -7,6 +7,7 @@ import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.DownloadInfo;
 import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.commons.model.Technology;
+import com.photon.phresco.commons.model.User;
 import com.photon.phresco.commons.model.WebService;
 import com.photon.phresco.exception.PhrescoException;
 
@@ -67,5 +68,7 @@ public interface DbManager {
     List<DownloadInfo> findSelectedServers(List<String> ids, String customerId) throws PhrescoException;
     
     List<DownloadInfo> findSelectedDatabases(List<String> ids, String customerId) throws PhrescoException;
+    
+    User authenticate(String username, String password) throws PhrescoException;
     
 }
