@@ -31,6 +31,7 @@ import javax.ws.rs.core.MediaType;
 import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.User;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.impl.DbService;
@@ -73,6 +74,19 @@ public class LoginService extends DbService {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public User login(Credentials credentials) throws PhrescoException {
+		User user = null;
+		PhrescoServerFactory.initialize();
+		DbManager dbManager = PhrescoServerFactory.getDbManager();
+		user = dbManager.authenticate(credentials.getUsername(), credentials.getPassword());
+        if(user != null){
+        	user.setValidLogin(true);
+        	user.setToken(createAuthToken(credentials.getUsername()));
+        	return user;
+        }
+		return loginUsingAuth(credentials);
+    }
+	
+	private User loginUsingAuth(Credentials credentials) throws PhrescoException {
 		Client client = Client.create();
 		PhrescoServerFactory.initialize();
 		RepositoryManager repoMgr = PhrescoServerFactory.getRepositoryManager();
@@ -82,39 +96,17 @@ public class LoginService extends DbService {
         ClientResponse response = resource.type(MediaType.APPLICATION_JSON_TYPE).post(ClientResponse.class, credentials);
         GenericType<User> genericType = new GenericType<User>() {};
         User user = response.getEntity(genericType);
-        AuthenticationUtil authTokenUtil = AuthenticationUtil.getInstance();
-        user.setToken(authTokenUtil.generateToken(credentials.getUsername()));
+        user.setToken(createAuthToken(credentials.getUsername()));
         user.setPhrescoEnabled(true);
         user.setValidLogin(true);
         user.setCustomerIds(createCustomerIds());
         return user;
-        
-        
-//        UserDAO userDao = mongoOperation.findOne(ServiceConstants.USERDAO_COLLECTION_NAME, 
-//                new Query(Criteria.whereId().is(user.getName())), UserDAO.class);
-//        user.setId(user.getName());
-//        Converter<UserDAO, User> converter = (Converter<UserDAO, User>) ConvertersFactory.getConverter(UserDAO.class);
-//        User convertedUser = new User();
-//        if(userDao != null) {
-//        	convertedUser = converter.convertDAOToObject(userDao, mongoOperation);
-//        }
-////        List<Customer> customers = mongoOperation.getCollection(ServiceConstants.CUSTOMERS_COLLECTION_NAME , Customer.class);
-////        List<Customer> customers = new ArrayList<Customer>();
-////        Converter<CustomerDAO, Customer> customerConverter = 
-////            (Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
-////        List<CustomerDAO> customerDAOs = mongoOperation.getCollection(ServiceConstants.CUSTOMERDAO_COLLECTION_NAME , CustomerDAO.class);
-////        for (CustomerDAO customerDAO : customerDAOs) {
-////            customers.add(customerConverter.convertDAOToObject(customerDAO, mongoOperation));
-////        }
-//        
-//        AuthenticationUtil authTokenUtil = AuthenticationUtil.getInstance();
-//        convertedUser.setLoginId(credentials.getUsername());
-//        convertedUser.setToken(authTokenUtil.generateToken(credentials.getUsername()));
-//        convertedUser.setDisplayName(user.getDisplayName());
-//        convertedUser.setPhrescoEnabled(user.isPhrescoEnabled());
-//        convertedUser.setCustomers(customers);
-//        return convertedUser;
-    }
+	}
+	
+	private String createAuthToken(String userName) throws PhrescoException {
+		AuthenticationUtil authTokenUtil = AuthenticationUtil.getInstance();
+	    return authTokenUtil.generateToken(userName);
+	}
 	
 	 private List<String> createCustomerIds() {
      	List<String> customerIds = new ArrayList<String>();

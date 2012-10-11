@@ -48,6 +48,7 @@ import com.photon.phresco.commons.model.Property;
 import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.commons.model.Role;
 import com.photon.phresco.commons.model.User;
+import com.photon.phresco.commons.model.User.AuthType;
 import com.photon.phresco.commons.model.VideoInfo;
 import com.photon.phresco.commons.model.VideoType;
 import com.photon.phresco.exception.PhrescoException;
@@ -603,7 +604,13 @@ public class AdminService extends DbService {
 	    }
 		
 		try {
-			mongoOperation.insertList(USERS_COLLECTION_NAME, users);
+			for (User user : users) {
+				user.setPhrescoEnabled(true);
+				user.setAuthType(AuthType.LOCAL);
+				user.setPassword(ServerUtil.encodeUsingHash(user.getName(),user.getPassword()));
+				mongoOperation.save(USERS_COLLECTION_NAME, user);
+			}
+			
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
 		}

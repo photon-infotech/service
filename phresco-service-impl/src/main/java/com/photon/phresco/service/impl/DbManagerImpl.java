@@ -49,6 +49,8 @@ import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.DownloadInfo;
 import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.commons.model.Technology;
+import com.photon.phresco.commons.model.User;
+import com.photon.phresco.commons.model.User.AuthType;
 import com.photon.phresco.commons.model.WebService;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.DbManager;
@@ -56,6 +58,8 @@ import com.photon.phresco.service.dao.ApplicationInfoDAO;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
 import com.photon.phresco.service.dao.DownloadsDAO;
 import com.photon.phresco.service.dao.TechnologyDAO;
+import com.photon.phresco.service.util.ServerUtil;
+import com.photon.phresco.util.Credentials;
 import com.photon.phresco.util.ServiceConstants;
 
 public class DbManagerImpl extends DbService implements DbManager, ServiceConstants {
@@ -173,7 +177,7 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
 		Query query = createCustomerIdQuery(customerId);
 		Criteria idCriteria = Criteria.whereId().in(ids.toArray());
 		query.addCriteria(idCriteria);
-		Criteria categoryCriteria = Criteria.where("category").is("Server");
+		Criteria categoryCriteria = Criteria.where(CATEGORY).is(SERVER);
 		query.addCriteria(categoryCriteria);
 		List<DownloadsDAO> downloadsDAOs = mongoOperation.find(DOWNLOAD_COLLECTION_NAME, query, DownloadsDAO.class);
 		return convertDownloadDAOs(downloadsDAOs);
@@ -185,10 +189,26 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
 		Query query = createCustomerIdQuery(customerId);
 		Criteria idCriteria = Criteria.whereId().in(ids.toArray());
 		query.addCriteria(idCriteria);
-		Criteria categoryCriteria = Criteria.where("category").is("Database");
+		Criteria categoryCriteria = Criteria.where(CATEGORY).is(DATABASE);
 		query.addCriteria(categoryCriteria);
 		List<DownloadsDAO> downloadsDAOs = mongoOperation.find(DOWNLOAD_COLLECTION_NAME, query, DownloadsDAO.class);
 		return convertDownloadDAOs(downloadsDAOs);
+	}
+
+	@Override
+	public User authenticate(String username, String password)
+			throws PhrescoException {
+		password = ServerUtil.decryptString(password);
+		String hashedPwd = ServerUtil.encodeUsingHash(username,password);
+		Query query = new Query();
+		Criteria nameCriteria = Criteria.where(REST_API_NAME).is(username);
+		Criteria pwdCriteria = Criteria.where(PASSWORD).is(hashedPwd);
+		Criteria typeCriteria = Criteria.where(AUTHTYPE).is(AuthType.LOCAL.name());
+		query = query.addCriteria(nameCriteria);
+		query = query.addCriteria(pwdCriteria);
+		query = query.addCriteria(typeCriteria);
+		User user = mongoOperation.findOne(USERS_COLLECTION_NAME, query, User.class);
+		return user;
 	}
 
 }
