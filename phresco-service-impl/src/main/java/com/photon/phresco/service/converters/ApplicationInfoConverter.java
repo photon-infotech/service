@@ -19,6 +19,7 @@ public class ApplicationInfoConverter implements Converter<ApplicationInfoDAO, A
 			MongoOperations mongoOperation) throws PhrescoException {
 		ApplicationInfo applicationInfo = new ApplicationInfo();
 		applicationInfo.setCode(dao.getCode());
+		applicationInfo.setVersion(dao.getVersion());
 		applicationInfo.setCustomerIds(dao.getCustomerIds());
 		applicationInfo.setDescription(dao.getDescription());
 		applicationInfo.setEmailSupported(dao.isEmailSupported());
@@ -56,6 +57,7 @@ public class ApplicationInfoConverter implements Converter<ApplicationInfoDAO, A
 		applicationInfoDAO.setSystem(applicationInfo.isSystem());
 		applicationInfoDAO.setTechInfo(applicationInfo.getTechInfo());
 		applicationInfoDAO.setCustomerIds(applicationInfo.getCustomerIds());
+		applicationInfoDAO.setVersion(applicationInfo.getVersion());
 		applicationInfoDAO.setArtifactGroupId(applicationInfo.getPilotContent().getId());
 		return applicationInfoDAO;
 	}

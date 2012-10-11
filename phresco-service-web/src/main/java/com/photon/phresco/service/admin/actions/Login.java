@@ -61,10 +61,7 @@ public class Login extends ServiceBaseAction {
 		
 		User user = null;
 		try {
-			byte[] encodeBase64 = Base64.encodeBase64(password.getBytes());
-			String encodedPassword = new String(encodeBase64);
-			
-			user = doLogin(username, encodedPassword);
+			user = doLogin(username, password);
 			if (StringUtils.isEmpty(user.getDisplayName())) {
 				setReqAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_ERROR_LOGIN));
 				

@@ -19,9 +19,6 @@
  */
 package com.photon.phresco.service.rest.api;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -35,11 +32,9 @@ public class EnvironmentService implements ServerConstants {
 
     @GET
     @Produces({ MediaType.APPLICATION_JSON })
-    public List<Environment> getEnvInfos() {
-        Environment enviromentInfos = new Environment("Production", "Production Environment is used for Development purpose only", true);
-        List<Environment> envs = new ArrayList<Environment>();
-        envs.add(enviromentInfos);
-        return envs;
+    public Environment getEnvInfos() {
+        Environment enviromentInfo = new Environment("Production", "Production Environment is used for Development purpose only", true);
+        return enviromentInfo;
     }
 }
 
