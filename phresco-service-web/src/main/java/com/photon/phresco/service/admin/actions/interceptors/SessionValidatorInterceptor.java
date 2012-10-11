@@ -16,7 +16,7 @@ public class SessionValidatorInterceptor extends ServiceBaseAction implements In
     }
 	    
 	public String intercept(ActionInvocation invocation) throws Exception {
-		User user = (User) getHttpSession().getAttribute(SESSION_USER_INFO);
+		User user = (User) getSessionAttribute(SESSION_USER_INFO);
 		if (user == null) {
 			setSessionAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_SESSION_EXPIRED));
 			return SUCCESS;

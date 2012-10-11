@@ -22,12 +22,12 @@ public class Login extends ServiceBaseAction {
 	        S_LOGGER.debug("Entering Method  Login.login()");
 	    }
 	    
-	    User user = (User) getHttpSession().getAttribute(SESSION_USER_INFO);
+	    User user = (User) getSessionAttribute(SESSION_USER_INFO);
 	    if (user != null) {
 	    	return SUCCESS;
 	    }
 	    if (loginFirst) {
-	    	getHttpRequest().setAttribute(REQ_LOGIN_ERROR, "");
+	    	setReqAttribute(REQ_LOGIN_ERROR, "");
         	return LOGIN_FAILURE;	
 		}
 		if (validateLogin()) {
@@ -42,14 +42,14 @@ public class Login extends ServiceBaseAction {
 			S_LOGGER.debug("Entering Method  Login.logout()");
 		}
 		
-		getHttpSession().removeAttribute(SESSION_USER_INFO);
-		String errorTxt = (String) getHttpSession().getAttribute(REQ_LOGIN_ERROR);
+		removeSessionAttribute(SESSION_USER_INFO);
+		String errorTxt = (String) getSessionAttribute(REQ_LOGIN_ERROR);
 		if (StringUtils.isNotEmpty(errorTxt)) {
-			getHttpRequest().setAttribute(REQ_LOGIN_ERROR, getText(errorTxt));
+			setReqAttribute(REQ_LOGIN_ERROR, getText(errorTxt));
 		} else {
-			getHttpRequest().setAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_SUCCESS_LOGOUT));
+			setReqAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_SUCCESS_LOGOUT));
 		}
-		getHttpSession().removeAttribute(REQ_LOGIN_ERROR);
+		removeSessionAttribute(REQ_LOGIN_ERROR);
 		
         return SUCCESS;
     }
@@ -66,16 +66,16 @@ public class Login extends ServiceBaseAction {
 			
 			user = doLogin(username, encodedPassword);
 			if (StringUtils.isEmpty(user.getDisplayName())) {
-				getHttpRequest().setAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_ERROR_LOGIN));
+				setReqAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_ERROR_LOGIN));
 				
 				return LOGIN_FAILURE;
 			}
 			if (!user.isPhrescoEnabled()) {
-				getHttpRequest().setAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_ERROR_LOGIN_ACCESS_DENIED));
+				setReqAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_ERROR_LOGIN_ACCESS_DENIED));
 				
 				return LOGIN_FAILURE;
 			}
-			getHttpSession().setAttribute(SESSION_USER_INFO, user);
+			setSessionAttribute(SESSION_USER_INFO, user);
 		} catch (Exception e) {
 			return LOGIN_FAILURE;
 		}
@@ -88,8 +88,8 @@ public class Login extends ServiceBaseAction {
 	        S_LOGGER.debug("Entering Method  Login.validateLogin()");
 	    }
 		
-		if(StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
-			getHttpRequest().setAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_LOGIN_EMPTY_CRED));
+		if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
+			setReqAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_LOGIN_EMPTY_CRED));
 			return false;
 		}
 		

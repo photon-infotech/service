@@ -43,6 +43,9 @@ public interface ServiceUIConstants {
 	String INVALID_ARCHETYPE_JAR = "{\"isJarTypeValid\": false,\"errorMsg\": \"Not a valid application jar\"}";
 	String INVALID_PLUGIN_JAR = "{\"isJarTypeValid\": false,\"errorMsg\": \"Not a valid plugin jar\"}";
 	String CSV_PATTERN = "\\s*,\\s*";
+	String REQ_ARTIFACT_ID = "_artifactId";
+	String REQ_GROUP_ID = "_groupId";
+	String REQ_VERSION = "_version";
     
 	String VIDEOS = "video";
 	String ARCHETYPES = "archetype";
@@ -83,6 +86,7 @@ public interface ServiceUIConstants {
     String REQ_IMAGE_JPEG_EXTENSION = "jpeg";
     String REQ_IMAGE_PNG_EXTENSION = "png";
     String REQ_JAR_FILE = "jar";
+    String REQ_TECHNOLOGY_OPTION = "options";
     
     
     /*****************************
@@ -330,7 +334,9 @@ public interface ServiceUIConstants {
     
     String KEY_I18N_ERR_APPTYPE_EMPTY = "err.msg.apptye.empty";
     String KEY_I18N_ERR_APPLIES_EMPTY = "err.msg.applies.empty";
+    String KEY_I18N_ERR_APPLICABLE_EMPTY = "err.msg.applicable.empty";
     String KEY_I18N_ERR_APPLNJAR_EMPTY = "err.msg.applnjar.empty";
+    String KEY_I18N_ERR_ARCHETYPEJAR_EMPTY = "err.msg.archetypejar.empty";
     String KEY_I18N_ERR_PLTPROJ_EMPTY = "err.msg.pltproj.empty";
     String KEY_I18N_ERR_PLUGINJAR_INVALID = "err.msg.plugin.invalid";
     

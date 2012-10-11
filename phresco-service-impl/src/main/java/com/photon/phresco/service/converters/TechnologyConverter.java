@@ -23,6 +23,7 @@ package com.photon.phresco.service.converters;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.document.mongodb.MongoOperations;
 import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
@@ -59,15 +60,17 @@ public class TechnologyConverter implements Converter<TechnologyDAO, Technology>
 	        ArtifactGroup artifactGroup = artifactConverter.convertDAOToObject(artifactGrpDAO, mongoOperation);
 	        technology.setArchetypeInfo(artifactGroup);
         }
-        List<ArtifactGroupDAO> pluginsDAO = mongoOperation.find(ARTIFACT_GROUP_COLLECTION_NAME, 
-        		new Query(Criteria.whereId().is(dao.getPluginIds().toArray())), ArtifactGroupDAO.class);
-        List<ArtifactGroup> plugins = new ArrayList<ArtifactGroup>();
-        if(pluginsDAO != null) {
-        	for (ArtifactGroupDAO artifactGroupDAO : pluginsDAO) {
-            	ArtifactGroup artifactGroup = artifactConverter.convertDAOToObject(artifactGroupDAO, mongoOperation);
-            	plugins.add(artifactGroup);
-    		}
-            technology.setPlugins(plugins);
+        if(CollectionUtils.isNotEmpty(dao.getPluginIds())) {
+        	List<ArtifactGroupDAO> pluginsDAO = mongoOperation.find(ARTIFACT_GROUP_COLLECTION_NAME, 
+            		new Query(Criteria.whereId().is(dao.getPluginIds().toArray())), ArtifactGroupDAO.class);
+            List<ArtifactGroup> plugins = new ArrayList<ArtifactGroup>();
+            if(pluginsDAO != null) {
+            	for (ArtifactGroupDAO artifactGroupDAO : pluginsDAO) {
+                	ArtifactGroup artifactGroup = artifactConverter.convertDAOToObject(artifactGroupDAO, mongoOperation);
+                	plugins.add(artifactGroup);
+        		}
+                technology.setPlugins(plugins);
+            }
         }
         technology.setOptions(dao.getOptions());
         return technology;

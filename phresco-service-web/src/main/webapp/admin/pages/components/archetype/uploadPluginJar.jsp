@@ -62,9 +62,10 @@
 		});
 
 		$('#pluginUpload').click(function() {
-			$('#pluginJarUpload').hide();
+			$('#formPlugin').hide();
+			$('#popup_div').hide();
 			enableScreen();
-			loadContent('technology', $('#formPlugin'), $('#popup_div'), '', true);
+			//loadContent('technology', $('#formPlugin'), $('#popup_div'), '', true);
 		});
 
 	});
@@ -79,12 +80,8 @@
 	}
 
 	function jarPopupError(data, type) {
-		var controlpluginObj;
-		var msgpluginObj;
-		if (type == "pluginJar") {
-			controlpluginObj = $("#popupPluginControl");
-			msgpluginObj = $("#popupPluginError");
-		}
+		var	controlpluginObj = $("#popupPluginControl");
+		var	msgpluginObj = $("#popupPluginError");
 		if (data != undefined && !isBlank(data)) {
 			showError(controlpluginObj, msgpluginObj, data);
 		} else {
@@ -105,7 +102,7 @@
 			}
 		});
 		var params = "uploadedJar=";
-		params = params.concat($(obj).attr("id"));
+		params = params.concat(tempFile);
 		params = params.concat("&type=");
 		params = params.concat(type);
 		$.ajax({

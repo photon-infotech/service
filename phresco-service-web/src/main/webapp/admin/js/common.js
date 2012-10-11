@@ -171,8 +171,10 @@ function showError(tag, span, errmsg) {
 }
 
 function hideError(tag, span) {
-	tag.removeClass("error");
-	span.empty();
+	if (!isBlank(tag)) {
+		tag.removeClass("error");
+		span.empty();
+	} 
 }
 
 function setTimeOut() {

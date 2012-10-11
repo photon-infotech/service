@@ -381,9 +381,10 @@ public class ComponentService extends DbService {
 			String customerId = technology.getCustomerIds().get(0);
 			artifactinfo.setCustomerIds(technology.getCustomerIds());
 			
-			File appJarFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null,artifactinfo.getPackaging());
-            uploadBinary(artifactinfo, appJarFile);
-            FileUtil.delete(appJarFile);
+			//TODO: Need to work on this
+//			File appJarFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null,artifactinfo.getPackaging());
+//            uploadBinary(artifactinfo, appJarFile);
+//            FileUtil.delete(appJarFile);
         }
 		
 		saveTechnology(technology);

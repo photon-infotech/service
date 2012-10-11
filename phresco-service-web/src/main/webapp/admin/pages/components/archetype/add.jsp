@@ -23,9 +23,11 @@
 <%@ page import="org.apache.commons.lang.StringUtils"%>
 <%@ page import="org.apache.commons.collections.CollectionUtils"%>
 <%@ page import="java.util.List"%>
+<%@page import="java.util.ArrayList"%>
 
 <%@ page import="com.photon.phresco.commons.model.ApplicationType"%>
 <%@ page import="com.photon.phresco.commons.model.Technology"%>
+<%@page import="com.photon.phresco.commons.model.TechnologyOptions"%>
 <%@ page import="com.photon.phresco.commons.model.ArtifactGroup"%>
 <%@ page import="com.photon.phresco.commons.model.ArtifactInfo"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
@@ -36,6 +38,7 @@
 	String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
 	List<ApplicationType> appTypes = (List<ApplicationType>) request.getAttribute(ServiceUIConstants.REQ_APP_TYPES);
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
+	List<TechnologyOptions> options = (List<TechnologyOptions>) request.getAttribute(ServiceUIConstants.REQ_TECHNOLOGY_OPTION);
 	
 	String title = ServiceActionUtil.getTitle(ServiceUIConstants.ARCHETYPES, fromPage);
 	String buttonLbl = ServiceActionUtil.getButtonLabel(fromPage);
@@ -51,17 +54,10 @@
 	boolean isSystem = false;
 	String appTypeId = "";
 	String techVer = "";
+	
 	if (technology != null) {
 		name = technology.getName();
 		desc = technology.getDescription();
-		List<ArtifactInfo> technoVersions = technology
-				.getArchetypeInfo().getVersions();
-		if (CollectionUtils.isNotEmpty(technoVersions)) {
-			for (ArtifactInfo versions : technoVersions) {
-				version = versions.getVersion();
-			}
-		}
-
 		techVersion = technology.getTechVersions();
 		techVer  = techVersion.toString().replace("[", "").replace("]", "");
 		isSystem = technology.isSystem();
@@ -96,7 +92,7 @@
 			</div>
 		</div>
 
-		<div class="control-group" id="verControl">
+		<%-- <div class="control-group" id="verControl">
 			<label class="control-label labelbold"> <span
 				class="mandatory">*</span>&nbsp;<s:text name='lbl.version' />
 			</label>
@@ -106,7 +102,7 @@
 					title="30 Characters only">
 				<span class="help-inline" id="verError"></span>
 			</div>
-		</div> 
+		</div>  --%>
 
   		<div class="control-group" id="techverControl">
 			<label class="control-label labelbold"> <span
@@ -159,7 +155,7 @@
 					<s:text name='lbl.hdr.comp.groupid'/>
 				</label>
 				<div class="controls">
-					<input id="groupid" class="groupId" class="input-xlarge" maxlength="40" title="40 Characters only" type="text"
+					<input id="groupid" name="groupId" class="input-xlarge groupId" maxlength="40" title="40 Characters only" type="text"
 						placeholder="<s:text name='place.hldr.archetype.add.groupId'/>">
 				</div>
 			</div>
@@ -169,7 +165,7 @@
 					<s:text name='lbl.hdr.comp.artifactid'/>
 				</label>
 				<div class="controls">
-					<input id="artifId" class="artifactId" class="input-xlarge" maxlength="40" title="40 Characters only" type="text"
+					<input id="artifId" name="artifactId" class="input-xlarge artifactId" maxlength="40" title="40 Characters only" type="text"
 						placeholder="<s:text name='place.hldr.archetype.add.artifactId'/>">
 				</div>
 			</div>
@@ -179,7 +175,7 @@
 					<s:text name='lbl.hdr.comp.jar.version'/>
 				</label>
 				<div class="controls">
-					<input id="versnId" class="jarVersion" maxlength="30" title="30 Characters only" class="input-xlarge" type="text"
+					<input id="versnId" name="version" maxlength="30" title="30 Characters only" class="input-xlarge jarVersion" type="text"
 						placeholder="<s:text name='place.hldr.archetype.add.jar.version'/>">
 				</div>
 			</div>
@@ -210,6 +206,46 @@
 			</div>
 			<%-- <span class="help-inline pluginError" id="pluginError"></span> --%>
 		</div>
+		<div class="control-group" id="applicableControl">
+			<label class="control-label labelbold">
+				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.applicable'/>
+			</label>
+			<div class="controls">
+					<div class="typeFields" id="typefield">
+					<div class="multilist-scroller multiselct" id="applicableToDiv">
+						<ul>
+							<li>
+								<input type="checkbox" value="all" id="checkAllAuto" name="" onclick="checkAllEvent(this,$('.applsChk'), true);"
+								style="margin: 3px 8px 6px 0;">All
+							</li>
+							<%
+								if (options != null) {
+									String checkedStr = "";
+									for (TechnologyOptions option : options) {
+										List<String> selectedOptions = new ArrayList<String>();
+										if (technology != null) {
+											for (TechnologyOptions technologyOption : technology.getOptions()) {
+												selectedOptions.add(technologyOption.getOption());
+											}
+											if (selectedOptions.contains(option.getOption())) {
+												checkedStr = "checked";
+											} else {
+												checkedStr = "";
+											}
+										}	
+							%>
+										<li> <input type="checkbox" id="appliestoCheckbox" name="applicable" value='<%= option.getOption() %>'
+											class="check applsChk" <%= checkedStr %>><%= option.getOption() %>
+										</li>
+							<%		}	
+								}
+							%>
+						</ul>
+					</div>
+				</div>
+          		 <span class="help-inline applyerror" id="applicableError"></span>
+			</div>
+		</div>
 	</div>
 
 	<div class="bottom_button">
@@ -222,7 +258,7 @@
 			}
 		%>
 		<input type="button" id="" class="btn <%= disabledClass %>" <%= disabled %>
-			onclick="validate('<%= pageUrl %>', $('#formArcheTypeAdd'), $('#subcontainer'), '<%= progressTxt %>');"
+			onclick="validate('<%= pageUrl %>', $('#formArcheTypeAdd'), $('#subcontainer'), '<%= progressTxt %>', $('.content_adder :input'));"
 			value='<%= buttonLbl %>'/>
 		
 		<input type="button" id="archetypeCancel" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>" 
@@ -241,6 +277,7 @@
 	//To check whether the device is ipad or not and then apply jquery scrollbar
 	if (!isiPad()) {
 		$(".content_adder").scrollbars();  
+		$(".multilist-scroller").scrollbars();
 	}
 
     $(document).ready(function() {
@@ -295,10 +332,17 @@
         } else {
             hideError($("#appControl"), $("#appError"));
         }
+        
         if (!isBlank(data.fileError)) {
             showError($("#appFileControl"), $("#fileError"), data.fileError);
         } else {
             hideError($("#appFileControl"), $("#fileError"));
+        }
+     	
+        if (!isBlank(data.applicableErr)) {
+        	showError($("#applicableControl"), $("#applicableError"), data.applicableErr);
+        } else {
+        	hideError($("#applicableControl"), $("#applicableError"));
         }
     }
     

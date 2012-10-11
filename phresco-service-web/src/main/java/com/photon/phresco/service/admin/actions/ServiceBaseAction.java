@@ -27,11 +27,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.struts2.ServletActionContext;
@@ -116,6 +118,7 @@ public class ServiceBaseAction extends ActionSupport implements ServiceActions, 
         return LOG_ERROR;
 	}
 	
+	//To get byte array of uploaded jar
 	protected byte[] getByteArray() throws PhrescoException {
     	PrintWriter writer = null;
 		try {
@@ -131,7 +134,8 @@ public class ServiceBaseAction extends ActionSupport implements ServiceActions, 
 		return byteArray;
 	}
 	
-	protected void getArtifactGroupInfo(PrintWriter writer, byte[] tempByteArray) throws PhrescoException {
+	// To get groupId, artfId, version from byteArray
+	protected ArtifactGroup getArtifactGroupInfo(PrintWriter writer, byte[] tempByteArray) throws PhrescoException {
 		ArtifactGroup artifactGroupInfo = ServerUtil.getArtifactinfo(new ByteArrayInputStream(tempByteArray));
 		FileInfo fileInfo = new FileInfo();
 		getHttpResponse().setStatus(getHttpResponse().SC_OK);
@@ -148,6 +152,24 @@ public class ServiceBaseAction extends ActionSupport implements ServiceActions, 
 		} else {
 			writer.print(MAVEN_JAR_FALSE);
 		}
+
+		return artifactGroupInfo;
+	}
+	
+	// To set groupId, artfId, version in ArtifactGroup
+	protected ArtifactGroup getArtifactGroupInfo(String name, String artfactId, String groupId, String packaging, String version) {
+		ArtifactGroup artifactGroup = new ArtifactGroup();
+		artifactGroup.setName(name);
+        artifactGroup.setArtifactId(artfactId);
+        artifactGroup.setGroupId(groupId);
+        artifactGroup.setPackaging(packaging);
+        List<ArtifactInfo> artifactVersion = new ArrayList<ArtifactInfo>();
+        ArtifactInfo artifactInfo = new ArtifactInfo();
+        artifactInfo.setVersion(version);
+        artifactVersion.add(artifactInfo);
+        artifactGroup.setVersions(artifactVersion);
+        
+        return artifactGroup;
 	}
 	
 	protected void setReqAttribute(String key, Object value) {
@@ -169,6 +191,14 @@ public class ServiceBaseAction extends ActionSupport implements ServiceActions, 
     protected Object getSessionAttribute(String key) {
         return getHttpSession().getAttribute(key);
     }
+    
+	protected String getReqParameter(String key) {
+		return getHttpRequest().getParameter(key);
+	}
+	
+	protected String[] getReqParameterValues(String Key) {
+		return getHttpRequest().getParameterValues(Key);
+	}
     
     protected HttpServletRequest getHttpRequest() {
         return (HttpServletRequest) ActionContext.getContext().get(ServletActionContext.HTTP_REQUEST);
@@ -193,5 +223,13 @@ public class ServiceBaseAction extends ActionSupport implements ServiceActions, 
 
 	public String getCopyToClipboard() {
 		return copyToClipboard;
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
 	}
 }
