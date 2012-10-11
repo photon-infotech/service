@@ -18,8 +18,11 @@
   ###
   --%>
 
- <%@ taglib uri="/struts-tags" prefix="s"%> 
-
+<%@ taglib uri="/struts-tags" prefix="s"%> 
+<%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
+<%
+	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
+%>
 <form id="formPlugin">
 <div class="modal pluginpopup" id="pluginJarUpload" style="width: 900px; margin-left: -400px; overflow: hidden;" >
 	<div class="modal-header">
@@ -127,6 +130,7 @@
 			typeError : '<s:text name="err.invalid.jar.selection" />',
 			params : {
 				type : 'pluginJar',
+				customerId: '<%= customerId %>',
 				archType : false
 			},
 			debug : true

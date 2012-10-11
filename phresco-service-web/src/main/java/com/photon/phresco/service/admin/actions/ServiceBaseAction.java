@@ -28,12 +28,12 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.struts2.ServletActionContext;
@@ -157,12 +157,13 @@ public class ServiceBaseAction extends ActionSupport implements ServiceActions, 
 	}
 	
 	// To set groupId, artfId, version in ArtifactGroup
-	protected ArtifactGroup getArtifactGroupInfo(String name, String artfactId, String groupId, String packaging, String version) {
+	protected ArtifactGroup getArtifactGroupInfo(String name, String artfactId, String groupId, String packaging, String version, String customerId) {
 		ArtifactGroup artifactGroup = new ArtifactGroup();
 		artifactGroup.setName(name);
         artifactGroup.setArtifactId(artfactId);
         artifactGroup.setGroupId(groupId);
         artifactGroup.setPackaging(packaging);
+        artifactGroup.setCustomerIds(Arrays.asList(customerId));
         List<ArtifactInfo> artifactVersion = new ArrayList<ArtifactInfo>();
         ArtifactInfo artifactInfo = new ArtifactInfo();
         artifactInfo.setVersion(version);

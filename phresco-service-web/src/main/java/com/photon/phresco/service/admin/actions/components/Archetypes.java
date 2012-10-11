@@ -171,13 +171,11 @@ public class Archetypes extends ServiceBaseAction {
 			if(s_archetypeJarByteArray != null){
 				inputStreamMap.put(technology.getName(),  new ByteArrayInputStream(s_archetypeJarByteArray));
 			} 
-			
 			getServiceManager().createArcheTypes(technology, inputStreamMap, getCustomerId());
 			addActionMessage(getText(ARCHETYPE_ADDED, Collections.singletonList(name)));
 		} catch (PhrescoException e) {
 			return showErrorPopup(e, getText(EXCEPTION_ARCHETYPE_SAVE));
 		} 
-
 		return list();
 	}
 	
@@ -188,12 +186,10 @@ public class Archetypes extends ServiceBaseAction {
 		
 		try {
 			Technology technology = createTechnology();
-
 			//update application jar files
 			if(s_archetypeJarByteArray != null){
 				inputStreamMap.put(technology.getName(),  new ByteArrayInputStream(s_archetypeJarByteArray));
 			} 
-
 			getServiceManager().updateArcheType(technology, inputStreamMap, getCustomerId());
 			addActionMessage(getText(ARCHETYPE_UPDATED, Collections.singletonList(getName())));
 		}catch(PhrescoException e) {
@@ -220,18 +216,15 @@ public class Archetypes extends ServiceBaseAction {
         technology.setAppTypeId(getApptype());
         
         //to set plugin infos
-        if (pluginArtficatInfos != null) {
+        if (MapUtils.isNotEmpty(pluginArtfactInfoMap)) {
         	pluginArtficatInfos = new ArrayList<ArtifactGroup>();
         	ArtifactGroup pluginArtfInfoGroup = new ArtifactGroup();
-        	if (MapUtils.isNotEmpty(pluginArtfactInfoMap)) {
-    			Iterator iter = pluginArtfactInfoMap.keySet().iterator();
-    			while (iter.hasNext()) {
-    				String fileName = (String) iter.next();
-    				pluginArtfInfoGroup = pluginArtfactInfoMap.get(fileName);
-    			}
-    		}
-        	
-        	pluginArtficatInfos.add(pluginArtfInfoGroup);
+			Iterator iter = pluginArtfactInfoMap.keySet().iterator();
+			while (iter.hasNext()) {
+				String fileName = (String) iter.next();
+				pluginArtfInfoGroup = pluginArtfactInfoMap.get(fileName);
+				pluginArtficatInfos.add(pluginArtfInfoGroup);
+			}
         	technology.setPlugins(pluginArtficatInfos);
         } 
         
@@ -243,11 +236,11 @@ public class Archetypes extends ServiceBaseAction {
         technology.setOptions(options);
         
         //To create the ArtifactGroup with groupId, artifactId and version for archetype jar
-        ArtifactGroup archetypeArtfGroup = getArtifactGroupInfo(getName(), getArtifactId(), getGroupId(), REQ_JAR_FILE, getVersion());
+        ArtifactGroup archetypeArtfGroup = getArtifactGroupInfo(getName(), getArtifactId(), getGroupId(), REQ_JAR_FILE, getVersion(), getCustomerId());
         technology.setArchetypeInfo(archetypeArtfGroup);
         technology.setCustomerIds(Arrays.asList(getCustomerId()));
         technology.setTechVersions(Arrays.asList(getTechVersion()));
-
+        
         return technology;
     }
 
@@ -256,18 +249,15 @@ public class Archetypes extends ServiceBaseAction {
 	 * @param artifactGroupInfo 
 	 * @return
 	 */
-	public void createPluginInfos(ArtifactGroup artifactGroupInfo) {
+	public void createPluginInfos(ArtifactGroup artifactGroupInfo, String jarName) {
 		if (inputStreamMap != null) {
-			Iterator iter = inputStreamMap.keySet().iterator();
-			while (iter.hasNext()) {
-				String fileName = (String) iter.next();
-			    ArtifactGroup pluginInfo = new ArtifactGroup();
-			    pluginInfo.setName(fileName);
-			    pluginInfo.setArtifactId(artifactGroupInfo.getArtifactId());
-			    pluginInfo.setGroupId(artifactGroupInfo.getGroupId());
-			    pluginInfo.setVersions(artifactGroupInfo.getVersions());
-			    pluginArtfactInfoMap.put(fileName, pluginInfo);
-			}
+		    ArtifactGroup pluginInfo = new ArtifactGroup();
+		    pluginInfo.setName(jarName);
+		    pluginInfo.setArtifactId(artifactGroupInfo.getArtifactId());
+		    pluginInfo.setGroupId(artifactGroupInfo.getGroupId());
+		    pluginInfo.setVersions(artifactGroupInfo.getVersions());
+		    pluginInfo.setCustomerIds(Arrays.asList(getCustomerId()));
+		    pluginArtfactInfoMap.put(jarName, pluginInfo);
 		}
 	}
 
@@ -326,11 +316,11 @@ public class Archetypes extends ServiceBaseAction {
 	 */
 	private void uploadPluginJar(PrintWriter writer, byte[] tempApplnByteArray) throws PhrescoException {
 		try {
-			String jarName = getFileName();
+			String pluginJarName = getFileName();
 			byte[] byteArray = tempApplnByteArray;
 			ArtifactGroup artifactGroupInfo = getArtifactGroupInfo(writer, tempApplnByteArray);
-			inputStreamMap.put(jarName, new ByteArrayInputStream(byteArray));
-			createPluginInfos(artifactGroupInfo);
+			inputStreamMap.put(pluginJarName, new ByteArrayInputStream(byteArray));
+			createPluginInfos(artifactGroupInfo, pluginJarName);
 		} catch (Exception e) {
 		}
 	}
@@ -358,6 +348,7 @@ public class Archetypes extends ServiceBaseAction {
 		if (s_isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Archetypes.showPluginJarPopup()");
 	    }
+		setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		
 		return uploadPlugin;
 	}
