@@ -185,10 +185,10 @@ public class ServerUtil {
         // handled the file separator since java.io.tmpdir does not return
         // the last file separator in linux and Mac OS
         if ((systemTempFolder.endsWith(File.separator))) {
-            tempFolderPath = systemTempFolder + Constants.PHRESCO_FOLDER_NAME;
+            tempFolderPath = systemTempFolder + Constants.PHRESCO;
         } else {
             tempFolderPath = systemTempFolder + File.separator
-                    + Constants.PHRESCO_FOLDER_NAME;
+                    + Constants.PHRESCO;
         }
 
         tempFolderPath = tempFolderPath + File.separator + uuid;
