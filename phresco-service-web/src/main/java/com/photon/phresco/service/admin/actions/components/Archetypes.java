@@ -40,7 +40,6 @@ import org.apache.log4j.Logger;
 
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
-import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.commons.model.TechnologyOptions;
 import com.photon.phresco.exception.PhrescoException;
@@ -57,7 +56,7 @@ public class Archetypes extends ServiceBaseAction {
 	private static final Logger S_LOGGER = Logger.getLogger(Archetypes.class);
 	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
-	/* plugin and appln jar InputStream Map*/
+	/* plugin and archetype jar InputStream Map*/
 	private static Map<String, InputStream> inputStreamMap = new HashMap<String, InputStream>();
 	
 	//Plugin jar artifact info map
