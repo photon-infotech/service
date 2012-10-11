@@ -6,6 +6,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -335,4 +337,30 @@ public class ServerUtil {
     	return groupId.replace(".", "/") + "/" + artifactId + "/" + version + "/" + artifactId + "-" + version + "." + packaging;
     }
     
+    /**
+     * Returns one way hashed string using SALT
+	 * @param userName
+	 * @param password
+	 * @return
+	 * @throws PhrescoException
+	 */
+	public static String encodeUsingHash(String userName, String password) throws PhrescoException {
+	   	String salt = password + userName;
+	   	StringBuffer stringBuffer = new StringBuffer();
+	   	byte[] bytes = salt.getBytes();
+		MessageDigest msgDigest;
+		try {
+			msgDigest = MessageDigest.getInstance("MD5");
+			msgDigest.reset();
+			msgDigest.update(bytes);
+			byte messageDigests[] = msgDigest.digest();
+			for (int i = 0; i < messageDigests.length; i++) {
+			stringBuffer.append(Integer.toHexString(0xFF & messageDigests[i]));
+			}
+		} catch (NoSuchAlgorithmException e) {
+			throw new PhrescoException(e);
+		}
+		return stringBuffer.toString();
+   }
+   
 }
