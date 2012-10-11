@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collections;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -36,10 +37,12 @@ import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.FileUtils;
 
 import com.photon.phresco.commons.model.ApplicationInfo;
+import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.ProjectServiceManager;
+import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.ArchiveUtil;
 import com.photon.phresco.util.ArchiveUtil.ArchiveType;
 import com.photon.phresco.util.FileUtil;
@@ -65,30 +68,30 @@ public class ProjectService {
 	@Path(ServiceConstants.REST_API_PROJECT_CREATE)
 	@Produces(ServiceConstants.MEDIATYPE_ZIP)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public StreamingOutput createProject(ApplicationInfo applicationInfo) throws PhrescoException, IOException {
+	public StreamingOutput createProject(ProjectInfo projectInfo) throws PhrescoException, IOException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method PhrescoService.createProject(ProjectInfo projectInfo)");
 		}
-		String projectPathStr = "";
-		File projectPath = null;
+		String tempFolderPath = "";
 		try {
-			if (isDebugEnabled) {
-				S_LOGGER.debug("createProject() ProjectInfo=" + applicationInfo.getCode());
-			}
-			ProjectServiceManager projectService = PhrescoServerFactory.getProjectService(applicationInfo);
-			projectPath = projectService.createProject(applicationInfo);
+			tempFolderPath = ServerUtil.getTempFolderPath();
 			
-			projectPathStr = projectPath.getPath();
-
 			if (isDebugEnabled) {
-				S_LOGGER.debug("Project Path = " + projectPathStr);
+				S_LOGGER.debug("createProject() ProjectInfo=" + projectInfo.getId());
+				S_LOGGER.debug("Project Path = " + tempFolderPath);
 			}
-
-			ArchiveUtil.createArchive(projectPathStr, projectPathStr + ZIP, ArchiveType.ZIP);
-			FileUtil.delete(projectPath);
-			ServiceOutput serviceOutput = new ServiceOutput(projectPathStr);
+			
+			ProjectServiceManager projectService = PhrescoServerFactory.getProjectService();
+			for (int i=0; i < projectInfo.getNoOfApps(); i++) {
+				projectService.createProject(cloneProjectInfo(projectInfo, i), tempFolderPath);
+			}
+			
+			ArchiveUtil.createArchive(tempFolderPath, tempFolderPath + ZIP, ArchiveType.ZIP);
+			ServiceOutput serviceOutput = new ServiceOutput(tempFolderPath);
+			
+			//TODO store the created projects in DB
 			if(serviceOutput != null) {
-			    dbManager.storeCreatedProjects(applicationInfo);
+//			    dbManager.storeCreatedProjects(applicationInfo);
 			  //  updateUsedObjects(projectInfo);
 			}
 			
@@ -97,6 +100,13 @@ public class ProjectService {
 			S_LOGGER.error("Error During createProject(projectInfo)", pe);
 			throw new PhrescoException(pe);
 		}
+	}
+
+	private ProjectInfo cloneProjectInfo(ProjectInfo projectInfo, int i) {
+		ProjectInfo clonedProjectInfo = projectInfo.clone();
+		ApplicationInfo applicationInfo = clonedProjectInfo.getAppInfos().get(i);
+		clonedProjectInfo.setAppInfos(Collections.singletonList(applicationInfo));
+		return clonedProjectInfo;
 	}
 
 	/*private void updateUsedObjects(ApplicationInfo projectInfo) throws PhrescoException {
@@ -149,7 +159,7 @@ public class ProjectService {
 		}
 		String projectPathStr = "";
 		try {
-			ProjectServiceManager projectService = PhrescoServerFactory.getProjectService(appInfo);
+			ProjectServiceManager projectService = PhrescoServerFactory.getProjectService();
 			File projectPath = projectService.updateProject(appInfo);
 			projectPathStr = projectPath.getPath();
 			if (isDebugEnabled) {
@@ -180,7 +190,7 @@ public class ProjectService {
 		}
 		String projectPathStr = "";
 		try {
-			ProjectServiceManager projectService = PhrescoServerFactory.getProjectService(appInfo);
+			ProjectServiceManager projectService = PhrescoServerFactory.getProjectService();
 			File projectPath = projectService.updateDocumentProject(appInfo);
 			projectPathStr = projectPath.getPath();
 			ArchiveUtil.createArchive(projectPathStr, projectPathStr + ZIP, ArchiveType.ZIP);
@@ -217,9 +227,7 @@ public class ProjectService {
 			} catch (Exception e) {
 				S_LOGGER.error("Error During Stream write()", e);
 				throw new WebApplicationException(e);
-			}
-			// //TODO: Temporay File path deleted. Need to revisit the logic
-			finally {
+			} finally {
 				if (fis != null) {
 					fis.close();
 					FileUtils.deleteDirectory(path.getParentFile());

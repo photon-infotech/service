@@ -87,7 +87,7 @@ public class Customers extends ServiceBaseAction  {
             List<Customer> customers = getServiceManager().getCustomers();
 			setReqAttribute(REQ_CUST_CUSTOMERS, customers);
 		} catch (PhrescoException e) {
-			return showErrorPopup(e, EXCEPTION_CUSTOMERS_LIST);
+			return showErrorPopup(e, getText(EXCEPTION_CUSTOMERS_LIST));
 		}
 		
 		return ADMIN_CUSTOMER_LIST;	
@@ -122,7 +122,7 @@ public class Customers extends ServiceBaseAction  {
 			setReqAttribute(REQ_CUST_CUSTOMER, customer);
 			setReqAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (PhrescoException e) {
-		    return showErrorPopup(e, EXCEPTION_CUSTOMERS_ADD);
+		    return showErrorPopup(e, getText(EXCEPTION_CUSTOMERS_ADD));
 		    
 		}
 		
@@ -145,7 +145,7 @@ public class Customers extends ServiceBaseAction  {
 			getServiceManager().createCustomers(customers);
 			addActionMessage(getText(CUSTOMER_ADDED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
-		    return showErrorPopup(e, EXCEPTION_CUSTOMERS_SAVE);
+		    return showErrorPopup(e, getText(EXCEPTION_CUSTOMERS_SAVE));
 		}
 		
 		return list();
@@ -165,7 +165,7 @@ public class Customers extends ServiceBaseAction  {
 		try {
 			getServiceManager().updateCustomer(createCustomer(), getCustomerId());
 		} catch (PhrescoException e) {
-		    return showErrorPopup(e, EXCEPTION_CUSTOMERS_UPDATE);
+		    return showErrorPopup(e, getText(EXCEPTION_CUSTOMERS_UPDATE));
 		}
 		
 		return list();
@@ -216,7 +216,7 @@ public class Customers extends ServiceBaseAction  {
 				addActionMessage(getText(CUSTOMER_DELETED));
 			}
 		} catch (PhrescoException e) {
-		    return showErrorPopup(e, EXCEPTION_CUSTOMERS_DELETE);
+		    return showErrorPopup(e, getText(EXCEPTION_CUSTOMERS_DELETE));
 		}
 		
 		return list();
@@ -308,7 +308,7 @@ public class Customers extends ServiceBaseAction  {
                 setErrorFound(true);
             }
 	    } catch (PhrescoException e) {
-	        return showErrorPopup(e, EXCEPTION_CUSTOMERS_VALIDATE);
+	        return showErrorPopup(e, getText(EXCEPTION_CUSTOMERS_VALIDATE));
 	    }
 		
 		return SUCCESS;

@@ -95,7 +95,7 @@ public class Component extends ServiceBaseAction {
     		//To remove the selected dependent component moduleIds from the session
             removeSessionAttribute(SESSION_COMP_DEPENDENT_MOD_IDS);
     	} catch (PhrescoException e) {
-    	    return showErrorPopup(e, EXCEPTION_COMPONENT_LIST);
+    	    return showErrorPopup(e, getText(EXCEPTION_COMPONENT_LIST));
     	}
     	
     	return COMP_COMPONENT_LIST;
@@ -111,7 +111,7 @@ public class Component extends ServiceBaseAction {
             setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
     		setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
     	} catch (PhrescoException e){
-    	    return showErrorPopup(e, EXCEPTION_COMPONENT_LIST);
+    	    return showErrorPopup(e, getText(EXCEPTION_COMPONENT_LIST));
     	}
     	
     	return COMP_COMPONENT_LIST;
@@ -127,7 +127,7 @@ public class Component extends ServiceBaseAction {
 		setReqAttribute(REQ_ARCHE_TYPES, technologies);
 		setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		}catch (PhrescoException e) {
-		    return showErrorPopup(e, EXCEPTION_COMPONENT_ADD);
+		    return showErrorPopup(e, getText(EXCEPTION_COMPONENT_ADD));
 		}
 	
 		return COMP_COMPONENT_ADD;
@@ -148,7 +148,7 @@ public class Component extends ServiceBaseAction {
 	        setReqAttribute(REQ_FROM_PAGE, EDIT);
 	        setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
         } catch (PhrescoException e) {
-		    return showErrorPopup(e, EXCEPTION_COMPONENT_EDIT);
+		    return showErrorPopup(e, getText(EXCEPTION_COMPONENT_EDIT));
 		}
 
 		return COMP_COMPONENT_ADD;
@@ -168,7 +168,7 @@ public class Component extends ServiceBaseAction {
             getServiceManager().createFeatures(moduleGroup, inputStreams, getCustomerId());
 			addActionMessage(getText(COMPONENT_ADDED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
-		    return showErrorPopup(e, EXCEPTION_COMPONENT_SAVE);    		
+		    return showErrorPopup(e, getText(EXCEPTION_COMPONENT_SAVE));    		
 		}
 
 		return technologies();
@@ -187,7 +187,7 @@ public class Component extends ServiceBaseAction {
             }
             getServiceManager().updateFeature(moduleGroup, inputStreams, getCustomerId());
         } catch (PhrescoException e) {
-            return showErrorPopup(e, EXCEPTION_COMPONENT_UPDATE);
+            return showErrorPopup(e, getText(EXCEPTION_COMPONENT_UPDATE));
         }
         
         return technologies();
@@ -257,7 +257,7 @@ public class Component extends ServiceBaseAction {
 				addActionMessage(getText(COMPONENT_DELETED));
 			}
 		} catch (PhrescoException e) {
-		    return showErrorPopup(e, EXCEPTION_COMPONENT_DELETE);
+		    return showErrorPopup(e, getText(EXCEPTION_COMPONENT_DELETE));
 		}
 		
 		return technologies();
@@ -296,7 +296,7 @@ public class Component extends ServiceBaseAction {
         } catch (PhrescoException e) {
             getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
             writer.print(SUCCESS_FALSE);
-            return showErrorPopup(e, EXCEPTION_COMPONENT_UPLOAD_FILE);
+            return showErrorPopup(e, getText(EXCEPTION_COMPONENT_UPLOAD_FILE));
         }
         
         return SUCCESS;
@@ -321,7 +321,7 @@ public class Component extends ServiceBaseAction {
             setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
             setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
         } catch (PhrescoException e) {
-            return showErrorPopup(e, EXCEPTION_COMPONENT_LIST_DEPENDENCY);
+            return showErrorPopup(e, getText(EXCEPTION_COMPONENT_LIST_DEPENDENCY));
         }
         
         return COMP_COMPONENT_LIST;

@@ -218,9 +218,9 @@ function showLoadingIcon(tag) {
     if (theme == undefined || theme == "theme/photon/css/red.css") {
     	src = "theme/photon/images/loading_red.gif";
     }
+    $("#loadingIconDiv").show();
+	$("#loadingIconImg").attr("src", src);
     disableScreen();
- 	tag.empty();
-	tag.html("<img class='loadingIcon' src='"+ src +"' style='display: block'>");
 }
 
 function showProgressBar(progressText) {

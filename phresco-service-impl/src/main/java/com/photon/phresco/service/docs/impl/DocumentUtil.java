@@ -146,7 +146,7 @@ public final class DocumentUtil {
     	if (isDebugEnabled) {
     		S_LOGGER.debug("getVersion() ProjectCode="+ info.getCode());
 		}
-    	String version = info.getVersion();
+    	String version = "";
         if(org.apache.commons.lang.StringUtils.isEmpty(version)){
             return DocumentMessages.getString("Documents.default.version"); //$NON-NLS-1$
         }

@@ -34,20 +34,21 @@
 <form id="formMenu">
 	<div id="subTabcontent">
 		<nav>
-			<ul class="tabs subtabs">
-				<li class="subtabsLi">
-					<a href="#" class="active" id="technologies" name="featureTab" additionalParam="type=<%= Type.FEATURE.name() %>">
-						<s:label key="lbl.hdr.comp.featrs.modules" theme="simple"/>
-					</a>
-				</li>
-				<li>
-					<a href="#" class="inactive" id="technologies" name="featureTab" additionalParam="type=<%= Type.JAVASCRIPT.name() %>">
-						<s:label key="lbl.hdr.comp.featrs.jslib" theme="simple"/>
-					</a>
-				</li>
-			</ul>
+			<div class="subLinks">
+				<ul class="tabs subtabs">
+					<li class="subtabsLi">
+						<a href="#" class="active" id="technologies" name="featureTab" additionalParam="type=<%= Type.FEATURE.name() %>">
+							<s:text name="lbl.hdr.comp.featrs.modules" />
+						</a>
+					</li>
+					<li>
+						<a href="#" class="inactive" id="technologies" name="featureTab" additionalParam="type=<%= Type.JAVASCRIPT.name() %>">
+							<s:text name="lbl.hdr.comp.featrs.jslib"/>
+						</a>
+					</li>
+				</ul>
+			</div>
 		</nav>
-		
 		<div id="featureContainer" style="height:76%;">
 	
 		</div>

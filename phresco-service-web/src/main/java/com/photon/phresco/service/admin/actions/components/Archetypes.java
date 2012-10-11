@@ -94,7 +94,7 @@ public class Archetypes extends ServiceBaseAction {
 			setReqAttribute(REQ_ARCHE_TYPES, technologies);
 			setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		} catch (PhrescoException e) {
-			return showErrorPopup(e, EXCEPTION_ARCHETYPE_LIST);
+			return showErrorPopup(e, getText(EXCEPTION_ARCHETYPE_LIST));
 		}
 		
 		/* To clear appln & plugin input streams */
@@ -115,7 +115,7 @@ public class Archetypes extends ServiceBaseAction {
 			setReqAttribute(REQ_APP_TYPES, appTypes);
 			setReqAttribute(REQ_FROM_PAGE, ADD);
 		} catch (PhrescoException e) {
-		    return showErrorPopup(e, EXCEPTION_ARCHETYPE_ADD);
+		    return showErrorPopup(e, getText(EXCEPTION_ARCHETYPE_ADD));
 		}
 
 		return COMP_ARCHETYPE_ADD;
@@ -134,7 +134,7 @@ public class Archetypes extends ServiceBaseAction {
             setReqAttribute(REQ_ARCHE_TYPE,  technology);
 			setReqAttribute(REQ_APP_TYPES, appTypes);
 		} catch (PhrescoException e) {
-		    return showErrorPopup(e, EXCEPTION_ARCHETYPE_EDIT);
+		    return showErrorPopup(e, getText(EXCEPTION_ARCHETYPE_EDIT));
 		}
 
 		return COMP_ARCHETYPE_ADD;
@@ -164,7 +164,7 @@ public class Archetypes extends ServiceBaseAction {
 			getServiceManager().createArcheTypes(technology, inputStreams, getCustomerId());
 			addActionMessage(getText(ARCHETYPE_ADDED, Collections.singletonList(name)));
 		} catch (PhrescoException e) {
-			return showErrorPopup(e, EXCEPTION_ARCHETYPE_SAVE);
+			return showErrorPopup(e, getText(EXCEPTION_ARCHETYPE_SAVE));
 		} 
 
 		return list();
@@ -194,7 +194,7 @@ public class Archetypes extends ServiceBaseAction {
 				addActionMessage(getText(ARCHETYPE_UPDATED, Collections.singletonList(getName())));
 			}
 		}catch(PhrescoException e) {
-			return showErrorPopup(e, EXCEPTION_ARCHETYPE_UPDATE);
+			return showErrorPopup(e, getText(EXCEPTION_ARCHETYPE_UPDATE));
 		}
 
 		return list();
@@ -280,7 +280,7 @@ public class Archetypes extends ServiceBaseAction {
 				addActionMessage(getText(ARCHETYPE_DELETED));
 			}
 		} catch (PhrescoException e) {
-		    return showErrorPopup(e, EXCEPTION_ARCHETYPE_DELETE);
+		    return showErrorPopup(e, getText(EXCEPTION_ARCHETYPE_DELETE));
 		}
 
 		return list();

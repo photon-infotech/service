@@ -38,6 +38,7 @@ package com.photon.phresco.service.api;
 import java.io.File;
 import java.io.InputStream;
 
+import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.model.ArtifactInfo;
@@ -83,5 +84,7 @@ public interface RepositoryManager {
     RepoInfo createCustomerRepository(String customerId) throws PhrescoException;
     
     String getLatestArtifact(String groupId, String artifactId) throws PhrescoException;
-
+    
+    boolean deleteArtifact(String customerId,ArtifactGroup artifactGroup) throws PhrescoException;
+    
 }

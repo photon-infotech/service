@@ -44,7 +44,7 @@ public class PermissionsAction extends ServiceBaseAction {
 			List<Permission> permissions = getServiceManager().getPermissions();
 			setReqAttribute(REQ_PERMISSIONS_LIST, permissions);
 		} catch (PhrescoException e) {
-			return showErrorPopup(e, EXCEPTION_PERMISSION_LIST);
+			return showErrorPopup(e, getText(EXCEPTION_PERMISSION_LIST));
 		}
 
 		return ADMIN_PERMISSION_LIST;	

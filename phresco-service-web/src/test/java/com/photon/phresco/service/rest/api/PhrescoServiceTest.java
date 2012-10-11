@@ -7,7 +7,7 @@ import java.util.List;
 import org.junit.Test;
 
 import com.photon.phresco.commons.model.ApplicationInfo;
-import com.photon.phresco.commons.model.Element;
+import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.commons.model.TechnologyInfo;
 import com.photon.phresco.exception.PhrescoException;
 
@@ -19,10 +19,22 @@ public class PhrescoServiceTest {
 		service.createProject(createApplicationInfo());
 	}
 	
-	private ApplicationInfo createApplicationInfo() {
+	private ProjectInfo createApplicationInfo() {
+		ProjectInfo projectInfo = new ProjectInfo();
+		projectInfo.setNoOfApps(3);
+		projectInfo.setVersion("1.0");
+		projectInfo.setProjectCode("PHR_sampleproject");
+		List<ApplicationInfo> appInfos = new ArrayList<ApplicationInfo>();
+		appInfos.add(createAppInfo("Test1", "tech-php"));
+		appInfos.add(createAppInfo("Test2", "tech-php"));
+		appInfos.add(createAppInfo("Test3", "tech-php"));
+		projectInfo.setAppInfos(appInfos);
+		return projectInfo;
+	}
+	
+	private ApplicationInfo createAppInfo(String dirName, String techId) {
 		ApplicationInfo applicationInfo = new ApplicationInfo();
 		applicationInfo.setId("PHR_Test");
-		applicationInfo.setCode("PHR_Test");
 		List<String> customerIds = new ArrayList<String>();
 		customerIds.add("photon");
 		applicationInfo.setCustomerIds(customerIds);
@@ -35,11 +47,9 @@ public class PhrescoServiceTest {
 		selectedWebservices.add("restjson");
 		applicationInfo.setSelectedWebservices(selectedWebservices);
 		TechnologyInfo techInfo = new TechnologyInfo();
-		techInfo.setVersion("tech-php");
+		techInfo.setVersion(techId);
 		applicationInfo.setTechInfo(techInfo);
-		Element pilotInfo = new Element();
-		pilotInfo.setId("PHR_phpblog");
-		applicationInfo.setPilotInfo(pilotInfo);
+		applicationInfo.setAppDirName(dirName);
 		return applicationInfo;
 	}
 	

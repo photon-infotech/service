@@ -45,6 +45,7 @@ import org.apache.log4j.Logger;
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactInfo;
+import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.ArchetypeExecutor;
@@ -52,7 +53,6 @@ import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.model.ServerConfiguration;
 import com.photon.phresco.service.util.ServerConstants;
-import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.Constants;
 import com.photon.phresco.util.ProjectUtils;
 import com.photon.phresco.util.Utility;
@@ -74,20 +74,19 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
         dbManager = PhrescoServerFactory.getDbManager();
     }
 
-    public File execute(ApplicationInfo applicationInfo) throws PhrescoException {
+    public void execute(ProjectInfo projectInfo, String tempFolderPath) throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method ArchetypeExecutorImpl.execute(ProjectInfo info)");
-			S_LOGGER.debug("execute() ProjectCode=" + applicationInfo.getCode());
+			S_LOGGER.debug("execute() ProjectCode=" + projectInfo.getProjectCode());
 		}
-		String tempFolderPath = null;
 		try {
-			String commandString = buildCommandString(applicationInfo);
+			ApplicationInfo applicationInfo = projectInfo.getAppInfos().get(0);
+			String commandString = buildCommandString(applicationInfo, projectInfo.getVersion());
 			if (S_LOGGER.isDebugEnabled()) {
 				S_LOGGER.debug("command String " + commandString);
 			}
 			// the below implementation is required since a new command or shell is forked from the 
 			//existing running web server command or shell instance
-			tempFolderPath = ServerUtil.getTempFolderPath();
 			BufferedReader bufferedReader = Utility.executeCommand(commandString, tempFolderPath);
 			String line = null;
 			while ((line = bufferedReader.readLine()) != null) {
@@ -95,23 +94,22 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 					S_LOGGER.debug(line);
 				}
 			}
-			createProjectFolders(applicationInfo, new File(tempFolderPath));
+			createProjectFolders(projectInfo, applicationInfo.getAppDirName(), new File(tempFolderPath));
 		} catch (IOException e) {
 			throw new PhrescoException(e);
 		}
-		return new File(tempFolderPath);
 	}
 
-    private void createProjectFolders(ApplicationInfo info, File file) throws PhrescoException {
+    private void createProjectFolders(ProjectInfo info, String appDirName, File file) throws PhrescoException {
     	if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method ArchetypeExecutorImpl.createProjectFolders(ProjectInfo info, File file)");
 			S_LOGGER.debug("createProjectFolders()  path="+file.getPath());
 		}
         //create .phresco folder inside the project
     	if (isDebugEnabled) {
-			S_LOGGER.debug("createProjectFolders()  ProjectCode=" + info.getCode());
+			S_LOGGER.debug("createProjectFolders()  ProjectCode=" + info.getProjectCode());
 		}
-    	File phrescoFolder = new File(file.getPath() + File.separator + info.getCode() + File.separator + DOT_PHRESCO_FOLDER);
+    	File phrescoFolder = new File(file.getPath() + File.separator + appDirName + File.separator + DOT_PHRESCO_FOLDER);
         phrescoFolder.mkdirs();
         if (isDebugEnabled) {
 			S_LOGGER.info("create .phresco folder inside the project");
@@ -119,11 +117,12 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
        ProjectUtils.writeProjectInfo(info, phrescoFolder);
     }
 
-    private String buildCommandString(ApplicationInfo info) throws PhrescoException {
+    private String buildCommandString(ApplicationInfo info, String projectVersion) throws PhrescoException {
     	if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method ArchetypeExecutorImpl.buildCommandString(ProjectInfo info)");
 			S_LOGGER.debug("buildCommandString() ProjectCode=" + info.getCode());
 		}
+    	System.out.println("Creating Project   " + info.getAppDirName());
     	String customerId = info.getCustomerIds().get(0);
     	if(StringUtils.isEmpty(customerId)) {
     		throw new PhrescoException("Customer Id Should Not Be Null");
@@ -148,9 +147,9 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
                 .append(Constants.STR_BLANK_SPACE)
                 .append(ARCHETYPE_GROUPID).append(Constants.STR_EQUALS).append("com.photon.phresco")
                 .append(Constants.STR_BLANK_SPACE)
-                .append(ARCHETYPE_ARTIFACTID).append(Constants.STR_EQUALS).append(STR_DOUBLE_QUOTES).append(info.getCode()).append(STR_DOUBLE_QUOTES) //artifactId --> project name could have space in between
+                .append(ARCHETYPE_ARTIFACTID).append(Constants.STR_EQUALS).append(STR_DOUBLE_QUOTES).append(info.getAppDirName()).append(STR_DOUBLE_QUOTES) //artifactId --> project name could have space in between
                 .append(Constants.STR_BLANK_SPACE)
-                .append(ARCHETYPE_VERSION).append(Constants.STR_EQUALS).append(info.getVersion())
+                .append(ARCHETYPE_VERSION).append(Constants.STR_EQUALS).append(projectVersion)
                 .append(Constants.STR_BLANK_SPACE)
                 .append(ARCHETYPE_ARCHETYPEREPOSITORYURL).append(Constants.STR_EQUALS).append(repoInfo.getGroupRepoURL())
                 .append(Constants.STR_BLANK_SPACE)
