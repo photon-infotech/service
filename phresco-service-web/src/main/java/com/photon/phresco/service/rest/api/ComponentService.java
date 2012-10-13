@@ -22,6 +22,7 @@ package com.photon.phresco.service.rest.api;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -316,82 +317,61 @@ public class ComponentService extends DbService {
 	}
 	
 	private Response saveOrUpdateTechnology(MultiPart multiPart) throws PhrescoException {
-		Map<Technology, List<BodyPart>> map = new HashMap<Technology, List<BodyPart>>(); 
-	    List<BodyPart> techs = new ArrayList<BodyPart>();
 	    List<BodyPart> entities = new ArrayList<BodyPart>();
+	    Technology technology = null;
+	    Map<ArtifactGroup, BodyPart> archetypeMap = new HashMap<ArtifactGroup, BodyPart>();
+	    Map<ArtifactGroup, BodyPart> pluginMap = new HashMap<ArtifactGroup, BodyPart>();
 	    
 	    //To separete the object and binary file
 	    List<BodyPart> bodyParts = multiPart.getBodyParts();
 	    for (BodyPart bodyPart : bodyParts) {
 	        if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
-	            techs.add(bodyPart);
+	            technology = bodyPart.getEntityAs(Technology.class);
 	        } else {
 	            entities.add(bodyPart);
 	        }
         }
 	    
-	    //To map the binary file with corresponding object
-	    List<BodyPart> foundBodyPart = null;
-	    for (BodyPart tech : techs) {
-	        foundBodyPart = new ArrayList<BodyPart>();
-            for (BodyPart bodyPart : entities) {
-                if (tech.getContentDisposition().getFileName().equals(bodyPart.getContentDisposition().getFileName())) {
-                    foundBodyPart.add(bodyPart);
-                }
-            }
-            
-            map.put(tech.getEntityAs(Technology.class), foundBodyPart);
-        } 
-	    Response response = null;
-	   //Iterate the content map for upload binaries
-       Set<Technology> keySet = map.keySet();
-	   for (Technology technology : keySet) {
-	       List<BodyPart> list = map.get(technology);
-	       response = createBinary(technology, list);
-	   }
-	   return response;
+	    if(technology == null) {
+	    	throw new PhrescoException("Technology Is Null");
+	    }
+	    
+	    for (BodyPart bodyPart : entities) {
+			if(bodyPart.getContentDisposition().getFileName().equals(technology.getName())) {
+				archetypeMap.put(technology.getArchetypeInfo(), bodyPart);
+			} else {
+				List<ArtifactGroup> plugins = technology.getPlugins();
+				for (ArtifactGroup artifactGroup : plugins) {
+					if(artifactGroup.getName().equals(bodyPart.getContentDisposition().getFileName())) {
+						pluginMap.put(artifactGroup, bodyPart);
+					}
+				}
+			}
+		}
+	    
+	    Set<ArtifactGroup> archetypeSet = archetypeMap.keySet();
+	    for (ArtifactGroup artifactGroup : archetypeSet) {
+			createArtifacts(artifactGroup, archetypeMap.get(artifactGroup));
+		}
+	    
+	    Set<ArtifactGroup> pluginSet = pluginMap.keySet();
+	    for (ArtifactGroup artifactGroup : pluginSet) {
+			createArtifacts(artifactGroup, pluginMap.get(artifactGroup));
+		}
+	    
+	    saveTechnology(technology);
+	   return Response.status(Response.Status.OK).entity(ERROR_MSG_NOT_FOUND).build();
 	}
 
-	private Response createBinary(Technology technology, List<BodyPart> list) throws PhrescoException {
+	private void createArtifacts(ArtifactGroup artifactGroup, BodyPart bodyPart) throws PhrescoException {
+		BodyPartEntity bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
+		File artifactFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null, artifactGroup.getPackaging());
+		boolean uploadBinary = uploadBinary(artifactGroup, artifactFile);
+		if(uploadBinary) {
+			saveModuleGroup(artifactGroup);
+		}
+	}
 
-		List<ArtifactGroupDAO> artifactGroups = new ArrayList<ArtifactGroupDAO>();
-		List<com.photon.phresco.commons.model.ArtifactInfo> artifactInfos = new ArrayList<com.photon.phresco.commons.model.ArtifactInfo>();
-		
-		Converter<ArtifactGroupDAO, ArtifactGroup> artifactConverter = 
-	            (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
-		ArtifactGroup artifactinfo = null;
-		for (BodyPart bodyPart : list) {
-			
-			//check if this is archetype
-            ContentDisposition disposition = bodyPart.getContentDisposition();
-			Type contentType = Content.Type.valueOf(disposition.getType());
-			
-			BodyPartEntity bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
-			artifactinfo = technology.getArchetypeInfo();
-			if (!Content.Type.ARCHETYPE.equals(contentType)) {
-                artifactinfo = ServerUtil.getArtifactinfo(bodyPartEntity.getInputStream());
-            }
-			
-			//convert Artifact Group
-			ArtifactGroupDAO artfGrpDAO = artifactConverter.convertObjectToDAO(artifactinfo);
-			artifactGroups.add(artfGrpDAO);
-
-            //Assuming there will be only one customer will be provided here for 2.0.0
-            //Need to handle multiple customer in future
-			String customerId = technology.getCustomerIds().get(0);
-			artifactinfo.setCustomerIds(technology.getCustomerIds());
-			
-			//TODO: Need to work on this
-//			File appJarFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null,artifactinfo.getPackaging());
-//            uploadBinary(artifactinfo, appJarFile);
-//            FileUtil.delete(appJarFile);
-        }
-		
-		saveTechnology(technology);
-		saveModuleGroup(artifactinfo);
-        return Response.status(Response.Status.OK).entity(technology).build();
-    }
-	
 	private void saveTechnology(Technology technology) throws PhrescoException {
     	Converter<TechnologyDAO, Technology> techConverter = 
     		(Converter<TechnologyDAO, Technology>) ConvertersFactory.getConverter(TechnologyDAO.class);
@@ -432,7 +412,7 @@ public class ComponentService extends DbService {
         info.setPomFile(pomFile);
         
         List<String> customerIds = archetypeInfo.getCustomerIds();
-        String customerId = archetypeInfo.getCustomerIds().get(0);
+        String customerId = customerIds.get(0);
         boolean addArtifact = repositoryManager.addArtifact(info, artifactFile, customerId);
         FileUtil.delete(pomFile);
         return addArtifact;
