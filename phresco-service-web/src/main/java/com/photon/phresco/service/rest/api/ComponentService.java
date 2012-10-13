@@ -1360,13 +1360,18 @@ public class ComponentService extends DbService {
     @GET
     @Path (REST_API_DOWNLOADS)
     @Produces (MediaType.APPLICATION_JSON)
-    public Response findDownloadInfo(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
+    public Response findDownloadInfo(@QueryParam(REST_QUERY_CUSTOMERID) String customerId, 
+    		@QueryParam(REST_QUERY_TECHID) String techId, @QueryParam(REST_QUERY_TYPE) String type) {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.findDownloadInfo()");
         }
         List<DownloadInfo> downloads = new ArrayList<DownloadInfo>();
         try {
         	Query query = createCustomerIdQuery(customerId);
+        	Criteria techIdCriteria = Criteria.where("appliesToTechIds").in(techId);
+        	Criteria typeCriteria = Criteria.where("category").is(type);
+        	query.addCriteria(techIdCriteria);
+        	query.addCriteria(typeCriteria);
         	List<DownloadsDAO> downloadList = mongoOperation.find(DOWNLOAD_COLLECTION_NAME, query, DownloadsDAO.class);
             if (downloadList != null) {
             	Converter<DownloadsDAO, DownloadInfo> downloadConverter = 
