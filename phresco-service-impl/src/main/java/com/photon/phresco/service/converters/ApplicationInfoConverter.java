@@ -33,7 +33,10 @@ public class ApplicationInfoConverter implements Converter<ApplicationInfoDAO, A
 		applicationInfo.setSelectedModules(dao.getSelectedModules());
 		applicationInfo.setSelectedServers(dao.getSelectedServers());
 		applicationInfo.setSelectedWebservices(dao.getSelectedWebservices());
-		applicationInfo.setPilotContent(createPilotContent(dao.getArtifactGroupId(), mongoOperation));
+		applicationInfo.setTechInfo(dao.getTechInfo());
+		if(dao.getArtifactGroupId() != null) {
+			applicationInfo.setPilotContent(createPilotContent(dao.getArtifactGroupId(), mongoOperation));
+		}
 		return applicationInfo;
 	}
 
@@ -58,7 +61,9 @@ public class ApplicationInfoConverter implements Converter<ApplicationInfoDAO, A
 		applicationInfoDAO.setTechInfo(applicationInfo.getTechInfo());
 		applicationInfoDAO.setCustomerIds(applicationInfo.getCustomerIds());
 		applicationInfoDAO.setVersion(applicationInfo.getVersion());
-		applicationInfoDAO.setArtifactGroupId(applicationInfo.getPilotContent().getId());
+		if(applicationInfo.getPilotContent() != null) {
+			applicationInfoDAO.setArtifactGroupId(applicationInfo.getPilotContent().getId());
+		}
 		return applicationInfoDAO;
 	}
 	
