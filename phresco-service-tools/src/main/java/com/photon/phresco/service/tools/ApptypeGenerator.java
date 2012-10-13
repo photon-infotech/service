@@ -48,6 +48,7 @@ import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.Technology;
+import com.photon.phresco.commons.model.TechnologyOptions;
 import com.photon.phresco.exception.AIException;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.Converter;
@@ -172,16 +173,16 @@ public class ApptypeGenerator extends DbService implements ServiceConstants {
     public void createWebAppTechs() throws PhrescoException {
         List<Technology> techs = new ArrayList<Technology>();
         techs.add(createTechnology(TechnologyTypes.PHP, "PHP", new String[]{"5.4.x", "5.3.x", "5.2.x", "5.1.x", "5.0.x"}, "apptype-webapp"));
-        techs.add(createTechnology(TechnologyTypes.PHP_DRUPAL6, "Drupal6", new String[]{"6.3", "6.25", "6.19"}, "apptype-webapp"));
-        techs.add(createTechnology(TechnologyTypes.PHP_DRUPAL7, "Drupal7", new String[]{"7.8"},"apptype-webapp"));
-        techs.add(createTechnology(TechnologyTypes.SHAREPOINT, "Sharepoint", new String[]{"3.5", "3.0", "2.0"}, "apptype-webapp"));
-        techs.add(createTechnology(TechnologyTypes.HTML5_WIDGET, "HTML5 Multichannel YUI Widget", new String[]{"1.6", "1.5"}, "apptype-webapp"));
-        techs.add(createTechnology(TechnologyTypes.HTML5_MULTICHANNEL_JQUERY_WIDGET, "HTML5 Multichannel JQuery Widget", new String[]{"1.6", "1.5"},"apptype-webapp"));
-        techs.add(createTechnology(TechnologyTypes.HTML5_JQUERY_MOBILE_WIDGET, "HTML5 JQuery Mobile Widget", new String[]{"1.6", "1.5"},"apptype-webapp"));
-        techs.add(createTechnology(TechnologyTypes.HTML5_MOBILE_WIDGET, "HTML5 YUI Mobile Widget", new String[]{"1.6", "1.5"},"apptype-webapp"));
-        techs.add(createTechnology(TechnologyTypes.DOT_NET, "ASP.NET", new String[]{"3.5", "3.0", "2.0"},"apptype-webapp"));
-        techs.add(createTechnology(TechnologyTypes.WORDPRESS, "WordPress", new String[]{"3.3.1"},"apptype-webapp"));
-        techs.add(createTechnology(TechnologyTypes.JAVA_STANDALONE, "Java Standalone", new String[]{"1.6", "1.5"},"apptype-webapp"));
+//        techs.add(createTechnology(TechnologyTypes.PHP_DRUPAL6, "Drupal6", new String[]{"6.3", "6.25", "6.19"}, "apptype-webapp"));
+//        techs.add(createTechnology(TechnologyTypes.PHP_DRUPAL7, "Drupal7", new String[]{"7.8"},"apptype-webapp"));
+//        techs.add(createTechnology(TechnologyTypes.SHAREPOINT, "Sharepoint", new String[]{"3.5", "3.0", "2.0"}, "apptype-webapp"));
+//        techs.add(createTechnology(TechnologyTypes.HTML5_WIDGET, "HTML5 Multichannel YUI Widget", new String[]{"1.6", "1.5"}, "apptype-webapp"));
+//        techs.add(createTechnology(TechnologyTypes.HTML5_MULTICHANNEL_JQUERY_WIDGET, "HTML5 Multichannel JQuery Widget", new String[]{"1.6", "1.5"},"apptype-webapp"));
+//        techs.add(createTechnology(TechnologyTypes.HTML5_JQUERY_MOBILE_WIDGET, "HTML5 JQuery Mobile Widget", new String[]{"1.6", "1.5"},"apptype-webapp"));
+//        techs.add(createTechnology(TechnologyTypes.HTML5_MOBILE_WIDGET, "HTML5 YUI Mobile Widget", new String[]{"1.6", "1.5"},"apptype-webapp"));
+//        techs.add(createTechnology(TechnologyTypes.DOT_NET, "ASP.NET", new String[]{"3.5", "3.0", "2.0"},"apptype-webapp"));
+//        techs.add(createTechnology(TechnologyTypes.WORDPRESS, "WordPress", new String[]{"3.3.1"},"apptype-webapp"));
+//        techs.add(createTechnology(TechnologyTypes.JAVA_STANDALONE, "Java Standalone", new String[]{"1.6", "1.5"},"apptype-webapp"));
         
         saveTechnologies(techs);
     }
@@ -206,10 +207,10 @@ public class ApptypeGenerator extends DbService implements ServiceConstants {
     }
     
     public void publish() throws PhrescoException {
-        generateApptypes();
+//        generateApptypes();
         createWebAppTechs();
-        createMobAppTechs();
-        createWebServiceAppTechs();
+//        createMobAppTechs();
+//        createWebServiceAppTechs();
     }
     
     private Technology createTechnology(String id, String name, String[] versions, String appId) throws PhrescoException {
@@ -224,11 +225,57 @@ public class ApptypeGenerator extends DbService implements ServiceConstants {
         technology.setTechVersions(Arrays.asList(versions));
         technology.setArchetypeInfo(createArchetypeInfo(id, name));
         technology.setPlugins(createPlugins(id));
+        technology.setOptions(createTechOptionsInit(id));
         return technology;
     }
     
+    private List<TechnologyOptions> createTechOptionsInit(String techId) {
+    	Map<String, String[]> techOptions = new HashMap<String, String[]>();
+    	techOptions.put(TechnologyTypes.PHP, new String[]{"Code", "Build","Deploy", "Unit Test", "Functional Test", 
+    			"Perfomance Test", "Load Test" , "Reports", "CI"});
+    	techOptions.put(TechnologyTypes.PHP_DRUPAL7, new String[]{"Code", "Build","Deploy", "Unit Test", "Functional Test", 
+    			"Perfomance Test", "Load Test" , "Reports", "CI"});
+    	techOptions.put(TechnologyTypes.PHP_DRUPAL7, new String[]{"Code", "Build","Deploy", "Unit Test", "Functional Test", 
+    			"Perfomance Test", "Load Test" , "Reports", "CI"});
+    	techOptions.put(TechnologyTypes.ANDROID_HYBRID, new String[]{"Code", "Build","Deploy", "Unit Test", "Functional Test", 
+    			"Perfomance Test", "Load Test" , "Reports", "CI"});
+    	techOptions.put(TechnologyTypes.ANDROID_NATIVE, new String[]{"Code", "Build","Deploy", "Unit Test", "Functional Test", 
+    			"Perfomance Test", "Load Test" , "Reports", "CI"});
+    	techOptions.put(TechnologyTypes.IPHONE_NATIVE, new String[]{"Code", "Build","Deploy", "Unit Test", "Functional Test", 
+    			"Perfomance Test", "Load Test" , "Reports", "CI"});
+    	techOptions.put(TechnologyTypes.IPHONE_HYBRID, new String[]{"Code", "Build","Deploy", "Unit Test", "Functional Test", 
+    			"Perfomance Test", "Load Test" , "Reports", "CI"});
+    	techOptions.put(TechnologyTypes.HTML5_JQUERY_MOBILE_WIDGET, new String[]{"Code", "Build","Deploy", "Unit Test", "Functional Test", 
+    			"Perfomance Test", "Load Test" , "Reports", "CI" , "Run Against Source"});
+    	techOptions.put(TechnologyTypes.HTML5_MOBILE_WIDGET, new String[]{"Code", "Build","Deploy", "Unit Test", "Functional Test", 
+    			"Perfomance Test", "Load Test" , "Reports", "CI" , "Run Against Source"});
+    	techOptions.put(TechnologyTypes.HTML5_MULTICHANNEL_JQUERY_WIDGET, new String[]{"Code", "Build","Deploy", "Unit Test", "Functional Test", 
+    			"Perfomance Test", "Load Test" , "Reports", "CI" , "Run Against Source"});
+    	techOptions.put(TechnologyTypes.HTML5_WIDGET, new String[]{"Code", "Build","Deploy", "Unit Test", "Functional Test", 
+    			"Perfomance Test", "Load Test" , "Reports", "CI" , "Run Against Source"});
+    	techOptions.put(TechnologyTypes.JAVA_WEBSERVICE, new String[]{"Code", "Build","Deploy", "Unit Test", "Functional Test", 
+    			"Perfomance Test", "Load Test" , "Reports", "CI" , "Run Against Source"});
+    	techOptions.put(TechnologyTypes.WORDPRESS, new String[]{"Code", "Build","Deploy", "Unit Test", "Functional Test", 
+    			"Perfomance Test", "Load Test" , "Reports", "CI"});
+    	techOptions.put(TechnologyTypes.SHAREPOINT, new String[]{"Code", "Build","Deploy", "Unit Test", "Functional Test", 
+    			"Perfomance Test", "Load Test" , "Reports", "CI"});
+    	techOptions.put(TechnologyTypes.DOT_NET, new String[]{"Code", "Build","Deploy", "Unit Test", "Functional Test", 
+    			"Perfomance Test", "Load Test" , "Reports", "CI"});
+    			
+    	return createTechOptionList(techOptions.get(techId));
+    }
 
-    private ArtifactGroup createArchetypeInfo(String id, String name) throws PhrescoException {
+    private List<TechnologyOptions> createTechOptionList(String[] strings) {
+    	List<TechnologyOptions> techOptions = new ArrayList<TechnologyOptions>();
+    	for (String option : strings) {
+			TechnologyOptions options = new TechnologyOptions();
+			options.setOption(option);
+			techOptions.add(options);
+		}
+		return techOptions;
+	}
+
+	private ArtifactGroup createArchetypeInfo(String id, String name) throws PhrescoException {
         ArtifactGroup group = new ArtifactGroup();
         group.setGroupId("archetypes");
         group.setArtifactId(archetypeMap.get(id));
