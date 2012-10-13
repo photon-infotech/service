@@ -31,4 +31,68 @@
             <additional_context>/</additional_context>
         </Server>
 	</environment>
+	<environment default="false" name="Staging">
+        <WebService name="webservice">
+            <port>3030</port>
+            <password/>
+            <context>auth</context>
+            <host>localhost</host>
+            <protocol>http</protocol>
+            <username/>
+        </WebService>	
+	<Database  desc="" name="database">
+		<host>localhost</host>
+		<port>27017</port>
+		<username></username>
+		<password/>
+		<dbname>phresco-staging</dbname>
+		<type>mongodb</type>
+		<version>2.0.4</version>
+	</Database>
+	<Server appliesTo="" desc="" name="server">
+            <protocol>http</protocol>
+            <host>172.16.17.226</host>
+            <port>8080</port>
+            <admin_username>admin</admin_username>
+            <admin_password></admin_password>
+            <remoteDeployment>No</remoteDeployment>
+            <type>Apache Tomcat</type>
+            <version>7.0.x</version>
+            <deploy_dir>c:/</deploy_dir>
+            <context>repository</context>
+            <additional_context>/</additional_context>
+        </Server>
+	</environment>
+	<environment default="false" name="Testing">
+        <WebService name="webservice">
+            <port>3030</port>
+            <password/>
+            <context>auth</context>
+            <host>localhost</host>
+            <protocol>http</protocol>
+            <username/>
+        </WebService>	
+	<Database  desc="" name="database">
+		<host>localhost</host>
+		<port>27017</port>
+		<username></username>
+		<password/>
+		<dbname>phresco-testing</dbname>
+		<type>mongodb</type>
+		<version>2.0.4</version>
+	</Database>
+	<Server appliesTo="" desc="" name="server">
+            <protocol>http</protocol>
+            <host>172.16.17.226</host>
+            <port>8080</port>
+            <admin_username>admin</admin_username>
+            <admin_password></admin_password>
+            <remoteDeployment>No</remoteDeployment>
+            <type>Apache Tomcat</type>
+            <version>7.0.x</version>
+            <deploy_dir>c:/</deploy_dir>
+            <context>repository</context>
+            <additional_context>/</additional_context>
+        </Server>
+	</environment>
 </environments>
