@@ -32,6 +32,8 @@ import org.springframework.data.document.mongodb.query.Query;
 
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.ArtifactInfo;
+import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.DownloadInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.Converter;
@@ -40,6 +42,7 @@ import com.photon.phresco.service.converters.ConvertersFactory;
 import com.photon.phresco.service.dao.ApplicationInfoDAO;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
 import com.photon.phresco.service.dao.DownloadsDAO;
+import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.ServiceConstants;
 
 public class DbService implements ServiceConstants {
@@ -103,5 +106,25 @@ public class DbService implements ServiceConstants {
 		Converter<ApplicationInfoDAO, ApplicationInfo> appConverter = 
 			(Converter<ApplicationInfoDAO, ApplicationInfo>) ConvertersFactory.getConverter(ApplicationInfoDAO.class);
 		return appConverter.convertDAOToObject(applicationInfoDAO, mongoOperation);
+	}
+	
+	protected ArtifactGroup createArticatGroupURL(ArtifactGroup artifactGroup) {
+		List<ArtifactInfo> newVersions = new ArrayList<ArtifactInfo>();
+		List<ArtifactInfo> actualVersions = artifactGroup.getVersions();
+		String customerId = artifactGroup.getCustomerIds().get(0);
+		for (ArtifactInfo artifactInfo : actualVersions) {
+			String downloadURL = createDownloadURL(artifactGroup.getGroupId(), artifactGroup.getArtifactId(), 
+					artifactGroup.getPackaging(), artifactInfo.getVersion(), customerId);
+			artifactInfo.setDownloadURL(downloadURL);
+			newVersions.add(artifactInfo);
+		}
+		artifactGroup.setVersions(newVersions);
+		return artifactGroup;
+	}
+
+	private String createDownloadURL(String groupId, String artifactId, String packaging, String version, String customerId) {
+		Customer customer = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME, new Query(Criteria.whereId().is(customerId)), Customer.class);
+		String repoGroupURL = customer.getRepoInfo().getGroupRepoURL();
+		return repoGroupURL + ServerUtil.createContentURL(groupId, artifactId, version, packaging);
 	}
 }
