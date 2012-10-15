@@ -81,7 +81,8 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 		}
 		try {
 			ApplicationInfo applicationInfo = projectInfo.getAppInfos().get(0);
-			String commandString = buildCommandString(applicationInfo, projectInfo.getVersion());
+			String customerId = projectInfo.getCustomerIds().get(0);
+			String commandString = buildCommandString(applicationInfo, projectInfo.getVersion(), customerId);
 			if (S_LOGGER.isDebugEnabled()) {
 				S_LOGGER.debug("command String " + commandString);
 			}
@@ -117,13 +118,12 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
        ProjectUtils.writeProjectInfo(info, phrescoFolder);
     }
 
-    private String buildCommandString(ApplicationInfo info, String projectVersion) throws PhrescoException {
+    private String buildCommandString(ApplicationInfo info, String projectVersion, String customerId) throws PhrescoException {
     	if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method ArchetypeExecutorImpl.buildCommandString(ProjectInfo info)");
 			S_LOGGER.debug("buildCommandString() ProjectCode=" + info.getCode());
 		}
     	System.out.println("Creating Project   " + info.getAppDirName());
-    	String customerId = info.getCustomerIds().get(0);
     	if(StringUtils.isEmpty(customerId)) {
     		throw new PhrescoException("Customer Id Should Not Be Null");
     	}
