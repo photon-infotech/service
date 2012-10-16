@@ -47,16 +47,20 @@ import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.DownloadInfo;
+import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.commons.model.User;
 import com.photon.phresco.commons.model.User.AuthType;
 import com.photon.phresco.commons.model.WebService;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.api.DbManager;
+import com.photon.phresco.service.converters.ConvertersFactory;
 import com.photon.phresco.service.dao.ApplicationInfoDAO;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
 import com.photon.phresco.service.dao.DownloadsDAO;
+import com.photon.phresco.service.dao.ProjectInfoDAO;
 import com.photon.phresco.service.dao.TechnologyDAO;
 import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.Credentials;
@@ -102,9 +106,18 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
     }
 
     @Override
-    public void storeCreatedProjects(ApplicationInfo projectInfo) throws PhrescoException {
+    public void storeCreatedProjects(ProjectInfo projectInfo) throws PhrescoException {
         if(projectInfo != null) {
-            mongoOperation.save(CREATEDPROJECTS_COLLECTION_NAME, projectInfo);
+        	Converter<ProjectInfoDAO, ProjectInfo> projectConverter = 
+        		(Converter<ProjectInfoDAO, ProjectInfo>) ConvertersFactory.getConverter(ProjectInfoDAO.class);
+        	ProjectInfoDAO projectInfoDAO = projectConverter.convertObjectToDAO(projectInfo);
+        	mongoOperation.save("projectInfo", projectInfoDAO);
+        	List<ApplicationInfo> appInfos = projectInfo.getAppInfos();
+        	Converter<ApplicationInfoDAO, ApplicationInfo> appConverter = 
+        		(Converter<ApplicationInfoDAO, ApplicationInfo>) ConvertersFactory.getConverter(ApplicationInfoDAO.class);
+        	for (ApplicationInfo applicationInfo : appInfos) {
+        		mongoOperation.save(APPLICATION_INFO_COLLECTION_NAME, appConverter.convertObjectToDAO(applicationInfo));
+			}
         }
     }
 
@@ -209,6 +222,17 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
 		query = query.addCriteria(typeCriteria);
 		User user = mongoOperation.findOne(USERS_COLLECTION_NAME, query, User.class);
 		return user;
+	}
+
+	@Override
+	public ProjectInfo getProjectInfo(String projectInfoId)
+			throws PhrescoException {
+		ProjectInfoDAO projectInfoDAO = mongoOperation.findOne("projectInfo", 
+				new Query(Criteria.whereId().is(projectInfoId)), ProjectInfoDAO.class);
+		Converter<ProjectInfoDAO, ProjectInfo> converter = 
+			(Converter<ProjectInfoDAO, ProjectInfo>) ConvertersFactory.getConverter(ProjectInfoDAO.class);
+		ProjectInfo convertDAOToObject = converter.convertDAOToObject(projectInfoDAO, mongoOperation);
+		return convertDAOToObject;
 	}
 
 }

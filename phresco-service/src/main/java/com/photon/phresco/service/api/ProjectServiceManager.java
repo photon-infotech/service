@@ -59,7 +59,7 @@ public interface ProjectServiceManager {
 	 * @param projectInfo
 	 * @param projectPath
 	 */
-	File updateProject(ApplicationInfo projectInfo)  throws PhrescoException;
+	void updateProject(ProjectInfo projectInfo, String tempFolderPath)  throws PhrescoException;
 	
 	/**
 	 * @param projectInfo

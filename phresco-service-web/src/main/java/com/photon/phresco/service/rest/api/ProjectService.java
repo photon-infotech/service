@@ -24,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collections;
+import java.util.UUID;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -47,6 +48,7 @@ import com.photon.phresco.util.ArchiveUtil;
 import com.photon.phresco.util.ArchiveUtil.ArchiveType;
 import com.photon.phresco.util.FileUtil;
 import com.photon.phresco.util.ServiceConstants;
+import com.photon.phresco.util.Utility;
 
 /**
  * Phresco Service Class hosted at the URI path "/api"
@@ -57,8 +59,7 @@ public class ProjectService {
 	private static final String ZIP = ".zip";
     private static final Logger S_LOGGER = Logger.getLogger(ProjectService.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
-	private DbManager dbManager = null;
-	
+	private DbManager dbManager;
 	public ProjectService() throws PhrescoException {
 		PhrescoServerFactory.initialize();
 		dbManager = PhrescoServerFactory.getDbManager();
@@ -88,13 +89,7 @@ public class ProjectService {
 			
 			ArchiveUtil.createArchive(tempFolderPath, tempFolderPath + ZIP, ArchiveType.ZIP);
 			ServiceOutput serviceOutput = new ServiceOutput(tempFolderPath);
-			
-			//TODO store the created projects in DB
-			if(serviceOutput != null) {
-//			    dbManager.storeCreatedProjects(applicationInfo);
-			  //  updateUsedObjects(projectInfo);
-			}
-			
+			dbManager.storeCreatedProjects(projectInfo);
 			return serviceOutput;
 		} catch (Exception pe) {
 			S_LOGGER.error("Error During createProject(projectInfo)", pe);
@@ -152,16 +147,16 @@ public class ProjectService {
 	@Path(ServiceConstants.REST_API_PROJECT_UPDATE)
 	@Produces(ServiceConstants.MEDIATYPE_ZIP)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public StreamingOutput updateProject(ApplicationInfo appInfo) throws PhrescoException {
+	public StreamingOutput updateProject(ProjectInfo projectInfo) throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method PhrescoService.updateProject(ProjectInfo projectInfo)");
-			S_LOGGER.debug("updateProject() ProjectInfo=" + appInfo.getCode());
+			S_LOGGER.debug("updateProject() ProjectInfo=" + projectInfo.getProjectCode());
 		}
-		String projectPathStr = "";
+		String projectPathStr = Utility.getPhrescoTemp() + UUID.randomUUID().toString();
 		try {
 			ProjectServiceManager projectService = PhrescoServerFactory.getProjectService();
-			File projectPath = projectService.updateProject(appInfo);
-			projectPathStr = projectPath.getPath();
+			projectService.updateProject(projectInfo, projectPathStr);
+			
 			if (isDebugEnabled) {
 				S_LOGGER.debug("updateProject() ProjectPath=" + projectPathStr);
 			}
@@ -173,9 +168,6 @@ public class ProjectService {
 			// to client
 		}
 		ServiceOutput serviceOutput = new ServiceOutput(projectPathStr);
-		if(serviceOutput != null) {
-		    dbManager.updateCreatedProjects(appInfo);
-		}
 		return serviceOutput;
 	}
 	

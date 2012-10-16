@@ -5,6 +5,7 @@ import java.util.List;
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.DownloadInfo;
+import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.commons.model.User;
@@ -50,7 +51,7 @@ public interface DbManager {
      * @param projectInfo
      * @throws PhrescoException
      */
-    void storeCreatedProjects(ApplicationInfo projectInfo) throws PhrescoException;
+    void storeCreatedProjects(ProjectInfo projectInfo) throws PhrescoException;
     
     /**
      * To update the created project information in db
@@ -71,4 +72,5 @@ public interface DbManager {
     
     User authenticate(String username, String password) throws PhrescoException;
     
+    ProjectInfo getProjectInfo(String projectInfoId) throws PhrescoException;
 }

@@ -36,14 +36,20 @@
 package com.photon.phresco.service.impl;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.service.api.DependencyManager;
+import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.ProjectServiceManager;
 import com.photon.phresco.util.Constants;
@@ -53,7 +59,13 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 	
 	private static final Logger S_LOGGER = Logger.getLogger(ProjectServiceManagerImpl.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
-
+	private DbManager dbManager;
+	
+	public ProjectServiceManagerImpl() throws PhrescoException {
+		PhrescoServerFactory.initialize();
+		dbManager = PhrescoServerFactory.getDbManager();
+	}
+	
 	public synchronized void createProject(ProjectInfo projectInfo, String tempFolderPath) throws PhrescoException {
 		// TODO:This code should be moved into server initialization
 		if (isDebugEnabled) {
@@ -65,18 +77,53 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 		PhrescoServerFactory.getArchetypeExecutor().execute(projectInfo, tempFolderPath);
 	}
 
-	public File updateProject(ApplicationInfo projectInfo) throws PhrescoException {
-		File projectPath = new File(Utility.getPhrescoTemp(), UUID.randomUUID().toString()) ;
+	public void updateProject(ProjectInfo projectInfo, String tempFolderPath) throws PhrescoException {
+		File projectPath = new File(tempFolderPath);
 		projectPath.mkdirs();
-		DependencyManager dependencyManager = PhrescoServerFactory.getDependencyManager();
-		if (dependencyManager != null) {
-			dependencyManager.configureProject(projectInfo, projectPath);
+		
+		Map<String, String> appInfoMap = new HashMap<String, String>();
+		PhrescoServerFactory.initialize();
+		DbManager dbManager = PhrescoServerFactory.getDbManager();
+		ProjectInfo projectInfoInDB = dbManager.getProjectInfo(projectInfo.getId());
+		
+		List<ApplicationInfo> appInfosInDB = projectInfoInDB.getAppInfos();
+		List<ApplicationInfo> appInfos = projectInfo.getAppInfos();
+		List<ApplicationInfo> createdAppInfos = new ArrayList<ApplicationInfo>();
+		
+		for (ApplicationInfo appInfoInDB : appInfosInDB) {
+			String techType = appInfoInDB.getTechInfo().getVersion();
+			appInfoMap.put(techType, techType);
 		}
+		
+		for (ApplicationInfo appInfo : appInfos) {
+			if (!appInfoMap.containsKey(appInfo.getTechInfo().getVersion())) {
+				createdAppInfos.add(appInfo);
+			}
+		}
+		
+		ProjectInfo projectInfoClone = projectInfo.clone();
+		if(CollectionUtils.isNotEmpty(createdAppInfos)) {
+			for (int i = 0; i < createdAppInfos.size(); i++) {
+				projectInfoClone.setAppInfos(Arrays.asList(createdAppInfos.get(i)));
+				createProject(projectInfoClone, tempFolderPath);
+			}
+		}
+		
+		dbManager.storeCreatedProjects(projectInfo);
+		/*for (ApplicationInfo actualAppInfo : actualAppInfos) {
+			for (ApplicationInfo updatedAppInfo : updatedAppInfos) {
+				if(actualAppInfo.getTechInfo().getId().equals(updatedAppInfo.getTechInfo().getId())) {
+					
+				}
+			}
+		}*/
+//		DependencyManager dependencyManager = PhrescoServerFactory.getDependencyManager();
+//		if (dependencyManager != null) {
+//			dependencyManager.configureProject(projectInfo, projectPath);
+//		}
 		if (isDebugEnabled) {
 			S_LOGGER.info("successfully updated application :" + projectInfo.getName());
 		}
-		
-		return projectPath;
 	}
 
 	public File updateDocumentProject(ApplicationInfo projectInfo) throws PhrescoException {
@@ -92,5 +139,4 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 	public void deleteProject(ProjectInfo projectInfo, File projectPath) throws PhrescoException {
 
 	}
-
 }
