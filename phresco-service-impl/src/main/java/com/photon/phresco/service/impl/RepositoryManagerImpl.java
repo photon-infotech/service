@@ -522,7 +522,7 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 		DbManager dbManager = PhrescoServerFactory.getDbManager();
 		RepoInfo repoInfo = dbManager.getRepoInfo(customerId);
 		Client client = new Client();
-        client.addFilter(new HTTPBasicAuthFilter(repoInfo.getRepoUserName(), repoInfo.getRepoPassword()));
+        client.addFilter(new HTTPBasicAuthFilter(repoInfo.getRepoUserName(), ServerUtil.decryptString(repoInfo.getRepoPassword())));
         WebResource resource = client.resource(repoInfo.getBaseRepoURL() + REPO_LOCAL + 
         		customerId + REPOTYPE_RELEASE.toLowerCase() + CONTENT + createFileUrl(artifactGroup));
         ClientResponse response = resource.delete(ClientResponse.class);
@@ -536,4 +536,5 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 		return artifactGroup.getGroupId().replace(DOT, FORWARD_SLASH) + FORWARD_SLASH + artifactGroup.getArtifactId() + FORWARD_SLASH + 
 				artifactGroup.getVersions().get(0).getVersion();
 	}
+
 }
