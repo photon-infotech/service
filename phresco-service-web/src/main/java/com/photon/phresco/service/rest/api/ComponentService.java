@@ -67,6 +67,7 @@ import com.photon.phresco.service.client.api.Content;
 import com.photon.phresco.service.client.api.Content.Type;
 import com.photon.phresco.service.converters.ConvertersFactory;
 import com.photon.phresco.service.dao.ApplicationInfoDAO;
+import com.photon.phresco.service.dao.ApplicationTypeDAO;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
 import com.photon.phresco.service.dao.DownloadsDAO;
 import com.photon.phresco.service.dao.TechnologyDAO;
@@ -108,10 +109,15 @@ public class ComponentService extends DbService {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.findAppTypes()");
 	    }
-
 		try {
+			List<ApplicationType> applicationTypes = new ArrayList<ApplicationType>();
 			Query query = createCustomerIdQuery(customerId);
-			List<ApplicationType> applicationTypes = mongoOperation.find(APPTYPES_COLLECTION_NAME, query, ApplicationType.class);
+			List<ApplicationTypeDAO> applicationTypeDAOs = mongoOperation.find(APPTYPES_COLLECTION_NAME, query, ApplicationTypeDAO.class);
+			Converter<ApplicationTypeDAO, ApplicationType> converter = (Converter<ApplicationTypeDAO, ApplicationType>) 
+				ConvertersFactory.getConverter(ApplicationTypeDAO.class);
+			for (ApplicationTypeDAO applicationTypeDAO : applicationTypeDAOs) {
+				applicationTypes.add(converter.convertDAOToObject(applicationTypeDAO, mongoOperation));
+			}
 	        return Response.status(Response.Status.OK).entity(applicationTypes).build();
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, APPTYPES_COLLECTION_NAME);
@@ -1382,10 +1388,12 @@ public class ComponentService extends DbService {
         List<DownloadInfo> downloads = new ArrayList<DownloadInfo>();
         try {
         	Query query = createCustomerIdQuery(customerId);
-        	Criteria techIdCriteria = Criteria.where("appliesToTechIds").in(techId);
-        	Criteria typeCriteria = Criteria.where("category").is(type);
-        	query.addCriteria(techIdCriteria);
-        	query.addCriteria(typeCriteria);
+        	if(StringUtils.isNotEmpty(techId) && StringUtils.isNotEmpty(type)) {
+        		Criteria techIdCriteria = Criteria.where("appliesToTechIds").in(techId);
+            	Criteria typeCriteria = Criteria.where("category").is(type);
+            	query.addCriteria(techIdCriteria);
+            	query.addCriteria(typeCriteria);
+        	}
         	List<DownloadsDAO> downloadList = mongoOperation.find(DOWNLOAD_COLLECTION_NAME, query, DownloadsDAO.class);
             if (downloadList != null) {
             	Converter<DownloadsDAO, DownloadInfo> downloadConverter = 

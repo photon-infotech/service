@@ -33,6 +33,7 @@ public class TechnologyDAO extends CustomerBaseDAO {
 	private List<String> dependencyIds;
 	private List<String> pluginIds;
 	private List<TechnologyOptions> options;
+	private String techGroupId;
 	
 	public TechnologyDAO() {
 		super();
@@ -84,6 +85,14 @@ public class TechnologyDAO extends CustomerBaseDAO {
 
 	public void setOptions(List<TechnologyOptions> options) {
 		this.options = options;
+	}
+
+	public String getTechGroupId() {
+		return techGroupId;
+	}
+
+	public void setTechGroupId(String techGroupId) {
+		this.techGroupId = techGroupId;
 	}
 
 }

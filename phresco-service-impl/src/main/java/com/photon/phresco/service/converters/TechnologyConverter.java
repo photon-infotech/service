@@ -73,6 +73,7 @@ public class TechnologyConverter implements Converter<TechnologyDAO, Technology>
             }
         }
         technology.setOptions(dao.getOptions());
+        technology.setTechGroupId(dao.getTechGroupId());
         return technology;
     }
 
@@ -95,6 +96,7 @@ public class TechnologyConverter implements Converter<TechnologyDAO, Technology>
         	techDAO.setPluginIds(createPluginId(plugins));
         }
         techDAO.setOptions(technology.getOptions());
+        techDAO.setTechGroupId(technology.getTechGroupId());
         return techDAO;
     }
 
