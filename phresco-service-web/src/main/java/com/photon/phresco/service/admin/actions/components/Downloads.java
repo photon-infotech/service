@@ -36,6 +36,7 @@ import org.apache.log4j.Logger;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.DownloadInfo;
+import com.photon.phresco.commons.model.DownloadInfo.Category;
 import com.photon.phresco.commons.model.PlatformType;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
@@ -53,7 +54,7 @@ public class Downloads extends ServiceBaseAction {
 	private String name = "";
 	private String version = "";
 	private List<String> platform = null;
-	private String category = "";
+	private Category category = null;
 	private String description = "";
 	private List<String> technology = null;
 	
@@ -323,7 +324,7 @@ public class Downloads extends ServiceBaseAction {
 		} 
 
 		//Empty validation for group
-		if (StringUtils.isEmpty(getCategory())) {
+		if (getCategory() != null) {
 			setGroupError(getText(KEY_I18N_ERR_GROUP_EMPTY));
 			isError = true;
 		}
@@ -389,11 +390,11 @@ public class Downloads extends ServiceBaseAction {
 		this.platformTypeError = appltError;
 	}
 
-	public String getCategory() {
+	public Category getCategory() {
 		return category;
 	}
 
-	public void setCategory(String group) {
+	public void setCategory(Category group) {
 		this.category = group;
 	}
 

@@ -39,7 +39,7 @@ import com.google.gson.Gson;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.DownloadInfo;
-import com.photon.phresco.commons.model.PlatformType;
+import com.photon.phresco.commons.model.DownloadInfo.Category;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.api.PhrescoServerFactory;
@@ -65,18 +65,29 @@ public class SoftwareDownloadGenerator extends DbService {
 	private static final String SEPERATOR = "/";
 	private static final String FILES = "files";
 	RepositoryManager manager = null;
-    private Map<String, PlatformType> platformMap = new HashMap<String, PlatformType>();
+    private Map<String, String> platformMap = new HashMap<String, String>();
     private Map<String, String> filePathMap = new HashMap<String, String>();
+    private Map<String, Category> categoryMap = new HashMap<String, Category>();
     
     private void initMap() {
-    	platformMap.put("Windows86", PlatformType.WIN32);
-    	platformMap.put("Windows786",PlatformType.WIN32);
-    	platformMap.put("Windows64", PlatformType.WIN64);
-    	platformMap.put("Windows764", PlatformType.WIN64);
-    	platformMap.put("Linux64", PlatformType.LINUX64);
-    	platformMap.put("Linux86", PlatformType.LINUX32);
-    	platformMap.put("server86", PlatformType.WINSERVER32);
-    	platformMap.put("server64", PlatformType.WINSERVER64);
+    	platformMap.put("Windows86", "Windows x86");
+    	platformMap.put("Windows786","Windows7 x86");
+    	platformMap.put("Windows64", "Windows x64");
+    	platformMap.put("Windows764", "Windows7 x64");
+    	platformMap.put("Linux64", "Linux x64");
+    	platformMap.put("Linux86", "Linux x86");
+    	platformMap.put("server86", "Server x86");
+    	platformMap.put("server64", "Server x64");
+    	platformMap.put("Mac86", "Mac x86");
+    	platformMap.put("Mac64", "Mac x64");
+    }
+    
+    private void initCategoryMap() {
+    	categoryMap.put("Server", Category.SERVER);
+    	categoryMap.put("Database", Category.DATABASE);
+    	categoryMap.put("Editor", Category.EDITOR);
+    	categoryMap.put("Tools", Category.TOOLS);
+    	categoryMap.put("Others", Category.OTHERS);
     }
     
 	public SoftwareDownloadGenerator(File inputDir, File outDir ,File softwareDirectory) throws PhrescoException {
@@ -85,6 +96,7 @@ public class SoftwareDownloadGenerator extends DbService {
 		this.softDir = softwareDirectory;
 		this.workbook = getWorkBook(new File(inputDir,DOWNLOADS_EXCEL_FILE));
 		initMap();
+		initCategoryMap();
 		PhrescoServerFactory.initialize();
 		manager = PhrescoServerFactory.getRepositoryManager();
 	}
@@ -109,7 +121,7 @@ public class SoftwareDownloadGenerator extends DbService {
 
 	public void publish() throws PhrescoException {
 		HSSFSheet downLoadInfoSheet = workbook.getSheet(DOWNLOADS);
-
+		List<DownloadInfo> infos = new ArrayList<DownloadInfo>();
 		Iterator<Row> rowIterator = downLoadInfoSheet.iterator();
 		DownloadInfo info = null;
 		for (int i = 0; i < noofRows; i++) {
@@ -118,9 +130,11 @@ public class SoftwareDownloadGenerator extends DbService {
 		while (rowIterator.hasNext()) {
 			Row row = rowIterator.next();
 			info = createDownloadInfo(row);
-			saveDownloads(info);
-			uploadSoftwareFileToRepository(info.getArtifactGroup());
+//			saveDownloads(info);
+//			uploadSoftwareFileToRepository(info.getArtifactGroup());
+			infos.add(info);
 		}
+		System.out.println(new Gson().toJson(infos));
 	}
 
 	private void saveDownloads(DownloadInfo info) throws PhrescoException {
@@ -128,8 +142,8 @@ public class SoftwareDownloadGenerator extends DbService {
 			(Converter<DownloadsDAO, DownloadInfo>) ConvertersFactory.getConverter(DownloadsDAO.class);
 		DownloadsDAO downloadDAO = downlodConverter.convertObjectToDAO(info);
 		ArtifactGroup artifactGroup = info.getArtifactGroup();
-		saveArtifactGroup(artifactGroup);
-		mongoOperation.save(DOWNLOAD_COLLECTION_NAME, downloadDAO);
+//		saveArtifactGroup(artifactGroup);
+//		mongoOperation.save(DOWNLOAD_COLLECTION_NAME, downloadDAO);
 	}
 	
 	private void saveArtifactGroup(ArtifactGroup artifactGroup) throws PhrescoException {
@@ -189,7 +203,7 @@ public class SoftwareDownloadGenerator extends DbService {
 		if(next.getCell(3) != null) {
     		Cell cell = next.getCell(3);
     		String category = getValue(cell);
-    		info.setCategory(category);
+    		info.setCategory(categoryMap.get(category));
     	}
 		
 		String[] versions = null;
@@ -203,8 +217,8 @@ public class SoftwareDownloadGenerator extends DbService {
     		Cell platformCell = next.getCell(5);
     		String platforms = getValue(platformCell);
     		String[] platform = StringUtils.split(platforms, ",");
-    		List<PlatformType> types = createPlatform(platform);
-    		info.setPlatform(types);
+    		List<String> types = createPlatform(platform);
+    		info.setPlatformTypeIds(types);
     	}
 		
 		String description = "";
@@ -241,17 +255,17 @@ public class SoftwareDownloadGenerator extends DbService {
     	}
 		
 		List<ArtifactInfo> createArticatInfo = createArticatInfo(versions, info.getId(), size);
-		
+		List<String> customerIds = new ArrayList<String>();
+		customerIds.add("photon");
 		artifactGroup.setId(id);
 		artifactGroup.setVersions(createArticatInfo);
 		artifactGroup.setGroupId(groupId);
 		artifactGroup.setArtifactId(artifactId);
 		artifactGroup.setPackaging(packaging);
 		artifactGroup.setDescription(description);
+		artifactGroup.setCustomerIds(customerIds);
 		info.setId(id);
 		info.setSystem(true);
-		List<String> customerIds = new ArrayList<String>();
-		customerIds.add("photon");
 		info.setCustomerIds(customerIds);
 		info.setArtifactGroup(artifactGroup);
 		
@@ -261,7 +275,9 @@ public class SoftwareDownloadGenerator extends DbService {
 
 	private List<ArtifactInfo> createArticatInfo(String[] split, String id, long size) {
 		List<ArtifactInfo> versions = new ArrayList<ArtifactInfo>();
+		System.out.println(split.length);
 		for (String version : split) {
+			System.out.println("Entereidn with ID" + id);
 			ArtifactInfo info = new ArtifactInfo();
 			info.setArtifactGroupId(id);
 			info.setVersion(version);
@@ -271,12 +287,12 @@ public class SoftwareDownloadGenerator extends DbService {
 		return versions;
 	}
 
-	private List<PlatformType> createPlatform(String[] platform) {
-		List<PlatformType> types = new ArrayList<PlatformType>();
+	private List<String> createPlatform(String[] platform) {
+		List<String> types = new ArrayList<String>();
 		for (String type : platform) {
-			PlatformType platformType = platformMap.get(type);
-			if(platformType != null) {
-				types.add(platformType);
+			String platformId = platformMap.get(type);
+			if(platformId != null) {
+				types.add(platformId);
 			}
 		}
 		return types;
