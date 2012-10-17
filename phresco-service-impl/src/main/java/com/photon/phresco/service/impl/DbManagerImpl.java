@@ -39,6 +39,7 @@ package com.photon.phresco.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
 import org.springframework.data.document.mongodb.query.Update;
@@ -63,7 +64,6 @@ import com.photon.phresco.service.dao.DownloadsDAO;
 import com.photon.phresco.service.dao.ProjectInfoDAO;
 import com.photon.phresco.service.dao.TechnologyDAO;
 import com.photon.phresco.service.util.ServerUtil;
-import com.photon.phresco.util.Credentials;
 import com.photon.phresco.util.ServiceConstants;
 
 public class DbManagerImpl extends DbService implements DbManager, ServiceConstants {
@@ -130,11 +130,41 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
     }
     
     @Override
-    public void updateUsedObjects(String collectionName, String criteriaKey, String criteriaValue)
+    public void updateUsedObjects(ProjectInfo projectInfo)
             throws PhrescoException {
-        Query query = new Query(Criteria.where(criteriaKey).is(criteriaValue));
-        mongoOperation.updateFirst(collectionName, query, Update.update(REST_API_USED, true));
+    	List<ApplicationInfo> appInfos = projectInfo.getAppInfos();
+		for (ApplicationInfo applicationInfo : appInfos) {
+			List<String> selectedModulesIds = applicationInfo.getSelectedModules();
+			if(CollectionUtils.isNotEmpty(selectedModulesIds)) {
+				updateUsedObjects(selectedModulesIds);
+			}
+			List<String> selectedJSLibs = applicationInfo.getSelectedJSLibs();
+			if(CollectionUtils.isNotEmpty(selectedJSLibs)){
+				updateUsedObjects(selectedJSLibs);	
+			}
+			
+			List<String> selectedComponents = applicationInfo.getSelectedComponents();
+			if(CollectionUtils.isNotEmpty(selectedComponents)){
+			updateUsedObjects(selectedComponents);
+			}
+			List<String> selectedServers = applicationInfo.getSelectedServers();
+			if(CollectionUtils.isNotEmpty(selectedServers)){
+				updateUsedObjects(selectedServers);
+			}
+			List<String> selectedDatabases = applicationInfo.getSelectedDatabases();
+			if(CollectionUtils.isNotEmpty(selectedDatabases)){
+				updateUsedObjects(selectedDatabases);
+			}
+		}
     }
+    
+    private void updateUsedObjects(List<String> selectedModulesIds){
+    	for (String id : selectedModulesIds) {
+			Query query = new Query(Criteria.where("_id").is(id));
+			mongoOperation.updateFirst(ARTIFACT_INFO_COLLECTION_NAME, 
+					query, Update.update("used", true));
+		}
+     }
 
 	@Override
 	public List<ArtifactGroup> findSelectedArtifacts(List<String> ids, String customerId, String type)

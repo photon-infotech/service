@@ -60,7 +60,7 @@ public interface DbManager {
      */
     void updateCreatedProjects(ApplicationInfo projectInfo) throws PhrescoException;
     
-    void updateUsedObjects(String collectionName, String criteriaKey, String criteriaValue) throws PhrescoException;
+    void updateUsedObjects(ProjectInfo projectInfo) throws PhrescoException;
     
     List<ArtifactGroup> findSelectedArtifacts(List<String> ids, String customerId, String type) throws PhrescoException;
     
