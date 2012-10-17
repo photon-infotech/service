@@ -87,4 +87,6 @@ public interface RepositoryManager {
     
     boolean deleteArtifact(String customerId,ArtifactGroup artifactGroup) throws PhrescoException;
     
+    boolean deleteCustomerRepo(String customerId) throws PhrescoException;
+    
 }

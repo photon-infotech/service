@@ -50,6 +50,7 @@ import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -535,6 +536,34 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 	private String createFileUrl(ArtifactGroup artifactGroup) {
 		return artifactGroup.getGroupId().replace(DOT, FORWARD_SLASH) + FORWARD_SLASH + artifactGroup.getArtifactId() + FORWARD_SLASH + 
 				artifactGroup.getVersions().get(0).getVersion();
+	}
+	
+	@Override
+	public boolean deleteCustomerRepo(String customerId) throws PhrescoException {
+		PhrescoServerFactory.initialize();
+		DbManager dbManager = PhrescoServerFactory.getDbManager();
+		RepoInfo repoInfo = dbManager.getRepoInfo(customerId);
+		Client client = new Client();
+		client.addFilter(new HTTPBasicAuthFilter(repoInfo.getRepoUserName(), ServerUtil.decryptString(repoInfo.getRepoPassword())));
+		WebResource resource = client.resource(repoInfo.getBaseRepoURL() + REPO_LOCAL + 
+		        		customerId + REPOTYPE_RELEASE.toLowerCase());
+	    ClientResponse response = resource.delete(ClientResponse.class);
+	    if(response.getStatus() != 204) {
+		   throw new PhrescoException("Repository Deletion Failed");
+	    }
+		WebResource resource1 = client.resource(repoInfo.getBaseRepoURL() + REPO_LOCAL + 
+		        		customerId + REPOTYPE_SNAPSHOT.toLowerCase());
+	    ClientResponse response1 = resource1.delete(ClientResponse.class);
+	    if(response1.getStatus() != 204) {
+			   throw new PhrescoException("Repository Deletion Failed");
+		    }
+		WebResource resource2 = client.resource(repoInfo.getBaseRepoURL() + REPO_GROUPURL + 
+		        		customerId + REPOTYPE_GROUP.toLowerCase());
+	    ClientResponse response2 = resource2.delete(ClientResponse.class);
+	    if(response2.getStatus() != 204) {
+			   throw new PhrescoException("Repository Deletion Failed");
+		    }
+		return true;
 	}
 
 }
