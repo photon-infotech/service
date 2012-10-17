@@ -37,6 +37,9 @@ public class ApplicationInfoConverter implements Converter<ApplicationInfoDAO, A
 		if(dao.getArtifactGroupId() != null) {
 			applicationInfo.setPilotContent(createPilotContent(dao.getArtifactGroupId(), mongoOperation));
 		}
+		applicationInfo.setPhoneEnabled(dao.isPhoneEnabled());
+		applicationInfo.setTabletEnabled(dao.isTabletEnabled());
+
 		return applicationInfo;
 	}
 
@@ -64,6 +67,9 @@ public class ApplicationInfoConverter implements Converter<ApplicationInfoDAO, A
 		if(applicationInfo.getPilotContent() != null) {
 			applicationInfoDAO.setArtifactGroupId(applicationInfo.getPilotContent().getId());
 		}
+		applicationInfoDAO.setPhoneEnabled(applicationInfo.isPhoneEnabled());
+		applicationInfoDAO.setTabletEnabled(applicationInfo.isTabletEnabled());
+
 		return applicationInfoDAO;
 	}
 	

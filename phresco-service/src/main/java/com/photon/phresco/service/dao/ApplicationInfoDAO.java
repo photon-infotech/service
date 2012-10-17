@@ -22,6 +22,8 @@ public class ApplicationInfoDAO extends CustomerBaseDAO {
     private List<String> selectedWebservices;
     private boolean emailSupported;
     private String artifactGroupId;
+    private boolean phoneEnabled;
+    private boolean tabletEnabled;
     
 	public String getCode() {
 		return code;
@@ -126,4 +128,20 @@ public class ApplicationInfoDAO extends CustomerBaseDAO {
 	public void setArtifactGroupId(String artifactGroupId) {
 		this.artifactGroupId = artifactGroupId;
 	}
+
+    public boolean isPhoneEnabled() {
+        return phoneEnabled;
+    }
+
+    public void setPhoneEnabled(boolean phoneEnabled) {
+        this.phoneEnabled = phoneEnabled;
+    }
+
+    public boolean isTabletEnabled() {
+        return tabletEnabled;
+    }
+
+    public void setTabletEnabled(boolean tabletEnabled) {
+        this.tabletEnabled = tabletEnabled;
+    }
 }

@@ -123,12 +123,12 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 			S_LOGGER.debug("Entering Method ArchetypeExecutorImpl.buildCommandString(ProjectInfo info)");
 			S_LOGGER.debug("buildCommandString() ProjectCode=" + info.getCode());
 		}
-    	System.out.println("Creating Project   " + info.getAppDirName());
+
     	if(StringUtils.isEmpty(customerId)) {
     		throw new PhrescoException("Customer Id Should Not Be Null");
     	}
     	
-    	String techId = info.getTechInfo().getVersion();
+    	String techId = info.getTechInfo().getId();
     	ArtifactGroup archetypeInfo = dbManager.getArchetypeInfo(techId, customerId);
     	//TODO to sort version 
     	ArtifactInfo artifactInfo = archetypeInfo.getVersions().get(0);

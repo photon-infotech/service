@@ -6,11 +6,11 @@ public class ApplicationTypeDAO extends CustomerBaseDAO {
 	
 	private static final long serialVersionUID = 1L;
 
-	public void ApplicationTypeDAO() {
-	}
-	
 	private List<String> techGroupIds;
-
+	
+	public ApplicationTypeDAO() {
+    }
+	
 	public List<String> getTechGroupIds() {
 		return techGroupIds;
 	}
