@@ -90,6 +90,7 @@ public class ProjectService {
 			ArchiveUtil.createArchive(tempFolderPath, tempFolderPath + ZIP, ArchiveType.ZIP);
 			ServiceOutput serviceOutput = new ServiceOutput(tempFolderPath);
 			dbManager.storeCreatedProjects(projectInfo);
+			dbManager.updateUsedObjects(projectInfo);
 			return serviceOutput;
 		} catch (Exception pe) {
 			S_LOGGER.error("Error During createProject(projectInfo)", pe);
@@ -104,45 +105,6 @@ public class ProjectService {
 		return clonedProjectInfo;
 	}
 
-	/*private void updateUsedObjects(ApplicationInfo projectInfo) throws PhrescoException {
-	    
-        if(projectInfo.getTechInfo() != null) {
-           Technology archetypeInfo = projectInfo.getTechInfo();
-            dbManager.updateUsedObjects(ServiceConstants.ARCHETYPEINFO_COLLECTION_NAME, 
-                    ServiceConstants.REST_API_ARTIFACTID, archetypeInfo.getArtifactId());
-            dbManager.updateUsedObjects(ServiceConstants.ARCHETYPEINFO_COLLECTION_NAME, 
-                    ServiceConstants.REST_API_ARTIFACTID, archetypeInfo.);
-            
-        }
-        
-        if(projectInfo.getTechnology().getModules() != null) {
-            List<ArtifactGroup> modules = projectInfo.getTechnology().getModules();
-            for (ArtifactGroup moduleGroup : modules) {
-                ArtifactInfo module = moduleGroup.getVersions().get(0);
-                dbManager.updateUsedObjects(ServiceConstants.MODULES_COLLECTION_NAME, ServiceConstants.REST_API_NAME, module.getName());
-            }
-        }
-        
-        if (StringUtils.isNotEmpty(projectInfo.getPilotProjectName())) {
-            dbManager.updateUsedObjects(ServiceConstants.PILOTS_COLLECTION_NAME, ServiceConstants.REST_API_NAME, projectInfo.getName());
-        }
-        
-        if (CollectionUtils.isNotEmpty(projectInfo.getSelectedServers())) {
-            List<DownloadInfo> servers = projectInfo.getServers();
-            for (DownloadInfo server : servers) {
-                dbManager.updateUsedObjects(ServiceConstants.DOWNLOAD_COLLECTION_NAME, ServiceConstants.REST_API_NAME, server.getName());
-            }
-        }
-        
-        if (CollectionUtils.isNotEmpty(projectInfo.getTechnology().getDatabases())) {
-            List<DownloadInfo> databases = projectInfo.getTechnology().getDatabases();
-            for (DownloadInfo database : databases) {
-                dbManager.updateUsedObjects(ServiceConstants.DOWNLOAD_COLLECTION_NAME, ServiceConstants.REST_API_NAME, database.getName());
-            }
-        }
-        
-    }
-*/
     @POST
 	@Path(ServiceConstants.REST_API_PROJECT_UPDATE)
 	@Produces(ServiceConstants.MEDIATYPE_ZIP)
