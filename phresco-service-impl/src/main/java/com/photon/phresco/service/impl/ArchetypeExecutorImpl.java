@@ -39,6 +39,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 
+import javax.xml.bind.JAXBException;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -56,6 +58,7 @@ import com.photon.phresco.service.util.ServerConstants;
 import com.photon.phresco.util.Constants;
 import com.photon.phresco.util.ProjectUtils;
 import com.photon.phresco.util.Utility;
+import com.phresco.pom.util.PomProcessor;
 
 public class ArchetypeExecutorImpl implements ArchetypeExecutor,
         ServerConstants, Constants {
@@ -96,12 +99,27 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 				}
 			}
 			createProjectFolders(projectInfo, applicationInfo.getAppDirName(), new File(tempFolderPath));
+			updateRepository(customerId, applicationInfo.getAppDirName(), new File(tempFolderPath));
 		} catch (IOException e) {
 			throw new PhrescoException(e);
 		}
 	}
 
-    private void createProjectFolders(ProjectInfo info, String appDirName, File file) throws PhrescoException {
+    private void updateRepository(String customerId, String appDirName,	File tempFolderPath) throws PhrescoException {
+		RepoInfo repoInfo = dbManager.getRepoInfo(customerId);
+		File pomFile = new File(tempFolderPath, appDirName + "/pom.xml");
+		try {
+			PomProcessor processor = new PomProcessor(pomFile);
+			processor.addRepositories(customerId, repoInfo.getGroupRepoURL());
+			processor.save();
+		} catch (JAXBException e) {
+			throw new PhrescoException(e);
+		} catch (IOException e) {
+			throw new PhrescoException(e);
+		}
+	}
+
+	private void createProjectFolders(ProjectInfo info, String appDirName, File file) throws PhrescoException {
     	if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method ArchetypeExecutorImpl.createProjectFolders(ProjectInfo info, File file)");
 			S_LOGGER.debug("createProjectFolders()  path="+file.getPath());
