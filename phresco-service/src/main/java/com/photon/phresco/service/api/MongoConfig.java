@@ -22,6 +22,7 @@ package com.photon.phresco.service.api;
 
 import java.net.UnknownHostException;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.document.mongodb.MongoTemplate;
@@ -61,6 +62,12 @@ public class MongoConfig extends AbstractMongoConfiguration implements ServiceCo
 		MongoTemplate mongoTemplate = null;
 		try {
 			mongoTemplate = new MongoTemplate(mongo(), config.getDbName() , config.getDbCollection());
+			if(StringUtils.isNotEmpty(config.getDbUserName())) {
+				mongoTemplate.setUsername(config.getDbUserName());
+			}
+			if(StringUtils.isNotEmpty(config.getDbPassword())) {
+				mongoTemplate.setPassword(config.getDbPassword());
+			}
 		}catch (MongoException e) {
 			throw new PhrescoException(e, EX_PHEX00003);
 		}

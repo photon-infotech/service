@@ -100,9 +100,13 @@ public class ServerConfiguration {
 	private String dbHost;
 	private String dbPort;
 	private String dbName;
+	private String dbUserName;
+	private String dbPassword;
 	private static final String HOST = "host";
 	private static final String PORT= "port";
 	private static final String DBNAME = "dbname";
+	private static final String DBUSERNAME = "username";
+	private static final String DBPASSWORD = "password";
 	private String dbDefaultCollectionName;
 	private String twitterServiceURL; 
 	private String configFilePath =  "phresco-env-config.xml";
@@ -344,6 +348,26 @@ public class ServerConfiguration {
 			}
 		}
 		return dbName;
+	}
+	
+	public String getDbUserName() throws PhrescoException {
+		List<Configuration> configurations = configurationList(DATABASES);
+		if (configurations != null) {
+			for (Configuration configuration : configurations) {
+				 dbUserName = configuration.getProperties().getProperty(DBUSERNAME);
+			}
+		}
+		return dbUserName;
+	}
+	
+	public String getDbPassword() throws PhrescoException {
+		List<Configuration> configurations = configurationList(DATABASES);
+		if (configurations != null) {
+			for (Configuration configuration : configurations) {
+				 dbPassword = configuration.getProperties().getProperty(DBPASSWORD);
+			}
+		}
+		return dbPassword;
 	}
 	
 	public String getDbCollection() {
