@@ -53,6 +53,7 @@ import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.DownloadInfo;
+import com.photon.phresco.commons.model.License;
 import com.photon.phresco.commons.model.PlatformType;
 import com.photon.phresco.commons.model.Property;
 import com.photon.phresco.commons.model.SettingsTemplate;
@@ -1926,5 +1927,46 @@ public class ComponentService extends DbService {
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, OPTIONS_COLLECTION_NAME);
 		}
+	}
+	
+	/**
+	 * Returns the list of Licenses
+	 * @return
+	 */
+	@GET
+	@Path (REST_API_LICENSE)
+	@Produces (MediaType.APPLICATION_JSON)
+	public Response findLicenses() {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.findLicenses()");
+	    }
+		try {
+			List<License> licenses = mongoOperation.getCollection(LICENSE_COLLECTION_NAME, License.class);
+			return  Response.status(Response.Status.OK).entity(licenses).build();
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00005, OPTIONS_COLLECTION_NAME);
+		}
+	}
+	
+	/**
+	 * Creates the list of Properties
+	 * @param properties
+	 * @return 
+	 */
+	@POST
+	@Consumes (MediaType.APPLICATION_JSON)
+	@Path (REST_API_LICENSE)
+	public Response createLicenses(List<License> licenses) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.createLicenses(List<License> licenses)");
+	    }
+		
+		try {
+			mongoOperation.insertList(LICENSE_COLLECTION_NAME , licenses);
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
+		}
+		
+		return Response.status(Response.Status.OK).build();
 	}
 }
