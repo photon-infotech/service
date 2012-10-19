@@ -35,32 +35,21 @@
  ******************************************************************************/
 package com.photon.phresco.service.model;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 import java.util.Properties;
 
 import com.photon.phresco.configuration.ConfigReader;
 import com.photon.phresco.configuration.Configuration;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.util.Utility;
 
 public class ServerConfiguration {
 
-	private static final String PHRESCO_SERVER_CONFIG_FILE = "phresco.server.dependency.config.file";
-	private static final String KEY_PHRESCO_MAVEN_REPOSITORY_URL = "phresco.maven.repository.url";
-	private static final String KEY_PHRESCO_MAVEN_REPOSITORY_USER = "phresco.maven.repository.user.name";
-	private static final String KEY_PHRESCO_MAVEN_REPOSITORY_PASSWORD = "phresco.maven.repository.user.password";
-	private static final String KEY_PHRESCO_SERVICE_URL ="phresco.service.url";
-	private static final String KEY_CREDENTIAL_URL ="phresco.credential.path";
 	private static final String LIBRARY = "lib.";
 	private static final String MODULE = "module.";
 	private static final String PLATFORM = "platform.";
 	private static final String DATABASE = "database.";
 	private static final String EDITOR = "editor.";
-//	private static final String JSLIBRARIES = "lib.tech-js";
 	private static final String JSLIBRARIES = "jslibrary.";
 	private static final String APPSERVER = "appserver.";
 	private static final String PILOTS = "pilots.";
@@ -77,19 +66,10 @@ public class ServerConfiguration {
 	private static final String ADMIN_CONFIG_FILE = "admin.config.file";
 	private static final String SERVICE_LATEST_VERSION  = "phresco.service.latest.version"; 
 	private static final String FRAMEWORK_LATEST_VERSION  = "phresco.framework.latest.version"; 
-	private static final String AUTHENTICATION_SERVICE_URL = "phresco.authenticate.url";
 	private static final String EMAIL_EXT_FILE = "phresco.ci.emailext.file";
-	private static final String PHRESCO_SERVER_CONTEXT_NAME = "phresco.server.context.name";
-	private static final String PHRESCO_DB_COLLECTION = "db.defaultcollection";
-	private static final String PHRESCO_TWITTER_SERVICE_URL = "phresco.twitter.service.url";
 	private static final String PHRESCO_FRAMEWORK_LATEST_URL = "phresco.framework.latest.version.file";
 	private static final String DATABASES = "Database";
-	private String repositoryURL;
-	private String repositoryUser;
-	private String repositoryPassword;
-	private String dependencyConfigFile;
 	private Properties dependencyConfig = new Properties();
-	private Properties serverProps;
 	private String serviceURL;
 	private String credentialurl;
 	private String authenticateurl;
@@ -111,63 +91,7 @@ public class ServerConfiguration {
 	private String twitterServiceURL; 
 	private String configFilePath =  "phresco-env-config.xml";
 
-	public ServerConfiguration(String fileName) throws PhrescoException {
-//		initServerConfig(fileName);
-//		initDependencyConfig();
-	}
-
-	private void initDependencyConfig() throws PhrescoException {
-		InputStream is = null;
-		try {
-			is = getArtifactAsStream(dependencyConfigFile);
-			dependencyConfig.load(is);
-		} catch (IOException e) {
-			throw new PhrescoException(e);
-		} finally {
-			Utility.closeStream(is);
-		}
-	}
-
-	private InputStream getArtifactAsStream(String filePath) throws PhrescoException {
-		try {
-			return new URL(repositoryURL + filePath).openStream();
-		} catch (MalformedURLException e) {
-			throw new PhrescoException(e);
-		} catch (IOException e) {
-			throw new PhrescoException(e);
-		}
-	}
-
-	private void initServerConfig(String fileName) throws PhrescoException {
-		InputStream is = null;
-		try {
-			is = this.getClass().getClassLoader().getResourceAsStream(fileName);
-			serverProps = new Properties();
-			serverProps.load(is);
-
-			// Initialize the Server URL
-			this.repositoryURL = serverProps.getProperty(KEY_PHRESCO_MAVEN_REPOSITORY_URL);
-			this.repositoryUser = serverProps.getProperty(KEY_PHRESCO_MAVEN_REPOSITORY_USER);
-			this.repositoryPassword = serverProps.getProperty(KEY_PHRESCO_MAVEN_REPOSITORY_PASSWORD);
-			this.dependencyConfigFile = serverProps.getProperty(PHRESCO_SERVER_CONFIG_FILE);
-			this.serviceURL = serverProps.getProperty(KEY_PHRESCO_SERVICE_URL);
-			this.credentialurl = serverProps.getProperty(KEY_CREDENTIAL_URL);
-			this.authenticateurl= serverProps.getProperty(AUTHENTICATION_SERVICE_URL);
-			this.serviceContextName = serverProps.getProperty(PHRESCO_SERVER_CONTEXT_NAME);
-//			this.dbHost = serverProps.getProperty(PHRESCO_DB_HOST);
-//			this.dbPort = serverProps.getProperty(PHRESCO_DB_PORT);
-//			this.dbName = serverProps.getProperty(PHRESCO_DB_NAME);
-			this.dbDefaultCollectionName = serverProps.getProperty(PHRESCO_DB_COLLECTION);
-			this.twitterServiceURL = serverProps.getProperty(PHRESCO_TWITTER_SERVICE_URL);
-		} catch (IOException e) {
-			throw new PhrescoException(e);
-		} finally {
-			Utility.closeStream(is);
-		}
-	}
-	
-	public Properties getServerProperties() {
-		return serverProps;
+	public ServerConfiguration() throws PhrescoException {
 	}
 
 	public String getApptypeFile() {
@@ -211,18 +135,6 @@ public class ServerConfiguration {
 		return dependencyConfig.getProperty(PILOTSURL.concat(techId));
 	}
 
-	public String getRepositoryURL() {
-		return repositoryURL;
-	}
-
-	public String getRepositoryUser() {
-		return repositoryUser;
-	}
-
-	public String getRepositoryPassword() {
-		return repositoryPassword;
-	}
-	
 	public String getServerContextName() {
         return serviceContextName;
 	}

@@ -22,7 +22,6 @@ package com.photon.phresco.service.rest.api;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -41,6 +40,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -65,8 +65,6 @@ import com.photon.phresco.exception.PhrescoWebServiceException;
 import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
-import com.photon.phresco.service.client.api.Content;
-import com.photon.phresco.service.client.api.Content.Type;
 import com.photon.phresco.service.converters.ConvertersFactory;
 import com.photon.phresco.service.dao.ApplicationInfoDAO;
 import com.photon.phresco.service.dao.ApplicationTypeDAO;
@@ -76,10 +74,10 @@ import com.photon.phresco.service.dao.TechnologyDAO;
 import com.photon.phresco.service.impl.DbService;
 import com.photon.phresco.service.model.ArtifactInfo;
 import com.photon.phresco.service.util.ServerUtil;
+import com.photon.phresco.util.Constants;
 import com.photon.phresco.util.FileUtil;
 import com.photon.phresco.util.ServiceConstants;
 import com.phresco.pom.site.Reports;
-import com.sun.jersey.core.header.ContentDisposition;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.MultiPart;
@@ -310,7 +308,9 @@ public class ComponentService extends DbService {
 				return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();	
 			}
 			
-			return Response.status(Response.Status.OK).entity(techList).build();
+			ResponseBuilder response = Response.status(Response.Status.OK);
+			response.header(Constants.ARTIFACT_COUNT_RESULT, count(TECHNOLOGIES_COLLECTION_NAME, query));
+			return response.entity(techList).build();
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, TECHNOLOGIES_COLLECTION_NAME);
 		}
@@ -740,7 +740,10 @@ public class ComponentService extends DbService {
 			List<ArtifactGroupDAO> artifactGroupDAOs = mongoOperation.find(ARTIFACT_GROUP_COLLECTION_NAME,
 					query, ArtifactGroupDAO.class);
 		    List<ArtifactGroup> modules = convertDAOToModule(artifactGroupDAOs);
-		    return Response.status(Response.Status.OK).entity(modules).build();
+		    
+		    ResponseBuilder response = Response.status(Response.Status.OK);
+		    response.header(Constants.ARTIFACT_COUNT_RESULT, count(ARTIFACT_GROUP_COLLECTION_NAME, query));
+			return response.entity(modules).build();
 		    
 		} catch(Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, ARTIFACT_GROUP_COLLECTION_NAME);
@@ -1014,24 +1017,30 @@ public class ComponentService extends DbService {
 			Converter<ApplicationInfoDAO, ApplicationInfo> pilotConverter = 
             		(Converter<ApplicationInfoDAO, ApplicationInfo>) ConvertersFactory.getConverter(ApplicationInfoDAO.class);
 			if (StringUtils.isNotEmpty(techId)) {
-                query.addCriteria(Criteria.where("techInfo.version").is(techId));
+                query.addCriteria(Criteria.where(TECHINFO_VERSION).is(techId));
                 appInfos = mongoOperation.find(APPLICATION_INFO_COLLECTION_NAME, query, ApplicationInfoDAO.class);
                 for (ApplicationInfoDAO applicationInfoDAO : appInfos) {
 	               	 ApplicationInfo applicationInfo = pilotConverter.convertDAOToObject(applicationInfoDAO, mongoOperation);
-	               	 ArtifactGroup pilotContent = createArticatGroupURL(applicationInfo.getPilotContent());
-	               	 applicationInfo.setPilotContent(pilotContent);
+		               	if(applicationInfo.getPilotContent() != null) {
+	               		 ArtifactGroup pilotContent = createArticatGroupURL(applicationInfo.getPilotContent());
+	               		 applicationInfo.setPilotContent(pilotContent);
+		               	}
 	                 applicationInfos.add(applicationInfo);
 					}
             } else {
                 appInfos = mongoOperation.find(APPLICATION_INFO_COLLECTION_NAME, query, ApplicationInfoDAO.class);
                 for (ApplicationInfoDAO applicationInfoDAO : appInfos) {
                 	 ApplicationInfo applicationInfo = pilotConverter.convertDAOToObject(applicationInfoDAO, mongoOperation);
-                	 ArtifactGroup pilotContent = createArticatGroupURL(applicationInfo.getPilotContent());
-                	 applicationInfo.setPilotContent(pilotContent);
+                	 if(applicationInfo.getPilotContent() != null) {
+                		 ArtifactGroup pilotContent = createArticatGroupURL(applicationInfo.getPilotContent());
+                		 applicationInfo.setPilotContent(pilotContent);
+                	 }
                 	 applicationInfos.add(applicationInfo);
 				}
             }
-			return Response.status(Response.Status.OK).entity(applicationInfos).build();
+			ResponseBuilder response = Response.status(Response.Status.OK);
+			response.header(Constants.ARTIFACT_COUNT_RESULT, count(APPLICATION_INFO_COLLECTION_NAME, query));
+			return response.entity(applicationInfos).build();
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, APPLICATION_INFO_COLLECTION_NAME);
 		}
@@ -1383,11 +1392,12 @@ public class ComponentService extends DbService {
             S_LOGGER.debug("Entered into AdminService.findDownloadInfo()");
         }
         List<DownloadInfo> downloads = new ArrayList<DownloadInfo>();
+        Query query = new Query();
         try {
-        	Query query = createCustomerIdQuery(customerId);
+        	query = createCustomerIdQuery(customerId);
         	if(StringUtils.isNotEmpty(techId) && StringUtils.isNotEmpty(type)) {
-        		Criteria techIdCriteria = Criteria.where("appliesToTechIds").in(techId);
-            	Criteria typeCriteria = Criteria.where("category").is(type);
+        		Criteria techIdCriteria = Criteria.where(APPLIES_TO_TECHIDS).in(techId);
+            	Criteria typeCriteria = Criteria.where(CATEGORY).is(type);
             	query.addCriteria(techIdCriteria);
             	query.addCriteria(typeCriteria);
         	}
@@ -1401,13 +1411,13 @@ public class ComponentService extends DbService {
 					downloadInfo.setArtifactGroup(artifactGroup);
 					downloads.add(downloadInfo);
 				}
-                return Response.status(Response.Status.OK).entity(downloads).build();
             } 
         } catch (Exception e) {
             throw new PhrescoWebServiceException(e, EX_PHEX00006, DOWNLOAD_COLLECTION_NAME);
         }
-        
-        return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
+        ResponseBuilder response = Response.status(Response.Status.OK);
+        response.header(Constants.ARTIFACT_COUNT_RESULT, count(DOWNLOAD_COLLECTION_NAME, query));
+		return response.entity(downloads).build();
     }
     
 

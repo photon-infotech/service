@@ -51,8 +51,6 @@ public class PhrescoServerFactory {
 	private static final String DEPENDENCY_MANAGER_IMPL_CLASS = "com.photon.phresco.service.impl.DependencyManagerImpl";
     private static final String PROJECT_SERVICE_MANAGER_IMPL_CLASS = "com.photon.phresco.service.impl.ProjectServiceManagerImpl";
 	
-    private static final String SERVER_CONFIG_FILE = "server.config";
-
     private static RepositoryManager repositoryManager 	= null;
     private static ServerConfiguration serverConfig     = null;
 	private static TweetCacheManager tweetCacheManager 	= null;
@@ -61,7 +59,7 @@ public class PhrescoServerFactory {
 
     public static synchronized void initialize() throws PhrescoException {
         if (serverConfig == null) {
-            serverConfig = new ServerConfiguration(SERVER_CONFIG_FILE);
+            serverConfig = new ServerConfiguration();
 
             repositoryManager = (RepositoryManager) constructClass(REPOSITORY_MANAGER_IMPL_CLASS, serverConfig);
             dbManager = (DbManager) constructClass(DB_MANAGER_IMPL_CLASS);

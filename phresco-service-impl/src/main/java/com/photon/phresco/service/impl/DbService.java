@@ -127,4 +127,12 @@ public class DbService implements ServiceConstants {
 		String repoGroupURL = customer.getRepoInfo().getGroupRepoURL();
 		return repoGroupURL + ServerUtil.createContentURL(groupId, artifactId, version, packaging);
 	}
+	
+	protected long count(String collection, Query query ) {  
+        return mongoOperation.executeCommand(
+            "{ " +
+                "\"count\" : \"" + collection + "\"," +
+                "\"query\" : " + query.getQueryObject().toString() + 
+            " }"  ).getLong( "n" );
+    }
 }
