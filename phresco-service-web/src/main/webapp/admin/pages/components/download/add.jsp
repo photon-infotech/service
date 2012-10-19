@@ -17,6 +17,7 @@
   limitations under the License.
   ###
   --%>
+<%@page import="com.photon.phresco.commons.model.DownloadInfo.Category"%>
 <%@ taglib uri="/struts-tags" prefix="s" %>
 
 <%@ page import="java.util.List" %>
@@ -49,7 +50,7 @@
     String name = "";
     String description = "";
     String version = "";
-    String category = "";
+    Category category = null;
     List<String> downloadInfoPlatforms = null;
     if (downloadInfo != null) {
    		name = downloadInfo.getName();
