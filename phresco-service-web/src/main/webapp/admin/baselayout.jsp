@@ -191,7 +191,7 @@
 				<!-- Shortcut Top Arrows Starts Here -->
 				<aside class="shortcut_top">
 					<div class="lefttopnav">
-						<a href="JavaScript:void(0);" id="applications" name="headerMenu"
+						<a href="JavaScript:void(0);" id="dashboard" name="headerMenu"
 							class="arrow_links_top">
 							<span class="shortcutRed" id=""></span>
 							<span class="shortcutWh" id="">
@@ -217,13 +217,13 @@
 				<!-- Shortcut Bottom Arrows Starts Here -->
 				<aside class="shortcut_bottom">
 				   <div class="leftbotnav">
-						<a href="JavaScript:void(0);" id="forum" name="headerMenu"
+						<a href="JavaScript:void(0);" id="components" name="headerMenu"
 							class="arrow_links_bottom"><span class="shortcutRed" id=""></span><span
 							class="shortcutWh" id=""><s:label key="lbl.hdr.bottomleftnavlab"  theme="simple"/></span>
 						</a>
 					</div>
 					<div class="rightbotnav">
-						<a href="JavaScript:void(0);" id="settings" name="headerMenu"
+						<a href="JavaScript:void(0);" id="adminMenu" name="headerMenu"
 							class="arrow_links_bottom"><span class="shortcutRed" id="lf_tp1"></span><span
 							class="shortcutWh" id="lf_tp2"><s:label key="lbl.hdr.bottomrightnavlab" theme="simple"/></span>
 						</a>

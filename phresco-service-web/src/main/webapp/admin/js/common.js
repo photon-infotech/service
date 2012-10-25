@@ -21,8 +21,8 @@ function clickMenu(menu, tag, form) {
 	menu.click(function() {
 		showLoadingIcon(tag);
 		inActivateAllMenu(menu);
-		activateMenu($(this));
 		var selectedMenu = $(this).attr("id");
+		activateMenu($('#'+ selectedMenu));
 		var additionalParam = $(this).attr('additionalParam');
 		loadContent(selectedMenu, form, tag, additionalParam);
 	});
