@@ -25,82 +25,35 @@
 <% 
 	LogInfo log = (LogInfo)request.getAttribute(ServiceUIConstants.REQ_LOG_REPORT); 
 %>
-	
-<!-- Error dialog starts -->	
-<div id="errorDialog" class="modal exceptionErrors">
-	<div id="versionInfo">
-		<div class="modal-header">
-			<h3><s:text name="label.phresco.alert"/><span id="version"></span></h3>
-			<a id="closeAboutDialog" class="close" href="#" id="close">&times;</a>
-		</div>
-		
-		<div class="modal-body abt_modal-body errorReportContainer">
-			<div class="abt_logo errLogo">
-				<img src="images/crashReport.png" alt="logo" class="abt_err_img">
-			</div>
-			<div class="abt_content errorMsgDisplay" id="errorMsgDisplay">
-				<%= log.getAction() %>
-			</div>
-			<div class="clipboardDiv">
-				<img src="images/clipboard-copy.png" alt="clipboard" class="clipboard" 
-					id="clipboard" " title="Copy to clipboard">
-			</div>
-		</div>
-		
-		<div class="modal-body abt_modal-body errorReportTrace">
-			<div id="trackTrace" id="trackTrace"> <%= log.getTrace() %> </div>
-		</div>
-		
-		<div class="modal-footer">
-			<div class="errMsg" id="reportMsg"></div>
-			<div class="action abt_action">
-				<input type="button" class="btn btn-primary" value="<s:text name="label.sent.report"/>" id="submitReport">
-				<input type="button" class="btn btn-primary" value="<s:text name="label.cancel"/>" id="submitReportCancel">
-			</div>
-		</div>
+
+	<div style="display:none;" id="trace">
+			<%= log.getTrace() %>
 	</div>
-</div>
-<!-- Error dialog ends -->
 	
 <script>
-	$(document).ready(function() {
-		$('.modal-backdrop').show();
-		$('#closeAboutDialog').click(function(){
-			errorReportEnable();
-		});
-		
-		$('#clipboard').click(function(){
-			copyToClipboard($('#trackTrace').text());
-		});
-		
-		<%-- $('#submitReport').click(function(){
-			var errorOrigin = $('.errorMessage li span').html();
-			var errorMessage = $('#message').html();
-			var errorTrace =  $('#trace').html();
-			$.ajax({
-				url : 'sendReport',
-	            data : {
-	                'message' : errorMessage,
-	                'trace' : errorTrace,
-	                'action' : "<%= log.getAction() %>",
-	                'userid' : "<%= log.getUserId() %>",
-	            },
-	            type : "POST",
-	            success : function(data) {
-	            	$('#reportMsg').html(data.reportStatus);
-	            	$("#submitReport").attr("class", "btn disabled");
-	                $("#submitReport").attr("disabled", true);
-	            }
-			});
-		}); --%>
-		 
-		$('#submitReportCancel').click(function() {
-			errorReportEnable();
+	var trace =$('p').html();
+	$('document').ready(function() {
+		$('#popupTitle').html("Error Report"); // Title for the popup
+		$('#popupClose').hide(); //no need close button since yesno popup
+		$(".popupOk").html("<s:text name="label.sent.report"/>");
+		$('.popupOk, #popupCancel').show(); // show ok & cancel button
+		$('.modal-body').html($('#trace').html());
+		$('#popupPage').modal({
+			show: true
 		});
 	});
-
-	function errorReportEnable() {
-		$("#errorDialog").hide();
-		$('.modal-backdrop').hide();
+	
+	function popupOnOk(obj) {
+		var errorTrace =  $('#trace').html();	 
+		var params = "message=";
+		params = params.concat("<%= log.getMessage() %>");
+		params = params.concat("&trace=");
+		params = params.concat(errorTrace);
+		params = params.concat("&action=");
+		params = params.concat("<%= log.getAction() %>");
+		params = params.concat("&userid=");
+		params = params.concat("<%= log.getUserId() %>"); 
+		loadContent("sendReport", "", "", params, "");  
 	}
+	
 </script>

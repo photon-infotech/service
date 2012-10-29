@@ -544,5 +544,11 @@
 		
 		<!-- COPY TO CLIPBOARD -->
 		<action name="copyToClipboard" method="copyToClipboard" class="com.photon.phresco.service.admin.actions.ServiceBaseAction"/>
+		
+		 <!-- Error report -->
+        <action name="sendReport" method="sendReport" class="com.photon.phresco.service.admin.actions.ErrorReport">
+        	<result type="json"/>
+        </action>
+		
     </package>
 </struts>

@@ -28,6 +28,13 @@ function clickMenu(menu, tag, form) {
 	});
 }
 
+
+function copyToClipboard(data) {
+    var params = "copyToClipboard=";
+    params = params.concat(data);
+    loadContent('copyToClipboard','','', params,'');
+}
+
 function clickButton(button, tag) {
 	button.click(function() {
 		var selectedMenu = $(this).attr("id");
@@ -36,7 +43,9 @@ function clickButton(button, tag) {
 }
 
 function loadContent(pageUrl, form, tag, additionalParams, callSuccessEvent) {
-	showLoadingIcon(tag);
+	if (tag != undefined && tag != "" && !isBlank(tag)) {
+		showLoadingIcon(tag);
+	}
 	var params = "";
 	if (form != undefined && form != "" && !isBlank(form.serialize())) {
 		params = form.serialize();
@@ -103,8 +112,10 @@ function loadData(data, tag, pageUrl, callSuccessEvent) {
 		if (callSuccessEvent != undefined && !isBlank(callSuccessEvent) && callSuccessEvent) {
 			successEvent(pageUrl, data);
 		} else {
-			tag.empty();
-			tag.html(data);
+			if (tag !== undefined && !isBlank(tag)) {
+				tag.empty();
+				tag.html(data);
+			}
 			accordion();
 			setTimeOut();
 		}

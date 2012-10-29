@@ -1953,7 +1953,8 @@ input[class *='sample'] {
 
 /* exception popup starts */
 .modal-header {
-	padding: 5px 3%;
+	padding: 9px 15px;
+	border: 1px solid #FFFFFF;
 }
 
 .modal-header h3 {
@@ -2239,3 +2240,18 @@ input[class *='sample'] {
 div[class *='syncTable'] {
 	margin-top: 4px;
 }
+
+#popupPage {
+	overflow: hidden;
+}
+.modal-body {
+	height: 300px;
+	overflow: auto;
+}
+.modal-footer {
+	height: 21px;
+}
+
+#clipboard {
+	margin-right:19px;
+}	

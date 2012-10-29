@@ -104,7 +104,12 @@
 				loadContent("dashboard", '', $("#container"));
 				activateMenu($("#dashboard"));
 				showWelcomeImage();
+				
+				$('#clipboard').click(function(){
+					copyToClipboard($('.modal-body').text());
+				});
 			});
+		    
 		</script>
 	</head>
 	<body>
@@ -278,6 +283,30 @@
 	    <div class="popup_div" id="popup_div">
 	    
 	    </div>
+	    
+	    <!-- Popup Starts-->
+	    <div id="popupPage" class="modal hide fade">
+			<div class="modal-header">
+				<a class="close" data-dismiss="modal" >&times;</a>
+				<h3 id="popupTitle"><s:text name='lbl.progress'/></h3>
+				<img src="images/clipboard-copy.png" alt="clipboard" id="clipboard" class="close progressClipboard" title="Copy to clipboard"/>
+			</div>
+			<div class="modal-body">
+			</div>
+			<div class="modal-footer">
+				<div class="errMsg" id="reportMsg"></div>
+				<a href="#" class="btn btn-primary" data-dismiss="modal" id="popupCancel"><s:text name='lbl.btn.cancel'/></a>
+				<a href="#" class="btn btn-primary popupOk" data-dismiss="modal" id="" onclick="popupOnOk(this);" ><s:text name='lbl.btn.ok'/></a>
+				<a href="#" class="btn btn-primary" data-dismiss="modal" id="popupClose"><s:text name='lbl.btn.close'/></a>
+			</div>
+		</div>
 	    <!-- Popup Ends -->
+	    
+	    
+	    <!-- Popup Ends -->
+	    
+	    <!-- Command Display starts -->
+				<div class="build_cmd_div" id="build-output">
+				</div>
 	</body>
 </html>
