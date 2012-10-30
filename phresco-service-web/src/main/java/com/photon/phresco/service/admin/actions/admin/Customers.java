@@ -330,7 +330,6 @@ public class Customers extends ServiceBaseAction  {
     			Matcher matcher = pattern.matcher(getRepoURL());
     	   		boolean matchFound = matcher.matches();
     	   		if (!matchFound) {
-    	   			System.out.println(getRepoURL() + "is Invalid");
     	   			setRepoURLError(getText(KEY_I18N_ERR_REPO_URL_INVALID));
     	   			isError = true;
     	   		}
