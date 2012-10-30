@@ -61,14 +61,20 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.artifact.Artifact;
+import org.sonatype.aether.connector.file.FileRepositoryConnectorFactory;
 import org.sonatype.aether.deployment.DeployRequest;
 import org.sonatype.aether.deployment.DeploymentException;
 import org.sonatype.aether.repository.Authentication;
 import org.sonatype.aether.repository.LocalRepository;
 import org.sonatype.aether.repository.RemoteRepository;
+import org.sonatype.aether.resolution.ArtifactRequest;
+import org.sonatype.aether.resolution.ArtifactResolutionException;
+import org.sonatype.aether.resolution.ArtifactResult;
 import org.sonatype.aether.resolution.VersionRangeRequest;
 import org.sonatype.aether.resolution.VersionRangeResolutionException;
 import org.sonatype.aether.resolution.VersionRangeResult;
+import org.sonatype.aether.spi.connector.RepositoryConnector;
+import org.sonatype.aether.transfer.NoRepositoryConnectorException;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.aether.util.artifact.SubArtifact;
 import org.sonatype.aether.version.Version;
@@ -444,36 +450,36 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 	}
 
     @Override
-    public RepoInfo createCustomerRepository(String customerId) throws PhrescoException {
+    public RepoInfo createCustomerRepository(String customerId, String repoName) throws PhrescoException {
         String repoBaseURL = config.getRepoBaseURL();
         RepoInfo repoInfo = new RepoInfo();
         repoInfo.setCustomerId(customerId);
         repoInfo.setBaseRepoURL(repoBaseURL);
         repoInfo.setRepoUserName(config.getRepoUserName());
         repoInfo.setRepoPassword(ServerUtil.encryptString(config.getRepoPassword()));
-        String releaseRepo = createHostedRepo(customerId, repoBaseURL, REPOTYPE_RELEASE);
+        String releaseRepo = createHostedRepo(repoName, repoBaseURL, REPOTYPE_RELEASE);
         if(StringUtils.isNotEmpty(releaseRepo)) {
             repoInfo.setReleaseRepoURL(releaseRepo);
         }
-        String snapshotRepo = createHostedRepo(customerId, repoBaseURL, REPOTYPE_SNAPSHOT);
-        if(StringUtils.isNotEmpty(snapshotRepo)) {
-            repoInfo.setSnapshotRepoURL(snapshotRepo);
-        }
-        String groupRepo = createGroupRepo(customerId, repoBaseURL, REPOTYPE_GROUP);
+//        String snapshotRepo = createHostedRepo(customerId, repoBaseURL, REPOTYPE_SNAPSHOT);
+//        if(StringUtils.isNotEmpty(snapshotRepo)) {
+//            repoInfo.setSnapshotRepoURL(snapshotRepo);
+//        }
+        String groupRepo = createGroupRepo(repoName, repoBaseURL, REPOTYPE_GROUP);
         if(StringUtils.isNotEmpty(groupRepo)) {
             repoInfo.setGroupRepoURL(groupRepo);
         }
         return repoInfo;
     }
 
-    private String createGroupRepo(String customerId, String repoBaseURL, String repoType) throws PhrescoException {
+    private String createGroupRepo(String repoName, String repoBaseURL, String repoType) throws PhrescoException {
         Client client = new Client();
         client.addFilter(new HTTPBasicAuthFilter(config.getRepoUserName(), config.getRepoPassword()));
         WebResource resource = client.resource(repoBaseURL + REPO_GROUP_PATH);
         ClientResponse response = resource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).
-            post(ClientResponse.class, createGroupRepoData(customerId, repoBaseURL, repoType));
+            post(ClientResponse.class, createGroupRepoData(repoName, repoBaseURL, repoType));
         if(response.getStatus() == 201) {
-            return repoBaseURL + REPO_GROUP_CONTENT + customerId + repoType.toLowerCase();
+            return repoBaseURL + REPO_GROUP_CONTENT + repoName + repoType.toLowerCase();
         } else {
             throw new PhrescoException(REPO_FAILURE_MSG);
         }
@@ -501,15 +507,18 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
         return OPEN_PHRASE + SLASH + REPO_OBJECT_ID + SLASH + COLON + json + CLOSE_PHRASE;
     }
     
-    private String createGroupRepoData(String customerId, String repoBaseURL, String repoType) {
-        String repoId = customerId + repoType.toLowerCase();
-        String releaseId = customerId + REPO_RELEASE_NAME;
-        String snapshotId = customerId + REPO_SNAPSHOT_NAME;
+    private String createGroupRepoData(String repoName, String repoBaseURL, String repoType) {
+        String repoId = repoName + repoType.toLowerCase();
+        String releaseId = repoName + REPO_RELEASE_NAME;
+        String snapshotId = repoName + REPO_SNAPSHOT_NAME;
         List<Repository> repositories = new ArrayList<Repository>();
         Repository repo = new Repository(releaseId, releaseId, repoBaseURL + LOCAL_REPO_GROUP + releaseId);
         repositories.add(repo);
-        repo = new Repository(snapshotId, snapshotId, repoBaseURL + LOCAL_REPO_GROUP + snapshotId);
+        String phrescoRepoId = PHRESCO_REPO_NAME.toLowerCase();
+        repo = new Repository(phrescoRepoId, PHRESCO_REPO_NAME, repoBaseURL + LOCAL_REPO_GROUP + phrescoRepoId);
         repositories.add(repo);
+//        repo = new Repository(snapshotId, snapshotId, repoBaseURL + LOCAL_REPO_GROUP + snapshotId);
+//        repositories.add(repo);
         GroupRepository data =  new GroupRepository(repoBaseURL + REPO_GROUP_CONTENT + repoId, repoId, repoId, REPO_PROVIDER, 
                 REPO_PROVIDER, REPO_HOSTED, true, repositories);
         String json = new Gson().toJson(data);
@@ -565,5 +574,28 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 		    }
 		return true;
 	}
-
+	
+	private void resolveArtifact() throws ArtifactResolutionException, PhrescoException, NoRepositoryConnectorException {
+		RepositorySystem system = newRepositorySystem();
+		RepositorySystemSession session = newRepositorySystemSession(system);
+        Artifact artifact = new DefaultArtifact( "org.sonatype.aether:aether-util:1.9" );
+        RemoteRepository repo = new RemoteRepository();
+        Authentication authentication = new Authentication("admin", "devrepo2");
+		repo.setAuthentication(authentication);
+        repo.setUrl("http://172.16.17.226:8080/repository/content/repositories/releases/");
+        FileRepositoryConnectorFactory factory = new FileRepositoryConnectorFactory();
+        RepositoryConnector newInstance = factory.newInstance(session, repo);
+        ArtifactRequest artifactRequest = new ArtifactRequest();
+        artifactRequest.setArtifact( artifact );
+        artifactRequest.addRepository( repo );
+        ArtifactResult artifactResult = system.resolveArtifact( session, artifactRequest );
+        boolean missing = artifactResult.isMissing();
+        System.out.println("The Given Artifact Is " + missing);
+	}
+	
+	public static void main(String[] args) throws PhrescoException, ArtifactResolutionException, NoRepositoryConnectorException {
+		ServerConfiguration config = new ServerConfiguration();
+		RepositoryManagerImpl impl = new RepositoryManagerImpl(config);
+		impl.resolveArtifact();
+	}
 }

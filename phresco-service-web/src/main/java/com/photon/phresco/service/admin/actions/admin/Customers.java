@@ -33,6 +33,7 @@ import org.apache.log4j.Logger;
 
 import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.Customer.LicenseType;
+import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 
@@ -58,6 +59,10 @@ public class Customers extends ServiceBaseAction  {
     private String licence = "";
     private Date validFrom = null;
     private Date validUpTo = null;
+    private String repoName = "";
+	private String repoUserName = "";
+	private String repoPassword = "";
+	private String repoURL = "";
 	
 	private String nameError = "";
 	private String mailError = "";
@@ -67,6 +72,10 @@ public class Customers extends ServiceBaseAction  {
 	private String faxError = "";
 	private String conError = "";
 	private String licenError = "";
+	private String repoNameError = "";
+	private String repoUserNameError = "";
+	private String repoPasswordError = "";
+	private String repoURLError = "";
 	private boolean errorFound = false;
 	
 	private String fromPage = "";
@@ -177,7 +186,7 @@ public class Customers extends ServiceBaseAction  {
 	 */
 	private Customer createCustomer() {
         Customer customer = new Customer();
-        customer.setId(getCustomerId());
+//        customer.setId(getCustomerId());
         customer.setName(getName());
         customer.setDescription(getDescription());
         customer.setEmailId(getEmail());
@@ -192,7 +201,12 @@ public class Customers extends ServiceBaseAction  {
         customer.setType(licenceType);
         customer.setValidFrom(getValidFrom());
         customer.setValidUpto(getValidUpTo());
-        
+        RepoInfo repoInfo = new RepoInfo();
+        repoInfo.setReleaseRepoURL(getRepoURL());
+        repoInfo.setRepoPassword(getRepoPassword());
+        repoInfo.setRepoUserName(getRepoUserName());
+        repoInfo.setRepoName(getRepoName());
+        customer.setRepoInfo(repoInfo);
         return customer;
     }
 	
@@ -304,10 +318,42 @@ public class Customers extends ServiceBaseAction  {
     			isError = true;
     		}
     		
+    		//Empty validation for license type
+    		if (StringUtils.isEmpty(getRepoName())) {
+    			setRepoNameError(getText(KEY_I18N_ERR_REPO_NAME_EMPTY));
+    			isError = true;
+    		}
+    		
+    		if (StringUtils.isNotEmpty(getRepoURL())) {
+    			String urlPattern = "^(http|https|ftp)://.*$";
+    			Pattern pattern = Pattern.compile(urlPattern);
+    			Matcher matcher = pattern.matcher(getRepoURL());
+    	   		boolean matchFound = matcher.matches();
+    	   		if (!matchFound) {
+    	   			System.out.println(getRepoURL() + "is Invalid");
+    	   			setRepoURLError(getText(KEY_I18N_ERR_REPO_URL_INVALID));
+    	   			isError = true;
+    	   		}
+    		}
+    		
+    		if (StringUtils.isNotEmpty(getRepoURL())) {
+    			//Empty validation for repo username
+        		if (StringUtils.isEmpty(getRepoUserName())) {
+        			setRepoUserNameError(getText(KEY_I18N_ERR_REPO_USERNAME_EMPTY));
+        			isError = true;
+        		}
+        		//Empty validation for repo password
+        		if (StringUtils.isEmpty(getRepoPassword())) {
+        			setRepoPasswordError(getText(KEY_I18N_ERR_REPO_PASSWORD_EMPTY));
+        			isError = true;
+        		}
+    		}
+    		
     		if (isError) {
                 setErrorFound(true);
             }
 	    } catch (PhrescoException e) {
+	    	e.printStackTrace();
 	        return showErrorPopup(e, getText(EXCEPTION_CUSTOMERS_VALIDATE));
 	    }
 		
@@ -513,4 +559,68 @@ public class Customers extends ServiceBaseAction  {
     public void setHelpText(String helpText) {
         this.helpText = helpText;
     }
+
+	public void setRepoURL(String repoURL) {
+		this.repoURL = repoURL;
+	}
+
+	public String getRepoURL() {
+		return repoURL;
+	}
+
+	public void setRepoPassword(String repoPassword) {
+		this.repoPassword = repoPassword;
+	}
+
+	public String getRepoPassword() {
+		return repoPassword;
+	}
+
+	public void setRepoUserName(String repoUserName) {
+		this.repoUserName = repoUserName;
+	}
+
+	public String getRepoUserName() {
+		return repoUserName;
+	}
+
+	public void setRepoName(String repoName) {
+		this.repoName = repoName;
+	}
+
+	public String getRepoName() {
+		return repoName;
+	}
+	
+	public String getRepoNameError() {
+		return repoNameError;
+	}
+
+	public void setRepoNameError(String repoNameError) {
+		this.repoNameError = repoNameError;
+	}
+
+	public void setRepoUserNameError(String repoUserNameError) {
+		this.repoUserNameError = repoUserNameError;
+	}
+
+	public String getRepoUserNameError() {
+		return repoUserNameError;
+	}
+
+	public void setRepoPasswordError(String repoPasswordError) {
+		this.repoPasswordError = repoPasswordError;
+	}
+
+	public String getRepoPasswordError() {
+		return repoPasswordError;
+	}
+
+	public void setRepoURLError(String repoURLError) {
+		this.repoURLError = repoURLError;
+	}
+
+	public String getRepoURLError() {
+		return repoURLError;
+	}
 }

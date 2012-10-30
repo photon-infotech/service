@@ -43,6 +43,10 @@
 	String fax = "";
 	String helpText = "";
 	String repoUrl = "";
+	String repoName = "";
+	String repoURL = "";
+	String repoPassword = "";
+	String repoUserName = "";
 	Date validFrom = null;
 	Date validUpto = null;
 	if (customer != null) {
@@ -60,7 +64,7 @@
 		}
 		if (StringUtils.isNotEmpty(customer.getAddress())) {
 			address = customer.getAddress();
-		} 
+		}
 		if (StringUtils.isNotEmpty(customer.getState())) {
 			state = customer.getState();
 		} 
@@ -84,6 +88,18 @@
 		}
 		if (customer.getValidUpto() != null) {
 			validUpto = customer.getValidUpto();
+		}
+		if (StringUtils.isNotEmpty(customer.getRepoInfo().getRepoName())) {
+			repoName = customer.getRepoInfo().getRepoName();
+		}
+		if (StringUtils.isNotEmpty(customer.getRepoInfo().getReleaseRepoURL())) {
+			repoURL = customer.getRepoInfo().getReleaseRepoURL();
+		}
+		if (StringUtils.isNotEmpty(customer.getRepoInfo().getRepoUserName())) {
+			repoUserName = customer.getRepoInfo().getRepoUserName();
+		}
+		if (StringUtils.isNotEmpty(customer.getRepoInfo().getRepoPassword())) {
+			repoPassword = customer.getRepoInfo().getRepoPassword();
 		}
 	}
 %>
@@ -488,19 +504,51 @@
 				    value="<%= validUpto != null ? validUpto : "" %>">
 			</div>
 		</div>
-
-		<% if (StringUtils.isNotEmpty(fromPage)) { %>
-			<div class="control-group">
-				<label class="control-label labelbold">
-					<s:text name='lbl.hdr.adm.cust.url'/>
-				</label>
-				<div class="controls">
-					<label class="control-label labelbold" style="width: auto;">
-						<%= repoUrl %>
-					</label>
-				</div>
+	
+		<div class="control-group" id ="repoNameControl">
+			<label class="control-label labelbold">
+				<span class="mandatory">*</span>&nbsp;<s:text name='place.hldr.cust.add.reponame'/>
+			</label>
+			<div class="controls">
+				<input id="reponame" placeholder="<s:text name='lbl.hdr.adm.cust.repoName'/>" class="input-xlarge" name="repoName" type="text" 
+				    value="<%= repoName %>" maxlength="30" title="30 Characters only">
+					<span class="help-inline" id="repoNameError"></span>
 			</div>
-		<% } %>
+		</div>
+		
+		<div class="control-group" id ="repoURLControl">
+			<label class="control-label labelbold">
+				<s:text name='place.hldr.cust.add.repoURL'/>
+			</label>
+			<div class="controls">
+				<input id="repourl" placeholder="<s:text name='lbl.hdr.adm.cust.repoURL'/>" class="input-xlarge" name="repoURL" type="text" 
+				    value="<%= repoURL %>" maxlength="30" title="30 Characters only"/>
+				    <span class="help-inline" id="repoURLError"></span>
+			</div>
+		</div>
+		
+		<div class="control-group hideContent repoMndatory" id ="repoUserNameControl">
+			<label class="control-label labelbold">
+				<span class="mandatory">*</span>&nbsp;<s:text name='place.hldr.cust.add.repoUserName'/>
+			</label>
+			<div class="controls">
+				<input id="repousername" placeholder="<s:text name='lbl.hdr.adm.cust.repoUserName'/>" class="input-xlarge"
+					name="repoUserName" type="text" value="<%= repoUserName %>" maxlength="30" title="30 Characters only">
+					<span class="help-inline" id="repoUserNameError"></span>
+			</div>
+		</div>
+		
+		<div class="control-group hideContent repoMndatory" id ="repoPasswordControl">
+			<label class="control-label labelbold">
+				<span class="mandatory">*</span>&nbsp;<s:text name='place.hldr.cust.add.repoPassword'/>
+			</label>
+			<div class="controls">
+				<input id="repopassword" placeholder="<s:text name='lbl.hdr.adm.cust.repoPassword'/>" class="input-xlarge" 
+					name="repoPassword" type="password" value="<%= repoPassword %>" maxlength="30" title="30 Characters only">
+					<span class="help-inline" id="repoPasswordError"></span>
+			</div>
+		</div>
+		
 	</div>
 
 	<div class="bottom_button">
@@ -541,7 +589,7 @@
         $('#statefld').bind('input propertychange', function (e) {
             var state = $(this).val();
             statevalue = allowAlpha(state);
-            $(this).val(statevalue);        
+            $(this).val(statevalue);
 		});
     	
      	// To check for the special character in zipcode
@@ -579,6 +627,22 @@
 		});
 	});
 	
+	//To show/hide the username and password field
+	//It will be enabled only when the user gives the repo URL
+	$('#repourl').live('input', function() {
+		if (!isBlank($(this).val())) {
+			$(".repoMndatory").show();
+		} else {
+			$(".repoMndatory").hide();
+		}
+	});
+	
+	 $('#reponame').bind('input propertychange', function (e) {
+		var reponame = $(this).val();
+		reponame = allowAlphaNum(reponame);
+		$(this).val(reponame.trim());
+	});
+
 	function findError(data) {
 		if (!isBlank(data.nameError)) {
 			showError($("#nameControl"), $("#nameError"), data.nameError);
@@ -626,6 +690,30 @@
 			showError($("#licenControl"), $("#licenError"), data.licenError);
 		} else {
 			hideError($("#licenControl"), $("#licenError"));
+		}
+		
+		if (!isBlank(data.repoNameError)) {
+			showError($("#repoNameControl"), $("#repoNameError"), data.repoNameError);
+		} else {
+			hideError($("#repoNameControl"), $("#repoNameError"));
+		}
+		
+		if (!isBlank(data.repoUserNameError)) {
+			showError($("#repoUserNameControl"), $("#repoUserNameError"), data.repoUserNameError);
+		} else {
+			hideError($("#repoUserNameControl"), $("#repoUserNameError"));
+		}
+		
+		if (!isBlank(data.repoPasswordError)) {
+			showError($("#repoPasswordControl"), $("#repoPasswordError"), data.repoPasswordError);
+		} else {
+			hideError($("#repoPasswordControl"), $("#repoPasswordError"));
+		}
+		
+		if (!isBlank(data.repoURLError)) {
+			showError($("#repoURLControl"), $("#repoURLError"), data.repoURLError);
+		} else {
+			hideError($("#repoURLControl"), $("#repoURLError"));
 		}
 	}
 </script>

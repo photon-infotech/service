@@ -254,8 +254,8 @@ function checkForSplChr(inputStr) {
 }
 
 //It allows A-Z, a-z,
-function allowAlpha(state) {
-	return state.replace(/[^a-zA-Z]+/g, '');
+function allowAlpha(inputStr) {
+	return inputStr.replace(/[^a-zA-Z]+/g, '');
 }
 
 //It allows A-Z, a-z, 0-9, - , _ and .

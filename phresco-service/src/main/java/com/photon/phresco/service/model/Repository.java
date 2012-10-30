@@ -41,4 +41,10 @@ public class Repository {
 	public void setResourceURI(String resourceURI) {
 		this.resourceURI = resourceURI;
 	}
+
+	@Override
+	public String toString() {
+		return "Repository [id=" + id + ", name=" + name + ", resourceURI="
+				+ resourceURI + "]";
+	}
 }

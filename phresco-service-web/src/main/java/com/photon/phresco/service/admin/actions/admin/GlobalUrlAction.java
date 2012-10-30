@@ -46,16 +46,21 @@ public class GlobalUrlAction extends ServiceBaseAction {
 	private String urlError = "";
 	private boolean errorFound = false;
 	
-	private String customerId = "";
+	private String globalurlId = "";
 	
-	private String globalurlId ="";
+	private String fromPage = "";
 	
 	//To get the all the globalURLs from the DB
 	public String list() throws PhrescoException {
 		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method GlobalUrlAction.list()");
 		}
-         
+		try {
+			List<Property> globalUrls = getServiceManager().getGlobalUrls();
+			setReqAttribute(REQ_GLOBURL_URL, globalUrls);
+		} catch (PhrescoException e) {
+			throw new PhrescoException(e, getText(""));
+		}
 		return ADMIN_GLOBALURL_LIST;	
 	}
 	
@@ -75,7 +80,7 @@ public class GlobalUrlAction extends ServiceBaseAction {
 		}
 		
 		try {
-			  Property globalUrl = getServiceManager().getGlobalUrl(getGlobalurlId(), getCustomerId());
+			  Property globalUrl = getServiceManager().getGlobalUrl(getGlobalurlId());
 			  setReqAttribute(REQ_GLOBURL_URL , globalUrl);
 			  setReqAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (PhrescoException e) {
@@ -94,7 +99,7 @@ public class GlobalUrlAction extends ServiceBaseAction {
 		try  {
 			List<Property> globalURLs = new ArrayList<Property>();
 			globalURLs.add(createGlobalURL());
-			getServiceManager().createGlobalUrl(globalURLs, getCustomerId());
+			getServiceManager().createGlobalUrl(globalURLs);
 			addActionMessage(getText(URL_ADDED, Collections.singletonList(getName())));
 		}  catch (PhrescoException e) {
 			return showErrorPopup(e, getText(EXCEPTION_GLOBAL_URL_SAVE));
@@ -105,9 +110,14 @@ public class GlobalUrlAction extends ServiceBaseAction {
 	
 	private Property createGlobalURL() {
 		Property globalUrl = new Property();
-		globalUrl.setId(getGlobalurlId());
+		if (StringUtils.isNotEmpty(getFromPage())) {
+			globalUrl.setId(getGlobalurlId());
+		}
 		globalUrl.setName(getName());
 		globalUrl.setDescription(getDescription());
+		globalUrl.setKey(globalUrl.getId());
+		globalUrl.setValue(getUrl());
+		
 		return globalUrl;
 	}
 
@@ -118,7 +128,7 @@ public class GlobalUrlAction extends ServiceBaseAction {
 		}
 		
 		try {
-			getServiceManager().updateGlobalUrl(createGlobalURL(), getGlobalurlId(), getCustomerId());
+			getServiceManager().updateGlobalUrl(createGlobalURL(), getGlobalurlId());
 		} catch (PhrescoException e) {
 			return showErrorPopup(e, getText(EXCEPTION_GLOBAL_URL_UPDATE));
 		}
@@ -136,7 +146,7 @@ public class GlobalUrlAction extends ServiceBaseAction {
 			String[] globalUrlIds = getHttpRequest().getParameterValues(REQ_GLOBURL_ID);
 			if (ArrayUtils.isNotEmpty(globalUrlIds)) {
 				for (String globalUrlId : globalUrlIds) {
-					getServiceManager().deleteGlobalUrl(globalUrlId, getCustomerId());
+					getServiceManager().deleteGlobalUrl(globalUrlId);
 				}
 				addActionMessage(getText(URL_DELETED));
 			}
@@ -154,15 +164,14 @@ public class GlobalUrlAction extends ServiceBaseAction {
 		}
 
 		boolean isError = false;
-		
 		//Empty validation for name
-		if (StringUtils.isEmpty(name)) {
+		if (StringUtils.isEmpty(getName())) {
 			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY));
 			isError = true;
 		} 
 
 		//Empty validation for url
-		if (StringUtils.isEmpty(url)) {
+		if (StringUtils.isEmpty(getUrl())) {
 			setUrlError(getText(KEY_I18N_ERR_URL_EMPTY));
 			isError = true;
 		}
@@ -238,12 +247,11 @@ public class GlobalUrlAction extends ServiceBaseAction {
 		this.globalurlId = globalurlId;
 	}
 
-	public String getCustomerId() {
-		return customerId;
+	public void setFromPage(String fromPage) {
+		this.fromPage = fromPage;
 	}
 
-	public void setCustomerId(String customerId) {
-		this.customerId = customerId;
+	public String getFromPage() {
+		return fromPage;
 	}
-	
 }

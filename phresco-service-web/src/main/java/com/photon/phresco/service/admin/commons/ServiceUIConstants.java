@@ -347,6 +347,10 @@ public interface ServiceUIConstants {
     String KEY_I18N_ERR_FAXNUM_EMPTY = "err.msg.faxnum.empty";
     String KEY_I18N_ERR_COUN_EMPTY = "err.msg.country.empty";
     String KEY_I18N_ERR_LICEN_EMPTY = "err.msg.licence.empty";
+    String KEY_I18N_ERR_REPO_NAME_EMPTY = "err.msg.reponame.empty";
+    String KEY_I18N_ERR_REPO_URL_INVALID = "err.msg.repourl.invalid";
+    String KEY_I18N_ERR_REPO_USERNAME_EMPTY = "err.msg.repousername.empty";
+    String KEY_I18N_ERR_REPO_PASSWORD_EMPTY = "err.msg.repopassword.empty";
     String KEY_I18N_ERR_URL_EMPTY = "err.msg.url.empty";
     String KEY_I18N_ERR_APPLNPLTF_EMPTY = "err.msg.applnpltf.empty";
     String KEY_I18N_ERR_GROUP_EMPTY = "err.msg.group.empty";

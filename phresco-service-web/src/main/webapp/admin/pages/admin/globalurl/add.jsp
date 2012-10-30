@@ -25,15 +25,19 @@
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
 
 <% 
-	Property globalUrls = (Property) request.getAttribute(ServiceUIConstants.REQ_GLOBURL_URL);
+	Property globalUrl = (Property) request.getAttribute(ServiceUIConstants.REQ_GLOBURL_URL);
     String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
-    String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
+    
+    String id = "";
     String name = "";
 	String description = "";
 	String url  = "";
-	if(globalUrls != null) {
-		if (StringUtils.isNotEmpty(globalUrls.getDescription())) {
-			description = globalUrls.getDescription();
+	if (globalUrl != null) {
+		id = globalUrl.getId();
+		name = globalUrl.getName();
+		url = globalUrl.getValue();
+		if (StringUtils.isNotEmpty(globalUrl.getDescription())) {
+			description = globalUrl.getDescription();
 		}
 	}
 %>
@@ -41,16 +45,16 @@
 <form id="formGlobalUrlAdd" class="form-horizontal customer_list">
 	<h4>
 	<%
-			if (StringUtils.isNotEmpty(fromPage)) {
-		%>
-			<s:label key="lbl.hdr.adm.url.edit.title"/>
-		<%
-			} else {
-		%>
-			<s:label key="lbl.hdr.adm.url.tiltle" theme="simple"/>
-		<%
-			}
-		%>
+		if (StringUtils.isNotEmpty(fromPage)) {
+	%>
+		<s:label key="lbl.hdr.adm.url.edit.title"/>
+	<%
+		} else {
+	%>
+		<s:label key="lbl.hdr.adm.url.tiltle" theme="simple"/>
+	<%
+		}
+	%>
 	</h4>	
 	<div class="content_adder">
 		<div class="control-group" id="nameControl">
@@ -59,7 +63,7 @@
 			</label>
 			<div class="controls">
 				<input id="globalUrlName" placeholder="<s:text name='place.hldr.globalurl.add.name'/>" value= "<%= name %>" maxlength="30" title="30 Characters only"
-				                          class="input-xlarge" type="text" name="name">
+					class="input-xlarge" type="text" name="name">
 				<span class="help-inline" id="nameError"></span>
 			</div>
 		</div>
@@ -69,8 +73,8 @@
 				<s:text name='lbl.desc'/>
 			</label>
 			<div class="controls">
-				<textarea id="globalUrlDesc" placeholder="<s:text name='place.hldr.globalurl.add.desc'/>" value="<%= description %>" maxlength="150" title="150 Characters only"
-				                         class="input-xlarge" type="text" name="description"></textarea>
+				<textarea id="globalUrlDesc" placeholder="<s:text name='place.hldr.globalurl.add.desc'/>" maxlength="150" title="150 Characters only"
+					class="input-xlarge" name="description"><%= description %></textarea>
 				
 			</div>
 		</div>
@@ -89,22 +93,22 @@
 	
 	<div class="bottom_button">
 	  	<% if (StringUtils.isNotEmpty(fromPage)) { %>
-		<input type="button" id="globalurlUpdate" class="btn btn-primary"
+			<input type="button" id="globalurlUpdate" class="btn btn-primary"
 				onclick="validate('globalurlUpdate', $('#formGlobalUrlAdd'), $('#subcontainer'), 'Updating GlobalURL');" 
 		        value="<s:text name='lbl.btn.edit'/>"/>
-    <% } else { %>		
-		<input type="button" id="globalurlSave" class="btn btn-primary"
+    	<% } else { %>		
+			<input type="button" id="globalurlSave" class="btn btn-primary"
 		        onclick="validate('globalurlSave', $('#formGlobalUrlAdd'), $('#subcontainer'), 'Creating GlobalURL');" 
 		        value="<s:text name='lbl.btn.add'/>"/>
-	<% } %> 
-		<input type="button" id="globalurlCancel" class="btn btn-primary" 
-		                   onclick="loadContent('globalurlList', $('#formGlobalUrlAdd'), $('#subcontainer'));" 
-		                         value="<s:text name='lbl.btn.cancel'/>"/>
+		<% } %> 
+			<input type="button" id="globalurlCancel" class="btn btn-primary" 
+				onclick="loadContent('globalurlList', $('#formGlobalUrlAdd'), $('#subcontainer'));" 
+				value="<s:text name='lbl.btn.cancel'/>"/>
 	</div>
 	
 	<!-- Hidden Fields -->
-	<input type="hidden" name="customerId" value="<%= customerId %>">
-	
+	<input type="hidden" name="fromPage" value="<%= fromPage %>">
+	<input type="hidden" name="globalurlId" value="<%= id %>">
 </form>
 
 <script type="text/javascript">

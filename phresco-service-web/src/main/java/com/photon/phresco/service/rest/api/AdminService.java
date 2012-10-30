@@ -76,6 +76,8 @@ import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.MultiPart;
 import com.sun.jersey.multipart.MultiPartMediaTypes;
 
+import fr.opensagres.xdocreport.utils.StringUtils;
+
 @Component
 @Path(ServiceConstants.REST_API_ADMIN)
 public class AdminService extends DbService {
@@ -126,8 +128,12 @@ public class AdminService extends DbService {
         }
     	try {
     		for(Customer customer : customers){
-		        RepoInfo repoInfo = repositoryManager.createCustomerRepository(customer.getId());
-		        customer.setRepoInfo(repoInfo);
+    			RepoInfo repoInfo = customer.getRepoInfo();
+    			String repoName = repoInfo.getRepoName();
+    			if(StringUtils.isEmpty(repoInfo.getReleaseRepoURL())) {
+    				repoInfo = repositoryManager.createCustomerRepository(customer.getId(), repoName);
+    				customer.setRepoInfo(repoInfo);
+    			}
 		        mongoOperation.insert(CUSTOMERDAO_COLLECTION_NAME, customer);
     		}
     	} catch (Exception e) {

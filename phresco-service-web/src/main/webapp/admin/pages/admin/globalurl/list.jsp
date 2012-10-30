@@ -33,10 +33,9 @@
 
 <form id="formGlobalUrlList" class="customer_list">
 	<div class="operation" id="operation">
-		<input type="button" id="globalurlAdd" class="btn btn-disabled" name="url_add" 
+		<input type="button" id="globalurlAdd" class="btn btn-primary" name="url_add" 
             onclick="loadContent('globalurlAdd', $('#formGlobalUrlList'), $('#subcontainer'));" 
-            	 disabled="disbaled" value="<s:text name='lbl.hdr.adm.urllst.title'/>"/>
-		              
+            value="<s:text name='lbl.hdr.adm.urllst.title'/>"/>
 		<input type="button" class="btn" id="del" disabled value="<s:text name='lbl.btn.del'/>"
 			onclick="showDeleteConfirmation('<s:text name='del.confirm.globalURL'/>');"/>              
 		<s:if test="hasActionMessages()">
@@ -81,27 +80,30 @@
 					</thead>
 		
 					<tbody>
-					<% if(CollectionUtils.isNotEmpty(globalUrls)) {
-						  for(Property globalUrl : globalUrls) {
-						//TODO:Arunprasanna
+					<% 
+						if (CollectionUtils.isNotEmpty(globalUrls)) {
+							for(Property globalUrl : globalUrls) {
 					%>
-						<tr>
-							<td class="checkboxwidth">
-								<input type="checkbox" class="check" name="globalurlId" value="<%= globalUrl.getId() %>" onclick="checkboxEvent();">
-							</td>
-							<td class="namelabel-width">
-								<a href="#" name="edit" id="" onclick="editGlobalUrl('<%= globalUrl.getId() %>');">
-								     <%= StringUtils.isNotEmpty(globalUrl.getName()) ? globalUrl.getName() : "" %>
-								</a>
-							</td>
-							<td><%= StringUtils.isNotEmpty(globalUrl.getDescription()) ? globalUrl.getDescription() : "" %></td>
-							<td></td>
-							<%-- <td><%= StringUtils.isNotEmpty(globalUrl.getUrl()) ? globalUrl.getUrl() : "" %></td> --%>
-						</tr>
-						<%
-						   }
-						 }
-						%>
+							<tr>
+								<td class="checkboxwidth">
+									<% if (globalUrl.isSystem()) { %>
+										<input type="checkbox" disabled>
+									<% } else { %>
+										<input type="checkbox" class="check" name="globalurlId" value="<%= globalUrl.getId() %>" onclick="checkboxEvent();">
+									<% } %>
+								</td>
+								<td class="namelabel-width">
+									<a href="#" name="edit" id="" onclick="editGlobalUrl('<%= globalUrl.getId() %>');">
+										<%= StringUtils.isNotEmpty(globalUrl.getName()) ? globalUrl.getName() : "" %>
+									</a>
+								</td>
+								<td><%= StringUtils.isNotEmpty(globalUrl.getDescription()) ? globalUrl.getDescription() : "" %></td>
+								<td><%= StringUtils.isNotEmpty(globalUrl.getValue()) ? globalUrl.getValue() : "" %></td>
+							</tr>
+					<%
+							}
+						}
+					%>
 					</tbody>
 				</table>
 			</div>

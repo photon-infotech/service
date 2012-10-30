@@ -521,12 +521,10 @@
 		
 		<action name="globalurlSave" class="com.photon.phresco.service.admin.actions.admin.GlobalUrlAction" method="save">
 			<result name="globalurlList">/admin/pages/admin/globalurl/list.jsp</result>
-			<result type="json" />
         </action>
         
         <action name="globalurlUpdate" class="com.photon.phresco.service.admin.actions.admin.GlobalUrlAction" method="update">
             <result name="globalurlList">/admin/pages/admin/globalurl/list.jsp</result>
-            <result type="json" />
         </action>
         
         <action name="globalurlSaveValidate" class="com.photon.phresco.service.admin.actions.admin.GlobalUrlAction" method="validateForm">
@@ -537,7 +535,7 @@
 			<result type="json" />
         </action>
 		
-         <action name="globalurlDelete" class="com.photon.phresco.service.admin.actions.admin.GlobalUrlAction" method="delete">
+        <action name="globalurlDelete" class="com.photon.phresco.service.admin.actions.admin.GlobalUrlAction" method="delete">
             <result name="globalurlList">/admin/pages/admin/globalurl/list.jsp</result>
         </action>
 		<!-- ADMIN GLOBALURL ENDS-->
