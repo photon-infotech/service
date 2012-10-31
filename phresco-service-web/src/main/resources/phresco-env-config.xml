@@ -31,7 +31,8 @@
             <additional_context>/</additional_context>
         </Server>
 	</environment>
-	<environment default="false" name="Staging">
+    
+	<environment default="false" name="Development">
         <WebService name="webservice">
             <port>3030</port>
             <password/>
@@ -45,7 +46,7 @@
 		<port>27017</port>
 		<username></username>
 		<password/>
-		<dbname>phresco-staging</dbname>
+		<dbname>phresco</dbname>
 		<type>mongodb</type>
 		<version>2.0.4</version>
 	</Database>
@@ -63,21 +64,22 @@
             <additional_context>/</additional_context>
         </Server>
 	</environment>
-	<environment default="false" name="Testing">
+	
+    <environment default="true" name="Testing">
         <WebService name="webservice">
-            <port>3030</port>
+            <port>7070</port>
             <password/>
-            <context>auth</context>
-            <host>localhost</host>
+            <context>auth-2.0</context>
+            <host>172.16.18.174</host>
             <protocol>http</protocol>
             <username/>
         </WebService>	
 	<Database  desc="" name="database">
-		<host>localhost</host>
+		<host>172.16.17.227</host>
 		<port>27017</port>
 		<username></username>
 		<password/>
-		<dbname>phresco-testing</dbname>
+		<dbname>phresco-dev</dbname>
 		<type>mongodb</type>
 		<version>2.0.4</version>
 	</Database>
