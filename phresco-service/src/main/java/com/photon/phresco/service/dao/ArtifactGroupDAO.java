@@ -36,6 +36,7 @@ public class ArtifactGroupDAO extends CustomerBaseDAO {
     private String imageURL;
     private List<String> versionIds;
     private List<CoreOption> appliesTo;
+    private String licenseId;
     
     public String getGroupId() {
         return groupId;
@@ -100,4 +101,12 @@ public class ArtifactGroupDAO extends CustomerBaseDAO {
     public void setVersionIds(List<String> versionIds) {
         this.versionIds = versionIds;
     }
+
+	public void setLicenseId(String licenseId) {
+		this.licenseId = licenseId;
+	}
+
+	public String getLicenseId() {
+		return licenseId;
+	}
 }

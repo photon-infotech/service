@@ -24,6 +24,7 @@
 <%@ page import="org.apache.commons.collections.CollectionUtils"%>
 
 <%@ page import="com.photon.phresco.commons.model.ArtifactInfo" %>
+<%@ page import="com.photon.phresco.commons.model.License" %>
 <%@ page import="com.photon.phresco.commons.model.ArtifactGroup" %>
 <%@ page import="com.photon.phresco.commons.model.Technology" %>
 <%@ page import="com.photon.phresco.commons.model.CoreOption" %>
@@ -33,12 +34,12 @@
 <%
     ArtifactGroup moduleGroup = (ArtifactGroup) request.getAttribute(ServiceUIConstants.REQ_FEATURES_MOD_GRP); 
     List<Technology> technologies = (List<Technology>) request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
+    List<License> licenses = (List<License>) request.getAttribute(ServiceUIConstants.REQ_FEATURES_LICENSE);
     String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
     String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
     String type = (String) request.getAttribute(ServiceUIConstants.REQ_FEATURES_TYPE);
     String selectedModuleId = (String) request.getAttribute(ServiceUIConstants.REQ_FEATURES_SELECTED_MODULEID);
     String selectedTechnology = (String) request.getAttribute(ServiceUIConstants.FEATURES_SELECTED_TECHNOLOGY);
-    
   	//For edit
   	String moduleId = "";
     String name = "";
@@ -227,6 +228,35 @@
 			</div>
 		</div>
 		
+		<div class="control-group" id="licenseControl">
+			<label class="control-label labelbold"> 
+				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.comp.featr.license'/>
+			 </label>
+			<div class="controls">
+				<select name="license">
+				<option value=""><s:text name='lbl.comp.featr.license.select'/></option>
+				<%	
+					if (CollectionUtils.isNotEmpty(licenses)) {
+					    String selectedStr = "";
+						for (License license : licenses) {
+							if (moduleGroup != null) {
+								if (license.getId().equals(moduleGroup.getLicenseId())) {
+									selectedStr = "selected";
+								} else {
+									selectedStr = "";
+								}
+							}
+				%>
+							<option value="<%= license.getId() %>" <%= selectedStr %>><%= license.getName() %></option>
+				<%
+                        }
+					}
+				%>
+				</select>
+				<span class="help-inline applyerror" id="licenseError"></span>
+			</div>
+		</div>
+		
 		<!-- POM details starts -->
 		<div id="jarDetailsDiv" class="hideContent">
 		
@@ -404,6 +434,12 @@
             showError($("#nameControl"), $("#nameError"), data.nameError);
         } else {
             hideError($("#nameControl"), $("#nameError"));
+        }
+        
+        if (!isBlank(data.licenseError)) {
+            showError($("#licenseControl"), $("#licenseError"), data.licenseError);
+        } else {
+            hideError($("#licenseControl"), $("#licenseError"));
         }
         
         if (!isBlank(data.groupIdError)) {

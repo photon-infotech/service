@@ -39,6 +39,7 @@ import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactGroup.Type;
 import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.CoreOption;
+import com.photon.phresco.commons.model.License;
 import com.photon.phresco.commons.model.RequiredOption;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
@@ -69,6 +70,7 @@ public class Features extends ServiceBaseAction {
     private String oldVersion = "";
     private String moduleGroupId = "";
     private String moduleId = "";
+    private String license = "";
     
     private List<String> dependentModGroupId = null;
     
@@ -79,6 +81,7 @@ public class Features extends ServiceBaseAction {
     private String groupIdError = "";
 	private String fileError = "";
 	private String verError = "";
+	private String licenseError = "";
 	private boolean errorFound = false;
     
 	public String menu() {
@@ -146,6 +149,7 @@ public class Features extends ServiceBaseAction {
             setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
             setReqAttribute(REQ_FEATURES_TYPE, getType());
             setTechnologiesInRequest();
+            setReqAttribute(REQ_FEATURES_LICENSE, getLicences());
         } catch (PhrescoException e) {
             return showErrorPopup(e, getText(EXCEPTION_FEATURE_ADD));            
         }
@@ -153,7 +157,11 @@ public class Features extends ServiceBaseAction {
         return COMP_FEATURES_ADD;
     }
     
-    public String fetchFeaturesForDependency() {
+    private List<License> getLicences() throws PhrescoException {
+    	return getServiceManager().getLicenses();
+	}
+
+	public String fetchFeaturesForDependency() {
       if (s_isDebugEnabled) {
           S_LOGGER.debug("Entering Method  Features.featurelist()");
       }
@@ -213,6 +221,7 @@ public class Features extends ServiceBaseAction {
 	        setReqAttribute(REQ_FEATURES_SELECTED_MODULEID, getModuleId());
 	        setReqAttribute(REQ_FROM_PAGE, EDIT);
 	        setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
+	        setReqAttribute(REQ_FEATURES_LICENSE, getLicences());
 		} catch (PhrescoException e) {
 			showErrorPopup(e, getText(EXCEPTION_FEATURE_EDIT));
 		}
@@ -265,6 +274,9 @@ public class Features extends ServiceBaseAction {
             
             artifactGroup.setCustomerIds(Arrays.asList(getCustomerId()));
             
+            //To set license
+            System.out.println("liscence-----------------"+getLicense());
+            artifactGroup.setLicenseId(getLicense());
             //To set the details of the version
             ArtifactInfo artifactInfo = new ArtifactInfo();
             artifactInfo.setDescription(getDescription());
@@ -372,6 +384,12 @@ public class Features extends ServiceBaseAction {
             setFileError(getText(KEY_I18N_ERR_APPLNJAR_EMPTY));
             isError = true;
         }
+        
+        if(StringUtils.isEmpty(getLicense())) {
+        	setLicenseError(getText(KEY_I18N_ERR_LICEN_EMPTY));
+            isError = true;
+        }
+        
         if (s_featureByteArray != null) {
             //Empty validation for groupId if file is selected
             if (StringUtils.isEmpty(getGroupId())) {
@@ -592,4 +610,20 @@ public class Features extends ServiceBaseAction {
     public void setDependentModGroupId(List<String> dependentModGroupId) {
         this.dependentModGroupId = dependentModGroupId;
     }
+
+	public void setLicense(String license) {
+		this.license = license;
+	}
+
+	public String getLicense() {
+		return license;
+	}
+
+	public void setLicenseError(String licenseError) {
+		this.licenseError = licenseError;
+	}
+
+	public String getLicenseError() {
+		return licenseError;
+	}
 }

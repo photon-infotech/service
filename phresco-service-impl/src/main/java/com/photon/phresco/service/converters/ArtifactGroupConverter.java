@@ -59,7 +59,7 @@ public class ArtifactGroupConverter implements Converter<ArtifactGroupDAO, Artif
         List<ArtifactInfo> versions = mongoOperation.find(ARTIFACT_INFO_COLLECTION_NAME, 
         		query , ArtifactInfo.class);
         artifactGroup.setVersions(versions);
-        
+        artifactGroup.setLicenseId(artifactGroupDAO.getLicenseId());
         return artifactGroup;
     }
 
@@ -81,6 +81,7 @@ public class ArtifactGroupConverter implements Converter<ArtifactGroupDAO, Artif
         artifactGroupDAO.setUsed(artifactGroup.isUsed());
         artifactGroupDAO.setAppliesTo(artifactGroup.getAppliesTo());
         artifactGroupDAO.setHelpText(artifactGroup.getHelpText());
+        artifactGroupDAO.setLicenseId(artifactGroup.getLicenseId());
 //        List<ArtifactInfo> versions = artifactGroup.getVersions();
 //        artifactGroupDAO.setVersionIds(createVersionIds(versions));
         return artifactGroupDAO;
