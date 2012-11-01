@@ -20,16 +20,18 @@
 
 <%@ taglib uri="/struts-tags" prefix="s"%>
 
+<%@ page import="java.util.List"%>
+<%@ page import="java.util.ArrayList"%>
+
 <%@ page import="org.apache.commons.lang.StringUtils"%>
 <%@ page import="org.apache.commons.collections.CollectionUtils"%>
-<%@ page import="java.util.List"%>
-<%@page import="java.util.ArrayList"%>
 
 <%@ page import="com.photon.phresco.commons.model.ApplicationType"%>
 <%@ page import="com.photon.phresco.commons.model.Technology"%>
-<%@page import="com.photon.phresco.commons.model.TechnologyOptions"%>
+<%@ page import="com.photon.phresco.commons.model.TechnologyOptions"%>
 <%@ page import="com.photon.phresco.commons.model.ArtifactGroup"%>
 <%@ page import="com.photon.phresco.commons.model.ArtifactInfo"%>
+<%@ page import="com.phresco.pom.site.Reports"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
 <%@ page import="com.photon.phresco.service.admin.actions.util.ServiceActionUtil"%>
 
@@ -39,6 +41,7 @@
 	List<ApplicationType> appTypes = (List<ApplicationType>) request.getAttribute(ServiceUIConstants.REQ_APP_TYPES);
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
 	List<TechnologyOptions> options = (List<TechnologyOptions>) request.getAttribute(ServiceUIConstants.REQ_TECHNOLOGY_OPTION);
+	List<Reports> reports = (List<Reports>)request.getAttribute(ServiceUIConstants.REQ_TECHNOLOGY_REPORTS);
 	
 	String title = ServiceActionUtil.getTitle(ServiceUIConstants.ARCHETYPES, fromPage);
 	String buttonLbl = ServiceActionUtil.getButtonLabel(fromPage);
@@ -50,18 +53,21 @@
 	String desc = "";
 	String version = "";
 	String versionComment = "";
-	List<String> techVersion = null;
+	List<String> techVersions = null;
 	boolean isSystem = false;
 	String appTypeId = "";
 	String techVer = "";
-	
+	List<String> selectedReports = null;
 	if (technology != null) {
 		name = technology.getName();
 		desc = technology.getDescription();
-		techVersion = technology.getTechVersions();
-		techVer  = techVersion.toString().replace("[", "").replace("]", "");
+		techVersions = technology.getTechVersions();
+		if (CollectionUtils.isNotEmpty(techVersions)) {
+			techVer  = techVersions.toString().replace("[", "").replace("]", "");
+		}
 		isSystem = technology.isSystem();
 		appTypeId = technology.getAppTypeId();
+		selectedReports = technology.getReports();
 	}
 %>
 
@@ -79,8 +85,6 @@
 					name="name" value="<%= name %>" maxlength="30" title="30 Characters only">
 				<span class="help-inline" id="nameError"></span>
 			</div>
-			
-			
 		</div>
 
 		<div class="control-group">
@@ -91,18 +95,6 @@
 					rows="3" name="description" maxlength="150" title="150 Characters only"><%= desc %></textarea>
 			</div>
 		</div>
-
-		<%-- <div class="control-group" id="verControl">
-			<label class="control-label labelbold"> <span
-				class="mandatory">*</span>&nbsp;<s:text name='lbl.version' />
-			</label>
-			<div class="controls">
-				<input id="version" placeholder='<s:text name="place.hldr.archetype.add.version"/>' class="input-xlarge" 
-					type="text" name="version" value="<%= StringUtils.isNotEmpty(version) ? version : "" %>" maxlength="30" 
-					title="30 Characters only">
-				<span class="help-inline" id="verError"></span>
-			</div>
-		</div>  --%>
 
   		<div class="control-group" id="techverControl">
 			<label class="control-label labelbold"> <span
@@ -131,14 +123,14 @@
 			<div class="controls">
 				<select id="select01" name="apptype">
 					<%
-						if (CollectionUtils.isNotEmpty(appTypes))  {
+						if (CollectionUtils.isNotEmpty(appTypes)) {
 							for (ApplicationType appType : appTypes) {
 								String selectedStr= "";
 								if (appType.getId().equals(appTypeId)) {
 									selectedStr = "selected";
 								}
 					%>
-							<option value="<%= appType.getId() %>" <%= selectedStr %>><%= appType.getName() %></option>
+								<option value="<%= appType.getId() %>" <%= selectedStr %>><%= appType.getName() %></option>
 					<%
 							}
 						}
@@ -183,8 +175,8 @@
 		<!-- POM details ends -->
 		
 		<div class="control-group" id="appFileControl">
-			<label class="control-label labelbold"> <span
-				class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.archtypejar' />
+			<label class="control-label labelbold"> 
+				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.archtypejar' />
 			</label>
 			<div class="controls" style="float: left; margin-left: 3%;">
 				<div id="appln-file-uploader" class="file-uploader">
@@ -198,13 +190,12 @@
 		</div>
 		
 		<div class="control-group" >
-		<label class="control-label labelbold"> <s:text
-					name='lbl.hdr.comp.plugindependencies' /> </label>
+			<label class="control-label labelbold">
+				<s:text name='lbl.hdr.comp.plugindependencies'/></label>
 			<div class="controls">
 				<input type="button" class="btn btn-primary" value="Upload PluginJar" 
 					onclick="uploadPluginJar();" />
 			</div>
-			<%-- <span class="help-inline pluginError" id="pluginError"></span> --%>
 		</div>
 		<div class="control-group" id="applicableControl">
 			<label class="control-label labelbold">
@@ -216,16 +207,18 @@
 						<ul>
 							<li>
 								<input type="checkbox" value="all" id="checkAllAuto" name="" onclick="checkAllEvent(this,$('.applsChk'), true);"
-								style="margin: 3px 8px 6px 0;">All
+									style="margin: 3px 8px 6px 0;"><s:text name='lbl.all'/>
 							</li>
 							<%
-								if (options != null) {
+								if (CollectionUtils.isNotEmpty(options)) {
 									String checkedStr = "";
 									for (TechnologyOptions option : options) {
 										List<String> selectedOptions = new ArrayList<String>();
 										if (technology != null) {
-											for (TechnologyOptions technologyOption : technology.getOptions()) {
-												selectedOptions.add(technologyOption.getOption());
+											if(CollectionUtils.isNotEmpty(technology.getOptions())) {
+												for (TechnologyOptions technologyOption : technology.getOptions()) {
+													selectedOptions.add(technologyOption.getOption());
+												}
 											}
 											if (selectedOptions.contains(option.getOption())) {
 												checkedStr = "checked";
@@ -236,6 +229,42 @@
 							%>
 										<li> <input type="checkbox" id="appliestoCheckbox" name="applicable" value='<%= option.getOption() %>'
 											class="check applsChk" <%= checkedStr %>><%= option.getOption() %>
+										</li>
+							<%		}	
+								}
+							%>
+						</ul>
+					</div>
+				</div>
+          		 <span class="help-inline applyerror" id="applicableError"></span>
+			</div>
+		</div>
+		<div class="control-group" id="reportsControl">
+			<label class="control-label labelbold">
+				<s:text name='lbl.hdr.comp.reports'/>
+			</label>
+		<div class="controls">
+					<div class="typeFields" id="typefield">
+					<div class="multilist-scroller multiselct" id="applicableToDiv">
+						<ul>
+							<li>
+								<input type="checkbox" value="all" id="checkAllAuto" name="" onclick="checkAllEvent(this,$('.reportsChk'), true);"
+								style="margin: 3px 8px 6px 0;"><s:text name='lbl.all'/>
+							</li>
+							<%
+								if (CollectionUtils.isNotEmpty(reports)) {
+									String checkedStr = "";
+									for (Reports report : reports) {
+										if (CollectionUtils.isNotEmpty(selectedReports)) {
+											if (selectedReports.contains(report.getId())) {
+												checkedStr = "checked";
+											} else {
+												checkedStr = "";
+											}
+										}
+							%>
+										<li> <input type="checkbox" id="reportsCheckbox" name="applicableReports" value='<%= report.getId() %>'
+											class="check reportsChk" <%= checkedStr %>><%= report.getDisplayName() %>
 										</li>
 							<%		}	
 								}

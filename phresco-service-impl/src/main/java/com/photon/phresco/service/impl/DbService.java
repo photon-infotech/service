@@ -23,6 +23,7 @@ package com.photon.phresco.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -110,6 +111,9 @@ public class DbService implements ServiceConstants {
 	
 	protected ArtifactGroup createArticatGroupURL(ArtifactGroup artifactGroup) {
 		List<ArtifactInfo> newVersions = new ArrayList<ArtifactInfo>();
+		if(CollectionUtils.isEmpty(artifactGroup.getVersions())) {
+			return artifactGroup;
+		}
 		List<ArtifactInfo> actualVersions = artifactGroup.getVersions();
 		String customerId = artifactGroup.getCustomerIds().get(0);
 		for (ArtifactInfo artifactInfo : actualVersions) {

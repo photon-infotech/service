@@ -39,19 +39,21 @@ import com.photon.phresco.util.ServiceConstants;
 public class TechnologyConverter implements Converter<TechnologyDAO, Technology>, ServiceConstants {
 
     @Override
-    public Technology convertDAOToObject(TechnologyDAO dao, MongoOperations mongoOperation) throws PhrescoException {
-        Technology technology = new Technology(dao.getId());
-        technology.setAppTypeId(dao.getAppTypeId());
-        technology.setCreationDate(dao.getCreationDate());
-        technology.setCustomerIds(dao.getCustomerIds());
-        technology.setDescription(dao.getDescription());
-        technology.setHelpText(dao.getHelpText());
-        technology.setName(dao.getName());
-        technology.setStatus(dao.getStatus());
-        technology.setSystem(dao.isSystem());
-        technology.setTechVersions(dao.getTechVersions());
-        technology.setUsed(dao.isUsed());
-        String archetypeGroupDAOId = dao.getArchetypeGroupDAOId();
+    public Technology convertDAOToObject(TechnologyDAO technologyDAO, MongoOperations mongoOperation) throws PhrescoException {
+        Technology technology = new Technology(technologyDAO.getId());
+        technology.setAppTypeId(technologyDAO.getAppTypeId());
+        technology.setCreationDate(technologyDAO.getCreationDate());
+        technology.setCustomerIds(technologyDAO.getCustomerIds());
+        technology.setDescription(technologyDAO.getDescription());
+        technology.setHelpText(technologyDAO.getHelpText());
+        technology.setName(technologyDAO.getName());
+        technology.setStatus(technologyDAO.getStatus());
+        technology.setSystem(technologyDAO.isSystem());
+        if (CollectionUtils.isNotEmpty(technologyDAO.getTechVersions())) {
+        	technology.setTechVersions(technologyDAO.getTechVersions());
+        }
+        technology.setUsed(technologyDAO.isUsed());
+        String archetypeGroupDAOId = technologyDAO.getArchetypeGroupDAOId();
         ArtifactGroupDAO artifactGrpDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
         		new Query(Criteria.whereId().is(archetypeGroupDAOId)), ArtifactGroupDAO.class);
         Converter<ArtifactGroupDAO, ArtifactGroup> artifactConverter = 
@@ -60,9 +62,9 @@ public class TechnologyConverter implements Converter<TechnologyDAO, Technology>
 	        ArtifactGroup artifactGroup = artifactConverter.convertDAOToObject(artifactGrpDAO, mongoOperation);
 	        technology.setArchetypeInfo(artifactGroup);
         }
-        if(CollectionUtils.isNotEmpty(dao.getPluginIds())) {
+        if(CollectionUtils.isNotEmpty(technologyDAO.getPluginIds())) {
         	List<ArtifactGroupDAO> pluginsDAO = mongoOperation.find(ARTIFACT_GROUP_COLLECTION_NAME, 
-            		new Query(Criteria.whereId().is(dao.getPluginIds().toArray())), ArtifactGroupDAO.class);
+            		new Query(Criteria.whereId().is(technologyDAO.getPluginIds().toArray())), ArtifactGroupDAO.class);
             List<ArtifactGroup> plugins = new ArrayList<ArtifactGroup>();
             if(pluginsDAO != null) {
             	for (ArtifactGroupDAO artifactGroupDAO : pluginsDAO) {
@@ -72,8 +74,13 @@ public class TechnologyConverter implements Converter<TechnologyDAO, Technology>
                 technology.setPlugins(plugins);
             }
         }
-        technology.setOptions(dao.getOptions());
-        technology.setTechGroupId(dao.getTechGroupId());
+        if(CollectionUtils.isNotEmpty(technologyDAO.getOptions())) {
+        	technology.setOptions(technologyDAO.getOptions());
+        }
+        technology.setTechGroupId(technologyDAO.getTechGroupId());
+        if(CollectionUtils.isNotEmpty(technologyDAO.getReports())) {
+        	technology.setReports(technologyDAO.getReports());
+        }
         return technology;
     }
 
@@ -97,6 +104,7 @@ public class TechnologyConverter implements Converter<TechnologyDAO, Technology>
         }
         techDAO.setOptions(technology.getOptions());
         techDAO.setTechGroupId(technology.getTechGroupId());
+        techDAO.setReports(technology.getReports());
         return techDAO;
     }
 

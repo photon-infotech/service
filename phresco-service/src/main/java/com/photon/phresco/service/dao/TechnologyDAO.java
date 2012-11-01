@@ -34,6 +34,7 @@ public class TechnologyDAO extends CustomerBaseDAO {
 	private List<String> pluginIds;
 	private List<TechnologyOptions> options;
 	private String techGroupId;
+	private List<String> reports;
 	
 	public TechnologyDAO() {
 		super();
@@ -93,6 +94,14 @@ public class TechnologyDAO extends CustomerBaseDAO {
 
 	public void setTechGroupId(String techGroupId) {
 		this.techGroupId = techGroupId;
+	}
+	
+	public void setReports(List<String> reports) {
+		this.reports = reports;
+	}
+
+	public List<String> getReports() {
+		return reports;
 	}
 
 }

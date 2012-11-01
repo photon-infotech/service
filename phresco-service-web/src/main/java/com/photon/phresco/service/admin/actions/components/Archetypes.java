@@ -46,6 +46,7 @@ import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.client.api.ServiceManager;
 import com.photon.phresco.service.util.ServerUtil;
+import com.phresco.pom.site.Reports;
 
 
 
@@ -92,6 +93,7 @@ public class Archetypes extends ServiceBaseAction {
 	private String artifactId = "";
 	private String uploadPlugin = "";
 	private List<String> applicable = null;
+	private List<String> applicableReports = null;
 	private boolean archType = false;
 	
 	public String list() throws PhrescoException {
@@ -129,8 +131,10 @@ public class Archetypes extends ServiceBaseAction {
 			List<ApplicationType> appTypes = serviceManager.getApplicationTypes(getCustomerId());
 			setReqAttribute(REQ_APP_TYPES, appTypes);
 			List<TechnologyOptions> options = serviceManager.getOptions();
+			List<Reports> reports = serviceManager.getReports();
 			setReqAttribute(REQ_TECHNOLOGY_OPTION, options);
 			setReqAttribute(REQ_FROM_PAGE, ADD);
+			setReqAttribute(REQ_TECHNOLOGY_REPORTS, reports);
 		} catch (PhrescoException e) {
 		    return showErrorPopup(e, getText(EXCEPTION_ARCHETYPE_ADD));
 		}
@@ -152,6 +156,8 @@ public class Archetypes extends ServiceBaseAction {
             setReqAttribute(REQ_APP_TYPES, appTypes);
 			setReqAttribute(REQ_TECHNOLOGY_OPTION, options);
 			setReqAttribute(REQ_FROM_PAGE, EDIT);
+			List<Reports> reports = serviceManager.getReports();
+			setReqAttribute(REQ_TECHNOLOGY_REPORTS, reports);
 		} catch (PhrescoException e) {
 		    return showErrorPopup(e, getText(EXCEPTION_ARCHETYPE_EDIT));
 		}
@@ -240,10 +246,9 @@ public class Archetypes extends ServiceBaseAction {
         technology.setArchetypeInfo(archetypeArtfGroup);
         technology.setCustomerIds(Arrays.asList(getCustomerId()));
         technology.setTechVersions(Arrays.asList(getTechVersion()));
-        
+        technology.setReports(getApplicableReports());
         return technology;
     }
-
 
 	/**
 	 * @param artifactGroupInfo 
@@ -602,5 +607,13 @@ public class Archetypes extends ServiceBaseAction {
 
 	public List<String> getApplicable() {
 		return applicable;
+	}
+
+	public void setApplicableReports(List<String> applicableReports) {
+		this.applicableReports = applicableReports;
+	}
+
+	public List<String> getApplicableReports() {
+		return applicableReports;
 	}
 }

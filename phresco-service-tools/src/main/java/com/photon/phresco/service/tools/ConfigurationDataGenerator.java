@@ -38,6 +38,8 @@ package com.photon.phresco.service.tools;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import com.photon.phresco.commons.model.Element;
 import com.photon.phresco.commons.model.PropertyTemplate;
 import com.photon.phresco.commons.model.SettingsTemplate;
@@ -131,7 +133,9 @@ public class ConfigurationDataGenerator extends DbService implements Constants {
 	private PropertyTemplate createPropertyTemplate(String key, String name, String type,
             boolean isProjSpecific, boolean isRequired , List<String> possibleValues, String description) {
         PropertyTemplate propTemplate = new PropertyTemplate(key, type, isProjSpecific ,isRequired);
-        propTemplate.setPossibleValues(possibleValues);
+        if(CollectionUtils.isNotEmpty(possibleValues)) {
+        	propTemplate.setPossibleValues(possibleValues);
+        }
         propTemplate.setName(name);
         propTemplate.setDescription(description);
         return propTemplate;
@@ -145,7 +149,7 @@ public class ConfigurationDataGenerator extends DbService implements Constants {
                 null, "Name or IPAddress of the database server"));
         props.add(createPropertyTemplate(DB_PORT, "Port", "Number", false,true, null,
                 "Port number of the database server"));
-        props.add(createPropertyTemplate(DB_USERNAME, "Username", "String", false,true, null,
+        props.add(createPropertyTemplate(DB_USERNAME, "Username", "Password", false,true, null,
                 "User name to access the database"));
         props.add(createPropertyTemplate(DB_PASSWORD, "Password", "String", false,false, null,
                 "Password to access the database"));
@@ -297,7 +301,7 @@ public class ConfigurationDataGenerator extends DbService implements Constants {
                 "Type Of Authendication"));
         props.add(createPropertyTemplate("bindDN", "Bind DN or User", "String", false, false, null,
                 "Bind DN or User"));
-        props.add(createPropertyTemplate("bindPassword", "Bind Password", "String", false, false, null,
+        props.add(createPropertyTemplate("bindPassword", "Bind Password", "Password", false, false, null,
         "Bind Password"));
         
         List<Element> appsTo = new ArrayList<Element>(8);

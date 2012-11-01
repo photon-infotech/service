@@ -53,6 +53,7 @@ import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.DownloadInfo;
+import com.photon.phresco.commons.model.Element;
 import com.photon.phresco.commons.model.License;
 import com.photon.phresco.commons.model.PlatformType;
 import com.photon.phresco.commons.model.Property;
@@ -291,12 +292,16 @@ public class ComponentService extends DbService {
 
 			for (TechnologyDAO technologyDAO : techDAOList) {
 				Technology technology = technologyConverter.convertDAOToObject(technologyDAO, mongoOperation);
-				ArtifactGroup archetypecontent = createArticatGroupURL(technology.getArchetypeInfo());
-				technology.setArchetypeInfo(archetypecontent);
+				if(technology.getArchetypeInfo() != null) {
+					ArtifactGroup archetypecontent = createArticatGroupURL(technology.getArchetypeInfo());
+					technology.setArchetypeInfo(archetypecontent);
+				}
 				if(CollectionUtils.isNotEmpty(technology.getPlugins())) {
 					List<ArtifactGroup> plugins = new ArrayList<ArtifactGroup>();
-					for (ArtifactGroup agArtifactGroup : technology.getPlugins()) {
-						plugins.add(createArticatGroupURL(agArtifactGroup));
+					for (ArtifactGroup plugArtifactGroup : technology.getPlugins()) {
+						if(plugArtifactGroup != null) {
+							plugins.add(createArticatGroupURL(plugArtifactGroup));
+						}
 					}
 					technology.setPlugins(plugins);
 				}
@@ -375,7 +380,6 @@ public class ComponentService extends DbService {
 	    for (ArtifactGroup artifactGroup : pluginSet) {
 			createArtifacts(artifactGroup, pluginMap.get(artifactGroup));
 		}
-	    
 	    saveTechnology(technology);
 	   return Response.status(Response.Status.OK).entity(ERROR_MSG_NOT_FOUND).build();
 	}
@@ -561,14 +565,34 @@ public class ComponentService extends DbService {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.findSettings()" + customerId);
 	    }
-		
+		List<SettingsTemplate> settings = new ArrayList<SettingsTemplate>();
 		try {
 			Query query = createCustomerIdQuery(customerId);
 			List<SettingsTemplate> settingsList = mongoOperation.find(SETTINGS_COLLECTION_NAME, query, SettingsTemplate.class);
-			return Response.status(Response.Status.NO_CONTENT).entity(settingsList).build();
+			for (SettingsTemplate settingsTemplate : settingsList) {
+				List<Element> types = getTypes(settingsTemplate.getName(), customerId);
+				settingsTemplate.setPossibleTypes(types);
+				settings.add(settingsTemplate);
+			}
+			return Response.status(Response.Status.NO_CONTENT).entity(settings).build();
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, SETTINGS_COLLECTION_NAME);
 		}
+	}
+	
+	private List<Element> getTypes(String type, String customerId) {
+		List<Element> types = new ArrayList<Element>();
+		Query query = createCustomerIdQuery(customerId);
+		Criteria typeCriteria = Criteria.where(CATEGORY).is(type.toUpperCase());
+		query.addCriteria(typeCriteria);
+		List<DownloadsDAO> downloads = mongoOperation.find(DOWNLOAD_COLLECTION_NAME, query, DownloadsDAO.class);
+		for (DownloadsDAO downloadsDAO : downloads) {
+			Element element = new Element();
+			element.setId(downloadsDAO.getId());
+			element.setName(downloadsDAO.getName());
+			types.add(element);
+		}
+		return types;
 	}
 	
 	/**
@@ -727,7 +751,6 @@ public class ComponentService extends DbService {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.findModules()" + type);
 	    }
-	    
 		try {
 			Query query = createCustomerIdQuery(customerId);
 			Criteria typeQuery = Criteria.where(DB_COLUMN_ARTIFACT_GROUP_TYPE).is(type);
@@ -740,7 +763,6 @@ public class ComponentService extends DbService {
 			List<ArtifactGroupDAO> artifactGroupDAOs = mongoOperation.find(ARTIFACT_GROUP_COLLECTION_NAME,
 					query, ArtifactGroupDAO.class);
 		    List<ArtifactGroup> modules = convertDAOToModule(artifactGroupDAOs);
-		    
 		    ResponseBuilder response = Response.status(Response.Status.OK);
 		    response.header(Constants.ARTIFACT_COUNT_RESULT, count(ARTIFACT_GROUP_COLLECTION_NAME, query));
 			return response.entity(modules).build();
@@ -1401,6 +1423,10 @@ public class ComponentService extends DbService {
             	query.addCriteria(techIdCriteria);
             	query.addCriteria(typeCriteria);
         	}
+        	if(StringUtils.isEmpty(techId)) {
+        		Criteria typeCriteria = Criteria.where(CATEGORY).is(type);
+        		query.addCriteria(typeCriteria);
+        	}
         	List<DownloadsDAO> downloadList = mongoOperation.find(DOWNLOAD_COLLECTION_NAME, query, DownloadsDAO.class);
             if (downloadList != null) {
             	Converter<DownloadsDAO, DownloadInfo> downloadConverter = 
@@ -1622,9 +1648,14 @@ public class ComponentService extends DbService {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.findReports(String techId)");
 	    }
+	    List<Reports> reports = new ArrayList<Reports>();
 		try {
-			List<Reports> reports = mongoOperation.find(REPORTS_COLLECTION_NAME, 
-					new Query(Criteria.where(REST_QUERY_TECHID).is(techId)), Reports.class);
+			if(StringUtils.isEmpty(techId)) {
+				reports = mongoOperation.getCollection("reports-all", Reports.class);
+			} else {
+				reports = mongoOperation.find(REPORTS_COLLECTION_NAME, 
+						new Query(Criteria.where(REST_QUERY_TECHID).is(techId)), Reports.class);
+			}
 			return  Response.status(Response.Status.OK).entity(reports).build();
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, WEBSERVICES_COLLECTION_NAME);

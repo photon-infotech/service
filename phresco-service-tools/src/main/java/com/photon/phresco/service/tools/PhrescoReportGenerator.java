@@ -77,8 +77,33 @@ public class PhrescoReportGenerator extends DbService {
 		}
 	}
 	
+	private void createReports() {
+		List<Reports> reports = new ArrayList<Reports>();
+		Reports report = new Reports("Project-Info-Report", "maven-project-info-reports-plugin", "org.apache.maven.plugins", "2.4");
+		reports.add(report);
+		report = new Reports("Javadoc Report", "maven-javadoc-plugin", "org.apache.maven.plugins", "2.8");
+		reports.add(report);
+		report = new Reports("Project-Info-Report", "cobertura-maven-plugin", "org.codehaus.mojo", "2.4");
+		reports.add(report);
+		report = new Reports("Cobertura-Report", "maven-project-info-reports-plugin", "org.apache.maven.plugins", "2.5.1");
+		reports.add(report);
+		report = new Reports("Jdepend-Report", "jdepend-maven-plugin", "org.codehaus.mojo", "2.0-beta-2");
+		reports.add(report);
+		report = new Reports("JXR-Report", "maven-jxr-plugin", "org.apache.maven.plugins", "2.3");
+		reports.add(report);
+		report = new Reports("PMD-Report", "maven-pmd-plugin", "org.apache.maven.plugins", "2.7.1");
+		reports.add(report);
+		report = new Reports("Surefire Report", "maven-surefire-report-plugin", "org.apache.maven.plugins", "2.12");
+		reports.add(report);
+		for (Reports reports2 : reports) {
+			mongoOperation.save("reports-all", reports2);
+		}
+		
+	}
+	
 	public static void main(String[] args) {
 		PhrescoReportGenerator generator = new PhrescoReportGenerator();
 		generator.publish();
+		generator.createReports();
 	}
 }

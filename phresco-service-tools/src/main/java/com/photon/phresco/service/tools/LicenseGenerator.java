@@ -14,7 +14,7 @@ public class LicenseGenerator extends DbService {
 
 	private void publish() {
 		List<License> licenses = createLicenses();
-		mongoOperation.insertList("Licenses", licenses);
+		mongoOperation.insertList("licenses", licenses);
 	}
 
 	private List<License> createLicenses() {
