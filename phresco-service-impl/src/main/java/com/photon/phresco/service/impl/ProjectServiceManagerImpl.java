@@ -44,14 +44,19 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.photon.phresco.commons.model.ApplicationInfo;
+import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.Element;
 import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.ProjectServiceManager;
+import com.photon.phresco.service.util.DependencyUtils;
+import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.Constants;
 import com.photon.phresco.util.Utility;
 
@@ -109,25 +114,36 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 			}
 		}
 		
-		dbManager.storeCreatedProjects(projectInfo);
-		/*for (ApplicationInfo actualAppInfo : actualAppInfos) {
-			for (ApplicationInfo updatedAppInfo : updatedAppInfos) {
-				if(actualAppInfo.getTechInfo().getId().equals(updatedAppInfo.getTechInfo().getId())) {
-					
+		for (ApplicationInfo applicationInfo : appInfos) {
+			if(applicationInfo.getPilotInfo() != null) {
+				ApplicationInfo appInfo = dbManager.getProjectInfo(applicationInfo.getId(), applicationInfo.getCustomerIds().get(0));
+				if(appInfo.getPilotInfo() == null) {
+					createPilots(applicationInfo, tempFolderPath);
+				} else if(!StringUtils.equals(appInfo.getPilotInfo().getId(), applicationInfo.getPilotInfo().getId())) {
+					createPilots(applicationInfo, tempFolderPath);
 				}
 			}
-		}*/
-//		DependencyManager dependencyManager = PhrescoServerFactory.getDependencyManager();
-//		if (dependencyManager != null) {
-//			dependencyManager.configureProject(projectInfo, projectPath);
-//		}
+		}
+		
+		dbManager.storeCreatedProjects(projectInfo);
 		if (isDebugEnabled) {
 			S_LOGGER.info("successfully updated application :" + projectInfo.getName());
 		}
 	}
 
+	private void createPilots(ApplicationInfo applicationInfo, String tempFolderPath) throws PhrescoException {
+		Element pilotElement = applicationInfo.getPilotInfo();
+		String customerId = applicationInfo.getCustomerIds().get(0);
+		ApplicationInfo pilotInfo = dbManager.getProjectInfo(pilotElement.getId(), customerId);
+		ArtifactGroup pilotContent = pilotInfo.getPilotContent();
+		String version = pilotContent.getVersions().get(0).getVersion();
+		String contentURL = ServerUtil.createContentURL(pilotContent.getGroupId(), pilotContent.getArtifactId(), 
+				version, pilotContent.getPackaging());
+		DependencyUtils.extractFiles(contentURL, new File(tempFolderPath, applicationInfo.getAppDirName()), customerId);
+	}
+
 	public File updateDocumentProject(ApplicationInfo projectInfo) throws PhrescoException {
-		File tempPath = new File(Utility.getPhrescoTemp(), UUID.randomUUID().toString()+File.separator + projectInfo.getCode());
+		File tempPath = new File(Utility.getPhrescoTemp(), UUID.randomUUID().toString() + File.separator + projectInfo.getCode());
 		try {
 			PhrescoServerFactory.getDocumentGenerator().generate(projectInfo, tempPath);
 		} catch (Exception e) {

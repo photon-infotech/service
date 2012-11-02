@@ -155,7 +155,7 @@ public final class DependencyUtils {
 			if (isDebugEnabled) {
 				S_LOGGER.debug("extractFiles() path="+path.getPath());
 			}
-			ArchiveUtil.extractArchive(archive.toString(), path.getAbsolutePath(),folderName, archiveType);
+			ArchiveUtil.extractArchive(archive.toString(), path.getAbsolutePath(), folderName, archiveType);
 			archive.delete();
 		} 
 		catch (FileNotFoundException e) {
