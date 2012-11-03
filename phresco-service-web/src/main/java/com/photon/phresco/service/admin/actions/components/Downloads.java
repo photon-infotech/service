@@ -57,6 +57,7 @@ public class Downloads extends ServiceBaseAction {
 	private Category category = null;
 	private String description = "";
 	private List<String> technology = null;
+	private String license = "";
 	
 	private String nameError = "";
 	private String verError = "";
@@ -64,6 +65,7 @@ public class Downloads extends ServiceBaseAction {
 	private String groupError = "";
 	private String techError = "";
 	private String fileError = "";
+	private String licenseError = "";
 	private boolean errorFound = false;
 	
 	private String fromPage = "";
@@ -106,6 +108,7 @@ public class Downloads extends ServiceBaseAction {
 			List<Technology> technologies = serviceManager.getArcheTypes(getCustomerId());
 			setReqAttribute(REQ_ARCHE_TYPES, technologies);
 			setReqAttribute(REQ_FROM_PAGE, ADD);
+			setReqAttribute(REQ_FEATURES_LICENSE, getServiceManager().getLicenses());
 		} catch (PhrescoException e) {
 			return showErrorPopup(e, getText(EXCEPTION_DOWNLOADS_ADD));
 		}
@@ -127,6 +130,7 @@ public class Downloads extends ServiceBaseAction {
             List<PlatformType> platforms = serviceManager.getPlatforms();
             setReqAttribute(REQ_DOWNLOAD_PLATFORMS, platforms);
 			setReqAttribute(REQ_FROM_PAGE, EDIT);
+			setReqAttribute(REQ_FEATURES_LICENSE, getServiceManager().getLicenses());
 		} catch (PhrescoException e) {
 			return showErrorPopup(e, getText(EXCEPTION_DOWNLOADS_EDIT));
 		}
@@ -206,6 +210,7 @@ public class Downloads extends ServiceBaseAction {
         downloadVersions.add(downloadVersion);
         ArtifactGroup artifactGroup = new ArtifactGroup();
         artifactGroup.setVersions(downloadVersions);
+        artifactGroup.setLicenseId(getLicense());
         downloadInfo.setArtifactGroup(artifactGroup);
         
         return downloadInfo;
@@ -316,6 +321,11 @@ public class Downloads extends ServiceBaseAction {
 				}
 			}
 		}*/
+		
+		if(StringUtils.isEmpty(getLicense())) {
+        	setLicenseError(getText(KEY_I18N_ERR_LICEN_EMPTY));
+            isError = true;
+        }
 		
 		//Empty validation for platform 
 		if (CollectionUtils.isEmpty(getPlatform())) {
@@ -484,5 +494,21 @@ public class Downloads extends ServiceBaseAction {
 	
 	public String getTechError() {
 		return techError;
+	}
+
+	public void setLicense(String license) {
+		this.license = license;
+	}
+
+	public String getLicense() {
+		return license;
+	}
+
+	public void setLicenseError(String licenseError) {
+		this.licenseError = licenseError;
+	}
+
+	public String getLicenseError() {
+		return licenseError;
 	}
 }
