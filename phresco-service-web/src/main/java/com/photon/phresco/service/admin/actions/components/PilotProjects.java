@@ -56,7 +56,11 @@ public class PilotProjects extends ServiceBaseAction {
     private String jarVersion = "";
     
 	private String nameError = "";
+	private String artifactIdError = "";
+    private String groupIdError = "";
 	private String verError = "";
+	private String jarVerError = "";
+
 	private String fileError = "";
 	private boolean errorFound = false;
 	
@@ -186,23 +190,24 @@ public class PilotProjects extends ServiceBaseAction {
         if (StringUtils.isNotEmpty(getProjectId())) { 
         	pilotProInfo.setId(getProjectId());
         }
+        List<String> customerIds = new ArrayList<String>();
+        customerIds.add(getCustomerId());
+        
         pilotProInfo.setName(getName());
         pilotProInfo.setDescription(getDescription());
-//        pilotProInfo.setVersion(getVersion());
+//      pilotProInfo.setVersion(getVersion());
         
         ArtifactGroup pilotContent = new ArtifactGroup();
         pilotContent.setGroupId(getGroupId());
         pilotContent.setArtifactId(getArtifactId());
         pilotContent.setPackaging(Content.Type.ZIP.name());
-        List<String> customerIds = new ArrayList<String>();
-        customerIds.add(getCustomerId());
-        pilotProInfo.setCustomerIds(customerIds);
-        
         List<ArtifactInfo> jarVersions = new ArrayList<ArtifactInfo>();
         ArtifactInfo jarVersion = new ArtifactInfo();
         jarVersions.add(jarVersion);
         pilotContent.setVersions(jarVersions);
-        
+        pilotContent.setCustomerIds(customerIds);
+       
+        pilotProInfo.setCustomerIds(customerIds);
         pilotProInfo.setPilotContent(pilotContent);
         
         TechnologyInfo techInfo = new TechnologyInfo();
@@ -311,6 +316,27 @@ public class PilotProjects extends ServiceBaseAction {
     		isError = true;
     	}
     	
+    	if (s_pilotProByteArray != null) {
+    		//Empty validation for groupId if file is selected
+    		if (StringUtils.isEmpty(getGroupId())) {
+    			setGroupIdError(getText(KEY_I18N_ERR_GROUPID_EMPTY));
+    			isError = true;
+    		}
+
+    		//Empty validation for artifactId if file is selected
+    		if (StringUtils.isEmpty(getArtifactId())) {
+    			setArtifactIdError(getText(KEY_I18N_ERR_ARTIFACTID_EMPTY));
+    			isError = true;
+    		}
+
+    		//Empty validation for version if file is selected
+    		if (StringUtils.isEmpty(getJarVersion())) {
+    			setJarVerError(getText(KEY_I18N_ERR_VER_EMPTY));
+    			isError = true;
+    		}
+    	}
+
+
     	if (isError) {
     		setErrorFound(true);
     	}
@@ -436,5 +462,29 @@ public class PilotProjects extends ServiceBaseAction {
 
 	public void setVerError(String verError) {
 		this.verError = verError;
+	}
+
+	public String getArtifactIdError() {
+		return artifactIdError;
+	}
+
+	public void setArtifactIdError(String artifactIdError) {
+		this.artifactIdError = artifactIdError;
+	}
+
+	public String getGroupIdError() {
+		return groupIdError;
+	}
+
+	public void setGroupIdError(String groupIdError) {
+		this.groupIdError = groupIdError;
+	}
+	
+	public String getJarVerError() {
+		return jarVerError;
+	}
+
+	public void setJarVerError(String jarVerError) {
+		this.jarVerError = jarVerError;
 	}
 }

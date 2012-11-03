@@ -2254,4 +2254,16 @@ div[class *='syncTable'] {
 
 #clipboard {
 	margin-right:19px;
-}	
+}
+
+.borderBottom-none {
+	border-bottom:none;	
+}
+
+.header-background tr th.uploadpluginhead {
+	padding:3px;	
+}
+
+.table-striped {
+	border: 1px solid #630A0A;
+}
