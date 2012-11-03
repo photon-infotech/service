@@ -1423,9 +1423,10 @@ public class ComponentService extends DbService {
             	query.addCriteria(techIdCriteria);
             	query.addCriteria(typeCriteria);
         	}
-        	if(StringUtils.isEmpty(techId)) {
+        	if(StringUtils.isEmpty(techId) && StringUtils.isEmpty(customerId)) {
         		Criteria typeCriteria = Criteria.where(CATEGORY).is(type);
-        		query.addCriteria(typeCriteria);
+        		query = new Query();
+        		query = query.addCriteria(typeCriteria);
         	}
         	List<DownloadsDAO> downloadList = mongoOperation.find(DOWNLOAD_COLLECTION_NAME, query, DownloadsDAO.class);
             if (downloadList != null) {
