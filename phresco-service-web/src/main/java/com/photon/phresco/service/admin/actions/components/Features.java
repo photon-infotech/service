@@ -26,15 +26,15 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import com.google.gson.Gson;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactGroup.Type;
 import com.photon.phresco.commons.model.ArtifactInfo;
@@ -44,8 +44,7 @@ import com.photon.phresco.commons.model.RequiredOption;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
-import com.photon.phresco.service.model.FileInfo;
-import com.photon.phresco.service.util.ServerUtil;
+import com.photon.phresco.service.client.api.Content;
 
 public class Features extends ServiceBaseAction {
 
@@ -53,6 +52,8 @@ public class Features extends ServiceBaseAction {
     
 	private static final Logger S_LOGGER = Logger.getLogger(Features.class);
 	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
+	
+	private static Map<String, InputStream> inputStreamMap = new HashMap<String, InputStream>();
 	
 	private static byte[] s_featureByteArray = null;
 	
@@ -83,6 +84,7 @@ public class Features extends ServiceBaseAction {
 	private String verError = "";
 	private String licenseError = "";
 	private boolean errorFound = false;
+	private String fileType = "";
     
 	public String menu() {
 		if (s_isDebugEnabled) {
@@ -197,10 +199,11 @@ public class Features extends ServiceBaseAction {
             if (s_featureByteArray != null) {
                 inputStream.add(new ByteArrayInputStream(s_featureByteArray));
             }
-            getServiceManager().createFeatures(moduleGroup, inputStream, getCustomerId());
+            getServiceManager().createFeatures(moduleGroup, inputStreamMap, getCustomerId());
             setTechnologiesInRequest();
             addActionMessage(getText(FEATURE_ADDED, Collections.singletonList(getName())));
         } catch (PhrescoException e) {
+        	e.printStackTrace();
             return showErrorPopup(e, getText(EXCEPTION_FEATURE_SAVE));
         }
         
@@ -275,7 +278,6 @@ public class Features extends ServiceBaseAction {
             artifactGroup.setCustomerIds(Arrays.asList(getCustomerId()));
             
             //To set license
-            System.out.println("liscence-----------------"+getLicense());
             artifactGroup.setLicenseId(getLicense());
             //To set the details of the version
             ArtifactInfo artifactInfo = new ArtifactInfo();
@@ -329,35 +331,37 @@ public class Features extends ServiceBaseAction {
 		PrintWriter writer = null;
 		try {
             writer = getHttpResponse().getWriter();
-        	InputStream is = getHttpRequest().getInputStream();
-        	byte[] tempFeaByteArray = IOUtils.toByteArray(is);
-    		s_featureByteArray = tempFeaByteArray;
-    		
-        	ArtifactGroup artifactGroupInfo = ServerUtil.getArtifactinfo(new ByteArrayInputStream(tempFeaByteArray));
-        	FileInfo fileInfo = new FileInfo();
-            getHttpResponse().setStatus(getHttpResponse().SC_OK);
-            if (artifactGroupInfo != null) {
-            	fileInfo.setMavenJar(true);
-            	fileInfo.setSuccess(true);
-            	fileInfo.setGroupId(artifactGroupInfo.getGroupId());
-            	fileInfo.setArtifactId(artifactGroupInfo.getArtifactId());
-            	List<ArtifactInfo> versions = artifactGroupInfo.getVersions();
-            	fileInfo.setVersion(versions.get(0).getVersion());
-            	Gson gson = new Gson();
-                String json = gson.toJson(fileInfo);
-            	writer.print(json);
-            } else {
-            	writer.print(MAVEN_JAR_FALSE);
-        	}
+	        byte[] tempFeaByteArray = getByteArray();
+	        
+	        if (REQ_FEATURES_UPLOADTYPE.equals(getFileType())) {
+	        	uploadFeature(writer, tempFeaByteArray);
+	        } else {
+	        	inputStreamMap.put(Content.Type.ICON.name(), new ByteArrayInputStream(tempFeaByteArray));
+	        	writer.print(SUCCESS_TRUE);
+	        }
 	        writer.flush();
 	        writer.close();
 		} catch (Exception e) {
+			//If upload fails it will be shown in UI, so need not to throw error popup
+			getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
+            writer.print(SUCCESS_FALSE);
+		}
+		
+		return SUCCESS;
+		
+	}
+
+	private void uploadFeature(PrintWriter writer, byte[] tempFeaByteArray) throws PhrescoException {
+		try {
+    		s_featureByteArray = tempFeaByteArray;
+    		getArtifactGroupInfo(writer, tempFeaByteArray);
+    		inputStreamMap.put(Content.Type.ARCHETYPE.name(), new ByteArrayInputStream(tempFeaByteArray));
+		} catch (Exception e) {
+			e.printStackTrace();
 			getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
             writer.print(SUCCESS_FALSE);
 			throw new PhrescoException(e);
 		}
-		
-		return SUCCESS;
 	}
 	
 	public void removeUploadedFile() {
@@ -625,5 +629,13 @@ public class Features extends ServiceBaseAction {
 
 	public String getLicenseError() {
 		return licenseError;
+	}
+
+	public void setFileType(String fileType) {
+		this.fileType = fileType;
+	}
+
+	public String getFileType() {
+		return fileType;
 	}
 }

@@ -322,6 +322,21 @@
 				<input type="button" class="btn btn-primary" value="Select Dependency" onclick="getFeatures();" />
 			</div>
 		</div>
+		
+		<div class="control-group" id="featureImgControl">
+			<label class="control-label labelbold">
+				&nbsp;<s:text name='lbl.hdr.comp.icon'/>
+			</label>
+			
+			 <div class="controls" style="float: left; margin-left: 3%;">
+				<div id="feature-img-uploader" class="file-uploader">
+					<noscript>
+						<p>Please enable JavaScript to use file uploader.</p>
+						<!-- or put a simple form for upload here -->
+					</noscript>
+				</div>
+			</div>
+		</div>
 	</div>
 	
 	<div class="bottom_button">
@@ -492,11 +507,25 @@
 			action : 'uploadFeatureFile',
 			multiple : false,
 			allowedExtensions : ["zip","jar","dll","so"],
-			type : 'featureJar',
+			fileType : 'featureJar',
 			buttonLabel : '<s:label key="lbl.comp.featr.upload" />',
 			typeError : '<s:text name="err.invalid.file.selection" />',
 			params : {
-				type : 'featureJar'
+				fileType : 'featureJar'
+			},
+			debug : true
+		});
+	
+		var featureUploader = new qq.FileUploader({
+			element : document.getElementById('feature-img-uploader'),
+			action : 'uploadIconFile',
+			multiple : false,
+			allowedExtensions : ["png"],	
+			fileType : 'featureImg',
+			buttonLabel : '<s:label key="lbl.comp.featricon.upload" />',
+			typeError : '<s:text name="err.invalid.file.selection" />',
+			params : {
+				fileType : 'featureImg'
 			},
 			debug : true
 		});
