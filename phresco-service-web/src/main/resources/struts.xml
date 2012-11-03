@@ -547,6 +547,11 @@
         <action name="sendReport" method="sendReport" class="com.photon.phresco.service.admin.actions.ErrorReport">
         	<result type="json"/>
         </action>
+        
+        <!--  plugin jar upload -->
+        <action name="technology" class="com.photon.phresco.service.admin.actions.components.Archetypes" method="createPluginInfo">
+			<result type="json"/>
+		</action>
 		
     </package>
 </struts>

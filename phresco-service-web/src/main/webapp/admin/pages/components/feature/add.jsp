@@ -51,7 +51,7 @@
     boolean isDefaultModule = false;
     boolean isCoreModule = false;
     boolean isSystem = false;
-    boolean showArtifactGroup = false;
+    boolean showArtifactGroup = true;
 	if (moduleGroup != null) {
 	    name = moduleGroup.getName();
 	    
@@ -96,8 +96,8 @@
 		
 		isSystem = moduleGroup.isSystem();
 	}
-	if (ServiceUIConstants.REQ_FEATURES_TYPE_MODULE.equals(type)) {
-		showArtifactGroup = true;
+	if (ServiceUIConstants.REQ_FEATURES_TYPE_JS.equals(type)) {
+		showArtifactGroup = false;
 	}
 	
 %>

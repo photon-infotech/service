@@ -40,6 +40,7 @@ import org.apache.log4j.Logger;
 
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.commons.model.TechnologyOptions;
 import com.photon.phresco.exception.PhrescoException;
@@ -66,6 +67,7 @@ public class Archetypes extends ServiceBaseAction {
 	private static List<ArtifactGroup> pluginArtficatInfos = null;
 	private static byte[] s_archetypeJarByteArray = null;
 	private static String s_archetypeJarName = null;
+	static List<ArtifactGroup> pluginInfos = new ArrayList<ArtifactGroup>();
 
 	private String name = "";
 	private String nameError = "";
@@ -185,6 +187,36 @@ public class Archetypes extends ServiceBaseAction {
 		return list();
 	}
 	
+	public void createPluginInfo() {
+		String key = "";
+		if (MapUtils.isNotEmpty(inputStreamMap)) {
+			Iterator iter = inputStreamMap.keySet().iterator();
+			while (iter.hasNext()) {
+				key = (String) iter.next();
+				artifactId = getReqParameter(key + "_artifactId");
+				groupId = getReqParameter(key + "_groupId");
+				version = getReqParameter(key + "_version");
+				ArtifactGroup pluginInfo = new ArtifactGroup();
+				pluginInfo.setArtifactId(getArtifactId());
+				pluginInfo.setGroupId(getGroupId());
+
+				List<ArtifactInfo> artifactVersions = new ArrayList<ArtifactInfo>();
+				ArtifactInfo artifactVersion = new ArtifactInfo();
+				artifactVersion.setVersion(getVersion());
+				artifactVersions.add(artifactVersion);
+				pluginInfo.setVersions(artifactVersions);
+				List<String> customerIds = new ArrayList<String>();
+				customerIds.add(getCustomerId());
+				pluginInfo.setCustomerIds(customerIds);
+				pluginInfo.setName(key);
+				int pos = name.lastIndexOf('.');
+				String ext = key.substring(pos+1);
+				pluginInfo.setPackaging(ext);
+				pluginInfos.add(pluginInfo);
+			}
+		}
+	}
+
 	public String update() throws PhrescoException {
 		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.update()");
@@ -221,36 +253,24 @@ public class Archetypes extends ServiceBaseAction {
         technology.setDescription(getDescription());
         technology.setAppTypeId(getApptype());
         
-        //to set plugin infos
-        if (MapUtils.isNotEmpty(pluginArtfactInfoMap)) {
-        	pluginArtficatInfos = new ArrayList<ArtifactGroup>();
-        	ArtifactGroup pluginArtfInfoGroup = new ArtifactGroup();
-			Iterator iter = pluginArtfactInfoMap.keySet().iterator();
-			while (iter.hasNext()) {
-				String fileName = (String) iter.next();
-				pluginArtfInfoGroup = pluginArtfactInfoMap.get(fileName);
-				pluginArtficatInfos.add(pluginArtfInfoGroup);
-			}
-        	technology.setPlugins(pluginArtficatInfos);
-        } 
-        
         //To set the applicable features
+      
         List<TechnologyOptions> options = new ArrayList<TechnologyOptions>();
         for (String selectedOption : getApplicable()) {
         	options.add(new TechnologyOptions(selectedOption));
 		}
         technology.setOptions(options);
-        
         //To create the ArtifactGroup with groupId, artifactId and version for archetype jar
         ArtifactGroup archetypeArtfGroup = getArtifactGroupInfo(getName(), getArtifactId(), getGroupId(), REQ_JAR_FILE, getVersion(), getCustomerId());
         technology.setArchetypeInfo(archetypeArtfGroup);
         technology.setCustomerIds(Arrays.asList(getCustomerId()));
         technology.setTechVersions(Arrays.asList(getTechVersion()));
         technology.setReports(getApplicableReports());
+        technology.setPlugins(pluginInfos);
         return technology;
     }
 
-	/**
+    /**
 	 * @param artifactGroupInfo 
 	 * @return
 	 */
@@ -325,7 +345,6 @@ public class Archetypes extends ServiceBaseAction {
 			byte[] byteArray = tempApplnByteArray;
 			ArtifactGroup artifactGroupInfo = getArtifactGroupInfo(writer, tempApplnByteArray);
 			inputStreamMap.put(pluginJarName, new ByteArrayInputStream(byteArray));
-			createPluginInfos(artifactGroupInfo, pluginJarName);
 		} catch (Exception e) {
 		}
 	}
