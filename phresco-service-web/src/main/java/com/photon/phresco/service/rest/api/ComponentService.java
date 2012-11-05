@@ -66,6 +66,7 @@ import com.photon.phresco.exception.PhrescoWebServiceException;
 import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
+import com.photon.phresco.service.client.api.Content.Type;
 import com.photon.phresco.service.converters.ConvertersFactory;
 import com.photon.phresco.service.dao.ApplicationInfoDAO;
 import com.photon.phresco.service.dao.ApplicationTypeDAO;
@@ -806,16 +807,16 @@ public class ComponentService extends DbService {
 	
     private Response createOrUpdateFeatures(MultiPart moduleInfo) throws PhrescoException {
     	ArtifactGroup moduleGroup = null;
-        BodyPartEntity bodyPartEntity = null;
         File moduleFile = null;
         List<BodyPart> bodyParts = moduleInfo.getBodyParts();
+        Map<String, BodyPartEntity> bodyPartEntityMap = new HashMap<String, BodyPartEntity>();
        
         if (CollectionUtils.isNotEmpty(bodyParts)) {
             for (BodyPart bodyPart : bodyParts) {
                 if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
                     moduleGroup = bodyPart.getEntityAs(ArtifactGroup.class);
                 } else {
-                    bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
+                	bodyPartEntityMap.put(bodyPart.getContentDisposition().getFileName(), (BodyPartEntity) bodyPart.getEntity());
                 }
             }
         }
@@ -823,17 +824,30 @@ public class ComponentService extends DbService {
         if (moduleGroup == null) {
         }
         
-        if(bodyPartEntity == null & moduleGroup != null) {
+        if(bodyPartEntityMap == null & moduleGroup != null) {
         	saveModuleGroup(moduleGroup);
         }
         
-        if (bodyPartEntity != null) {
-            moduleFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null,moduleGroup.getPackaging());
-            boolean uploadBinary = uploadBinary(moduleGroup, moduleFile);
-            if (uploadBinary) {
-            	saveModuleGroup(moduleGroup);
-            }
-            FileUtil.delete(moduleFile);
+        if (bodyPartEntityMap != null) {
+        	BodyPartEntity bodyPartEntity = bodyPartEntityMap.get(Type.FEATURE.name());
+        	if (bodyPartEntity != null) {
+        		moduleFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null, moduleGroup.getPackaging());
+        		boolean uploadBinary = uploadBinary(moduleGroup, moduleFile);
+                if (uploadBinary) {
+                	saveModuleGroup(moduleGroup);
+                }
+                FileUtil.delete(moduleFile);
+			}
+        	if(bodyPartEntityMap.get(Type.ICON.name()) != null) {
+        		BodyPartEntity iconEntity = bodyPartEntityMap.get(Type.ICON.name());
+            	File iconFile = ServerUtil.writeFileFromStream(iconEntity.getInputStream(), null, "png");
+            	moduleGroup.setPackaging("png");
+        		boolean uploadBinary = uploadBinary(moduleGroup, iconFile);
+        		FileUtil.delete(iconFile);
+        		if(!uploadBinary) {
+        			throw new PhrescoException("Module Icon Uploading Failed...");
+        		}
+        	}
         }
         
         return Response.status(Response.Status.CREATED).entity(moduleGroup).build();
@@ -1423,9 +1437,10 @@ public class ComponentService extends DbService {
             	query.addCriteria(techIdCriteria);
             	query.addCriteria(typeCriteria);
         	}
-        	if(StringUtils.isEmpty(techId)) {
+        	if(StringUtils.isEmpty(techId) && StringUtils.isEmpty(customerId)) {
         		Criteria typeCriteria = Criteria.where(CATEGORY).is(type);
-        		query.addCriteria(typeCriteria);
+        		query = new Query();
+        		query = query.addCriteria(typeCriteria);
         	}
         	List<DownloadsDAO> downloadList = mongoOperation.find(DOWNLOAD_COLLECTION_NAME, query, DownloadsDAO.class);
             if (downloadList != null) {

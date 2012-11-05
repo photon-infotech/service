@@ -332,17 +332,14 @@ function disableEnableTextBox(groupId, artifactId, jarVersion, isEnable, type, f
 		var artifId = "artifId" ;
 		var versnId = "versnId" ;
 		var fileDetParentDiv = $(document.createElement('div')).attr("id", fileName).attr("class","fileClass");
-		fileDetParentDiv.html("<div style='float: left; margin-right: 13px;'><label class='control-label labelbold' style='color:black;'> Group Id </label>" +
-				           "<div class='controls'><input id='" +groupid +"' class='groupId' class='input-xlarge' name='"+fileName+"_groupId" +"' maxlength='40' title='40 Characters only' type='text'  value='" + groupId +"' >" +
-				           "</div></div>"); 
-		fileDetParentDiv.append("<div style='float: left; margin-right: 7px;'> <label class='control-label labelbold' style='color:black;'> " +
-				              "Artifact Id </label><div class='controls'><input id='" +artifId +"'class='artifactId' class='input-xlarge' name='"+fileName+"_artifactId" +"' maxlength='40' title='40 Characters only' type='text' value='" + artifactId +"' >" +
+		fileDetParentDiv.html("<div style='float: left; margin: 0px 10px 0px 0px;'><div class='controls'><input style='text-align:center;'id='" +groupid +"' class='groupId' class='input-xlarge' name='"+fileName+"_groupId" +"' maxlength='40' title='40 Characters only' type='text'  value='" + groupId +"' >" +
+				           "</div></div></td>"); 
+		fileDetParentDiv.append("<div style='float: left; margin: 0px 10px 0px 0px;'><div class='controls'><input style='text-align:center;'id='" +artifId +"'class='artifactId' class='input-xlarge' name='"+fileName+"_artifactId" +"' maxlength='40' title='40 Characters only' type='text' value='" + artifactId +"' >" +
 				              "</div></div>");
-		fileDetParentDiv.append("<div style='float: left; margin-right: 7px;'><label class='control-label labelbold' style='color:black;'> Version </label> "+
-		                   "<div class='controls'><input id='" +versnId +"'class='jarVersion' name='"+fileName+"_version" +"'  maxlength='30' title='30 Characters only' class='input-xlarge' type='text' value='" +jarVersion +"' > " +
+		fileDetParentDiv.append("<div style='float: left; margin: 0px 10px 0px 0px;'><div class='controls'><input style='text-align:center;'id='" +versnId +"'class='jarVersion' name='"+fileName+"_version" +"'  maxlength='30' title='30 Characters only' class='input-xlarge' type='text' value='" +jarVersion +"' > " +
 		                   "</div></div>");
-		fileDetParentDiv.append("</div>")
-		fileDetParentDiv.appendTo("#jarDetailsDivPopup");
+		fileDetParentDiv.append("</div>");
+		fileDetParentDiv.appendTo("#table");
 	} else {
 		$('.groupId').val(groupId).attr('disabled', isEnable);
 		$('.artifactId').val(artifactId).attr('disabled', isEnable);

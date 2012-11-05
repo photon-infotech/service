@@ -298,7 +298,7 @@ qq.FileUploaderBasic = function(o){
         				}
         				//jarError(responseJSON.errorMsg, o.type);
         			} else {
-        				if (o.type === "applnJar" || o.type === "uploadFile" || o.type === "featureJar" || o.type === "pilotProZip" || o.type === "pluginJar") {
+        				if (o.type === "applnJar" || o.type === "uploadFile" || o.fileType === "featureJar" || o.type === "pilotProZip" || o.type === "pluginJar") {
         					fillTextBoxes(responseJSON, o.type, fileName);// To show the text box for groupId, artifactId and version 
     		        		enableDisableUpload();// To disable the upload button when a file is uploaded successfully
         				}

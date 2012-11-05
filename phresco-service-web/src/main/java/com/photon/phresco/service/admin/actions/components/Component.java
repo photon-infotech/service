@@ -26,7 +26,9 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
@@ -161,11 +163,11 @@ public class Component extends ServiceBaseAction {
 		
 		try {
 		    ArtifactGroup moduleGroup = createModuleGroup();
-            List<InputStream> inputStreams = new ArrayList<InputStream>();
+		    Map<String, InputStream> inputStreamMap = new HashMap<String, InputStream>();
             if (s_componentByteArray != null) {
-                inputStreams.add(new ByteArrayInputStream(s_componentByteArray));
+            	inputStreamMap.put(moduleGroup.getName(), new ByteArrayInputStream(s_componentByteArray));
             }
-            getServiceManager().createFeatures(moduleGroup, inputStreams, getCustomerId());
+            getServiceManager().createFeatures(moduleGroup, inputStreamMap, getCustomerId());
 			addActionMessage(getText(COMPONENT_ADDED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
 		    return showErrorPopup(e, getText(EXCEPTION_COMPONENT_SAVE));    		

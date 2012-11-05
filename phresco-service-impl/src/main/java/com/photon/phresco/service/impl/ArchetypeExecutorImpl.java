@@ -39,8 +39,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 
-import javax.xml.bind.JAXBException;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -58,6 +56,7 @@ import com.photon.phresco.service.util.ServerConstants;
 import com.photon.phresco.util.Constants;
 import com.photon.phresco.util.ProjectUtils;
 import com.photon.phresco.util.Utility;
+import com.phresco.pom.exception.PhrescoPomException;
 import com.phresco.pom.util.PomProcessor;
 
 public class ArchetypeExecutorImpl implements ArchetypeExecutor,
@@ -112,9 +111,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 			PomProcessor processor = new PomProcessor(pomFile);
 			processor.addRepositories(customerId, repoInfo.getGroupRepoURL());
 			processor.save();
-		} catch (JAXBException e) {
-			throw new PhrescoException(e);
-		} catch (IOException e) {
+		} catch (PhrescoPomException e) {
 			throw new PhrescoException(e);
 		}
 	}

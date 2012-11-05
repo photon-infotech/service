@@ -44,6 +44,9 @@
     String name = "";
 	String version = "";
     String description = "";
+    String groupId = "";
+    String artifactId = "";
+    String jarVersion = "";
     boolean isSystem = false;
     if (pilotProjectInfo != null) {
    		name = pilotProjectInfo.getName();
@@ -90,8 +93,8 @@
 		</div>
 
 		<div class="control-group" id="applyControl">
-			<label class="control-label labelbold"> <span
-				class="mandatory">*</span>&nbsp;<s:text name="Technology" /> </label>
+			<label class="control-label labelbold">
+				<span class="mandatory">*</span>&nbsp;<s:text name="Technology" /> </label>
 			<div class="controls">
 				<select id="multiSelect" name="techId">
 				 	<%
@@ -119,33 +122,35 @@
         
         <!-- POM details starts -->
 		<div id="jarDetailsDiv" class="hideContent">
-			<div class="control-group">
+			<div class="control-group" id="groupIdControl">
 				<label class="control-label labelbold">
-					<s:text name='lbl.hdr.comp.groupid'/>
+					<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.groupid'/>
 				</label>
 				<div class="controls">
 					<input name="groupId" class="input-xlarge" type="text"
 						placeholder="<s:text name='place.hldr.archetype.add.groupId'/>">
+					<span class="help-inline" id="groupIdError"></span>
 				</div>
 			</div>
-			
-			<div class="control-group">
+			<div class="control-group" id="artifactIdControl">
 				<label class="control-label labelbold">
-					<s:text name='lbl.hdr.comp.artifactid'/>
+					<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.artifactid'/>
 				</label>
 				<div class="controls">
 					<input name="artifactId" class="input-xlarge" type="text"
 						placeholder="<s:text name='place.hldr.archetype.add.artifactId'/>">
+					<span class="help-inline" id="artifactIdError"></span>
 				</div>
 			</div>
 			
-			<div class="control-group">
+			<div class="control-group" id="verControl">
 				<label class="control-label labelbold">
-					<s:text name='lbl.hdr.comp.jar.version'/>
+					<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.jar.version'/>
 				</label>
 				<div class="controls">
 					<input name="jarVersion" class="input-xlarge" type="text"
 						placeholder="<s:text name='place.hldr.pilot.add.version'/>">
+					<span class="help-inline" id="jarversionError"></span>
 				</div>
 			</div>
 		</div>
@@ -177,7 +182,7 @@
 		} 
 	%>	
 		<input type="button" id="" class="btn <%= disabledClass %>" <%= disabled %> value='<%= buttonLbl %>'
-			onclick="validate('<%= pageUrl %>', $('#formPilotProAdd'), $('#subcontainer'), '<%= progressTxt %>');" />
+			onclick="validate('<%= pageUrl %>', $('#formPilotProAdd'), $('#subcontainer'), '<%= progressTxt %>',$('.content_adder: input'));"/>
 		<input type="button" id="pilotprojCancel" class="btn btn-primary" onclick="loadContent('pilotprojList', '', $('#subcontainer'));"
 			value="<s:text name='lbl.btn.cancel'/>"/>
 	</div>
@@ -226,7 +231,26 @@
 			showError($("#pilotProFileControl"), $("#pilotProFileError"), data.fileError);
 		} else {
 			hideError($("#pilotProFileControl"), $("#pilotProFileError"));
-		} 
+		}
+		if (!isBlank(data.groupIdError)) {
+			showError($("#groupIdControl"), $("#groupIdError"), data.groupIdError);
+		} else {
+			hideError($("#groupIdControl"), $("#groupIdError"));
+			disableCtrl($('input[name=groupId]'));
+		}
+		if (!isBlank(data.artifactIdError)) {
+			showError($("#artifactIdControl"), $("#artifactIdError"), data.artifactIdError);
+		} else {
+			hideError($("#artifactIdControl"), $("#artifactIdError"));
+			disableCtrl($('input[name=artifactId]'));
+		}
+		if (!isBlank(data.jarVerError)) {
+			showError($("#verControl"), $("#jarversionError"), data.jarVerError);
+		} else {
+			hideError($("#verControl"), $("#jarversionError"));
+			disableCtrl($('input[name=jarVersion]'));
+		}
+		
 	}
 	
 	function jarError(data, type) {

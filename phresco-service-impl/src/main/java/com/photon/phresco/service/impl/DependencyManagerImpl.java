@@ -44,7 +44,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -160,10 +159,6 @@ public class DependencyManagerImpl implements DependencyManager {
 				processor.save();
 			}
 			updatePOMWithPluginArtifact(path, modules);
-		} catch (IOException e) {
-			throw new PhrescoException(e);
-		} catch (JAXBException e) {
-			throw new PhrescoException(e);
 		} catch (PhrescoPomException e) {
 			throw new PhrescoException(e);
 		}
@@ -194,10 +189,6 @@ public class DependencyManagerImpl implements DependencyManager {
 				}
 				processor.save();
 			}
-		} catch (JAXBException e) {
-			throw new PhrescoException(e);
-		} catch (IOException e) {
-			throw new PhrescoException(e);
 		} catch (PhrescoPomException e) {
 			throw new PhrescoException(e);
 		} catch (ParserConfigurationException e) {

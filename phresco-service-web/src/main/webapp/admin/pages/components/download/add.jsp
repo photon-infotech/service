@@ -26,6 +26,7 @@
 
 <%@ page import="com.photon.phresco.commons.model.Technology"%>
 <%@ page import="com.photon.phresco.commons.model.DownloadInfo" %>
+<%@page import="com.photon.phresco.commons.model.License"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
 <%@ page import="com.photon.phresco.commons.model.PlatformType" %>
 <%@ page import="com.photon.phresco.commons.model.ArtifactGroup"%>
@@ -38,6 +39,7 @@
     DownloadInfo downloadInfo = (DownloadInfo)request.getAttribute(ServiceUIConstants.REQ_DOWNLOAD_INFO);
     String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
     List<Technology> technologies = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
+    List<License> licenses = (List<License>) request.getAttribute(ServiceUIConstants.REQ_FEATURES_LICENSE);
     String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
     List<PlatformType> platforms = (List<PlatformType>) request.getAttribute(ServiceUIConstants.REQ_DOWNLOAD_PLATFORMS);
 	
@@ -52,12 +54,13 @@
     String version = "";
     Category category = null;
     List<String> downloadInfoPlatforms = null;
+    ArtifactGroup artifactGroup = null;
     if (downloadInfo != null) {
    		name = downloadInfo.getName();
    		description = downloadInfo.getDescription();
    		category = downloadInfo.getCategory();
    		//To get the versions
-   		ArtifactGroup artifactGroup = downloadInfo.getArtifactGroup();
+   		artifactGroup = downloadInfo.getArtifactGroup();
    		List<ArtifactInfo> artifactInfos = artifactGroup.getVersions();
    		if (CollectionUtils.isNotEmpty(artifactInfos)) {
    		    for (ArtifactInfo artifactInfo : artifactInfos) {
@@ -182,6 +185,35 @@
 				</div>
 			</div>
 			 <span class="help-inline fileError" id="fileError"></span>
+		</div>
+		
+		<div class="control-group" id="licenseControl">
+			<label class="control-label labelbold"> 
+				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.comp.featr.license'/>
+			 </label>
+			<div class="controls">
+				<select name="license">
+				<option value=""><s:text name='lbl.comp.featr.license.select'/></option>
+				<%	
+					if (CollectionUtils.isNotEmpty(licenses)) {
+					    String selectedStr = "";
+						for (License license : licenses) {
+							if (artifactGroup != null) {
+								if (license.getId().equals(artifactGroup.getLicenseId())) {
+									selectedStr = "selected";
+								} else {
+									selectedStr = "";
+								}
+							}
+				%>
+							<option value="<%= license.getId() %>" <%= selectedStr %>><%= license.getName() %></option>
+				<%
+                        }
+					}
+				%>
+				</select>
+				<span class="help-inline applyerror" id="licenseError"></span>
+			</div>
 		</div>
 		
 		<div class="control-group" id="platformControl">
@@ -333,6 +365,12 @@
 		} else {
 			hideError($("#verControl"), $("#verError"));
 		}
+		
+		if (!isBlank(data.licenseError)) {
+            showError($("#licenseControl"), $("#licenseError"), data.licenseError);
+        } else {
+            hideError($("#licenseControl"), $("#licenseError"));
+        }
 		
 		if (!isBlank(data.platformTypeError)) {
 			showError($("#platformControl"), $("#platformError"), data.platformTypeError);
