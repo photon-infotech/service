@@ -38,6 +38,8 @@ package com.photon.phresco.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.document.mongodb.query.Criteria;
@@ -46,6 +48,7 @@ import org.springframework.data.document.mongodb.query.Update;
 
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.ArtifactGroupInfo;
 import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.DownloadInfo;
 import com.photon.phresco.commons.model.ProjectInfo;
@@ -136,29 +139,35 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
 		for (ApplicationInfo applicationInfo : appInfos) {
 			List<String> selectedModulesIds = applicationInfo.getSelectedModules();
 			if(CollectionUtils.isNotEmpty(selectedModulesIds)) {
-				updateUsedObjects(selectedModulesIds);
+				updateUsedObjectsId(selectedModulesIds);
 			}
 			List<String> selectedJSLibs = applicationInfo.getSelectedJSLibs();
 			if(CollectionUtils.isNotEmpty(selectedJSLibs)){
-				updateUsedObjects(selectedJSLibs);	
+				updateUsedObjectsId(selectedJSLibs);	
 			}
 			
 			List<String> selectedComponents = applicationInfo.getSelectedComponents();
 			if(CollectionUtils.isNotEmpty(selectedComponents)){
-			updateUsedObjects(selectedComponents);
+				updateUsedObjectsId(selectedComponents);
 			}
-			List<String> selectedServers = applicationInfo.getSelectedServers();
+			List<ArtifactGroupInfo> selectedServers = applicationInfo.getSelectedServers();
 			if(CollectionUtils.isNotEmpty(selectedServers)){
 				updateUsedObjects(selectedServers);
 			}
-			List<String> selectedDatabases = applicationInfo.getSelectedDatabases();
+			List<ArtifactGroupInfo> selectedDatabases = applicationInfo.getSelectedDatabases();
 			if(CollectionUtils.isNotEmpty(selectedDatabases)){
 				updateUsedObjects(selectedDatabases);
 			}
 		}
     }
     
-    private void updateUsedObjects(List<String> selectedModulesIds){
+    private void updateUsedObjects(List<ArtifactGroupInfo> selectedServers) {
+    	for (ArtifactGroupInfo artifactGroupInfo : selectedServers) {
+    		updateUsedObjectsId(artifactGroupInfo.getArtifactInfoIds());
+		}
+	}
+
+	private void updateUsedObjectsId(List<String> selectedModulesIds){
     	for (String id : selectedModulesIds) {
 			Query query = new Query(Criteria.where("_id").is(id));
 			mongoOperation.updateFirst(ARTIFACT_INFO_COLLECTION_NAME, 
