@@ -55,6 +55,7 @@ import org.w3c.dom.Document;
 
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.ArtifactGroupInfo;
 import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.DownloadInfo;
 import com.photon.phresco.commons.model.Element;
@@ -123,8 +124,10 @@ public class DependencyManagerImpl implements DependencyManager {
 		}
 		
 		if(CollectionUtils.isNotEmpty(applicationInfo.getSelectedDatabases())) {
-			List<DownloadInfo> selectedDbs = dbManager.findSelectedDatabases(applicationInfo.getSelectedDatabases(), customerId);
-			createSqlFolder(selectedDbs, projectPath);
+			for (ArtifactGroupInfo artifactGroupInfo : applicationInfo.getSelectedDatabases()) {
+				List<DownloadInfo> selectedDbs = dbManager.findSelectedDatabases(artifactGroupInfo.getArtifactInfoIds(), customerId);
+				createSqlFolder(selectedDbs, projectPath);
+			}
 		}
 		
 		updateTestPom(projectPath);
