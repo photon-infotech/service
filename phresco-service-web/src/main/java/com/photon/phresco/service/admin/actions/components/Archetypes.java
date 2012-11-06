@@ -97,6 +97,7 @@ public class Archetypes extends ServiceBaseAction {
 	private List<String> applicable = null;
 	private List<String> applicableReports = null;
 	private boolean archType = false;
+	private String versioning = "";
 	
 	public String list() throws PhrescoException {
 		if (s_isDebugEnabled) {
@@ -160,6 +161,7 @@ public class Archetypes extends ServiceBaseAction {
 			setReqAttribute(REQ_FROM_PAGE, EDIT);
 			List<Reports> reports = serviceManager.getReports();
 			setReqAttribute(REQ_TECHNOLOGY_REPORTS, reports);
+            setReqAttribute(REQ_VERSIONING, getVersioning()); 
 		} catch (PhrescoException e) {
 		    return showErrorPopup(e, getText(EXCEPTION_ARCHETYPE_EDIT));
 		}
@@ -635,4 +637,12 @@ public class Archetypes extends ServiceBaseAction {
 	public List<String> getApplicableReports() {
 		return applicableReports;
 	}
+	
+    public String getVersioning() {
+		return versioning;
+	}
+
+	public void setVersioning(String versioning) {
+		this.versioning = versioning;
+	} 
 }

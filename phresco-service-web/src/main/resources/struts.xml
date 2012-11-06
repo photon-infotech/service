@@ -312,7 +312,6 @@
 		
 		<action name="downloadSave" class="com.photon.phresco.service.admin.actions.components.Downloads" method="save">
 			<result name="downloadList">/admin/pages/components/download/list.jsp</result>
-			<result type="json" />
         </action>
         
         <action name="uploadFile" class="com.photon.phresco.service.admin.actions.components.Downloads" method="uploadFile">

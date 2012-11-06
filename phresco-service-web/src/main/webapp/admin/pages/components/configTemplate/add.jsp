@@ -349,16 +349,8 @@
 		</fieldset>
 	</div>
 	 
-	<div class="bottom_button">
-	<%
-		String disabledClass = "btn-primary";
-		String disabled = "";
-		if (isSystem) {
-			disabledClass = "btn-disabled";
-			disabled = "disabled";
-		}
-	%>
-		<input type="button" id="" class="btn <%=disabledClass%>" <%=disabled%>
+	<div class="bottom_config">
+		<input type="button" id="" class="btn btn-primary" 
 				onclick="validatePropTempKey('<%= pageUrl %>', '<%= progressTxt %>');" 
 		        value='<%= buttonLbl %>'/>
 		<input type="button" id="configtempCancel" class="btn btn-primary" 

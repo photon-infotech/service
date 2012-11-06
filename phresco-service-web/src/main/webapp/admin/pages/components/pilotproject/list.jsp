@@ -84,6 +84,11 @@
 										<s:label key="lbl.hdr.comp.tchngy" theme="simple" />
 									</div>
 								</th>
+								<th class="third">
+									<div class="th-inner tablehead">
+										<s:label key="lbl.hdr.pilot.version" theme="simple" />
+									</div>
+								</th>
 							</tr>
 						</thead>
 	
@@ -104,9 +109,16 @@
 										<a href="#" onclick="editPilotProject('<%=proInfo.getId() %>');" name="edit" id=""><%=proInfo.getName()%></a>
 									</td>
 									<td class="descwidth"><%= StringUtils.isNotEmpty(proInfo.getDescription()) ? proInfo.getDescription() : ""%></td>
-									<%  TechnologyInfo techId = proInfo.getTechInfo();
-									%>
-									<td><%= techId.getVersion() %></td>
+									 <%  
+									     TechnologyInfo techId = proInfo.getTechInfo();
+									 %> 
+									 <td><%= techId.getVersion() %></td> 
+									
+									<td class="psblevalue" id="1_psblSinglDiv">
+									      <a href="#" onclick="versioningPilotPro('<%=proInfo.getId() %>');" name="edit" id=""><img class="addiconAlign imagealign" temp="1" 
+													src="images/versioning.png"/></a>
+									</td>
+									
 								</tr>
 						<%			
 								}
@@ -133,12 +145,25 @@
 		toDisableCheckAll(); 
 		enableScreen();
 	});
-
+     
+	
+	function versioningPilotPro(id) {
+		 var params = "projectId=";
+	      params = params.concat(id);
+	      params = params.concat("&versioning=")
+	      params = params.concat("versioning");
+	      loadCont(params)
+	}
+	
     /** To edit the pilot project **/
     function editPilotProject(id) {
         var params = "projectId=";
         params = params.concat(id);
-        loadContent("pilotprojEdit", $("#formPilotProjList"), $('#subcontainer'), params);
+        loadCont(params)
+    }
+    
+    function loadCont(params) {
+    	loadContent("pilotprojEdit", $("#formPilotProjList"), $('#subcontainer'), params);
     }
     
  	// This method calling from confirm_dialog.jsp

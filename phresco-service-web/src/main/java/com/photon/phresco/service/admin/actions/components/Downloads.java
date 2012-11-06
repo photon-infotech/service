@@ -25,7 +25,9 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
@@ -72,7 +74,9 @@ public class Downloads extends ServiceBaseAction {
 	private String customerId = "";
 	private String oldVersion = "";
 	private String type = ""; // type of the file uploaded (file or image) 
+	private String versioning = "";
    
+	private static Map<String, InputStream> inputStreamMap = new HashMap<String, InputStream>();
 	private static byte[] s_downloadByteArray = null;
 	private static byte[] s_imgByteArray = null;
 
@@ -90,6 +94,7 @@ public class Downloads extends ServiceBaseAction {
 		}
 
 		//to clear file inpustreams
+		inputStreamMap.clear();
 		s_downloadByteArray = null;
 		s_imgByteArray = null;
 		
@@ -131,7 +136,8 @@ public class Downloads extends ServiceBaseAction {
             setReqAttribute(REQ_DOWNLOAD_PLATFORMS, platforms);
 			setReqAttribute(REQ_FROM_PAGE, EDIT);
 			setReqAttribute(REQ_FEATURES_LICENSE, getServiceManager().getLicenses());
-		} catch (PhrescoException e) {
+			setReqAttribute(REQ_VERSIONING, getVersioning());	
+	} catch (PhrescoException e) {
 			return showErrorPopup(e, getText(EXCEPTION_DOWNLOADS_EDIT));
 		}
 
@@ -142,16 +148,18 @@ public class Downloads extends ServiceBaseAction {
 		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Downloads.save()");
 		}
-
+		
 		try {
-		    List<InputStream> inputStreams = new ArrayList<InputStream>(2);
-		    if (s_downloadByteArray != null) {
-		        inputStreams.add(new ByteArrayInputStream(s_downloadByteArray));
-		    }
-		    if (s_imgByteArray != null) {
-		        inputStreams.add(new ByteArrayInputStream(s_imgByteArray));
-		    }
-			getServiceManager().createDownloads(getDownloadInfo(), inputStreams, getCustomerId());
+			DownloadInfo downloadInfo = getDownloadInfo();
+			if(s_downloadByteArray != null){
+				inputStreamMap.put(downloadInfo.getName(),  new ByteArrayInputStream(s_downloadByteArray));
+			} 
+			if(s_imgByteArray != null){
+				inputStreamMap.put(downloadInfo.getName(),  new ByteArrayInputStream(s_imgByteArray));
+			} 
+		    
+		    
+			getServiceManager().createDownloads(getDownloadInfo(), inputStreamMap, getCustomerId());
 			addActionMessage(getText(DOWNLOAD_ADDED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
 			return showErrorPopup(e, getText(EXCEPTION_DOWNLOADS_SAVE));
@@ -166,14 +174,14 @@ public class Downloads extends ServiceBaseAction {
 		}
 
 		try {
-		    List<InputStream> inputStreams = new ArrayList<InputStream>(2);
-		    if (s_downloadByteArray != null) {
-                inputStreams.add(new ByteArrayInputStream(s_downloadByteArray));
-            }
-            if (s_imgByteArray != null) {
-                inputStreams.add(new ByteArrayInputStream(s_imgByteArray));
-            }
-			getServiceManager().updateDownload(getDownloadInfo(), inputStreams, getCustomerId());
+			DownloadInfo downloadInfo = getDownloadInfo();
+			if(s_downloadByteArray != null){
+				inputStreamMap.put(downloadInfo.getName(),  new ByteArrayInputStream(s_downloadByteArray));
+			} 
+			if(s_imgByteArray != null){
+				inputStreamMap.put(downloadInfo.getName(),  new ByteArrayInputStream(s_imgByteArray));
+			} 
+			getServiceManager().updateDownload(getDownloadInfo(), inputStreamMap, getCustomerId());
 			addActionMessage(getText(DOWNLOAD_ADDED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
 			return showErrorPopup(e, getText(EXCEPTION_DOWNLOADS_UPDATE));
@@ -209,6 +217,9 @@ public class Downloads extends ServiceBaseAction {
         downloadVersion.setVersion(getVersion());
         downloadVersions.add(downloadVersion);
         ArtifactGroup artifactGroup = new ArtifactGroup();
+        List<String> customerIds = new ArrayList<String>();
+        customerIds.add(getCustomerId());
+        artifactGroup.setCustomerIds(customerIds);
         artifactGroup.setVersions(downloadVersions);
         artifactGroup.setLicenseId(getLicense());
         downloadInfo.setArtifactGroup(artifactGroup);
@@ -407,7 +418,7 @@ public class Downloads extends ServiceBaseAction {
 	public void setCategory(Category group) {
 		this.category = group;
 	}
-
+	
 	public String getGroupError() {
 		return groupError;
 	}
@@ -510,5 +521,13 @@ public class Downloads extends ServiceBaseAction {
 
 	public String getLicenseError() {
 		return licenseError;
+	}
+
+	public String getVersioning() {
+		return versioning;
+	}
+
+	public void setVersioning(String versioning) {
+		this.versioning = versioning;
 	}
 }

@@ -24,7 +24,9 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -47,6 +49,7 @@ public class PilotProjects extends ServiceBaseAction {
 	
 	private static final Logger S_LOGGER = Logger.getLogger(PilotProjects.class);
 	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
+	private static Map<String, InputStream> inputStreamMap = new HashMap<String, InputStream>();
 	
 	private String name = "";
 	private String description = "";
@@ -71,7 +74,7 @@ public class PilotProjects extends ServiceBaseAction {
 	
 	private String techId = "";
 	private String oldName = "";
-	
+	private String versioning = "";
 	private static byte[] s_pilotProByteArray = null;
 	
 	 /**
@@ -93,6 +96,7 @@ public class PilotProjects extends ServiceBaseAction {
 		}
 		
 		//to clear file input stream and byte array
+		inputStreamMap.clear();
 		s_pilotProByteArray = null;
 		
 		return COMP_PILOTPROJ_LIST;
@@ -135,6 +139,7 @@ public class PilotProjects extends ServiceBaseAction {
     		List<Technology> technologies = serviceManager.getArcheTypes(getCustomerId());
     		setReqAttribute(REQ_ARCHE_TYPES, technologies);
     		setReqAttribute(REQ_FROM_PAGE, EDIT);
+    		setReqAttribute(REQ_VERSIONING, getVersioning());
     	} catch (PhrescoException e) {
     		return showErrorPopup(e, getText(EXCEPTION_PILOT_PROJECTS_EDIT));
 		}
@@ -153,9 +158,13 @@ public class PilotProjects extends ServiceBaseAction {
     	}
     	
     	try {
-    		List<InputStream> inputStreams = new ArrayList<InputStream>();
-    		inputStreams.add(new ByteArrayInputStream(s_pilotProByteArray));
-    		getServiceManager().createPilotProjects(createPilotProj(), inputStreams, getCustomerId());
+            ApplicationInfo pilotProInfo = createPilotProj();     		
+    		//save pilot project jar files
+			if(s_pilotProByteArray != null){
+				inputStreamMap.put(pilotProInfo.getName(),  new ByteArrayInputStream(s_pilotProByteArray));
+			} 
+    		
+    		getServiceManager().createPilotProjects(createPilotProj(), inputStreamMap, getCustomerId());
 			addActionMessage(getText(PLTPROJ_ADDED, Collections.singletonList(getName())));
     	} catch (PhrescoException e) {
     		return showErrorPopup(e, getText(EXCEPTION_PILOT_PROJECTS_SAVE));
@@ -174,9 +183,12 @@ public class PilotProjects extends ServiceBaseAction {
     		S_LOGGER.debug("Entering Method  PilotProjects.update()");
     	}
     	try {
-    		List<InputStream> inputStreams = new ArrayList<InputStream>();
-    		inputStreams.add(new ByteArrayInputStream(s_pilotProByteArray));
-    		getServiceManager().updatePilotProject(createPilotProj(), inputStreams, getProjectId(), getCustomerId());
+    		ApplicationInfo pilotProInfo = createPilotProj();
+    		//update pilot project jar files
+    		if(s_pilotProByteArray != null){
+    			inputStreamMap.put(pilotProInfo.getName(),  new ByteArrayInputStream(s_pilotProByteArray));
+    		} 
+    		getServiceManager().updatePilotProject(createPilotProj(), inputStreamMap, getProjectId(), getCustomerId());
     		addActionMessage(getText(PLTPROJ_UPDATED, Collections.singletonList(getName())));
     	} catch (PhrescoException e) {
     		return showErrorPopup(e, getText(EXCEPTION_PILOT_PROJECTS_UPDATE));
@@ -195,7 +207,7 @@ public class PilotProjects extends ServiceBaseAction {
         
         pilotProInfo.setName(getName());
         pilotProInfo.setDescription(getDescription());
-//      pilotProInfo.setVersion(getVersion());
+        pilotProInfo.setVersion(getVersion());
         
         ArtifactGroup pilotContent = new ArtifactGroup();
         pilotContent.setGroupId(getGroupId());
@@ -487,4 +499,12 @@ public class PilotProjects extends ServiceBaseAction {
 	public void setJarVerError(String jarVerError) {
 		this.jarVerError = jarVerError;
 	}
+    
+    public String getVersioning() {
+		return versioning;
+	}
+    
+    public void setVersioning(String versioning) {
+		this.versioning = versioning;
+	} 
 }

@@ -46,12 +46,18 @@ public interface ServiceUIConstants {
 	String REQ_ARTIFACT_ID = "_artifactId";
 	String REQ_GROUP_ID = "_groupId";
 	String REQ_VERSION = "_version";
+	String REQ_VERSIONING = "versioning";
     
 	String VIDEOS = "video";
 	String ARCHETYPES = "archetype";
 	String CONFIG_TEMPLATES = "configtemp";
 	String PILOT_PROJECTS = "pilot";
 	String DOWNLOADS = "download";
+	String FEATURES = "features";
+	String CUSTOMERS = "customer";
+	String GLOBALURLS = "globalurl";
+	String JSLIBS = "jslibs";
+	String COMPONENT = "component";
     
 	/*****************************
      * Login Request Constants

@@ -70,6 +70,9 @@
 		<script type="text/javascript" src="js/jquery.ba-resize.min.js"></script>
 		<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
 		<script type="text/javascript" src="js/mousehold.js"></script>
+		<!-- Editable ComboBox -->
+		<script type="text/javascript" src="js/jquery.editable.combobox.js"></script>
+		
 			
 		<script type="text/javascript">
 		    changeTheme(); 

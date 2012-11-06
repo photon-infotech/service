@@ -29,6 +29,7 @@
 <%@ page import="com.photon.phresco.commons.model.Technology" %>
 <%@ page import="com.photon.phresco.commons.model.CoreOption" %>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
+<%@ page import="com.photon.phresco.service.admin.actions.util.ServiceActionUtil"%>
 <%@ page import="com.photon.phresco.commons.model.RequiredOption"%>
 
 <%
@@ -40,6 +41,13 @@
     String type = (String) request.getAttribute(ServiceUIConstants.REQ_FEATURES_TYPE);
     String selectedModuleId = (String) request.getAttribute(ServiceUIConstants.REQ_FEATURES_SELECTED_MODULEID);
     String selectedTechnology = (String) request.getAttribute(ServiceUIConstants.FEATURES_SELECTED_TECHNOLOGY);
+	String buttonLbl = ServiceActionUtil.getButtonLabel(fromPage);
+	String pageUrl = ServiceActionUtil.getPageUrl(ServiceUIConstants.FEATURES, fromPage);
+	
+	String progressTxt = ServiceActionUtil.getProgressTxt(ServiceUIConstants.FEATURES, fromPage);
+  
+	
+    
   	//For edit
   	String moduleId = "";
     String name = "";
@@ -51,7 +59,38 @@
     boolean isDefaultModule = false;
     boolean isCoreModule = false;
     boolean isSystem = false;
-    boolean showArtifactGroup = true;
+    boolean showArtifactGroup = false;
+    boolean editPage = false;
+    boolean features = false;
+    boolean jslibs = false;
+    boolean component = false;
+    String title = "";
+  //Get Types
+	if (ServiceUIConstants.REQ_FEATURES_TYPE_MODULE.equals(type)) {
+		features = true;
+	}
+
+	if (ServiceUIConstants.REQ_FEATURES_TYPE_JS.equals(type)) {
+		jslibs = true;
+	}
+
+	if (ServiceUIConstants.REQ_FEATURES_TYPE_COMPONENT.equals(type)) {
+		component = true;
+	}
+
+	//Get title
+	 if (features) {
+		title = ServiceActionUtil.getTitle(ServiceUIConstants.FEATURES,fromPage);
+	}
+
+	if (jslibs) {
+		title = ServiceActionUtil.getTitle(ServiceUIConstants.JSLIBS,fromPage);
+	}
+
+	if (component) {
+		title = ServiceActionUtil.getTitle(ServiceUIConstants.COMPONENT,fromPage);
+	}
+ 
 	if (moduleGroup != null) {
 	    name = moduleGroup.getName();
 	    
@@ -96,48 +135,24 @@
 		
 		isSystem = moduleGroup.isSystem();
 	}
-	if (ServiceUIConstants.REQ_FEATURES_TYPE_JS.equals(type)) {
-		showArtifactGroup = false;
+
+	// Wont allow to update for System generated Features
+	String disabledClass = "btn-primary";
+	String disabled = "";
+	if (isSystem) {
+		disabledClass = "btn-disabled";
+		disabled = "disabled";
+	}
+	//from page is not empty
+	if (StringUtils.isNotEmpty(fromPage)) {
+		editPage = true;
 	}
 	
 %>
 
 <form id="formFeatureAdd" class="form-horizontal customer_list" method="post" enctype="multipart/form-data">
 
-	<%
-		if (ServiceUIConstants.REQ_FEATURES_TYPE_MODULE.equals(type)) {
-		    if (StringUtils.isEmpty(fromPage)) {
-	%>
-				<h4 class="hdr headerFeat"><s:text name='lbl.hdr.comp.featrs.mod.add'/></h4>
-	<%
-		    } else {
-	%>
-				<h4 class="hdr headerFeat"><s:text name='lbl.hdr.comp.featrs.mod.edit'/></h4>
-	<% 		
-			}
-		} else if (ServiceUIConstants.REQ_FEATURES_TYPE_JS.equals(type)) {
-			if (StringUtils.isEmpty(fromPage)) {
-	%>
-				<h4 class="hdr headerFeat"><s:text name='lbl.hdr.comp.featrs.js.add'/></h4>
-	<%
-		} else {
-	%>
-				<h4 class="hdr headerFeat"><s:text name='lbl.hdr.comp.featrs.js.edit'/></h4>
-	<% 		
-			}
-		} else if (ServiceUIConstants.REQ_FEATURES_TYPE_COMPONENT.equals(type)) {
-			if (StringUtils.isEmpty(fromPage)) {
-	%>
-				<h4 class="hdr headerFeat"><s:text name='lbl.hdr.comp.component.add'/></h4>
-	<%
-			} else {
-	%>
-				<h4 class="hdr headerFeat"><s:text name='lbl.hdr.comp.component.edit'/></h4>
-				
-	<%
-			}
-		}
-	%>
+    <h4 class="hdr headerFeat"><%= title %></h4>
 	
 	<div class="content_feature">
 		<div class="control-group" id="nameControl">
@@ -199,7 +214,7 @@
 			</div>
 		</div>
 		
-		<% if (ServiceUIConstants.REQ_FEATURES_TYPE_MODULE.equals(type)) { %>
+		<% if (features) { %>
 			<div class="control-group" id="moduleSelection">
 				<label class="control-label labelbold">
 					<span class="mandatory">*</span>&nbsp;<s:text name="lbl.comp.featr.module.type" />
@@ -260,7 +275,7 @@
 		<!-- POM details starts -->
 		<div id="jarDetailsDiv" class="hideContent">
 		
-		<% if (showArtifactGroup) { %>
+		<% if (features || component ) { %>
 			<div class="control-group" id="groupIdControl">
 				<label class="control-label labelbold">
 					<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.groupid'/>
@@ -340,51 +355,12 @@
 	</div>
 	
 	<div class="bottom_button">
-		<%
-			String disabledClass = "btn-primary";
-			String disabled = "";
-			if (isSystem) {
-				disabledClass = "btn-disabled";
-				disabled = "disabled";
-			}
-		%>
-     	<% 
-     		if (StringUtils.isNotEmpty(fromPage)) {
-     		    if (ServiceUIConstants.REQ_FEATURES_TYPE_COMPONENT.equals(type)) {
-   		%>
-   					<input type="button" id="featuresUpdate" class="btn <%= disabledClass %>" <%= disabled %> 
-						onclick="validate('componentUpdate', $('#formFeatureAdd'), $('#subcontainer'), 'Updating Feature', $('#jarDetailsDiv :input'));"
-						value="<s:text name='lbl.btn.edit' />"/>
-   		<%
-     		    } else {
-   		%>
-			     	<input type="button" id="featuresUpdate" class="btn <%= disabledClass %>" <%= disabled %> 
-						onclick="validate('featuresUpdate', $('#formFeatureAdd'), $('#featureContainer'), 'Updating Feature', $('#jarDetailsDiv :input'));"
-						value="<s:text name='lbl.btn.edit' />"/> 
-     	<%
-     		    }
-     		} else {
-				if (ServiceUIConstants.REQ_FEATURES_TYPE_COMPONENT.equals(type)) {
-   		%>
-			     	<input type="button" id="featuresSave" class="btn btn-primary" value="<s:text name='lbl.btn.add'/>" 
-						onclick="validate('componentSave', $('#formFeatureAdd'), $('#subcontainer'), 'Creating Feature', $('#jarDetailsDiv :input'));"/> 
-		<%
-				} else {
-	    %>
-	    			<input type="button" id="featuresSave" class="btn btn-primary" value="<s:text name='lbl.btn.add'/>" 
-						onclick="validate('featuresSave', $('#formFeatureAdd'), $('#featureContainer'), 'Creating Feature', $('#jarDetailsDiv :input'));"/> 
-	    <%
-				}
-     		}
-		%>
-		
-		<% if (ServiceUIConstants.REQ_FEATURES_TYPE_COMPONENT.equals(type)) { %>
-			<input type="button" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>"
-				onclick="loadContent('technologies', $('#formFeatureAdd'), $('#subcontainer'));" />
-		<% } else { %>
+     
+     		<input type="button" id="featuresUpdate" class="btn <%= disabledClass %>" <%= disabled %> 
+						onclick="validate('<%= pageUrl %>', $('#formFeatureAdd'), $('#featureContainer'), '<%= progressTxt %>', $('#jarDetailsDiv :input'));"
+						value="<%= buttonLbl %>"/>
 			<input type="button" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>"
 				onclick="loadContent('technologies', $('#formFeatureAdd'), $('#featureContainer'));" />
-		<% } %>
 	</div>
 	
 	<!-- Hidden Fields -->

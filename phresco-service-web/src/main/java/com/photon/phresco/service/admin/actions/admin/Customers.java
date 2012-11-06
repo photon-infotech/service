@@ -111,7 +111,8 @@ public class Customers extends ServiceBaseAction  {
 	    if (s_isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Customers.add()");
 	    }
-		
+	    setReqAttribute(REQ_FROM_PAGE, ADD);
+	    
 		return ADMIN_CUSTOMER_ADD;
 	}
 	

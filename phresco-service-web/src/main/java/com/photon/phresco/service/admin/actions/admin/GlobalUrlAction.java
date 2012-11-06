@@ -69,6 +69,7 @@ public class GlobalUrlAction extends ServiceBaseAction {
 		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method GlobalUrlAction.add()");
 		}
+		setReqAttribute(REQ_FROM_PAGE, ADD);
 
 		return ADMIN_GLOBALURL_ADD;
 	}

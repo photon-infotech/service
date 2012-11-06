@@ -149,6 +149,12 @@ div.lgnBtnLabel {
 
 .bottom_button {
 	margin-right: 23px;
+	margin-top: 9px;
+	text-align: right;
+}
+
+.bottom_config {
+	margin-right: 23px;
 	margin-top: 16px;
 	float: right;
 	text-align: right;
@@ -853,7 +859,7 @@ a {
 
 .subtabs {
 	float: right;
-	margin-right: 20px;
+	margin-right: 53%;
 }
 a {
 	font-weight: inherit;
@@ -1551,7 +1557,7 @@ h3 label {
 }
 
 .namelabel-width {
-	width: 25%;
+	width: 20%;
 }
 
 .desclabel-width {

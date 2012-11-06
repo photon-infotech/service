@@ -183,11 +183,11 @@ public class Component extends ServiceBaseAction {
         
         try {
             ArtifactGroup moduleGroup = createModuleGroup();
-            List<InputStream> inputStreams = new ArrayList<InputStream>();
+            Map<String, InputStream> inputStreamMap = new HashMap<String, InputStream>();
             if (s_componentByteArray != null) {
-                inputStreams.add(new ByteArrayInputStream(s_componentByteArray));
+            	inputStreamMap.put(moduleGroup.getName(), new ByteArrayInputStream(s_componentByteArray));
             }
-            getServiceManager().updateFeature(moduleGroup, inputStreams, getCustomerId());
+            getServiceManager().updateFeature(moduleGroup, inputStreamMap, getCustomerId());
         } catch (PhrescoException e) {
             return showErrorPopup(e, getText(EXCEPTION_COMPONENT_UPDATE));
         }

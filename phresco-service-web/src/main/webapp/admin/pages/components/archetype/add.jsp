@@ -47,6 +47,11 @@
 	String buttonLbl = ServiceActionUtil.getButtonLabel(fromPage);
 	String pageUrl = ServiceActionUtil.getPageUrl(ServiceUIConstants.ARCHETYPES, fromPage);
 	String progressTxt = ServiceActionUtil.getProgressTxt(ServiceUIConstants.ARCHETYPES, fromPage);
+	String versioning = (String)request.getAttribute(ServiceUIConstants.REQ_VERSIONING);
+	String disabledVer ="";
+	if(StringUtils.isNotEmpty(versioning)) {
+		disabledVer = "disabled";
+	}
 	
 	//For edit
 	String name = "";
@@ -81,8 +86,8 @@
 				class="mandatory">*</span>&nbsp;<s:text name='lbl.name' />
 			</label>
 			<div class="controls">
-				<input id="archename" placeholder='<s:text name="place.hldr.archetype.add.name"/>' class="input-xlarge" type="text" 
-					name="name" value="<%= name %>" maxlength="30" title="30 Characters only">
+				<input id="archename"  placeholder='<s:text name="place.hldr.archetype.add.name"/>' class="input-xlarge" type="text" 
+					name="name" <%= disabledVer %> value="<%= name %>" maxlength="30" title="30 Characters only">
 				<span class="help-inline" id="nameError"></span>
 			</div>
 		</div>
@@ -102,7 +107,7 @@
 			</label>
 			<div class="controls">
 				<input id="techVersion" placeholder='<s:text name="place.hldr.archetype.add.technologyVersion"/>' class="input-xlarge" 
-					type="text" name="techVersion" value="<%= StringUtils.isNotEmpty(techVer) ? techVer : "" %>" maxlength="30" title="30 Characters only">
+					type="text" name="techVersion" <%= disabledVer %> value="<%= StringUtils.isNotEmpty(techVer) ? techVer : "" %>" maxlength="30" title="30 Characters only">
 				<span class="help-inline" id="techvernError"></span>
 			</div>
 		</div>  
@@ -111,7 +116,7 @@
 			<label class="control-label labelbold"> <s:text
 					name='lbl.hdr.com.vercmnt' /> </label>
 			<div class="controls">
-				<textarea name="versionComment" placeholder='<s:text name="place.hldr.archetype.add.ver.comment"/>' class="input-xlarge" 
+				<textarea name="versionComment" <%= disabledVer %> placeholder='<s:text name="place.hldr.archetype.add.ver.comment"/>' class="input-xlarge" 
 					rows="2" cols="10" maxlength="150" title="150 Characters only"><%= versionComment %></textarea>
 			</div>
 		</div>
@@ -130,7 +135,7 @@
 									selectedStr = "selected";
 								}
 					%>
-								<option value="<%= appType.getId() %>" <%= selectedStr %>><%= appType.getName() %></option>
+							<option <%= disabledVer %> value="<%= appType.getId() %>" <%= selectedStr %>><%= appType.getName() %></option>
 					<%
 							}
 						}
@@ -227,7 +232,7 @@
 											}
 										}	
 							%>
-										<li> <input type="checkbox" id="appliestoCheckbox" name="applicable" value='<%= option.getOption() %>'
+										<li> <input type="checkbox" id="appliestoCheckbox" <%= disabledVer %> name="applicable" value='<%= option.getOption() %>'
 											class="check applsChk" <%= checkedStr %>><%= option.getOption() %>
 										</li>
 							<%		}	

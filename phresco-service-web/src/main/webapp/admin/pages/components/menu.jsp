@@ -45,7 +45,6 @@
 
 <%
     User userInfo = (User) session.getAttribute(ServiceUIConstants.SESSION_USER_INFO);
-	// TODO:Arunprasanna
     List<String> customers = userInfo.getCustomerIds();
 %>
 
@@ -53,9 +52,6 @@
 	<ul class="tabs">
 		<li>
 			<a href="#" class="active" name="compTab" id="featuresMenu"><s:label key="lbl.hdr.comp.featrs" theme="simple"/></a>
-		</li>
-		<li>
-			<a href="#" class="inactive" name="compTab" id="technologies" additionalParam="type=<%= Type.COMPONENT.name() %>"><s:label key="lbl.hdr.comp.component" theme="simple"/></a>
 		</li>
 		<li>
 			<a href="#" class="inactive" name="compTab" id="archetypesList"><s:label key="lbl.hdr.comp.arhtyp" theme="simple"/></a>

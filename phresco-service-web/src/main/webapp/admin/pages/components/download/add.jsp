@@ -47,6 +47,11 @@
 	String buttonLbl = ServiceActionUtil.getButtonLabel(fromPage);
 	String pageUrl = ServiceActionUtil.getPageUrl(ServiceUIConstants.DOWNLOADS, fromPage);
 	String progressTxt = ServiceActionUtil.getProgressTxt(ServiceUIConstants.DOWNLOADS, fromPage);
+	String versionPro = (String)request.getAttribute(ServiceUIConstants.REQ_VERSIONING);
+	String disabledVer ="";
+	if(StringUtils.isNotEmpty(versionPro)) {
+		disabledVer = "disabled";
+	}
 	
     //For edit
     String name = "";
@@ -83,7 +88,7 @@
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.name'/>
 			</label>
 			<div class="controls">
-				<input id="downloadName" placeholder="<s:text name='place.hldr.download.add.name'/>" 
+				<input id="downloadName" <%= disabledVer %> placeholder="<s:text name='place.hldr.download.add.name'/>" 
 					value="<%= name %>" maxlength="30" title="30 Characters only" class="input-xlarge" type="text" name="name">
 				<span class="help-inline" id="nameError"></span>
 			</div>
@@ -108,7 +113,7 @@
 	                <div class="multilist-scroller multiselct" style="height: 95px; width:300px;">
 		                <ul>
 							<li>
-								<input type="checkbox" id="checkAllAuto" onclick="checkAllEvent(this, $('.techCheck'), true);"
+								<input type="checkbox" <%= disabledVer %> id="checkAllAuto" onclick="checkAllEvent(this, $('.techCheck'), true);"
 									style="margin: 3px 8px 6px 0;">All
 							</li>
 		                    <%
@@ -124,7 +129,7 @@
    										}
 		                    %>
 	                   			<li>
-									<input type="checkbox" name="technology" value="<%= technology.getId() %>"  <%= checkedStr %>
+									<input type="checkbox" name="technology" <%= disabledVer %>  value="<%= technology.getId() %>"  <%= checkedStr %>
 										class="check techCheck"><%= technology.getName() %>
 								</li>
 							<% 	 
@@ -225,7 +230,7 @@
 				<div class="multilist-scroller multiselct" style="height: 95px; width:300px;">
 					<ul>
 						<li>
-							<input type="checkbox" id="checkAll" onclick="checkAllEvent(this, $('.platFormCheck'), true);" 
+							<input type="checkbox" <%= disabledVer %> id="checkAll" onclick="checkAllEvent(this, $('.platFormCheck'), true);" 
 								style="margin: 3px 8px 6px 0;">All
 						</li>
 						<%
@@ -240,7 +245,7 @@
 										}
 						%>
 								<li>
-									<input type="checkbox" name="platform" class="check platFormCheck" value="<%= platform.getId() %>" <%= checkedStr %>>
+									<input type="checkbox" <%= disabledVer %> name="platform" class="check platFormCheck" value="<%= platform.getId() %>" <%= checkedStr %>>
 									<%= platform.getType() + platform.getBit() %>
 								</li>
 						<% 
@@ -274,7 +279,7 @@
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.dwnld.ver'/>
 			</label>
 			<div class="controls">
-				<input id="dwnVersn" placeholder="<s:text name='place.hldr.download.add.version'/>" value="<%= version %>" 
+				<input id="dwnVersn" <%= disabledVer %> placeholder="<s:text name='place.hldr.download.add.version'/>" value="<%= version %>" 
 					maxlength="30" title="30 Characters only" class="input-xlarge" type="text" name="version">
 				<span class="help-inline" id="verError"></span>
 			</div>
@@ -285,7 +290,7 @@
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.dwnld.group'/>
 			</label>	
 			<div class="controls">
-				<select id="category" name="category">
+				<select id="category" name="category" <%= disabledVer %>>
 					<option value="">- select -</option>
 					<option value="Server">Server</option>
 					<option value="Database">Database</option>
@@ -311,7 +316,7 @@
 
 	<div class="bottom_button">
 		<input type="button" id="" class="btn btn-primary" value='<%= buttonLbl %>' 
-			onclick="validate('<%= pageUrl %>', $('#formDownloadAdd'), $('#subcontainer'), '<%= progressTxt %>', $('#downloadInputDiv :input'));" />	
+			onclick="validate('<%= pageUrl %>', $('#formDownloadAdd'), $('#subcontainer'), '<%= progressTxt %>', $('.content_adder :input'));" />	
 		<input type="button" id="downloadCancel" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>"
 			onclick="loadContent('downloadList', $('#formDownloadAdd'), $('#subcontainer'));"/>
 	</div>
@@ -329,6 +334,11 @@
 		$(".content_adder").scrollbars(); 
 		$(".multilist-scroller").scrollbars();
 	}
+	
+	//For Editable Combo Box
+	$(function () {
+	    $('#category').jec();
+	});
 	
 	$(document).ready(function() {
 		enableScreen();

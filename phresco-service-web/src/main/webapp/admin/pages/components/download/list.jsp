@@ -26,6 +26,7 @@
 
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
 <%@ page import="com.photon.phresco.commons.model.DownloadInfo" %>
+<%@ page import="com.photon.phresco.commons.model.ArtifactInfo" %>
 
 <% 
 	List<DownloadInfo> downloadInfos = (List<DownloadInfo>)request.getAttribute(ServiceUIConstants.REQ_DOWNLOAD_INFO); 
@@ -78,8 +79,11 @@
 									<div class="th-inner tablehead"><s:label key="lbl.hdr.adm.dwnldlst.appltfrm" theme="simple"/></div>
 								</th>
 								<th class="third">
-									<div class="th-inner tablehead" style="margin-left:-80px;">
-										<s:label key="lbl.hdr.adm.dwnldlst.ver"  theme="simple"/>
+									<div class="th-inner tablehead" ><s:label key="lbl.hdr.adm.dwnldlst.ver"  theme="simple"/></div>
+								</th>
+								<th class="third">
+									<div class="th-inner tablehead">
+										<s:label key="lbl.hdr.pilot.version" theme="simple" />
 									</div>
 								</th>
 							</tr>
@@ -103,7 +107,15 @@
 								<td>
 									<%=CollectionUtils.isNotEmpty(download.getPlatformTypeIds()) ? download.getPlatformTypeIds() : ""%>
 								</td>
-<%-- 								<td><%= CollectionUtils.isNotEmpty(download.getVersions()) ? download.getVersions() : "" %></td> --%>
+								<%
+				                   List<ArtifactInfo> versions = download.getArtifactGroup().getVersions();
+								%>
+								
+ 								 <td><%= StringUtils.isNotEmpty(versions.get(0).getVersion()) ? versions.get(0).getVersion() : "" %></td> 
+                                 <td class="psblevalue" id="1_psblSinglDiv">
+									      <a href="#" onclick="versioningDownload('<%= download.getId() %>');" name="edit" id=""><img class="addiconAlign imagealign" temp="1" 
+													src="images/versioning.png"/></a>
+							   </td>
 							</tr>
 						<%
 								}
@@ -129,12 +141,24 @@
 	$(document).ready(function() {
 		enableScreen();
 	});
-
+     
+	function versioningDownload(id) {
+		 var params = "downloadId=";
+	     params = params.concat(id);
+	     params = params.concat("&versioning=")
+	     params = params.concat("versioning");
+	     loadDownloadCont(params);
+	}
+	
     /** To edit the download **/
     function editDownload(id) {
         var params = "downloadId=";
         params = params.concat(id);
-        loadContent("downloadEdit", $("#formDownloadList"), $('#subcontainer'), params);
+        loadDownloadCont(params);
+    }
+    
+    function loadDownloadCont(params) {
+    	loadContent("downloadEdit", $("#formDownloadList"), $('#subcontainer'), params);
     }
     
  	// This method calling from confirm_dialog.jsp

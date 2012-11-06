@@ -23,11 +23,17 @@
 
 <%@ page import="com.photon.phresco.commons.model.Property"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
+<%@ page import="com.photon.phresco.service.admin.actions.util.ServiceActionUtil"%>
 
 <% 
 	Property globalUrl = (Property) request.getAttribute(ServiceUIConstants.REQ_GLOBURL_URL);
     String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
     
+    String title = ServiceActionUtil.getTitle(ServiceUIConstants.GLOBALURLS, fromPage);
+	String buttonLbl = ServiceActionUtil.getButtonLabel(fromPage);
+	String pageUrl = ServiceActionUtil.getPageUrl(ServiceUIConstants.GLOBALURLS, fromPage);
+	String progressTxt = ServiceActionUtil.getProgressTxt(ServiceUIConstants.GLOBALURLS, fromPage);
+	
     String id = "";
     String name = "";
 	String description = "";
@@ -43,18 +49,8 @@
 %>
 
 <form id="formGlobalUrlAdd" class="form-horizontal customer_list">
-	<h4>
-	<%
-		if (StringUtils.isNotEmpty(fromPage)) {
-	%>
-		<s:label key="lbl.hdr.adm.url.edit.title"/>
-	<%
-		} else {
-	%>
-		<s:label key="lbl.hdr.adm.url.tiltle" theme="simple"/>
-	<%
-		}
-	%>
+	<h4 class="hdr">
+	  <%= title %>
 	</h4>	
 	<div class="content_adder">
 		<div class="control-group" id="nameControl">
@@ -92,18 +88,11 @@
 	</div>
 	
 	<div class="bottom_button">
-	  	<% if (StringUtils.isNotEmpty(fromPage)) { %>
-			<input type="button" id="globalurlUpdate" class="btn btn-primary"
-				onclick="validate('globalurlUpdate', $('#formGlobalUrlAdd'), $('#subcontainer'), 'Updating GlobalURL');" 
-		        value="<s:text name='lbl.btn.edit'/>"/>
-    	<% } else { %>		
-			<input type="button" id="globalurlSave" class="btn btn-primary"
-		        onclick="validate('globalurlSave', $('#formGlobalUrlAdd'), $('#subcontainer'), 'Creating GlobalURL');" 
-		        value="<s:text name='lbl.btn.add'/>"/>
-		<% } %> 
-			<input type="button" id="globalurlCancel" class="btn btn-primary" 
-				onclick="loadContent('globalurlList', $('#formGlobalUrlAdd'), $('#subcontainer'));" 
-				value="<s:text name='lbl.btn.cancel'/>"/>
+			<input type="button" id="" class="btn btn-primary"  value="<%= buttonLbl %>"
+				onclick="validate('<%= pageUrl %>', $('#formGlobalUrlAdd'), $('#subcontainer'), '<%= progressTxt %>');" />
+    
+			<input type="button" id="globalurlCancel" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>"
+				onclick="loadContent('globalurlList', $('#formGlobalUrlAdd'), $('#subcontainer'));" />
 	</div>
 	
 	<!-- Hidden Fields -->

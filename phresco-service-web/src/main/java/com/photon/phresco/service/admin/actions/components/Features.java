@@ -92,6 +92,7 @@ public class Features extends ServiceBaseAction {
     	}
 
 		setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
+		inputStreamMap.clear();
 		s_featureByteArray = null;
 		
     	return COMP_FEATURES_LIST;
@@ -150,6 +151,7 @@ public class Features extends ServiceBaseAction {
         try {
             setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
             setReqAttribute(REQ_FEATURES_TYPE, getType());
+            setReqAttribute(REQ_FROM_PAGE, ADD);
             setTechnologiesInRequest();
             setReqAttribute(REQ_FEATURES_LICENSE, getLicences());
         } catch (PhrescoException e) {
@@ -195,15 +197,14 @@ public class Features extends ServiceBaseAction {
     public String save() throws PhrescoException, IOException {
         try {
             ArtifactGroup moduleGroup = createModuleGroup(Type.valueOf(getType()));
-            List<InputStream> inputStream = new ArrayList<InputStream>();
-            if (s_featureByteArray != null) {
-                inputStream.add(new ByteArrayInputStream(s_featureByteArray));
-            }
+            
+            if(s_featureByteArray != null){
+				inputStreamMap.put(moduleGroup.getName(),  new ByteArrayInputStream(s_featureByteArray));
+			} 
             getServiceManager().createFeatures(moduleGroup, inputStreamMap, getCustomerId());
             setTechnologiesInRequest();
             addActionMessage(getText(FEATURE_ADDED, Collections.singletonList(getName())));
         } catch (PhrescoException e) {
-        	e.printStackTrace();
             return showErrorPopup(e, getText(EXCEPTION_FEATURE_SAVE));
         }
         
@@ -239,11 +240,10 @@ public class Features extends ServiceBaseAction {
         
         try {
             ArtifactGroup moduleGroup = createModuleGroup(Type.valueOf(getType()));
-            List<InputStream> inputStream = new ArrayList<InputStream>();
-            if (s_featureByteArray != null) {
-                inputStream.add(new ByteArrayInputStream(s_featureByteArray));
-            }
-            getServiceManager().updateFeature(moduleGroup, inputStream, getCustomerId());
+            if(s_featureByteArray != null){
+				inputStreamMap.put(moduleGroup.getName(),  new ByteArrayInputStream(s_featureByteArray));
+			} 
+            getServiceManager().updateFeature(moduleGroup, inputStreamMap, getCustomerId());
             addActionMessage(getText(FEATURE_ADDED, Collections.singletonList(getName())));
             setTechnologiesInRequest();
         } catch (PhrescoException e) {

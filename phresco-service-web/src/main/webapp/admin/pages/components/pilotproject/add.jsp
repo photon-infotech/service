@@ -39,7 +39,11 @@
 	String buttonLbl = ServiceActionUtil.getButtonLabel(fromPage);
 	String pageUrl = ServiceActionUtil.getPageUrl(ServiceUIConstants.PILOT_PROJECTS, fromPage);
 	String progressTxt = ServiceActionUtil.getProgressTxt(ServiceUIConstants.PILOT_PROJECTS, fromPage);
-	
+	String versioning = (String)request.getAttribute(ServiceUIConstants.REQ_VERSIONING);
+	String disabledVer ="";
+	if(StringUtils.isNotEmpty(versioning)) {
+		disabledVer = "disabled";
+	}
 	//For edit
     String name = "";
 	String version = "";
@@ -66,8 +70,8 @@
 			<label class="control-label labelbold">
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.name'/>
 			</label>
-			<div class="controls">
-				<input id="pilotname" placeholder="<s:text name='place.hldr.pilot.add.name'/>" value="<%= name %>" maxlength="30" title="30 Characters only" class="input-xlarge" type="text" name="name">
+			<div id="pilotProName" class="controls">
+				<input id="pilotname" placeholder="<s:text name='place.hldr.pilot.add.name'/>" <%= disabledVer %> value="<%= name %>" maxlength="30" title="30 Characters only" class="input-xlarge" type="text" name="name">
 				<span class="help-inline" id="nameError"></span>
 			</div>
 		</div>
@@ -87,7 +91,7 @@
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.version'/>
 			</label>
 			<div class="controls">
-				<input id="versionname" placeholder="<s:text name='place.hldr.pilot.add.version'/>" value="<%= version %>" maxlength="30" title="30 Characters only" class="input-xlarge" type="text" name="version">
+				<input id="versionname" placeholder="<s:text name='place.hldr.pilot.add.version'/>" <%= disabledVer %> value="<%= version %>" maxlength="30" title="30 Characters only" class="input-xlarge" type="text" name="version">
 				<span class="help-inline" id="versionError"></span>
 			</div>
 		</div>
@@ -111,7 +115,7 @@
 								selectedStr = "";
 							}
 					%>
-						<option value="<%=technology.getId() %>" <%= selectedStr %>><%=technology.getName() %></option>
+						<option <%= disabledVer %> value="<%=technology.getId() %>" <%= selectedStr %>><%=technology.getName() %></option>
 					<%
 							}
 						}

@@ -25,7 +25,6 @@
 
 <%@ page import="com.photon.phresco.commons.model.ArtifactInfo" %>
 <%@ page import=" com.photon.phresco.commons.model.ArtifactGroup" %>
-
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
 
 <% 
@@ -57,7 +56,7 @@
 		
 		<div class="theme_accordion_container jsLib_accordion_container">
 		    <section class="accordion_panel_wid">
-		        <div class="accordion_panel_inner">
+		        <div class="accordion_panel_inner accordian_height" >
 		            <section class="lft_menus_container">
 		            <%
 						for (ArtifactGroup moduleGroup : moduleGroups) {
@@ -141,4 +140,5 @@
 	    params = params.concat(moduleId);
 	    loadContent("featurseEdit", $('#formFeaturesList'), $('#featureContainer'), params);
 	}
+	
 </script>

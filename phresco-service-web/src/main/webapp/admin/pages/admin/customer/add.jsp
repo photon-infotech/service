@@ -25,11 +25,17 @@
 
 <%@ page import="com.photon.phresco.commons.model.Customer" %>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
+<%@ page import="com.photon.phresco.service.admin.actions.util.ServiceActionUtil" %>
 <%@ page import=" com.photon.phresco.commons.model.Customer.LicenseType" %>
 
 <%
 	Customer customer = (Customer) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER);
 	String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
+	
+	String title = ServiceActionUtil.getTitle(ServiceUIConstants.CUSTOMERS, fromPage);
+	String buttonLbl = ServiceActionUtil.getButtonLabel(fromPage);
+	String pageUrl = ServiceActionUtil.getPageUrl(ServiceUIConstants.CUSTOMERS, fromPage);
+	String progressTxt = ServiceActionUtil.getProgressTxt(ServiceUIConstants.CUSTOMERS, fromPage);
 	
 	//For edit
 	String id = "";
@@ -105,12 +111,8 @@
 %>
 
 <form id="formCustomerAdd" class="form-horizontal customer_list">
-	<h4>
-		<% if (StringUtils.isNotEmpty(fromPage)) { %>
-				<s:label key="lbl.hdr.adm.cust.edit.tilte" theme="simple" />
-		<% } else { %>
-				<s:label key="lbl.hdr.adm.cust.tilte" theme="simple" />
-		<% } %>
+	<h4 class="hdr">
+	   <%= title %>
 	</h4>
 	<div class="content_adder">
 		<div class="control-group" id ="nameControl">
@@ -552,13 +554,9 @@
 	</div>
 
 	<div class="bottom_button">
-		<% if (StringUtils.isNotEmpty(fromPage)) { %>
-				<input type="button" id="customerUpdate" class="btn btn-primary" value="<s:text name='lbl.btn.edit'/>" 
-				    onclick="validate('customerUpdate', $('#formCustomerAdd'), $('#subcontainer'), 'Updating Customer');" />
-		<% } else { %>
-				<input type="button" id="customerSave" class="btn btn-primary" value="<s:text name='lbl.btn.add'/>" 
-				    onclick="validate('customerSave', $('#formCustomerAdd'), $('#subcontainer'), 'Creating Customer');" />
-		<% } %>
+		
+		<input type="button" id="" class="btn btn-primary" value="<%= buttonLbl %>" 
+			 onclick="validate('<%= pageUrl %>', $('#formCustomerAdd'), $('#subcontainer'), '<%= progressTxt %>');" />
 		<input type="button" id="customerCancel" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>" 
             onclick="loadContent('customerList', $('#formCustomerAdd'), $('#subcontainer'));" />
 	</div>

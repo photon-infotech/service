@@ -25,7 +25,9 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -42,6 +44,7 @@ public class Videos extends ServiceBaseAction {
 
 	private static final Logger S_LOGGER = Logger.getLogger(Videos.class);
 	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
+	private static Map<String, InputStream> inputStreamMap = new HashMap<String, InputStream>();
 
 	private static byte[] s_videoByteArray = null;
 	private static byte[] s_imgByteArray = null;
@@ -64,7 +67,8 @@ public class Videos extends ServiceBaseAction {
 		} catch (PhrescoException e) {
 			return showErrorPopup(e, getText(EXCEPTION_VIDEO_LIST));
 		}
-
+        
+		inputStreamMap.clear();
 		s_videoByteArray = null;
 		s_imgByteArray = null;
 
@@ -100,10 +104,16 @@ public class Videos extends ServiceBaseAction {
 			S_LOGGER.debug("Entering Method Videos.save()");
 		}
 		try {
-			List<InputStream> inputStreams = new ArrayList<InputStream>();
-			inputStreams.add(new ByteArrayInputStream(s_videoByteArray));
-			inputStreams.add(new ByteArrayInputStream(s_imgByteArray));
-			getServiceManager().createVideos(createVideoInstance(), inputStreams);
+			VideoInfo videoInfo = createVideoInstance();
+			if(s_videoByteArray != null){
+				inputStreamMap.put(videoInfo.getName(),  new ByteArrayInputStream(s_videoByteArray));
+			} 
+			if(s_imgByteArray != null){
+				inputStreamMap.put(videoInfo.getName(),  new ByteArrayInputStream(s_imgByteArray));
+			} 
+			
+			
+			getServiceManager().createVideos(createVideoInstance(), inputStreamMap);
 			addActionMessage(getText(VIDEO_ADDED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
 			return showErrorPopup(e, getText(EXCEPTION_VIDEO_SAVE));
@@ -117,10 +127,14 @@ public class Videos extends ServiceBaseAction {
 			S_LOGGER.debug("Entering Method  PilotProjects.update()");
 		}
 		try {
-			List<InputStream> inputStreams = new ArrayList<InputStream>();
-			inputStreams.add(new ByteArrayInputStream(s_videoByteArray));
-			inputStreams.add(new ByteArrayInputStream(s_imgByteArray));
-			getServiceManager().updateVideo(createVideoInstance(), inputStreams, getVideoId());
+			VideoInfo videoInfo = createVideoInstance();
+			if(s_videoByteArray != null){
+				inputStreamMap.put(videoInfo.getName(),  new ByteArrayInputStream(s_videoByteArray));
+			} 
+			if(s_imgByteArray != null){
+				inputStreamMap.put(videoInfo.getName(),  new ByteArrayInputStream(s_imgByteArray));
+			} 
+			getServiceManager().updateVideo(createVideoInstance(), inputStreamMap, getVideoId());
 			addActionMessage(getText(PLTPROJ_UPDATED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
 			return showErrorPopup(e, getText(EXCEPTION_VIDEO_UPDATE));

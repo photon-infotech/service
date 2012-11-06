@@ -81,6 +81,11 @@
 								<th class="third">
 									<div class="th-inner tablehead"><s:label key="lbl.hdr.comp.apptype"  theme="simple"/></div>
 								</th>
+								<th class="third">
+									<div class="th-inner tablehead">
+										<s:label key="lbl.hdr.pilot.version" theme="simple" />
+									</div>
+								</th>
 							</tr>
 						</thead>
 			
@@ -124,7 +129,12 @@
 											}
 										%>
 										<%= appTypeName %>
-									</td>		
+									</td>
+									
+									<td class="psblevalue" id="1_psblSinglDiv">
+									      <a href="#" onclick="versioningTech('<%= technology.getId() %>');" name="edit" id=""><img class="addiconAlign imagealign" temp="1" 
+													src="images/versioning.png"/></a>
+							   		</td>		
 								</tr>	
 						<%		
 								}
@@ -154,12 +164,24 @@
 	        return textTrim($(this));
 	    }); 
 	});
-
+ 
+	function versioningTech(id) {
+		var params = "techId=";
+		params = params.concat(id);
+		params = params.concat("&versioning=")
+	    params = params.concat("versioning");
+		loadTechCont(params);
+	}
+	
     function editTech(id) {
 		var params = "techId=";
 		params = params.concat(id);
-		loadContent("archetypeEdit", $("#formArchetypeList"), $('#subcontainer'), params);
+		loadTechCont(params);
 	}
+    
+    function loadTechCont(params) {
+    	loadContent("archetypeEdit", $("#formArchetypeList"), $('#subcontainer'), params);
+    }
     
     // This method calling from confirm_dialog.jsp
     function continueDeletion() {

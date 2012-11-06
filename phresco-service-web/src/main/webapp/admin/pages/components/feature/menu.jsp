@@ -46,6 +46,12 @@
 							<s:text name="lbl.hdr.comp.featrs.jslib"/>
 						</a>
 					</li>
+					<li>
+						<a href="#" class="inactive" id="technologies" name="featureTab" additionalParam="type=<%= Type.COMPONENT.name() %>">
+							<s:text name="lbl.hdr.comp.component"/>
+						</a>
+					<li>
+					
 				</ul>
 			</div>
 		</nav>
