@@ -22,6 +22,11 @@ package com.photon.phresco.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.ValidatorFactory;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
@@ -109,29 +114,6 @@ public class DbService implements ServiceConstants {
 		return appConverter.convertDAOToObject(applicationInfoDAO, mongoOperation);
 	}
 	
-	protected ArtifactGroup createArticatGroupURL(ArtifactGroup artifactGroup) {
-		List<ArtifactInfo> newVersions = new ArrayList<ArtifactInfo>();
-		if(CollectionUtils.isEmpty(artifactGroup.getVersions())) {
-			return artifactGroup;
-		}
-		List<ArtifactInfo> actualVersions = artifactGroup.getVersions();
-		String customerId = artifactGroup.getCustomerIds().get(0);
-		for (ArtifactInfo artifactInfo : actualVersions) {
-			String downloadURL = createDownloadURL(artifactGroup.getGroupId(), artifactGroup.getArtifactId(), 
-					artifactGroup.getPackaging(), artifactInfo.getVersion(), customerId);
-			artifactInfo.setDownloadURL(downloadURL);
-			newVersions.add(artifactInfo);
-		}
-		artifactGroup.setVersions(newVersions);
-		return artifactGroup;
-	}
-
-	private String createDownloadURL(String groupId, String artifactId, String packaging, String version, String customerId) {
-		Customer customer = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME, new Query(Criteria.whereId().is(customerId)), Customer.class);
-		String repoGroupURL = customer.getRepoInfo().getGroupRepoURL();
-		return repoGroupURL + ServerUtil.createContentURL(groupId, artifactId, version, packaging);
-	}
-	
 	protected long count(String collection, Query query ) {  
         return mongoOperation.executeCommand(
             "{ " +
@@ -139,4 +121,18 @@ public class DbService implements ServiceConstants {
                 "\"query\" : " + query.getQueryObject().toString() + 
             " }"  ).getLong( "n" );
     }
+	
+	protected boolean validate(Object object) throws PhrescoException {
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		javax.validation.Validator validator = factory.getValidator();
+		Set<ConstraintViolation<Object>> constraintViolations = validator.validate(object);
+		if (constraintViolations.isEmpty()) {
+			return true;
+		}
+		for (ConstraintViolation<Object> constraintViolation : constraintViolations) {
+			throw new PhrescoException(constraintViolation.getMessage());
+		}
+		return false;
+	}
+
 }

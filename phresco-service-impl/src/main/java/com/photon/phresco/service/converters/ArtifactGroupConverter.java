@@ -19,8 +19,10 @@
  */
 package com.photon.phresco.service.converters;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.document.mongodb.MongoOperations;
 import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Order;
@@ -28,16 +30,20 @@ import org.springframework.data.document.mongodb.query.Query;
 
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactInfo;
+import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
+import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.ServiceConstants;
 
 public class ArtifactGroupConverter implements Converter<ArtifactGroupDAO, ArtifactGroup>, ServiceConstants {
-
+	
+	private MongoOperations mongoOperation  = null;
 	@Override
     public ArtifactGroup convertDAOToObject(ArtifactGroupDAO artifactGroupDAO,
             MongoOperations mongoOperation) throws PhrescoException {
+		this.mongoOperation = mongoOperation;
         ArtifactGroup artifactGroup = new ArtifactGroup();
         artifactGroup.setArtifactId(artifactGroupDAO.getArtifactId());
         artifactGroup.setClassifier(artifactGroupDAO.getClassifier());
@@ -60,6 +66,7 @@ public class ArtifactGroupConverter implements Converter<ArtifactGroupDAO, Artif
         		query , ArtifactInfo.class);
         artifactGroup.setVersions(versions);
         artifactGroup.setLicenseId(artifactGroupDAO.getLicenseId());
+        createArticatGroupURL(artifactGroup);
         return artifactGroup;
     }
 
@@ -82,17 +89,30 @@ public class ArtifactGroupConverter implements Converter<ArtifactGroupDAO, Artif
         artifactGroupDAO.setAppliesTo(artifactGroup.getAppliesTo());
         artifactGroupDAO.setHelpText(artifactGroup.getHelpText());
         artifactGroupDAO.setLicenseId(artifactGroup.getLicenseId());
-//        List<ArtifactInfo> versions = artifactGroup.getVersions();
-//        artifactGroupDAO.setVersionIds(createVersionIds(versions));
         return artifactGroupDAO;
     }
-
-//	private List<String> createVersionIds(List<ArtifactInfo> versions) {
-//		List<String> versionIds = new ArrayList<String>();
-//		for (ArtifactInfo artifactInfo : versions) {
-//			versionIds.add(artifactInfo.getId());
-//		}
-//		return versionIds;
-//	}
+    
+    private ArtifactGroup createArticatGroupURL(ArtifactGroup artifactGroup) {
+		List<ArtifactInfo> newVersions = new ArrayList<ArtifactInfo>();
+		if(CollectionUtils.isEmpty(artifactGroup.getVersions())) {
+			return artifactGroup;
+		}
+		List<ArtifactInfo> actualVersions = artifactGroup.getVersions();
+		String customerId = artifactGroup.getCustomerIds().get(0);
+		for (ArtifactInfo artifactInfo : actualVersions) {
+			String downloadURL = createDownloadURL(artifactGroup.getGroupId(), artifactGroup.getArtifactId(), 
+					artifactGroup.getPackaging(), artifactInfo.getVersion(), customerId);
+			artifactInfo.setDownloadURL(downloadURL);
+			newVersions.add(artifactInfo);
+		}
+		artifactGroup.setVersions(newVersions);
+		return artifactGroup;
+	}
+    
+	private String createDownloadURL(String groupId, String artifactId, String packaging, String version, String customerId) {
+		Customer customer = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME, new Query(Criteria.whereId().is(customerId)), Customer.class);
+		String repoGroupURL = customer.getRepoInfo().getGroupRepoURL();
+		return repoGroupURL + ServerUtil.createContentURL(groupId, artifactId, version, packaging);
+	}
 
 }

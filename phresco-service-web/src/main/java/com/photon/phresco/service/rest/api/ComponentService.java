@@ -293,19 +293,6 @@ public class ComponentService extends DbService {
 
 			for (TechnologyDAO technologyDAO : techDAOList) {
 				Technology technology = technologyConverter.convertDAOToObject(technologyDAO, mongoOperation);
-				if(technology.getArchetypeInfo() != null) {
-					ArtifactGroup archetypecontent = createArticatGroupURL(technology.getArchetypeInfo());
-					technology.setArchetypeInfo(archetypecontent);
-				}
-				if(CollectionUtils.isNotEmpty(technology.getPlugins())) {
-					List<ArtifactGroup> plugins = new ArrayList<ArtifactGroup>();
-					for (ArtifactGroup plugArtifactGroup : technology.getPlugins()) {
-						if(plugArtifactGroup != null) {
-							plugins.add(createArticatGroupURL(plugArtifactGroup));
-						}
-					}
-					technology.setPlugins(plugins);
-				}
 				techList.add(technology);
 			}
 			
@@ -780,7 +767,6 @@ public class ComponentService extends DbService {
 	    List<ArtifactGroup> modules = new ArrayList<ArtifactGroup>();
 	    for (ArtifactGroupDAO artifactGroupDAO : moduleDAOs) {
 			ArtifactGroup artifactGroup = artifactConverter.convertDAOToObject(artifactGroupDAO, mongoOperation);
-			artifactGroup = createArticatGroupURL(artifactGroup);
 			modules.add(artifactGroup);
 		}
         return modules;
@@ -1058,20 +1044,12 @@ public class ComponentService extends DbService {
                 appInfos = mongoOperation.find(APPLICATION_INFO_COLLECTION_NAME, query, ApplicationInfoDAO.class);
                 for (ApplicationInfoDAO applicationInfoDAO : appInfos) {
 	               	 ApplicationInfo applicationInfo = pilotConverter.convertDAOToObject(applicationInfoDAO, mongoOperation);
-		               	if(applicationInfo.getPilotContent() != null) {
-	               		 ArtifactGroup pilotContent = createArticatGroupURL(applicationInfo.getPilotContent());
-	               		 applicationInfo.setPilotContent(pilotContent);
-		               	}
 	                 applicationInfos.add(applicationInfo);
 					}
             } else {
                 appInfos = mongoOperation.find(APPLICATION_INFO_COLLECTION_NAME, query, ApplicationInfoDAO.class);
                 for (ApplicationInfoDAO applicationInfoDAO : appInfos) {
                 	 ApplicationInfo applicationInfo = pilotConverter.convertDAOToObject(applicationInfoDAO, mongoOperation);
-                	 if(applicationInfo.getPilotContent() != null) {
-                		 ArtifactGroup pilotContent = createArticatGroupURL(applicationInfo.getPilotContent());
-                		 applicationInfo.setPilotContent(pilotContent);
-                	 }
                 	 applicationInfos.add(applicationInfo);
 				}
             }
@@ -1449,12 +1427,11 @@ public class ComponentService extends DbService {
             		(Converter<DownloadsDAO, DownloadInfo>) ConvertersFactory.getConverter(DownloadsDAO.class);
             	for (DownloadsDAO downloadsDAO : downloadList) {
 					DownloadInfo downloadInfo = downloadConverter.convertDAOToObject(downloadsDAO, mongoOperation);
-					ArtifactGroup artifactGroup = createArticatGroupURL(downloadInfo.getArtifactGroup());
-					downloadInfo.setArtifactGroup(artifactGroup);
 					downloads.add(downloadInfo);
 				}
             } 
         } catch (Exception e) {
+        	e.printStackTrace();
             throw new PhrescoWebServiceException(e, EX_PHEX00006, DOWNLOAD_COLLECTION_NAME);
         }
         ResponseBuilder response = Response.status(Response.Status.OK);
