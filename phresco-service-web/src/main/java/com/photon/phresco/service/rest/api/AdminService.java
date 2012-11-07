@@ -62,10 +62,7 @@ import com.photon.phresco.service.dao.ArtifactGroupDAO;
 import com.photon.phresco.service.dao.VideoInfoDAO;
 import com.photon.phresco.service.dao.VideoTypeDAO;
 import com.photon.phresco.service.impl.DbService;
-import com.photon.phresco.service.model.ArtifactInfo;
-import com.photon.phresco.service.model.ServerConfiguration;
 import com.photon.phresco.service.util.ServerUtil;
-import com.photon.phresco.util.FileUtil;
 import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -99,7 +96,7 @@ public class AdminService extends DbService {
     @GET
     @Path (REST_API_CUSTOMERS)
     @Produces (MediaType.APPLICATION_JSON)
-    public Response findCustomer() throws PhrescoWebServiceException {
+    public Response findCustomer() {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.findCustomer()");
         }
@@ -122,7 +119,7 @@ public class AdminService extends DbService {
     @POST
     @Consumes (MediaType.APPLICATION_JSON)
     @Path (REST_API_CUSTOMERS)
-    public Response createCustomer(List<Customer> customers) throws PhrescoWebServiceException {
+    public Response createCustomer(List<Customer> customers) {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.createCustomer(List<Customer> customer)");
         }
@@ -135,7 +132,7 @@ public class AdminService extends DbService {
         				repoInfo = repositoryManager.createCustomerRepository(customer.getId(), repoName);
         				customer.setRepoInfo(repoInfo);
         			}
-    		        mongoOperation.save(CUSTOMERDAO_COLLECTION_NAME, customer);
+    		        mongoOperation.insert(CUSTOMERDAO_COLLECTION_NAME, customer);
     			}
     		}
     	} catch (Exception e) {
@@ -154,7 +151,7 @@ public class AdminService extends DbService {
     @Consumes (MediaType.APPLICATION_JSON)
     @Produces (MediaType.APPLICATION_JSON)
     @Path (REST_API_CUSTOMERS)
-    public Response updateCustomer(List<Customer> customers) throws PhrescoWebServiceException {
+    public Response updateCustomer(List<Customer> customers) {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.updateCustomer(List<Customer> customers)");
         }
@@ -199,7 +196,7 @@ public class AdminService extends DbService {
     @GET
     @Produces (MediaType.APPLICATION_JSON)
     @Path (REST_API_CUSTOMERS + REST_API_PATH_ID)
-    public Response getCustomer(@PathParam(REST_API_PATH_PARAM_ID) String id) throws PhrescoWebServiceException {
+    public Response getCustomer(@PathParam(REST_API_PATH_PARAM_ID) String id) {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.getCustomer(String id)" + id);
         }
@@ -226,8 +223,7 @@ public class AdminService extends DbService {
     @Consumes (MediaType.APPLICATION_JSON)
     @Produces (MediaType.APPLICATION_JSON)
     @Path (REST_API_CUSTOMERS + REST_API_PATH_ID)
-    public Response updateCustomer(@PathParam(REST_API_PATH_PARAM_ID) String id , 
-    		Customer updateCustomers) throws PhrescoWebServiceException {
+    public Response updateCustomer(@PathParam(REST_API_PATH_PARAM_ID) String id , Customer updateCustomers) {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.updateCustomer(String id , Customer updateCustomers)" + id);
         }
@@ -252,7 +248,7 @@ public class AdminService extends DbService {
      */
     @DELETE
     @Path (REST_API_CUSTOMERS + REST_API_PATH_ID)
-    public Response deleteCustomer(@PathParam(REST_API_PATH_PARAM_ID) String id) throws PhrescoWebServiceException {
+    public Response deleteCustomer(@PathParam(REST_API_PATH_PARAM_ID) String id) {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.deleteCustomer(String id)" + id);
         }
@@ -274,7 +270,7 @@ public class AdminService extends DbService {
 	@GET
 	@Path (REST_API_VIDEOS)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findVideos() throws PhrescoWebServiceException {
+	public Response findVideos() {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.findVideos()");
 	    }
@@ -306,7 +302,7 @@ public class AdminService extends DbService {
 	@POST
 	@Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
 	@Path (REST_API_VIDEOS)
-	public Response createVideo(MultiPart videosinfo) throws PhrescoWebServiceException {
+	public Response createVideo(MultiPart videosinfo) throws PhrescoException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.createVideo(List<VideoInfo> videos)");
 	    }
@@ -314,7 +310,7 @@ public class AdminService extends DbService {
 	}
 
 	private Response createOrUpdateVideo(MultiPart videosinfo)
-		throws PhrescoWebServiceException {
+			throws PhrescoException {
 		VideoInfo video = null;
 		BodyPartEntity bodyPartEntity = null;
 		File videoFile = null;
@@ -336,20 +332,16 @@ public class AdminService extends DbService {
 		}
 
 		if(bodyPartEntity != null) {
-			try {
-				videoFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null, video.getVideoList().get(0).getArtifactGroup().getPackaging());
-				List<VideoType> videoTypeList = video.getVideoList();
-				for (VideoType videoType : videoTypeList) {
-						ArtifactGroup artifactGroup = videoType.getArtifactGroup();
-					if (artifactGroup != null) {
-						boolean uploadBinary = uploadBinary(artifactGroup, videoFile);
-						if (uploadBinary) {
-							saveVideos(video);
-						}
+			videoFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null, video.getVideoList().get(0).getArtifactGroup().getPackaging());
+			List<VideoType> videoTypeList = video.getVideoList();
+			for (VideoType videoType : videoTypeList) {
+					ArtifactGroup artifactGroup = videoType.getArtifactGroup();
+				if (artifactGroup != null) {
+					boolean uploadBinary = uploadBinary(artifactGroup, videoFile);
+					if (uploadBinary) {
+						saveVideos(video);
 					}
 				}
-			} catch (PhrescoException e) {
-				throw new PhrescoWebServiceException(e);
 			}
 		}
 		
@@ -360,22 +352,13 @@ public class AdminService extends DbService {
 		return Response.status(Response.Status.OK).entity(video).build();
 	}
 
-	private void saveVideos(VideoInfo video) throws PhrescoWebServiceException {
-		try {
-			if(!validate(video)) {
-				return;
-			}
-		} catch (PhrescoException e) {
-			throw new PhrescoWebServiceException(e);
+	private void saveVideos(VideoInfo video) throws PhrescoException {
+		if(!validate(video)) {
+			return;
 		}
 		Converter<VideoInfoDAO, VideoInfo> converter = 
 	            (Converter<VideoInfoDAO, VideoInfo>) ConvertersFactory.getConverter(VideoInfoDAO.class);
-		VideoInfoDAO videoDAO = null;
-		try {
-			videoDAO = converter.convertObjectToDAO(video);
-		} catch (PhrescoException e) {
-			throw new PhrescoWebServiceException(e);
-		}
+		VideoInfoDAO videoDAO = converter.convertObjectToDAO(video);
 //		mongoOperation.save(VIDEODAO_COLLECTION_NAME, videoDAO);
 		List<String> videoTypeIds = new ArrayList<String>();
 		Converter<VideoTypeDAO, VideoType> videoTypeConverter = 
@@ -383,25 +366,16 @@ public class AdminService extends DbService {
 		List<VideoType> videoTypes = video.getVideoList();
 		for(VideoType videoType : videoTypes){
 			videoTypeIds.add(videoType.getId());
-			VideoTypeDAO videoTypeDAO;
-			try {
-				videoTypeDAO = videoTypeConverter.convertObjectToDAO(videoType);
-				VideoTypeDAO findOne = mongoOperation.findOne(VIDEOTYPESDAO_COLLECTION_NAME, 
-						new Query(Criteria.where(REST_API_NAME).is(videoTypeDAO.getName())), VideoTypeDAO.class);
-				if(findOne!=null){
-					videoTypeDAO.setArtifactGroupId(findOne.getArtifactGroupId());
-					videoTypeDAO.setId(findOne.getId());
-				}
-
-			} catch (PhrescoException e) {
-				throw new PhrescoWebServiceException(e);
+			VideoTypeDAO videoTypeDAO = videoTypeConverter.convertObjectToDAO(videoType);
+			
+			VideoTypeDAO findOne = mongoOperation.findOne(VIDEOTYPESDAO_COLLECTION_NAME, 
+					new Query(Criteria.where(REST_API_NAME).is(videoTypeDAO.getName())), VideoTypeDAO.class);
+			if(findOne!=null){
+				videoTypeDAO.setArtifactGroupId(findOne.getArtifactGroupId());
+				videoTypeDAO.setId(findOne.getId());
 			}
 			ArtifactGroup artifactGroup = videoType.getArtifactGroup();
-			try {
-				saveModuleGroup(artifactGroup);
-			} catch (PhrescoException e) {
-				throw new PhrescoWebServiceException(e);
-			}
+			saveModuleGroup(artifactGroup);
 			mongoOperation.save(VIDEOTYPESDAO_COLLECTION_NAME, videoTypeDAO);
 		}
 		videoDAO.setVideoListId(videoTypeIds);
@@ -466,7 +440,7 @@ public class AdminService extends DbService {
 	@Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_VIDEOS)
-	public Response updateVideos(MultiPart videos) throws PhrescoWebServiceException {
+	public Response updateVideos(MultiPart videos) throws PhrescoException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.updateVideos(List<VideoInfo> videos)");
 	    }
@@ -498,7 +472,7 @@ public class AdminService extends DbService {
 	@GET
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_VIDEOS + REST_API_PATH_ID)
-	public Response getVideo(@PathParam(REST_API_PATH_PARAM_ID) String id) throws PhrescoWebServiceException {
+	public Response getVideo(@PathParam(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.getVideo(String id)" + id);
 	    }
@@ -529,11 +503,11 @@ public class AdminService extends DbService {
 	@Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_VIDEOS + REST_API_PATH_ID)
-	public Response updateVideo(@PathParam(REST_API_PATH_PARAM_ID) String id , MultiPart videoInfo) throws PhrescoWebServiceException {
+	public Response updateVideo(@PathParam(REST_API_PATH_PARAM_ID) String id , MultiPart videoInfo) throws PhrescoException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.updateVideo(String id , VideoInfo videoInfo)" + id);
 	    }
-		return createOrUpdateVideo(videoInfo);
+				return createOrUpdateVideo(videoInfo);
 	}
 
 	
@@ -544,7 +518,7 @@ public class AdminService extends DbService {
 	 */
 	@DELETE
 	@Path(REST_API_VIDEOS + REST_API_PATH_ID)
-	public Response deleteVideo(@PathParam(REST_API_PATH_PARAM_ID) String id) throws PhrescoWebServiceException {
+	public Response deleteVideo(@PathParam(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.deleteVideo(String id)" + id);
 	    }
@@ -588,7 +562,7 @@ public class AdminService extends DbService {
 	@GET
 	@Path (REST_API_USERS)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findUsers() throws PhrescoWebServiceException {
+	public Response findUsers() {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.findUsers()");
 	    }
@@ -613,7 +587,7 @@ public class AdminService extends DbService {
 	@POST
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Path (REST_API_USERS)
-	public Response createUser(List<User> users) throws PhrescoWebServiceException {
+	public Response createUser(List<User> users) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.createUser(List<User> users)");
 	    }
@@ -645,23 +619,20 @@ public class AdminService extends DbService {
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_USERS_IMPORT)
-	public Response importUsers(User user) throws PhrescoWebServiceException {
+	public Response importUsers(User user) throws PhrescoException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.createUser(List<User> users)");
 	    }
-	    List<User> users = null;
-	    try {
-			PhrescoServerFactory.initialize();
-			RepositoryManager repoMgr = PhrescoServerFactory.getRepositoryManager();
-	    	Client client = ClientHelper.createClient();
-	    	WebResource resource = client.resource(repoMgr.getAuthServiceURL() + "/ldap/import");
-	    	resource.accept(MediaType.APPLICATION_JSON);
-	        ClientResponse response = resource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, user);
-	        GenericType<List<User>> genericType = new GenericType<List<User>>() {};
-	        users = response.getEntity(genericType);
-		} catch (PhrescoException e) {
-			throw new PhrescoWebServiceException(e);
-		}
+	    PhrescoServerFactory.initialize();
+        RepositoryManager repoMgr = PhrescoServerFactory.getRepositoryManager();
+    	Client client = ClientHelper.createClient();
+        WebResource resource = client.resource(repoMgr.getAuthServiceURL() + "/ldap/import");
+        resource.accept(MediaType.APPLICATION_JSON);
+        ClientResponse response = resource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, user);
+        GenericType<List<User>> genericType = new GenericType<List<User>>() {};
+        List<User> users = response.getEntity(genericType);
+        
+        //To save the users into user table
         mongoOperation.insertList(USERS_COLLECTION_NAME, users);
 		return Response.status(Response.Status.OK).entity(users).build();
 	}
@@ -676,7 +647,7 @@ public class AdminService extends DbService {
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_USERS)
-	public Response updateUsers(List<User> users) throws PhrescoWebServiceException {
+	public Response updateUsers(List<User> users) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.updateUsers(List<User> users)");
 	    }
@@ -721,7 +692,7 @@ public class AdminService extends DbService {
 	@GET
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_USERS + REST_API_PATH_ID)
-	public Response getUser(@PathParam(REST_API_PATH_PARAM_ID) String id) throws PhrescoWebServiceException {
+	public Response getUser(@PathParam(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.getUser(String id)" + id);
 	    }
@@ -748,7 +719,7 @@ public class AdminService extends DbService {
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_USERS + REST_API_PATH_ID)
-	public Response updateUser(@PathParam(REST_API_PATH_PARAM_ID) String id , User user) throws PhrescoWebServiceException {
+	public Response updateUser(@PathParam(REST_API_PATH_PARAM_ID) String id , User user) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.updateUser(String id , User user)" + id);
 	    }
@@ -772,7 +743,7 @@ public class AdminService extends DbService {
 	 */
 	@DELETE
 	@Path (REST_API_USERS + REST_API_PATH_ID)
-	public Response deleteUser(@PathParam(REST_API_PATH_PARAM_ID) String id) throws PhrescoWebServiceException {
+	public Response deleteUser(@PathParam(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.deleteUser(String id)" + id);
 	    }
@@ -793,7 +764,7 @@ public class AdminService extends DbService {
 	@GET
 	@Path (REST_API_ROLES)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findRoles() throws PhrescoWebServiceException {
+	public Response findRoles() {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.findRoles()");
 	    }
@@ -818,7 +789,7 @@ public class AdminService extends DbService {
 	@POST
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Path (REST_API_ROLES)
-	public Response createRoles(List<Role> roles) throws PhrescoWebServiceException {
+	public Response createRoles(List<Role> roles) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.createRoles(List<Role> roles)");
 	    }
@@ -845,7 +816,7 @@ public class AdminService extends DbService {
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_ROLES)
-	public Response updateRoles(List<Role> roles) throws PhrescoWebServiceException {
+	public Response updateRoles(List<Role> roles) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.updateRoles(List<Role> roles)");
 	    }
@@ -890,7 +861,7 @@ public class AdminService extends DbService {
 	@GET
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_ROLES + REST_API_PATH_ID)
-	public Response getRole(@PathParam(REST_API_PATH_PARAM_ID) String id) throws PhrescoWebServiceException {
+	public Response getRole(@PathParam(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.Response getRole(String id)" + id);
 	    }
@@ -917,7 +888,7 @@ public class AdminService extends DbService {
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_ROLES + REST_API_PATH_ID)
-	public Response updateRole(@PathParam(REST_API_PATH_PARAM_ID) String id , Role role) throws PhrescoWebServiceException {
+	public Response updateRole(@PathParam(REST_API_PATH_PARAM_ID) String id , Role role) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.updateRole(String id , Role role)" + id);
 	    }
@@ -941,7 +912,7 @@ public class AdminService extends DbService {
 	 */
 	@DELETE
 	@Path (REST_API_ROLES + REST_API_PATH_ID)
-	public Response deleteRole(@PathParam(REST_API_PATH_PARAM_ID) String id) throws PhrescoWebServiceException {
+	public Response deleteRole(@PathParam(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.deleteRole(String id)" + id);
 	    }
@@ -963,7 +934,7 @@ public class AdminService extends DbService {
 	@GET
 	@Path (REST_API_PERMISSIONS)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findPermissions() throws PhrescoWebServiceException {
+	public Response findPermissions() {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.findPermissions()");
 	    }
@@ -988,7 +959,7 @@ public class AdminService extends DbService {
 	@POST
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Path (REST_API_PERMISSIONS)
-	public Response createPermission(List<Permission> permissions) throws PhrescoWebServiceException {
+	public Response createPermission(List<Permission> permissions) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.createPermission(List<Permission> permissions)");
 	    }
@@ -1015,7 +986,7 @@ public class AdminService extends DbService {
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_PERMISSIONS)
-	public Response updatePermissions(List<Permission> permissions) throws PhrescoWebServiceException {
+	public Response updatePermissions(List<Permission> permissions) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.updatePermissions(List<Permission> permissions)");
 	    }
@@ -1060,7 +1031,7 @@ public class AdminService extends DbService {
 	@GET
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_PERMISSIONS + REST_API_PATH_ID)
-	public Response getPermission(@PathParam(REST_API_PATH_PARAM_ID) String id) throws PhrescoWebServiceException {
+	public Response getPermission(@PathParam(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.Response getPermission(String id)" + id);
 	    }
@@ -1087,7 +1058,7 @@ public class AdminService extends DbService {
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_PERMISSIONS + REST_API_PATH_ID)
-	public Response updatePermission(@PathParam(REST_API_PATH_PARAM_ID) String id , Permission permission) throws PhrescoWebServiceException {
+	public Response updatePermission(@PathParam(REST_API_PATH_PARAM_ID) String id , Permission permission) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.updatePermission(String id , Permission permission)" + id);
 	    }
@@ -1111,7 +1082,7 @@ public class AdminService extends DbService {
 	 */
 	@DELETE
 	@Path (REST_API_PERMISSIONS + REST_API_PATH_ID)
-	public Response deletePermission(@PathParam(REST_API_PATH_PARAM_ID) String id) throws PhrescoWebServiceException {
+	public Response deletePermission(@PathParam(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.deletePermission(String id)" + id);
 	    }
@@ -1133,7 +1104,7 @@ public class AdminService extends DbService {
 	@POST
 	@Consumes (MediaType.APPLICATION_JSON)
     @Path (REST_API_FORUMS)
-    public Response createForum(List<Property> adminConfigInfo) throws PhrescoWebServiceException {
+    public Response createForum(List<Property> adminConfigInfo) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.createForum(List<AdminConfigInfo> adminConfigInfo)");
 	    }
@@ -1159,7 +1130,7 @@ public class AdminService extends DbService {
     @GET
     @Produces (MediaType.APPLICATION_JSON)
     @Path (REST_API_FORUMS)
-    public Response getForum(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) throws PhrescoWebServiceException {
+    public Response getForum(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.getForum(String id)");
         }
