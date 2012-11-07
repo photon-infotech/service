@@ -111,9 +111,9 @@ public class GlobalUrlAction extends ServiceBaseAction {
 	
 	private Property createGlobalURL() {
 		Property globalUrl = new Property();
-		if (StringUtils.isNotEmpty(getFromPage())) {
-			globalUrl.setId(getGlobalurlId());
-		}
+//		if (StringUtils.isNotEmpty(getFromPage())) {
+//			globalUrl.setId(getGlobalurlId());
+//		}
 		globalUrl.setName(getName());
 		globalUrl.setDescription(getDescription());
 		globalUrl.setKey(globalUrl.getId());

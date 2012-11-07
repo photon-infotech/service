@@ -107,7 +107,7 @@ public class ComponentService extends DbService {
 	@GET
 	@Path (REST_API_APPTYPES)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findAppTypes(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) throws PhrescoException {
+	public Response findAppTypes(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.findAppTypes()");
 	    }
@@ -135,18 +135,14 @@ public class ComponentService extends DbService {
 	@POST
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Path (REST_API_APPTYPES)
-	public Response createAppTypes(List<ApplicationType> appTypes) throws PhrescoException {
+	public Response createAppTypes(List<ApplicationType> appTypes) throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.createAppTypes(List<ApplicationType> appTypes)");
         }
-	    
-		try {
-			mongoOperation.insertList(APPTYPES_COLLECTION_NAME , appTypes);
-		} catch (Exception e) {
-			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
+	    for (ApplicationType applicationType : appTypes) {
+			createArtifact(APPTYPES_COLLECTION_NAME, applicationType);
 		}
-		
-		return Response.status(Response.Status.CREATED).build();
+	    return Response.status(Response.Status.CREATED).build();
 	}
 	
 	/**
@@ -162,7 +158,6 @@ public class ComponentService extends DbService {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.updateAppTypes(List<ApplicationType> appTypes)");
 	    }
-		
 	    try {
 	        for (ApplicationType applicationType : appTypes) {
 	            mongoOperation.save(APPTYPES_COLLECTION_NAME , applicationType);
@@ -200,7 +195,7 @@ public class ComponentService extends DbService {
 	@GET
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_APPTYPES + REST_API_PATH_ID)
-	public Response getApptype(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	public Response getApptype(@PathParam(REST_API_PATH_PARAM_ID) String id) throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.getApptype(String id)" + id);
 	    }
@@ -227,12 +222,11 @@ public class ComponentService extends DbService {
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_APPTYPES + REST_API_PATH_ID)
-	public Response updateAppType(@PathParam(REST_API_PATH_PARAM_ID) String id , ApplicationType appType) throws PhrescoException {
+	public Response updateAppType(@PathParam(REST_API_PATH_PARAM_ID) String id , ApplicationType appType) throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.updateAppType(String id , ApplicationType appType)" + id);
 	    }
 		
-	    //TODO:Need to check if it is used.
 		try {
 	        mongoOperation.save(APPTYPES_COLLECTION_NAME, appType);
 		} catch (Exception e) {
@@ -249,7 +243,7 @@ public class ComponentService extends DbService {
 	 */
 	@DELETE
 	@Path (REST_API_APPTYPES + REST_API_PATH_ID)
-	public Response deleteAppType(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	public Response deleteAppType(@PathParam(REST_API_PATH_PARAM_ID) String id) throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.deleteAppType(String id)" + id);
 	    }
@@ -260,7 +254,6 @@ public class ComponentService extends DbService {
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
 		}
-		
 		return Response.status(Response.Status.OK).build();
 	}
 	
@@ -271,7 +264,7 @@ public class ComponentService extends DbService {
 	@GET
 	@Path (REST_API_TECHNOLOGIES)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findTechnologies(@QueryParam(REST_QUERY_CUSTOMERID) String customerId, @QueryParam(REST_QUERY_APPTYPEID) String appTypeId) {
+	public Response findTechnologies(@QueryParam(REST_QUERY_CUSTOMERID) String customerId, @QueryParam(REST_QUERY_APPTYPEID) String appTypeId) throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.findTechnologies() " + customerId);
 	    }
@@ -319,7 +312,7 @@ public class ComponentService extends DbService {
 	@POST
 	@Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
 	@Path (REST_API_TECHNOLOGIES)
-	public Response createTechnologies(MultiPart multiPart) throws PhrescoException, IOException {
+	public Response createTechnologies(MultiPart multiPart) throws PhrescoException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.createTechnologies(List<Technology> technologies)");
 	    }
@@ -399,36 +392,6 @@ public class ComponentService extends DbService {
     	}
 	}
 	
-    /**
-     * Upload binaries using the given artifact info
-     * @param archetypeInfo
-     * @param artifactFile
-     * @param customerId
-     * @return
-     * @throws PhrescoException
-     */
-    private boolean uploadBinary(ArtifactGroup archetypeInfo, File artifactFile) throws PhrescoException {
-    	
-        File pomFile = ServerUtil.createPomFile(archetypeInfo);
-        
-        //Assuming there will be only one version for the artifactGroup
-        List<com.photon.phresco.commons.model.ArtifactInfo> versions = archetypeInfo.getVersions();
-        com.photon.phresco.commons.model.ArtifactInfo artifactInfo = versions.get(0);
-        
-		ArtifactInfo info = new ArtifactInfo(archetypeInfo.getGroupId(), archetypeInfo.getArtifactId(), archetypeInfo.getClassifier(), 
-                archetypeInfo.getPackaging(), artifactInfo.getVersion());
-		
-        info.setPomFile(pomFile);
-        
-        List<String> customerIds = archetypeInfo.getCustomerIds();
-        String customerId = customerIds.get(0);
-        boolean addArtifact = repositoryManager.addArtifact(info, artifactFile, customerId);
-        FileUtil.delete(pomFile);
-        return addArtifact;
-    }
-    
-
-
     /**
 	 * Updates the list of technologies
 	 * @param technologies
@@ -782,7 +745,7 @@ public class ComponentService extends DbService {
     @Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
     @Produces (MediaType.APPLICATION_JSON)
     @Path (REST_API_MODULES)
-    public Response createModules(MultiPart moduleInfo) throws PhrescoException {
+    public Response createModules(MultiPart moduleInfo) throws PhrescoWebServiceException {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into ComponentService.createModules(List<ModuleGroup> modules)");
         }
@@ -791,7 +754,7 @@ public class ComponentService extends DbService {
     }
     
 	
-    private Response createOrUpdateFeatures(MultiPart moduleInfo) throws PhrescoException {
+    private Response createOrUpdateFeatures(MultiPart moduleInfo) throws PhrescoWebServiceException {
     	ArtifactGroup moduleGroup = null;
         File moduleFile = null;
         List<BodyPart> bodyParts = moduleInfo.getBodyParts();
@@ -817,32 +780,53 @@ public class ComponentService extends DbService {
         if (bodyPartEntityMap != null) {
         	BodyPartEntity bodyPartEntity = bodyPartEntityMap.get(Type.FEATURE.name());
         	if (bodyPartEntity != null) {
-        		moduleFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null, moduleGroup.getPackaging());
-        		boolean uploadBinary = uploadBinary(moduleGroup, moduleFile);
-                if (uploadBinary) {
-                	saveModuleGroup(moduleGroup);
-                }
-                FileUtil.delete(moduleFile);
+        		try {
+					moduleFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null, moduleGroup.getPackaging());
+					boolean uploadBinary = uploadBinary(moduleGroup, moduleFile);
+	                if (uploadBinary) {
+	                	saveModuleGroup(moduleGroup);
+	                }
+	                FileUtil.delete(moduleFile);
+				} catch (PhrescoException e) {
+					throw new PhrescoWebServiceException(e);
+				}
 			}
         	if(bodyPartEntityMap.get(Type.ICON.name()) != null) {
         		BodyPartEntity iconEntity = bodyPartEntityMap.get(Type.ICON.name());
-            	File iconFile = ServerUtil.writeFileFromStream(iconEntity.getInputStream(), null, "png");
-            	moduleGroup.setPackaging("png");
-        		boolean uploadBinary = uploadBinary(moduleGroup, iconFile);
-        		FileUtil.delete(iconFile);
-        		if(!uploadBinary) {
-        			throw new PhrescoException("Module Icon Uploading Failed...");
-        		}
+            	File iconFile;
+				try {
+					iconFile = ServerUtil.writeFileFromStream(iconEntity.getInputStream(), null, "png");
+					moduleGroup.setPackaging("png");
+	        		boolean uploadBinary = uploadBinary(moduleGroup, iconFile);
+	        		FileUtil.delete(iconFile);
+	        		if(!uploadBinary) {
+	        			throw new PhrescoException("Module Icon Uploading Failed...");
+	        		}
+				} catch (PhrescoException e) {
+					throw new PhrescoWebServiceException(e);
+				}
         	}
         }
         
         return Response.status(Response.Status.CREATED).entity(moduleGroup).build();
 	}
 
-	private void saveModuleGroup(ArtifactGroup moduleGroup) throws PhrescoException {
+	private void saveModuleGroup(ArtifactGroup moduleGroup) throws PhrescoWebServiceException {
+		try {
+			if(!validate(moduleGroup)) {
+				return;
+			}
+		} catch (PhrescoException e) {
+			throw new PhrescoWebServiceException(e);
+		}
         Converter<ArtifactGroupDAO, ArtifactGroup> converter = 
             (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
-        ArtifactGroupDAO moduleGroupDAO = converter.convertObjectToDAO(moduleGroup);
+        ArtifactGroupDAO moduleGroupDAO = null;
+		try {
+			moduleGroupDAO = converter.convertObjectToDAO(moduleGroup);
+		} catch (PhrescoException e) {
+			throw new PhrescoWebServiceException(e);
+		}
         
         List<com.photon.phresco.commons.model.ArtifactInfo> moduleGroupVersions = moduleGroup.getVersions();
         List<String> versionIds = new ArrayList<String>();
@@ -897,7 +881,7 @@ public class ComponentService extends DbService {
 	@Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_MODULES)
-	public Response updateModules(MultiPart multiPart) throws PhrescoException {
+	public Response updateModules(MultiPart multiPart) throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.updateModules(List<ModuleGroup> modules)");
 	    }
@@ -930,7 +914,7 @@ public class ComponentService extends DbService {
 	@GET
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_MODULES + REST_API_PATH_ID)
-	public Response getModule(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	public Response getModule(@PathParam(REST_API_PATH_PARAM_ID) String id) throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.getModule(String id)" + id);
 	    }
@@ -962,7 +946,7 @@ public class ComponentService extends DbService {
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_MODULES + REST_API_PATH_ID)
-	public Response updatemodule(@PathParam(REST_API_PATH_PARAM_ID) String id, ArtifactGroup module) {
+	public Response updatemodule(@PathParam(REST_API_PATH_PARAM_ID) String id, ArtifactGroup module) throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.updatemodule(String id , ModuleGroup module)" + id);
 	    }
@@ -986,14 +970,14 @@ public class ComponentService extends DbService {
 	 */
 	@DELETE
 	@Path (REST_API_MODULES + REST_API_PATH_ID)
-	public Response deleteModules(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	public Response deleteModules(@PathParam(REST_API_PATH_PARAM_ID) String id) throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.deleteModules(String id)" + id);
 	    }
 		return deleteVersion(id);
 	}
 	
-	private Response deleteVersion(String id) {
+	private Response deleteVersion(String id) throws PhrescoWebServiceException {
 		try {
 			com.photon.phresco.commons.model.ArtifactInfo artifactInfo =mongoOperation.findOne(ARTIFACT_INFO_COLLECTION_NAME, 
 					new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), com.photon.phresco.commons.model.ArtifactInfo.class);
@@ -1028,7 +1012,7 @@ public class ComponentService extends DbService {
 	@GET
 	@Path (REST_API_PILOTS)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findPilots(@QueryParam(REST_QUERY_CUSTOMERID) String customerId, @QueryParam(REST_QUERY_TECHID) String techId) {
+	public Response findPilots(@QueryParam(REST_QUERY_CUSTOMERID) String customerId, @QueryParam(REST_QUERY_TECHID) String techId) throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.findPilots()" + customerId);
 	    }
@@ -1071,7 +1055,7 @@ public class ComponentService extends DbService {
     @Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
     @Produces (MediaType.APPLICATION_JSON)
     @Path (REST_API_PILOTS)
-    public Response createPilots(MultiPart pilotInfo) throws PhrescoException {
+    public Response createPilots(MultiPart pilotInfo) throws PhrescoWebServiceException {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into ComponentService.createPilots(List<ProjectInfo> projectInfos)");
         }
@@ -1079,7 +1063,7 @@ public class ComponentService extends DbService {
         return createOrUpdatePilots(pilotInfo);
     }
     
-	private Response createOrUpdatePilots(MultiPart pilotInfo) throws PhrescoException {
+	private Response createOrUpdatePilots(MultiPart pilotInfo) throws PhrescoWebServiceException {
 		ApplicationInfo applicationInfo = null;
         BodyPartEntity bodyPartEntity = null;
         File pilotFile = null;
@@ -1096,13 +1080,17 @@ public class ComponentService extends DbService {
         }
         
         if(bodyPartEntity != null) {
-        	 pilotFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null, 
-             		applicationInfo.getPilotContent().getPackaging());
-             boolean uploadBinary = uploadBinary(applicationInfo.getPilotContent(), pilotFile);
-             if(uploadBinary) {
-             	saveApplicationInfo(applicationInfo);
-             } 
-             FileUtil.delete(pilotFile);
+        	 try {
+				pilotFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null, 
+				 		applicationInfo.getPilotContent().getPackaging());
+				boolean uploadBinary = uploadBinary(applicationInfo.getPilotContent(), pilotFile);
+	             if(uploadBinary) {
+	             	saveApplicationInfo(applicationInfo);
+	             } 
+	             FileUtil.delete(pilotFile);
+			} catch (PhrescoException e) {
+				throw new PhrescoWebServiceException(e);
+			}
         }
        
         
@@ -1112,13 +1100,25 @@ public class ComponentService extends DbService {
         return Response.status(Response.Status.CREATED).entity(applicationInfo).build();
 	}
 	
-	private void saveApplicationInfo(ApplicationInfo applicationInfo) throws PhrescoException {
+	private void saveApplicationInfo(ApplicationInfo applicationInfo) throws PhrescoWebServiceException {
+		try {
+			if(!validate(applicationInfo)) {
+				return;
+			}
+		} catch (PhrescoException e) {
+			throw new PhrescoWebServiceException(e);
+		}
 		ApplicationInfoDAO applicationInfoDAOs = mongoOperation.findOne(APPLICATION_INFO_COLLECTION_NAME, 
 				new Query(Criteria.where(REST_API_NAME).is(applicationInfo.getName())), ApplicationInfoDAO.class);
 		if(applicationInfoDAOs == null){
 			Converter<ApplicationInfoDAO, ApplicationInfo> appConverter = 
 			(Converter<ApplicationInfoDAO, ApplicationInfo>) ConvertersFactory.getConverter(ApplicationInfoDAO.class);
-			ApplicationInfoDAO applicationInfoDAO = appConverter.convertObjectToDAO(applicationInfo);
+			ApplicationInfoDAO applicationInfoDAO = null;
+			try {
+				applicationInfoDAO = appConverter.convertObjectToDAO(applicationInfo);
+			} catch (PhrescoException e) {
+				throw new PhrescoWebServiceException(e);
+			}
 			mongoOperation.save(APPLICATION_INFO_COLLECTION_NAME, applicationInfoDAO);
 			ArtifactGroup pilotContent = applicationInfo.getPilotContent();
 			saveModuleGroup(pilotContent);
@@ -1138,7 +1138,7 @@ public class ComponentService extends DbService {
 	@Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
     @Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_PILOTS)
-	public Response updatePilots(MultiPart pilotInfo) throws PhrescoException {
+	public Response updatePilots(MultiPart pilotInfo) throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.updatePilots(List<ProjectInfo> pilots)");
 	    }
@@ -1171,7 +1171,7 @@ public class ComponentService extends DbService {
 	@GET
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_PILOTS + REST_API_PATH_ID)
-	public Response getPilot(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	public Response getPilot(@PathParam(REST_API_PATH_PARAM_ID) String id) throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.getPilot(String id)" + id);
 	    }
@@ -1199,7 +1199,7 @@ public class ComponentService extends DbService {
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_PILOTS + REST_API_PATH_ID)
-	public Response updatePilot(@PathParam(REST_API_PATH_PARAM_ID) String id , ApplicationInfo pilot) {
+	public Response updatePilot(@PathParam(REST_API_PATH_PARAM_ID) String id , ApplicationInfo pilot) throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.updatePilot(String id, ProjectInfo pilot)" + id); 
 	    }
@@ -1223,7 +1223,7 @@ public class ComponentService extends DbService {
 	 */
 	@DELETE
 	@Path (REST_API_PILOTS + REST_API_PATH_ID)
-	public Response deletePilot(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	public Response deletePilot(@PathParam(REST_API_PATH_PARAM_ID) String id) throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.deletePilot(String id)" + id);
 	    }
@@ -1237,7 +1237,7 @@ public class ComponentService extends DbService {
 	@GET
 	@Path (REST_API_WEBSERVICES)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findWebServices(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
+	public Response findWebServices(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.findWebServices()");
 	    }
@@ -1265,7 +1265,11 @@ public class ComponentService extends DbService {
 	    }
 		
 		try {
-			mongoOperation.insertList(WEBSERVICES_COLLECTION_NAME , webServices);
+			for (WebService webService : webServices) {
+				if(validate(webService)) {
+					mongoOperation.save(WEBSERVICES_COLLECTION_NAME , webService);
+				}
+			}
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
 		}
@@ -1282,7 +1286,7 @@ public class ComponentService extends DbService {
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_WEBSERVICES)
-	public Response updateWebServices(List<WebService> webServices) {
+	public Response updateWebServices(List<WebService> webServices) throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.updateWebServices(List<WebService> webServices)");
 	    }
@@ -1327,7 +1331,7 @@ public class ComponentService extends DbService {
 	@GET
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_WEBSERVICES + REST_API_PATH_ID)
-	public Response getWebService(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	public Response getWebService(@PathParam(REST_API_PATH_PARAM_ID) String id) throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.getWebService(String id)" + id);
 	    }
@@ -1355,7 +1359,7 @@ public class ComponentService extends DbService {
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_WEBSERVICES + REST_API_PATH_ID)
-	public Response updateWebService(@PathParam(REST_API_PATH_PARAM_ID) String id , WebService webService) {
+	public Response updateWebService(@PathParam(REST_API_PATH_PARAM_ID) String id , WebService webService) throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.updateWebService(String id, WebService webService)" + id);
 	    }
@@ -1379,7 +1383,7 @@ public class ComponentService extends DbService {
 	 */
 	@DELETE
 	@Path (REST_API_WEBSERVICES + REST_API_PATH_ID)
-	public Response deleteWebService(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	public Response deleteWebService(@PathParam(REST_API_PATH_PARAM_ID) String id) throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.deleteWebService(String id)" + id);
 	    }
@@ -1402,7 +1406,7 @@ public class ComponentService extends DbService {
     @Path (REST_API_DOWNLOADS)
     @Produces (MediaType.APPLICATION_JSON)
     public Response findDownloadInfo(@QueryParam(REST_QUERY_CUSTOMERID) String customerId, 
-    		@QueryParam(REST_QUERY_TECHID) String techId, @QueryParam(REST_QUERY_TYPE) String type) {
+    		@QueryParam(REST_QUERY_TECHID) String techId, @QueryParam(REST_QUERY_TYPE) String type) throws PhrescoWebServiceException {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.findDownloadInfo()");
         }
@@ -1431,7 +1435,6 @@ public class ComponentService extends DbService {
 				}
             } 
         } catch (Exception e) {
-        	e.printStackTrace();
             throw new PhrescoWebServiceException(e, EX_PHEX00006, DOWNLOAD_COLLECTION_NAME);
         }
         ResponseBuilder response = Response.status(Response.Status.OK);
@@ -1450,7 +1453,7 @@ public class ComponentService extends DbService {
     @Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
     @Produces (MediaType.APPLICATION_JSON)
     @Path (REST_API_DOWNLOADS)
-    public Response createDownloads(MultiPart downloadPart) throws PhrescoException {
+    public Response createDownloads(MultiPart downloadPart) throws PhrescoWebServiceException {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into ComponentService.createModules(List<ModuleGroup> modules)");
         }
@@ -1458,7 +1461,7 @@ public class ComponentService extends DbService {
         return createOrUpdateDownloads(downloadPart);
     }
     
-    private Response createOrUpdateDownloads(MultiPart downloadPart) throws PhrescoException {
+    private Response createOrUpdateDownloads(MultiPart downloadPart) throws PhrescoWebServiceException {
     	DownloadInfo downloadInfo = null;
         BodyPartEntity bodyPartEntity = null;
         File downloadFile = null;
@@ -1476,12 +1479,16 @@ public class ComponentService extends DbService {
         }
 
         if(bodyPartEntity != null) {
-            downloadFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null,downloadInfo.getArtifactGroup().getPackaging());
-            boolean uploadBinary = uploadBinary(downloadInfo.getArtifactGroup(), downloadFile);
-            if(uploadBinary) {
-                saveDownloads(downloadInfo);
-            }
-            FileUtil.delete(downloadFile);
+            try {
+				downloadFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null,downloadInfo.getArtifactGroup().getPackaging());
+				boolean uploadBinary = uploadBinary(downloadInfo.getArtifactGroup(), downloadFile);
+	            if(uploadBinary) {
+	                saveDownloads(downloadInfo);
+	            }
+	            FileUtil.delete(downloadFile);
+			} catch (PhrescoException e) {
+				throw new PhrescoWebServiceException(e);
+			}
         }
         
         if(bodyPartEntity == null && downloadInfo != null) {
@@ -1492,13 +1499,25 @@ public class ComponentService extends DbService {
 		
 	}
 
-	private void saveDownloads(DownloadInfo info) throws PhrescoException {
+	private void saveDownloads(DownloadInfo info) throws PhrescoWebServiceException {
+		try {
+			if(!validate(info)) {
+				return;
+			}
+		} catch (PhrescoException e) {
+			throw new PhrescoWebServiceException(e);
+		}
 		DownloadsDAO downloadsDAO = mongoOperation.findOne(DOWNLOAD_COLLECTION_NAME, 
 				new Query(Criteria.where(REST_API_NAME).is(info.getName())), DownloadsDAO.class);
 		if(downloadsDAO == null) {
 			Converter<DownloadsDAO, DownloadInfo> downlodConverter = 
 					(Converter<DownloadsDAO, DownloadInfo>) ConvertersFactory.getConverter(DownloadsDAO.class);
-				DownloadsDAO downloadDAO = downlodConverter.convertObjectToDAO(info);
+				DownloadsDAO downloadDAO = null;
+				try {
+					downloadDAO = downlodConverter.convertObjectToDAO(info);
+				} catch (PhrescoException e) {
+					throw new PhrescoWebServiceException(e);
+				}
 				ArtifactGroup artifactGroup = info.getArtifactGroup();
 				saveModuleGroup(artifactGroup);
 				mongoOperation.save(DOWNLOAD_COLLECTION_NAME, downloadDAO);
@@ -1519,7 +1538,7 @@ public class ComponentService extends DbService {
     @Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
     @Produces (MediaType.APPLICATION_JSON)
     @Path (REST_API_DOWNLOADS)
-    public Response updateDownloadInfo(MultiPart multiPart) throws PhrescoException {
+    public Response updateDownloadInfo(MultiPart multiPart) throws PhrescoWebServiceException {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.updateDownloadInfo(List<DownloadInfo> downloads)");
         }
@@ -1552,7 +1571,7 @@ public class ComponentService extends DbService {
     @GET
     @Produces (MediaType.APPLICATION_JSON)
     @Path (REST_API_DOWNLOADS + REST_API_PATH_ID)
-    public Response getDownloadInfo(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+    public Response getDownloadInfo(@PathParam(REST_API_PATH_PARAM_ID) String id) throws PhrescoWebServiceException {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.getDownloadInfo(String id)" + id);
         }
@@ -1579,7 +1598,8 @@ public class ComponentService extends DbService {
     @Consumes (MediaType.APPLICATION_JSON)
     @Produces (MediaType.APPLICATION_JSON)
     @Path (REST_API_DOWNLOADS + REST_API_PATH_ID)
-    public Response updateDownloadInfo(@PathParam(REST_API_PATH_PARAM_ID) String id , DownloadInfo downloadInfo) {
+    public Response updateDownloadInfo(@PathParam(REST_API_PATH_PARAM_ID) String id , 
+    		DownloadInfo downloadInfo) throws PhrescoWebServiceException{
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.updateDownloadInfo(String id , DownloadInfo downloadInfos)" + id);
         }
@@ -1603,7 +1623,7 @@ public class ComponentService extends DbService {
      */
     @DELETE
     @Path (REST_API_DOWNLOADS + REST_API_PATH_ID)
-    public Response deleteDownloadInfo(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+    public Response deleteDownloadInfo(@PathParam(REST_API_PATH_PARAM_ID) String id) throws PhrescoWebServiceException {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.deleteDownloadInfo(String id)" + id);
         }
@@ -1617,7 +1637,7 @@ public class ComponentService extends DbService {
 	@GET
 	@Path (REST_API_PLATFORMS)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findPlatforms() {
+	public Response findPlatforms() throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.findPlatforms()");
 	    }
@@ -1637,7 +1657,7 @@ public class ComponentService extends DbService {
 	@GET
 	@Path (REST_API_REPORTS)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findReports(@QueryParam(REST_QUERY_TECHID) String techId) {
+	public Response findReports(@QueryParam(REST_QUERY_TECHID) String techId) throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.findReports(String techId)");
 	    }
@@ -1663,13 +1683,17 @@ public class ComponentService extends DbService {
 	@POST
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Path (REST_API_REPORTS)
-	public Response createReports(List<Reports> reports) {
+	public Response createReports(List<Reports> reports) throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.createReports(List<Reports> reports)");
 	    }
 		
 		try {
-			mongoOperation.insertList(REPORTS_COLLECTION_NAME , reports);
+			for (Reports report : reports) {
+				if(validate(report)) {
+					mongoOperation.save(REPORTS_COLLECTION_NAME , report);
+				}
+			}
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
 		}
@@ -1686,7 +1710,7 @@ public class ComponentService extends DbService {
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_REPORTS)
-	public Response updateReports(List<Reports> reports) {
+	public Response updateReports(List<Reports> reports) throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.updateReports(List<Reports> reports)");
 	    }
@@ -1727,7 +1751,7 @@ public class ComponentService extends DbService {
 	@GET
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_REPORTS + REST_API_PATH_ID)
-	public Response getReports(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	public Response getReports(@PathParam(REST_API_PATH_PARAM_ID) String id) throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.getReports(String id)" + id);
 	    }
@@ -1754,7 +1778,7 @@ public class ComponentService extends DbService {
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_REPORTS + REST_API_PATH_ID)
-	public Response updateReports(@PathParam(REST_API_PATH_PARAM_ID) String id , Reports reports) {
+	public Response updateReports(@PathParam(REST_API_PATH_PARAM_ID) String id , Reports reports) throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.updateReports(String id, Reports reports)" + id);
 	    }
@@ -1775,7 +1799,7 @@ public class ComponentService extends DbService {
 	 */
 	@DELETE
 	@Path (REST_API_REPORTS + REST_API_PATH_ID)
-	public Response deleteReports(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	public Response deleteReports(@PathParam(REST_API_PATH_PARAM_ID) String id) throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.deleteReportse(String id)" + id);
 	    }
@@ -1797,7 +1821,7 @@ public class ComponentService extends DbService {
 	@GET
 	@Path (REST_API_PROPERTY)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findProperties() {
+	public Response findProperties() throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.findProperties()");
 	    }
@@ -1817,14 +1841,20 @@ public class ComponentService extends DbService {
 	@POST
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Path (REST_API_PROPERTY)
-	public Response createProperties(List<Property> properties) {
+	public Response createProperties(List<Property> properties) throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.createProperties(List<Property> properties)");
 	    }
 		
 		try {
-			mongoOperation.insertList(PROPERTIES_COLLECTION_NAME , properties);
+			for (Property property : properties) {
+				System.out.println(property);
+				if(validate(property)) {
+					mongoOperation.save(PROPERTIES_COLLECTION_NAME , property);
+				}
+			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
 		}
 		
@@ -1840,7 +1870,7 @@ public class ComponentService extends DbService {
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_PROPERTY)
-	public Response updateProperties(List<Property> properties) {
+	public Response updateProperties(List<Property> properties) throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.updateProperties(List<Property> properties)");
 	    }
@@ -1881,7 +1911,7 @@ public class ComponentService extends DbService {
 	@GET
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_PROPERTY + REST_API_PATH_ID)
-	public Response getProperty(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	public Response getProperty(@PathParam(REST_API_PATH_PARAM_ID) String id) throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.getProperty(String id)" + id);
 	    }
@@ -1908,7 +1938,7 @@ public class ComponentService extends DbService {
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_PROPERTY + REST_API_PATH_ID)
-	public Response updateProperty(@PathParam(REST_API_PATH_PARAM_ID) String id , Property property) {
+	public Response updateProperty(@PathParam(REST_API_PATH_PARAM_ID) String id , Property property) throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.updateProperty(String id, Property property)" + id);
 	    }
@@ -1929,7 +1959,7 @@ public class ComponentService extends DbService {
 	 */
 	@DELETE
 	@Path (REST_API_PROPERTY + REST_API_PATH_ID)
-	public Response deleteProperty(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	public Response deleteProperty(@PathParam(REST_API_PATH_PARAM_ID) String id) throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.deleteProperty(String id)" + id);
 	    }
@@ -1951,7 +1981,7 @@ public class ComponentService extends DbService {
 	@GET
 	@Path (REST_API_OPTIONS)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findOptions() {
+	public Response findOptions() throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.findOptions()");
 	    }
@@ -1970,7 +2000,7 @@ public class ComponentService extends DbService {
 	@GET
 	@Path (REST_API_LICENSE)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findLicenses() {
+	public Response findLicenses() throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.findLicenses()");
 	    }
@@ -1990,13 +2020,15 @@ public class ComponentService extends DbService {
 	@POST
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Path (REST_API_LICENSE)
-	public Response createLicenses(List<License> licenses) {
+	public Response createLicenses(List<License> licenses) throws PhrescoWebServiceException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.createLicenses(List<License> licenses)");
 	    }
 		
 		try {
-			mongoOperation.insertList(LICENSE_COLLECTION_NAME , licenses);
+			for (License license : licenses) {
+				mongoOperation.save(LICENSE_COLLECTION_NAME , license);
+			}
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
 		}

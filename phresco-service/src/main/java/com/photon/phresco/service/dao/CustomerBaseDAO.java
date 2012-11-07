@@ -24,6 +24,10 @@ import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+import org.hibernate.validator.constraints.NotEmpty;
+
+import com.photon.phresco.service.util.ServerConstants;
+import com.photon.phresco.util.ServiceConstants;
 
 public class CustomerBaseDAO extends BaseDAO {
 
@@ -32,6 +36,7 @@ public class CustomerBaseDAO extends BaseDAO {
 	 */
 	private static final long serialVersionUID = 1L;
 	
+	@NotEmpty(message = ServiceConstants.VAL_CUSID_MSG)
 	private List<String> customerIds;
     private boolean used;
 	

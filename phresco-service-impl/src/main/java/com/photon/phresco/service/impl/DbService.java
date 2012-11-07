@@ -20,6 +20,7 @@
 
 package com.photon.phresco.service.impl;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -28,7 +29,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -38,17 +38,19 @@ import org.springframework.data.document.mongodb.query.Query;
 
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ArtifactGroup;
-import com.photon.phresco.commons.model.ArtifactInfo;
-import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.DownloadInfo;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.exception.PhrescoWebServiceException;
 import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.api.MongoConfig;
+import com.photon.phresco.service.api.PhrescoServerFactory;
+import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.converters.ConvertersFactory;
 import com.photon.phresco.service.dao.ApplicationInfoDAO;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
 import com.photon.phresco.service.dao.DownloadsDAO;
 import com.photon.phresco.service.util.ServerUtil;
+import com.photon.phresco.util.FileUtil;
 import com.photon.phresco.util.ServiceConstants;
 
 public class DbService implements ServiceConstants {
@@ -134,5 +136,44 @@ public class DbService implements ServiceConstants {
 		}
 		return false;
 	}
+	
+	protected void createArtifact(String collectionName, Object object) throws PhrescoWebServiceException {
+		try {
+			if(validate(object)) {
+				mongoOperation.save(collectionName, object);
+			}
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e);
+		}
+	}
+	
+	/**
+     * Upload binaries using the given artifact info
+     * @param archetypeInfo
+     * @param artifactFile
+     * @param customerId
+     * @return
+     * @throws PhrescoException
+     */
+    protected boolean uploadBinary(ArtifactGroup archetypeInfo, File artifactFile) throws PhrescoException {
+    	PhrescoServerFactory.initialize();
+    	RepositoryManager repositoryManager = PhrescoServerFactory.getRepositoryManager();
+        File pomFile = ServerUtil.createPomFile(archetypeInfo);
+        
+        //Assuming there will be only one version for the artifactGroup
+        List<com.photon.phresco.commons.model.ArtifactInfo> versions = archetypeInfo.getVersions();
+        com.photon.phresco.commons.model.ArtifactInfo artifactInfo = versions.get(0);
+        
+		com.photon.phresco.service.model.ArtifactInfo info = new com.photon.phresco.service.model.ArtifactInfo(archetypeInfo.getGroupId(), 
+				archetypeInfo.getArtifactId(), archetypeInfo.getClassifier(), archetypeInfo.getPackaging(), artifactInfo.getVersion());
+		
+        info.setPomFile(pomFile);
+        
+        List<String> customerIds = archetypeInfo.getCustomerIds();
+        String customerId = customerIds.get(0);
+        boolean addArtifact = repositoryManager.addArtifact(info, artifactFile, customerId);
+        FileUtil.delete(pomFile);
+        return addArtifact;
+    }
 
 }
