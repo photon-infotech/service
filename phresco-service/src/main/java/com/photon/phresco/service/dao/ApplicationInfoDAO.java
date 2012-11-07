@@ -26,6 +26,7 @@ public class ApplicationInfoDAO extends CustomerBaseDAO {
     private String artifactGroupId;
     private boolean phoneEnabled;
     private boolean tabletEnabled;
+    private boolean isPilot;
     
 	public String getCode() {
 		return code;
@@ -146,4 +147,12 @@ public class ApplicationInfoDAO extends CustomerBaseDAO {
     public void setTabletEnabled(boolean tabletEnabled) {
         this.tabletEnabled = tabletEnabled;
     }
+
+	public void setPilot(boolean isPilot) {
+		this.isPilot = isPilot;
+	}
+
+	public boolean isPilot() {
+		return isPilot;
+	}
 }

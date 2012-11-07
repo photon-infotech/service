@@ -39,7 +39,7 @@ public class ApplicationInfoConverter implements Converter<ApplicationInfoDAO, A
 		}
 		applicationInfo.setPhoneEnabled(dao.isPhoneEnabled());
 		applicationInfo.setTabletEnabled(dao.isTabletEnabled());
-
+		applicationInfo.setPilot(dao.isPilot());
 		return applicationInfo;
 	}
 
@@ -69,7 +69,7 @@ public class ApplicationInfoConverter implements Converter<ApplicationInfoDAO, A
 		}
 		applicationInfoDAO.setPhoneEnabled(applicationInfo.isPhoneEnabled());
 		applicationInfoDAO.setTabletEnabled(applicationInfo.isTabletEnabled());
-
+		applicationInfoDAO.setPilot(applicationInfo.isPilot());
 		return applicationInfoDAO;
 	}
 	

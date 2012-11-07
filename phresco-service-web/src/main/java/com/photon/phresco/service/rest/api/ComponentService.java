@@ -1050,6 +1050,7 @@ public class ComponentService extends DbService {
 		try {
 		    List<ApplicationInfoDAO> appInfos = new ArrayList<ApplicationInfoDAO>();
 			Query query = createCustomerIdQuery(customerId);
+			query.addCriteria(Criteria.where(REST_QUERY_ISPILOT).is(true));
 			Converter<ApplicationInfoDAO, ApplicationInfo> pilotConverter = 
             		(Converter<ApplicationInfoDAO, ApplicationInfo>) ConvertersFactory.getConverter(ApplicationInfoDAO.class);
 			if (StringUtils.isNotEmpty(techId)) {
