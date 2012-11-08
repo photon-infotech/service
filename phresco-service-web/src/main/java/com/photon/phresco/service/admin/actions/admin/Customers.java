@@ -42,7 +42,7 @@ public class Customers extends ServiceBaseAction  {
 	private static final long serialVersionUID = 6801037145464060759L;
 	
 	private static final Logger S_LOGGER = Logger.getLogger(Customers.class);
-	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
+	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
 	private String customerId = "";
 	
@@ -88,7 +88,7 @@ public class Customers extends ServiceBaseAction  {
      * @throws PhrescoException
      */
     public String list() throws PhrescoException {
-	    if (s_isDebugEnabled) {
+	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Customers.list()");
 	    }
 		
@@ -108,7 +108,7 @@ public class Customers extends ServiceBaseAction  {
 	 * @throws PhrescoException
 	 */
 	public String add() throws PhrescoException {
-	    if (s_isDebugEnabled) {
+	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Customers.add()");
 	    }
 	    setReqAttribute(REQ_FROM_PAGE, ADD);
@@ -123,7 +123,7 @@ public class Customers extends ServiceBaseAction  {
 	 * @throws PhrescoException
 	 */
 	public String edit() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Customers.edit()");
 		}
 
@@ -145,7 +145,7 @@ public class Customers extends ServiceBaseAction  {
 	 * @throws PhrescoException
 	 */
 	public String save() throws PhrescoException {
-	    if (s_isDebugEnabled) {
+	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Customers.save()");
 	    }
 	    
@@ -168,7 +168,7 @@ public class Customers extends ServiceBaseAction  {
 	 * @throws PhrescoException
 	 */
 	public String update() throws PhrescoException {
-	    if (s_isDebugEnabled) {
+	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Customers.update()");
 	    }
 		try {
@@ -220,15 +220,15 @@ public class Customers extends ServiceBaseAction  {
 	 * @throws PhrescoException
 	 */
 	public String delete() throws PhrescoException {
-	    if (s_isDebugEnabled) {
+	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Customers.delete()");
 	    }
 		
 		try {
 			String[] customerIds = getHttpRequest().getParameterValues(REQ_CUST_CUSTOMER_ID);
 			if (ArrayUtils.isNotEmpty(customerIds)) {
-				for (String customerId : customerIds) {
-			    	getServiceManager().deleteCustomer(customerId);
+				for (String customerid : customerIds) {
+			    	getServiceManager().deleteCustomer(customerid);
 				}
 				addActionMessage(getText(CUSTOMER_DELETED));
 			}
@@ -245,98 +245,44 @@ public class Customers extends ServiceBaseAction  {
 	 * @throws PhrescoException
 	 */
 	public String validateForm() throws PhrescoException {
-	    if (s_isDebugEnabled) {
+	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Customers.validateForm()");
         }
 	    
 	    try {
     		boolean isError = false;
-    		if (StringUtils.isEmpty(getName())) { //Empty validation for name
-    			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY));
-    			isError = true;
-    		} else if (StringUtils.isEmpty(getFromPage()) || (!getName().equals(getOldName()))) {
-    			// to check duplication of name
-    			List<Customer> customers = getServiceManager().getCustomers();
-    			if (CollectionUtils.isNotEmpty(customers)) {
-    				for (Customer customer : customers) {
-    					if (customer.getName().equalsIgnoreCase(getName())) {
-    						setNameError(getText(KEY_I18N_ERR_NAME_ALREADY_EXIST));
-    			    		isError = true;
-    						break;
-    					}
-    				}
-    			}
-    		}
+    		
+    		//Empty validation for name
+    		isError = nameValidation(isError);
     		
     		//Empty validation for email
-    		if (StringUtils.isEmpty(getEmail())) {
-    			setMailError(getText(KEY_I18N_ERR_EMAIL_EMPTY));
-    			isError = true;
-    		} 
+    		isError = emailValidation(isError); 
     		
     		//EmailId format validation
-    		if (StringUtils.isNotEmpty(getEmail())) {
-    	   		Pattern p = Pattern.compile("^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
-    	   		Matcher m = p.matcher(getEmail());
-    	   		boolean b = m.matches();
-    	   		if (!b) {
-    	   			setMailError(getText(INVALID_EMAIL));
-    	   			isError = true;
-    	   		}
-    	   	}
+    		isError = emailIdFormatValidation(isError);
     		
     		//Empty validation for address
-    		if (StringUtils.isEmpty(getAddress())) {
-    			setAddressError(getText(KEY_I18N_ERR_ADDRS_EMPTY));
-    			isError = true;
-    		} 
+    		isError = addressValidation(isError); 
     		
     		//Empty validation for zip code
-    		if (StringUtils.isEmpty(getZipcode())) {
-    			setZipError(getText(KEY_I18N_ERR_ZIPCODE_EMPTY));
-    			isError = true;
-    		} 
+    		isError = zipCodeValidation(isError); 
     		
     		//Empty validation for contact number
-    		if (StringUtils.isEmpty(getNumber())) {
-    			setNumError(getText(KEY_I18N_ERR_CONTNUM_EMPTY));
-    			isError = true;
-    		} 
+    		isError = contactNumberValidation(isError); 
     		
     		//Empty validation for fax
-    		if (StringUtils.isEmpty(getFax())) {
-    			setFaxError(getText(KEY_I18N_ERR_FAXNUM_EMPTY));
-    			isError = true;
-    		} 
+    		isError = faxValidation(isError); 
     		
     		//Empty validation for country
-    		if (StringUtils.isEmpty(getCountry())) {
-    			setConError(getText(KEY_I18N_ERR_COUN_EMPTY));
-    			isError = true;
-    		} 
+    		isError = countryValidation(isError); 
     		
     		//Empty validation for license type
-    		if (StringUtils.isEmpty(getLicence())) {
-    			setLicenError(getText(KEY_I18N_ERR_LICEN_EMPTY));
-    			isError = true;
-    		}
+    		isError = licenseTypeValidation(isError);
     		
-    		//Empty validation for license type
-    		if (StringUtils.isEmpty(getRepoName())) {
-    			setRepoNameError(getText(KEY_I18N_ERR_REPO_NAME_EMPTY));
-    			isError = true;
-    		}
+    		//Empty validation for repo name
+    		isError = repoNameValidation(isError);
     		
-    		if (StringUtils.isNotEmpty(getRepoURL())) {
-    			String urlPattern = "^(http|https|ftp)://.*$";
-    			Pattern pattern = Pattern.compile(urlPattern);
-    			Matcher matcher = pattern.matcher(getRepoURL());
-    	   		boolean matchFound = matcher.matches();
-    	   		if (!matchFound) {
-    	   			setRepoURLError(getText(KEY_I18N_ERR_REPO_URL_INVALID));
-    	   			isError = true;
-    	   		}
-    		}
+    		isError = repoUrlValidation(isError);
     		
     		if (StringUtils.isNotEmpty(getRepoURL())) {
     			//Empty validation for repo username
@@ -355,11 +301,121 @@ public class Customers extends ServiceBaseAction  {
                 setErrorFound(true);
             }
 	    } catch (PhrescoException e) {
-	    	e.printStackTrace();
 	        return showErrorPopup(e, getText(EXCEPTION_CUSTOMERS_VALIDATE));
 	    }
 		
 		return SUCCESS;
+	}
+
+	public boolean repoUrlValidation(boolean isError) {
+		if (StringUtils.isNotEmpty(getRepoURL())) {
+			String urlPattern = "^(http|https|ftp)://.*$";
+			Pattern pattern = Pattern.compile(urlPattern);
+			Matcher matcher = pattern.matcher(getRepoURL());
+			boolean matchFound = matcher.matches();
+			if (!matchFound) {
+				setRepoURLError(getText(KEY_I18N_ERR_REPO_URL_INVALID));
+				isError = true;
+			}
+		}
+		return isError;
+	}
+
+	public boolean repoNameValidation(boolean isError) {
+		if (StringUtils.isEmpty(getRepoName())) {
+			setRepoNameError(getText(KEY_I18N_ERR_REPO_NAME_EMPTY));
+			isError = true;
+		}
+		return isError;
+	}
+
+	public boolean licenseTypeValidation(boolean isError) {
+		if (StringUtils.isEmpty(getLicence())) {
+			setLicenError(getText(KEY_I18N_ERR_LICEN_EMPTY));
+			isError = true;
+		}
+		return isError;
+	}
+
+	public boolean countryValidation(boolean isError) {
+		if (StringUtils.isEmpty(getCountry())) {
+			setConError(getText(KEY_I18N_ERR_COUN_EMPTY));
+			isError = true;
+		}
+		return isError;
+	}
+
+	public boolean faxValidation(boolean isError) {
+		if (StringUtils.isEmpty(getFax())) {
+			setFaxError(getText(KEY_I18N_ERR_FAXNUM_EMPTY));
+			isError = true;
+		}
+		return isError;
+	}
+
+	public boolean contactNumberValidation(boolean isError) {
+		if (StringUtils.isEmpty(getNumber())) {
+			setNumError(getText(KEY_I18N_ERR_CONTNUM_EMPTY));
+			isError = true;
+		}
+		return isError;
+	}
+
+	public boolean zipCodeValidation(boolean isError) {
+		if (StringUtils.isEmpty(getZipcode())) {
+			setZipError(getText(KEY_I18N_ERR_ZIPCODE_EMPTY));
+			isError = true;
+		}
+		return isError;
+	}
+
+	public boolean addressValidation(boolean isError) {
+		if (StringUtils.isEmpty(getAddress())) {
+			setAddressError(getText(KEY_I18N_ERR_ADDRS_EMPTY));
+			isError = true;
+		}
+		return isError;
+	}
+
+	public boolean emailIdFormatValidation(boolean isError) {
+		if (StringUtils.isNotEmpty(getEmail())) {
+			Pattern p = Pattern.compile("^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
+			Matcher m = p.matcher(getEmail());
+			boolean b = m.matches();
+			if (!b) {
+				setMailError(getText(INVALID_EMAIL));
+				isError = true;
+			}
+		}
+		return isError;
+	}
+
+	public boolean emailValidation(boolean isError) {
+		if (StringUtils.isEmpty(getEmail())) {
+			setMailError(getText(KEY_I18N_ERR_EMAIL_EMPTY));
+			isError = true;
+		}
+		return isError;
+	}
+
+	public boolean nameValidation(boolean isError) throws PhrescoException {
+		if (StringUtils.isEmpty(getName())) { 
+			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY));
+			isError = true;
+		} else if (StringUtils.isEmpty(getFromPage()) || (!getName().equals(getOldName()))) {
+			// to check duplication of name
+			List<Customer> customers = getServiceManager().getCustomers();
+			if (CollectionUtils.isNotEmpty(customers)) {
+				for (Customer customer : customers) {
+					if (customer.getName().equalsIgnoreCase(getName())) {
+						setNameError(getText(KEY_I18N_ERR_NAME_ALREADY_EXIST));
+			    		isError = true;
+						break;
+					}
+				}
+			}
+		}
+		return isError;
 	}
 	
 	public String getName() {

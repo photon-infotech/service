@@ -44,6 +44,7 @@ import com.photon.phresco.commons.model.VideoInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
+import com.photon.phresco.service.docs.impl.MAGICNUMBER;
 import com.photon.phresco.service.util.ServerConstants;
 import com.photon.phresco.util.ServiceConstants;
 
@@ -55,6 +56,7 @@ public class VideoService implements ServerConstants {
 	private static final String FILE = "file";
     private static final Logger S_LOGGER = Logger.getLogger(VideoService.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
+
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
 	public List<VideoInfo> getHomePageVideo(@QueryParam(ServiceConstants.REST_QUERY_CUSTOMERID) String customerId) throws PhrescoException,
@@ -121,7 +123,7 @@ public class VideoService implements ServerConstants {
 				RepoInfo repo = PhrescoServerFactory.getDbManager().getRepoInfo(ServiceConstants.DEFAULT_CUSTOMER_NAME);
 				URL url = new URL(repo.getGroupRepoURL() + projectPath);
 				fis = url.openStream();
-				byte[] buf = new byte[1024];
+				byte[] buf = new byte[MAGICNUMBER.BYTESMALLSIZE];
 				int i = 0;
 				while ((i = fis.read(buf)) != -1) {
 					output.write(buf, 0, i);

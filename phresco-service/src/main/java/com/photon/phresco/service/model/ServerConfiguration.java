@@ -72,8 +72,6 @@ public class ServerConfiguration {
 	private Properties dependencyConfig = new Properties();
 	private String serviceURL;
 	private String credentialurl;
-	private String authenticateurl;
-	private String repoBaseURL;
 	private String repoUserName;
 	private String repoPassword;
 	private String serviceContextName;
@@ -190,6 +188,7 @@ public class ServerConfiguration {
 	}
 
 	public String getAuthServiceURL() throws PhrescoException {
+		String authenticateurl = "";
 		List<Configuration> configurations = configurationList("WebService");
 		for (Configuration configuration : configurations) {
 			String protocol = configuration.getProperties().getProperty("protocol");
@@ -202,6 +201,7 @@ public class ServerConfiguration {
 	}
 	
 	public String getRepoBaseURL() throws PhrescoException {
+		String repoBaseURL = "";
         List<Configuration> configurations = configurationList("Server");
         for (Configuration configuration : configurations) {
             String protocol = configuration.getProperties().getProperty("protocol");

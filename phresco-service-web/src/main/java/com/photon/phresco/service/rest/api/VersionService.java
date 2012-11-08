@@ -99,10 +99,7 @@ public class VersionService implements ServerConstants {
 			S_LOGGER.debug("Entering Method VersionServic.isUpdateRequired(String currentVersion, String latestVersion)");
 		}
 		if (isDebugEnabled) {
-			S_LOGGER.debug("isUpdateRequired() currentVersion="+currentVersion);
-		}
-		if (isDebugEnabled) {
-			S_LOGGER.debug("isUpdateRequired() LatestVersion="+latestVersion);
+			S_LOGGER.debug("isUpdateRequired() currentVersion=" + currentVersion + " LatestVersion=" + latestVersion);
 		}
 		boolean updateRequired = false;
 		if (isSnapshot(currentVersion, latestVersion)) {

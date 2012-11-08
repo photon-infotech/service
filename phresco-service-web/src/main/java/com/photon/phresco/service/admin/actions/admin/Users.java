@@ -32,10 +32,10 @@ public class Users extends ServiceBaseAction {
     private static final long serialVersionUID = 1L;
     
     private static final Logger S_LOGGER = Logger.getLogger(Customers.class);
-    private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
+    private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
     
     public String fetchUsersFromDB() throws PhrescoException {
-    	if (s_isDebugEnabled) {
+    	if (isDebugEnabled) {
     		S_LOGGER.debug("Entering Method Users.getUsersFromDB()");
     	}
 
@@ -50,7 +50,7 @@ public class Users extends ServiceBaseAction {
     }
 	
     public String syncUsers() throws PhrescoException {
-    	if (s_isDebugEnabled) {
+    	if (isDebugEnabled) {
     		S_LOGGER.debug("Entering Method Users.getSyncUsers()");
     	}
 

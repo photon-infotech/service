@@ -45,7 +45,8 @@ public class MongoConfig extends AbstractMongoConfiguration implements ServiceCo
 	}
 	
 	@Override
-	public @Bean Mongo mongo() throws PhrescoException {
+	@Bean 
+	public Mongo mongo() throws PhrescoException {
 		Mongo mongo = null;
 		try {
 			mongo = new Mongo(config.getDbHost(), config.getDbPort());
@@ -58,7 +59,8 @@ public class MongoConfig extends AbstractMongoConfiguration implements ServiceCo
 	}
 
 	@Override
-	public @Bean MongoTemplate mongoTemplate() throws PhrescoException {
+	@Bean
+	public MongoTemplate mongoTemplate() throws PhrescoException {
 		MongoTemplate mongoTemplate = null;
 		try {
 			mongoTemplate = new MongoTemplate(mongo(), config.getDbName() , config.getDbCollection());

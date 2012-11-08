@@ -76,19 +76,16 @@ public final class DocConvertor {
 	 */
 	public static PdfInput convertToPdf(String fileUrl) throws PhrescoException{
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method DocConvertor.convertToPdf(String fileUrl)");
+			S_LOGGER.debug("Entering Method DocConvertor.convertToPdf(String fileUrl)" + fileUrl);
 		}
 		try {
-			if (isDebugEnabled) {
-				S_LOGGER.debug("convertToPdf() fileUrl="+fileUrl);
-			}
-			if(fileUrl.endsWith(".pdf")){
+			if(fileUrl.endsWith(".pdf")) {
 				return convertPdf(fileUrl);
-			} else if (fileUrl.endsWith(".rtf")){
+			} else if (fileUrl.endsWith(".rtf")) {
 				return convertRtfToPdf(fileUrl);
-			} else if(fileUrl.endsWith(".docx")){
+			} else if(fileUrl.endsWith(".docx")) {
 				return convertDocxToPDF(fileUrl);
-			} else if(fileUrl.endsWith(".htm") || fileUrl.endsWith(".html")){
+			} else if(fileUrl.endsWith(".htm") || fileUrl.endsWith(".html")) {
 				return convertHtmlToPdf(fileUrl);
 			}
 		} catch (IOException e) {

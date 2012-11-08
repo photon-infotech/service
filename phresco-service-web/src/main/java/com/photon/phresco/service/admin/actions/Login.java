@@ -1,6 +1,5 @@
 package com.photon.phresco.service.admin.actions;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 

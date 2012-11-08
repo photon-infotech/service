@@ -50,7 +50,7 @@ public class Downloads extends ServiceBaseAction {
 	private static final long serialVersionUID = 6801037145464060759L;
 	
 	private static final Logger S_LOGGER = Logger.getLogger(Downloads.class);
-	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
+	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 
 	private String downloadId = "";
 	private String name = "";
@@ -77,11 +77,11 @@ public class Downloads extends ServiceBaseAction {
 	private String versioning = "";
    
 	private static Map<String, InputStream> inputStreamMap = new HashMap<String, InputStream>();
-	private static byte[] s_downloadByteArray = null;
-	private static byte[] s_imgByteArray = null;
+	private static byte[] downloadByteArray = null;
+	private static byte[] imgByteArray = null;
 
 	public String list() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Downloads.list()");
 		}
 		
@@ -95,14 +95,14 @@ public class Downloads extends ServiceBaseAction {
 
 		//to clear file inpustreams
 		inputStreamMap.clear();
-		s_downloadByteArray = null;
-		s_imgByteArray = null;
+		downloadByteArray = null;
+		imgByteArray = null;
 		
 		return COMP_DOWNLOAD_LIST;	
 	}
 	
 	public String add() throws PhrescoException {
-		if (s_isDebugEnabled) {	
+		if (isDebugEnabled) {	
 			S_LOGGER.debug("Entering Method Downloads.add()");
 		}
 		
@@ -122,7 +122,7 @@ public class Downloads extends ServiceBaseAction {
 	}
 	
 	public String edit() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Downloads.edit()");
 		}
 		
@@ -145,17 +145,17 @@ public class Downloads extends ServiceBaseAction {
 	}
 	
 	public String save() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Downloads.save()");
 		}
 		
 		try {
 			DownloadInfo downloadInfo = getDownloadInfo();
-			if(s_downloadByteArray != null){
-				inputStreamMap.put(downloadInfo.getName(),  new ByteArrayInputStream(s_downloadByteArray));
+			if(downloadByteArray != null){
+				inputStreamMap.put(downloadInfo.getName(),  new ByteArrayInputStream(downloadByteArray));
 			} 
-			if(s_imgByteArray != null){
-				inputStreamMap.put(downloadInfo.getName(),  new ByteArrayInputStream(s_imgByteArray));
+			if(imgByteArray != null){
+				inputStreamMap.put(downloadInfo.getName(),  new ByteArrayInputStream(imgByteArray));
 			} 
 		    
 		    
@@ -169,17 +169,17 @@ public class Downloads extends ServiceBaseAction {
 	}
 
 	public String update() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Downloads.update()");
 		}
 
 		try {
 			DownloadInfo downloadInfo = getDownloadInfo();
-			if(s_downloadByteArray != null){
-				inputStreamMap.put(downloadInfo.getName(),  new ByteArrayInputStream(s_downloadByteArray));
+			if(downloadByteArray != null){
+				inputStreamMap.put(downloadInfo.getName(),  new ByteArrayInputStream(downloadByteArray));
 			} 
-			if(s_imgByteArray != null){
-				inputStreamMap.put(downloadInfo.getName(),  new ByteArrayInputStream(s_imgByteArray));
+			if(imgByteArray != null){
+				inputStreamMap.put(downloadInfo.getName(),  new ByteArrayInputStream(imgByteArray));
 			} 
 			getServiceManager().updateDownload(getDownloadInfo(), inputStreamMap, getCustomerId());
 			addActionMessage(getText(DOWNLOAD_ADDED, Collections.singletonList(getName())));
@@ -228,15 +228,15 @@ public class Downloads extends ServiceBaseAction {
     }
 
 	public String delete() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Downloads.delete()");
 		}
 
 		try {
 			String[] downloadIds = getHttpRequest().getParameterValues(REQ_DOWNLOAD_ID);
 			if (ArrayUtils.isNotEmpty(downloadIds)) {
-				for (String downloadId : downloadIds) {
-					getServiceManager().deleteDownloadInfo(downloadId, getCustomerId());
+				for (String downloadid : downloadIds) {
+					getServiceManager().deleteDownloadInfo(downloadid, getCustomerId());
 				}
 				addActionMessage(getText(DOWNLOAD_DELETED));
 			}
@@ -248,7 +248,7 @@ public class Downloads extends ServiceBaseAction {
 	}
 
 	public String uploadFile() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Downloads.uploadFile()");
 		}
 		
@@ -256,7 +256,7 @@ public class Downloads extends ServiceBaseAction {
 		try {
             writer = getHttpResponse().getWriter();
 	        InputStream is = getHttpRequest().getInputStream();
-	        s_downloadByteArray = IOUtils.toByteArray(is);
+	        downloadByteArray = IOUtils.toByteArray(is);
         	writer.print(MAVEN_JAR_FALSE);
         	getHttpResponse().setStatus(getHttpResponse().SC_OK);
 	        writer.flush();
@@ -270,7 +270,7 @@ public class Downloads extends ServiceBaseAction {
 	}
 	
 	public String uploadImage() throws PhrescoException {
-	    if (s_isDebugEnabled) {
+	    if (isDebugEnabled) {
             S_LOGGER.debug("Entering Method  Downloads.uploadImage()");
         }
 	    
@@ -278,7 +278,7 @@ public class Downloads extends ServiceBaseAction {
 		try {
 			writer = getHttpResponse().getWriter();
         	InputStream is = getHttpRequest().getInputStream();
-        	s_imgByteArray = IOUtils.toByteArray(is);
+        	imgByteArray = IOUtils.toByteArray(is);
         	writer.print(MAVEN_JAR_FALSE);
             getHttpResponse().setStatus(getHttpResponse().SC_OK);
 	        writer.flush();
@@ -293,19 +293,19 @@ public class Downloads extends ServiceBaseAction {
 	}
 	
 	public void removeUploadedFile() {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Downloads.removeUploadedFile()");
 		}
 		
 		if (REQ_DOWNLOAD_UPLOAD_FILE.equals(getType())) {
-			s_downloadByteArray = null;
+			downloadByteArray = null;
 		} else {
-			s_imgByteArray = null;
+			imgByteArray = null;
 		}
 	}
 
 	public String validateForm() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Downloads.validateForm()");
 		}
 		

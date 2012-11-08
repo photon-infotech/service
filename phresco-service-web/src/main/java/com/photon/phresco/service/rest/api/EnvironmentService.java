@@ -33,8 +33,7 @@ public class EnvironmentService implements ServerConstants {
     @GET
     @Produces({ MediaType.APPLICATION_JSON })
     public Environment getEnvInfos() {
-        Environment enviromentInfo = new Environment("Production", "Production Environment is used for Development purpose only", true);
-        return enviromentInfo;
+        return new Environment("Production", "Production Environment is used for Development purpose only", true);
     }
 }
 

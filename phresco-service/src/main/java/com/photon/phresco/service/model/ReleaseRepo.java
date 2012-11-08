@@ -1,7 +1,5 @@
 package com.photon.phresco.service.model;
 
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 

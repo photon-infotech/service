@@ -23,7 +23,6 @@ package com.photon.phresco.service.admin.actions.admin;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -43,11 +42,11 @@ public class Videos extends ServiceBaseAction {
 	private static final long serialVersionUID = -3065717999492844302L;
 
 	private static final Logger S_LOGGER = Logger.getLogger(Videos.class);
-	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
+	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	private static Map<String, InputStream> inputStreamMap = new HashMap<String, InputStream>();
 
-	private static byte[] s_videoByteArray = null;
-	private static byte[] s_imgByteArray = null;
+	private static byte[] videoByteArray = null;
+	private static byte[] imgByteArray = null;
 
 	private String name = "";
 	private String description = "";
@@ -58,7 +57,7 @@ public class Videos extends ServiceBaseAction {
 	private Boolean errorFound = false;
 
 	public String list() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Videos.list()");
 		}
 		try {
@@ -69,14 +68,14 @@ public class Videos extends ServiceBaseAction {
 		}
         
 		inputStreamMap.clear();
-		s_videoByteArray = null;
-		s_imgByteArray = null;
+		videoByteArray = null;
+		imgByteArray = null;
 
 		return ADMIN_VIDEO_LIST;	
 	}
 
 	public String add() {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Videos.list()");
 		}
 		setReqAttribute(REQ_FROM_PAGE, ADD);
@@ -85,7 +84,7 @@ public class Videos extends ServiceBaseAction {
 	}
 
 	public String edit() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method PilotProjects.edit()");
 		}
 		try {
@@ -100,16 +99,16 @@ public class Videos extends ServiceBaseAction {
 		return ADMIN_VIDEO_ADD;
 	}
 	public String save() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Videos.save()");
 		}
 		try {
 			VideoInfo videoInfo = createVideoInstance();
-			if(s_videoByteArray != null){
-				inputStreamMap.put(videoInfo.getName(),  new ByteArrayInputStream(s_videoByteArray));
+			if(videoByteArray != null){
+				inputStreamMap.put(videoInfo.getName(),  new ByteArrayInputStream(videoByteArray));
 			} 
-			if(s_imgByteArray != null){
-				inputStreamMap.put(videoInfo.getName(),  new ByteArrayInputStream(s_imgByteArray));
+			if(imgByteArray != null){
+				inputStreamMap.put(videoInfo.getName(),  new ByteArrayInputStream(imgByteArray));
 			} 
 			
 			
@@ -123,16 +122,16 @@ public class Videos extends ServiceBaseAction {
 	}
 	
 	public String update() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  PilotProjects.update()");
 		}
 		try {
 			VideoInfo videoInfo = createVideoInstance();
-			if(s_videoByteArray != null){
-				inputStreamMap.put(videoInfo.getName(),  new ByteArrayInputStream(s_videoByteArray));
+			if(videoByteArray != null){
+				inputStreamMap.put(videoInfo.getName(),  new ByteArrayInputStream(videoByteArray));
 			} 
-			if(s_imgByteArray != null){
-				inputStreamMap.put(videoInfo.getName(),  new ByteArrayInputStream(s_imgByteArray));
+			if(imgByteArray != null){
+				inputStreamMap.put(videoInfo.getName(),  new ByteArrayInputStream(imgByteArray));
 			} 
 			getServiceManager().updateVideo(createVideoInstance(), inputStreamMap, getVideoId());
 			addActionMessage(getText(PLTPROJ_UPDATED, Collections.singletonList(getName())));
@@ -156,14 +155,14 @@ public class Videos extends ServiceBaseAction {
 	}	 
 
 	public String delete() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method PilotProjects.delete()");
 		}
 		try {
 			String[] videoIds = getHttpRequest().getParameterValues("videoId");
 			if (ArrayUtils.isNotEmpty(videoIds)) {
-				for (String videoId : videoIds) {
-					getServiceManager().deleteVideo(videoId);
+				for (String videoid : videoIds) {
+					getServiceManager().deleteVideo(videoid);
 				}
 				addActionMessage(getText(VIDEO_DELETED));
 			}
@@ -175,14 +174,14 @@ public class Videos extends ServiceBaseAction {
 	} 
 
 	public String uploadFile() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Videos.uploadFile()");
 		}
 		String type = getHttpRequest().getParameter(REQ_VIDEO_FILE_TYPE);
 		if(REQ_VIDEO_UPLOAD.equals(type)) {
-			s_videoByteArray = getFileByteArray();
+			videoByteArray = getFileByteArray();
 		} else {
-			s_imgByteArray = getFileByteArray();
+			imgByteArray = getFileByteArray();
 		}
 
 		return SUCCESS;
@@ -209,20 +208,20 @@ public class Videos extends ServiceBaseAction {
 	}
 
 	public void removeUploadedFile() {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.removeUploadedJar()");
 		}
 
 		String type = getHttpRequest().getParameter(REQ_VIDEO_FILE_TYPE);
 		if (REQ_VIDEO_UPLOAD.equals(type)) {
-			s_videoByteArray = null;
+			videoByteArray = null;
 		} else {
-			s_imgByteArray = null;
+			imgByteArray = null;
 		}
 	}
 
 	public String validateForm() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  PilotProjects.validateForm()");
 		}
 		boolean isError = false;
@@ -232,12 +231,12 @@ public class Videos extends ServiceBaseAction {
 			isError = true;
 		} 
 		//empty validation for fileupload
-		if (s_videoByteArray == null) {
+		if (videoByteArray == null) {
 			setVideoError(getText(KEY_I18N_ERR_VIDEO_EMPTY));
 			isError = true;
 		}
 
-		if (s_imgByteArray == null) {
+		if (imgByteArray == null) {
 			setImgError(getText(KEY_I18N_ERR_IMAGE_EMPTY));
 			isError = true;
 		}

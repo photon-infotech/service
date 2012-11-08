@@ -51,11 +51,13 @@ public class Features extends ServiceBaseAction {
     private static final long serialVersionUID = 6801037145464060759L;
     
 	private static final Logger S_LOGGER = Logger.getLogger(Features.class);
-	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
+	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
 	private static Map<String, InputStream> inputStreamMap = new HashMap<String, InputStream>();
 	
-	private static byte[] s_featureByteArray = null;
+	private static byte[] featureByteArray = null;
+	
+	private static byte[] newtempFeaByteArray = null;
 	
 	private String name = "";
 	private String customerId = "";
@@ -87,21 +89,22 @@ public class Features extends ServiceBaseAction {
 	private String fileType = "";
 	private static String featureJarFileName = "";
 	private static String iconName = "";
+	private boolean tempError = false;
     
 	public String menu() {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
     		S_LOGGER.debug("Entering Method  Features.menu()");
     	}
 
 		setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		inputStreamMap.clear();
-		s_featureByteArray = null;
+		featureByteArray = null;
 		
     	return COMP_FEATURES_LIST;
     }
 	
 	public String technologies() {
-	    if (s_isDebugEnabled) {
+	    if (isDebugEnabled) {
             S_LOGGER.debug("Entering Method  Features.modulesList()");
         }
 	    
@@ -119,21 +122,21 @@ public class Features extends ServiceBaseAction {
 	}
 	
     private void setTechnologiesInRequest() throws PhrescoException {
-    	if (s_isDebugEnabled) {
+    	if (isDebugEnabled) {
     		S_LOGGER.debug("Entering Method  Features.list()");
     	}
     	
     	try {
     		List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
     		setReqAttribute(REQ_ARCHE_TYPES, technologies);
-    		s_featureByteArray = null;
+    		featureByteArray = null;
     	} catch (PhrescoException e) {
     	    throw new PhrescoException(e);
     	}
     }
     
     public String listFeatures() throws PhrescoException {
-    	if (s_isDebugEnabled) {
+    	if (isDebugEnabled) {
     		S_LOGGER.debug("Entering Method  Features.featurelist()");
     	}
     	
@@ -146,7 +149,7 @@ public class Features extends ServiceBaseAction {
     }
     
     public String addFeatures() {
-        if (s_isDebugEnabled) {
+        if (isDebugEnabled) {
             S_LOGGER.debug("Entering Method  Features.addModules()");
         }
       
@@ -168,7 +171,7 @@ public class Features extends ServiceBaseAction {
 	}
 
 	public String fetchFeaturesForDependency() {
-      if (s_isDebugEnabled) {
+      if (isDebugEnabled) {
           S_LOGGER.debug("Entering Method  Features.featurelist()");
       }
       
@@ -183,7 +186,7 @@ public class Features extends ServiceBaseAction {
   }
     
     public void saveDependentFeatures() {
-        if (s_isDebugEnabled) {
+        if (isDebugEnabled) {
             S_LOGGER.debug("Entering Method  Features.saveDependentFeatures()");
         }
         
@@ -200,8 +203,8 @@ public class Features extends ServiceBaseAction {
         try {
             ArtifactGroup moduleGroup = createModuleGroup(Type.valueOf(getType()));
             
-            if(s_featureByteArray != null){
-				inputStreamMap.put(moduleGroup.getName(),  new ByteArrayInputStream(s_featureByteArray));
+            if(featureByteArray != null){
+				inputStreamMap.put(moduleGroup.getName(),  new ByteArrayInputStream(featureByteArray));
 			} 
             getServiceManager().createFeatures(moduleGroup, inputStreamMap, getCustomerId());
             setTechnologiesInRequest();
@@ -214,7 +217,7 @@ public class Features extends ServiceBaseAction {
     }
 	
 	public String edit() {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Features.edit()");
 		}
 		
@@ -236,14 +239,14 @@ public class Features extends ServiceBaseAction {
 	}
 	
     public String update() throws PhrescoException, IOException {
-        if (s_isDebugEnabled) {
+        if (isDebugEnabled) {
             S_LOGGER.debug("Entering Method Features.update()");
         }
         
         try {
             ArtifactGroup moduleGroup = createModuleGroup(Type.valueOf(getType()));
-            if(s_featureByteArray != null){
-				inputStreamMap.put(moduleGroup.getName(),  new ByteArrayInputStream(s_featureByteArray));
+            if(featureByteArray != null){
+				inputStreamMap.put(moduleGroup.getName(),  new ByteArrayInputStream(featureByteArray));
 			} 
             getServiceManager().updateFeature(moduleGroup, inputStreamMap, getCustomerId());
             addActionMessage(getText(FEATURE_ADDED, Collections.singletonList(getName())));
@@ -256,7 +259,7 @@ public class Features extends ServiceBaseAction {
     }
 	
 	private ArtifactGroup createModuleGroup(Type type) throws PhrescoException {
-	    if (s_isDebugEnabled) {
+	    if (isDebugEnabled) {
             S_LOGGER.debug("Entering Method  Features.createModuleGroup()");
         }
         
@@ -303,15 +306,15 @@ public class Features extends ServiceBaseAction {
     }
     
     public String delete() throws PhrescoException {
-        if (s_isDebugEnabled) {
+        if (isDebugEnabled) {
             S_LOGGER.debug("Entering Method  Features.deleteJSLibs()");
         }
         
         try {
             String[] moduleGroupIds = getHttpRequest().getParameterValues(REQ_FEATURES_MOD_GRP);
             if (ArrayUtils.isNotEmpty(moduleGroupIds)) {
-                for (String moduleGroupId : moduleGroupIds) {
-                    getServiceManager().deleteFeature(moduleGroupId, getCustomerId());
+                for (String moduleGroupid : moduleGroupIds) {
+                    getServiceManager().deleteFeature(moduleGroupid, getCustomerId());
                 }
                 addActionMessage(getText(FEATURE_DELETED));
             }
@@ -324,7 +327,7 @@ public class Features extends ServiceBaseAction {
     }
 	
 	public String uploadFile() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Features.uploadFile()");
 		}
 		
@@ -354,12 +357,16 @@ public class Features extends ServiceBaseAction {
 
 	private void uploadFeature(PrintWriter writer, byte[] tempFeaByteArray) throws PhrescoException {
 		try {
+			if (tempFeaByteArray == null) {
+				Features.newtempFeaByteArray = new byte[0];
+			} else {
+				Features.newtempFeaByteArray = Arrays.copyOf(tempFeaByteArray, tempFeaByteArray.length);
+			}
 			featureJarFileName = getFileName();
-    		s_featureByteArray = tempFeaByteArray;
-    		getArtifactGroupInfo(writer, tempFeaByteArray);
-    		inputStreamMap.put(Content.Type.ARCHETYPE.name(), new ByteArrayInputStream(tempFeaByteArray));
+    		featureByteArray = newtempFeaByteArray;
+    		getArtifactGroupInfo(writer, newtempFeaByteArray);
+    		inputStreamMap.put(Content.Type.ARCHETYPE.name(), new ByteArrayInputStream(newtempFeaByteArray));
 		} catch (Exception e) {
-			e.printStackTrace();
 			getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
             writer.print(SUCCESS_FALSE);
 			throw new PhrescoException(e);
@@ -377,11 +384,11 @@ public class Features extends ServiceBaseAction {
 	}
 	
 	public void removeUploadedFile() {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Features.removeUploadedFile()");
 		}
 		 if (REQ_FEATURES_UPLOADTYPE.equals(getFileType())) {
-			 s_featureByteArray = null;
+			 featureByteArray = null;
 			 featureJarFileName = "";
 		 } else {
 			inputStreamMap.remove(Content.Type.ICON.name());
@@ -391,18 +398,16 @@ public class Features extends ServiceBaseAction {
 	}
 
 	public String validateForm() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Features.validateForm()");
 		}
 		
 		boolean isError = false;
         //Empty validation for name
-        if (StringUtils.isEmpty(getName())) {
-            setNameError(getText(KEY_I18N_ERR_NAME_EMPTY));
-            isError = true;
-        }
+        isError = nameValidation(isError);
+        
         //Validate whether file is selected during add
-        if (!EDIT.equals(getFromPage()) && s_featureByteArray == null) {
+        if (!EDIT.equals(getFromPage()) && featureByteArray == null) {
             setFileError(getText(KEY_I18N_ERR_APPLNJAR_EMPTY));
             isError = true;
         }
@@ -412,21 +417,30 @@ public class Features extends ServiceBaseAction {
             isError = true;
         }
         
-        if (s_featureByteArray != null) {
+        isError = featureValidation(isError);
+        if (isError) {
+            setErrorFound(true);
+        }
+        
+        return SUCCESS;
+	}
+
+	public boolean featureValidation(boolean isError) {
+		if (featureByteArray != null) {
             //Empty validation for groupId if file is selected
             if (StringUtils.isEmpty(getGroupId())) {
                 setGroupIdError(getText(KEY_I18N_ERR_GROUPID_EMPTY));
-                isError = true;
+                tempError = true;
             }
             //Empty validation for artifactId if file is selected
             if (StringUtils.isEmpty(getArtifactId())) {
                 setArtifactIdError(getText(KEY_I18N_ERR_ARTIFACTID_EMPTY));
-                isError = true;
+                tempError = true;
             }
             //Empty validation for version if file is selected
             if (StringUtils.isEmpty(getVersion())) {
                 setVerError(getText(KEY_I18N_ERR_VER_EMPTY));
-                isError = true;
+                tempError = true;
             }
             //To check whether the version already exist
             // TODO: Lohes(check must be done by querying the DB)
@@ -450,11 +464,15 @@ public class Features extends ServiceBaseAction {
                 }
             }*/
         }
-        if (isError) {
-            setErrorFound(true);
+		return isError;
+	}
+
+	public boolean nameValidation(boolean isError) {
+		if (StringUtils.isEmpty(getName())) {
+            setNameError(getText(KEY_I18N_ERR_NAME_EMPTY));
+            tempError = true;
         }
-        
-        return SUCCESS;
+		return tempError;
 	}
 
 	public String getName() {

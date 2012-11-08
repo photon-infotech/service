@@ -43,10 +43,10 @@ import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.ProjectServiceManager;
+import com.photon.phresco.service.docs.impl.MAGICNUMBER;
 import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.ArchiveUtil;
 import com.photon.phresco.util.ArchiveUtil.ArchiveType;
-import com.photon.phresco.util.FileUtil;
 import com.photon.phresco.util.ServiceConstants;
 import com.photon.phresco.util.Utility;
 
@@ -60,6 +60,7 @@ public class ProjectService {
     private static final Logger S_LOGGER = Logger.getLogger(ProjectService.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	private DbManager dbManager;
+	
 	public ProjectService() throws PhrescoException {
 		PhrescoServerFactory.initialize();
 		dbManager = PhrescoServerFactory.getDbManager();
@@ -129,8 +130,7 @@ public class ProjectService {
 			// //TODO: Need to design a proper way to throw the error response
 			// to client
 		}
-		ServiceOutput serviceOutput = new ServiceOutput(projectPathStr);
-		return serviceOutput;
+		return new ServiceOutput(projectPathStr);
 	}
 	
 	@POST
@@ -173,7 +173,7 @@ public class ProjectService {
 			}
 			try {
 				fis = new FileInputStream(projectPath + ZIP);
-				byte[] buf = new byte[1024];
+				byte[] buf = new byte[MAGICNUMBER.BYTESMALLSIZE];
 				int i = 0;
 				while ((i = fis.read(buf)) != -1) {
 					output.write(buf, 0, i);

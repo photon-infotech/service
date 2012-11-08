@@ -32,11 +32,11 @@ public class PermissionsAction extends ServiceBaseAction {
 	private static final long serialVersionUID = 1L;
 	
 	private static final Logger S_LOGGER = Logger.getLogger(PermissionsAction.class);
-	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
+	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
 	//To get the all the permissions 
 	public String list() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method PermissionsAction.list()");
 		}
 		

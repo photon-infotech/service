@@ -26,7 +26,7 @@ public class ServiceActionUtil implements ServiceUIConstants {
 	
 	private static final long serialVersionUID = -6221527128960085451L;
 	
-	static ActionSupport actionSupport = new ActionSupport();
+	private static ActionSupport actionSupport = new ActionSupport();
 	
 	public static String getTitle(String page, String from) {
 		String propKey = getPropKey(LBL_HDR, page, from);

@@ -82,6 +82,7 @@ public class AdminService extends DbService {
 	private static final Logger S_LOGGER = Logger.getLogger(AdminService.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	private RepositoryManager repositoryManager = null;
+	private static String exceptionString = "PhrescoException Is";
 	
     public AdminService() throws PhrescoException {
     	super();
@@ -184,7 +185,7 @@ public class AdminService extends DbService {
         }
         
     	PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-    	S_LOGGER.error("PhrescoException Is" + phrescoException.getErrorMessage());
+    	S_LOGGER.error(exceptionString + phrescoException.getErrorMessage());
     	throw phrescoException;
     }
 
@@ -327,9 +328,9 @@ public class AdminService extends DbService {
 			}
 		}
 
-		if (video == null) {
-			// TODO:Throw exception
-		}
+//		if (video == null) {
+//			// TODO:Throw exception
+//		}
 
 		if(bodyPartEntity != null) {
 			videoFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null, video.getVideoList().get(0).getArtifactGroup().getPackaging());
@@ -387,7 +388,7 @@ public class AdminService extends DbService {
             (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
         ArtifactGroupDAO moduleGroupDAO = converter.convertObjectToDAO(moduleGroup);
         
-        List<com.photon.phresco.commons.model.ArtifactInfo> moduleGroupVersions = moduleGroup.getVersions();
+//        List<com.photon.phresco.commons.model.ArtifactInfo> moduleGroupVersions = moduleGroup.getVersions();
         List<String> versionIds = new ArrayList<String>();
         
         ArtifactGroupDAO moduleDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
@@ -460,7 +461,7 @@ public class AdminService extends DbService {
 	    }
 		
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-		S_LOGGER.error("PhrescoException Is" + phrescoException.getErrorMessage());
+		S_LOGGER.error(exceptionString + phrescoException.getErrorMessage());
 		throw phrescoException;
 	}
 
@@ -680,7 +681,7 @@ public class AdminService extends DbService {
 	    }
 		
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-		S_LOGGER.error("PhrescoException Is" + phrescoException.getErrorMessage());
+		S_LOGGER.error(exceptionString + phrescoException.getErrorMessage());
 		throw phrescoException;
 	}
 
@@ -849,7 +850,7 @@ public class AdminService extends DbService {
 	    }
 		
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-		S_LOGGER.error("PhrescoException Is"  + phrescoException.getErrorMessage());
+		S_LOGGER.error(exceptionString  + phrescoException.getErrorMessage());
 		throw phrescoException;
 	}
 
@@ -1019,7 +1020,7 @@ public class AdminService extends DbService {
 	    }
 		
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-		S_LOGGER.error("PhrescoException Is"  + phrescoException.getErrorMessage());
+		S_LOGGER.error(exceptionString  + phrescoException.getErrorMessage());
 		throw phrescoException;
 	}
 

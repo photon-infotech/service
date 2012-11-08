@@ -36,7 +36,7 @@ public class GlobalUrlAction extends ServiceBaseAction {
 	private static final long serialVersionUID = 6801037145464060759L;
 	
 	private static final Logger S_LOGGER = Logger.getLogger(GlobalUrlAction.class);
-	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
+	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
 	private String name = "";
 	private String description = "";
@@ -52,7 +52,7 @@ public class GlobalUrlAction extends ServiceBaseAction {
 	
 	//To get the all the globalURLs from the DB
 	public String list() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method GlobalUrlAction.list()");
 		}
 		try {
@@ -66,7 +66,7 @@ public class GlobalUrlAction extends ServiceBaseAction {
 	
 	//To return the page to add GlobalURL
 	public String add() {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method GlobalUrlAction.add()");
 		}
 		setReqAttribute(REQ_FROM_PAGE, ADD);
@@ -76,7 +76,7 @@ public class GlobalUrlAction extends ServiceBaseAction {
 	
 	//To return the edit page with the details of the selected GlobalURL
 	public String edit() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method GlobalUrlAction.edit()");
 		}
 		
@@ -93,7 +93,7 @@ public class GlobalUrlAction extends ServiceBaseAction {
 	
 	//To create a GlobalURL with the provided details
 	public String save() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method GlobalUrlAction.save()");
 		}
 
@@ -124,7 +124,7 @@ public class GlobalUrlAction extends ServiceBaseAction {
 
 	//To update the details of the selected GlobalURL
 	public String update() throws PhrescoException { 
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method GlobalUrlAction.update()");
 		}
 		
@@ -139,7 +139,7 @@ public class GlobalUrlAction extends ServiceBaseAction {
 	
 	//To delete the selected GlobalURLs
 	public String delete() throws PhrescoException {
-	    if (s_isDebugEnabled) {
+	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method GlobalUrlAction.delete()");
 	    }
 
@@ -160,7 +160,7 @@ public class GlobalUrlAction extends ServiceBaseAction {
 	
 	//To validate the form values passed from the jsp
 	public String validateForm() {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method GlobalUrlAction.validateForm()");
 		}
 
@@ -185,7 +185,7 @@ public class GlobalUrlAction extends ServiceBaseAction {
 	}
 	
 	public String cancel() {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method GlobalUrlAction.list()");
 		}
 

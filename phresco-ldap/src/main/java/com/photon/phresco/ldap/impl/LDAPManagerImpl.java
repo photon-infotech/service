@@ -35,7 +35,6 @@
  ******************************************************************************/
 package com.photon.phresco.ldap.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -136,11 +135,9 @@ public class LDAPManagerImpl implements LDAPManager {
 				Attributes attrs = ne.next().getAttributes();
 
 				user.setName(userName);
-		//		userInfo.setCredentials(credentials);
 				user.setDisplayName(getDisplayName(attrs));
 				user.setEmail(getMailId(attrs));
 				user.setPhrescoEnabled(isPhrescoEnabled(attrs)); 
-		//		userInfo.setCustomerNames(getCustomerNames(attrs));
 				
 			}
 			
@@ -148,22 +145,6 @@ public class LDAPManagerImpl implements LDAPManager {
 			throw new PhrescoException(e);
 		}
 		return user;
-	}
-
-	private List<String> getCustomerNames(Attributes attrs) throws NamingException {
-		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method LDAPManagerImpl.getCustomerName(Attributes attrs");
-		}
-		List<String> customerNames = new ArrayList<String>();
-		Attribute attribute=attrs.get(ldapConfig.getCustomerNameAttribute());
-		if (attribute != null) {
-			NamingEnumeration<?> all = attribute.getAll();
-			while (all.hasMoreElements()) {
-				customerNames.add((String)all.nextElement());
-			}
-		}
-		
-		return customerNames;
 	}
 
 	private boolean isPhrescoEnabled(Attributes attrs) throws NamingException {

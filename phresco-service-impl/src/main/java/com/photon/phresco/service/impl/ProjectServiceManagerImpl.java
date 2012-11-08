@@ -88,23 +88,14 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 		
 		Map<String, String> appInfoMap = new HashMap<String, String>();
 		PhrescoServerFactory.initialize();
-		DbManager dbManager = PhrescoServerFactory.getDbManager();
-		ProjectInfo projectInfoInDB = dbManager.getProjectInfo(projectInfo.getId());
+		DbManager dBManager = PhrescoServerFactory.getDbManager();
+		ProjectInfo projectInfoInDB = dBManager.getProjectInfo(projectInfo.getId());
 		
 		List<ApplicationInfo> appInfosInDB = projectInfoInDB.getAppInfos();
 		List<ApplicationInfo> appInfos = projectInfo.getAppInfos();
 		List<ApplicationInfo> createdAppInfos = new ArrayList<ApplicationInfo>();
 		
-		for (ApplicationInfo appInfoInDB : appInfosInDB) {
-			String techType = appInfoInDB.getTechInfo().getVersion();
-			appInfoMap.put(techType, techType);
-		}
-		
-		for (ApplicationInfo appInfo : appInfos) {
-			if (!appInfoMap.containsKey(appInfo.getTechInfo().getVersion())) {
-				createdAppInfos.add(appInfo);
-			}
-		}
+		findNewlyAddedProject(appInfoMap, appInfosInDB, appInfos, createdAppInfos);
 		
 		ProjectInfo projectInfoClone = projectInfo.clone();
 		if(CollectionUtils.isNotEmpty(createdAppInfos)) {
@@ -116,7 +107,7 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 		
 		for (ApplicationInfo applicationInfo : appInfos) {
 			if(applicationInfo.getPilotInfo() != null) {
-				ApplicationInfo appInfo = dbManager.getProjectInfo(applicationInfo.getId(), applicationInfo.getCustomerIds().get(0));
+				ApplicationInfo appInfo = dBManager.getProjectInfo(applicationInfo.getId(), applicationInfo.getCustomerIds().get(0));
 				if(appInfo.getPilotInfo() == null) {
 					createPilots(applicationInfo, tempFolderPath);
 				} else if(!StringUtils.equals(appInfo.getPilotInfo().getId(), applicationInfo.getPilotInfo().getId())) {
@@ -125,9 +116,23 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 			}
 		}
 		
-		dbManager.storeCreatedProjects(projectInfo);
+		dBManager.storeCreatedProjects(projectInfo);
 		if (isDebugEnabled) {
 			S_LOGGER.info("successfully updated application :" + projectInfo.getName());
+		}
+	}
+
+	public void findNewlyAddedProject(Map<String, String> appInfoMap, List<ApplicationInfo> appInfosInDB,
+			List<ApplicationInfo> appInfos, List<ApplicationInfo> createdAppInfos) {
+		for (ApplicationInfo appInfoInDB : appInfosInDB) {
+			String techType = appInfoInDB.getTechInfo().getVersion();
+			appInfoMap.put(techType, techType);
+		}
+		
+		for (ApplicationInfo appInfo : appInfos) {
+			if (!appInfoMap.containsKey(appInfo.getTechInfo().getVersion())) {
+				createdAppInfos.add(appInfo);
+			}
 		}
 	}
 

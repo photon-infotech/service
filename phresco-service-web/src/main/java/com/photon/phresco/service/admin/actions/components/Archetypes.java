@@ -20,7 +20,6 @@
 package com.photon.phresco.service.admin.actions.components;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -31,7 +30,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.JAXBException;
 
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -56,7 +54,7 @@ public class Archetypes extends ServiceBaseAction {
 	private static final long serialVersionUID = 6801037145464060759L;
 	
 	private static final Logger S_LOGGER = Logger.getLogger(Archetypes.class);
-	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
+	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
 	/* plugin and archetype jar InputStream Map*/
 	private static Map<String, InputStream> inputStreamMap = new HashMap<String, InputStream>();
@@ -64,10 +62,8 @@ public class Archetypes extends ServiceBaseAction {
 	//Plugin jar artifact info map
 	private static Map<String, ArtifactGroup> pluginArtfactInfoMap = new HashMap<String, ArtifactGroup>();
 
-	private static List<ArtifactGroup> pluginArtficatInfos = null;
-	private static byte[] s_archetypeJarByteArray = null;
-	private static String s_archetypeJarName = null;
-	static List<ArtifactGroup> pluginInfos = new ArrayList<ArtifactGroup>();
+	private static byte[] archetypeJarByteArray = null;
+	private static List<ArtifactGroup> pluginInfos = new ArrayList<ArtifactGroup>();
 
 	private String name = "";
 	private String nameError = "";
@@ -98,9 +94,12 @@ public class Archetypes extends ServiceBaseAction {
 	private List<String> applicableReports = null;
 	private boolean archType = false;
 	private String versioning = "";
+	private boolean tempError = false;
+	
+	private byte[] newtempApplnByteArray = null;
 	
 	public String list() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.list()");
 		}
 
@@ -117,15 +116,13 @@ public class Archetypes extends ServiceBaseAction {
 		/* To clear all static variables after successfull create or update */
 		inputStreamMap.clear();
 		pluginArtfactInfoMap.clear();
-		s_archetypeJarByteArray = null;
-		s_archetypeJarName = null;
-		pluginArtficatInfos = null;
+		archetypeJarByteArray = null;
 
 		return COMP_ARCHETYPE_LIST;
 	}
 
 	public String add() throws PhrescoException {
-	    if (s_isDebugEnabled) {
+	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Archetypes.add()");
 	    }
 
@@ -146,7 +143,7 @@ public class Archetypes extends ServiceBaseAction {
 	}
 	
 	public String edit() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.edit()");
 		}
 
@@ -170,16 +167,16 @@ public class Archetypes extends ServiceBaseAction {
 	}
 	
 	public String save() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.save()");
 		}
 
 		try {
 			Technology technology = createTechnology();
-			List<InputStream> inputStreams = new ArrayList<InputStream>();
+//			List<InputStream> inputStreams = new ArrayList<InputStream>();
 			//save application jar files
-			if(s_archetypeJarByteArray != null){
-				inputStreamMap.put(technology.getName(),  new ByteArrayInputStream(s_archetypeJarByteArray));
+			if(archetypeJarByteArray != null){
+				inputStreamMap.put(technology.getName(),  new ByteArrayInputStream(archetypeJarByteArray));
 			} 
 			getServiceManager().createArcheTypes(technology, inputStreamMap, getCustomerId());
 			addActionMessage(getText(ARCHETYPE_ADDED, Collections.singletonList(name)));
@@ -220,15 +217,15 @@ public class Archetypes extends ServiceBaseAction {
 	}
 
 	public String update() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.update()");
 		}
 		
 		try {
 			Technology technology = createTechnology();
 			//update application jar files
-			if(s_archetypeJarByteArray != null){
-				inputStreamMap.put(technology.getName(),  new ByteArrayInputStream(s_archetypeJarByteArray));
+			if(archetypeJarByteArray != null){
+				inputStreamMap.put(technology.getName(),  new ByteArrayInputStream(archetypeJarByteArray));
 			} 
 			getServiceManager().updateArcheType(technology, inputStreamMap, getCustomerId());
 			addActionMessage(getText(ARCHETYPE_UPDATED, Collections.singletonList(getName())));
@@ -244,7 +241,7 @@ public class Archetypes extends ServiceBaseAction {
      * @throws PhrescoException
      */
     private Technology createTechnology() throws PhrescoException {
-    	if (s_isDebugEnabled) {
+    	if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.getTechnology()");
 		}
         Technology technology = new Technology();
@@ -289,7 +286,7 @@ public class Archetypes extends ServiceBaseAction {
 	}
 
 	public String delete() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.delete()");
 		}
 
@@ -297,8 +294,8 @@ public class Archetypes extends ServiceBaseAction {
 			String[] techTypeIds = getReqParameterValues(REQ_ARCHE_TECHID);
 			if (ArrayUtils.isNotEmpty(techTypeIds)) {
                 ServiceManager serviceManager = getServiceManager();
-				for (String techId : techTypeIds) {
-                    serviceManager.deleteArcheType(techId, getCustomerId());
+				for (String techid : techTypeIds) {
+                    serviceManager.deleteArcheType(techid, getCustomerId());
 				}
 				addActionMessage(getText(ARCHETYPE_DELETED));
 			}
@@ -310,7 +307,7 @@ public class Archetypes extends ServiceBaseAction {
 	}
 	
 	public String uploadJar() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.uploadAppJar()");
 		}
 		
@@ -345,7 +342,7 @@ public class Archetypes extends ServiceBaseAction {
 		try {
 			String pluginJarName = getFileName();
 			byte[] byteArray = tempApplnByteArray;
-			ArtifactGroup artifactGroupInfo = getArtifactGroupInfo(writer, tempApplnByteArray);
+//			ArtifactGroup artifactGroupInfo = getArtifactGroupInfo(writer, tempApplnByteArray);
 			inputStreamMap.put(pluginJarName, new ByteArrayInputStream(byteArray));
 		} catch (Exception e) {
 		}
@@ -359,19 +356,23 @@ public class Archetypes extends ServiceBaseAction {
 	 * @throws IOException
 	 */
 	private void uploadArchetypeJar(PrintWriter writer, byte[] tempApplnByteArray) throws PhrescoException {
-		boolean isArchetypeJar = ServerUtil.validateArchetypeJar(new ByteArrayInputStream(tempApplnByteArray));
-		if (isArchetypeJar) {
-			s_archetypeJarByteArray = tempApplnByteArray;
-			getArtifactGroupInfo(writer, tempApplnByteArray);
+		if (tempApplnByteArray == null) {
+			this.newtempApplnByteArray = new byte[0];
 		} else {
-			s_archetypeJarName = null;
-			s_archetypeJarByteArray = null;
+			this.newtempApplnByteArray = Arrays.copyOf(tempApplnByteArray, tempApplnByteArray.length);
+		}
+		boolean isArchetypeJar = ServerUtil.validateArchetypeJar(new ByteArrayInputStream(newtempApplnByteArray));
+		if (isArchetypeJar) {
+			archetypeJarByteArray = newtempApplnByteArray;
+			getArtifactGroupInfo(writer, newtempApplnByteArray);
+		} else {
+			archetypeJarByteArray = null;
 			writer.print(INVALID_ARCHETYPE_JAR);
 		}
 	}
 
 	public String showPluginJarPopup() {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Archetypes.showPluginJarPopup()");
 	    }
 		setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
@@ -380,7 +381,7 @@ public class Archetypes extends ServiceBaseAction {
 	}
 	
 	public void removeUploadedJar() {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Archetypes.removeUploadedJar()");
 	    }
 		
@@ -390,20 +391,46 @@ public class Archetypes extends ServiceBaseAction {
 			inputStreamMap.remove(uploadedFileName);
 			pluginArtfactInfoMap.remove(uploadedFileName);
 		} else {
-			s_archetypeJarName = null;
-			s_archetypeJarByteArray = null;
+			archetypeJarByteArray = null;
 		}
 	}
 	
 	public String validateForm() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.validateForm()");
 		}
 		
 		boolean isError = false;
+		isError = nameValidation(isError);
+
+		isError = versionValidation(isError);
+
+		isError = appTypeValidation(isError);
+		
+		isError = archJarValidation(isError);
+		
+		//Empty validation for applicable features
+		isError = featureValidation(isError);
+		
+		if (isError) {
+            setErrorFound(true);
+        }
+		
+		return SUCCESS;
+	}
+
+	public boolean featureValidation(boolean isError) {
+		if (getApplicable() == null) {
+			setApplicableErr(getText(KEY_I18N_ERR_APPLICABLE_EMPTY ));
+			tempError = true;
+		}
+		return tempError;
+	}
+
+	public boolean nameValidation(boolean isError) throws PhrescoException {
 		if (StringUtils.isEmpty(getName())) {
 			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY ));
-			isError = true;
+			tempError = true;
 		} else if (ADD.equals(getFromPage()) || (!getName().equals(getOldName()))) {
 			// To check whether the name already exist (Application type wise)
 			List<Technology> archetypes = getServiceManager().getArcheTypes(getCustomerId());
@@ -411,39 +438,37 @@ public class Archetypes extends ServiceBaseAction {
 				for (Technology archetype : archetypes) {
 					if (archetype.getAppTypeId().equals(getApptype()) && archetype.getName().equalsIgnoreCase(getName())) {
 						setNameError(getText(KEY_I18N_ERR_NAME_ALREADY_EXIST_APPTYPE));
-						isError = true;
+						tempError = true;
 						break;
 					}
 				}
 			}
 		}
+		return tempError;
+	}
 
-		if (StringUtils.isEmpty(getTechVersion())) {
-			setTechvernError(getText(KEY_I18N_ERR_TECHVER_EMPTY));
-			isError = true;
+	public boolean archJarValidation(boolean isError) {
+		if (archetypeJarByteArray == null) {
+			setFileError(getText(KEY_I18N_ERR_ARCHETYPEJAR_EMPTY));
+			tempError = true;
 		}
+		return tempError;
+	}
 
+	public boolean appTypeValidation(boolean isError) {
 		if (StringUtils.isEmpty(getApptype())) {
 			setAppError(getText(KEY_I18N_ERR_APPTYPE_EMPTY));
-			isError = true;
+			tempError = true;
 		}
-		
-		if (s_archetypeJarByteArray == null) {
-			setFileError(getText(KEY_I18N_ERR_ARCHETYPEJAR_EMPTY));
-			isError = true;
+		return tempError;
+	}
+
+	public boolean versionValidation(boolean isError) {
+		if (StringUtils.isEmpty(getTechVersion())) {
+			setTechvernError(getText(KEY_I18N_ERR_TECHVER_EMPTY));
+			tempError = true;
 		}
-		
-		//Empty validation for applicable features
-		if (getApplicable() == null) {
-			setApplicableErr(getText(KEY_I18N_ERR_APPLICABLE_EMPTY ));
-			isError = true;
-		}
-		
-		if (isError) {
-            setErrorFound(true);
-        }
-		
-		return SUCCESS;
+		return tempError;
 	}
 
 	public String getName() {

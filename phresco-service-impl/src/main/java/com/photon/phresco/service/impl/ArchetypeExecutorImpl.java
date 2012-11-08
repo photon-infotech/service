@@ -67,11 +67,11 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
     public static final String WINDOWS 			= "Windows";
     private static final String PHRESCO_FOLDER_NAME = "phresco";
     private static final String DOT_PHRESCO_FOLDER 	= "." + PHRESCO_FOLDER_NAME;
-    private ServerConfiguration serverConfiguration; 
+//    private ServerConfiguration serverConfiguration; 
     private DbManager dbManager = null;
     
     public ArchetypeExecutorImpl(ServerConfiguration serverConfiguration) throws PhrescoException {
-        this.serverConfiguration = serverConfiguration;
+//        this.serverConfiguration = serverConfiguration;
         PhrescoServerFactory.initialize();
         dbManager = PhrescoServerFactory.getDbManager();
     }

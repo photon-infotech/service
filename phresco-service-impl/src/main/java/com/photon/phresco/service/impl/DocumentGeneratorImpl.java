@@ -58,8 +58,8 @@ import com.photon.phresco.util.Utility;
 public class DocumentGeneratorImpl implements DocumentGenerator {
 	private static final Logger S_LOGGER= Logger.getLogger(DocumentGeneratorImpl.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
-    private static final String MODULES = "Modules";
-    private static final String LIB = "JsLibraries";
+//    private static final String MODULES = "Modules";
+//    private static final String LIB = "JsLibraries";
 
     @Override
     public void generate(ApplicationInfo info, File filePath)

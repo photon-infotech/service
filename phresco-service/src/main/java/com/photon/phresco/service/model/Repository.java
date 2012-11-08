@@ -5,9 +5,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class Repository {
 	
-	String id;
-	String name;
-	String resourceURI;
+	private String id;
+	private String name;
+	private String resourceURI;
 	
 	public Repository() {
 	}

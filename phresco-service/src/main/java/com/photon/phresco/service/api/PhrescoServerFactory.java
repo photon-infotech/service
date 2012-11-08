@@ -37,8 +37,6 @@ package com.photon.phresco.service.api;
 
 import java.lang.reflect.Constructor;
 
-import com.photon.phresco.commons.model.ApplicationInfo;
-import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.model.ServerConfiguration;
 

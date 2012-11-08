@@ -26,7 +26,6 @@ import org.apache.log4j.Logger;
 
 import com.photon.phresco.commons.model.LogInfo;
 import com.photon.phresco.exception.PhrescoException;
-import com.sun.jersey.api.client.ClientResponse;
 
 
 
@@ -53,7 +52,7 @@ public class ErrorReport extends ServiceBaseAction {
         	if (debugEnabled) {
         		S_LOGGER.debug("Going to send error report to service ");
     		}
-        	ClientResponse response = getServiceManager().sendErrorReport(infos);
+//        	ClientResponse response = getServiceManager().sendErrorReport(infos);
         } catch (Exception e) {
         	throw new PhrescoException(e);
         }

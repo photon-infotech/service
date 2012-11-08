@@ -37,7 +37,7 @@ public class ApplicationTypes extends ServiceBaseAction {
 	private static final long serialVersionUID = 6801037145464060759L;
 	
 	private static final Logger S_LOGGER = Logger.getLogger(ApplicationTypes.class);
-	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
+	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 
 	private String customerId = "";
 	
@@ -53,7 +53,7 @@ public class ApplicationTypes extends ServiceBaseAction {
     private boolean errorFound = false;
 
     public String list() {
-	    if (s_isDebugEnabled) {
+	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method ApplicationTypes.list()");
 	    }
 
@@ -69,7 +69,7 @@ public class ApplicationTypes extends ServiceBaseAction {
 	}
 
 	public String add() {
-	    if (s_isDebugEnabled) {
+	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method ApplicationTypes.add()");
 	    }
 	    
@@ -79,7 +79,7 @@ public class ApplicationTypes extends ServiceBaseAction {
 	}
 
 	public String edit() {
-	    if (s_isDebugEnabled) {
+	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method ApplicationTypes.edit()");
 	    }
 		
@@ -95,7 +95,7 @@ public class ApplicationTypes extends ServiceBaseAction {
 	}
 
 	public String save() {
-	    if (s_isDebugEnabled) {
+	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method ApplicationTypes.save()");
 	    }
 		
@@ -112,7 +112,7 @@ public class ApplicationTypes extends ServiceBaseAction {
 	}
 
 	public String update() {
-	    if (s_isDebugEnabled) {
+	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Apptypes.update()");
 	    }
 
@@ -138,15 +138,15 @@ public class ApplicationTypes extends ServiceBaseAction {
     }
 
 	public String delete() throws PhrescoException {
-	    if (s_isDebugEnabled) {
+	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method AppType.delete()");
 	    }
 
 		try {
 			String[] appTypeIds = getHttpRequest().getParameterValues(REQ_APP_TYPEID);
 			if (ArrayUtils.isNotEmpty(appTypeIds)) {
-				for (String appTypeId : appTypeIds) {
-					getServiceManager().deleteApplicationType(appTypeId, getCustomerId());
+				for (String appTypeid : appTypeIds) {
+					getServiceManager().deleteApplicationType(appTypeid, getCustomerId());
 				}
 				addActionMessage(getText(APPTYPES_DELETED));
 			}
@@ -158,7 +158,7 @@ public class ApplicationTypes extends ServiceBaseAction {
 	}
 
 	public String validateForm() {
-	    if (s_isDebugEnabled) {
+	    if (isDebugEnabled) {
             S_LOGGER.debug("Entering Method AppType.validateForm()");
         }
 

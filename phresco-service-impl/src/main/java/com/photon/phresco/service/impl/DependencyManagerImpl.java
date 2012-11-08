@@ -72,10 +72,9 @@ import com.phresco.pom.util.PomProcessor;
 public class DependencyManagerImpl implements DependencyManager {
 	
 	private DbManager dbManager = null;
-	private String customerId = null;
 	private static Map<String, String> artifactTypeMap = new HashMap<String, String>();
 	private static Map<String, String> testPomFiles = new HashMap<String, String>();
-	private String type = null;
+	private String artifactType = null;
 	
 	static {
 		artifactTypeMap.put("FEATURE", "${feature.directory}");
@@ -98,6 +97,7 @@ public class DependencyManagerImpl implements DependencyManager {
 	
 	@Override
 	public void configureProject(ApplicationInfo applicationInfo, File projectPath) throws PhrescoException {
+		String customerId = null;
 		customerId = applicationInfo.getCustomerIds().get(0);
 		
 		if(StringUtils.isEmpty(customerId)) {
@@ -142,7 +142,7 @@ public class DependencyManagerImpl implements DependencyManager {
 	}
 
 	private void updatePOMWithArtifacts(File path, List<ArtifactGroup> modules, String type) throws PhrescoException {
-		this.type = type;
+		this.artifactType = type;
 		if(CollectionUtils.isEmpty(modules)) {
 			return;
 		}
@@ -213,7 +213,7 @@ public class DependencyManagerImpl implements DependencyManager {
 		org.w3c.dom.Element overWrite = doc.createElement("overWrite");
 		overWrite.setTextContent("false");
 		org.w3c.dom.Element outputDirectory = doc.createElement("outputDirectory");
-		outputDirectory.setTextContent(artifactTypeMap.get(type));	
+		outputDirectory.setTextContent(artifactTypeMap.get(artifactType));	
 		configList.add(groupId);
 		configList.add(artifactId);
 		configList.add(version);

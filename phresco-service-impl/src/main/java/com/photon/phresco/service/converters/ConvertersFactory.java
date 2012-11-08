@@ -23,7 +23,6 @@ package com.photon.phresco.service.converters;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.Element;
 import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.dao.ApplicationInfoDAO;

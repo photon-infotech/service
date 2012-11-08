@@ -17,7 +17,6 @@ import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 import java.util.zip.ZipEntry;
 
-import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
@@ -244,7 +243,7 @@ public class ServerUtil {
         }
         try {
             fileOutStream = new FileOutputStream(artifactFile);
-            byte buf[] = new byte[1024];
+            byte buf[] = new byte[MAGICNUMBER.BYTESIZE];
             int len;
             while ((len = inputStream.read(buf)) > 0) {
                 fileOutStream.write(buf, 0, len);
@@ -355,7 +354,7 @@ public class ServerUtil {
 			msgDigest.update(bytes);
 			byte messageDigests[] = msgDigest.digest();
 			for (int i = 0; i < messageDigests.length; i++) {
-			stringBuffer.append(Integer.toHexString(0xFF & messageDigests[i]));
+			stringBuffer.append(Integer.toHexString(MAGICNUMBER.HEXADECIMAL & messageDigests[i]));
 			}
 		} catch (NoSuchAlgorithmException e) {
 			throw new PhrescoException(e);

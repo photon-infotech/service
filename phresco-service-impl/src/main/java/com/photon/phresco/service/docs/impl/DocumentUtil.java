@@ -70,6 +70,7 @@ public final class DocumentUtil {
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	private static String coreModule = "COREMODULE";
     private static String externalModule = "EXTERNALMODULE";
+	
     private DocumentUtil(){
 
     }
@@ -79,58 +80,62 @@ public final class DocumentUtil {
      * Adds title section.
      * @param info the project info object
      * @return PDF input stream
-     * @throws DocumentException
+     * @throws PhrescoException 
      */
-    public static InputStream getTitleSection(ApplicationInfo info) throws DocumentException{
+    public static InputStream getTitleSection(ApplicationInfo info) throws PhrescoException {
     	if (isDebugEnabled) {
     		S_LOGGER.debug(" Entering Method DocumentUtil.getTitleSection(ProjectInfo info)");
 		}
     	if (isDebugEnabled) {
     		S_LOGGER.debug("getTitleSection() projectCode=" + info.getCode());
 		}
-        //create output stream
-        com.itextpdf.text.Document docu = new com.itextpdf.text.Document();
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        PdfWriter.getInstance(docu, os);
-        docu.open();
+        try {
+			//create output stream
+			com.itextpdf.text.Document docu = new com.itextpdf.text.Document();
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			PdfWriter.getInstance(docu, os);
+			docu.open();
 
-        //add standard title section with supplied info object
-        Paragraph paragraph = new Paragraph();
-        paragraph.setAlignment(Element.ALIGN_CENTER);
-        paragraph.setFont(DocConstants.TITLE_FONT);
-        addBlankLines(paragraph, 10);
-        paragraph.add(info.getName());
-        addBlankLines(paragraph, 4);
-        docu.add(paragraph);
-        
-        paragraph = new Paragraph();
-        paragraph.setAlignment(Element.ALIGN_CENTER);
-        addBlankLines(paragraph, 10);
-        String techName = info.getTechInfo().getVersion();
-    	if(StringUtils.isNotEmpty(info.getTechInfo().getVersion())) {
-    		paragraph.add(techName + " - " + info.getTechInfo().getVersion());
-    	} else {
-    		paragraph.add(techName);
-    	}
-        docu.add(paragraph);
-        
-        paragraph = new Paragraph();
-        addBlankLines(paragraph, 10);
-        paragraph.setAlignment(Element.ALIGN_CENTER);
-        paragraph.add(DocumentMessages.getString("Documents.version.name") + getVersion(info)); //$NON-NLS-1$
-        addBlankLines(paragraph, 7);
-        docu.add(paragraph);
-        paragraph = new Paragraph();
-        paragraph.setAlignment(Element.ALIGN_RIGHT);
-        paragraph.setFont(DocConstants.DESC_FONT);
-        paragraph.setFirstLineIndent(8);
-        paragraph.add(info.getDescription());
-        docu.add(paragraph);
+			//add standard title section with supplied info object
+			Paragraph paragraph = new Paragraph();
+			paragraph.setAlignment(Element.ALIGN_CENTER);
+			paragraph.setFont(DocConstants.TITLE_FONT);
+			addBlankLines(paragraph, MAGICNUMBER.DOCLINES);
+			paragraph.add(info.getName());
+			addBlankLines(paragraph, MAGICNUMBER.BLANKLINESFOUR);
+			docu.add(paragraph);
+			
+			paragraph = new Paragraph();
+			paragraph.setAlignment(Element.ALIGN_CENTER);
+			addBlankLines(paragraph, MAGICNUMBER.DOCLINES);
+			String techName = info.getTechInfo().getVersion();
+			if(StringUtils.isNotEmpty(info.getTechInfo().getVersion())) {
+				paragraph.add(techName + " - " + info.getTechInfo().getVersion());
+			} else {
+				paragraph.add(techName);
+			}
+			docu.add(paragraph);
+			
+			paragraph = new Paragraph();
+			addBlankLines(paragraph, MAGICNUMBER.DOCLINES);
+			paragraph.setAlignment(Element.ALIGN_CENTER);
+			paragraph.add(DocumentMessages.getString("Documents.version.name") + getVersion(info)); //$NON-NLS-1$
+			addBlankLines(paragraph, MAGICNUMBER.BLANKLINESSEVEN);
+			docu.add(paragraph);
+			paragraph = new Paragraph();
+			paragraph.setAlignment(Element.ALIGN_RIGHT);
+			paragraph.setFont(DocConstants.DESC_FONT);
+			paragraph.setFirstLineIndent(MAGICNUMBER.BLANKLINESEIGHT);
+			paragraph.add(info.getDescription());
+			docu.add(paragraph);
 
-        docu.close();
+			docu.close();
 
-        //Create an inputstream to return.
-        return new ByteArrayInputStream(os.toByteArray());
+			//Create an inputstream to return.
+			return new ByteArrayInputStream(os.toByteArray());
+		} catch (DocumentException e) {
+			throw new PhrescoException(e);
+		}
 
     }
 
@@ -157,28 +162,32 @@ public final class DocumentUtil {
      * Creates and returns PDF input stream for the supplied string.
      * @param string to be printed in the PDF
      * @return PDF input stream.
-     * @throws DocumentException
+     * @throws PhrescoException
      */
-    public static InputStream getStringAsPDF(String string) throws DocumentException{
+    public static InputStream getStringAsPDF(String string) throws PhrescoException {
     	if (isDebugEnabled) {
     		S_LOGGER.debug("Entering Method DocumentUtil.getStringAsPDF(String string)");
 		}
-    	com.itextpdf.text.Document docu = new com.itextpdf.text.Document();
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        PdfWriter.getInstance(docu, os);
-        docu.open();
-        Paragraph paragraph = new Paragraph();
-        paragraph.setAlignment(Element.ALIGN_LEFT);
-        paragraph.setFirstLineIndent(180);
-        paragraph.add("\n"); //$NON-NLS-1$
-        paragraph.add(string);
-        paragraph.add("\n\n"); //$NON-NLS-1$
-        docu.add(paragraph);
+    	try {
+			com.itextpdf.text.Document docu = new com.itextpdf.text.Document();
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			PdfWriter.getInstance(docu, os);
+			docu.open();
+			Paragraph paragraph = new Paragraph();
+			paragraph.setAlignment(Element.ALIGN_LEFT);
+			paragraph.setFirstLineIndent(MAGICNUMBER.INDENTLINE);
+			paragraph.add("\n"); //$NON-NLS-1$
+			paragraph.add(string);
+			paragraph.add("\n\n"); //$NON-NLS-1$
+			docu.add(paragraph);
 
-        docu.close();
+			docu.close();
 
-        //Create an inputstream to return.
-        return new ByteArrayInputStream(os.toByteArray());
+			//Create an inputstream to return.
+			return new ByteArrayInputStream(os.toByteArray());
+		} catch (DocumentException e) {
+			throw new PhrescoException(e);
+		}
 
     }
 
@@ -189,55 +198,58 @@ public final class DocumentUtil {
      * @param type Entity type
      * @return PDF input stream.
      * @throws PhrescoException
-     * @throws DocumentException
-     * @throws IOException
      */
-    public static InputStream getDocumentStream(List<ArtifactGroup> modules, String moduleType) throws PhrescoException, DocumentException, IOException {
+    public static InputStream getDocumentStream(List<ArtifactGroup> modules, String moduleType) throws PhrescoException {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entering Method DocumentUtil.getDocumentStream(RepositoryManager repoManager,List<TupleBean> modules, EntityType type)");
         }
-        if(modules!= null && !modules.isEmpty()){
-            com.itextpdf.text.Document docu = new com.itextpdf.text.Document();
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            PdfWriter writer = PdfWriter.getInstance(docu, os);
-            docu.open();
-            if(moduleType.equals("Modules")) {
-            	 List<ArtifactGroup> coreModules = new ArrayList<ArtifactGroup>();
-                 List<ArtifactGroup> externalModules = new ArrayList<ArtifactGroup>();
-                 for (ArtifactGroup moduleGroup : modules) {
+        try {
+			if(!modules.isEmpty()){
+			    com.itextpdf.text.Document docu = new com.itextpdf.text.Document();
+			    ByteArrayOutputStream os = new ByteArrayOutputStream();
+			    PdfWriter writer = PdfWriter.getInstance(docu, os);
+			    docu.open();
+			    if(moduleType.equals("Modules")) {
+			    	 List<ArtifactGroup> coreModules = new ArrayList<ArtifactGroup>();
+			         List<ArtifactGroup> externalModules = new ArrayList<ArtifactGroup>();
+//			         for (ArtifactGroup moduleGroup : modules) {
 //                 	if (moduleGroup.getC) {
 //                      	 coreModules.add(moduleGroup);
 //                 	}
 //                 	if (!moduleGroup.isCore()) {
 //                      	 externalModules.add(moduleGroup);
 //                 	}
-                 }	
-             		if (coreModules != null && CollectionUtils.isNotEmpty(coreModules) && moduleType.equals("Modules")) {
-             			updateDoc(coreModules, docu, writer, coreModule);
-             		}
-             		if (externalModules != null && CollectionUtils.isNotEmpty(externalModules) && moduleType.equals("Modules")) {
-             			updateDoc(externalModules, docu, writer, externalModule);
-             		}
-            }
-            	if (moduleType.equals("JsLibraries")) {
-            		updateDoc(modules, docu, writer, moduleType);
-            	}
-            docu.close();
+//			         }	
+			     		if (CollectionUtils.isNotEmpty(coreModules) && moduleType.equals("Modules")) {
+			     			updateDoc(coreModules, docu, writer, coreModule);
+			     		}
+			     		if (CollectionUtils.isNotEmpty(externalModules) && moduleType.equals("Modules")) {
+			     			updateDoc(externalModules, docu, writer, externalModule);
+			     		}
+			    }
+			    	if (moduleType.equals("JsLibraries")) {
+			    		updateDoc(modules, docu, writer, moduleType);
+			    	}
+			    docu.close();
 
-            return new ByteArrayInputStream(os.toByteArray());
-        }
-        return null;
+			    return new ByteArrayInputStream(os.toByteArray());
+			}
+			return null;
+		} catch (DocumentException e) {
+			throw new PhrescoException(e);
+		}
     }
 
-    private static void updateDoc(List<ArtifactGroup> modules, com.itextpdf.text.Document docu, PdfWriter writer, String moduleName)	throws DocumentException, PhrescoException, IOException {
-		Paragraph para = new Paragraph();
-		para.setAlignment(Element.ALIGN_CENTER);
-        para.setFont(DocConstants.BODY_FONT);
-        para.setFont(DocConstants.CATEGORY_FONT);
-        para.add(moduleName);
-        addBlankLines(para, 2);
-        docu.add(para); 
-        
+    private static void updateDoc(List<ArtifactGroup> modules, com.itextpdf.text.Document docu, PdfWriter writer, String moduleName) throws PhrescoException {
+		try {
+			Paragraph para = new Paragraph();
+			para.setAlignment(Element.ALIGN_CENTER);
+			para.setFont(DocConstants.BODY_FONT);
+			para.setFont(DocConstants.CATEGORY_FONT);
+			para.add(moduleName);
+			addBlankLines(para, MAGICNUMBER.BLANKLINESTWO);
+			docu.add(para); 
+			
 //		for (ModuleGroup tupleBean : modules) {
 //		    para = new Paragraph();
 //		    para.setFont(DocConstants.CATEGORY_FONT);
@@ -259,6 +271,9 @@ public final class DocumentUtil {
 //		        }
 //		    }
 //		}
+		} catch (DocumentException e) {
+			throw new PhrescoException(e);
+		}
 	}
 
     
@@ -268,7 +283,7 @@ public final class DocumentUtil {
      * @param p the Paragraph object
      * @param noOfLines no of blank lines.
      */
-    private static void addBlankLines(Paragraph p, int noOfLines){
+    private static void addBlankLines(Paragraph p, int noOfLines) {
     	if (isDebugEnabled) {
     		S_LOGGER.debug("Entering Method DocumentUtil.addBlankLines(Paragraph p, int noOfLines)");
 		}
@@ -285,21 +300,26 @@ public final class DocumentUtil {
     /**
      * @param titleSection
      * @param pdfCopy
-     * @throws IOException
-     * @throws BadPdfFormatException
+     * @throws PhrescoException 
      */
-    public static void addPages(InputStream titleSection, PdfCopy pdfCopy) throws IOException, BadPdfFormatException {
+    public static void addPages(InputStream titleSection, PdfCopy pdfCopy) throws PhrescoException {
     	if (isDebugEnabled) {
     		S_LOGGER.debug("Entering Method DocumentUtil.addPages(InputStream titleSection, PdfCopy pdfCopy)");
 		}
-    	PdfReader reader = new PdfReader(titleSection);
-        reader.consolidateNamedDestinations();
-        int pages = reader.getNumberOfPages();
-        for (int i = 1; i <= pages; i++) {
-            PdfImportedPage importedPage = pdfCopy.getImportedPage(reader, i);
-            pdfCopy.addPage(importedPage);
-        }
-        pdfCopy.freeReader(reader);
+    	try {
+			PdfReader reader = new PdfReader(titleSection);
+			reader.consolidateNamedDestinations();
+			int pages = reader.getNumberOfPages();
+			for (int i = 1; i <= pages; i++) {
+			    PdfImportedPage importedPage = pdfCopy.getImportedPage(reader, i);
+			    pdfCopy.addPage(importedPage);
+			}
+			pdfCopy.freeReader(reader);
+		} catch (BadPdfFormatException e) {
+			throw new PhrescoException(e);
+		} catch (IOException e) {
+			throw new PhrescoException(e);
+		}
     }
 
 
@@ -307,23 +327,26 @@ public final class DocumentUtil {
      * @param titleSection
      * @param writer
      * @param docu
-     * @throws IOException
-     * @throws DocumentException
+     * @throws PhrescoException 
      */
-    public static void addPages(InputStream titleSection, PdfWriter writer, com.itextpdf.text.Document docu) throws IOException, DocumentException {
+    public static void addPages(InputStream titleSection, PdfWriter writer, com.itextpdf.text.Document docu) throws PhrescoException {
     	if (isDebugEnabled) {
     		S_LOGGER.debug("Entering Method DocumentUtil.addPages(InputStream titleSection, PdfWriter writer, com.itextpdf.text.Document docu)");
 		}
-    	PdfReader reader = new PdfReader(titleSection);
-        reader.consolidateNamedDestinations();
-        PdfContentByte cb = writer.getDirectContent();
+    	try {
+			PdfReader reader = new PdfReader(titleSection);
+			reader.consolidateNamedDestinations();
+			PdfContentByte cb = writer.getDirectContent();
 
-        int pages = reader.getNumberOfPages();
-        for (int i = 1; i <= pages; i++) {
-            PdfImportedPage importedPage = writer.getImportedPage(reader, i);
-            cb.addTemplate(importedPage, 0,0);
-            docu.newPage();
-        }
+			int pages = reader.getNumberOfPages();
+			for (int i = 1; i <= pages; i++) {
+			    PdfImportedPage importedPage = writer.getImportedPage(reader, i);
+			    cb.addTemplate(importedPage, 0, 0);
+			    docu.newPage();
+			}
+		} catch (IOException e) {
+			throw new PhrescoException(e);
+		}
     }
 
 
@@ -334,20 +357,17 @@ public final class DocumentUtil {
      * @param pdfCopy
      * @return
      * @throws PhrescoException
-     * @throws DocumentException
-     * @throws IOException
-     * @throws BadPdfFormatException
      */
     public static InputStream addPages(List<ArtifactGroup> tuples, PdfCopy pdfCopy, String moduleType)
-            throws PhrescoException, DocumentException, IOException {
+            throws PhrescoException {
     	if (isDebugEnabled) {
     		S_LOGGER.debug("Entering Method DocumentUtil.addPages(RepositoryManager repoManager,List<TupleBean> tuples, EntityType type, PdfCopy pdfCopy)");
 		}
     	InputStream addDocumentInfo = getDocumentStream(tuples, moduleType);
-        if(addDocumentInfo !=null) {
-            addPages(addDocumentInfo, pdfCopy);
-        }
-        return addDocumentInfo;
+		if(addDocumentInfo != null) {
+		    addPages(addDocumentInfo, pdfCopy);
+		}
+		return addDocumentInfo;
     }
 
     /**
@@ -359,7 +379,7 @@ public final class DocumentUtil {
     		S_LOGGER.debug("Entering Method DocumentUtil.getIndexHtml(File folder)");
 		}
     	if (isDebugEnabled) {
-    		S_LOGGER.debug("getIndexHtml() folder="+folder.getPath());
+    		S_LOGGER.debug("getIndexHtml() folder=" + folder.getPath());
 		}
     	StringBuffer sb = new StringBuffer();
         sb.append("<html>"); //$NON-NLS-1$
@@ -380,7 +400,7 @@ public final class DocumentUtil {
     	String[] list = file.list();
         sb.append("<ul>"); //$NON-NLS-1$
         for (String fileOrFolder : list) {
-            File newFile = new File(file.toString()+File.separator+fileOrFolder);
+            File newFile = new File(file.toString() + File.separator + fileOrFolder);
             if(newFile.isHidden()) { continue; }
             /*if(newFile.isDirectory()){
                 sb.append("<li>"); //$NON-NLS-1$

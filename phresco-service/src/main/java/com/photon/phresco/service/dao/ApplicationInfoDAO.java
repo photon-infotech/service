@@ -1,7 +1,6 @@
 package com.photon.phresco.service.dao;
 
 import java.util.List;
-import java.util.Map;
 
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactGroupInfo;

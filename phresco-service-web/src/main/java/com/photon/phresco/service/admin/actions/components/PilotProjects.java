@@ -48,7 +48,7 @@ public class PilotProjects extends ServiceBaseAction {
 	private static final long serialVersionUID = 6801037145464060759L;
 	
 	private static final Logger S_LOGGER = Logger.getLogger(PilotProjects.class);
-	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
+	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	private static Map<String, InputStream> inputStreamMap = new HashMap<String, InputStream>();
 	
 	private String name = "";
@@ -75,7 +75,8 @@ public class PilotProjects extends ServiceBaseAction {
 	private String techId = "";
 	private String oldName = "";
 	private String versioning = "";
-	private static byte[] s_pilotProByteArray = null;
+	private static byte[] pilotProByteArray = null;
+	private boolean tempError = false;
 	
 	 /**
      * To get all Pilot Projects form DB
@@ -83,7 +84,7 @@ public class PilotProjects extends ServiceBaseAction {
      * @throws PhrescoException
      */
 	public String list() throws PhrescoException {
-        if (s_isDebugEnabled) {
+        if (isDebugEnabled) {
             S_LOGGER.debug("Entering Method PilotProjects.list()");
         }
 
@@ -97,7 +98,7 @@ public class PilotProjects extends ServiceBaseAction {
 		
 		//to clear file input stream and byte array
 		inputStreamMap.clear();
-		s_pilotProByteArray = null;
+		pilotProByteArray = null;
 		
 		return COMP_PILOTPROJ_LIST;
 	}
@@ -108,7 +109,7 @@ public class PilotProjects extends ServiceBaseAction {
      * @throws PhrescoException
      */
     public String add() throws PhrescoException {
-    	if (s_isDebugEnabled) {	
+    	if (isDebugEnabled) {	
     		S_LOGGER.debug("Entering Method PilotProjects.add()");
     	}
     	
@@ -129,7 +130,7 @@ public class PilotProjects extends ServiceBaseAction {
 	 * @throws PhrescoException
 	 */
     public String edit() throws PhrescoException {
-    	if (s_isDebugEnabled) {
+    	if (isDebugEnabled) {
     		S_LOGGER.debug("Entering Method PilotProjects.edit()");
     	}
     	try {
@@ -153,15 +154,15 @@ public class PilotProjects extends ServiceBaseAction {
 	 * @throws PhrescoException
 	 */
     public String save() throws PhrescoException {
-    	if (s_isDebugEnabled) {
+    	if (isDebugEnabled) {
     		S_LOGGER.debug("Entering Method PilotProjects.save()");
     	}
     	
     	try {
             ApplicationInfo pilotProInfo = createPilotProj();     		
     		//save pilot project jar files
-			if(s_pilotProByteArray != null){
-				inputStreamMap.put(pilotProInfo.getName(),  new ByteArrayInputStream(s_pilotProByteArray));
+			if(pilotProByteArray != null){
+				inputStreamMap.put(pilotProInfo.getName(),  new ByteArrayInputStream(pilotProByteArray));
 			} 
     		
     		getServiceManager().createPilotProjects(createPilotProj(), inputStreamMap, getCustomerId());
@@ -179,14 +180,14 @@ public class PilotProjects extends ServiceBaseAction {
 	 * @throws PhrescoException
 	 */
     public String update() throws PhrescoException {
-    	if (s_isDebugEnabled) {
+    	if (isDebugEnabled) {
     		S_LOGGER.debug("Entering Method  PilotProjects.update()");
     	}
     	try {
     		ApplicationInfo pilotProInfo = createPilotProj();
     		//update pilot project jar files
-    		if(s_pilotProByteArray != null){
-    			inputStreamMap.put(pilotProInfo.getName(),  new ByteArrayInputStream(s_pilotProByteArray));
+    		if(pilotProByteArray != null){
+    			inputStreamMap.put(pilotProInfo.getName(),  new ByteArrayInputStream(pilotProByteArray));
     		} 
     		getServiceManager().updatePilotProject(createPilotProj(), inputStreamMap, getProjectId(), getCustomerId());
     		addActionMessage(getText(PLTPROJ_UPDATED, Collections.singletonList(getName())));
@@ -214,8 +215,8 @@ public class PilotProjects extends ServiceBaseAction {
         pilotContent.setArtifactId(getArtifactId());
         pilotContent.setPackaging(Content.Type.ZIP.name());
         List<ArtifactInfo> jarVersions = new ArrayList<ArtifactInfo>();
-        ArtifactInfo jarVersion = new ArtifactInfo();
-        jarVersions.add(jarVersion);
+        ArtifactInfo jarversion = new ArtifactInfo();
+        jarVersions.add(jarversion);
         pilotContent.setVersions(jarVersions);
         pilotContent.setCustomerIds(customerIds);
        
@@ -235,15 +236,15 @@ public class PilotProjects extends ServiceBaseAction {
 	 * @throws PhrescoException
 	 */
     public String delete() throws PhrescoException {
-    	if (s_isDebugEnabled) {
+    	if (isDebugEnabled) {
     		S_LOGGER.debug("Entering Method PilotProjects.delete()");
     	}
     	
     	try {
     		String[] projectIds = getHttpRequest().getParameterValues(REQ_PILOT_PROJ_ID);
     		if (ArrayUtils.isNotEmpty(projectIds)) {
-    			for (String projectId : projectIds) {
-    				getServiceManager().deletePilotProject(projectId, getCustomerId());
+    			for (String projectid : projectIds) {
+    				getServiceManager().deletePilotProject(projectid, getCustomerId());
     			}
     			addActionMessage(getText(PLTPROJ_DELETED));
     		}
@@ -260,7 +261,7 @@ public class PilotProjects extends ServiceBaseAction {
 	 * @throws PhrescoException
 	 */
     public String uploadFile() throws PhrescoException {
-    	if (s_isDebugEnabled) {
+    	if (isDebugEnabled) {
     	S_LOGGER.debug("Entering Method PilotProjects.uploadFile()");
     	}
 
@@ -268,7 +269,7 @@ public class PilotProjects extends ServiceBaseAction {
     	try {
     		writer = getHttpResponse().getWriter();
     		InputStream is = getHttpRequest().getInputStream();
-    		s_pilotProByteArray = IOUtils.toByteArray(is);
+    		pilotProByteArray = IOUtils.toByteArray(is);
     		getHttpResponse().setStatus(getHttpResponse().SC_OK);
     		writer.print(SUCCESS_TRUE);
     		writer.flush();
@@ -288,65 +289,29 @@ public class PilotProjects extends ServiceBaseAction {
 	 * @throws PhrescoException
 	 */
 	public void removeUploadedFile() {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  PilotProjects.removeUploadedFile()");
 		}
 		
-		s_pilotProByteArray = null;
+		pilotProByteArray = null;
 	}
 	
     public String validateForm() throws PhrescoException {
-    	if (s_isDebugEnabled) {
+    	if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  PilotProjects.validateForm()");
 		}
     	boolean isError = false;
     	//Empty validation for name
-    	if (StringUtils.isEmpty(getName())) {
-    		setNameError(getText(KEY_I18N_ERR_NAME_EMPTY ));
-    		isError = true;
-    	} else if (ADD.equals(getFromPage()) || (!getName().equals(getOldName()))) {
-    		//To check whether the name already exist (Technology wise)
-			List<ApplicationInfo> pilotProjInfos = getServiceManager().getPilotProjects(getCustomerId());
-			if (pilotProjInfos != null) {
-				for (ApplicationInfo pilotProjectInfo : pilotProjInfos) {
-					if (pilotProjectInfo.getTechInfo().getVersion().equals(getTechId()) && pilotProjectInfo.getName().equalsIgnoreCase(getName())) {
-						setNameError(getText(KEY_I18N_ERR_NAME_ALREADY_EXIST_TECH));
-			    		isError = true;
-			    		break;
-					} 
-				}	
-			}
-    	}
-    	//empty validation for version
-    	if (StringUtils.isEmpty(getVersion())) {
-    		setVerError(getText(KEY_I18N_ERR_VER_EMPTY ));
-    		isError = true;
-    	}
-    	//empty validation for fileupload
-    	if (s_pilotProByteArray == null) {
-    		setFileError(getText(KEY_I18N_ERR_PLTPROJ_EMPTY));
-    		isError = true;
-    	}
+    	isError = nameValidation(isError);
     	
-    	if (s_pilotProByteArray != null) {
-    		//Empty validation for groupId if file is selected
-    		if (StringUtils.isEmpty(getGroupId())) {
-    			setGroupIdError(getText(KEY_I18N_ERR_GROUPID_EMPTY));
-    			isError = true;
-    		}
-
-    		//Empty validation for artifactId if file is selected
-    		if (StringUtils.isEmpty(getArtifactId())) {
-    			setArtifactIdError(getText(KEY_I18N_ERR_ARTIFACTID_EMPTY));
-    			isError = true;
-    		}
-
-    		//Empty validation for version if file is selected
-    		if (StringUtils.isEmpty(getJarVersion())) {
-    			setJarVerError(getText(KEY_I18N_ERR_VER_EMPTY));
-    			isError = true;
-    		}
-    	}
+    	//empty validation for version
+    	isError = versionValidation(isError);
+    	
+    	//empty validation for fileupload
+    	isError = fileuploadValidation(isError);
+    	
+    	//Empty Validation for pilot Project
+    	isError = pilotProjectValidation(isError);
 
 
     	if (isError) {
@@ -355,6 +320,65 @@ public class PilotProjects extends ServiceBaseAction {
 		
     	return SUCCESS;
     }
+
+	public boolean pilotProjectValidation(boolean isError) {
+		if (pilotProByteArray != null) {
+    		//Empty validation for groupId if file is selected
+    		if (StringUtils.isEmpty(getGroupId())) {
+    			setGroupIdError(getText(KEY_I18N_ERR_GROUPID_EMPTY));
+    			tempError = true;
+    		}
+
+    		//Empty validation for artifactId if file is selected
+    		if (StringUtils.isEmpty(getArtifactId())) {
+    			setArtifactIdError(getText(KEY_I18N_ERR_ARTIFACTID_EMPTY));
+    			tempError = true;
+    		}
+
+    		//Empty validation for version if file is selected
+    		if (StringUtils.isEmpty(getJarVersion())) {
+    			setJarVerError(getText(KEY_I18N_ERR_VER_EMPTY));
+    			tempError = true;
+    		}
+    	}
+		return tempError;
+	}
+
+	public boolean fileuploadValidation(boolean isError) {
+		if (pilotProByteArray == null) {
+    		setFileError(getText(KEY_I18N_ERR_PLTPROJ_EMPTY));
+    		tempError = true;
+    	}
+		return tempError;
+	}
+
+	public boolean versionValidation(boolean isError) {
+		if (StringUtils.isEmpty(getVersion())) {
+    		setVerError(getText(KEY_I18N_ERR_VER_EMPTY ));
+    		tempError = true;
+    	}
+		return tempError;
+	}
+
+	public boolean nameValidation(boolean isError) throws PhrescoException {
+		if (StringUtils.isEmpty(getName())) {
+    		setNameError(getText(KEY_I18N_ERR_NAME_EMPTY ));
+    		tempError = true;
+    	} else if (ADD.equals(getFromPage()) || (!getName().equals(getOldName()))) {
+    		//To check whether the name already exist (Technology wise)
+			List<ApplicationInfo> pilotProjInfos = getServiceManager().getPilotProjects(getCustomerId());
+			if (pilotProjInfos != null) {
+				for (ApplicationInfo pilotProjectInfo : pilotProjInfos) {
+					if (pilotProjectInfo.getTechInfo().getVersion().equals(getTechId()) && pilotProjectInfo.getName().equalsIgnoreCase(getName())) {
+						setNameError(getText(KEY_I18N_ERR_NAME_ALREADY_EXIST_TECH));
+						tempError = true;
+			    		break;
+					} 
+				}	
+			}
+    	}
+		return tempError;
+	}
 
 	public String getName() {
 		return name;

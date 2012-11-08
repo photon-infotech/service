@@ -50,7 +50,6 @@ import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -61,7 +60,6 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.connector.file.FileRepositoryConnectorFactory;
 import org.sonatype.aether.deployment.DeployRequest;
 import org.sonatype.aether.deployment.DeploymentException;
 import org.sonatype.aether.repository.Authentication;
@@ -73,7 +71,6 @@ import org.sonatype.aether.resolution.ArtifactResult;
 import org.sonatype.aether.resolution.VersionRangeRequest;
 import org.sonatype.aether.resolution.VersionRangeResolutionException;
 import org.sonatype.aether.resolution.VersionRangeResult;
-import org.sonatype.aether.spi.connector.RepositoryConnector;
 import org.sonatype.aether.transfer.NoRepositoryConnectorException;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.aether.util.artifact.SubArtifact;
@@ -86,6 +83,7 @@ import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
+import com.photon.phresco.service.docs.impl.MAGICNUMBER;
 import com.photon.phresco.service.model.ArtifactInfo;
 import com.photon.phresco.service.model.GroupRepository;
 import com.photon.phresco.service.model.ReleaseRepo;
@@ -112,18 +110,17 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 	private ServerConfiguration config = null;
 
 	// TODO:Add ehcaching
-	private static Map<String, String[]> versionMap = new HashMap<String, String[]>(16);
-
+	private static Map<String, String[]> versionMap = new HashMap<String, String[]>(MAGICNUMBER.MAPVALUE);
 	
 	private void initMap() {
 		versionMap.put(TechnologyTypes.PHP, new String[]{"5.4.x", "5.3.x", "5.2.x", "5.1.x", "5.0.x"});
 		versionMap.put(TechnologyTypes.PHP_DRUPAL6, new String[]{"6.3", "6.25", "6.19","6.14"});
 		versionMap.put(TechnologyTypes.PHP_DRUPAL7, new String[]{"7.8","7.12","7.14"});
-		versionMap.put(TechnologyTypes.JAVA_WEBSERVICE, new String[]{"1.6", "1.5"});
-		versionMap.put(TechnologyTypes.JAVA_STANDALONE, new String[]{"1.6", "1.5"});
-		versionMap.put(TechnologyTypes.HTML5_MOBILE_WIDGET, new String[]{"1.6", "1.5"});
-		versionMap.put(TechnologyTypes.HTML5_MULTICHANNEL_JQUERY_WIDGET, new String[]{"1.6", "1.5"});
-		versionMap.put(TechnologyTypes.HTML5_WIDGET, new String[]{"1.6", "1.5"});
+		versionMap.put(TechnologyTypes.JAVA_WEBSERVICE, new String[]{MAGICNUMBER.VERSIONNUMSIX, MAGICNUMBER.VERSIONNUMFIVE});
+		versionMap.put(TechnologyTypes.JAVA_STANDALONE, new String[]{MAGICNUMBER.VERSIONNUMSIX, MAGICNUMBER.VERSIONNUMFIVE});
+		versionMap.put(TechnologyTypes.HTML5_MOBILE_WIDGET, new String[]{MAGICNUMBER.VERSIONNUMSIX, MAGICNUMBER.VERSIONNUMFIVE});
+		versionMap.put(TechnologyTypes.HTML5_MULTICHANNEL_JQUERY_WIDGET, new String[]{MAGICNUMBER.VERSIONNUMSIX, MAGICNUMBER.VERSIONNUMFIVE});
+		versionMap.put(TechnologyTypes.HTML5_WIDGET, new String[]{MAGICNUMBER.VERSIONNUMSIX, MAGICNUMBER.VERSIONNUMFIVE});
 		versionMap.put(TechnologyTypes.ANDROID_HYBRID, new String[]{"4.0.3", "2.3.3", "2.2"});
 		versionMap.put(TechnologyTypes.ANDROID_NATIVE, new String[]{"4.0.3", "2.3.3", "2.2"});
 		/*versionMap.put(TechnologyTypes.IPHONE_HYBRID, new String[]{"4.0.3", "2.3.3", "2.2"});
@@ -478,7 +475,7 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
         WebResource resource = client.resource(repoBaseURL + REPO_GROUP_PATH);
         ClientResponse response = resource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).
             post(ClientResponse.class, createGroupRepoData(repoName, repoBaseURL, repoType));
-        if(response.getStatus() == 201) {
+        if(response.getStatus() == MAGICNUMBER.RESPONSECODESUCCESS) {
             return repoBaseURL + REPO_GROUP_CONTENT + repoName + repoType.toLowerCase();
         } else {
             throw new PhrescoException(REPO_FAILURE_MSG);
@@ -492,7 +489,7 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
         WebResource resource = client.resource(repoBaseURL + REPO_HOSTED_PATH);
         ClientResponse response = resource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).
             post(ClientResponse.class, createReleaseRepoData(customerId, repoBaseURL, repoType));
-        if(response.getStatus() == 201) {
+        if(response.getStatus() == MAGICNUMBER.RESPONSECODESUCCESS) {
             return repoBaseURL + REPO_HOSTED_CONTENT + customerId + repoType.toLowerCase();
         } else {
             throw new PhrescoException(REPO_FAILURE_MSG);
@@ -510,7 +507,7 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
     private String createGroupRepoData(String repoName, String repoBaseURL, String repoType) {
         String repoId = repoName + repoType.toLowerCase();
         String releaseId = repoName + REPO_RELEASE_NAME;
-        String snapshotId = repoName + REPO_SNAPSHOT_NAME;
+//        String snapshotId = repoName + REPO_SNAPSHOT_NAME;
         List<Repository> repositories = new ArrayList<Repository>();
         Repository repo = new Repository(releaseId, releaseId, repoBaseURL + LOCAL_REPO_GROUP + releaseId);
         repositories.add(repo);
@@ -536,7 +533,7 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
         WebResource resource = client.resource(repoInfo.getBaseRepoURL() + REPO_LOCAL + 
         		customerId + REPOTYPE_RELEASE.toLowerCase() + CONTENT + createFileUrl(artifactGroup));
         ClientResponse response = resource.delete(ClientResponse.class);
-        if(response.getStatus() == 204) {
+        if(response.getStatus() == MAGICNUMBER.RESPONSECODEERROR) {
         	return true;
         }
 		return false;
@@ -557,19 +554,19 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 		WebResource resource = client.resource(repoInfo.getBaseRepoURL() + REPO_LOCAL + 
 		        		customerId + REPOTYPE_RELEASE.toLowerCase());
 	    ClientResponse response = resource.delete(ClientResponse.class);
-	    if(response.getStatus() != 204) {
+	    if(response.getStatus() != MAGICNUMBER.RESPONSECODEERROR) {
 		   throw new PhrescoException("Repository Deletion Failed");
 	    }
 		WebResource resource1 = client.resource(repoInfo.getBaseRepoURL() + REPO_LOCAL + 
 		        		customerId + REPOTYPE_SNAPSHOT.toLowerCase());
 	    ClientResponse response1 = resource1.delete(ClientResponse.class);
-	    if(response1.getStatus() != 204) {
+	    if(response1.getStatus() != MAGICNUMBER.RESPONSECODEERROR) {
 			   throw new PhrescoException("Repository Deletion Failed");
 		    }
 		WebResource resource2 = client.resource(repoInfo.getBaseRepoURL() + REPO_GROUPURL + 
 		        		customerId + REPOTYPE_GROUP.toLowerCase());
 	    ClientResponse response2 = resource2.delete(ClientResponse.class);
-	    if(response2.getStatus() != 204) {
+	    if(response2.getStatus() != MAGICNUMBER.RESPONSECODEERROR) {
 			   throw new PhrescoException("Repository Deletion Failed");
 		    }
 		return true;
@@ -583,14 +580,13 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
         Authentication authentication = new Authentication("admin", "devrepo2");
 		repo.setAuthentication(authentication);
         repo.setUrl("http://172.16.17.226:8080/repository/content/repositories/releases/");
-        FileRepositoryConnectorFactory factory = new FileRepositoryConnectorFactory();
-        RepositoryConnector newInstance = factory.newInstance(session, repo);
+//        FileRepositoryConnectorFactory factory = new FileRepositoryConnectorFactory();
+//        RepositoryConnector newInstance = factory.newInstance(session, repo);
         ArtifactRequest artifactRequest = new ArtifactRequest();
         artifactRequest.setArtifact( artifact );
         artifactRequest.addRepository( repo );
         ArtifactResult artifactResult = system.resolveArtifact( session, artifactRequest );
-        boolean missing = artifactResult.isMissing();
-        System.out.println("The Given Artifact Is " + missing);
+        artifactResult.isMissing();
 	}
 	
 	public static void main(String[] args) throws PhrescoException, ArtifactResolutionException, NoRepositoryConnectorException {

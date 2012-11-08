@@ -35,11 +35,9 @@
  ******************************************************************************/
 package com.photon.phresco.ldap.model;
 
-import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
 
-import com.photon.phresco.configuration.ConfigReader;
 import com.photon.phresco.configuration.Configuration;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.ldap.LDAPConstants;
@@ -48,7 +46,6 @@ public class LDAPConfiguration implements LDAPConstants {
 	
 	private Properties ldapProps;
 	private String ldapContextFactory;
-	private String ldapUrl;
 	private String ldaphost;
 	private String ldapPort;
 	private String ldapProtocol;
@@ -109,8 +106,7 @@ public class LDAPConfiguration implements LDAPConstants {
 	 * @return the ldapUrl
 	 */
 	public String getLdapUrl()throws PhrescoException {
-				ldapUrl = ldapProtocol + "://" + ldaphost + ":" + ldapPort;
-		return ldapUrl;
+		return ldapProtocol + "://" + ldaphost + ":" + ldapPort;
 	}
 
 	/**

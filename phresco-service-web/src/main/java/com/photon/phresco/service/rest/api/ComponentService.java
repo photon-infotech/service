@@ -92,6 +92,8 @@ public class ComponentService extends DbService {
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	private static RepositoryManager repositoryManager;
 	
+	private static String exceptionString ="PhrescoException Is";
+	
 	public ComponentService() throws PhrescoException {
 		super();
 		PhrescoServerFactory.initialize();
@@ -191,7 +193,7 @@ public class ComponentService extends DbService {
         }
 		
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-		S_LOGGER.error("PhrescoException Is" + phrescoException.getErrorMessage());
+		S_LOGGER.error(exceptionString + phrescoException.getErrorMessage());
 		throw phrescoException;
 	}
 	
@@ -435,7 +437,7 @@ public class ComponentService extends DbService {
 	    }
 		
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-		S_LOGGER.error("PhrescoException Is" + phrescoException.getErrorMessage());
+		S_LOGGER.error(exceptionString + phrescoException.getErrorMessage());
 		throw phrescoException;
 	}
 	
@@ -626,7 +628,7 @@ public class ComponentService extends DbService {
 	    }
 		
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-		S_LOGGER.error("PhrescoException Is" + phrescoException.getErrorMessage());
+		S_LOGGER.error(exceptionString + phrescoException.getErrorMessage());
 		throw phrescoException;
 		
 	}
@@ -765,8 +767,7 @@ public class ComponentService extends DbService {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into ComponentService.createModules(List<ModuleGroup> modules)");
         }
-        Response createFeatures = createOrUpdateFeatures(moduleInfo);
-        return createFeatures;
+        return createOrUpdateFeatures(moduleInfo);
     }
     
 	
@@ -776,18 +777,7 @@ public class ComponentService extends DbService {
         List<BodyPart> bodyParts = moduleInfo.getBodyParts();
         Map<String, BodyPartEntity> bodyPartEntityMap = new HashMap<String, BodyPartEntity>();
        
-        if (CollectionUtils.isNotEmpty(bodyParts)) {
-            for (BodyPart bodyPart : bodyParts) {
-                if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
-                    moduleGroup = bodyPart.getEntityAs(ArtifactGroup.class);
-                } else {
-                	bodyPartEntityMap.put(bodyPart.getContentDisposition().getFileName(), (BodyPartEntity) bodyPart.getEntity());
-                }
-            }
-        }
-        
-        if (moduleGroup == null) {
-        }
+        moduleGroup = createBodyPart(moduleGroup, bodyParts, bodyPartEntityMap);
         
         if(bodyPartEntityMap == null & moduleGroup != null) {
         	saveModuleGroup(moduleGroup);
@@ -817,6 +807,20 @@ public class ComponentService extends DbService {
         return Response.status(Response.Status.CREATED).entity(moduleGroup).build();
 	}
 
+	public ArtifactGroup createBodyPart(ArtifactGroup moduleGroup, List<BodyPart> bodyParts,
+			Map<String, BodyPartEntity> bodyPartEntityMap) {
+		if (CollectionUtils.isNotEmpty(bodyParts)) {
+            for (BodyPart bodyPart : bodyParts) {
+                if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
+                    moduleGroup = bodyPart.getEntityAs(ArtifactGroup.class);
+                } else {
+                	bodyPartEntityMap.put(bodyPart.getContentDisposition().getFileName(), (BodyPartEntity) bodyPart.getEntity());
+                }
+            }
+        }
+		return moduleGroup;
+	}
+
 	private void saveModuleGroup(ArtifactGroup moduleGroup) throws PhrescoException {
 		if(!validate(moduleGroup)) {
 			return;
@@ -825,7 +829,7 @@ public class ComponentService extends DbService {
             (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
         ArtifactGroupDAO moduleGroupDAO = converter.convertObjectToDAO(moduleGroup);
         
-        List<com.photon.phresco.commons.model.ArtifactInfo> moduleGroupVersions = moduleGroup.getVersions();
+//        List<com.photon.phresco.commons.model.ArtifactInfo> moduleGroupVersions = moduleGroup.getVersions();
         List<String> versionIds = new ArrayList<String>();
         
         ArtifactGroupDAO moduleDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
@@ -881,8 +885,7 @@ public class ComponentService extends DbService {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.updateModules(List<ModuleGroup> modules)");
 	    }
-	    Response updateFeatures = createOrUpdateFeatures(multiPart);
-		return updateFeatures;
+		return createOrUpdateFeatures(multiPart);
 	}
 	
 	/**
@@ -898,7 +901,7 @@ public class ComponentService extends DbService {
 	    }
 		
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-		S_LOGGER.error("PhrescoException Is" + phrescoException.getErrorMessage());
+		S_LOGGER.error(exceptionString + phrescoException.getErrorMessage());
 		throw phrescoException;
 	}
 	
@@ -1142,7 +1145,7 @@ public class ComponentService extends DbService {
 	    }
 		
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-		S_LOGGER.error("PhrescoException Is" + phrescoException.getErrorMessage());
+		S_LOGGER.error(exceptionString + phrescoException.getErrorMessage());
 		throw phrescoException;
 	}
 	
@@ -1302,7 +1305,7 @@ public class ComponentService extends DbService {
 	    }
 		
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-		S_LOGGER.error("PhrescoException Is" + phrescoException.getErrorMessage());
+		S_LOGGER.error(exceptionString + phrescoException.getErrorMessage());
 		throw phrescoException;
 	}
 	
@@ -1418,7 +1421,6 @@ public class ComponentService extends DbService {
 				}
             } 
         } catch (Exception e) {
-        	e.printStackTrace();
             throw new PhrescoWebServiceException(e, EX_PHEX00006, DOWNLOAD_COLLECTION_NAME);
         }
         ResponseBuilder response = Response.status(Response.Status.OK);
@@ -1530,7 +1532,7 @@ public class ComponentService extends DbService {
         }
         
         PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-        S_LOGGER.error("PhrescoException Is"  + phrescoException.getErrorMessage());
+        S_LOGGER.error(exceptionString  + phrescoException.getErrorMessage());
         throw phrescoException;
     }
 
@@ -1709,7 +1711,7 @@ public class ComponentService extends DbService {
 	    }
 		
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-		S_LOGGER.error("PhrescoException Is" + phrescoException.getErrorMessage());
+		S_LOGGER.error(exceptionString + phrescoException.getErrorMessage());
 		throw phrescoException;
 	}
 	
@@ -1867,7 +1869,7 @@ public class ComponentService extends DbService {
 	    }
 		
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-		S_LOGGER.error("PhrescoException Is" + phrescoException.getErrorMessage());
+		S_LOGGER.error(exceptionString + phrescoException.getErrorMessage());
 		throw phrescoException;
 	}
 	

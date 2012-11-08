@@ -38,8 +38,6 @@ package com.photon.phresco.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.document.mongodb.query.Criteria;
@@ -250,8 +248,8 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
 	@Override
 	public User authenticate(String username, String password)
 			throws PhrescoException {
-		password = ServerUtil.decryptString(password);
-		String hashedPwd = ServerUtil.encodeUsingHash(username,password);
+		String decryptedPassword = ServerUtil.decryptString(password);
+		String hashedPwd = ServerUtil.encodeUsingHash(username, decryptedPassword);
 		Query query = new Query();
 		Criteria nameCriteria = Criteria.where(REST_API_NAME).is(username);
 		Criteria pwdCriteria = Criteria.where(PASSWORD).is(hashedPwd);
@@ -259,8 +257,7 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
 		query = query.addCriteria(nameCriteria);
 		query = query.addCriteria(pwdCriteria);
 		query = query.addCriteria(typeCriteria);
-		User user = mongoOperation.findOne(USERS_COLLECTION_NAME, query, User.class);
-		return user;
+		return mongoOperation.findOne(USERS_COLLECTION_NAME, query, User.class);
 	}
 
 	@Override
@@ -270,8 +267,7 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
 				new Query(Criteria.whereId().is(projectInfoId)), ProjectInfoDAO.class);
 		Converter<ProjectInfoDAO, ProjectInfo> converter = 
 			(Converter<ProjectInfoDAO, ProjectInfo>) ConvertersFactory.getConverter(ProjectInfoDAO.class);
-		ProjectInfo convertDAOToObject = converter.convertDAOToObject(projectInfoDAO, mongoOperation);
-		return convertDAOToObject;
+		return converter.convertDAOToObject(projectInfoDAO, mongoOperation);
 	}
 
 }

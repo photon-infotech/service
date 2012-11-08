@@ -64,8 +64,7 @@ public class ServiceBaseAction extends ActionSupport implements ServiceActions, 
     
     private String copyToClipboard = "";
     
-    protected String fileName = "";
-    protected byte[] byteArray = null;
+    private String fileName = "";
     
     protected ServiceManager getServiceManager() {
 		return serviceManager;
@@ -121,6 +120,7 @@ public class ServiceBaseAction extends ActionSupport implements ServiceActions, 
 	//To get byte array of uploaded jar
 	protected byte[] getByteArray() throws PhrescoException {
     	PrintWriter writer = null;
+    	byte[] byteArray = null;
 		try {
             writer = getHttpResponse().getWriter();
 	        fileName = getHttpRequest().getHeader(X_FILE_NAME);
@@ -197,8 +197,8 @@ public class ServiceBaseAction extends ActionSupport implements ServiceActions, 
 		return getHttpRequest().getParameter(key);
 	}
 	
-	protected String[] getReqParameterValues(String Key) {
-		return getHttpRequest().getParameterValues(Key);
+	protected String[] getReqParameterValues(String key) {
+		return getHttpRequest().getParameterValues(key);
 	}
     
     protected HttpServletRequest getHttpRequest() {

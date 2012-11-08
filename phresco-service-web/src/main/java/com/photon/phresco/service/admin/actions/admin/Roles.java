@@ -37,7 +37,7 @@ public class Roles extends ServiceBaseAction {
     private static final long serialVersionUID = 1L;
     
     private static final Logger S_LOGGER = Logger.getLogger(Roles.class);
-	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
+	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
 	private String name = "";
 	private String description = "";
@@ -52,7 +52,7 @@ public class Roles extends ServiceBaseAction {
 	private String roleId = "";
 	
 	public String list() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Roles.list()");
 		}
 		
@@ -67,7 +67,7 @@ public class Roles extends ServiceBaseAction {
 	}
 	
 	public String add() {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Roles.add()");
 		}
 		
@@ -75,7 +75,7 @@ public class Roles extends ServiceBaseAction {
 	}
 	
 	public String edit() throws PhrescoException {
-	    if (s_isDebugEnabled) {
+	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Roles.edit()");
 	    }
 		
@@ -91,7 +91,7 @@ public class Roles extends ServiceBaseAction {
 	}
 	
 	public String save() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Roles.save()");
 		}
 		
@@ -115,7 +115,7 @@ public class Roles extends ServiceBaseAction {
 	}
 	
 	public String update() throws PhrescoException {
-	    if (s_isDebugEnabled) {
+	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Roles.update()");
 	    }
  
@@ -130,15 +130,15 @@ public class Roles extends ServiceBaseAction {
 	}
 	
 	public String delete() throws PhrescoException {
-	    if (s_isDebugEnabled) {
+	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Roles.delete()");
 	    }
 
 		try {
 			String[] roleIds = getHttpRequest().getParameterValues(REQ_ROLE_ID);
 			if (ArrayUtils.isNotEmpty(roleIds)) {
-				for (String roleId : roleIds) {
-					ClientResponse clientResponse = getServiceManager().deleteRole(roleId);
+				for (String roleid : roleIds) {
+					ClientResponse clientResponse = getServiceManager().deleteRole(roleid);
 					if (clientResponse.getStatus() != RES_CODE_200) {
 						addActionError(getText(ROLE_NOT_DELETED));
 					}
@@ -153,7 +153,7 @@ public class Roles extends ServiceBaseAction {
 	}
 		
 	public String validateForm() {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
             S_LOGGER.debug("Entering Method Roles.validateForm()");
         }
 		
@@ -173,7 +173,7 @@ public class Roles extends ServiceBaseAction {
 	}
 	
 	public String assign() {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method RolesList.assign()");
 		}
 		
@@ -181,7 +181,7 @@ public class Roles extends ServiceBaseAction {
 	}
 	
 	public String assignSave() {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method RolesList.assignSave()");
 		}
 		
@@ -189,7 +189,7 @@ public class Roles extends ServiceBaseAction {
 	}
 	
 	public String assignCancel() {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method RolesList.assignCancel()");
 		}
 		

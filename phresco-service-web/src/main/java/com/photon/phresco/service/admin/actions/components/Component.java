@@ -55,9 +55,9 @@ public class Component extends ServiceBaseAction {
 	private static final long serialVersionUID = 6801037145464060759L;
 	
 	private static final Logger S_LOGGER = Logger.getLogger(Features.class);
-	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
+	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
-	private static byte[] s_componentByteArray = null;
+	private static byte[] componentByteArray = null;
 	
 	private String name = "";
     private String customerId = "";
@@ -86,7 +86,7 @@ public class Component extends ServiceBaseAction {
     private boolean errorFound = false;
 	
     public String technologies() {
-    	if (s_isDebugEnabled) {
+    	if (isDebugEnabled) {
     		S_LOGGER.debug("Entering Method  Component.technologies()");
     	}
     	
@@ -104,7 +104,7 @@ public class Component extends ServiceBaseAction {
     }
     
     public String list() {
-    	if (s_isDebugEnabled) {
+    	if (isDebugEnabled) {
     		S_LOGGER.debug("Entering Method  Component.list()");
     	}
     	
@@ -120,7 +120,7 @@ public class Component extends ServiceBaseAction {
     }
 	
 	public String add() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Component.add()");
 		}
 		
@@ -136,7 +136,7 @@ public class Component extends ServiceBaseAction {
 	}
 	
 	public String edit() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Component.edit()");
 		}
 		
@@ -157,15 +157,15 @@ public class Component extends ServiceBaseAction {
 	}
 	
 	public String save() throws PhrescoException, IOException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Component.save()");
 		}
 		
 		try {
 		    ArtifactGroup moduleGroup = createModuleGroup();
 		    Map<String, InputStream> inputStreamMap = new HashMap<String, InputStream>();
-            if (s_componentByteArray != null) {
-            	inputStreamMap.put(moduleGroup.getName(), new ByteArrayInputStream(s_componentByteArray));
+            if (componentByteArray != null) {
+            	inputStreamMap.put(moduleGroup.getName(), new ByteArrayInputStream(componentByteArray));
             }
             getServiceManager().createFeatures(moduleGroup, inputStreamMap, getCustomerId());
 			addActionMessage(getText(COMPONENT_ADDED, Collections.singletonList(getName())));
@@ -177,15 +177,15 @@ public class Component extends ServiceBaseAction {
 	}
 	
 	public String update() throws PhrescoException, IOException {
-        if (s_isDebugEnabled) {
+        if (isDebugEnabled) {
             S_LOGGER.debug("Entering Method  Component.update()");
         }
         
         try {
             ArtifactGroup moduleGroup = createModuleGroup();
             Map<String, InputStream> inputStreamMap = new HashMap<String, InputStream>();
-            if (s_componentByteArray != null) {
-            	inputStreamMap.put(moduleGroup.getName(), new ByteArrayInputStream(s_componentByteArray));
+            if (componentByteArray != null) {
+            	inputStreamMap.put(moduleGroup.getName(), new ByteArrayInputStream(componentByteArray));
             }
             getServiceManager().updateFeature(moduleGroup, inputStreamMap, getCustomerId());
         } catch (PhrescoException e) {
@@ -196,7 +196,7 @@ public class Component extends ServiceBaseAction {
     }
 	
 	private ArtifactGroup createModuleGroup() throws PhrescoException {
-        if (s_isDebugEnabled) {
+        if (isDebugEnabled) {
             S_LOGGER.debug("Entering Method  Features.createModuleGroup()");
         }
         
@@ -243,7 +243,7 @@ public class Component extends ServiceBaseAction {
     }
 	
 	public String delete() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Component.delete()");
 		}
 		
@@ -266,7 +266,7 @@ public class Component extends ServiceBaseAction {
 	}
 	
 	public String uploadFile() throws PhrescoException, IOException {
-        if (s_isDebugEnabled) {
+        if (isDebugEnabled) {
             S_LOGGER.debug("Entering Method  Features.uploadFile()");
         }
         
@@ -275,7 +275,7 @@ public class Component extends ServiceBaseAction {
             writer = getHttpResponse().getWriter();
             InputStream is = getHttpRequest().getInputStream();
             byte[] tempFeaByteArray = IOUtils.toByteArray(is);
-            s_componentByteArray = tempFeaByteArray;
+            componentByteArray = tempFeaByteArray;
             
             ArtifactGroup artifactGroupInfo = ServerUtil.getArtifactinfo(new ByteArrayInputStream(tempFeaByteArray));
             FileInfo fileInfo = new FileInfo();
@@ -305,15 +305,15 @@ public class Component extends ServiceBaseAction {
     }
 	
 	public void removeComponentFile() {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Component.removeUploadedFile()");
 		}
 		
-		s_componentByteArray = null;
+		componentByteArray = null;
 	}
 	
 	public String listConponentsDependency() throws PhrescoException {
-        if (s_isDebugEnabled) {
+        if (isDebugEnabled) {
             S_LOGGER.debug("Entering Method  Features.featurelist()");
         }
         
@@ -330,7 +330,7 @@ public class Component extends ServiceBaseAction {
     }
 	
 	public void saveDependentComponents() {
-        if (s_isDebugEnabled) {
+        if (isDebugEnabled) {
             S_LOGGER.debug("Entering Method  Features.saveDependentFeatures()");
         }
         
@@ -344,7 +344,7 @@ public class Component extends ServiceBaseAction {
     }
 
 	public String validateForm() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Component.validateForm()");
 		}
 		
@@ -355,11 +355,11 @@ public class Component extends ServiceBaseAction {
             isError = true;
         }
         //Validate whether file is selected during add
-        if (/*!EDIT.equals(getFromPage()) &&*/ s_componentByteArray == null) {
+        if (/*!EDIT.equals(getFromPage()) &&*/ componentByteArray == null) {
             setFileError(getText(KEY_I18N_ERR_APPLNJAR_EMPTY));
             isError = true;
         }
-        if (s_componentByteArray != null) {
+        if (componentByteArray != null) {
             //Empty validation for groupId if file is selected
             if (StringUtils.isEmpty(getGroupId())) {
                 setGroupIdError(getText(KEY_I18N_ERR_GROUPID_EMPTY));

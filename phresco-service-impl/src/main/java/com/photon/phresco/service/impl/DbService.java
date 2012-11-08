@@ -137,7 +137,7 @@ public class DbService implements ServiceConstants {
 		return false;
 	}
 	
-	protected void createArtifact(String collectionName, Object object) throws PhrescoWebServiceException {
+	protected void createArtifact(String collectionName, Object object) {
 		try {
 			if(validate(object)) {
 				mongoOperation.save(collectionName, object);

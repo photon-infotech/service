@@ -13,6 +13,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.service.docs.impl.MAGICNUMBER;
 public class AuthenticationUtil {
 	
 	private static final String AUTH_TOKEN_CACHE_TIME = "auth.token.cache.ttl";
@@ -31,12 +32,14 @@ public class AuthenticationUtil {
 	}
 	
 	private AuthenticationUtil(InputStream is) throws PhrescoException {
+		InputStream tempIs = null;
+		tempIs = is;
 		try {
 			Properties properties = new Properties();
-			if (is == null) {
-				is = this.getClass().getClassLoader().getResourceAsStream("server.config");
+			if (tempIs == null) {
+				tempIs = this.getClass().getClassLoader().getResourceAsStream("server.config");
 			}
-			properties.load(is);
+			properties.load(tempIs);
 			String cacheTTL = properties.getProperty(AUTH_TOKEN_CACHE_TIME); 
 			Long tokenIdleTime = Long.parseLong(cacheTTL);
 			tokenCache = CacheBuilder.newBuilder().expireAfterAccess(tokenIdleTime, TimeUnit.MINUTES).removalListener(
@@ -59,9 +62,9 @@ public class AuthenticationUtil {
 		String token = "";
 		try {
 			SecureRandom random = new SecureRandom();
-			byte[] seed = random.generateSeed(132);
+			byte[] seed = random.generateSeed(MAGICNUMBER.BYTENUM);
 			random.setSeed(seed);
-			token = new BigInteger(132, random).toString(32);
+			token = new BigInteger(MAGICNUMBER.BYTENUM, random).toString(MAGICNUMBER.BYTENUMSTR);
 			tokenCache.put(token, userName);
 		} catch (Exception e) {
 			throw new PhrescoException(e);

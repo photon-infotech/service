@@ -49,8 +49,8 @@ public class RepositoryService {
 	public String getCiConfigPath(@QueryParam(ServiceConstants.REST_QUERY_CUSTOMERID) String customerId) throws PhrescoException {
 		PhrescoServerFactory.initialize();
 		DbManager dbMgr = PhrescoServerFactory.getDbManager();
-		RepositoryManager repoMgr = PhrescoServerFactory.getRepositoryManager();
-		return dbMgr.getRepoInfo(customerId).getGroupRepoURL() + repoMgr.getCiConfigPath();
+		RepositoryManager repoMngr = PhrescoServerFactory.getRepositoryManager();
+		return dbMgr.getRepoInfo(customerId).getGroupRepoURL() + repoMngr.getCiConfigPath();
 	}
 
 	@GET
@@ -59,8 +59,8 @@ public class RepositoryService {
 	public String getCiSvnPath(@QueryParam(ServiceConstants.REST_QUERY_CUSTOMERID) String customerId) throws PhrescoException {
 		PhrescoServerFactory.initialize();
 		DbManager dbMgr = PhrescoServerFactory.getDbManager();
-        RepositoryManager repoMgr = PhrescoServerFactory.getRepositoryManager();
-		return dbMgr.getRepoInfo(customerId).getGroupRepoURL() + repoMgr.getCiSvnPath();
+        RepositoryManager repoMngr = PhrescoServerFactory.getRepositoryManager();
+		return dbMgr.getRepoInfo(customerId).getGroupRepoURL() + repoMngr.getCiSvnPath();
 	}
 
 	@GET

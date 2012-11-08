@@ -2,8 +2,6 @@ package com.photon.phresco.service.dao;
 
 import java.util.List;
 
-import com.photon.phresco.commons.model.VideoType;
-
 public class VideoInfoDAO extends CustomerBaseDAO {
 	
 	private String imageurl;

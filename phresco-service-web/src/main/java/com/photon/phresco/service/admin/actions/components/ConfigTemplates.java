@@ -44,7 +44,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 	private static final long serialVersionUID = 6801037145464060759L;
 	
 	private static final Logger S_LOGGER = Logger.getLogger(ConfigTemplates.class);
-	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
+	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
 	private String name = "";
 	private String description = "";
@@ -67,7 +67,7 @@ public class ConfigTemplates extends ServiceBaseAction {
      * @throws PhrescoException
      */
 	public String list() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method ConfigTemplates.list()");
 		}
 		
@@ -88,7 +88,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 	 * @throws PhrescoException
 	 */
 	public String add() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method ConfigTemplates.add()");
 		}
 		
@@ -109,7 +109,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 	 * @throws PhrescoException
 	 */
 	public String edit() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method ConfigTemplates.edit()");
 		}
 		
@@ -133,7 +133,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 	 * @throws PhrescoException
 	 */
 	public String save() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method ConfigTemplates.save()");
 		}
 
@@ -155,7 +155,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 	 * @throws PhrescoException
 	 */
 	public String update() throws PhrescoException {
-    	if (s_isDebugEnabled) {
+    	if (isDebugEnabled) {
     		S_LOGGER.debug("Entering Method  ConfigTemplates.update()");
     	}
     	
@@ -175,7 +175,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 	 * @throws PhrescoException
 	 */
 	private SettingsTemplate createSettingsTemplateInstance() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method ConfigTemplates.createPropertyTemplates()");
 		}
 		SettingsTemplate settingTemplate = null;
@@ -236,15 +236,15 @@ public class ConfigTemplates extends ServiceBaseAction {
 	 * @throws PhrescoException
 	 */
 	public String delete() throws PhrescoException {
-	    if (s_isDebugEnabled) {
+	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method ConfigTemplates.delete()");
 	    }
 
 		try {
 			String[] configIds = getHttpRequest().getParameterValues(REQ_CONFIG_ID);
 			if (ArrayUtils.isNotEmpty(configIds)) {
-				for (String configId : configIds) {
-					getServiceManager().deleteConfigTemp(configId, getCustomerId());
+				for (String configid : configIds) {
+					getServiceManager().deleteConfigTemp(configid, getCustomerId());
 				}
 			addActionMessage(getText(CONFIGTEMPLATE_DELETED));
 			}
@@ -261,7 +261,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 	 * @throws PhrescoException
 	 */
 	public String validateForm() throws PhrescoException {
-		if (s_isDebugEnabled) {
+		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method ConfigTemplates.validateForm()");
 		}
 		boolean isError = false;

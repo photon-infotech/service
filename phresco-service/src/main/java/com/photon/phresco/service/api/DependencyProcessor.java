@@ -38,7 +38,6 @@ package com.photon.phresco.service.api;
 import java.io.File;
 
 import com.photon.phresco.commons.model.ApplicationInfo;
-import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.exception.PhrescoException;
 
 public interface DependencyProcessor {

@@ -52,8 +52,7 @@ public class DownloadsConverter implements Converter<DownloadsDAO, DownloadInfo>
 				new Query(Criteria.whereId().is(artifactGroupId)), ArtifactGroupDAO.class);
 		Converter<ArtifactGroupDAO, ArtifactGroup> artifactConverter = 
 			(Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
-		ArtifactGroup artifactGroup = artifactConverter.convertDAOToObject(artifactGroupDAO, mongoOperation);
-		return artifactGroup;
+		return artifactConverter.convertDAOToObject(artifactGroupDAO, mongoOperation);
 	}
 	
 }

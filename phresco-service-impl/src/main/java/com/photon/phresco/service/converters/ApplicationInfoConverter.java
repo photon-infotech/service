@@ -78,8 +78,7 @@ public class ApplicationInfoConverter implements Converter<ApplicationInfoDAO, A
 				new Query(Criteria.whereId().is(artifactGroupId)), ArtifactGroupDAO.class);
 		Converter<ArtifactGroupDAO, ArtifactGroup> converter = 
 			(Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
-		ArtifactGroup artifactGroup = converter.convertDAOToObject(artifactGroupDAO, mongoOperation);
-		return artifactGroup;
+		return converter.convertDAOToObject(artifactGroupDAO, mongoOperation);
 	}
 
 }

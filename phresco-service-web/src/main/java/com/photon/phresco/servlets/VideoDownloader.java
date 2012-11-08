@@ -38,8 +38,11 @@ import com.photon.phresco.commons.model.VideoType;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
+import com.photon.phresco.service.docs.impl.MAGICNUMBER;
 import com.photon.phresco.service.util.ServerConstants;
+import com.photon.phresco.util.Constants;
 import com.photon.phresco.util.ServiceConstants;
+import com.photon.phresco.util.Utility;
 
 public class VideoDownloader extends Thread implements ServerConstants {
 
@@ -103,7 +106,7 @@ public class VideoDownloader extends Thread implements ServerConstants {
 			URL url = new URL(repoUrl + videoURL);
 			URLConnection connection = url.openConnection();
 			in = connection.getInputStream();
-			int index = videoURL.lastIndexOf("/");
+			int index = videoURL.lastIndexOf(Constants.SLASH);
 			String fileName = videoURL.substring(index + 1);
 			String filePathStr = videoURL.substring(0, index);
 			File filePath = new File("../" + VIDEO_FOLDER + serverContext + filePathStr);
@@ -113,7 +116,7 @@ public class VideoDownloader extends Thread implements ServerConstants {
 			File videoFile = new File(filePath, fileName);
 			if(!videoFile.exists()){
 			fos = new FileOutputStream(videoFile);
-			byte[] buf = new byte[2048];
+			byte[] buf = new byte[MAGICNUMBER.BYTELARSIZE];
 			while (true) {
 				int len;
 				len = in.read(buf);
@@ -126,13 +129,7 @@ public class VideoDownloader extends Thread implements ServerConstants {
 		} catch (Exception e) {
 			throw new PhrescoException(e);
 		} finally {
-			if (in != null) {
-				try {
-					in.close();
-				} catch (IOException e) {
-					throw new PhrescoException(e);
-				}
-			}
+			Utility.closeStream(in);
 			if (fos != null) {
 				try {
 					fos.close();

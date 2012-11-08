@@ -32,6 +32,7 @@ import org.apache.log4j.Logger;
 import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.PhrescoServerFactory;
+import com.photon.phresco.service.docs.impl.MAGICNUMBER;
 import com.photon.phresco.service.util.ServerConstants;
 import com.photon.phresco.util.ArchiveUtil;
 import com.photon.phresco.util.ArchiveUtil.ArchiveType;
@@ -96,7 +97,7 @@ public class ImageDownloader extends Thread implements ServerConstants {
 			File archiveFile = new File(imageFile , fileName);
 			fileOutputStream = new FileOutputStream(archiveFile);
 			try {
-				byte[] data = new byte[1024];
+				byte[] data = new byte[MAGICNUMBER.BYTESMALLSIZE];
 				int i = 0;
 				while ((i = inputStream.read(data)) != -1) {
 					fileOutputStream.write(data, 0, i);
