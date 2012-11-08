@@ -85,6 +85,8 @@ public class Features extends ServiceBaseAction {
 	private String licenseError = "";
 	private boolean errorFound = false;
 	private String fileType = "";
+	private static String featureJarFileName = "";
+	private static String iconName = "";
     
 	public String menu() {
 		if (s_isDebugEnabled) {
@@ -268,15 +270,13 @@ public class Features extends ServiceBaseAction {
             artifactGroup.setGroupId(getGroupId());
             artifactGroup.setArtifactId(getArtifactId());
             artifactGroup.setType(type);
-
+            artifactGroup.setPackaging(getExtension(featureJarFileName));
             // To set appliesto tech and core
             List<CoreOption> appliesTo = new ArrayList<CoreOption>();
             CoreOption moduleCoreOption = new CoreOption(getTechnology(), Boolean.parseBoolean(getModuleType()));
             appliesTo.add(moduleCoreOption);
             artifactGroup.setAppliesTo(appliesTo);
-            
             artifactGroup.setCustomerIds(Arrays.asList(getCustomerId()));
-            
             //To set license
             artifactGroup.setLicenseId(getLicense());
             //To set the details of the version
@@ -336,6 +336,7 @@ public class Features extends ServiceBaseAction {
 	        if (REQ_FEATURES_UPLOADTYPE.equals(getFileType())) {
 	        	uploadFeature(writer, tempFeaByteArray);
 	        } else {
+	        	iconName = getFileName();
 	        	inputStreamMap.put(Content.Type.ICON.name(), new ByteArrayInputStream(tempFeaByteArray));
 	        	writer.print(SUCCESS_TRUE);
 	        }
@@ -353,6 +354,7 @@ public class Features extends ServiceBaseAction {
 
 	private void uploadFeature(PrintWriter writer, byte[] tempFeaByteArray) throws PhrescoException {
 		try {
+			featureJarFileName = getFileName();
     		s_featureByteArray = tempFeaByteArray;
     		getArtifactGroupInfo(writer, tempFeaByteArray);
     		inputStreamMap.put(Content.Type.ARCHETYPE.name(), new ByteArrayInputStream(tempFeaByteArray));
@@ -364,12 +366,28 @@ public class Features extends ServiceBaseAction {
 		}
 	}
 	
+	private String getExtension(String fileName) {
+		String fileExt = "jar";
+		if(fileName.endsWith("zip")) {
+			fileExt = "zip";
+		} else if(fileName.endsWith("dll")) {
+			fileExt = "dll";
+		}
+		return fileExt;
+	}
+	
 	public void removeUploadedFile() {
 		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Features.removeUploadedFile()");
 		}
+		 if (REQ_FEATURES_UPLOADTYPE.equals(getFileType())) {
+			 s_featureByteArray = null;
+			 featureJarFileName = "";
+		 } else {
+			inputStreamMap.remove(Content.Type.ICON.name());
+			iconName = "";
+		 }
 		
-		s_featureByteArray = null;
 	}
 
 	public String validateForm() throws PhrescoException {

@@ -792,9 +792,8 @@ public class ComponentService extends DbService {
         if(bodyPartEntityMap == null & moduleGroup != null) {
         	saveModuleGroup(moduleGroup);
         }
-        
         if (bodyPartEntityMap != null) {
-        	BodyPartEntity bodyPartEntity = bodyPartEntityMap.get(Type.FEATURE.name());
+        	BodyPartEntity bodyPartEntity = bodyPartEntityMap.get(Type.ARCHETYPE.name());
         	if (bodyPartEntity != null) {
         		moduleFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null, moduleGroup.getPackaging());
         		boolean uploadBinary = uploadBinary(moduleGroup, moduleFile);
