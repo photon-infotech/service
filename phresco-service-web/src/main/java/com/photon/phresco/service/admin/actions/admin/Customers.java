@@ -171,9 +171,9 @@ public class Customers extends ServiceBaseAction  {
 	    if (s_isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Customers.update()");
 	    }
-
 		try {
 			getServiceManager().updateCustomer(createCustomer(), getCustomerId());
+			addActionMessage(getText(CUSTOMER_UPDATED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
 		    return showErrorPopup(e, getText(EXCEPTION_CUSTOMERS_UPDATE));
 		}
@@ -187,7 +187,9 @@ public class Customers extends ServiceBaseAction  {
 	 */
 	private Customer createCustomer() {
         Customer customer = new Customer();
-//        customer.setId(getCustomerId());
+        if (StringUtils.isNotEmpty(customerId)) {
+        	customer.setId(customerId);
+        }
         customer.setName(getName());
         customer.setDescription(getDescription());
         customer.setEmailId(getEmail());
