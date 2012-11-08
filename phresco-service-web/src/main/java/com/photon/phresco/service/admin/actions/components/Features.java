@@ -402,7 +402,7 @@ public class Features extends ServiceBaseAction {
             isError = true;
         }
         //Validate whether file is selected during add
-        if (/*!EDIT.equals(getFromPage()) &&*/ s_featureByteArray == null) {
+        if (!EDIT.equals(getFromPage()) && s_featureByteArray == null) {
             setFileError(getText(KEY_I18N_ERR_APPLNJAR_EMPTY));
             isError = true;
         }

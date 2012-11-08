@@ -56,6 +56,7 @@
     String version = "";
     String groupId = "";
     String artifactId = "";
+    String moduleGroupId = "";
     boolean isDefaultModule = false;
     boolean isCoreModule = false;
     boolean isSystem = false;
@@ -93,7 +94,7 @@
  
 	if (moduleGroup != null) {
 	    name = moduleGroup.getName();
-	    
+	    moduleGroupId = moduleGroup.getId();
 	    List<ArtifactInfo> modules = moduleGroup.getVersions();
 	    ArtifactInfo selectedModule = null;
 	    if (CollectionUtils.isNotEmpty(modules)) {
@@ -104,7 +105,6 @@
 	            }
 	        }
 	        moduleId = selectedModule.getId();
-			
 	        //To get whether the selected module is default for the currently selected technology
 	        List<RequiredOption> requiredOptions = selectedModule.getAppliesTo();
 	        if (CollectionUtils.isNotEmpty(requiredOptions)) {
@@ -315,7 +315,8 @@
 		
 		<div class="control-group" id="featureFileControl">
 			<label class="control-label labelbold">
-				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.file'/>
+				<% if(fromPage != ServiceUIConstants.EDIT) { %>
+				<span class="mandatory">*</span><% } %>&nbsp;<s:text name='lbl.hdr.comp.file'/>
 			</label>
 			
 			 <div class="controls" style="float: left; margin-left: 3%;">
@@ -366,7 +367,7 @@
 	<!-- Hidden Fields -->
 	<input type="hidden" name="customerId" value="<%= customerId %>">
 	<input type="hidden" name="fromPage" value="<%= StringUtils.isNotEmpty(fromPage) ? fromPage : "" %>"/>
-    <input type="hidden" name="moduleGroupId" value="<%= moduleId %>"/>
+    <input type="hidden" name="moduleGroupId" value="<%= moduleGroupId %>"/>
     <input type="hidden" name="oldName" value="<%= name %>"/>
     <input type="hidden" name="oldVersion" value="<%= version %>"/>
     <input type="hidden" name="type" value="<%= type %>">

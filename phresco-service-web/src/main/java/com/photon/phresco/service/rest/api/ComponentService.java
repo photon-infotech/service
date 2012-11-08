@@ -829,8 +829,7 @@ public class ComponentService extends DbService {
         List<String> versionIds = new ArrayList<String>();
         
         ArtifactGroupDAO moduleDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
-		        new Query(Criteria.where(REST_API_NAME).is(moduleGroupDAO.getName())), ArtifactGroupDAO.class);
-        
+		        new Query(Criteria.whereId().is(moduleGroupDAO.getId())), ArtifactGroupDAO.class);
         com.photon.phresco.commons.model.ArtifactInfo newVersion = moduleGroup.getVersions().get(0);
         if(moduleDAO != null) {
         	moduleGroupDAO.setId(moduleDAO.getId());
