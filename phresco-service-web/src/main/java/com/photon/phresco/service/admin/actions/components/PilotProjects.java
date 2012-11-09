@@ -200,6 +200,7 @@ public class PilotProjects extends ServiceBaseAction {
     
     private ApplicationInfo createPilotProj() throws PhrescoException {
         ApplicationInfo pilotProInfo = new ApplicationInfo();
+        pilotProInfo.setPilot(true);
         if (StringUtils.isNotEmpty(getProjectId())) { 
         	pilotProInfo.setId(getProjectId());
         }
@@ -211,11 +212,14 @@ public class PilotProjects extends ServiceBaseAction {
         pilotProInfo.setVersion(getVersion());
         
         ArtifactGroup pilotContent = new ArtifactGroup();
+        pilotContent.setName(getName());
         pilotContent.setGroupId(getGroupId());
         pilotContent.setArtifactId(getArtifactId());
         pilotContent.setPackaging(Content.Type.ZIP.name());
         List<ArtifactInfo> jarVersions = new ArrayList<ArtifactInfo>();
         ArtifactInfo jarversion = new ArtifactInfo();
+        jarversion.setName(getName());
+        jarversion.setVersion(getJarVersion());
         jarVersions.add(jarversion);
         pilotContent.setVersions(jarVersions);
         pilotContent.setCustomerIds(customerIds);
@@ -224,6 +228,7 @@ public class PilotProjects extends ServiceBaseAction {
         pilotProInfo.setPilotContent(pilotContent);
         
         TechnologyInfo techInfo = new TechnologyInfo();
+        techInfo.setName(getTechId());
         techInfo.setVersion(getTechId());
         pilotProInfo.setTechInfo(techInfo);
         
