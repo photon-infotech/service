@@ -379,10 +379,7 @@ public class ComponentService extends DbService {
 	private void createArtifacts(ArtifactGroup artifactGroup, BodyPart bodyPart) throws PhrescoException {
 		BodyPartEntity bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
 		File artifactFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null, artifactGroup.getPackaging());
-		boolean uploadBinary = uploadBinary(artifactGroup, artifactFile);
-		if(uploadBinary) {
-			saveModuleGroup(artifactGroup);
-		}
+		uploadBinary(artifactGroup, artifactFile);
 	}
 
 	private void saveTechnology(Technology technology) throws PhrescoException {
@@ -391,22 +388,77 @@ public class ComponentService extends DbService {
 		}
     	Converter<TechnologyDAO, Technology> techConverter = 
     		(Converter<TechnologyDAO, Technology>) ConvertersFactory.getConverter(TechnologyDAO.class);
-    	TechnologyDAO tech = techConverter.convertObjectToDAO(technology);
-    	TechnologyDAO techDAO = mongoOperation.findOne(TECHNOLOGIES_COLLECTION_NAME, 
-    			new Query(Criteria.where(REST_API_NAME).is(tech.getName())), TechnologyDAO.class);
-    	if(techDAO == null) {
-    		mongoOperation.save(TECHNOLOGIES_COLLECTION_NAME, tech);
-    	} else {
-    		List<String> pluginIds = techDAO.getPluginIds();
-    		if(CollectionUtils.isNotEmpty(pluginIds)) {
-    			pluginIds.addAll(tech.getPluginIds());
-        		techDAO.setPluginIds(pluginIds);
-    		}
-    		mongoOperation.save(TECHNOLOGIES_COLLECTION_NAME, techDAO);
+    	TechnologyDAO technologyDAO = techConverter.convertObjectToDAO(technology);
+    	String archetypeId = createArchetypeId(technology);
+    	technologyDAO.setArchetypeGroupDAOId(archetypeId);
+    	ArtifactGroup archetypeInfo = technology.getArchetypeInfo();
+    	archetypeInfo.setId(archetypeId);
+    	saveModuleGroup(archetypeInfo);
+    	if(CollectionUtils.isNotEmpty(technology.getPlugins())) {
+    		List<String> pluginIds = createPluginIds(technology);
+        	technologyDAO.setPluginIds(pluginIds);
+        	for (ArtifactGroup plugin : technology.getPlugins()) {
+        		ArtifactGroupDAO agDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
+        				new Query(Criteria.where("artifactId").is(plugin.getArtifactId())), ArtifactGroupDAO.class);
+        		if(agDAO != null) {
+        			plugin.setId(agDAO.getId());
+        		}
+				saveModuleGroup(plugin);
+			}
     	}
 	}
-	
-    /**
+
+	private List<String> createPluginIds(Technology technology) {
+		List<String> pluginIds = new ArrayList<String>();
+		TechnologyDAO techDAO = mongoOperation.findOne(TECHNOLOGIES_COLLECTION_NAME, 
+				new Query(Criteria.whereId().is(technology.getId())), TechnologyDAO.class);
+		if(techDAO == null) {
+			for (ArtifactGroup plugin : technology.getPlugins()) {
+				pluginIds.add(plugin.getId());
+			}
+			return pluginIds;
+		}
+		pluginIds = techDAO.getPluginIds();
+		List<ArtifactGroup> plugins = technology.getPlugins();
+		for (ArtifactGroup artifactGroup : plugins) {
+			if(CollectionUtils.isNotEmpty(pluginIds)) {
+				boolean pluginAvailable = checkPluginAvailable(pluginIds, artifactGroup.getArtifactId());
+				if(pluginAvailable) {
+					pluginIds.add(artifactGroup.getId());
+				} else {
+					pluginIds.add(artifactGroup.getId());
+				}
+			}
+		}
+		return pluginIds;
+	}
+
+	private boolean checkPluginAvailable(List<String> pluginIds, String artifactId) {
+		for (String pluginId : pluginIds) {
+			ArtifactGroupDAO pluginFound = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
+					new Query(Criteria.whereId().is(pluginId)), ArtifactGroupDAO.class);
+			if(pluginFound != null) {
+				if(pluginFound.getArtifactId().equals(artifactId)) {
+					return false;
+				} else {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	private String createArchetypeId(Technology technology) {
+		TechnologyDAO techDAO = mongoOperation.findOne(TECHNOLOGIES_COLLECTION_NAME, 
+				new Query(Criteria.whereId().is(technology.getId())), TechnologyDAO.class);
+		if(techDAO == null) {
+			return technology.getArchetypeInfo().getId();
+		} else {
+			return techDAO.getArchetypeGroupDAOId();
+		}
+	}
+
+	/**
 	 * Updates the list of technologies
 	 * @param technologies
 	 * @return
