@@ -77,6 +77,7 @@ public class Customers extends ServiceBaseAction  {
 	private String repoPasswordError = "";
 	private String repoURLError = "";
 	private boolean errorFound = false;
+	private boolean tempError = false;
 	
 	private String fromPage = "";
 	
@@ -315,66 +316,66 @@ public class Customers extends ServiceBaseAction  {
 			boolean matchFound = matcher.matches();
 			if (!matchFound) {
 				setRepoURLError(getText(KEY_I18N_ERR_REPO_URL_INVALID));
-				isError = true;
+				tempError = true;
 			}
 		}
-		return isError;
+		return tempError;
 	}
 
 	public boolean repoNameValidation(boolean isError) {
 		if (StringUtils.isEmpty(getRepoName())) {
 			setRepoNameError(getText(KEY_I18N_ERR_REPO_NAME_EMPTY));
-			isError = true;
+			tempError = true;
 		}
-		return isError;
+		return tempError;
 	}
 
 	public boolean licenseTypeValidation(boolean isError) {
 		if (StringUtils.isEmpty(getLicence())) {
 			setLicenError(getText(KEY_I18N_ERR_LICEN_EMPTY));
-			isError = true;
+			tempError = true;
 		}
-		return isError;
+		return tempError;
 	}
 
 	public boolean countryValidation(boolean isError) {
 		if (StringUtils.isEmpty(getCountry())) {
 			setConError(getText(KEY_I18N_ERR_COUN_EMPTY));
-			isError = true;
+			tempError = true;
 		}
-		return isError;
+		return tempError;
 	}
 
 	public boolean faxValidation(boolean isError) {
 		if (StringUtils.isEmpty(getFax())) {
 			setFaxError(getText(KEY_I18N_ERR_FAXNUM_EMPTY));
-			isError = true;
+			tempError = true;
 		}
-		return isError;
+		return tempError;
 	}
 
 	public boolean contactNumberValidation(boolean isError) {
 		if (StringUtils.isEmpty(getNumber())) {
 			setNumError(getText(KEY_I18N_ERR_CONTNUM_EMPTY));
-			isError = true;
+			tempError = true;
 		}
-		return isError;
+		return tempError;
 	}
 
 	public boolean zipCodeValidation(boolean isError) {
 		if (StringUtils.isEmpty(getZipcode())) {
 			setZipError(getText(KEY_I18N_ERR_ZIPCODE_EMPTY));
-			isError = true;
+			tempError = true;
 		}
-		return isError;
+		return tempError;
 	}
 
 	public boolean addressValidation(boolean isError) {
 		if (StringUtils.isEmpty(getAddress())) {
 			setAddressError(getText(KEY_I18N_ERR_ADDRS_EMPTY));
-			isError = true;
+			tempError = true;
 		}
-		return isError;
+		return tempError;
 	}
 
 	public boolean emailIdFormatValidation(boolean isError) {
@@ -384,18 +385,18 @@ public class Customers extends ServiceBaseAction  {
 			boolean b = m.matches();
 			if (!b) {
 				setMailError(getText(INVALID_EMAIL));
-				isError = true;
+				tempError = true;
 			}
 		}
-		return isError;
+		return tempError;
 	}
 
 	public boolean emailValidation(boolean isError) {
 		if (StringUtils.isEmpty(getEmail())) {
 			setMailError(getText(KEY_I18N_ERR_EMAIL_EMPTY));
-			isError = true;
+			tempError = true;
 		}
-		return isError;
+		return tempError;
 	}
 
 	public boolean nameValidation(boolean isError) throws PhrescoException {
@@ -409,13 +410,13 @@ public class Customers extends ServiceBaseAction  {
 				for (Customer customer : customers) {
 					if (customer.getName().equalsIgnoreCase(getName())) {
 						setNameError(getText(KEY_I18N_ERR_NAME_ALREADY_EXIST));
-			    		isError = true;
+						tempError = true;
 						break;
 					}
 				}
 			}
 		}
-		return isError;
+		return tempError;
 	}
 	
 	public String getName() {
