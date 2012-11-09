@@ -97,11 +97,11 @@ public class TechnologyConverter implements Converter<TechnologyDAO, Technology>
         techDAO.setSystem(technology.isSystem());
         techDAO.setTechVersions(technology.getTechVersions());
         techDAO.setUsed(technology.isUsed());
-        techDAO.setArchetypeGroupDAOId(technology.getArchetypeInfo().getId());
+//        techDAO.setArchetypeGroupDAOId(technology.getArchetypeInfo().getId());
         List<ArtifactGroup> plugins = technology.getPlugins();
-        if(plugins != null) {
-        	techDAO.setPluginIds(createPluginId(plugins));
-        }
+//        if(plugins != null) {
+//        	techDAO.setPluginIds(createPluginId(plugins));
+//        }
         techDAO.setOptions(technology.getOptions());
         techDAO.setTechGroupId(technology.getTechGroupId());
         techDAO.setReports(technology.getReports());
