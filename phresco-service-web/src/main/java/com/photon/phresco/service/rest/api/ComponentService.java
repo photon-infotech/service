@@ -140,7 +140,6 @@ public class ComponentService extends DbService {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.createAppTypes(List<ApplicationType> appTypes)");
         }
-	    
 		try {
 			for (ApplicationType applicationType : appTypes) {
 				if(validate(applicationType)) {

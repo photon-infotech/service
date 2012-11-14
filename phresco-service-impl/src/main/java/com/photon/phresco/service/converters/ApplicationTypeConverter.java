@@ -24,6 +24,7 @@ public class ApplicationTypeConverter implements Converter<ApplicationTypeDAO, A
 		applicationType.setId(applicationTypeDAO.getId());
 		applicationType.setName(applicationTypeDAO.getName());
 		applicationType.setSystem(applicationTypeDAO.isSystem());
+		applicationType.setDescription(applicationTypeDAO.getDescription());
 		if(CollectionUtils.isNotEmpty(applicationTypeDAO.getTechGroupIds())) {
 			List<TechnologyGroup> techGroups = mongoOperation.find(TECH_GROUP_COLLECTION_NAME, 
 					new Query(Criteria.whereId().in(applicationTypeDAO.getTechGroupIds().toArray())), TechnologyGroup.class);
@@ -47,6 +48,7 @@ public class ApplicationTypeConverter implements Converter<ApplicationTypeDAO, A
 		applicationTypeDAO.setTechGroupIds(techIds);
 		applicationTypeDAO.setSystem(applicationType.isSystem());
 		applicationTypeDAO.setCustomerIds(applicationType.getCustomerIds());
+		applicationTypeDAO.setDescription(applicationType.getDescription());
 		return applicationTypeDAO;
 	}
 

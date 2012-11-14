@@ -129,7 +129,9 @@ public class ApplicationTypes extends ServiceBaseAction {
 
     private ApplicationType createAppType() throws PhrescoException {
         ApplicationType appType = new ApplicationType();
-        appType.setId(getAppTypeId());
+        if(StringUtils.isNotEmpty(getAppTypeId())) {
+        	appType.setId(getAppTypeId());
+        }
         appType.setName(getName());
         appType.setDescription(getDescription());
         appType.setCustomerIds(Arrays.asList(getCustomerId()));
