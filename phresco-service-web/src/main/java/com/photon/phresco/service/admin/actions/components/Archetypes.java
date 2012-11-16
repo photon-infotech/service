@@ -342,7 +342,7 @@ public class Archetypes extends ServiceBaseAction {
 		try {
 			String pluginJarName = getFileName();
 			byte[] byteArray = tempApplnByteArray;
-//			ArtifactGroup artifactGroupInfo = getArtifactGroupInfo(writer, tempApplnByteArray);
+		    getArtifactGroupInfo(writer, tempApplnByteArray);
 			inputStreamMap.put(pluginJarName, new ByteArrayInputStream(byteArray));
 		} catch (Exception e) {
 		}

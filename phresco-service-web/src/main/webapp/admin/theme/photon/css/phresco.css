@@ -1000,7 +1000,7 @@ legend {
 
 .customer_name {
 	float: right;
-	left: 73%;
+	left: 70%;
 	margin-bottom: 0;
 	position: absolute;
 	top: 10px;
@@ -2262,14 +2262,58 @@ div[class *='syncTable'] {
 	margin-right:19px;
 }
 
-.borderBottom-none {
-	border-bottom:none;	
-}
-
 .header-background tr th.uploadpluginhead {
 	padding:3px;	
 }
 
 .table-striped {
 	border: 1px solid #630A0A;
+}
+.pluginCoordinates {
+	width: 32%;
+	float: left;
+	text-align:center
+}
+
+.jarTable {
+	width: 708px;
+	margin:auto;
+	border:1px solid #630A0A;
+}
+
+.pluginJarPop {
+	padding: 0px 10px;
+	float: left; 
+	width: 97%;
+}
+.popupPluginControl {
+	float: left; 
+	width: 100%; 
+	margin-top:2%;
+}
+.uploadPluginPopUp { 
+	width: 62%;
+    margin-left: -400px; 
+    overflow: hidden;
+}
+.tablePopUp {
+	height: 20px;
+	width: 230px;
+	float: left;
+	text-align: center;
+}
+.table-bordered thead:last-child tr:last-child th:last-child, .table-bordered tbody:last-child tr:last-child td:last-child {
+	 border-radius: 0 0 4px 4px;
+}
+.tableCoordinates {
+	height: 20px;
+	width: 230px;
+	float: left;
+	text-align: center;
+}
+.tableCoordinate {
+	height: 20px;
+	width: 220px;
+	float: left;
+	text-align: center;
 }

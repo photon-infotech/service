@@ -405,6 +405,7 @@ public class ComponentService extends DbService {
 				saveModuleGroup(plugin);
 			}
     	}
+    	mongoOperation.save(TECHNOLOGIES_COLLECTION_NAME, technologyDAO);
 	}
 
 	private List<String> createPluginIds(Technology technology) {

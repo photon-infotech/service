@@ -279,7 +279,6 @@
 		<!-- Footer Ends Here -->
 		
 		<!-- Delete confirmation dialog starts -->
-		<%@ include file="pages/confirmDialog.jsp" %>
 		<!-- Delete confirmation dialog ends -->
 		
 		<!-- Popup Starts-->

@@ -444,6 +444,6 @@
 		$('#popup_div').show();
 		$('#popup_div').empty();
 		disableScreen();
-		loadContent('uploadPluginJar', $('#formArcheTypeAdd'), $('#popup_div'));
+		loadContent('uploadPluginJar', $('#formArcheTypeAdd'), $('.modal-body'));
 	}
 </script>
