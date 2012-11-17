@@ -371,7 +371,7 @@
     });
     
      function getTechGroup() {
-    	 loadContent('getTechGroup', $('#formArcheTypeAdd'), $('.modal-body'),'',true);
+    	 loadContent('getTechGroup', $('#formArcheTypeAdd'), '', '', true);
 	      $('#techGroup').empty();
      }
     
@@ -383,7 +383,6 @@
 				var id = techGroups[i].id;
 				var name = techGroups[i].name;
 				$('#techGroup').append($("<option></option>").attr("value", id).text(name));
-	    		  hideLoadingIcon();
 			}
 		}
 	}
