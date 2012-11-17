@@ -70,6 +70,6 @@
 	}
 	
 	$(document).ready(function() {
-		enableScreen();
+		hideLoadingIcon();
 	});
 </script>

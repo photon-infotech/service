@@ -108,7 +108,7 @@
 	}
 	
 	$(document).ready(function() {
-		enableScreen();
+		hideLoadingIcon();
 	});
 	
 	function editComponent(moduleGroupId, moduleId) {

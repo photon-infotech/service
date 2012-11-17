@@ -107,7 +107,7 @@
 	}
 
 	$(document).ready(function() {
-		enableScreen();
+		hideLoadingIcon();
 		
 		// To check for the special character in name
         $('#globalUrlName').bind('input propertychange', function (e) {

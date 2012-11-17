@@ -341,7 +341,7 @@
 	});
 	
 	$(document).ready(function() {
-		enableScreen();
+		hideLoadingIcon();
         createUploader(); 
         
      	// To check for the special character in name

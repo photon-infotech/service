@@ -382,7 +382,8 @@
 	$(document).ready(function() {
 	    createUploader();
 		enableScreen();
-		
+		hideLoadingIcon();	
+	
 		// To check for the special character in name
         $('#featureName').bind('input propertychange', function (e) {
             var name = $(this).val();

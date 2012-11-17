@@ -107,7 +107,7 @@
 	}
 
 	$(document).ready(function() {
-		enableScreen();
+		hideLoadingIcon();
 		
 		//To focus the name textbox by default
 		$('#name').focus();

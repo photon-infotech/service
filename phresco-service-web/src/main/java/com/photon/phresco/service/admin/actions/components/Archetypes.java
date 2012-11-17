@@ -20,6 +20,7 @@
 package com.photon.phresco.service.admin.actions.components;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.bind.JAXBException;
 
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -40,6 +42,7 @@ import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.Technology;
+import com.photon.phresco.commons.model.TechnologyGroup;
 import com.photon.phresco.commons.model.TechnologyOptions;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
@@ -85,6 +88,7 @@ public class Archetypes extends ServiceBaseAction {
 	
 	private String versionComment = "";
 	private String techVersion = "";
+	private String techGroup = "";
 	
 	private String jarVersion = "";
 	private String groupId = "";
@@ -95,6 +99,8 @@ public class Archetypes extends ServiceBaseAction {
 	private boolean archType = false;
 	private String versioning = "";
 	private boolean tempError = false;
+	
+	private List<TechnologyGroup> appTypeTechGroups = new ArrayList<TechnologyGroup>();
 	
 	private byte[] newtempApplnByteArray = null;
 	
@@ -244,6 +250,7 @@ public class Archetypes extends ServiceBaseAction {
     	if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.getTechnology()");
 		}
+   	
         Technology technology = new Technology();
         if (StringUtils.isNotEmpty(getTechId())) {
         	technology.setId(getTechId());
@@ -251,6 +258,7 @@ public class Archetypes extends ServiceBaseAction {
         technology.setName(getName());
         technology.setDescription(getDescription());
         technology.setAppTypeId(getApptype());
+        technology.setTechGroupId(getTechGroup());
         
         //To set the applicable features
       
@@ -394,7 +402,6 @@ public class Archetypes extends ServiceBaseAction {
 			archetypeJarByteArray = null;
 		}
 	}
-	
 	public String validateForm() throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.validateForm()");
@@ -416,6 +423,22 @@ public class Archetypes extends ServiceBaseAction {
             setErrorFound(true);
         }
 		
+		return SUCCESS;
+	}
+	
+	public String getTechnologyGroup() throws PhrescoException {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method Archetypes.getTechnologyGroup()");
+		}
+
+		List<ApplicationType> appTypes = getServiceManager().getApplicationTypes(getCustomerId());
+		for (ApplicationType appType : appTypes) {
+			if (appType.getId().equals(getApptype())) {
+				setAppTypeTechGroups(appType.getTechGroups());
+				return SUCCESS;
+			}
+		}
+
 		return SUCCESS;
 	}
 
@@ -670,4 +693,20 @@ public class Archetypes extends ServiceBaseAction {
 	public void setVersioning(String versioning) {
 		this.versioning = versioning;
 	} 
+	
+	public String getTechGroup() {
+		return techGroup;
+	}
+
+	public void setTechGroup(String techGroup) {
+		this.techGroup = techGroup;
+	}
+
+	public List<TechnologyGroup> getAppTypeTechGroups() {
+		return appTypeTechGroups;
+	}
+
+	public void setAppTypeTechGroups(List<TechnologyGroup> appTypeTechGroup) {
+		this.appTypeTechGroups = appTypeTechGroup;
+	}
 }

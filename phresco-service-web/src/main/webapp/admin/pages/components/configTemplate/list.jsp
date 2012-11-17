@@ -140,7 +140,7 @@
 
 	$(document).ready(function() {
 		toDisableCheckAll();
-		enableScreen();
+		hideLoadingIcon();
 		
 		$("td[id = 'hoverAppliesTo']").text(function(index) {
 	        return textTrim($(this));

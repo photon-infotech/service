@@ -85,7 +85,7 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
-		enableScreen();
+		hideLoadingIcon();
 	});
 
 	function findError(data) {

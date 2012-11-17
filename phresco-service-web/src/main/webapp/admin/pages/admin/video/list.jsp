@@ -112,7 +112,7 @@
 	}
 	
 	$(document).ready(function() {
-		enableScreen();
+		hideLoadingIcon();
 	});
 	
 	 /** To edit the pilot project **/

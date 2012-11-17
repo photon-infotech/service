@@ -19,7 +19,7 @@
  */
 function clickMenu(menu, tag, form) {
 	menu.click(function() {
-		showLoadingIcon(tag);
+		showLoadingIcon();
 		inActivateAllMenu(menu);
 		activateMenu($(this));
 		var selectedMenu = $(this).attr("id");
@@ -44,7 +44,7 @@ function clickButton(button, tag) {
 
 function loadContent(pageUrl, form, tag, additionalParams, callSuccessEvent) {
 	if (tag != undefined && tag != "" && !isBlank(tag)) {
-		showLoadingIcon(tag);
+		showLoadingIcon();
 	}
 	var params = "";
 	if (form != undefined && form != "" && !isBlank(form.serialize())) {
@@ -225,7 +225,7 @@ function accordion() {
     });
 }
 
-function showLoadingIcon(tag) {
+function showLoadingIcon() {
 	var src = "theme/photon/images/loading_blue.gif";
 	var theme =localStorage["color"];
     if (theme == undefined || theme == "theme/photon/css/red.css") {
@@ -234,6 +234,11 @@ function showLoadingIcon(tag) {
     $("#loadingIconDiv").show();
 	$("#loadingIconImg").attr("src", src);
     disableScreen();
+}
+
+function hideLoadingIcon() {
+    $("#loadingIconDiv").hide();
+    enableScreen();
 }
 
 function showProgressBar(progressText) {

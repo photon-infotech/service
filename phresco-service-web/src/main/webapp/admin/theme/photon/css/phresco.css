@@ -1785,7 +1785,6 @@ input[class *='sample'] {
 	position: absolute;
 	left: 48%;
 	top: 43%;
-	display: none;
 	z-index: 1041;
 }
 

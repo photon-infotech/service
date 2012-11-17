@@ -139,7 +139,7 @@
 	}
 
 	$(document).ready(function() {
-		enableScreen();
+		hideLoadingIcon();
 	});
      
 	function versioningDownload(id) {

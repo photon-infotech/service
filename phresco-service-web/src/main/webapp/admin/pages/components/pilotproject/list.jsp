@@ -143,7 +143,7 @@
 
 	$(document).ready(function() {
 		toDisableCheckAll(); 
-		enableScreen();
+		hideLoadingIcon();
 	});
      
 	
