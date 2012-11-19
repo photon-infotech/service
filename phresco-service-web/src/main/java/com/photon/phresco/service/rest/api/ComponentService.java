@@ -47,6 +47,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
+import org.springframework.data.document.mongodb.query.Update;
 import org.springframework.stereotype.Component;
 
 import com.photon.phresco.commons.model.ApplicationInfo;
@@ -59,6 +60,8 @@ import com.photon.phresco.commons.model.PlatformType;
 import com.photon.phresco.commons.model.Property;
 import com.photon.phresco.commons.model.SettingsTemplate;
 import com.photon.phresco.commons.model.Technology;
+import com.photon.phresco.commons.model.TechnologyGroup;
+import com.photon.phresco.commons.model.TechnologyInfo;
 import com.photon.phresco.commons.model.TechnologyOptions;
 import com.photon.phresco.commons.model.WebService;
 import com.photon.phresco.exception.PhrescoException;
@@ -278,7 +281,6 @@ public class ComponentService extends DbService {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.findTechnologies() " + customerId);
 	    }
-	    
 	    try {
 	        List<TechnologyDAO> techDAOList = new ArrayList<TechnologyDAO>();
 			Query query = createCustomerIdQuery(customerId);
@@ -305,6 +307,7 @@ public class ComponentService extends DbService {
 			}
 			
 			ResponseBuilder response = Response.status(Response.Status.OK);
+			
 			response.header(Constants.ARTIFACT_COUNT_RESULT, count(TECHNOLOGIES_COLLECTION_NAME, query));
 			return response.entity(techList).build();
 		} catch (Exception e) {
@@ -405,7 +408,26 @@ public class ComponentService extends DbService {
 				saveModuleGroup(plugin);
 			}
     	}
+    	
+    	addTechnologyToGroup(technologyDAO);
     	mongoOperation.save(TECHNOLOGIES_COLLECTION_NAME, technologyDAO);
+    	
+	}
+
+	private void addTechnologyToGroup(TechnologyDAO technologyDAO) {
+		TechnologyGroup technologyGroup = mongoOperation.findOne(TECH_GROUP_COLLECTION_NAME, 
+				new Query(Criteria.whereId().is(technologyDAO.getTechGroupId())), TechnologyGroup.class);
+		if(technologyGroup != null) {
+			List<TechnologyInfo> foundTechInfos = technologyGroup.getTechInfos();
+			TechnologyInfo info = new TechnologyInfo();
+			info.setId(technologyDAO.getId());
+			info.setAppTypeId(technologyDAO.getAppTypeId());
+			info.setName(technologyDAO.getName());
+			info.setCreationDate(technologyDAO.getCreationDate());
+			foundTechInfos.add(info);
+			technologyGroup.setTechInfos(foundTechInfos);
+			mongoOperation.save(TECH_GROUP_COLLECTION_NAME, technologyGroup);
+		}
 	}
 
 	private List<String> createPluginIds(Technology technology) {
