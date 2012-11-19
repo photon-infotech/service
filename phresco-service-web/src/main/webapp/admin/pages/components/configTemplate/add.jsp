@@ -185,6 +185,7 @@
 													<option value="Number"><s:text name='lbl.hdr.comp.cnfigtmplt.number'/></option>
 													<option value="Password"><s:text name='lbl.hdr.comp.cnfigtmplt.password'/></option>
 													<option value="FileType"><s:text name='lbl.hdr.comp.cnfigtmplt.filetype'/></option>
+													<option value="Boolean"><s:text name='lbl.hdr.comp.cnfigtmplt.boolean'/></option>
 												</select>
 											</td>
 											<td class="psblevalue" id="1_psblMulDiv" style="display:none;">
@@ -260,6 +261,7 @@
 															<option value="Number"><s:text name='lbl.hdr.comp.cnfigtmplt.number'/></option>
 															<option value="Password"><s:text name='lbl.hdr.comp.cnfigtmplt.password'/></option>
 															<option value="FileType"><s:text name='lbl.hdr.comp.cnfigtmplt.filetype'/></option>
+															<option value="Boolean"><s:text name='lbl.hdr.comp.cnfigtmplt.boolean'/></option>
 														</select>
 													</td>
 													<td class="psblevalue" id='<%= dynamicId + "_psblSinglDiv" %>' style="display:none">
