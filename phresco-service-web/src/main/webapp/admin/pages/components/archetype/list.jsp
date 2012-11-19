@@ -159,7 +159,7 @@
 	
 	$(document).ready(function() {
 		toDisableCheckAll();
-		enableScreen();
+		hideLoadingIcon();
 	 	 $("td[id = 'desc']").text(function(index) {
 	        return textTrim($(this));
 	    }); 

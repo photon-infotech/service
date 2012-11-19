@@ -19,7 +19,7 @@
  */
 function clickMenu(menu, tag, form) {
 	menu.click(function() {
-		showLoadingIcon(tag);
+		showLoadingIcon();
 		inActivateAllMenu(menu);
 		activateMenu($(this));
 		var selectedMenu = $(this).attr("id");
@@ -44,7 +44,7 @@ function clickButton(button, tag) {
 
 function loadContent(pageUrl, form, tag, additionalParams, callSuccessEvent) {
 	if (tag != undefined && tag != "" && !isBlank(tag)) {
-		showLoadingIcon(tag);
+		showLoadingIcon();
 	}
 	var params = "";
 	if (form != undefined && form != "" && !isBlank(form.serialize())) {
@@ -225,7 +225,7 @@ function accordion() {
     });
 }
 
-function showLoadingIcon(tag) {
+function showLoadingIcon() {
 	var src = "theme/photon/images/loading_blue.gif";
 	var theme =localStorage["color"];
     if (theme == undefined || theme == "theme/photon/css/red.css") {
@@ -234,6 +234,11 @@ function showLoadingIcon(tag) {
     $("#loadingIconDiv").show();
 	$("#loadingIconImg").attr("src", src);
     disableScreen();
+}
+
+function hideLoadingIcon() {
+    $("#loadingIconDiv").hide();
+    enableScreen();
 }
 
 function showProgressBar(progressText) {
@@ -332,14 +337,14 @@ function disableEnableTextBox(groupId, artifactId, jarVersion, isEnable, type, f
 		var artifId = "artifId" ;
 		var versnId = "versnId" ;
 		var fileDetParentDiv = $(document.createElement('div')).attr("id", fileName).attr("class","fileClass");
-		fileDetParentDiv.html("<div style='float: left; margin: 0px 10px 0px 0px;'><div class='controls'><input style='text-align:center;'id='" +groupid +"' class='groupId' class='input-xlarge' name='"+fileName+"_groupId" +"' maxlength='40' title='40 Characters only' type='text'  value='" + groupId +"' >" +
+		fileDetParentDiv.html("<div style='float: left; margin: 0px 10px 0px 0px;'><div class='controls' style='margin-left: 0%;'><input style='text-align:center;'id='" +groupid +"' class='groupId' class='input-xlarge' name='"+fileName+"_groupId" +"' maxlength='40' title='40 Characters only' type='text'  value='" + groupId +"' >" +
 				           "</div></div></td>"); 
-		fileDetParentDiv.append("<div style='float: left; margin: 0px 10px 0px 0px;'><div class='controls'><input style='text-align:center;'id='" +artifId +"'class='artifactId' class='input-xlarge' name='"+fileName+"_artifactId" +"' maxlength='40' title='40 Characters only' type='text' value='" + artifactId +"' >" +
+		fileDetParentDiv.append("<div style='float: left; margin: 0px 10px 0px 0px;'><div class='controls' style='margin-left: 0%;'><input style='text-align:center;'id='" +artifId +"'class='artifactId' class='input-xlarge' name='"+fileName+"_artifactId" +"' maxlength='40' title='40 Characters only' type='text' value='" + artifactId +"' >" +
 				              "</div></div>");
-		fileDetParentDiv.append("<div style='float: left; margin: 0px 10px 0px 0px;'><div class='controls'><input style='text-align:center;'id='" +versnId +"'class='jarVersion' name='"+fileName+"_version" +"'  maxlength='30' title='30 Characters only' class='input-xlarge' type='text' value='" +jarVersion +"' > " +
+		fileDetParentDiv.append("<div style='float: left; margin: 0px 10px 0px 0px;'><div class='controls'  style='margin-left: 0%;'><input style='text-align:center;'id='" +versnId +"'class='jarVersion' name='"+fileName+"_version" +"'  maxlength='30' title='30 Characters only' class='input-xlarge' type='text' value='" +jarVersion +"' > " +
 		                   "</div></div>");
 		fileDetParentDiv.append("</div>");
-		fileDetParentDiv.appendTo("#table");
+		fileDetParentDiv.appendTo("#tableAdd");
 	} else {
 		$('.groupId').val(groupId).attr('disabled', isEnable);
 		$('.artifactId').val(artifactId).attr('disabled', isEnable);
@@ -359,8 +364,29 @@ function isiPad() {
 
 //This method is calling from triggering list.jsp
 function showDeleteConfirmation(confirmMsg) {
-	confirmDialog("block", confirmMsg);
+	$('#popupPage').addClass('confirm');
+	$('#popupTitle').html("Confirmation Dialog"); 
+	$('.modal-body').html(confirmMsg);
+	$('#clipboard').hide();
+	$('.modal-body').css("height","50px");
+	$('#popupPage').css({"width":"649px","position":"relative","left":"48%"});
+	$('.popupOk').removeAttr("onclick");
+	$('.popupOk').attr("onclick","continueDeletion()");
+	$('#popupClose').hide();
+	$('#popupPage').modal({
+		show: true
+	});
 }
+
+$('#popupCancel').click(function() {
+	confirmDialog('none');
+});
+
+function confirmDialog(enableProp, msg) {
+    $(".modal-backdrop").css("display", enableProp);
+    $(".confirm").show().css("display", enableProp);
+}
+
 
 function copyToClipboard(data) {
     var params = "copyToClipboard=";

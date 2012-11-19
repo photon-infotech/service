@@ -123,6 +123,7 @@
         <action name="featuresUpdateValidate" class="com.photon.phresco.service.admin.actions.components.Features" method="validateForm">
             <result type="json" />
         </action>
+        
 		<!-- COMPONENT FEATURES ENDS-->
 		
 		<!--COMPONENT START-->
@@ -187,6 +188,10 @@
         </action>
         
          <action name="archetypeUpdateValidate" class="com.photon.phresco.service.admin.actions.components.Archetypes" method="validateForm">
+            <result type="json" />
+        </action>
+        
+         <action name="getTechGroup" class="com.photon.phresco.service.admin.actions.components.Archetypes" method="getTechnologyGroup">
             <result type="json" />
         </action>
 		<!-- COMPONENT ARCHETYPES ENDS-->

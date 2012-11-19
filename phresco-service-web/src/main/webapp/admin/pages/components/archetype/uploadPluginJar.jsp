@@ -18,67 +18,37 @@
   ###
   --%>
 
-<%@ taglib uri="/struts-tags" prefix="s"%> 
-<%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
+<%@ taglib uri="/struts-tags" prefix="s"%>
+<%@ page
+	import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
 <%
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
 %>
 <form id="formPlugin">
-<div class="modal pluginpopup" id="pluginJarUpload" style="width: 826px; margin-left: -400px; overflow: hidden;" >
-	<div class="modal-header" style="padding: 3px 15px";>
-     	<a class="close" id="close">&times;</a>
-		<h3>
-			<s:label key="lbl.hdr.featr.plugin.popup.title" theme="simple" />
-		</h3>
+	<div id="plugin-popup-file-uploader" class="file-uploader">
+		<noscript>
+			<p>Please enable JavaScript to use file uploader.</p>
+			<!-- or put a simple form for upload here -->
+		</noscript>
+		<span class="help-inline pluginError" id="popupPluginError"></span>
 	</div>
-    <div class="model-body" style="max-height: 300px;overflow-y:auto;overflow-x:hidden "> 
-		<div class="control-group" id="popupPluginControl" style="float: left; width: 100%; margin-top: 16px;">
-			<%-- <label class="control-label labelbold"> <s:text
-				name='lbl.hdr.comp.pluginjar' /> </label> --%>
-					<div class="controls" style="float: left; margin-left: 37%;">
-						<div id="plugin-popup-file-uploader" class="file-uploader">
-							<noscript>
-								<p>Please enable JavaScript to use file uploader.</p>
-								<!-- or put a simple form for upload here -->
-							</noscript>
-						</div>
-					</div>
-					 <span class="help-inline pluginError" id="popupPluginError"></span>
-		</div>
-		
-		
-		<!-- <div id="outerDiv" class="hideContent" style="padding: 0px 10px; float: left; width: 100%;border:1px solid red">
-			<div id="1stdiv" class="headerColor" style="background: RED">
-				<div class=""></div>
-				<div class=""></div>
-				<div class=""></div>
-			</div>
-			<div id="jarDetailsDivPopup" class="hideContent" style="padding: 0px 10px; width: 97%;border:1px solid red">
-			</div>
-		</div> -->
-	
-		<div id="jarDetailsDivPopup"  class="hideContent" style="padding: 0px 10px; float: left; width: 97%;">
-			 <table class="table table-bordered table-striped" style=" width: 708px;margin-left: 30px;border: 1px solid #630A0A;">
-		        <thead>
-		          <tr class="header-background">
-		            <th class="uploadpluginhead" style="padding: 3px">
-		            	<div class="" style="height: 20px;width: 230px;float: left;text-align: center;">GroupId</div>
-		            	<div class="" style="height: 20px;width: 230px;float: left;text-align: center;">ArtifactId</div>
-		            	<div class="" style="height: 20px;width: 220px;float: left;text-align: center;">Version</div>
-		            </th>
-		           </tr>
-		         </thead>
-				<tbody>
-					<tr>
-						<td id="table" class="borderBottom-none"></td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-	</div>
-	<div class="modal-footer" style="float: right; width: 97%">
-		<a href="#" class="btn btn-primary" id="cancelPluginUpload"><s:label key="lbl.btn.cancel"/></a>
-	  	<a href="#" class="btn btn-primary" id="pluginUpload"><s:label key="lbl.btn.ok"/></a>
+	<div id="jarDetailsDivPopup" class="hideContent" style="padding: 0px 10px; float: left; width: 97%;">
+		<table class="table table-bordered table-striped jarTable">
+			<thead>
+				<tr id="plugintable" class="header-background">
+					<th class="uploadpluginhead" style="padding: 3px">
+						<div class="tableCoordinates">GroupId</div>
+			        	<div class="tableCoordinates">ArtifactId</div>
+			        	<div class="tableCoordinate">Version</div>
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td id="table" class="borderBottom-none"></td>
+				</tr>
+			</tbody>
+		</table>
 	</div>
 	<input type="hidden" name="customerId" value="<%= customerId %>">
 </form>
@@ -86,18 +56,40 @@
  	
 	$(document).ready(function() {
 		createPluginUploader();
-		$('#cancelPluginUpload, #close').click(function() {
-			$('#popup_div').empty();
-			showParentPage();
+		$('#popup_div').hide();
+		$('#popupTitle').html("Upload Plugin Jar"); 
+		$('#popupClose').hide();
+		$('.popupOk').attr("onclick","popupOnOk(this)");
+		$('#popupPage').css({"width":"780px","position":"relative","left":"40%"});
+		$('#plugin-popup-file-uploader').css("margin-left","300px");
+		$('.modal-body').css("height","200px");
+		$('#clipboard').hide();
+		$(".popupOk").html("<s:text name="Ok"/>");
+		$('.popupOk, #popupCancel').show(); // show ok & cancel button
+		$('.modal-body').html($("#formPlugin"));
+		$('.popupOk').attr('id', "pluginUpload");
+		$('.borderBottom-none').attr('id', "tableAdd");
+		$('#popupPage').modal({
+			show: true
 		});
 
 		$('#pluginUpload').click(function() {
 			$('#formPlugin').hide();
 			$('#popup_div').hide();
-			enableScreen();
-			loadContent('technology', $('#formPlugin'), $('#popup_div'), '', true);
+			hideLoadingIcon();
+			loadContent('technology', $('#formPlugin'), $('#popupPage'), '', true);
 		});
 
+		$('#popupCancel').click(function() {
+			$('#popup_div').empty();
+			showParentPage();
+		});
+		
+		$('.close').click(function() {
+			$('#popup_div').empty();
+			showParentPage();
+		});
+		
 	});
 
 	function findError(data) {

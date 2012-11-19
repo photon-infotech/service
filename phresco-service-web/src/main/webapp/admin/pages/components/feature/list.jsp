@@ -63,14 +63,14 @@
 					%>
 		                <span class="siteaccordion closereg">
 		                	<span>
-	                			<% if (moduleGroup.isSystem()) { %>
+	                		 	<% if (moduleGroup.isSystem()) { %>
 									<input type="checkbox" name="moduleGroup" value="<%= moduleGroup.getId() %>" disabled/>
 									&nbsp;&nbsp;<%= moduleGroup.getName() %>&nbsp;&nbsp;
-								<% } else { %>
+								<% } else { %> 
 			                		<input type="checkbox" class="check technology" name="moduleGroup" value="<%= moduleGroup.getId()%>" 
 			                			id="<%= moduleGroup.getId()%>checkBox" onclick="checkboxEvent();">
 			                		&nbsp;&nbsp;<%= moduleGroup.getName() %>&nbsp;&nbsp;
-	                			<% } %>
+	                			 <% } %> 
 		                	</span>
 		                </span>
 		                <div class="mfbox siteinnertooltiptxt hideContent">
@@ -130,7 +130,7 @@
 	
 	$(document).ready(function() {
 		toDisableCheckAll();
-		enableScreen();
+		hideLoadingIcon();//To hide the loading icon
 	});
 	
 	function editFeature(moduleGroupId, moduleId) {
@@ -140,5 +140,4 @@
 	    params = params.concat(moduleId);
 	    loadContent("featurseEdit", $('#formFeaturesList'), $('#featureContainer'), params);
 	}
-	
 </script>

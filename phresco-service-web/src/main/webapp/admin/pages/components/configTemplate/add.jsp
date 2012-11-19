@@ -373,7 +373,7 @@
 	}
 
 	$(document).ready(function() {
-		enableScreen();
+		hideLoadingIcon();
 		
 		//for edit -- to dynamically populate possible values in property template fieldset 
 		<% 

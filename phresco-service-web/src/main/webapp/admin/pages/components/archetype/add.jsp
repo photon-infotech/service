@@ -34,6 +34,7 @@
 <%@ page import="com.phresco.pom.site.Reports"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
 <%@ page import="com.photon.phresco.service.admin.actions.util.ServiceActionUtil"%>
+<%@ page import="com.photon.phresco.commons.model.TechnologyGroup"%>
 
 <%
 	Technology technology = (Technology) request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPE);
@@ -126,7 +127,7 @@
 				class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.apptype' />
 			</label>
 			<div class="controls">
-				<select id="select01" name="apptype">
+				<select id="appTypeLayer" name="apptype">
 					<%
 						if (CollectionUtils.isNotEmpty(appTypes)) {
 							for (ApplicationType appType : appTypes) {
@@ -144,6 +145,29 @@
 				<span class="help-inline" id="appError"></span>
 			</div>
 		</div>
+		
+		 <div class="control-group apptype" id="appControl">
+			<label class="control-label labelbold"> <span
+				class="mandatory"></span>&nbsp;<s:text name='lbl.hdr.archetype.techgroup' />
+			</label>
+			<div class="controls">
+				<select id="techGroup" name="techGroup">
+					<%
+						if (CollectionUtils.isNotEmpty(appTypes)) {
+							for (ApplicationType appType : appTypes) {
+								  List<TechnologyGroup> techGroups = appType.getTechGroups();
+									  for (TechnologyGroup techGroup : techGroups) {
+					%>
+					   <option <%=disabledVer%> value="<%=techGroup.getId()%>"><%=techGroup.getName()%></option>
+					<%
+						    }
+						  }
+						}
+					%>
+				</select> 
+				<span class="help-inline" id="appError"></span>
+			</div>
+		</div> 
 		
 		<!-- POM details starts -->
 		<div id="jarDetailsDiv" class="hideContent">
@@ -315,10 +339,10 @@
 	}
 
     $(document).ready(function() {
-        enableScreen();
+    	hideLoadingIcon();
         
         createUploader();
-        
+        getTechGroup();
         // To focus the name textbox by default
         $('#archename').focus();
 
@@ -335,51 +359,74 @@
             artifId = checkForSplChrExceptDot(artifId);
             $(this).val(artifId);
         });
-     
+     	
+        $("#appTypeLayer").change(function() {
+       	 getTechGroup();
+        });  
+     	
         // To remove the plugin jar file field
         /* $('.del').live('click', function() {
             $(this).parent().parent().remove();
         }); */
     });
-
-    function findError(data) {
-        if (!isBlank(data.nameError)) {
-            showError($("#nameControl"), $("#nameError"), data.nameError);
-        } else {
-            hideError($("#nameControl"), $("#nameError"));
-        }
-
-        if (data.verError != undefined) {
-            showError($("#verControl"), $("#verError"), data.verError);
-        } else {
-            hideError($("#verControl"), $("#verError"));
-        }
-        
-        if (!isBlank(data.techvernError)) {
-            showError($("#techverControl"), $("#techvernError"), data.techvernError);
-        } else {
-            hideError($("#techverControl"), $("#techvernError"));
-        }
-        
-        if (!isBlank(data.appError)) {
-            showError($("#appControl"), $("#appError"), data.appError);
-        } else {
-            hideError($("#appControl"), $("#appError"));
-        }
-        
-        if (!isBlank(data.fileError)) {
-            showError($("#appFileControl"), $("#fileError"), data.fileError);
-        } else {
-            hideError($("#appFileControl"), $("#fileError"));
-        }
-     	
-        if (!isBlank(data.applicableErr)) {
-        	showError($("#applicableControl"), $("#applicableError"), data.applicableErr);
-        } else {
-        	hideError($("#applicableControl"), $("#applicableError"));
-        }
-    }
     
+     function getTechGroup() {
+    	 loadContent('getTechGroup', $('#formArcheTypeAdd'), '', '', true);
+	      $('#techGroup').empty();
+     }
+    
+   
+	function successEvent(pageUrl, data) {
+		if (pageUrl == "getTechGroup") {
+			var techGroups = data.appTypeTechGroups;
+			for (i in techGroups) {
+				var id = techGroups[i].id;
+				var name = techGroups[i].name;
+				$('#techGroup').append($("<option></option>").attr("value", id).text(name));
+			}
+		}
+	}
+
+	function findError(data) {
+		if (!isBlank(data.nameError)) {
+			showError($("#nameControl"), $("#nameError"), data.nameError);
+		} else {
+			hideError($("#nameControl"), $("#nameError"));
+		}
+
+		if (data.verError != undefined) {
+			showError($("#verControl"), $("#verError"), data.verError);
+		} else {
+			hideError($("#verControl"), $("#verError"));
+		}
+
+		if (!isBlank(data.techvernError)) {
+			showError($("#techverControl"), $("#techvernError"),
+					data.techvernError);
+		} else {
+			hideError($("#techverControl"), $("#techvernError"));
+		}
+
+		if (!isBlank(data.appError)) {
+			showError($("#appControl"), $("#appError"), data.appError);
+		} else {
+			hideError($("#appControl"), $("#appError"));
+		}
+
+		if (!isBlank(data.fileError)) {
+			showError($("#appFileControl"), $("#fileError"), data.fileError);
+		} else {
+			hideError($("#appFileControl"), $("#fileError"));
+		}
+
+		if (!isBlank(data.applicableErr)) {
+			showError($("#applicableControl"), $("#applicableError"),
+					data.applicableErr);
+		} else {
+			hideError($("#applicableControl"), $("#applicableError"));
+		}
+	}
+
 	function jarError(data, type) {
 		var controlObj;
 		var msgObj;
@@ -393,24 +440,24 @@
 			hideError(controlObj, msgObj);
 		}
 	}
-    
+
 	function createUploader() {
 		var applnUploader = new qq.FileUploader({
-            element: document.getElementById('appln-file-uploader'),
-            action: 'uploadJar',
-            multiple: false,
-            allowedExtensions : ["jar"],
-            type: 'applnJar',
-            buttonLabel: '<s:label key="lbl.comp.arhtyp.upload" />',
-            typeError : '<s:text name="err.invalid.jar.selection" />',
-            params : {
-            	type: 'applnJar',
-            	archType : true
-            }, 
-            debug: true
-        });
-   	}
-   
+			element : document.getElementById('appln-file-uploader'),
+			action : 'uploadJar',
+			multiple : false,
+			allowedExtensions : [ "jar" ],
+			type : 'applnJar',
+			buttonLabel : '<s:label key="lbl.comp.arhtyp.upload" />',
+			typeError : '<s:text name="err.invalid.jar.selection" />',
+			params : {
+				type : 'applnJar',
+				archType : true
+			},
+			debug : true
+		});
+	}
+
 	function removeUploadedJar(obj) {
 		$('#jarDetailsDiv').hide();
 		$(obj).parent().remove();
@@ -429,21 +476,26 @@
 		enableDisableUpload();
 		jarError('', type);
 	}
-	
+
 	function enableDisableUpload() {
-		if ($('ul[temp="applnJar"] > li').length === 1 ) {
-			$('#appln-file-uploader').find("input[type='file']").attr('disabled','disabled');
-			$('#appln-file-uploader').find($(".qq-upload-button")).removeClass("btn-primary qq-upload-button").addClass("disabled");
+		if ($('ul[temp="applnJar"] > li').length === 1) {
+			$('#appln-file-uploader').find("input[type='file']").attr(
+					'disabled', 'disabled');
+			$('#appln-file-uploader').find($(".qq-upload-button")).removeClass(
+					"btn-primary qq-upload-button").addClass("disabled");
 		} else {
-			$('#appln-file-uploader').find("input[type='file']").attr('disabled', false);
-			$('#appln-file-uploader').find($(".btn")).removeClass("disabled").addClass("btn-primary qq-upload-button");
+			$('#appln-file-uploader').find("input[type='file']").attr(
+					'disabled', false);
+			$('#appln-file-uploader').find($(".btn")).removeClass("disabled")
+					.addClass("btn-primary qq-upload-button");
 		}
 	}
-	
+
 	function uploadPluginJar() {
 		$('#popup_div').show();
 		$('#popup_div').empty();
 		disableScreen();
-		loadContent('uploadPluginJar', $('#formArcheTypeAdd'), $('#popup_div'));
+		loadContent('uploadPluginJar', $('#formArcheTypeAdd'), $('.modal-body'));
+		$("#loadingIconDiv").hide();
 	}
 </script>

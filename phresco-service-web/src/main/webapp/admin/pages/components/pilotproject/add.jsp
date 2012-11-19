@@ -205,7 +205,7 @@
 	}
 
 	$(document).ready(function() {
-		enableScreen();
+		hideLoadingIcon();
         createUploader();
         
         <% if (ServiceUIConstants.EDIT.equals(fromPage)) { %>

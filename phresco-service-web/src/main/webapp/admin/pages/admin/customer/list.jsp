@@ -123,7 +123,7 @@
 	}
 
 	$(document).ready(function() {
-		enableScreen();
+		hideLoadingIcon();
 	});
 	
 	/** To edit the customer **/

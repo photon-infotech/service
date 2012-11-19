@@ -123,7 +123,7 @@
 	}
 
 	$(document).ready(function() {
-		enableScreen();
+		hideLoadingIcon();
 		createUploader();
 		//To focus the name textbox by default
 		$('#name').focus();

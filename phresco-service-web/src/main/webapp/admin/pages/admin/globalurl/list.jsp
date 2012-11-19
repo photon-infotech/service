@@ -127,7 +127,7 @@
 	}
 
 	$(document).ready(function() {
-		enableScreen();
+		hideLoadingIcon();
 	});
 	
 	function editGlobalUrl(id) {

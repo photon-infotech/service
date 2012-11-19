@@ -144,7 +144,7 @@
 	}
 	
 	$(document).ready(function() {
-		enableScreen();
+		hideLoadingIcon();
 		
 		$("#addValues").click(function() {
 			var val = $("#txtCombo").val();

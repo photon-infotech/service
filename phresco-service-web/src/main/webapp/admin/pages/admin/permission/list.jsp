@@ -89,7 +89,7 @@
 	}
 
 	$(document).ready(function() {
-		enableScreen();
+		hideLoadingIcon();
 	});
 	
 	function continueDeletion() {

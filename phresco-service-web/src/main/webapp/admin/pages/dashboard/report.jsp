@@ -230,7 +230,7 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
-		enableScreen();
+		hideLoadingIcon();
 		
 		$('#replaceimg1').click(function() {
 			$('.list-slide1').slideToggle();
