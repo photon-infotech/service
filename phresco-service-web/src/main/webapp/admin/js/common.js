@@ -327,7 +327,7 @@ function fillTextBoxes(responseJSON, type, fileName) {
 	if (responseJSON.mavenJar) {
 		disableEnableTextBox(responseJSON.groupId, responseJSON.artifactId, responseJSON.version, true, type, fileName);
 	} else {
-		disableEnableTextBox('', '', '', false, '', '');
+		disableEnableTextBox('', '', '', false, type, '');
 	}
 }
 
@@ -437,4 +437,14 @@ function enableCtrl(control) {
 
 function enableDivCtrls(disabledDiv) {
 	disabledDiv.removeAttr("disabled");
+}
+
+function enableDisableUploads(type, controlObj){
+	if ($('ul[temp='+type+'] > li').length === 1) {
+		controlObj.find("input[type='file']").attr('disabled', 'disabled');
+		controlObj.find($(".qq-upload-button")).removeClass("btn-primary qq-upload-button").addClass("disabled");
+	} else {
+		controlObj.find("input[type='file']").attr('disabled', false);
+		controlObj.find($(".btn")).removeClass("disabled").addClass("btn-primary qq-upload-button");
+	}
 }

@@ -456,7 +456,7 @@
 		});
 	}
 
-	function removeUploadedJar(obj) {
+	function removeUploadedJar(obj, btnId) {
 		$('#jarDetailsDiv').hide();
 		$(obj).parent().remove();
 		var type = $(obj).attr("tempattr");
@@ -472,37 +472,6 @@
 			}
 		});
 		jarError('', type);
-		enableDisableUpload();
-		enableIconDisableUpload();
+		enableDisableUploads(type, $("#" + btnId));
 	}
-
-	function enableDisableUpload() {
-		if ($('ul[temp="uploadFile"] > li').length === 1) {
-			$('#download-file-uploader').find("input[type='file']").attr(
-					'disabled', 'disabled');
-			$('#download-file-uploader').find($(".qq-upload-button")).removeClass(
-					"btn-primary qq-upload-button").addClass("disabled");
-		} else {
-			$('#download-file-uploader').find("input[type='file']").attr(
-					'disabled', false);
-			$('#download-file-uploader').find($(".btn")).removeClass("disabled")
-					.addClass("btn-primary qq-upload-button");
-		}
-	}
-
-	function enableIconDisableUpload() {
-		if ($('ul[temp="uploadIcon"] > li').length === 1) {
-			$('#icon-file-uploader').find("input[type='file']").attr(
-					'disabled', 'disabled');
-			$('#icon-file-uploader').find($(".qq-upload-button"))
-					.removeClass("btn-primary qq-upload-button").addClass(
-							"disabled");
-		} else {
-			$('#icon-file-uploader').find("input[type='file']").attr(
-					'disabled', false);
-			$('#icon-file-uploader').find($(".btn")).removeClass("disabled")
-					.addClass("btn-primary qq-upload-button");
-		}
-	}
-	
 </script>

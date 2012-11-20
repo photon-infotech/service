@@ -300,17 +300,20 @@ qq.FileUploaderBasic = function(o){
         			} else {
         				if (o.type === "applnJar" || o.type === "uploadFile" || o.fileType === "featureJar" || o.type === "pilotProZip" || o.type === "pluginJar") {
         					fillTextBoxes(responseJSON, o.type, fileName);// To show the text box for groupId, artifactId and version 
-    		        		enableDisableUpload();// To disable the upload button when a file is uploaded successfully
+    		        		enableDisableUploads(o.type, $(o.element));// To disable the upload button when a file is uploaded successfully
         				}
         				if (o.type === "uploadIcon") {
-        					enableIconDisableUpload();// to disable the upload Icon Button when a image is uploaded successfully
+        					enableDisableUploads(o.type, $(o.element));// to disable the upload Icon Button when a image is uploaded successfully
         				}
         				if (o.type === "pluginJar"){
         					jarPopupError('', o.type);
         				} if (o.type === "videoFile") {
-        					enableDisableUpload("videoFile", "video-file-uploader");
+        					enableDisableUploads(o.type, $(o.element));
         				} else if (o.type === "imageFile"){
-        					enableDisableUpload("imageFile", "image-file-uploader");
+        					enableDisableUploads(o.type, $(o.element));
+        				} else if (o.fileType === "featureJar" || o.fileType === "featureImg"){
+        					enableDisableUploads(o.fileType, $(o.element));
+        					jarError('', o.fileType);
         				} else {
         					jarError('', o.type);
         				}
@@ -330,7 +333,9 @@ qq.FileUploaderBasic = function(o){
         showMessage: function(message){
         	if(o.type === "pluginJar"){
         		jarPopupError(message, o.type);
-        	} else {
+        	}else if (o.fileType === "featureJar" || o.fileType === "featureImg" ){
+				jarError(message, o.fileType);
+			} else {
         		jarError(message, o.type);
         	}
         	
@@ -531,6 +536,8 @@ qq.FileUploaderBasic.prototype = {
  */
 var urlAction = "";
 qq.FileUploader = function(o){
+	var type = o.type || o.fileType;
+	var btnId = o.element.getAttribute('id');
 	// call parent constructor
     qq.FileUploaderBasic.apply(this, arguments);
     // additional options    
@@ -538,11 +545,11 @@ qq.FileUploader = function(o){
         element: null,
         // if set, will be used instead of qq-upload-list in template
         listElement: null,
-                
+    	
         template: '<div class="qq-uploader">' + 
                 '<div class="qq-upload-drop-area"><span></span></div>' +
                 '<div class="qq-upload-button btn btn-primary">' + o.buttonLabel + '</div>' +
-                '<ul class="qq-upload-list" temp="'+ o.type +'"></ul>' + 
+                '<ul class="qq-upload-list" temp="'+ type +'"></ul>' + 
              '</div>',
 
         // template for one item in file list
@@ -552,7 +559,7 @@ qq.FileUploader = function(o){
                 '<span class="qq-upload-size"></span>' +
                 '<a class="qq-upload-cancel" href="#">Cancel</a>' +
                 '<span class="qq-upload-failed-text">Failed</span>' +
-                '<img class="qq-upload-remove" src="images/delete.png" alt="Remove" tempAttr="'+ o.type +'"  onclick="removeUploadedJar(this);"/>' +
+                '<img class="qq-upload-remove" src="images/delete.png" alt="Remove" tempAttr="'+ type +'"  onclick="removeUploadedJar(this,\'' + btnId + '\');"/>' +
             '</li>',        
         
         classes: {

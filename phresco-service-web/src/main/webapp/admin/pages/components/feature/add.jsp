@@ -352,6 +352,7 @@
 					</noscript>
 				</div>
 			</div>
+			<span class="help-inline fileError" id="featureImgError"></span>
 		</div>
 	</div>
 	
@@ -419,6 +420,7 @@
 	            $("p[id='" + name + "']").html(version);
 	        }
 	    });
+		
 	});
 
 	//To show the validation error
@@ -470,7 +472,11 @@
 		if (type == "featureJar") {
 			controlObj = $("#featureFileControl");
 			msgObj = $("#featureFileError");
-		} 
+		}else if(type == "featureImg" ){
+			controlObj = $("#featureImgControl");
+			msgObj = $("#featureImgError");
+		}
+		
 		if (data != undefined && !isBlank(data)) {
 			showError(controlObj, msgObj, data);
 		} else {
@@ -501,7 +507,7 @@
 			allowedExtensions : ["png"],	
 			fileType : 'featureImg',
 			buttonLabel : '<s:label key="lbl.comp.featricon.upload" />',
-			typeError : '<s:text name="err.invalid.file.selection" />',
+			typeError : '<s:text name="err.invalid.img.file" />',
 			params : {
 				fileType : 'featureImg'
 			},
@@ -510,7 +516,7 @@
 	}
  
 	//To remove the uploaded file
-	function removeUploadedJar(obj) {
+	function removeUploadedJar(obj, btnId) {
 		$('#jarDetailsDiv').hide();
 		$(obj).parent().remove();
 		var type = $(obj).attr("tempattr");
@@ -524,24 +530,9 @@
 			type : "POST",
 			success : function(data) {}
 		});
+		enableDisableUploads(type, $("#" + btnId));
 		jarError('', type);
-		enableDisableUpload();
 	}
-
-	//To restrict the no of files to be uploaded by disabling the upload button 
-	function enableDisableUpload() {
-		if ($('ul[temp="featureJar"] > li').length === 1) {
-			$('#feature-file-uploader').find("input[type='file']").attr(
-					'disabled', 'disabled');
-			$('#feature-file-uploader').find($(".qq-upload-button")).removeClass(
-					"btn-primary qq-upload-button").addClass("disabled");
-		} else {
-			$('#feature-file-uploader').find("input[type='file']").attr(
-					'disabled', false);
-			$('#feature-file-uploader').find($(".btn")).removeClass("disabled")
-					.addClass("btn-primary qq-upload-button");
-		}
-	} 
 	
 	// to get the features to add the dependencies
 	function getFeatures() {

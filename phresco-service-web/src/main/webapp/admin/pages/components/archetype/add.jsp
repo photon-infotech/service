@@ -113,11 +113,11 @@
 			</div>
 		</div>  
 
-		<div class="control-group">
+		<div class="control-group" id="versionComment">
 			<label class="control-label labelbold"> <s:text
 					name='lbl.hdr.com.vercmnt' /> </label>
 			<div class="controls">
-				<textarea name="versionComment" <%= disabledVer %> placeholder='<s:text name="place.hldr.archetype.add.ver.comment"/>' class="input-xlarge" 
+				<textarea name="versionComment"  placeholder='<s:text name="place.hldr.archetype.add.ver.comment"/>' class="input-xlarge" 
 					rows="2" cols="10" maxlength="150" title="150 Characters only"><%= versionComment %></textarea>
 			</div>
 		</div>
@@ -363,7 +363,11 @@
         $("#appTypeLayer").change(function() {
        	 getTechGroup();
         });  
-     	
+        
+        if( '<%= versioning %>' != "versioning" ){
+       	 $("#versionComment").hide();
+       }
+        
         // To remove the plugin jar file field
         /* $('.del').live('click', function() {
             $(this).parent().parent().remove();
@@ -458,7 +462,7 @@
 		});
 	}
 
-	function removeUploadedJar(obj) {
+	function removeUploadedJar(obj, btnId) {
 		$('#jarDetailsDiv').hide();
 		$(obj).parent().remove();
 		var type = $(obj).attr("tempattr");
@@ -473,22 +477,8 @@
 			success : function(data) {
 			}
 		});
-		enableDisableUpload();
+		enableDisableUploads(type, $("#" + btnId));
 		jarError('', type);
-	}
-
-	function enableDisableUpload() {
-		if ($('ul[temp="applnJar"] > li').length === 1) {
-			$('#appln-file-uploader').find("input[type='file']").attr(
-					'disabled', 'disabled');
-			$('#appln-file-uploader').find($(".qq-upload-button")).removeClass(
-					"btn-primary qq-upload-button").addClass("disabled");
-		} else {
-			$('#appln-file-uploader').find("input[type='file']").attr(
-					'disabled', false);
-			$('#appln-file-uploader').find($(".btn")).removeClass("disabled")
-					.addClass("btn-primary qq-upload-button");
-		}
 	}
 
 	function uploadPluginJar() {

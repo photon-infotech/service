@@ -285,7 +285,7 @@
 		});
 	} 
 	 
-	function removeUploadedJar(obj) {
+	function removeUploadedJar(obj, btnId) {
 		$('#jarDetailsDiv').hide();
 		$(obj).parent().remove();
 		var type = $(obj).attr("tempattr"); 
@@ -300,17 +300,8 @@
 			success : function(data) {
 			}
 		});
-		enableDisableUpload();
+		enableDisableUploads(type, $("#" + btnId));
 		jarError('', type)
 	} 
 	    
-	function enableDisableUpload() {
-		if ($('ul[temp="pilotProZip"] > li').length === 1 ) {
-			$('#pilotPro-file-uploader').find("input[type='file']").attr('disabled','disabled');
-			$('#pilotPro-file-uploader').find($(".qq-upload-button")).removeClass("btn-primary qq-upload-button").addClass("disabled");
-		} else {
-			$('#pilotPro-file-uploader').find("input[type='file']").attr('disabled', false);
-			$('#pilotPro-file-uploader').find($(".btn")).removeClass("disabled").addClass("btn-primary qq-upload-button");
-		}
-	} 
 </script>

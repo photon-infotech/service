@@ -180,7 +180,7 @@
         });
    	}
 	
-	function removeUploadedJar(obj) {
+	function removeUploadedJar(obj, btnId) {
 		$(obj).parent().remove();
 		var type = $(obj).attr("tempattr"); 
 		var params = "uploadedJar=";
@@ -196,10 +196,8 @@
 		});
 		if (type === "videoFile") {
 			$('#videoDetailsDiv').hide();
-			enableDisableUpload("videoFile", "video-file-uploader");
-		} else if (type === "imageFile"){
-			enableDisableUpload("imageFile", "image-file-uploader");
-		} 
+		}
+		enableDisableUploads(type, $("#" + btnId));
 	} 
 	
 	function jarError(data, type) {
@@ -216,16 +214,6 @@
 			showError(controlObj, msgObj, data);
 		} else {
 			hideError(controlObj, msgObj);
-		}
-	}
-	
-	function enableDisableUpload(tempattr, divId) {
-		if ($('ul[temp="'+ tempattr +'"] > li').length === 1 ) {
-			$('#'+divId).find("input[type='file']").attr('disabled','disabled');
-			$('#'+divId).find($(".qq-upload-button")).removeClass("btn-primary qq-upload-button").addClass("disabled");
-		} else {
-			$('#'+divId).find("input[type='file']").attr('disabled', false);
-			$('#'+divId).find($(".btn")).removeClass("disabled").addClass("btn-primary qq-upload-button");
 		}
 	}
 </script>
