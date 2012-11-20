@@ -53,6 +53,7 @@ import org.springframework.stereotype.Component;
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.DownloadInfo;
 import com.photon.phresco.commons.model.Element;
 import com.photon.phresco.commons.model.License;
@@ -1047,30 +1048,30 @@ public class ComponentService extends DbService {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.deleteModules(String id)" + id);
 	    }
-		return deleteVersion(id);
+		return deleteAttifact(id);
 	}
 	
-	private Response deleteVersion(String id) {
+	private Response deleteAttifact(String id) {
 		try {
-			com.photon.phresco.commons.model.ArtifactInfo artifactInfo =mongoOperation.findOne(ARTIFACT_INFO_COLLECTION_NAME, 
-					new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), com.photon.phresco.commons.model.ArtifactInfo.class);
-			if(artifactInfo != null) {
-				ArtifactGroupDAO artifactGroupDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
-						new Query(Criteria.whereId().is(artifactInfo.getArtifactGroupId())),
-						ArtifactGroupDAO.class);
-				List<String> versionIds = artifactGroupDAO.getVersionIds();
-				versionIds.remove(id);
-				artifactGroupDAO.setVersionIds(versionIds);
-				List<String> customerIds = artifactGroupDAO.getCustomerIds();
-				ArtifactGroup artifactGroup = new ArtifactGroup(artifactGroupDAO.getGroupId(), artifactGroupDAO.getArtifactId());
-				artifactGroup.setVersions(Arrays.asList(artifactInfo));
-				boolean deleted = repositoryManager.deleteArtifact(customerIds.get(0), artifactGroup);
-				if(deleted) {
+			Query query = new Query(Criteria.whereId().is(id));
+			ArtifactGroupDAO artifactGroupDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
+					query, ArtifactGroupDAO.class);
+			if(artifactGroupDAO != null) {
+				mongoOperation.remove(ARTIFACT_GROUP_COLLECTION_NAME, query, ArtifactGroupDAO.class);
+			} else {
+				ArtifactInfo artifactInfo = mongoOperation.findOne(ARTIFACT_INFO_COLLECTION_NAME, query, ArtifactInfo.class);
+				if(artifactInfo != null) {
+					ArtifactInfo info = mongoOperation.findOne(ARTIFACT_INFO_COLLECTION_NAME, query, ArtifactInfo.class);
+					artifactGroupDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
+							new Query(Criteria.whereId().is(info.getArtifactGroupId())), ArtifactGroupDAO.class);
+					List<String> versionIds = artifactGroupDAO.getVersionIds();
+					versionIds.remove(id);
+					artifactGroupDAO.setVersionIds(versionIds);
 					mongoOperation.save(ARTIFACT_GROUP_COLLECTION_NAME, artifactGroupDAO);
-					mongoOperation.remove(ARTIFACT_INFO_COLLECTION_NAME, 
-					        new Query(Criteria.whereId().is(id)));
+					mongoOperation.remove(ARTIFACT_INFO_COLLECTION_NAME, query, ArtifactInfo.class);
 				}
 			}
+			
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
 		}
@@ -1287,7 +1288,7 @@ public class ComponentService extends DbService {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.deletePilot(String id)" + id);
 	    }
-		return deleteVersion(id);
+		return deleteAttifact(id);
 	}
 
 	/**
@@ -1673,7 +1674,7 @@ public class ComponentService extends DbService {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.deleteDownloadInfo(String id)" + id);
         }
-       return deleteVersion(id);
+       return deleteAttifact(id);
     }
     
     /**
