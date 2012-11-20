@@ -65,6 +65,7 @@ import com.photon.phresco.commons.model.TechnologyGroup;
 import com.photon.phresco.commons.model.TechnologyInfo;
 import com.photon.phresco.commons.model.TechnologyOptions;
 import com.photon.phresco.commons.model.WebService;
+import com.photon.phresco.exception.AIException;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.exception.PhrescoWebServiceException;
 import com.photon.phresco.service.api.Converter;
@@ -260,15 +261,46 @@ public class ComponentService extends DbService {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.deleteAppType(String id)" + id);
 	    }
-		
 		try {
-			mongoOperation.remove(APPTYPES_COLLECTION_NAME, 
-			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ApplicationType.class);
+			ApplicationTypeDAO appType = mongoOperation.findOne(APPTYPES_COLLECTION_NAME, 
+					new Query(Criteria.whereId().is(id)), ApplicationTypeDAO.class);
+			if(appType != null) {
+				List<String> techGroups = appType.getTechGroupIds();
+				for (String techGroupId : techGroups) {
+					deleteTechGroup(techGroupId);
+				}
+				mongoOperation.remove(APPTYPES_COLLECTION_NAME, 
+				        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ApplicationTypeDAO.class);
+			}
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
 		}
 		
 		return Response.status(Response.Status.OK).build();
+	}
+	
+	private void deleteTechGroup(String id) {
+		TechnologyGroup techGroup = mongoOperation.findOne(TECH_GROUP_COLLECTION_NAME, 
+				new Query(Criteria.whereId().is(id)), TechnologyGroup.class);
+		List<TechnologyInfo> techInfos = techGroup.getTechInfos();
+		for (TechnologyInfo technologyInfo : techInfos) {
+			deleteTechnologyObject(technologyInfo.getId());
+		}
+		mongoOperation.remove(TECH_GROUP_COLLECTION_NAME, new Query(Criteria.whereId().is(id)), TechnologyGroup.class);
+	}
+	
+	private void deleteTechnologyObject(String id) {
+		Query query = new Query(Criteria.whereId().is(id));
+		TechnologyDAO technologyDAO = mongoOperation.findOne(TECHNOLOGIES_COLLECTION_NAME, query, TechnologyDAO.class);
+		if(technologyDAO != null) {
+			String archetypeGroupDAOId = technologyDAO.getArchetypeGroupDAOId();
+			deleteAttifact(archetypeGroupDAOId);
+			List<String> pluginIds = technologyDAO.getPluginIds();
+			for (String pluginId : pluginIds) {
+				deleteAttifact(pluginId);
+			}
+			mongoOperation.remove(TECHNOLOGIES_COLLECTION_NAME, query, TechnologyDAO.class);
+		}
 	}
 	
 	/**
@@ -583,10 +615,7 @@ public class ComponentService extends DbService {
 	    }
 		
 		try {
-			mongoOperation.remove(TECHNOLOGIES_COLLECTION_NAME, 
-			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), Technology.class);
-			//TODO:Need to check usage before deletion
-			//TODO:Need to remove dependent objects
+			deleteTechnologyObject(id);
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
 		}
@@ -1058,6 +1087,8 @@ public class ComponentService extends DbService {
 					query, ArtifactGroupDAO.class);
 			if(artifactGroupDAO != null) {
 				mongoOperation.remove(ARTIFACT_GROUP_COLLECTION_NAME, query, ArtifactGroupDAO.class);
+				List<String> versionIds = artifactGroupDAO.getVersionIds();
+				mongoOperation.remove(ARTIFACT_INFO_COLLECTION_NAME, new Query(Criteria.whereId().in(versionIds.toArray())), ArtifactInfo.class);
 			} else {
 				ArtifactInfo artifactInfo = mongoOperation.findOne(ARTIFACT_INFO_COLLECTION_NAME, query, ArtifactInfo.class);
 				if(artifactInfo != null) {
@@ -1288,7 +1319,13 @@ public class ComponentService extends DbService {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.deletePilot(String id)" + id);
 	    }
-		return deleteAttifact(id);
+	    Query query = new Query(Criteria.whereId().is(id));
+	    ApplicationInfoDAO applicationInfoDAO = mongoOperation.findOne(APPLICATION_INFO_COLLECTION_NAME, query, ApplicationInfoDAO.class);
+	    if(applicationInfoDAO != null) {
+	    	deleteAttifact(applicationInfoDAO.getArtifactGroupId());
+	    	mongoOperation.remove(APPLICATION_INFO_COLLECTION_NAME, query, ApplicationInfoDAO.class);
+	    }
+		return Response.status(Response.Status.OK).build(); 
 	}
 
 	/**
@@ -1674,7 +1711,13 @@ public class ComponentService extends DbService {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.deleteDownloadInfo(String id)" + id);
         }
-       return deleteAttifact(id);
+        Query query = new Query(Criteria.whereId().is(id));
+	    DownloadsDAO downloadsDAO = mongoOperation.findOne(DOWNLOAD_COLLECTION_NAME, query, DownloadsDAO.class);
+	    if(downloadsDAO != null) {
+	    	deleteAttifact(downloadsDAO.getArtifactGroupId());
+	    	mongoOperation.remove(DOWNLOAD_COLLECTION_NAME, query, DownloadsDAO.class);
+	    }
+		return Response.status(Response.Status.OK).build(); 
     }
     
     /**
@@ -1718,7 +1761,7 @@ public class ComponentService extends DbService {
 			}
 			return  Response.status(Response.Status.OK).entity(reports).build();
 		} catch (Exception e) {
-			throw new PhrescoWebServiceException(e, EX_PHEX00005, WEBSERVICES_COLLECTION_NAME);
+			throw new PhrescoWebServiceException(e, EX_PHEX00005, REPORTS_COLLECTION_NAME);
 		}
 	}
 	
