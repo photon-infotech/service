@@ -29,7 +29,7 @@ public interface DbManager {
      * @return
      * @throws PhrescoException
      */
-    ApplicationInfo getProjectInfo(String pilotId, String customerId) throws PhrescoException;
+    ApplicationInfo getApplicationInfo(String pilotId) throws PhrescoException;
     
     /**
      * Returns the documents for the given technology type

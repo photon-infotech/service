@@ -85,7 +85,7 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 	public void updateProject(ProjectInfo projectInfo, String tempFolderPath) throws PhrescoException {
 		File projectPath = new File(tempFolderPath);
 		projectPath.mkdirs();
-		
+		String customerId = projectInfo.getCustomerIds().get(0);
 		Map<String, String> appInfoMap = new HashMap<String, String>();
 		PhrescoServerFactory.initialize();
 		DbManager dBManager = PhrescoServerFactory.getDbManager();
@@ -107,11 +107,11 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 		
 		for (ApplicationInfo applicationInfo : appInfos) {
 			if(applicationInfo.getPilotInfo() != null) {
-				ApplicationInfo appInfo = dBManager.getProjectInfo(applicationInfo.getId(), applicationInfo.getCustomerIds().get(0));
+				ApplicationInfo appInfo = dBManager.getApplicationInfo(applicationInfo.getId());
 				if(appInfo.getPilotInfo() == null) {
-					createPilots(applicationInfo, tempFolderPath);
+					createPilots(applicationInfo, tempFolderPath, customerId);
 				} else if(!StringUtils.equals(appInfo.getPilotInfo().getId(), applicationInfo.getPilotInfo().getId())) {
-					createPilots(applicationInfo, tempFolderPath);
+					createPilots(applicationInfo, tempFolderPath, customerId);
 				}
 			}
 		}
@@ -125,7 +125,7 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 	public void findNewlyAddedProject(Map<String, String> appInfoMap, List<ApplicationInfo> appInfosInDB,
 			List<ApplicationInfo> appInfos, List<ApplicationInfo> createdAppInfos) {
 		for (ApplicationInfo appInfoInDB : appInfosInDB) {
-			String techType = appInfoInDB.getTechInfo().getVersion();
+			String techType = appInfoInDB.getTechInfo().getId();
 			appInfoMap.put(techType, techType);
 		}
 		
@@ -136,10 +136,9 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 		}
 	}
 
-	private void createPilots(ApplicationInfo applicationInfo, String tempFolderPath) throws PhrescoException {
+	private void createPilots(ApplicationInfo applicationInfo, String tempFolderPath, String customerId) throws PhrescoException {
 		Element pilotElement = applicationInfo.getPilotInfo();
-		String customerId = applicationInfo.getCustomerIds().get(0);
-		ApplicationInfo pilotInfo = dbManager.getProjectInfo(pilotElement.getId(), customerId);
+		ApplicationInfo pilotInfo = dbManager.getApplicationInfo(pilotElement.getId());
 		ArtifactGroup pilotContent = pilotInfo.getPilotContent();
 		String version = pilotContent.getVersions().get(0).getVersion();
 		String contentURL = ServerUtil.createContentURL(pilotContent.getGroupId(), pilotContent.getArtifactId(), 

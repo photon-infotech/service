@@ -83,10 +83,10 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
     }
 
     @Override
-    public ApplicationInfo getProjectInfo(String pilotId, String customerId)
+    public ApplicationInfo getApplicationInfo(String pilotId)
             throws PhrescoException {
-    	Query pilotQuery = createCustomerIdQuery(customerId);
     	Criteria criteria = Criteria.whereId().is(pilotId);
+    	Query pilotQuery = new Query();
     	pilotQuery.addCriteria(criteria);
     	ApplicationInfoDAO appDAO = mongoOperation.findOne(APPLICATION_INFO_COLLECTION_NAME, pilotQuery, ApplicationInfoDAO.class);
         return convertApplicationDAO(appDAO);

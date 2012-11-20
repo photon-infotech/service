@@ -118,7 +118,7 @@ public class DependencyManagerImpl implements DependencyManager {
 		
 		Element pilotInfo = applicationInfo.getPilotInfo();
 		String pilotId = pilotInfo.getId();
-		ApplicationInfo projectInfo = dbManager.getProjectInfo(pilotId, customerId);
+		ApplicationInfo projectInfo = dbManager.getApplicationInfo(pilotId);
 		if(projectInfo != null) {
 			extractPilots(projectInfo, projectPath, customerId);
 		}
