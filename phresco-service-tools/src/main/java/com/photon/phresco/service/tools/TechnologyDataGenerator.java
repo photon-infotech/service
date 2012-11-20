@@ -61,6 +61,8 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.codehaus.plexus.util.StringUtils;
+import org.springframework.data.document.mongodb.query.Criteria;
+import org.springframework.data.document.mongodb.query.Query;
 import org.w3c.dom.Element;
 
 import com.photon.phresco.commons.model.ArtifactGroup;
@@ -128,12 +130,12 @@ public class TechnologyDataGenerator extends DbService implements ServiceConstan
 //	    INPUT_EXCEL_MAP.put(TechnologyTypes.PHP_DRUPAL7,"PHTN_PHRESCO_Drupal7.xls");
 //	    INPUT_EXCEL_MAP.put(TechnologyTypes.SHAREPOINT,"PHTN_PHRESCO_Sharepoint.xls");
 //	    INPUT_EXCEL_MAP.put(TechnologyTypes.ANDROID_NATIVE,"PHTN_PHRESCO_Andriod-Native.xls");
-//	    INPUT_EXCEL_MAP.put(TechnologyTypes.IPHONE_NATIVE,"PHTN_PHRESCO_iPhone-Native.xls");
+	    INPUT_EXCEL_MAP.put(TechnologyTypes.IPHONE_NATIVE,"PHTN_PHRESCO_iPhone-Native.xls");
 //	    INPUT_EXCEL_MAP.put(TechnologyTypes.IPHONE_HYBRID,"PHTN_PHRESCO_iPhone-Native.xls");
 //	    INPUT_EXCEL_MAP.put(TechnologyTypes.NODE_JS_WEBSERVICE,"PHTN_PHRESCO_NodeJS-WebService.xls");
 //	    INPUT_EXCEL_MAP.put(TechnologyTypes.ANDROID_HYBRID,"PHTN_PHRESCO_Andriod-Hybrid.xls");
 //	    INPUT_EXCEL_MAP.put(TechnologyTypes.WORDPRESS, "PHTN_PHRESCO_Wordpress.xls");
-	    INPUT_EXCEL_MAP.put(TechnologyTypes.PHP_DRUPAL6, "PHTN_PHRESCO_Drupal6.xls");
+//	    INPUT_EXCEL_MAP.put(TechnologyTypes.PHP_DRUPAL6, "PHTN_PHRESCO_Drupal6.xls");
     }
 
     /**
@@ -199,34 +201,30 @@ public class TechnologyDataGenerator extends DbService implements ServiceConstan
       for (String string : keySet) {
           ArtifactGroup moduleGroup = moduleMap.get(string);
           createdModules.add(moduleGroup);
-          convertAndStrore(moduleGroup);
+          System.out.println(moduleGroup.getName());
+          saveModuleGroup(moduleGroup);
       }
       return;
     }
 
 
-    private void convertAndStrore(ArtifactGroup artifactGroup) throws PhrescoException {
-        List<ArtifactInfo> versions = artifactGroup.getVersions();
-        List<String> versionIds = new ArrayList<String>();
+    private void saveModuleGroup(ArtifactGroup moduleGroup) throws PhrescoException {
         Converter<ArtifactGroupDAO, ArtifactGroup> converter = 
             (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
-        ArtifactGroupDAO moduleGroupDAO = converter.convertObjectToDAO(artifactGroup);
-        String id2 = moduleGroupDAO.getId();
-        for (ArtifactInfo module : versions) {
-        	versionIds.add(module.getId());
-            module.setArtifactGroupId(id2);
-//            List<String> handleDependencies = handleDependencies(module);
-//            if(CollectionUtils.isNotEmpty(handleDependencies)) {
-//            	module.setDependencyIds(handleDependencies);
-//            }
-            System.out.println(module);
-            mongoOperation.save(ARTIFACT_INFO_COLLECTION_NAME, module);
-        }
-        moduleGroupDAO.setVersionIds(versionIds);
-      mongoOperation.save(ARTIFACT_GROUP_COLLECTION_NAME, moduleGroupDAO);
+        ArtifactGroupDAO moduleGroupDAO = converter.convertObjectToDAO(moduleGroup);
+        
     }
 
-
+    
+    private String checkVersionAvailable(List<com.photon.phresco.commons.model.ArtifactInfo> info, String version) {
+		for (com.photon.phresco.commons.model.ArtifactInfo artifactInfo : info) {
+			if(artifactInfo.getVersion().equals(version)) {
+				return artifactInfo.getId();
+			}
+		}
+		return null;
+	}
+    
     private List<String> handleDependencies(ArtifactInfo artifactGroup) {
     	List<String> idsList = new ArrayList<String>();
     	String[] moduleNos = NAME_AND_DEP_MAP.get(artifactGroup.getName());
@@ -367,6 +365,8 @@ public class TechnologyDataGenerator extends DbService implements ServiceConstan
         List<CoreOption> options = new ArrayList<CoreOption>();
         if(techId.equals(TechnologyTypes.JAVA_WEBSERVICE)) {
         	options = createCoreOptionsForJava(convertBoolean(core));
+        } else if (techId.equals(TechnologyTypes.IPHONE_NATIVE)){
+        	options = createCoreOptionsForIpone(convertBoolean(core));
         } else {
             CoreOption coreoption = new CoreOption(techId, convertBoolean(core));
             options.add(coreoption);
@@ -401,7 +401,17 @@ public class TechnologyDataGenerator extends DbService implements ServiceConstan
 		}
     	return options;
 	}
-
+    
+    private List<CoreOption> createCoreOptionsForIpone(Boolean core) {
+    	String javaList[] = new String[]{TechnologyTypes.IPHONE_NATIVE, TechnologyTypes.IPHONE_HYBRID};
+    	List<CoreOption> options = new ArrayList<CoreOption>();
+    	CoreOption option  = null;
+    	for (int i = 0; i < javaList.length; i++) {
+			option = new CoreOption(javaList[i], core);
+			options.add(option);
+		}
+    	return options;
+	}
 
 	/**
      * To create imageurl
