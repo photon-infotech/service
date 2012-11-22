@@ -883,7 +883,7 @@ public class ComponentService extends DbService {
        
         moduleGroup = createBodyPart(moduleGroup, bodyParts, bodyPartEntityMap);
         
-        if(bodyPartEntityMap == null & moduleGroup != null) {
+        if(bodyPartEntityMap.isEmpty() & moduleGroup != null) {
         	saveModuleGroup(moduleGroup);
         }
         if (bodyPartEntityMap != null) {
