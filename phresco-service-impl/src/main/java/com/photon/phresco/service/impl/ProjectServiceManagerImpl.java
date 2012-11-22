@@ -96,7 +96,6 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 		List<ApplicationInfo> createdAppInfos = new ArrayList<ApplicationInfo>();
 		
 		findNewlyAddedProject(appInfoMap, appInfosInDB, appInfos, createdAppInfos);
-		
 		ProjectInfo projectInfoClone = projectInfo.clone();
 		if(CollectionUtils.isNotEmpty(createdAppInfos)) {
 			for (int i = 0; i < createdAppInfos.size(); i++) {
@@ -130,7 +129,7 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 		}
 		
 		for (ApplicationInfo appInfo : appInfos) {
-			if (!appInfoMap.containsKey(appInfo.getTechInfo().getVersion())) {
+			if (!appInfoMap.containsKey(appInfo.getTechInfo().getId())) {
 				createdAppInfos.add(appInfo);
 			}
 		}
