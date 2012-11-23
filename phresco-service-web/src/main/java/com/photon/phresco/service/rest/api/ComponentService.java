@@ -880,13 +880,11 @@ public class ComponentService extends DbService {
         File moduleFile = null;
         List<BodyPart> bodyParts = moduleInfo.getBodyParts();
         Map<String, BodyPartEntity> bodyPartEntityMap = new HashMap<String, BodyPartEntity>();
-       
         moduleGroup = createBodyPart(moduleGroup, bodyParts, bodyPartEntityMap);
-        
-        if(bodyPartEntityMap.isEmpty() & moduleGroup != null) {
+        if(bodyPartEntityMap.isEmpty()) {
         	saveModuleGroup(moduleGroup);
         }
-        if (bodyPartEntityMap != null) {
+        if (!bodyPartEntityMap.isEmpty()) {
         	BodyPartEntity bodyPartEntity = bodyPartEntityMap.get(Type.ARCHETYPE.name());
         	if (bodyPartEntity != null) {
         		moduleFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null, moduleGroup.getPackaging());
@@ -907,7 +905,7 @@ public class ComponentService extends DbService {
         		}
         	}
         }
-        
+        bodyPartEntityMap.clear();
         return Response.status(Response.Status.CREATED).entity(moduleGroup).build();
 	}
 
@@ -924,7 +922,7 @@ public class ComponentService extends DbService {
         }
 		return moduleGroup;
 	}
-
+	
 	private void saveModuleGroup(ArtifactGroup moduleGroup) throws PhrescoException {
 		if(!validate(moduleGroup)) {
 			return;
@@ -933,13 +931,12 @@ public class ComponentService extends DbService {
             (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
         ArtifactGroupDAO moduleGroupDAO = converter.convertObjectToDAO(moduleGroup);
         
-//        List<com.photon.phresco.commons.model.ArtifactInfo> moduleGroupVersions = moduleGroup.getVersions();
         List<String> versionIds = new ArrayList<String>();
         
         ArtifactGroupDAO moduleDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
 		        new Query(Criteria.whereId().is(moduleGroupDAO.getId())), ArtifactGroupDAO.class);
         com.photon.phresco.commons.model.ArtifactInfo newVersion = moduleGroup.getVersions().get(0);
-        if(moduleDAO != null) {
+        if(moduleDAO != null && StringUtils.isNotEmpty(moduleGroupDAO.getGroupId())) {
         	moduleGroupDAO.setId(moduleDAO.getId());
         	versionIds.addAll(moduleDAO.getVersionIds());
         	List<com.photon.phresco.commons.model.ArtifactInfo> info = mongoOperation.find(ARTIFACT_INFO_COLLECTION_NAME, 
@@ -957,10 +954,13 @@ public class ComponentService extends DbService {
         	}
 			newVersion.setId(id);
     		mongoOperation.save(ARTIFACT_INFO_COLLECTION_NAME, newVersion);
-        }  else {
+        }  else if(moduleDAO == null && StringUtils.isNotEmpty(moduleGroupDAO.getGroupId())){
         		versionIds.add(newVersion.getId());
         		newVersion.setArtifactGroupId(moduleGroupDAO.getId());
                 mongoOperation.save(ARTIFACT_INFO_COLLECTION_NAME, newVersion);
+        }
+        if(CollectionUtils.isEmpty(versionIds)) {
+        	versionIds = moduleDAO.getVersionIds();
         }
         moduleGroupDAO.setVersionIds(versionIds);
         mongoOperation.save(ARTIFACT_GROUP_COLLECTION_NAME, moduleGroupDAO);
