@@ -151,6 +151,7 @@ div.lgnBtnLabel {
 	margin-right: 23px;
 	margin-top: 9px;
 	text-align: right;
+	width: 98%;
 }
 
 .bottom_config {
@@ -847,7 +848,7 @@ a {
 
 .tabs>li>a {
 	line-height: 25px;
-	padding: 0 12px;
+	padding: 0 9px;
 	text-decoration: none;
 	border-radius: 4px 4px 0 0;
 	margin-right: 2px;
@@ -2068,7 +2069,7 @@ input[class *='sample'] {
 }
 
 .featurelist_height {
-	height: 86%;
+	height: 82.5%;
 	overflow-x: hidden;
 }
 
