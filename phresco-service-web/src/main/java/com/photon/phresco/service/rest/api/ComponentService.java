@@ -2125,4 +2125,163 @@ public class ComponentService extends DbService {
 		
 		return Response.status(Response.Status.OK).build();
 	}
+	
+	/**
+	 * Returns the list of Technology Options
+	 * @return
+	 */
+	@GET
+	@Path (REST_API_TECHGROUPS)
+	@Produces (MediaType.APPLICATION_JSON)
+	public Response findTechnologyGroups() {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.findTechnologyGroups()");
+	    }
+		try {
+			List<TechnologyGroup> technologyGroups = mongoOperation.getCollection(TECH_GROUP_COLLECTION_NAME, TechnologyGroup.class);
+			return  Response.status(Response.Status.OK).entity(technologyGroups).build();
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00005, TECH_GROUP_COLLECTION_NAME);
+		}
+	}
+	
+	/**
+	 * Creates the list of Technology Groups
+	 * @param techGroups
+	 * @return 
+	 */
+	@POST
+	@Consumes (MediaType.APPLICATION_JSON)
+	@Path (REST_API_TECHGROUPS)
+	public Response createTechnologyGroups(List<TechnologyGroup> techGroups) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.createTechnologyGroups(List<TechnologyGroup> techGroups)");
+	    }
+		
+		try {
+			for (TechnologyGroup technologyGroup : techGroups) {
+				if(validate(technologyGroup)) {
+					mongoOperation.save(TECH_GROUP_COLLECTION_NAME , technologyGroup);
+				}
+			}
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
+		}
+		
+		return Response.status(Response.Status.OK).build();
+	}
+	
+	/**
+	 * Updates the list of TechnologyGroups
+	 * @param techGroups
+	 * @return
+	 */
+	@PUT
+	@Consumes (MediaType.APPLICATION_JSON)
+	@Produces (MediaType.APPLICATION_JSON)
+	@Path (REST_API_TECHGROUPS)
+	public Response updateTechnologyGroups(List<TechnologyGroup> techGroups) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.updateTechnologyGroups(List<TechnologyGroup> techGroups)");
+	    }
+		
+		try {
+			for (TechnologyGroup techGroup : techGroups) {
+				mongoOperation.save(TECH_GROUP_COLLECTION_NAME, techGroup);
+			}
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
+		}
+		
+		return Response.status(Response.Status.OK).entity(techGroups).build();
+	}
+	
+	/**
+	 * Deletes the list of TechnologyGroups
+	 * @param properties
+	 * @throws PhrescoException 
+	 */
+	@DELETE
+	@Path (REST_API_TECHGROUPS)
+	public void deleteTechnologyGroups(List<TechnologyGroup> techGroups) throws PhrescoException {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.deleteTechnologyGroups(List<TechnologyGroup> techGroups)");
+	    }
+		
+		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
+		S_LOGGER.error(exceptionString + phrescoException.getErrorMessage());
+		throw phrescoException;
+	}
+	
+	/**
+	 * Get the TechnologyGroup by id for the given parameter
+	 * @param id
+	 * @return
+	 */
+	@GET
+	@Produces (MediaType.APPLICATION_JSON)
+	@Path (REST_API_TECHGROUPS + REST_API_PATH_ID)
+	public Response getTechnologyGroup(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.getTechnologyGroup(String id)" + id);
+	    }
+		
+		try {
+			TechnologyGroup techGroup = mongoOperation.findOne(TECH_GROUP_COLLECTION_NAME, 
+					new Query(Criteria.whereId().is(id)), TechnologyGroup.class);
+			if(techGroup != null) {
+				return Response.status(Response.Status.OK).entity(techGroup).build();
+			}
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00005, TECH_GROUP_COLLECTION_NAME);
+		}
+		
+		return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
+	}
+	
+	/**
+	 * Updates the TechnologyGroup given by the parameter
+	 * @param id
+	 * @param techGroup
+	 * @return
+	 */
+	@PUT
+	@Consumes (MediaType.APPLICATION_JSON)
+	@Produces (MediaType.APPLICATION_JSON)
+	@Path (REST_API_TECHGROUPS + REST_API_PATH_ID)
+	public Response updateTechnologyGroup(@PathParam(REST_API_PATH_PARAM_ID) String id , TechnologyGroup techGroup) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.updateTechnologyGroup(String id, TechnologyGroup techGroup)" + id);
+	    }
+		
+		try {
+			mongoOperation.save(TECH_GROUP_COLLECTION_NAME, techGroup);
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
+		}
+		
+		return Response.status(Response.Status.BAD_REQUEST).entity(techGroup).build();
+	}
+	
+	/**
+	 * Deletes the TechnologyGroup by id for the given parameter
+	 * @param id
+	 * @return 
+	 */
+	@DELETE
+	@Path (REST_API_TECHGROUPS + REST_API_PATH_ID)
+	public Response deleteTechnologyGroup(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.deleteTechnologyGroup((String id)" + id);
+	    }
+		
+		try {
+			mongoOperation.remove(TECH_GROUP_COLLECTION_NAME, 
+			        new Query(Criteria.whereId().is(id)), TechnologyGroup.class);
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
+		}
+		
+		return Response.status(Response.Status.OK).build();
+	}
 }
