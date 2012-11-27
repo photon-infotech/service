@@ -267,8 +267,10 @@ public class ComponentService extends DbService {
 					new Query(Criteria.whereId().is(id)), ApplicationTypeDAO.class);
 			if(appType != null) {
 				List<String> techGroups = appType.getTechGroupIds();
-				for (String techGroupId : techGroups) {
-					deleteTechGroup(techGroupId);
+				if(CollectionUtils.isNotEmpty(techGroups)) {
+					for (String techGroupId : techGroups) {
+						deleteTechGroup(techGroupId);
+					}
 				}
 				mongoOperation.remove(APPTYPES_COLLECTION_NAME, 
 				        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ApplicationTypeDAO.class);
