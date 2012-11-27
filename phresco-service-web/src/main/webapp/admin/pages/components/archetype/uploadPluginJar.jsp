@@ -92,17 +92,17 @@
 		
 	});
 
+	
 	function findError(data) {
-		if (data.fileError != undefined) {
-			showError($("#popupPluginControl"), $("#popupPluginError"),
-					data.fileError);
+		if (data.popupPluginError != undefined) {
+			showError($("#plugin-popup-file-uploader"), $("#popupPluginError"),	data.popupPluginError);
 		} else {
-			hideError($("#popupPluginControl"), $("#popupPluginError"));
+			hideError($("#plugin-popup-file-uploader"), $("#popupPluginError"));
 		}
 	}
 
 	function jarPopupError(data, type) {
-		var	controlpluginObj = $("#popupPluginControl");
+		var	controlpluginObj = $("#plugin-popup-file-uploader");
 		var	msgpluginObj = $("#popupPluginError");
 		if (data != undefined && !isBlank(data)) {
 			showError(controlpluginObj, msgpluginObj, data);
@@ -111,20 +111,23 @@
 		}
 	}
 
-	function removeUploadedJar(obj) {
+	function removeUploadedJar(obj, btnId) {
+		$('#jarDetailsDiv').hide();
 		$(obj).parent().remove();
 		
 		var type = $(obj).attr("tempattr");
 		var tempFile = $(obj).attr("filename");
-
+		if(btnId != "appln-file-uploader"){	
 		$(".fileClass").each(function() {
 			if ($(this).attr("id") == tempFile) {
 				$(this).remove();
 				return false;
 			}
 		});
+		arrayPushPop(tempFile, false);
+		}
 		var params = "uploadedJar=";
-		params = params.concat(tempFile);
+		params = params.concat($(obj).attr("id"));
 		params = params.concat("&type=");
 		params = params.concat(type);
 		$.ajax({
@@ -134,8 +137,11 @@
 			success : function(data) {
 			}
 		});
-		enableDisableUpload();
-		jarPopupError('', type);
+		
+		if(btnId == "appln-file-uploader"){	
+			enableDisableUploads(type, $("#" + btnId));
+			jarError('', type);
+		}
 	}
 
 	function createPluginUploader() {

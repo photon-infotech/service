@@ -45,7 +45,7 @@
 				<tbody>
 					<tr>
 						<td>
-							<input type="checkbox" id="checkAllAuto" name="moduleGroup" 
+							<input type="checkbox" class=checkAll id="checkAllAuto" name="moduleGroup" 
 								onclick="checkAllEvent(this, $('.technology'), false);">
 						</td>
 						<td class="labelbold"><s:text name='lbl.hdr.comp.name'/></td>
@@ -68,7 +68,7 @@
 									&nbsp;&nbsp;<%= moduleGroup.getName() %>&nbsp;&nbsp;
 								<% } else { %> 
 			                		<input type="checkbox" class="check technology" name="moduleGroup" value="<%= moduleGroup.getId()%>" 
-			                			id="<%= moduleGroup.getId()%>checkBox" onclick="checkboxEvent();">
+			                			id="<%= moduleGroup.getId()%>checkBox" onclick="checkAllEvent(this, $('.<%= moduleGroup.getName()%>'), false); checkboxEvent();" value="Call2Functions" >
 			                		&nbsp;&nbsp;<%= moduleGroup.getName() %>&nbsp;&nbsp;
 	                			 <% } %> 
 		                	</span>
@@ -94,7 +94,11 @@
 										%>
 											<tr>
 												<td>
-													<input type="radio" name="<%= module.getId() %>" value="<%= module.getVersion() %>" >
+												<% if (moduleGroup.isSystem()) { %>
+													<input type="checkbox" name="selectedModuleId" value="<%= module.getId() %> %>" disabled/>
+												<% } else { %> 
+													<input type="checkbox" id="<%= moduleGroup.getName() %>" class="<%= moduleGroup.getName() %> subtechnology" name="selectedModuleId" value="<%= module.getId() %>"  onclick="checkOneEvent( $('.<%=moduleGroup.getName()%>'), $('#<%=moduleGroup.getId()%>checkBox'));">
+												<% } %> 
 												</td>
 												<td>
 													<a href="#" name="ModuleDesc" onclick="editFeature('<%= moduleGroup.getId() %>', '<%= module.getId() %>');" >
@@ -139,5 +143,50 @@
 	    params = params.concat("&moduleId=");
 	    params = params.concat(moduleId);
 	    loadContent("featurseEdit", $('#formFeaturesList'), $('#featureContainer'), params);
+	}
+	
+	function checkAllEvent(currentCheckbox, childCheckBox, disable) {
+		var checkAll = $(currentCheckbox).prop('checked');
+		childCheckBox.prop('checked', checkAll);
+		statusButton();
+		if (!checkAll) {
+			disable = false;
+		}
+		toDisableAllCheckbox(currentCheckbox,childCheckBox, disable);
+	}
+
+	function checkboxEvent() {
+		statusButton();
+		if ($('.check').length == $(".check:checked").length) {
+			$('#checkAllAuto').prop('checked', true);
+		} else {
+			$('#checkAllAuto').prop('checked', false);
+		}
+	}
+	function checkOneEvent(currentCheckbox,parentCheckBox) {
+		var id = currentCheckbox.attr("id");
+		statusButton();
+		if ( currentCheckbox.length == $('.' +id +':checked').length){
+			parentCheckBox.prop('checked', true);
+		} else {
+			parentCheckBox.prop('checked', false);
+		}
+	}
+	
+	function statusButton() {
+		var count = $("input:checked").length;
+		var flag;
+		if( count < 1 ){
+			$('#del').attr('disabled', true);
+			flag = true;
+		} else {
+			$('#del').attr('disabled', false);
+			flag = false;
+		}
+		if (!flag) {
+			$('#del').addClass('btn-primary');
+		} else {
+			$('#del').removeClass('btn-primary');
+		}
 	}
 </script>
