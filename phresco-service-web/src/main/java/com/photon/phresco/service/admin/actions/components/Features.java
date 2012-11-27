@@ -141,7 +141,8 @@ public class Features extends ServiceBaseAction {
     	if (isDebugEnabled) {
     		S_LOGGER.debug("Entering Method  Features.featurelist()");
     	}
-    	
+    	inputStreamMap.clear();
+    	featureByteArray = null;
 		List<ArtifactGroup> moduleGroups = getServiceManager().getFeatures(getCustomerId(), getTechnology(), Type.valueOf(getType()).name());
 		setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroups);
 		setReqAttribute(REQ_FEATURES_TYPE, getType());
@@ -205,9 +206,9 @@ public class Features extends ServiceBaseAction {
         try {
             ArtifactGroup moduleGroup = createModuleGroup(Type.valueOf(getType()));
             
-            if(featureByteArray != null){
+            /*if(featureByteArray != null){
 				inputStreamMap.put(moduleGroup.getName(),  new ByteArrayInputStream(featureByteArray));
-			} 
+			} */
             getServiceManager().createFeatures(moduleGroup, inputStreamMap, getCustomerId());
             setTechnologiesInRequest();
             addActionMessage(getText(FEATURE_ADDED, Collections.singletonList(getName())));
@@ -247,9 +248,9 @@ public class Features extends ServiceBaseAction {
         
         try {
             ArtifactGroup moduleGroup = createModuleGroup(Type.valueOf(getType()));
-            if(featureByteArray != null){
+            /*if(featureByteArray != null){
 				inputStreamMap.put(moduleGroup.getName(),  new ByteArrayInputStream(featureByteArray));
-			} 
+			}*/ 
             getServiceManager().updateFeature(moduleGroup, inputStreamMap, getCustomerId());
             addActionMessage(getText(FEATURE_ADDED, Collections.singletonList(getName())));
             setTechnologiesInRequest();

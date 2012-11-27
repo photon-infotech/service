@@ -887,6 +887,10 @@ public class ComponentService extends DbService {
         if (!bodyPartEntityMap.isEmpty()) {
         	BodyPartEntity bodyPartEntity = bodyPartEntityMap.get(Type.ARCHETYPE.name());
         	if (bodyPartEntity != null) {
+        		if(moduleGroup.getType().name().equals(FEATURE_TYPE_JS)) {
+					moduleGroup.setGroupId(JS_GROUP_ID);
+					moduleGroup.setArtifactId(moduleGroup.getName().toLowerCase());
+				}
         		moduleFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null, moduleGroup.getPackaging());
         		boolean uploadBinary = uploadBinary(moduleGroup, moduleFile);
                 if (uploadBinary) {
@@ -896,8 +900,8 @@ public class ComponentService extends DbService {
 			}
         	if(bodyPartEntityMap.get(Type.ICON.name()) != null) {
         		BodyPartEntity iconEntity = bodyPartEntityMap.get(Type.ICON.name());
-            	File iconFile = ServerUtil.writeFileFromStream(iconEntity.getInputStream(), null, "png");
-            	moduleGroup.setPackaging("png");
+            	File iconFile = ServerUtil.writeFileFromStream(iconEntity.getInputStream(), null, ICON_EXT);
+            	moduleGroup.setPackaging(ICON_EXT);
         		boolean uploadBinary = uploadBinary(moduleGroup, iconFile);
         		FileUtil.delete(iconFile);
         		if(!uploadBinary) {
