@@ -50,6 +50,7 @@ import org.springframework.data.document.mongodb.query.Query;
 import org.springframework.data.document.mongodb.query.Update;
 import org.springframework.stereotype.Component;
 
+import com.google.gson.Gson;
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
@@ -1662,11 +1663,15 @@ public class ComponentService extends DbService {
         }
         
         try {
-            DownloadInfo downloadInfo = mongoOperation.findOne(DOWNLOAD_COLLECTION_NAME, 
-                    new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), DownloadInfo.class);
-            if (downloadInfo != null) {
-                return Response.status(Response.Status.OK).entity(downloadInfo).build();
-            } 
+        	DownloadsDAO downloadDAO = mongoOperation.findOne(DOWNLOAD_COLLECTION_NAME, 
+                    new Query(Criteria.whereId().is(id)), DownloadsDAO.class);
+        	if(downloadDAO != null) {
+    			Converter<DownloadsDAO, DownloadInfo> downlodConverter = 
+    					(Converter<DownloadsDAO, DownloadInfo>) ConvertersFactory.getConverter(DownloadsDAO.class);
+    			DownloadInfo downloadInfo = downlodConverter.convertDAOToObject(downloadDAO, mongoOperation);
+    			return Response.status(Response.Status.OK).entity(downloadInfo).build();
+        	}
+        	
         } catch (Exception e) {
             throw new PhrescoWebServiceException(e, EX_PHEX00005, DOWNLOAD_COLLECTION_NAME);
         }
