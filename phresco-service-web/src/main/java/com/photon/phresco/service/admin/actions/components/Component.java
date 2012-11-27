@@ -46,6 +46,7 @@ import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.client.api.ServiceManager;
+import com.photon.phresco.service.client.impl.CacheKey;
 import com.photon.phresco.service.model.FileInfo;
 import com.photon.phresco.service.util.ServerUtil;
 import com.sun.jersey.api.client.ClientResponse;
@@ -249,9 +250,13 @@ public class Component extends ServiceBaseAction {
 		
 		try {
 			String[] techIds = getHttpRequest().getParameterValues(REST_QUERY_TECHID);
+			String customerId = getCustomerId();
+            String tech = getTechnology();
+            String type = getType();
+            CacheKey key = new CacheKey(customerId, type, tech);
 			if (ArrayUtils.isNotEmpty(techIds)) {
 				for (String techId : techIds) {
-					ClientResponse clientResponse = getServiceManager().deleteFeature(techId, getCustomerId());
+					ClientResponse clientResponse = getServiceManager().deleteFeature(techId, key);
 					if (clientResponse.getStatus() != RES_CODE_200) {
 						addActionError(getText(COMPONENT_NOT_DELETED));
 					}

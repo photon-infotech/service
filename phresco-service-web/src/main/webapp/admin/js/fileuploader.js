@@ -298,9 +298,12 @@ qq.FileUploaderBasic = function(o){
         				}
         				//jarError(responseJSON.errorMsg, o.type);
         			} else {
-        				if (o.type === "applnJar" || o.type === "uploadFile" || o.fileType === "featureJar" || o.type === "pilotProZip" || o.type === "pluginJar") {
+        				if (o.type === "applnJar" || o.type === "uploadFile" || o.fileType === "featureJar" || o.type === "pilotProZip") {
         					fillTextBoxes(responseJSON, o.type, fileName);// To show the text box for groupId, artifactId and version 
     		        		enableDisableUploads(o.type, $(o.element));// To disable the upload button when a file is uploaded successfully
+        				}
+        				if(o.type === "pluginJar"){
+        					fillTextBoxes(responseJSON, o.type, fileName);
         				}
         				if (o.type === "uploadIcon") {
         					enableDisableUploads(o.type, $(o.element));// to disable the upload Icon Button when a image is uploaded successfully

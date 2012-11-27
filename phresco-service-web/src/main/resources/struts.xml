@@ -41,9 +41,12 @@
 		<interceptors>
 			<interceptor name="sessionValidatorInterceptor" class="com.photon.phresco.service.admin.actions.interceptors.SessionValidatorInterceptor">
 			</interceptor>
-		
+			<interceptor name="json" class="com.photon.phresco.service.admin.actions.JSONInterceptor">
+			</interceptor>
+			
 			<interceptor-stack name="interceptorStack">
 				<interceptor-ref name="sessionValidatorInterceptor" />
+				<interceptor-ref name="json" />
 				<interceptor-ref name="defaultStack" />
 			</interceptor-stack>
 		</interceptors>
@@ -194,6 +197,16 @@
          <action name="getTechGroup" class="com.photon.phresco.service.admin.actions.components.Archetypes" method="getTechnologyGroup">
             <result type="json" />
         </action>
+        
+        <action name="openTechGroupPopup" class="com.photon.phresco.service.admin.actions.components.Archetypes" method="showTechGroupPopup">
+            <result name="techGroup">/admin/pages/components/archetype/technologyGroup.jsp</result>
+        </action>
+        
+        <action name="newTechGroup" class="com.photon.phresco.service.admin.actions.components.Archetypes" method="createTechGroup">
+        	 <interceptor-ref name="json"/>
+            <result name="archetypesList">/admin/pages/components/archetype/list.jsp</result>
+        </action>
+        
 		<!-- COMPONENT ARCHETYPES ENDS-->
 			
 		<!-- COMPONENT APPLICATION TYPES STARTS-->

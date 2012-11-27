@@ -94,6 +94,8 @@ public interface ServiceUIConstants {
     String REQ_JAR_FILE = "jar";
     String REQ_TECHNOLOGY_OPTION = "options";
     String REQ_TECHNOLOGY_REPORTS = "reports";
+    String REQ_TECHNOLOGY_GROUPS = "TechnologyGroups";
+    String REQ_TECH_GROUP = "techGroup";
     
     
     /*****************************

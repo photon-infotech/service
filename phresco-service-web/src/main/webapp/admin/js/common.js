@@ -17,7 +17,10 @@
  * limitations under the License.
  * ###
  */
+var jars = [];
+
 function clickMenu(menu, tag, form) {
+	
 	menu.click(function() {
 		showLoadingIcon();
 		inActivateAllMenu(menu);
@@ -40,6 +43,20 @@ function clickButton(button, tag) {
 		var selectedMenu = $(this).attr("id");
 		loadContent(selectedMenu, '', tag);
 	});
+}
+
+function loadJsonContent(url, jsonParam, containerTag) {
+	$.ajax({
+		url : url,
+		data : jsonParam,
+		type : "POST",
+		contentType: "application/json; charset=utf-8",
+		success : function(data) {
+			if (containerTag != undefined) {
+				loadData(data, containerTag);
+			}
+		}
+	});	
 }
 
 function loadContent(pageUrl, form, tag, additionalParams, callSuccessEvent) {
@@ -327,12 +344,36 @@ function fillTextBoxes(responseJSON, type, fileName) {
 	if (responseJSON.mavenJar) {
 		disableEnableTextBox(responseJSON.groupId, responseJSON.artifactId, responseJSON.version, true, type, fileName);
 	} else {
-		disableEnableTextBox('', '', '', false, type, '');
+		disableEnableTextBox('', '', '', false, type, fileName);
+	}
+}
+
+function checkExistence(fileName){
+	for (var i = 0; i < jars.length; i++) {
+        if (jars[i] === fileName) {
+        	return true;
+        }
+    }
+	return false;
+}
+
+function arrayPushPop(fileName, isEnable){
+	if(isEnable){
+		jars.push(fileName);
+	}else{
+		 for(var i in jars){
+	            if(jars[i]==fileName){
+	                jars.splice(i,1);
+	                break;
+	                }
+	        }
 	}
 }
 
 function disableEnableTextBox(groupId, artifactId, jarVersion, isEnable, type, fileName) {
 	if (type === "pluginJar") {
+		var duplicate = checkExistence(fileName);
+		arrayPushPop(fileName, true);
 		var groupid = "grouId" ;
 		var artifId = "artifId" ;
 		var versnId = "versnId" ;
@@ -345,6 +386,13 @@ function disableEnableTextBox(groupId, artifactId, jarVersion, isEnable, type, f
 		                   "</div></div>");
 		fileDetParentDiv.append("</div>");
 		fileDetParentDiv.appendTo("#tableAdd");
+		if(duplicate){
+			arrayPushPop(fileName, false);
+			var lis = $('#tableAdd').children(); // get all the children
+			var len=lis.length-1;
+			$(lis.get(len)).remove();
+			$('li').last().remove()
+		}
 	} else {
 		$('.groupId').val(groupId).attr('disabled', isEnable);
 		$('.artifactId').val(artifactId).attr('disabled', isEnable);
