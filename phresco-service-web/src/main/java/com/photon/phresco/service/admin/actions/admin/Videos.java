@@ -23,6 +23,7 @@ package com.photon.phresco.service.admin.actions.admin;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -33,10 +34,13 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.VideoInfo;
+import com.photon.phresco.commons.model.VideoType;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.client.api.ServiceManager;
+import com.photon.phresco.service.util.ServerUtil;
 public class Videos extends ServiceBaseAction { 
 
 	private static final long serialVersionUID = -3065717999492844302L;
@@ -150,7 +154,13 @@ public class Videos extends ServiceBaseAction {
 
 		videoInfo.setName(getName());
 		videoInfo.setDescription(getDescription());
-		
+		VideoType videoType = new VideoType();
+		ArtifactGroup artifactGroup = new ArtifactGroup();
+		System.out.println("In Video Action..............");
+		System.out.println("From Action Class,,,,,,,,,,,,,,,,,," + getFileName());
+		artifactGroup.setPackaging(ServerUtil.getFileExtension(getFileName()));
+		videoType.setArtifactGroup(artifactGroup);
+		videoInfo.setVideoList(Arrays.asList(videoType));
 		return videoInfo;
 	}	 
 

@@ -47,6 +47,7 @@ import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.client.api.Content;
 import com.photon.phresco.service.client.api.ServiceManager;
 import com.photon.phresco.service.client.impl.CacheKey;
+import com.photon.phresco.service.util.ServerUtil;
 
 public class Features extends ServiceBaseAction {
 
@@ -276,7 +277,7 @@ public class Features extends ServiceBaseAction {
             artifactGroup.setGroupId(getGroupId());
             artifactGroup.setArtifactId(getArtifactId());
             artifactGroup.setType(type);
-            artifactGroup.setPackaging(getExtension(featureJarFileName));
+            artifactGroup.setPackaging(ServerUtil.getFileExtension(featureJarFileName));
             // To set appliesto tech and core
             List<CoreOption> appliesTo = new ArrayList<CoreOption>();
             CoreOption moduleCoreOption = new CoreOption(getTechnology(), Boolean.parseBoolean(getModuleType()));
@@ -387,16 +388,6 @@ public class Features extends ServiceBaseAction {
             writer.print(SUCCESS_FALSE);
 			throw new PhrescoException(e);
 		}
-	}
-	
-	private String getExtension(String fileName) {
-		String fileExt = "jar";
-		if(fileName.endsWith("zip")) {
-			fileExt = "zip";
-		} else if(fileName.endsWith("dll")) {
-			fileExt = "dll";
-		}
-		return fileExt;
 	}
 	
 	public void removeUploadedFile() {

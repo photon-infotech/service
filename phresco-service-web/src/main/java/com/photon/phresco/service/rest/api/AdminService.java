@@ -21,6 +21,7 @@ package com.photon.phresco.service.rest.api;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -51,6 +52,7 @@ import com.photon.phresco.commons.model.User;
 import com.photon.phresco.commons.model.User.AuthType;
 import com.photon.phresco.commons.model.VideoInfo;
 import com.photon.phresco.commons.model.VideoType;
+import com.photon.phresco.exception.AIException;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.exception.PhrescoWebServiceException;
 import com.photon.phresco.service.api.Converter;
@@ -62,6 +64,7 @@ import com.photon.phresco.service.dao.ArtifactGroupDAO;
 import com.photon.phresco.service.dao.VideoInfoDAO;
 import com.photon.phresco.service.dao.VideoTypeDAO;
 import com.photon.phresco.service.impl.DbService;
+import com.photon.phresco.service.model.ArtifactInfo;
 import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.Client;
@@ -322,6 +325,8 @@ public class AdminService extends DbService {
 				if (bodyPart.getMediaType().equals(
 						MediaType.APPLICATION_JSON_TYPE)) {
 					video = bodyPart.getEntityAs(VideoInfo.class);
+					// FIXME : Need To Fix CustomerIds For Videos
+					video.setCustomerIds(Arrays.asList(DEFAULT_CUSTOMER_NAME));
 				} else {
 					bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
 				}
@@ -337,6 +342,12 @@ public class AdminService extends DbService {
 			List<VideoType> videoTypeList = video.getVideoList();
 			for (VideoType videoType : videoTypeList) {
 					ArtifactGroup artifactGroup = videoType.getArtifactGroup();
+					artifactGroup.setGroupId("videos.homepage");
+					artifactGroup.setArtifactId(video.getName().toLowerCase());
+					com.photon.phresco.commons.model.ArtifactInfo info = new com.photon.phresco.commons.model.ArtifactInfo();
+					info.setVersion("1.0");
+					artifactGroup.setVersions(Arrays.asList(info));
+					artifactGroup.setCustomerIds(Arrays.asList(DEFAULT_CUSTOMER_NAME));
 				if (artifactGroup != null) {
 					boolean uploadBinary = uploadBinary(artifactGroup, videoFile);
 					if (uploadBinary) {
@@ -360,27 +371,16 @@ public class AdminService extends DbService {
 		Converter<VideoInfoDAO, VideoInfo> converter = 
 	            (Converter<VideoInfoDAO, VideoInfo>) ConvertersFactory.getConverter(VideoInfoDAO.class);
 		VideoInfoDAO videoDAO = converter.convertObjectToDAO(video);
-//		mongoOperation.save(VIDEODAO_COLLECTION_NAME, videoDAO);
-		List<String> videoTypeIds = new ArrayList<String>();
-		Converter<VideoTypeDAO, VideoType> videoTypeConverter = 
-				(Converter<VideoTypeDAO, VideoType>)ConvertersFactory.getConverter(VideoTypeDAO.class);
-		List<VideoType> videoTypes = video.getVideoList();
-		for(VideoType videoType : videoTypes){
-			videoTypeIds.add(videoType.getId());
-			VideoTypeDAO videoTypeDAO = videoTypeConverter.convertObjectToDAO(videoType);
-			
-			VideoTypeDAO findOne = mongoOperation.findOne(VIDEOTYPESDAO_COLLECTION_NAME, 
-					new Query(Criteria.where(REST_API_NAME).is(videoTypeDAO.getName())), VideoTypeDAO.class);
-			if(findOne!=null){
-				videoTypeDAO.setArtifactGroupId(findOne.getArtifactGroupId());
-				videoTypeDAO.setId(findOne.getId());
-			}
-			ArtifactGroup artifactGroup = videoType.getArtifactGroup();
-			saveModuleGroup(artifactGroup);
-			mongoOperation.save(VIDEOTYPESDAO_COLLECTION_NAME, videoTypeDAO);
-		}
-		videoDAO.setVideoListId(videoTypeIds);
 		mongoOperation.save(VIDEODAO_COLLECTION_NAME, videoDAO);
+		List<VideoType> videoList = video.getVideoList();
+		Converter<VideoTypeDAO, VideoType> videoTypeconverter = 
+            (Converter<VideoTypeDAO, VideoType>) ConvertersFactory.getConverter(VideoTypeDAO.class);
+		Converter<ArtifactGroupDAO, ArtifactGroup> agConverter = 
+            (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
+		for (VideoType videoType : videoList) {
+			mongoOperation.save(VIDEOTYPESDAO_COLLECTION_NAME, videoTypeconverter.convertObjectToDAO(videoType));
+			saveModuleGroup(videoType.getArtifactGroup());
+		}
 	}
 
 	private void saveModuleGroup(ArtifactGroup moduleGroup) throws PhrescoException {
@@ -523,19 +523,27 @@ public class AdminService extends DbService {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.deleteVideo(String id)" + id);
 	    }
-		
 		try {
 			VideoInfoDAO videoInfoDAO = mongoOperation.findOne(VIDEODAO_COLLECTION_NAME, 
-					new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), VideoInfoDAO.class);
-			List<String> videoListId = videoInfoDAO.getVideoListId();
-			for(String videoTypeListId : videoListId){
-			VideoTypeDAO videoTypeDAO = mongoOperation.findOne(VIDEOTYPESDAO_COLLECTION_NAME, 
-					new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(videoTypeListId)), VideoTypeDAO.class);
-			String artifactGroupId = videoTypeDAO.getArtifactGroupId();
-			deleteArtifacts(artifactGroupId);
-			mongoOperation.remove(VIDEOTYPESDAO_COLLECTION_NAME, 
-					new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(videoTypeListId)),VideoType.class);
-			mongoOperation.remove(VIDEODAO_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), VideoInfo.class);
+					new Query(Criteria.whereId().is(id)), VideoInfoDAO.class);
+			if(videoInfoDAO != null) {
+				mongoOperation.remove(VIDEODAO_COLLECTION_NAME, new Query(Criteria.whereId().is(id)), VideoInfoDAO.class);
+				List<VideoTypeDAO> videotypeDAOs = mongoOperation.find(VIDEODAO_COLLECTION_NAME, 
+						new Query(Criteria.whereId().in(videoInfoDAO.getVideoListId().toArray())), VideoTypeDAO.class);
+				if(CollectionUtils.isNotEmpty(videotypeDAOs)) {
+					for (VideoTypeDAO videoTypeDAO : videotypeDAOs) {
+						ArtifactGroupDAO artifactGroupDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, new Query(Criteria.whereId().is(videoTypeDAO.getArtifactGroupId())), 
+								ArtifactGroupDAO.class);
+						if(artifactGroupDAO != null) {
+							mongoOperation.remove(ARTIFACT_GROUP_COLLECTION_NAME, new Query(Criteria.whereId().is(videoTypeDAO.getArtifactGroupId())), 
+									ArtifactGroupDAO.class);
+							mongoOperation.remove(ARTIFACT_INFO_COLLECTION_NAME, 
+									new Query(Criteria.whereId().in(artifactGroupDAO.getVersionIds().toArray())), com.photon.phresco.commons.model.ArtifactInfo.class);
+						}
+					}
+					mongoOperation.remove(VIDEOTYPESDAO_COLLECTION_NAME, 
+							new Query(Criteria.whereId().in(videoInfoDAO.getVideoListId().toArray())), VideoTypeDAO.class);
+				}
 			}
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
@@ -544,18 +552,6 @@ public class AdminService extends DbService {
 		return Response.status(Response.Status.OK).build();
 	}
 	
-	private boolean deleteArtifacts(String artifactGroupId) {
-		ArtifactGroupDAO artifactGroupDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
-				new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(artifactGroupId)), ArtifactGroupDAO.class);
-		List<String> versionIds = artifactGroupDAO.getVersionIds();
-		mongoOperation.remove(ARTIFACT_INFO_COLLECTION_NAME, 
-				new Query(Criteria.where(REST_API_PATH_PARAM_ID).in(versionIds.toArray())), 
-				com.photon.phresco.commons.model.ArtifactInfo.class);
-		mongoOperation.remove(ARTIFACT_GROUP_COLLECTION_NAME, 
-				new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(artifactGroupId)), ArtifactGroupDAO.class);
-	    return true;    
-	}
-
 	/**
 	 * Returns the list of users
 	 * @return
