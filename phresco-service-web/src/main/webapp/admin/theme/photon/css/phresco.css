@@ -277,7 +277,7 @@ input[type="checkbox"],input[type="radio"] {
 	border: medium none;
 	height: auto;
 	line-height: normal;
-	margin: 4px 0;
+	margin: 8px 0;
 	padding: 0;
 	width: auto;
 	cursor: pointer;
@@ -959,7 +959,10 @@ a {
 }
 
 legend {
+	border-style: none; 
 	line-height: 20px;
+	margin-bottom: 0;
+	width: auto; 
 }
 
 .tablelegend {
@@ -1660,8 +1663,8 @@ h3 label {
 
 .imageremove {
 	cursor: pointer;
-	margin-top: 8px;
-	margin-bottom: 8px;
+	margin-top: 35px;
+	margin-bottom: 35px;
 }
 
 .nameConfig {
@@ -2204,6 +2207,22 @@ input[class *='sample'] {
 	opacity: 0.4;
 }
 
+/*for multi select inside popup*/
+.multiSelectBorder {
+	float: left;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.popUpChckBox {
+	margin-right: 4px !important;
+}	
+
+/* For multiselect list box starts */
+
+.popuptable {
+    border-bottom:none;
+}
+
 .border_collapse {
 	border-collapse: separate;
 	margin-left: 20px;
@@ -2317,3 +2336,49 @@ div[class *='syncTable'] {
 	float: left;
 	text-align: center;
 }
+
+.popupimage {
+	float: left;
+	margin-left: 5px;
+}
+
+.popupTypeFields {
+    float: left;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    margin: 0 0 12px 34px;
+}
+
+.popup-fieldset {
+    margin-bottom: 10px;
+    margin-right: 11px;
+    border-radius: 5px;
+    margin-left:0px;
+    width: 100%;
+}
+
+.fieldSetLegend {
+    font-size: 13px;
+    font-weight: bold;
+    margin-left: 14px;
+    text-align: left;
+} 
+
+.multiselect {
+	overflow-y: auto;
+	height: 95px;
+	width: 290px;
+	background-color: #fff;
+	border-radius: 3px;
+	width: 301px;
+}
+
+.deleteButton{
+	margin-top: 6%;
+	text-align: center;
+}
+
+.addButton {
+	margin-top: 35px;
+	margin-left:6px;
+}
+

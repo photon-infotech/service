@@ -67,7 +67,9 @@ public class Archetypes extends ServiceBaseAction {
 
 	private static byte[] archetypeJarByteArray = null;
 	private static List<ArtifactGroup> pluginInfos = new ArrayList<ArtifactGroup>();
-
+	
+	private List<TechnologyGroup> techGroups = new ArrayList<TechnologyGroup>();
+	
 	private String name = "";
 	private String nameError = "";
 	private String version = "";
@@ -351,7 +353,9 @@ public class Archetypes extends ServiceBaseAction {
 			String pluginJarName = getFileName();
 			byte[] byteArray = tempApplnByteArray;
 		    getArtifactGroupInfo(writer, tempApplnByteArray);
-			inputStreamMap.put(pluginJarName, new ByteArrayInputStream(byteArray));
+		    if(!inputStreamMap.containsKey(pluginJarName)){
+		    	inputStreamMap.put(pluginJarName, new ByteArrayInputStream(byteArray));
+		    }
 		} catch (Exception e) {
 		}
 	}
@@ -440,6 +444,31 @@ public class Archetypes extends ServiceBaseAction {
 		}
 
 		return SUCCESS;
+	}
+	
+	public String showTechGroupPopup() throws PhrescoException {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method Archetypes.openTechGroup()");
+		}
+		List<ApplicationType> appTypes = getServiceManager().getApplicationTypes(getCustomerId());
+		List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
+		List<TechnologyGroup> techGroups = new ArrayList<TechnologyGroup>();
+		for (ApplicationType appType : appTypes) {
+			techGroups = appType.getTechGroups();
+		}
+        setReqAttribute(REQ_TECHNOLOGY_GROUPS, techGroups);
+		setReqAttribute(REQ_ARCHE_TYPE, technologies);
+		setReqAttribute(REQ_APP_TYPES, appTypes);
+		
+		return REQ_TECH_GROUP;
+	}
+	
+	public String createTechGroup() throws PhrescoException {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method Archetypes.addTechGroup()");
+		}
+		List<TechnologyGroup> GroupTech = getTechGroups();
+		return list();
 	}
 
 	public boolean featureValidation(boolean isError) {
@@ -702,11 +731,20 @@ public class Archetypes extends ServiceBaseAction {
 		this.techGroup = techGroup;
 	}
 
+
 	public List<TechnologyGroup> getAppTypeTechGroups() {
 		return appTypeTechGroups;
 	}
 
 	public void setAppTypeTechGroups(List<TechnologyGroup> appTypeTechGroup) {
 		this.appTypeTechGroups = appTypeTechGroup;
+	}
+	
+	public List<TechnologyGroup> getTechGroups() {
+		return techGroups;
+	}
+
+	public void setTechGroups(List<TechnologyGroup> techGroups) {
+		this.techGroups = techGroups;
 	}
 }

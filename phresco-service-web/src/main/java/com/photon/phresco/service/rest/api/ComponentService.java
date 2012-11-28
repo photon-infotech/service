@@ -50,6 +50,7 @@ import org.springframework.data.document.mongodb.query.Query;
 import org.springframework.data.document.mongodb.query.Update;
 import org.springframework.stereotype.Component;
 
+import com.google.gson.Gson;
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
@@ -266,8 +267,10 @@ public class ComponentService extends DbService {
 					new Query(Criteria.whereId().is(id)), ApplicationTypeDAO.class);
 			if(appType != null) {
 				List<String> techGroups = appType.getTechGroupIds();
-				for (String techGroupId : techGroups) {
-					deleteTechGroup(techGroupId);
+				if(CollectionUtils.isNotEmpty(techGroups)) {
+					for (String techGroupId : techGroups) {
+						deleteTechGroup(techGroupId);
+					}
 				}
 				mongoOperation.remove(APPTYPES_COLLECTION_NAME, 
 				        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ApplicationTypeDAO.class);
@@ -887,6 +890,10 @@ public class ComponentService extends DbService {
         if (!bodyPartEntityMap.isEmpty()) {
         	BodyPartEntity bodyPartEntity = bodyPartEntityMap.get(Type.ARCHETYPE.name());
         	if (bodyPartEntity != null) {
+        		if(moduleGroup.getType().name().equals(FEATURE_TYPE_JS)) {
+					moduleGroup.setGroupId(JS_GROUP_ID);
+					moduleGroup.setArtifactId(moduleGroup.getName().toLowerCase());
+				}
         		moduleFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null, moduleGroup.getPackaging());
         		boolean uploadBinary = uploadBinary(moduleGroup, moduleFile);
                 if (uploadBinary) {
@@ -896,8 +903,8 @@ public class ComponentService extends DbService {
 			}
         	if(bodyPartEntityMap.get(Type.ICON.name()) != null) {
         		BodyPartEntity iconEntity = bodyPartEntityMap.get(Type.ICON.name());
-            	File iconFile = ServerUtil.writeFileFromStream(iconEntity.getInputStream(), null, "png");
-            	moduleGroup.setPackaging("png");
+            	File iconFile = ServerUtil.writeFileFromStream(iconEntity.getInputStream(), null, ICON_EXT);
+            	moduleGroup.setPackaging(ICON_EXT);
         		boolean uploadBinary = uploadBinary(moduleGroup, iconFile);
         		FileUtil.delete(iconFile);
         		if(!uploadBinary) {
@@ -1662,11 +1669,15 @@ public class ComponentService extends DbService {
         }
         
         try {
-            DownloadInfo downloadInfo = mongoOperation.findOne(DOWNLOAD_COLLECTION_NAME, 
-                    new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), DownloadInfo.class);
-            if (downloadInfo != null) {
-                return Response.status(Response.Status.OK).entity(downloadInfo).build();
-            } 
+        	DownloadsDAO downloadDAO = mongoOperation.findOne(DOWNLOAD_COLLECTION_NAME, 
+                    new Query(Criteria.whereId().is(id)), DownloadsDAO.class);
+        	if(downloadDAO != null) {
+    			Converter<DownloadsDAO, DownloadInfo> downlodConverter = 
+    					(Converter<DownloadsDAO, DownloadInfo>) ConvertersFactory.getConverter(DownloadsDAO.class);
+    			DownloadInfo downloadInfo = downlodConverter.convertDAOToObject(downloadDAO, mongoOperation);
+    			return Response.status(Response.Status.OK).entity(downloadInfo).build();
+        	}
+        	
         } catch (Exception e) {
             throw new PhrescoWebServiceException(e, EX_PHEX00005, DOWNLOAD_COLLECTION_NAME);
         }

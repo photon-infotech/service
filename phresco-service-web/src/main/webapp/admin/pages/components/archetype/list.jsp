@@ -40,6 +40,7 @@
 			value="<s:text name='lbl.hdr.archetype.add'/>"/>
 		<input type="button" id="del" class="btn" disabled value="<s:text name='lbl.btn.del'/>"
 		 	onclick="showDeleteConfirmation('<s:text name='del.confirm.archetype'/>');"/>
+		<input type="button" id="techGroup" class="btn btn-primary" name="tech_group" onclick="addTechGroup();" value="<s:text name='lbl.hdr.archetype.techgroup'/>"/> 	
 		<s:if test="hasActionMessages()">
 			<div class="alert alert-success alert-message"  id="successmsg">
 				<s:actionmessage />
@@ -188,5 +189,18 @@
     	confirmDialog('none','');
     	loadContent('archetypeDelete', $('#formArchetypeList'), $('#subcontainer'));
     }
+    
+    function addTechGroup() {
+		$('#popup_div').show();
+		$('#popup_div').empty();
+		loadContent('openTechGroupPopup', $('#formArchetypeList'), $('.modal-body'));
+		$("#loadingIconDiv").hide();
+	}
+    
+function popupOnOk(self) {
+    	
+		var params = '{"techGroups" : [' + techGroupToAdd.join(',') + ']}';
+		loadJsonContent('newTechGroup', params);
+	}
     
 </script>

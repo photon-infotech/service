@@ -405,8 +405,7 @@
 		}
 
 		if (!isBlank(data.techvernError)) {
-			showError($("#techverControl"), $("#techvernError"),
-					data.techvernError);
+			showError($("#techverControl"), $("#techvernError"), data.techvernError);
 		} else {
 			hideError($("#techverControl"), $("#techvernError"));
 		}
@@ -424,8 +423,7 @@
 		}
 
 		if (!isBlank(data.applicableErr)) {
-			showError($("#applicableControl"), $("#applicableError"),
-					data.applicableErr);
+			showError($("#applicableControl"), $("#applicableError"), data.applicableErr);
 		} else {
 			hideError($("#applicableControl"), $("#applicableError"));
 		}

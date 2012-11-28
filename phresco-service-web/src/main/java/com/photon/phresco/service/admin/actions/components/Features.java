@@ -45,6 +45,8 @@ import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.client.api.Content;
+import com.photon.phresco.service.client.api.ServiceManager;
+import com.photon.phresco.service.client.impl.CacheKey;
 
 public class Features extends ServiceBaseAction {
 
@@ -139,7 +141,8 @@ public class Features extends ServiceBaseAction {
     	if (isDebugEnabled) {
     		S_LOGGER.debug("Entering Method  Features.featurelist()");
     	}
-    	
+    	inputStreamMap.clear();
+    	featureByteArray = null;
 		List<ArtifactGroup> moduleGroups = getServiceManager().getFeatures(getCustomerId(), getTechnology(), Type.valueOf(getType()).name());
 		setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroups);
 		setReqAttribute(REQ_FEATURES_TYPE, getType());
@@ -203,9 +206,9 @@ public class Features extends ServiceBaseAction {
         try {
             ArtifactGroup moduleGroup = createModuleGroup(Type.valueOf(getType()));
             
-            if(featureByteArray != null){
+            /*if(featureByteArray != null){
 				inputStreamMap.put(moduleGroup.getName(),  new ByteArrayInputStream(featureByteArray));
-			} 
+			} */
             getServiceManager().createFeatures(moduleGroup, inputStreamMap, getCustomerId());
             setTechnologiesInRequest();
             addActionMessage(getText(FEATURE_ADDED, Collections.singletonList(getName())));
@@ -245,9 +248,9 @@ public class Features extends ServiceBaseAction {
         
         try {
             ArtifactGroup moduleGroup = createModuleGroup(Type.valueOf(getType()));
-            if(featureByteArray != null){
+            /*if(featureByteArray != null){
 				inputStreamMap.put(moduleGroup.getName(),  new ByteArrayInputStream(featureByteArray));
-			} 
+			}*/ 
             getServiceManager().updateFeature(moduleGroup, inputStreamMap, getCustomerId());
             addActionMessage(getText(FEATURE_ADDED, Collections.singletonList(getName())));
             setTechnologiesInRequest();
@@ -312,9 +315,22 @@ public class Features extends ServiceBaseAction {
         
         try {
             String[] moduleGroupIds = getHttpRequest().getParameterValues(REQ_FEATURES_MOD_GRP);
+            String[] moduleIds = getHttpRequest().getParameterValues(REQ_FEATURES_SELECTED_MODULEID);
+            String customerId = getCustomerId();
+            String tech = getTechnology();
+            String type = getType();
+            CacheKey key = new CacheKey(customerId, type, tech);
+            ServiceManager serviceManager = getServiceManager(); 
+            
+			if (ArrayUtils.isNotEmpty(moduleIds)) {
+                for (String moduleId : moduleIds) {
+                	serviceManager.deleteFeature(moduleId, key);
+                } addActionMessage(getText(FEATURE_DELETED));
+            }
+            
             if (ArrayUtils.isNotEmpty(moduleGroupIds)) {
                 for (String moduleGroupid : moduleGroupIds) {
-                    getServiceManager().deleteFeature(moduleGroupid, getCustomerId());
+                	serviceManager.deleteFeature(moduleGroupid, key);
                 }
                 addActionMessage(getText(FEATURE_DELETED));
             }
