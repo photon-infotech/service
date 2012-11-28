@@ -36,6 +36,7 @@ import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.commons.model.VideoInfo;
 import com.photon.phresco.commons.model.VideoType;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.docs.impl.MAGICNUMBER;
@@ -69,17 +70,11 @@ public class VideoDownloader extends Thread implements ServerConstants {
 	}
 
 	private void downloadFiles() throws PhrescoException{
-		
 		PhrescoServerFactory.initialize();
-		repoUrl = getRepositoryUrl();
-		Gson gson = new Gson();
-		RepositoryManager repoMgr = PhrescoServerFactory.getRepositoryManager();
-		String videoInfoJSON = repoMgr.getArtifactAsString(HOMEPAGE_JSON_FILE, ServiceConstants.DEFAULT_CUSTOMER_NAME);
-		Type type = new TypeToken<List<VideoInfo>>() {
-		}.getType();
-		List<VideoInfo> videoInfoList = gson.fromJson(videoInfoJSON, type);
-		downloadVideos(videoInfoList);
-		downloadImageFiles(videoInfoList);
+		DbManager dbManager = PhrescoServerFactory.getDbManager();
+		List<VideoInfo> videos = dbManager.getVideos();
+		downloadVideos(videos);
+		downloadImageFiles(videos);
 		
 	}
 	
@@ -103,7 +98,7 @@ public class VideoDownloader extends Thread implements ServerConstants {
 		InputStream in = null;
 		FileOutputStream fos = null;
 		try {
-			URL url = new URL(repoUrl + videoURL);
+			URL url = new URL(getRepositoryUrl() + videoURL);
 			URLConnection connection = url.openConnection();
 			in = connection.getInputStream();
 			int index = videoURL.lastIndexOf(Constants.SLASH);

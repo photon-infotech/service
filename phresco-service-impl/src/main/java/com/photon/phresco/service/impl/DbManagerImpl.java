@@ -54,6 +54,7 @@ import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.commons.model.User;
 import com.photon.phresco.commons.model.User.AuthType;
+import com.photon.phresco.commons.model.VideoInfo;
 import com.photon.phresco.commons.model.WebService;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.Converter;
@@ -64,6 +65,7 @@ import com.photon.phresco.service.dao.ArtifactGroupDAO;
 import com.photon.phresco.service.dao.DownloadsDAO;
 import com.photon.phresco.service.dao.ProjectInfoDAO;
 import com.photon.phresco.service.dao.TechnologyDAO;
+import com.photon.phresco.service.dao.VideoInfoDAO;
 import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.ServiceConstants;
 
@@ -270,4 +272,18 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
 		return converter.convertDAOToObject(projectInfoDAO, mongoOperation);
 	}
 
+	@Override
+	public List<VideoInfo> getVideos() throws PhrescoException {
+		List<VideoInfo> videoInfos = new ArrayList<VideoInfo>();
+		List<VideoInfoDAO> videoList = mongoOperation.getCollection(VIDEODAO_COLLECTION_NAME , VideoInfoDAO.class);
+		if (videoList != null) {
+			Converter<VideoInfoDAO, VideoInfo> videoInfoConverter = 
+					(Converter<VideoInfoDAO, VideoInfo>) ConvertersFactory.getConverter(VideoInfoDAO.class);
+			for (VideoInfoDAO videoInfoDAO : videoList) {
+				VideoInfo videoInfo = videoInfoConverter.convertDAOToObject(videoInfoDAO, mongoOperation);
+				videoInfos.add(videoInfo);
+			}
+		}
+		return videoInfos;
+	}
 }
