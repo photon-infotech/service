@@ -55,15 +55,16 @@ public class VideoConverter implements Converter<VideoInfoDAO, VideoInfo>, Servi
 		return ids;
 	}
 
-	private List<VideoType> createVideoType(List<String> videoListId,MongoOperations mongoOperation) throws PhrescoException {
+	private List<VideoType> createVideoType(List<String> videoListId, MongoOperations mongoOperation) throws PhrescoException {
 		List<VideoType> videoTypes = new ArrayList<VideoType>();
 		List<VideoTypeDAO> videoTypeDAO = mongoOperation.find(VIDEOTYPESDAO_COLLECTION_NAME, 
-				new Query(Criteria.whereId().is(videoListId)), VideoTypeDAO.class);
+				new Query(Criteria.whereId().in(videoListId.toArray())), VideoTypeDAO.class);
+		
 		for(VideoTypeDAO vType : videoTypeDAO){
-		Converter<VideoTypeDAO, VideoType> videoConverter = 
-			(Converter<VideoTypeDAO, VideoType>) ConvertersFactory.getConverter(VideoTypeDAO.class);
-		VideoType videoType = videoConverter.convertDAOToObject(vType, mongoOperation);
-		videoTypes.add(videoType);
+			Converter<VideoTypeDAO, VideoType> videoConverter = 
+				(Converter<VideoTypeDAO, VideoType>) ConvertersFactory.getConverter(VideoTypeDAO.class);
+			VideoType videoType = videoConverter.convertDAOToObject(vType, mongoOperation);
+			videoTypes.add(videoType);
 		}
 		return videoTypes;
 	}

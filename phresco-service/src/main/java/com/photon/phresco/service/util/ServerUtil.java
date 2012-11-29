@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.net.URLConnection;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -362,4 +363,30 @@ public class ServerUtil {
 		return stringBuffer.toString();
    }
    
+	/**
+	 * It will return the extension of the file
+	 * @param fileName
+	 * @return
+	 */
+	public static String getFileExtension(String fileName) {
+		String fileExt = "jar";
+		if(fileName.endsWith("zip")) {
+			fileExt = "zip";
+		} else if(fileName.endsWith("dll")) {
+			fileExt = "dll";
+		} else if(fileName.endsWith("exe")) {
+			fileExt = "exe";
+		} else if(fileName.endsWith("webm")) {
+			fileExt = "webm";
+		} else if(fileName.endsWith("mp4")) {
+			fileExt = "mp4";
+		} else if(fileName.endsWith("ogv")) {
+			fileExt = "ogv";
+		} else if(fileName.endsWith("ogg")) {
+			fileExt = "ogg";
+		} else if(fileName.endsWith("png")) {
+			fileExt = "png";
+		}
+		return fileExt;
+	}
 }

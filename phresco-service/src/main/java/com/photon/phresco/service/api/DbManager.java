@@ -9,6 +9,7 @@ import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.commons.model.User;
+import com.photon.phresco.commons.model.VideoInfo;
 import com.photon.phresco.commons.model.WebService;
 import com.photon.phresco.exception.PhrescoException;
 
@@ -73,4 +74,6 @@ public interface DbManager {
     User authenticate(String username, String password) throws PhrescoException;
     
     ProjectInfo getProjectInfo(String projectInfoId) throws PhrescoException;
+    
+    List<VideoInfo> getVideos() throws PhrescoException;
 }

@@ -27,9 +27,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.service.api.PhrescoServerFactory;
-
 public class InitializeService extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
@@ -42,14 +39,6 @@ public class InitializeService extends HttpServlet {
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
 		String serverContextPath = config.getServletContext().getContextPath();
-		try {
-			PhrescoServerFactory.initialize();
-//			PhrescoServerFactory.getRepositoryManager().getApplicationTypes();
-//			List<ApplicationType> applicationTypes = PhrescoServerFactory.getDBManager().getApplicationTypes();
-//			System.out.println("applicationTypes " + applicationTypes);
-		} catch (PhrescoException e) {
-			throw new ServletException(e);
-		}
 		new VideoDownloader(serverContextPath).start();
 		new ImageDownloader(serverContextPath).start();
 	}
