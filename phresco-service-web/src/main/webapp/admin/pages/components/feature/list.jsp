@@ -76,7 +76,7 @@
 		                <div class="mfbox siteinnertooltiptxt hideContent">
 		                    <div class="scrollpanel">
 		                        <section class="scrollpanel_inner">
-		                        	<table class="download_tbl">
+		                        	<table class="download_tbl download_feature_tbl">
 			                            <tbody>
 			                            <% 
 									    	List<ArtifactInfo> versions = moduleGroup.getVersions();
@@ -93,14 +93,14 @@
 													}
 										%>
 											<tr>
-												<td>
+												<td class="child_chkBox">
 												<% if (moduleGroup.isSystem()) { %>
-													<input type="checkbox" name="selectedModuleId" value="<%= module.getId() %> %>" disabled/>
+													<input type="checkbox"  class ="child_chkBox" name="selectedModuleId" value="<%= module.getId() %> %>" disabled/>
 												<% } else { %> 
-													<input type="checkbox" id="<%= moduleGroup.getName() %>" class="<%= moduleGroup.getName() %> subtechnology" name="selectedModuleId" value="<%= module.getId() %>"  onclick="checkOneEvent( $('.<%=moduleGroup.getName()%>'), $('#<%=moduleGroup.getId()%>checkBox'));">
+													<input type="checkbox" class ="child_chkBox" id="<%= moduleGroup.getName() %>" class="<%= moduleGroup.getName() %> subtechnology" name="selectedModuleId" value="<%= module.getId() %>"  onclick="checkOneEvent( $('.<%=moduleGroup.getName()%>'), $('#<%=moduleGroup.getId()%>checkBox'));">
 												<% } %> 
 												</td>
-												<td>
+												<td class="zero_padding">
 													<a href="#" name="ModuleDesc" onclick="editFeature('<%= moduleGroup.getId() %>', '<%= module.getId() %>');" >
 														<%= moduleGroup.getName() %>
 													</a>

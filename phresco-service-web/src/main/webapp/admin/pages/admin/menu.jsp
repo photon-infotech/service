@@ -42,7 +42,7 @@
 			<s:label key="lbl.hdr.adm.rles"  theme="simple"/></a>
 		</li>
 		<li>
-			<a id="permissionList" class="inactive" name="adminTab" href="#">
+			<a id="permissionList" class="inactive" name="" href="#">
 			<s:label key="lbl.hdr.adm.perms"  theme="simple"/></a>
 		</li>
 		<li>

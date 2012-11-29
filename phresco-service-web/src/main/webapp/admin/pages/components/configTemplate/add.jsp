@@ -177,9 +177,10 @@
 											<div class="th-inner tablehead fixTableHdr"><s:label key="lbl.hdr.comp.cnfigtmplt.mltpl.title" theme="simple"/></div>
 										</th>
 										<th class="third">
-											<div class="th-inner">
-												
-											</div>
+											<div class="th-inner"></div>
+										</th>
+										<th class="third">
+											<div class="th-inner"></div>
 										</th>
 									</tr>
 								</thead>
@@ -189,15 +190,15 @@
 									<!-- For add -->
 									<% if (ServiceUIConstants.ADD.equals(fromPage)) { %>
 										<tr class="1_configdynamiadd">
-											<td class="textwidth">
+											<td class="tdWidth">
 												<input type="text" id="1" value="" placeholder="<s:text name='place.hldr.configTemp.add.key'/>" name="propTempKey"  
-													temp="1_key" class="key" onblur="updateRowInputNames(this)" maxlength="30" title="30 Characters only">
+													temp="1_key" class="keywidth" onblur="updateRowInputNames(this)" maxlength="30" title="30 Characters only">
 											</td>
-											<td class="textwidth">
-												<input type="text" id = "1_propTempName" value="" placeholder="<s:text name='place.hldr.configTemp.add.name'/>" maxlength="30" title="30 Characters only" class="propyName" >
+											<td class="tdWidth">
+												<input type="text" id = "1_propTempName" value="" placeholder="<s:text name='place.hldr.configTemp.add.name'/>" maxlength="30" title="30 Characters only" class="textWidth" >
 											</td>
-											<td class="textwidth">
-												<select id="1_type" class = "select typewidth">
+											<td class="tdWidth">
+												<select id="1_type" class = "textWidth">
 													<option value="String"><s:text name='lbl.hdr.comp.cnfigtmplt.string'/></option>
 													<option value="Number"><s:text name='lbl.hdr.comp.cnfigtmplt.number'/></option>
 													<option value="Password"><s:text name='lbl.hdr.comp.cnfigtmplt.password'/></option>
@@ -205,33 +206,34 @@
 													<option value="Boolean"><s:text name='lbl.hdr.comp.cnfigtmplt.boolean'/></option>
 												</select>
 											</td>
-											<td class="psblevalue" id="1_psblMulDiv" style="display:none;">
+											 <td class="tdWidth" id="1_psblMulDiv" style="display:none;">
 												<select type="text" placeholder="<s:text name='place.hldr.configTemp.add.possible.values'/>" 
-													class="propTempTxt psblSelect" id="1_psblMul"></select>
+													class="psblselectwidth" id="1_psblMul"></select>
 												<a data-toggle="modal" href="#myModal"><img class="addiconAlign imagealign" temp="1" src="images/add_icon.png"/ 
 													onclick="addPsblValPopup(this);"></a>
 											</td>
 											<input type="hidden" class="1"/>
-											<td class="psblevalue" id="1_psblSinglDiv">
+											<td class="psblbtnwidth" id="1_psblSinglDiv">
 												<input type="text" placeholder="<s:text name='place.hldr.configTemp.add.possible.values'/>" 
-													class="propTempTxt psblSngl" id="1_psblSingl">
+													class="psbltextwidth" id="1_psblSingl">
 												<a data-toggle="modal" href="#myModal"><img class="addiconAlign imagealign" temp="1" 
 													src="images/add_icon.png"/ onclick="addPsblValPopup(this);"/></a>
 											</td>
-											<td class="hlpText">
+											<td class="tdWidth">
 												<input type="text" placeholder="<s:text name='place.hldr.configTemp.add.help.text'/>" 
-													id="1_helpText" class="propTempTxt hlpTxt" maxlength="150" title="150 Characters only">
+													id="1_helpText" class="textWidth" maxlength="150" title="150 Characters only">
 											</td>
-											<td class="mandatoryfld">
-												<input type="checkbox" value="true" id="1_propMand">
+											<td class="buttonwidth">
+												<input class="chkBox_config" type="checkbox" value="true" id="1_propMand">
 											</td>
-											<td class="multiplefld">
-												<input type="checkbox" value="true" id="1_propMul">
+											<td class="buttonwidth">
+												<input class="chkBox_config" type="checkbox" value="true" id="1_propMul">
 											</td>
-											<td class="imagewidth">
+											<td class="buttonwidth">
 												<a><img class="add imagealign" temp="1" src="images/add_icon.png" onclick="addconfig(this);"></a>
 											</td>
-											<td>
+											<td class="buttonwidth">
+											<img class = 'del imagealign' id='deleteIcon' src='images/minus_icon.png' onclick='removeTag(this);'>
 											</td>
 										</tr>
 									<% 
@@ -261,19 +263,19 @@
 													}
 									%>
 												<tr class='<%= dynamicId + "_configdynamiadd" %>'>
-													<td class="textwidth">
+													<td class="tdWidth">
 														<input type="text" id='<%= dynamicId %>' value='<%= propertyTemplate.getKey()%>' 
 															placeholder="<s:text name='place.hldr.configTemp.add.key'/>" name="propTempKey"  
-															temp='<%= dynamicId + "_key" %>' class="key" onblur="updateRowInputNames(this)" 
+															temp='<%= dynamicId + "_key" %>' class="keywidth" onblur="updateRowInputNames(this)" 
 															maxlength="30" title="30 Characters only">
 													</td>
-													<td class="textwidth">
+													<td class="tdWidth">
 														<input type="text" placeholder="<s:text name='place.hldr.configTemp.add.name'/>" 
-															id=<%= dynamicId + "_propTempName"%> class="propyName" maxlength="30" 
+															id=<%= dynamicId + "_propTempName"%> class="textWidth" maxlength="30" 
 															title="30 Characters only" value='<%= propName %>'>
 													</td>
-													<td class="textwidth">
-														<select id='<%= dynamicId + "_type" %>' class = "select typewidth">
+													<td class="tdWidth">
+														<select id='<%= dynamicId + "_type" %>' class = "textWidth">
 															<option value="String"><s:text name='lbl.hdr.comp.cnfigtmplt.string'/></option>
 															<option value="Number"><s:text name='lbl.hdr.comp.cnfigtmplt.number'/></option>
 															<option value="Password"><s:text name='lbl.hdr.comp.cnfigtmplt.password'/></option>
@@ -281,39 +283,37 @@
 															<option value="Boolean"><s:text name='lbl.hdr.comp.cnfigtmplt.boolean'/></option>
 														</select>
 													</td>
-													<td class="psblevalue" id='<%= dynamicId + "_psblSinglDiv" %>' style="display:none">
+													<td class="psblbtnwidth" id='<%= dynamicId + "_psblSinglDiv" %>' style="display:none">
 														<input type="text" placeholder="<s:text name='place.hldr.configTemp.add.possible.values'/>" 
-															class="propTempTxt psblSngl" id='<%= dynamicId + "_psblSingl" %>'>
+															class="psbltextwidth" id='<%= dynamicId + "_psblSingl" %>'>
 														<a data-toggle="modal" href="#myModal"><img class="addiconAlign imagealign" temp='<%= dynamicId %>' 
 															src="images/add_icon.png"/ onclick="addPsblValPopup(this);"/></a>
 													</td>
 													<input type="hidden" class='<%= dynamicId %>'>
-													<td class="psblevalue" id='<%= dynamicId + "_psblMulDiv" %>' style="display:none">
+													<td class="psblbtnwidth" id='<%= dynamicId + "_psblMulDiv" %>' style="display:none">
 														<select type="text" placeholder="<s:text name='place.hldr.configTemp.add.possible.values'/>" 
-															class="propTempTxt psblSelect" id='<%= dynamicId + "_psblMul" %>'>
+															class="psblselectwidth" id='<%= dynamicId + "_psblMul" %>'>
 														</select>
 														<a data-toggle="modal" href="#myModal"><img class="addiconAlign imagealign" temp='<%= dynamicId %>' 
 															src="images/add_icon.png" onclick="addPsblValPopup(this);"></a>
 													</td>
-													<td class="hlpText">
+													<td class="tdWidth">
 														<input type="text" placeholder="<s:text name='place.hldr.configTemp.add.help.text'/>" 
-															id=<%= dynamicId + "_helpText"%> class="propTempTxt hlpTxt" maxlength="150" 
+															id=<%= dynamicId + "_helpText"%> class="textWidth" maxlength="150" 
 															title="150 Characters only" value='<%= StringUtils.isNotEmpty(propertyTemplate.getHelpText()) ? propertyTemplate.getHelpText() : ""  %>'>
 													</td>
-													<td class="mandatoryfld">
-														<input type="checkbox" value="true" id='<%= dynamicId + "_propMand" %>' <%= mndtryChck %>>
+													<td class="buttonwidth">
+														<input type="checkbox" class="chkBox_config" value="true" id='<%= dynamicId + "_propMand" %>' <%= mndtryChck %>>
 													</td>
-													<td class="multiplefld">
-														<input type="checkbox" value="true" id='<%= dynamicId + "_propMul" %>' <%= mulChck %>>
+													<td class="buttonwidth">
+														<input type="checkbox" class="chkBox_config" value="true" id='<%= dynamicId + "_propMul" %>' <%= mulChck %>>
 													</td>
-													<td class="imagewidth">
+													<td class="buttonwidth">
 														<a><img class="add imagealign" temp='<%= dynamicId %>' src="images/add_icon.png" onclick="addconfig(this);"></a>
-													</td>
-													<% if (dynamicId != 1) { %>
-														<td>
-															<img onclick="removeTag(this);" src="images/minus_icon.png" class="del imagealign">
+													</td class="buttonwidth">
+														<td class="buttonwidth">
+															<img onclick="removeTag(this);" id="deleteIcon" src="images/minus_icon.png" class="del imagealign">
 														</td>
-													<% } %>	
 												</tr>
 									<%
 												dynamicId++;
@@ -390,9 +390,11 @@
 		$(".content_adder").scrollbars();  
 		$(".multilist-scroller").scrollbars();
 	}
-	
+
 	$(document).ready(function() {
+		
 		hideLoadingIcon();
+		chkCount();
 		
 		//for edit -- to dynamically populate possible values in property template fieldset 
 		<% 
@@ -530,9 +532,11 @@
 		});
 	});
 	
+	
 	var counter = "";
+	
 	function addconfig() {
-		counter = $(".key").size() + 1;
+		counter = $(".keywidth").size() + 1;
 		var trId = counter + "_configdynamiadd";
 		var keyId = counter;
 		var keyTmpName = counter+"_key";
@@ -547,29 +551,40 @@
 		var mulChckId = counter + "_propMul";
 	 	
 	 	var newPropTempRow = $(document.createElement('tr')).attr("id", trId);
-	 	newPropTempRow.html("<td class='textwidth'><input type='text' id='"+ keyId +"' class='key' name='propTempKey' value='' "+
+	 	newPropTempRow.html("<td class='tdWidth'><input type='text' id='"+ keyId +"' class='keywidth' name='propTempKey' value='' "+
 	 			" temp='"+ keyTmpName +"' placeholder='<s:text name='place.hldr.configTemp.add.key'/>' onblur='updateRowInputNames(this)'></td>" + 
-				"<td class='textwidth'> <input type='text' id = '"+ nameId +"' placeholder='<s:text name='place.hldr.configTemp.add.name'/>' " + 
-				" value='' placeholder='' maxlength='30' class='propyName'></td><td class='textwidth'><select id='"+ typeId +"' " + 
-				"class = 'select typewidth'><option value='String'>String</option><option value='Integer'>Integer</option><option value='Password'>" + 
-				"Password</option></select></td><td class='psblevalue' id='"+ psblMulDivId +"' style='display:none;'><select type='text' " + 
-				"placeholder='<s:text name='place.hldr.configTemp.add.possible.values'/>'class='propTempTxt psblSelect' id='"+ psblValMultipleId +"'>" + 
+				"<td class='tdWidth'> <input type='text' id = '"+ nameId +"' placeholder='<s:text name='place.hldr.configTemp.add.name'/>' " + 
+				" value='' placeholder='' maxlength='30' class='textWidth'></td><td class='tdWidth'><select id='"+ typeId +"' " + 
+				"class = 'textWidth'><option value='String'>String</option><option value='Integer'>Integer</option><option value='Password'>" + 
+				"Password</option></select></td><td class='tdWidth' id='"+ psblMulDivId +"' style='display:none;'><select type='text' " + 
+				"placeholder='<s:text name='place.hldr.configTemp.add.possible.values'/>'class='psblselectwidth' id='"+ psblValMultipleId +"'>" + 
 				"</select><a data-toggle='modal' href='#myModal'><img class='addIcon imagealign' temp='"+ keyId +"' src='images/add_icon.png'" + 
-				"onclick='addPsblValPopup(this);'/></a></td><input type='hidden' class='"+ keyId +"'/><td class='psblevalue' id='"+ psblSinglDivId +"'>" + 
-				"<input type='text' placeholder='<s:text name='place.hldr.configTemp.add.possible.values'/>'class='propTempTxt psblSngl' " + 
-				"id='"+ psblValSingleId +"'><a data-toggle='modal' href='#myModal'><img id='addImage' class='addIcon imagealign' temp='"+ keyId +"' " +
-	 			"src='images/add_icon.png' onclick='addPsblValPopup(this);'/></a></td><td class='hlpText'><input type='text' id='"+ helpTextId +"' " + 
-	 			"placeholder='<s:text name='place.hldr.configTemp.add.help.text'/>' name='helpText' class='propTempTxt hlpTxt'></td>" + 
-	 			"<td class='mandatoryfld'><input type='checkbox' value='true' id='"+ mandChckId +"'></td><td class='multiplefld'> " + 
-	 			"<input type='checkbox' value='true' id='"+ mulChckId +"'></td><td class='imagewidth'><a ><img class='add imagealign' " + 
-	 			" temp='"+ keyId +"' src='images/add_icon.png' onclick='addconfig(this);'></a></td><td><img class = 'del imagealign'" + 
-	 			"src='images/minus_icon.png' onclick='removeTag(this);'></td>")
+				"onclick='addPsblValPopup(this);'/></a></td><input type='hidden' class='"+ keyId +"'/><td class='psblbtnwidth' id='"+ psblSinglDivId +"'>" + 
+				"<input type='text' placeholder='<s:text name='place.hldr.configTemp.add.possible.values'/>'class='psbltextwidth' " + 
+				"id='"+ psblValSingleId +"'><a data-toggle='modal' href='#myModal'><img class='addIcon imagealign' temp='"+ keyId +"' " +
+	 			"src='images/add_icon.png' onclick='addPsblValPopup(this);'/></a></td><td class='tdWidth'><input type='text' id='"+ helpTextId +"' " + 
+	 			"placeholder='<s:text name='place.hldr.configTemp.add.help.text'/>' name='helpText' class='textWidth'></td>" + 
+	 			"<td class='buttonwidth'><input type='checkbox' class='chkBox_config' value='true' id='"+ mandChckId +"'></td><td class='buttonwidth'> " + 
+	 			"<input type='checkbox' class='chkBox_config' value='true' id='"+ mulChckId +"'></td><td class='buttonwidth'><a ><img class='add imagealign' " + 
+	 			" temp='"+ keyId +"' src='images/add_icon.png' onclick='addconfig(this);'></a></td><td class='buttonwidth'><img class = 'del imagealign'" + 
+	 			"src='images/minus_icon.png' id='deleteIcon' onclick='removeTag(this);'></td>")
 	 	newPropTempRow.appendTo("#propTempTbody");		
 		counter++;
+		chkCount();
 	}
-	 
+	
 	function removeTag(currentTag) {
 		$(currentTag).parent().parent().remove();
+		chkCount();
+	}
+	
+	function chkCount(){
+		var noOfRows =  $('input[class="keywidth"]').size();
+		if(noOfRows >1){
+			$("#deleteIcon").show();
+		}else{
+			$("#deleteIcon").hide();
+		}
 	}
 	
 	function addPsblValPopup(obj) {
@@ -690,5 +705,4 @@
 		configname = checkForSplChr(configname);
 		$(this).val(configname);
 	});
-	
 </script>

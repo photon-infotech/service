@@ -345,7 +345,7 @@ public class PilotProjects extends ServiceBaseAction {
 	}
 
 	public boolean fileuploadValidation(boolean isError) {
-		if (pilotProByteArray == null) {
+		if (!EDIT.equals(getFromPage()) && pilotProByteArray == null) {
     		setFileError(getText(KEY_I18N_ERR_PLTPROJ_EMPTY));
     		tempError = true;
     	}

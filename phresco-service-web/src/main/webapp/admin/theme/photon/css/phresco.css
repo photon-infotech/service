@@ -2381,3 +2381,58 @@ div[class *='syncTable'] {
 	margin-left:6px;
 }
 
+.child_chkBox{
+	margin-left:20px;
+	padding-left:50px;
+	width:8%;
+}
+
+.zero_padding{
+	padding-left:0px;
+	width:35%;
+}
+
+.download_feature_tbl{
+	margin: 0px 5px;
+}
+
+.tdWidth{
+	width:15%;	
+}
+
+.buttonwidth {
+	width: 5%;
+}
+
+.psblbtnwidth{
+	width: 18%;
+}
+
+.keywidth {
+	width: 85%;
+}
+
+
+.psbltextwidth{
+	width: 61%;
+}
+
+.psblselectwidth{
+	width: 69%;
+}
+
+.psblValwidth {
+	width: 15%;
+}
+
+.textWidth{
+	width: 85%;
+}
+
+input[class="chkBox_config"] {
+	margin: 8px 18px;
+}
+
+#permissionList{
+	background:#727272;
+}
