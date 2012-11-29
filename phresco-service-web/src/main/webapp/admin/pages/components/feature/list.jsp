@@ -106,6 +106,10 @@
 													</a>
 												</td>
 												<td><%= module.getVersion() %></td>
+												<td class="psblevalue" id="1_psblSinglDiv" title="Versioning">
+									                <a href="#" onclick="versioningFeatu('<%= moduleGroup.getId() %>', '<%= module.getId() %>');" name="edit" id=""><img class="addiconAlign imagealign" temp="1" 
+													src="images/versioning.png"/></a>
+									           </td>
 											</tr>
 										<%	
 												}
@@ -137,13 +141,27 @@
 		hideLoadingIcon();//To hide the loading icon
 	});
 	
-	function editFeature(moduleGroupId, moduleId) {
+	function versioningFeatu(moduleGroupId, moduleId) {
 		var params = "moduleGroupId=";
 	    params = params.concat(moduleGroupId);
 	    params = params.concat("&moduleId=");
 	    params = params.concat(moduleId);
-	    loadContent("featurseEdit", $('#formFeaturesList'), $('#featureContainer'), params);
+	    params = params.concat("&versioning=")
+	    params = params.concat("versioning");
+	    loadCont(params);
 	}
+
+    function editFeature(moduleGroupId, moduleId) {
+		var params = "moduleGroupId=";
+	    params = params.concat(moduleGroupId);
+	    params = params.concat("&moduleId=");
+	    params = params.concat(moduleId);
+	    loadCont(params);
+	}
+	
+	function loadCont(params) {
+		loadContent("featurseEdit", $('#formFeaturesList'), $('#featureContainer'), params);
+    }
 	
 	function checkAllEvent(currentCheckbox, childCheckBox, disable) {
 		var checkAll = $(currentCheckbox).prop('checked');

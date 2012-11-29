@@ -45,10 +45,12 @@
 	String name = "";
 	String desc = "";
 	boolean isSystem = false;
+	boolean isCustProp = false;
 	if (settingsTemplate != null) {
 		name = settingsTemplate.getName();
 		desc = settingsTemplate.getDescription();
 		isSystem = settingsTemplate.isSystem();
+		isCustProp = settingsTemplate.isCustomProp();
 	}
 %>
 
@@ -125,6 +127,21 @@
 					</div>
 				</div>
           		 <span class="help-inline applyerror" id="applyError"></span>
+			</div>
+		</div>
+		
+		<div class="control-group">
+			<label class="control-label labelbold">
+				<s:text name="lbl.hdr.comp.system.properties" />
+			</label>
+			<div class="controls">
+				 <%
+					String checkedStr = "";
+					if (isCustProp) {
+					    checkedStr = "checked";
+					}
+				%> 
+				<input type="checkbox" name="defaultCustProp" value="true" <%= checkedStr %>>
 			</div>
 		</div>
 		
@@ -373,7 +390,7 @@
 		$(".content_adder").scrollbars();  
 		$(".multilist-scroller").scrollbars();
 	}
-
+	
 	$(document).ready(function() {
 		hideLoadingIcon();
 		
@@ -540,7 +557,7 @@
 				"</select><a data-toggle='modal' href='#myModal'><img class='addIcon imagealign' temp='"+ keyId +"' src='images/add_icon.png'" + 
 				"onclick='addPsblValPopup(this);'/></a></td><input type='hidden' class='"+ keyId +"'/><td class='psblevalue' id='"+ psblSinglDivId +"'>" + 
 				"<input type='text' placeholder='<s:text name='place.hldr.configTemp.add.possible.values'/>'class='propTempTxt psblSngl' " + 
-				"id='"+ psblValSingleId +"'><a data-toggle='modal' href='#myModal'><img class='addIcon imagealign' temp='"+ keyId +"' " +
+				"id='"+ psblValSingleId +"'><a data-toggle='modal' href='#myModal'><img id='addImage' class='addIcon imagealign' temp='"+ keyId +"' " +
 	 			"src='images/add_icon.png' onclick='addPsblValPopup(this);'/></a></td><td class='hlpText'><input type='text' id='"+ helpTextId +"' " + 
 	 			"placeholder='<s:text name='place.hldr.configTemp.add.help.text'/>' name='helpText' class='propTempTxt hlpTxt'></td>" + 
 	 			"<td class='mandatoryfld'><input type='checkbox' value='true' id='"+ mandChckId +"'></td><td class='multiplefld'> " + 
@@ -673,4 +690,5 @@
 		configname = checkForSplChr(configname);
 		$(this).val(configname);
 	});
+	
 </script>

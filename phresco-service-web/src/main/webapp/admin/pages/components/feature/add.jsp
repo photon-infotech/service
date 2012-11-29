@@ -43,11 +43,13 @@
     String selectedTechnology = (String) request.getAttribute(ServiceUIConstants.FEATURES_SELECTED_TECHNOLOGY);
 	String buttonLbl = ServiceActionUtil.getButtonLabel(fromPage);
 	String pageUrl = ServiceActionUtil.getPageUrl(ServiceUIConstants.FEATURES, fromPage);
-	
 	String progressTxt = ServiceActionUtil.getProgressTxt(ServiceUIConstants.FEATURES, fromPage);
+	String versioning = (String)request.getAttribute(ServiceUIConstants.REQ_VERSIONING);
+	String disabledVer ="";
+	if(StringUtils.isNotEmpty(versioning)) {
+		disabledVer = "disabled";
+	}
   
-	
-    
   	//For edit
   	String moduleId = "";
     String name = "";
@@ -161,7 +163,7 @@
 			</label>
 			<div class="controls">
 				<input id="featureName" placeholder="<s:text name='place.hldr.feature.add.name'/>" 
-				     maxlength="30" title="30 Characters only" class="input-xlarge" type="text" name="name" value="<%= name %>">
+				     maxlength="40" title="30 Characters only" class="input-xlarge" type="text" name="name" <%= disabledVer %> value="<%= name %>">
 				<span class="help-inline" id="nameError"></span>
 			</div>
 		</div>
@@ -189,30 +191,40 @@
 		</div>
 		
 		<div class="control-group" id="applyControl">
-			<label class="control-label labelbold"> 
+			<label class="control-label labelbold">
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.comp.featr.technology'/>
-			 </label>
+			</label>
 			<div class="controls">
-				<select name="technology">
-				<%
-					if (CollectionUtils.isNotEmpty(technologies)) {
-					    String selectedStr = "";
-						for (Technology technology : technologies) {
-						    if (technology.getId().equals(selectedTechnology)) {
-						        selectedStr = "selected";
-						    } else {
-						        selectedStr = "";
-						    }
-				%>
-							<option value="<%= technology.getId() %>" <%= selectedStr %>><%= technology.getName() %></option>
-				<%
-                        }
-					}
-				%>
-				</select>
-				<span class="help-inline applyerror" id="techError"></span>
+					<div class="typeFields" id="typefield">
+					<div class="multilist-scroller multiselct" id="applicableToDiv">
+						<ul>
+							<li>
+								<input type="checkbox" value="all" id="checkAllAuto" name="" onclick="checkAllEvent(this,$('.applsChk'), true);"
+									style="margin: 3px 8px 6px 0;" <%= disabledVer %> ><s:text name='lbl.all'/>
+							</li>
+							<%
+								if (CollectionUtils.isNotEmpty(technologies)) {
+									String checkedStr = "";
+									for (Technology technology : technologies) {
+										 if (technology.getId().equals(selectedTechnology)) {
+												checkedStr = "checked";
+											} else {
+												checkedStr = "";
+											}
+							%>
+										<li> <input type="checkbox" id="appliestoCheckbox" name="multiTechnology" value='<%= technology.getId() %>'
+											class="check applsChk" <%= checkedStr %> <%= disabledVer %> ><%= technology.getName() %>
+										</li>
+							<%		}	
+								}
+							%>
+						</ul>
+					</div>
+				</div>
+          		 <span class="help-inline" id="techError"></span>
 			</div>
 		</div>
+		
 		
 		<% if (features) { %>
 			<div class="control-group" id="moduleSelection">
@@ -220,7 +232,7 @@
 					<span class="mandatory">*</span>&nbsp;<s:text name="lbl.comp.featr.module.type" />
 				</label>
 				<div class="controls">
-					<select name="moduleType" id="type">
+					<select name="moduleType" id="type" <%= disabledVer %>>
 				        <option value="core"><s:text name="lbl.comp.featr.type.external" /></option>
 				        <option value="custom"><s:text name="lbl.comp.featr.type.custom" /></option>
 	     		 	</select>
@@ -239,7 +251,7 @@
 					    checkedStr = "checked";
 					}
 				%>
-				<input type="checkbox" name="defaultType" value="true" <%= checkedStr %>>
+				<input type="checkbox" name="defaultType" value="true" <%= checkedStr %> <%= disabledVer %>>
 			</div>
 		</div>
 		
@@ -262,7 +274,7 @@
 								}
 							}
 				%>
-							<option value="<%= license.getId() %>" <%= selectedStr %>><%= license.getName() %></option>
+							<option value="<%= license.getId() %>" <%= selectedStr %> <%= disabledVer %>><%= license.getName() %></option>
 				<%
                         }
 					}
@@ -359,7 +371,7 @@
 	<div class="bottom_button">
      
      		<input type="button" id="featuresUpdate" class="btn <%= disabledClass %>" <%= disabled %> 
-						onclick="validate('<%= pageUrl %>', $('#formFeatureAdd'), $('#featureContainer'), '<%= progressTxt %>', $('#jarDetailsDiv :input'));"
+						onclick="validate('<%= pageUrl %>', $('#formFeatureAdd'), $('#featureContainer'), '<%= progressTxt %>', $('.content_feature :input'));"
 						value="<%= buttonLbl %>"/>
 			<input type="button" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>"
 				onclick="loadContent('technologies', $('#formFeatureAdd'), $('#featureContainer'));" />
@@ -377,18 +389,19 @@
 <script type="text/javascript">
 	//To check whether the device is ipad or not and then apply jquery scrollbar
 	if (!isiPad()) {
-		$(".content_feature").scrollbars();  
+		$(".content_feature").scrollbars(); 
+		$(".multilist-scroller").scrollbars();
 	}
 
 	$(document).ready(function() {
-	    createUploader();
+		createUploader();
 		enableScreen();
-		hideLoadingIcon();	
+		hideLoadingIcon();
 	
 		// To check for the special character in name
         $('#featureName').bind('input propertychange', function (e) {
             var name = $(this).val();
-            name = checkForSplChr(name);
+              name = checkForSplChrExceptDot(name);
             $(this).val(name);
         });
 	
@@ -463,6 +476,12 @@
         } else {
             hideError($("#featureFileControl"), $("#featureFileError"));
         }
+        
+        if (!isBlank(data.techError)) {
+            showError($("#applyControl"), $("#techError"), data.techError);
+        } else {
+            hideError($("#applyControl"), $("#techError"));
+        }
     }
     
 	//To upload the file upload validation error
@@ -495,7 +514,7 @@
 			buttonLabel : '<s:label key="lbl.comp.featr.upload" />',
 			typeError : '<s:text name="err.invalid.file.selection" />',
 			params : {
-				fileType : 'featureJar'
+				fileType : 'featureJar',
 			},
 			debug : true
 		});
@@ -541,4 +560,5 @@
 		disableScreen();
 		loadContent('fetchFeaturesForDependency', $('#formFeatureAdd'), $('#popup_div'));
 	}
+	
 </script>

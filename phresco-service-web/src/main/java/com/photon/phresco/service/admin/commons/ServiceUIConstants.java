@@ -42,6 +42,7 @@ public interface ServiceUIConstants {
 	String MAVEN_JAR_FALSE = "{\"mavenJar\": false,\"success\": true}";
 	String INVALID_ARCHETYPE_JAR = "{\"isJarTypeValid\": false,\"errorMsg\": \"Not a valid application jar\"}";
 	String INVALID_PLUGIN_JAR = "{\"isJarTypeValid\": false,\"errorMsg\": \"Not a valid plugin jar\"}";
+	String INVALID_MODULE_NAME = "{\"isNameValid\": false,\"errorMsg\": \"ZIP Folder Name and Feature Name Not Matched\"}";
 	String CSV_PATTERN = "\\s*,\\s*";
 	String REQ_ARTIFACT_ID = "_artifactId";
 	String REQ_GROUP_ID = "_groupId";
@@ -58,6 +59,8 @@ public interface ServiceUIConstants {
 	String GLOBALURLS = "globalurl";
 	String JSLIBS = "jslibs";
 	String COMPONENT = "component";
+	String FILE_FORMAT = "zip";
+	String TEMP_FOLDER = "newtemp";
     
 	/*****************************
      * Login Request Constants
@@ -341,6 +344,7 @@ public interface ServiceUIConstants {
     String KEY_I18N_ERR_ARFID_EMPTY = "err.msg.aId.empty";
     String KEY_I18N_ERR_VER_ALREADY_EXISTS = "err.msg.ver.exists";
     String KEY_I18N_ERR_FILE_EMPTY	= "err.msg.file.empty";
+    String KEY_I18N_MULTI_TECH_EMPTY = "err.msg.multitech.empty";
     
     String KEY_I18N_ERR_APPTYPE_EMPTY = "err.msg.apptye.empty";
     String KEY_I18N_ERR_APPLIES_EMPTY = "err.msg.applies.empty";

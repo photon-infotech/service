@@ -283,16 +283,19 @@ qq.FileUploaderBasic = function(o){
         },
         onComplete: function(id, fileName, responseJSON){
         			//To show the error msg if the uploaded jar is not a valid jar
-        			if (responseJSON.isJarTypeValid != undefined && !responseJSON.isJarTypeValid) {
+        	       
+        			if ((responseJSON.isJarTypeValid != undefined && !responseJSON.isJarTypeValid) || (responseJSON.isNameValid != undefined && !responseJSON.isNameValid) ) {
         				$('.qq-upload-file').each(function() {
         					if ($.trim($(this).text()) == fileName) {
-        						if ($(this).parent().parent().attr("temp") == o.type) {
+        						if ($(this).parent().parent().attr("temp") == o.type || $(this).parent().parent().attr("temp") == o.fileType) {
         							$(this).parent().remove();
         						}
         					}
         				});
         				if (o.type === "pluginJar"){
         					jarPopupError(responseJSON.errorMsg, o.type);
+        				} else if(o.fileType === "featureJar"){
+        					jarError(responseJSON.errorMsg, o.fileType);
         				} else {
         					jarError(responseJSON.errorMsg, o.type);
         				}
@@ -537,6 +540,7 @@ qq.FileUploaderBasic.prototype = {
  * Class that creates upload widget with drag-and-drop and file list
  * @inherits qq.FileUploaderBasic
  */
+var modName = "";
 var urlAction = "";
 qq.FileUploader = function(o){
 	var type = o.type || o.fileType;
@@ -597,8 +601,8 @@ qq.FileUploader = function(o){
     
     this._bindCancelEvent();
     this._setupDragDrop();
-    
     urlAction = this._options.action;//This will assign the url passed from the JSP
+
 };
 
 // inherit from Basic Uploader
@@ -657,6 +661,8 @@ qq.extend(qq.FileUploader.prototype, {
         });                
     },
     _onSubmit: function(id, fileName){
+    	//For zip file extract
+    	modName = $('#featureName').val();
         qq.FileUploaderBasic.prototype._onSubmit.apply(this, arguments);
         this._addToList(id, fileName);  
     },
@@ -1267,11 +1273,12 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
         params = params || {};
         params['qqfile'] = name;
         var queryString = qq.obj2url(params, this._options.action);
-
         xhr.open("POST", queryString, true);
         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
         xhr.setRequestHeader("X-File-Name", encodeURIComponent(name));
         xhr.setRequestHeader("Content-Type", "application/octet-stream");
+        //for extract zip file validate feature name
+        xhr.setRequestHeader("Module-Name", modName);
         xhr.send(file);
     },
     _onComplete: function(id, xhr){

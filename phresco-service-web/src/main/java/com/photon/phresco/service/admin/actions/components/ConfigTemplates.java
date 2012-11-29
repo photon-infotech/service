@@ -49,6 +49,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 	private String name = "";
 	private String description = "";
 	private List<String> appliesTo = null;
+	private String defaultCustProp = "";
 	
 	private String nameError = "";
 	private String applyError = "";
@@ -183,6 +184,8 @@ public class ConfigTemplates extends ServiceBaseAction {
 			settingTemplate = new SettingsTemplate();
 			settingTemplate.setName(getName());
 			settingTemplate.setDescription(getDescription());
+			boolean customProp = Boolean.parseBoolean(getDefaultCustProp());
+			settingTemplate.setCustomProp(customProp);
 			settingTemplate.setCustomerIds(Arrays.asList(getCustomerId()));
 			if (StringUtils.isNotEmpty(getConfigId())) {
 				settingTemplate.setId(getConfigId());
@@ -375,4 +378,13 @@ public class ConfigTemplates extends ServiceBaseAction {
 	public String getOldName() {
 		return oldName;
 	}
+
+	public String getDefaultCustProp() {
+		return defaultCustProp;
+	}
+
+	public void setDefaultCustProp(String defaultCustProp) {
+		this.defaultCustProp = defaultCustProp;
+	}
+
 }

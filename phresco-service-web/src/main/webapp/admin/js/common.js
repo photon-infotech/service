@@ -496,3 +496,10 @@ function enableDisableUploads(type, controlObj){
 		controlObj.find($(".btn")).removeClass("disabled").addClass("btn-primary qq-upload-button");
 	}
 }
+
+function createDivId(fileupload,divId){
+	var divInput = new qq.UploadButton({
+		element : document.getElementById(fileupload),
+	    divId : divId
+	});
+}

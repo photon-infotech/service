@@ -66,6 +66,8 @@ public class ServiceBaseAction extends ActionSupport implements ServiceActions, 
     
     private String fileName = "";
     
+    private String moduleName = "";
+    
     protected ServiceManager getServiceManager() {
 		return serviceManager;
 	}
@@ -124,6 +126,7 @@ public class ServiceBaseAction extends ActionSupport implements ServiceActions, 
 		try {
             writer = getHttpResponse().getWriter();
 	        fileName = getHttpRequest().getHeader(X_FILE_NAME);
+	        moduleName = getHttpRequest().getHeader("Module-Name");
         	InputStream is = getHttpRequest().getInputStream();
         	byteArray = IOUtils.toByteArray(is);
 		} catch (Exception e) {
@@ -232,5 +235,13 @@ public class ServiceBaseAction extends ActionSupport implements ServiceActions, 
 
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
+	}
+
+	public String getModuleName() {
+		return moduleName;
+	}
+
+	public void setModuleName(String moduleName) {
+		this.moduleName = moduleName;
 	}
 }

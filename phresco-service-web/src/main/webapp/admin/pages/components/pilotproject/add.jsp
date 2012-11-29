@@ -86,16 +86,6 @@
 			</div>
 		</div>
 		
-		<div class="control-group" id="versionControl">
-			<label class="control-label labelbold">
-				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.version'/>
-			</label>
-			<div class="controls">
-				<input id="versionname" placeholder="<s:text name='place.hldr.pilot.add.version'/>" <%= disabledVer %> value="<%= version %>" maxlength="30" title="30 Characters only" class="input-xlarge" type="text" name="version">
-				<span class="help-inline" id="versionError"></span>
-			</div>
-		</div>
-
 		<div class="control-group" id="applyControl">
 			<label class="control-label labelbold">
 				<span class="mandatory">*</span>&nbsp;<s:text name="Technology" /> </label>
@@ -226,11 +216,7 @@
 		} else {
 			hideError($("#nameControl"), $("#nameError"));
 		}
-		if (!isBlank(data.verError)) {
-			showError($("#versionControl"), $("#versionError"), data.verError);
-		} else {
-			hideError($("#versionControl"), $("#versionError"));
-		}
+
 		if (!isBlank(data.fileError)) {
 			showError($("#pilotProFileControl"), $("#pilotProFileError"), data.fileError);
 		} else {
