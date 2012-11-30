@@ -293,8 +293,12 @@ public class Features extends ServiceBaseAction {
             artifactGroup.setPackaging(ServerUtil.getFileExtension(featureJarFileName));
             // To set appliesto tech and core
             List<CoreOption> appliesTo = new ArrayList<CoreOption>();
-            CoreOption moduleCoreOption = new CoreOption(getTechnology(), Boolean.parseBoolean(getModuleType()));
-            appliesTo.add(moduleCoreOption);
+            CoreOption moduleCoreOption = null;
+            for(String multiTech : getMultiTechnology()){
+            	moduleCoreOption = new CoreOption(multiTech, Boolean.parseBoolean(getModuleType()));
+            	appliesTo.add(moduleCoreOption);
+            }
+            
             artifactGroup.setAppliesTo(appliesTo);
             artifactGroup.setCustomerIds(Arrays.asList(getCustomerId()));
             //To set license
@@ -307,8 +311,11 @@ public class Features extends ServiceBaseAction {
             
             //To set whether the feature is default to the technology or not
             List<RequiredOption> required = new ArrayList<RequiredOption>();
-            RequiredOption requiredOption = new RequiredOption(getTechnology(), Boolean.parseBoolean(getDefaultType()));
-            required.add(requiredOption);
+            RequiredOption requiredOption = null;
+            for(String technology : getMultiTechnology()) {
+            	requiredOption = new RequiredOption(technology, Boolean.parseBoolean(getDefaultType()));
+            	required.add(requiredOption);
+            }
             artifactInfo.setAppliesTo(required);
             
             //To set dependencies
