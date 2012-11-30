@@ -152,7 +152,8 @@
          
 		<div class="control-group" id="pilotProFileControl">
 			<label class="control-label labelbold">
-				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.projsrc'/>
+				<% if(fromPage != ServiceUIConstants.EDIT) { %>
+				<span class="mandatory">*</span><% } %>&nbsp;<s:text name='lbl.hdr.comp.projsrc'/>
 			</label>
 			
 			<div class="controls" style="float: left; margin-left: 3%;">
