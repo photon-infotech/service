@@ -53,7 +53,6 @@ public class PilotProjects extends ServiceBaseAction {
 	
 	private String name = "";
 	private String description = "";
-    private String version = "";
     private String groupId = "";
     private String artifactId = "";
     private String jarVersion = "";
@@ -209,8 +208,7 @@ public class PilotProjects extends ServiceBaseAction {
         
         pilotProInfo.setName(getName());
         pilotProInfo.setDescription(getDescription());
-        pilotProInfo.setVersion(getVersion());
-        
+       
         ArtifactGroup pilotContent = new ArtifactGroup();
         pilotContent.setName(getName());
         pilotContent.setGroupId(getGroupId());
@@ -308,10 +306,7 @@ public class PilotProjects extends ServiceBaseAction {
     	boolean isError = false;
     	//Empty validation for name
     	isError = nameValidation(isError);
-    	
-    	//empty validation for version
-    	isError = versionValidation(isError);
-    	
+    	    	
     	//empty validation for fileupload
     	isError = fileuploadValidation(isError);
     	
@@ -350,16 +345,8 @@ public class PilotProjects extends ServiceBaseAction {
 	}
 
 	public boolean fileuploadValidation(boolean isError) {
-		if (pilotProByteArray == null) {
+		if (!EDIT.equals(getFromPage()) && pilotProByteArray == null) {
     		setFileError(getText(KEY_I18N_ERR_PLTPROJ_EMPTY));
-    		tempError = true;
-    	}
-		return tempError;
-	}
-
-	public boolean versionValidation(boolean isError) {
-		if (StringUtils.isEmpty(getVersion())) {
-    		setVerError(getText(KEY_I18N_ERR_VER_EMPTY ));
     		tempError = true;
     	}
 		return tempError;
@@ -487,14 +474,6 @@ public class PilotProjects extends ServiceBaseAction {
 
 	public void setJarVersion(String jarVersion) {
 		this.jarVersion = jarVersion;
-	}
-
-	public String getVersion() {
-		return version;
-	}
-
-	public void setVersion(String version) {
-		this.version = version;
 	}
 
 	public String getVerError() {

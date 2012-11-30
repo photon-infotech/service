@@ -106,7 +106,7 @@
                                         <% } %>
 									</td>
 									<td>
-										<a href="#" onclick="editPilotProject('<%=proInfo.getId() %>');" name="edit" id=""><%=proInfo.getName()%></a>
+										<a href="#" onclick="editPilotProject('<%=proInfo.getId() %>');" name="edit" id=""><%= proInfo.getName()%></a>
 									</td>
 									<td class="descwidth"><%= StringUtils.isNotEmpty(proInfo.getDescription()) ? proInfo.getDescription() : ""%></td>
 									 <%  

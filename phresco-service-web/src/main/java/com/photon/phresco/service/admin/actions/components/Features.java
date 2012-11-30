@@ -20,6 +20,8 @@
 package com.photon.phresco.service.admin.actions.components;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -31,9 +33,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+
 
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactGroup.Type;
@@ -48,6 +53,10 @@ import com.photon.phresco.service.client.api.Content;
 import com.photon.phresco.service.client.api.ServiceManager;
 import com.photon.phresco.service.client.impl.CacheKey;
 import com.photon.phresco.service.util.ServerUtil;
+import com.photon.phresco.util.ArchiveUtil;
+import com.photon.phresco.util.ArchiveUtil.ArchiveType;
+import com.photon.phresco.util.FileUtil;
+import com.photon.phresco.util.Utility;
 
 public class Features extends ServiceBaseAction {
 
@@ -67,6 +76,7 @@ public class Features extends ServiceBaseAction {
 	private String description = "";
     private String helpText = "";
     private String technology = "";
+    private List<String> multiTechnology = null; 
     private String type = "";
     private String groupId = "";
     private String artifactId = "";
@@ -77,6 +87,7 @@ public class Features extends ServiceBaseAction {
     private String moduleGroupId = "";
     private String moduleId = "";
     private String license = "";
+    private String versioning = "";
     
     private List<String> dependentModGroupId = null;
     
@@ -87,6 +98,7 @@ public class Features extends ServiceBaseAction {
     private String groupIdError = "";
 	private String fileError = "";
 	private String verError = "";
+	private String techError = "";
 	private String licenseError = "";
 	private boolean errorFound = false;
 	private String fileType = "";
@@ -235,6 +247,7 @@ public class Features extends ServiceBaseAction {
 	        setReqAttribute(REQ_FROM_PAGE, EDIT);
 	        setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 	        setReqAttribute(REQ_FEATURES_LICENSE, getLicences());
+	        setReqAttribute(REQ_VERSIONING, getVersioning());
 		} catch (PhrescoException e) {
 			showErrorPopup(e, getText(EXCEPTION_FEATURE_EDIT));
 		}
@@ -280,8 +293,12 @@ public class Features extends ServiceBaseAction {
             artifactGroup.setPackaging(ServerUtil.getFileExtension(featureJarFileName));
             // To set appliesto tech and core
             List<CoreOption> appliesTo = new ArrayList<CoreOption>();
-            CoreOption moduleCoreOption = new CoreOption(getTechnology(), Boolean.parseBoolean(getModuleType()));
-            appliesTo.add(moduleCoreOption);
+            CoreOption moduleCoreOption = null;
+            for(String multiTech : getMultiTechnology()){
+            	moduleCoreOption = new CoreOption(multiTech, Boolean.parseBoolean(getModuleType()));
+            	appliesTo.add(moduleCoreOption);
+            }
+            
             artifactGroup.setAppliesTo(appliesTo);
             artifactGroup.setCustomerIds(Arrays.asList(getCustomerId()));
             //To set license
@@ -294,8 +311,11 @@ public class Features extends ServiceBaseAction {
             
             //To set whether the feature is default to the technology or not
             List<RequiredOption> required = new ArrayList<RequiredOption>();
-            RequiredOption requiredOption = new RequiredOption(getTechnology(), Boolean.parseBoolean(getDefaultType()));
-            required.add(requiredOption);
+            RequiredOption requiredOption = null;
+            for(String technology : getMultiTechnology()) {
+            	requiredOption = new RequiredOption(technology, Boolean.parseBoolean(getDefaultType()));
+            	required.add(requiredOption);
+            }
             artifactInfo.setAppliesTo(required);
             
             //To set dependencies
@@ -349,12 +369,23 @@ public class Features extends ServiceBaseAction {
 		}
 		
 		PrintWriter writer = null;
+		boolean zipNameValidate =true;
 		try {
             writer = getHttpResponse().getWriter();
 	        byte[] tempFeaByteArray = getByteArray();
 	        
+	        featureJarFileName = getFileName();
+	        String ext = ServerUtil.getFileExtension(featureJarFileName);
+	        if(ext.equalsIgnoreCase(FILE_FORMAT)) {
+	        	zipNameValidate = extractArchive( new ByteArrayInputStream(tempFeaByteArray));
+	        }
+	        
 	        if (REQ_FEATURES_UPLOADTYPE.equals(getFileType())) {
-	        	uploadFeature(writer, tempFeaByteArray);
+	        	if(zipNameValidate) {
+	        	    uploadFeature(writer, tempFeaByteArray);
+	        	} else {
+	        		writer.print(INVALID_MODULE_NAME);
+	        	}
 	        } else {
 	        	iconName = getFileName();
 	        	inputStreamMap.put(Content.Type.ICON.name(), new ByteArrayInputStream(tempFeaByteArray));
@@ -370,6 +401,47 @@ public class Features extends ServiceBaseAction {
 		
 		return SUCCESS;
 		
+	}
+	
+	public boolean extractArchive(ByteArrayInputStream inputStream) throws  IOException, PhrescoException {
+		FileOutputStream fileOutputStream = null;
+		String sysTemp = Utility.getSystemTemp();
+		File uploadFile = new File(sysTemp + getFileName());
+		fileOutputStream = new FileOutputStream(uploadFile);
+		try {
+			byte[] data = new byte[1024];
+			int i = 0;
+			while ((i = inputStream.read(data)) != -1) {
+				fileOutputStream.write(data, 0, i);
+			}
+			fileOutputStream.flush();
+			Utility.closeStream(fileOutputStream);
+
+			StringBuilder builder = new StringBuilder(sysTemp);
+			builder.append(File.separator);
+			builder.append(TEMP_FOLDER);
+			File tempFolder = new File(builder.toString());
+			if (!tempFolder.exists()) {
+				tempFolder.mkdir();
+			}
+			ArchiveUtil.extractArchive(uploadFile.getPath(), tempFolder.getPath(), ArchiveType.ZIP);
+
+			File folder = new File(tempFolder.getPath());
+			File[] listOfFiles = folder.listFiles();
+
+			for (File listOfFile : listOfFiles)
+				if (listOfFile.isDirectory())
+					if(!listOfFile.getName().equals(getModuleName()) || StringUtils.isEmpty(getModuleName())) {	
+						FileUtil.delete(new File(tempFolder.getPath()));
+						FileUtil.delete(new File(sysTemp + getFileName()));
+						return false;
+					}
+		} finally {
+			Utility.closeStream(inputStream);
+			Utility.closeStream(fileOutputStream);
+		}
+
+		return true;
 	}
 
 	private void uploadFeature(PrintWriter writer, byte[] tempFeaByteArray) throws PhrescoException {
@@ -412,6 +484,9 @@ public class Features extends ServiceBaseAction {
 		boolean isError = false;
         //Empty validation for name
         isError = nameValidation(isError);
+        
+        //Empty Multiple Technology selection
+        isError = techValidation(isError);
         
         //Validate whether file is selected during add
         if (!EDIT.equals(getFromPage()) && featureByteArray == null) {
@@ -481,7 +556,15 @@ public class Features extends ServiceBaseAction {
         }
 		return tempError;
 	}
-
+	
+	public boolean techValidation(boolean isError) {
+		if (CollectionUtils.isEmpty(getMultiTechnology())) {
+            setTechError(getText(KEY_I18N_MULTI_TECH_EMPTY));
+            tempError = true;
+        }
+		return tempError;
+	}
+	
 	public String getName() {
 		return name;
 	}
@@ -498,6 +581,14 @@ public class Features extends ServiceBaseAction {
 		this.nameError = nameError;
 	}
 	
+	public String getTechError() {
+		return techError;
+	}
+
+	public void setTechError(String techError) {
+		this.techError = techError;
+	}
+
 	public String getFileError() {
 		return fileError;
 	}
@@ -665,6 +756,14 @@ public class Features extends ServiceBaseAction {
 	public String getLicense() {
 		return license;
 	}
+	
+	public String getVersioning() {
+		return versioning;
+	}
+
+	public void setVersioning(String versioning) {
+		this.versioning = versioning;
+	}
 
 	public void setLicenseError(String licenseError) {
 		this.licenseError = licenseError;
@@ -681,4 +780,13 @@ public class Features extends ServiceBaseAction {
 	public String getFileType() {
 		return fileType;
 	}
+
+	public List<String> getMultiTechnology() {
+		return multiTechnology;
+	}
+
+	public void setMultiTechnology(List<String> multiTechnology) {
+		this.multiTechnology = multiTechnology;
+	}
+	
 }

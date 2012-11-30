@@ -76,7 +76,7 @@
 		                <div class="mfbox siteinnertooltiptxt hideContent">
 		                    <div class="scrollpanel">
 		                        <section class="scrollpanel_inner">
-		                        	<table class="download_tbl">
+		                        	<table class="download_tbl download_feature_tbl">
 			                            <tbody>
 			                            <% 
 									    	List<ArtifactInfo> versions = moduleGroup.getVersions();
@@ -93,19 +93,23 @@
 													}
 										%>
 											<tr>
-												<td>
+												<td class="child_chkBox">
 												<% if (moduleGroup.isSystem()) { %>
-													<input type="checkbox" name="selectedModuleId" value="<%= module.getId() %> %>" disabled/>
+													<input type="checkbox"  class ="child_chkBox" name="selectedModuleId" value="<%= module.getId() %> %>" disabled/>
 												<% } else { %> 
-													<input type="checkbox" id="<%= moduleGroup.getName() %>" class="<%= moduleGroup.getName() %> subtechnology" name="selectedModuleId" value="<%= module.getId() %>"  onclick="checkOneEvent( $('.<%=moduleGroup.getName()%>'), $('#<%=moduleGroup.getId()%>checkBox'));">
+													<input type="checkbox" class ="child_chkBox" id="<%= moduleGroup.getName() %>" class="<%= moduleGroup.getName() %> subtechnology" name="selectedModuleId" value="<%= module.getId() %>"  onclick="checkOneEvent( $('.<%=moduleGroup.getName()%>'), $('#<%=moduleGroup.getId()%>checkBox'));">
 												<% } %> 
 												</td>
-												<td>
+												<td class="zero_padding">
 													<a href="#" name="ModuleDesc" onclick="editFeature('<%= moduleGroup.getId() %>', '<%= module.getId() %>');" >
 														<%= moduleGroup.getName() %>
 													</a>
 												</td>
 												<td><%= module.getVersion() %></td>
+												<td class="psblevalue" id="1_psblSinglDiv" title="Versioning">
+									                <a href="#" onclick="versioningFeatu('<%= moduleGroup.getId() %>', '<%= module.getId() %>');" name="edit" id=""><img class="addiconAlign imagealign" temp="1" 
+													src="images/versioning.png"/></a>
+									           </td>
 											</tr>
 										<%	
 												}
@@ -137,13 +141,27 @@
 		hideLoadingIcon();//To hide the loading icon
 	});
 	
-	function editFeature(moduleGroupId, moduleId) {
+	function versioningFeatu(moduleGroupId, moduleId) {
 		var params = "moduleGroupId=";
 	    params = params.concat(moduleGroupId);
 	    params = params.concat("&moduleId=");
 	    params = params.concat(moduleId);
-	    loadContent("featurseEdit", $('#formFeaturesList'), $('#featureContainer'), params);
+	    params = params.concat("&versioning=")
+	    params = params.concat("versioning");
+	    loadCont(params);
 	}
+
+    function editFeature(moduleGroupId, moduleId) {
+		var params = "moduleGroupId=";
+	    params = params.concat(moduleGroupId);
+	    params = params.concat("&moduleId=");
+	    params = params.concat(moduleId);
+	    loadCont(params);
+	}
+	
+	function loadCont(params) {
+		loadContent("featurseEdit", $('#formFeaturesList'), $('#featureContainer'), params);
+    }
 	
 	function checkAllEvent(currentCheckbox, childCheckBox, disable) {
 		var checkAll = $(currentCheckbox).prop('checked');

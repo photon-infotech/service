@@ -56,7 +56,7 @@ public class Downloads extends ServiceBaseAction {
 	private String name = "";
 	private String version = "";
 	private List<String> platform = null;
-	private Category category = null;
+	private String category = null;
 	private String description = "";
 	private List<String> technology = null;
 	private String license = "";
@@ -209,7 +209,8 @@ public class Downloads extends ServiceBaseAction {
             }
         }
         downloadInfo.setPlatformTypeIds(platformTypeIds);
-        downloadInfo.setCategory(getCategory()); //To set category
+        Category category = Category.valueOf(getCategory());
+        downloadInfo.setCategory(category); //To set category
 
         //To set the versions of the download items
         List<ArtifactInfo> downloadVersions = new ArrayList<ArtifactInfo>();
@@ -411,11 +412,11 @@ public class Downloads extends ServiceBaseAction {
 		this.platformTypeError = appltError;
 	}
 
-	public Category getCategory() {
+	public String getCategory() {
 		return category;
 	}
 
-	public void setCategory(Category group) {
+	public void setCategory(String group) {
 		this.category = group;
 	}
 	
