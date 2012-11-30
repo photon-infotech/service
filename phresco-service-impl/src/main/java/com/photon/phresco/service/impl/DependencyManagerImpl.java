@@ -187,7 +187,7 @@ public class DependencyManagerImpl implements DependencyManager {
 						String version = module.getVersions().get(0).getVersion();
 						configList = configList(pomFile, groupId, artifactId, version, doc);
 						processor.addExecutionConfiguration("org.apache.maven.plugins", "maven-dependency-plugin", 
-							 "unpack-module", "validate", "unpack", configList, false, doc);
+							 "unpack-module", "validate", "unpack", configList, doc);
 					}
 				}
 				processor.save();
