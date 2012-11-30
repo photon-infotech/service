@@ -130,6 +130,7 @@
 	}
 	
 	$(document).ready(function() {
+		
 		//To close the popup
 		$('#cancel, #close').click(function() {
 			showParentPage();
@@ -174,5 +175,6 @@
 	//To enable the page because the page will not be refreshed
 	function successEvent(url, data) {
 		showParentPage();
+		hideLoadingIcon();
 	}
 </script>
