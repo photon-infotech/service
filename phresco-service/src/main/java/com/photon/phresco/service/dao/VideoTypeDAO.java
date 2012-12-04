@@ -8,6 +8,8 @@ public class VideoTypeDAO extends CustomerBaseDAO {
 	private String videoInfoId;
 	private String url;
 	private String artifactGroupId;
+	private String type;
+	private String codec;
 	
 	public String getVideoInfoId() {
 		return videoInfoId;
@@ -31,5 +33,21 @@ public class VideoTypeDAO extends CustomerBaseDAO {
 	
 	public void setArtifactGroupId(String artifactGroupId) {
 		this.artifactGroupId = artifactGroupId;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getCodec() {
+		return codec;
+	}
+
+	public void setCodec(String codec) {
+		this.codec = codec;
 	}
 }

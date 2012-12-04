@@ -27,6 +27,8 @@ public class VideoTypeConverter implements Converter<VideoTypeDAO, VideoType>, S
 		videoType.setStatus(dao.getStatus());
 		videoType.setVideoInfoId(dao.getVideoInfoId());
 		videoType.setSystem(dao.isSystem());
+		videoType.setType(dao.getType());
+		videoType.setCodec(dao.getCodec());
 		return videoType;
 	}
 
@@ -43,6 +45,8 @@ public class VideoTypeConverter implements Converter<VideoTypeDAO, VideoType>, S
 		videoDAO.setHelpText(videoType.getHelpText());
 		videoDAO.setStatus(videoType.getStatus());
 		videoDAO.setSystem(videoType.isSystem());
+		videoDAO.setType(videoType.getType());
+		videoDAO.setCodec(videoType.getCodec());
 		return videoDAO;
 	}
 	
