@@ -134,6 +134,7 @@
 		//To close the popup
 		$('#cancel, #close').click(function() {
 			showParentPage();
+			hideLoadingIcon();
 		});
 		
 		//Check box click function to check the first radio button and show the selected version
@@ -154,6 +155,7 @@
 		$('#saveDependency').click(function() {
 			showParentPage();
 			loadContent('saveDependentFeatures', $('#formDependency'), $('#popup_div'), '', true);
+			hideLoadingIcon();
 		});
 		
 		//To check the selected modules group checkbox and show the selected version
