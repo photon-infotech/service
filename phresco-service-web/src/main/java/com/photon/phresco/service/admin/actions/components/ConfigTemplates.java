@@ -73,7 +73,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 		}
 		
 		try {
-			List<SettingsTemplate> configTemplates = getServiceManager().getconfigTemplates(getCustomerId());
+			List<SettingsTemplate> configTemplates = getServiceManager().getConfigTemplates(getCustomerId());
 			setReqAttribute(REQ_CONFIG_TEMPLATES, configTemplates);
 			setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		} catch (PhrescoException e) {
@@ -274,7 +274,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 			isError = true;
 		} else if(ADD.equals(getFromPage()) || (!getName().equals(getOldName()))) {
 			// to check duplication of name
-			List<SettingsTemplate> configTemplates = getServiceManager().getconfigTemplates(getCustomerId());
+			List<SettingsTemplate> configTemplates = getServiceManager().getConfigTemplates(getCustomerId());
 			if (CollectionUtils.isNotEmpty(configTemplates)) { //TODO: this should handled by query
 				for (SettingsTemplate configTemplate : configTemplates) {
 					if (configTemplate.getName().equalsIgnoreCase(getName())) {
