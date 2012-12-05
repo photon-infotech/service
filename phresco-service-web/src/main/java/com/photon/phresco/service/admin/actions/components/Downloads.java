@@ -44,6 +44,7 @@ import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.client.api.ServiceManager;
+import com.photon.phresco.service.util.ServerUtil;
 
 public class Downloads extends ServiceBaseAction { 
 
@@ -60,6 +61,8 @@ public class Downloads extends ServiceBaseAction {
 	private String description = "";
 	private List<String> technology = null;
 	private String license = "";
+	private String groupId = "";
+	private String artifactId = "";
 	
 	private String nameError = "";
 	private String verError = "";
@@ -79,6 +82,7 @@ public class Downloads extends ServiceBaseAction {
 	private static Map<String, InputStream> inputStreamMap = new HashMap<String, InputStream>();
 	private static byte[] downloadByteArray = null;
 	private static byte[] imgByteArray = null;
+	private static String featureJarFileName = "";
 
 	public String list() throws PhrescoException {
 		if (isDebugEnabled) {
@@ -220,11 +224,15 @@ public class Downloads extends ServiceBaseAction {
         ArtifactGroup artifactGroup = new ArtifactGroup();
         List<String> customerIds = new ArrayList<String>();
         customerIds.add(getCustomerId());
+        artifactGroup.setName(getName());
         artifactGroup.setCustomerIds(customerIds);
         artifactGroup.setVersions(downloadVersions);
         artifactGroup.setLicenseId(getLicense());
+        artifactGroup.setGroupId(getGroupId());
+        artifactGroup.setArtifactId(getArtifactId());
+        artifactGroup.setPackaging(ServerUtil.getFileExtension(featureJarFileName));
         downloadInfo.setArtifactGroup(artifactGroup);
-        
+      
         return downloadInfo;
     }
 
@@ -257,6 +265,9 @@ public class Downloads extends ServiceBaseAction {
 		try {
             writer = getHttpResponse().getWriter();
 	        InputStream is = getHttpRequest().getInputStream();
+	       
+	        getByteArray();
+	        featureJarFileName = getFileName();
 	        downloadByteArray = IOUtils.toByteArray(is);
         	writer.print(MAVEN_JAR_FALSE);
         	getHttpResponse().setStatus(getHttpResponse().SC_OK);
@@ -346,7 +357,7 @@ public class Downloads extends ServiceBaseAction {
 		} 
 
 		//Empty validation for group
-		if (getCategory() != null) {
+		if (StringUtils.isEmpty(getCategory())) {
 			setGroupError(getText(KEY_I18N_ERR_GROUP_EMPTY));
 			isError = true;
 		}
@@ -530,5 +541,21 @@ public class Downloads extends ServiceBaseAction {
 
 	public void setVersioning(String versioning) {
 		this.versioning = versioning;
+	}
+
+	public String getGroupId() {
+		return groupId;
+	}
+
+	public void setGroupId(String groupId) {
+		this.groupId = groupId;
+	}
+
+	public String getArtifactId() {
+		return artifactId;
+	}
+
+	public void setArtifactId(String artifactId) {
+		this.artifactId = artifactId;
 	}
 }
