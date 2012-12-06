@@ -192,8 +192,12 @@ public class Features extends ServiceBaseAction {
       }
       
       try {
-          List<ArtifactGroup> moduleGroups = getServiceManager().getFeatures(getCustomerId(), getTechnology(), Type.valueOf(getType()).name());
-          setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroups);
+    	  if(CollectionUtils.isNotEmpty(getMultiTechnology())) {
+    		  for(String technologyList : getMultiTechnology()){
+    			  List<ArtifactGroup>  moduleGroups = getServiceManager().getFeatures(getCustomerId(), technologyList, Type.valueOf(getType()).name());
+    			  setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroups); 
+    		  }
+    	  }
       } catch (PhrescoException e) {
           return showErrorPopup(e, getText(EXCEPTION_FEATURE_LIST));
       }
