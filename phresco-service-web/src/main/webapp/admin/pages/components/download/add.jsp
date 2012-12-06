@@ -357,7 +357,7 @@
 	});
 
 	function findError(data) {
-		if (!isBlank()) {
+		if (!isBlank(data.nameError)) {
 			showError($("#nameControl"), $("#nameError"), data.nameError);
 		} else {
 			hideError($("#nameControl"), $("#nameError"));
