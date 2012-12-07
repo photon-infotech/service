@@ -22,6 +22,7 @@ package com.photon.phresco.service.admin.actions.components;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -78,6 +79,11 @@ public class Downloads extends ServiceBaseAction {
 	private String oldVersion = "";
 	private String type = ""; // type of the file uploaded (file or image) 
 	private String versioning = "";
+	private String downloadURL = "";
+	private String fileName = "";
+	private InputStream fileInputStream;
+	private String contentType = "";
+	private int contentLength;
    
 	private static Map<String, InputStream> inputStreamMap = new HashMap<String, InputStream>();
 	private static byte[] downloadByteArray = null;
@@ -276,6 +282,28 @@ public class Downloads extends ServiceBaseAction {
 		} catch (Exception e) {
 			getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
             writer.print(SUCCESS_FALSE);
+		}
+		
+		return SUCCESS;
+	}
+
+	public String downloadArchive() {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method  Downloads.downloadArchive()");
+		}
+
+		try {
+			DownloadInfo downloadInfo = getServiceManager().getDownload(getDownloadId(), getCustomerId());
+			String archiveUrl = downloadInfo.getArtifactGroup().getVersions().get(0).getDownloadURL();
+
+			URL url = new URL(archiveUrl);
+			fileInputStream = url.openStream();
+			String[] parts = archiveUrl.split("/");
+			fileName = parts[parts.length - 1];
+			contentType = url.openConnection().getContentType();
+			contentLength = url.openConnection().getContentLength();
+		} catch (Exception e) {
+			return showErrorPopup(new PhrescoException(e), getText(DOWNLOAD_FAILED));
 		}
 		
 		return SUCCESS;
@@ -557,5 +585,37 @@ public class Downloads extends ServiceBaseAction {
 
 	public void setArtifactId(String artifactId) {
 		this.artifactId = artifactId;
+	}
+	
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+	public String getContentType() {
+		return contentType;
+	}
+
+	public void setContentType(String contentType) {
+		this.contentType = contentType;
+	}
+
+	public int getContentLength() {
+		return contentLength;
+	}
+
+	public void setContentLength(int contentLength) {
+		this.contentLength = contentLength;
+	}
+
+	public void setFileInputStream(InputStream fileInputStream) {
+		this.fileInputStream = fileInputStream;
+	}
+	
+	public InputStream getFileInputStream() {
+		return fileInputStream;
 	}
 }

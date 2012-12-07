@@ -411,6 +411,7 @@ public interface ServiceUIConstants {
     String PLTPROJ_ADDED = "succ.pltproj.add";
     String PLTPROJ_UPDATED = "succ.pltproj.updated";
     String PLTPROJ_DELETED = "succ.pltproj.delete";
+    String DOWNLOAD_FAILED = "download.failed";
     
     String CUSTOMER_ADDED = "succ.customer.add";
     String CUSTOMER_UPDATED = "succ.customer.update";

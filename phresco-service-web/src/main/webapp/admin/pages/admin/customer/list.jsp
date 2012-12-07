@@ -103,10 +103,10 @@
 								<td class="desclabel-width">
 									<%= StringUtils.isNotEmpty(customer.getDescription()) ? customer.getDescription() : "" %>
 								</td>
-								<td>
+								<td class="namelabel-width">
 									<%= customer.getValidUpto() != null ? customer.getValidUpto() : "" %>
 								</td>
-								<td><%= customer.getType() %></td>		
+								<td class="namelabel-width"><%= customer.getType() %></td>		
 							</tr>	
 						<%		
 							}

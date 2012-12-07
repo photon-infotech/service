@@ -22,6 +22,7 @@ package com.photon.phresco.service.admin.actions.components;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -74,6 +75,11 @@ public class PilotProjects extends ServiceBaseAction {
 	private String techId = "";
 	private String oldName = "";
 	private String versioning = "";
+	private String pilotURL = "";
+	private String fileName = "";
+	private InputStream fileInputStream;
+	private String contentType = "";
+	private int contentLength;
 	private static byte[] pilotProByteArray = null;
 	private boolean tempError = false;
 	
@@ -285,6 +291,28 @@ public class PilotProjects extends ServiceBaseAction {
 
     	return SUCCESS;
     }
+    
+    public String downloadPilotProjects() throws PhrescoException {
+    	if (isDebugEnabled) {
+    		S_LOGGER.debug("Entering Method  PilotProjects.downloadPilotProjects()");
+    	}
+
+    	try {
+    		ApplicationInfo pilotProjInfo = getServiceManager().getPilotProject(getProjectId(), getCustomerId());
+    		pilotURL = pilotProjInfo.getPilotContent().getVersions().get(0).getDownloadURL();
+
+    		URL url = new URL(pilotURL);
+    		fileInputStream = url.openStream();
+    		String[] parts = pilotURL.split("/");
+    		fileName = parts[parts.length - 1];
+    		contentType = url.openConnection().getContentType();
+    		contentLength = url.openConnection().getContentLength();
+    	} catch(Exception e) {
+    		return showErrorPopup(new PhrescoException(e), getText(DOWNLOAD_FAILED));
+    	}
+		
+		return SUCCESS;
+	}
 	
     /**
 	 * To remove uploaded file
@@ -515,4 +543,36 @@ public class PilotProjects extends ServiceBaseAction {
     public void setVersioning(String versioning) {
 		this.versioning = versioning;
 	} 
+    
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+	public InputStream getFileInputStream() {
+		return fileInputStream;
+	}
+
+	public void setFileInputStream(InputStream fileInputStream) {
+		this.fileInputStream = fileInputStream;
+	}
+
+	public String getContentType() {
+		return contentType;
+	}
+
+	public void setContentType(String contentType) {
+		this.contentType = contentType;
+	}
+
+	public int getContentLength() {
+		return contentLength;
+	}
+
+	public void setContentLength(int contentLength) {
+		this.contentLength = contentLength;
+	}
 }

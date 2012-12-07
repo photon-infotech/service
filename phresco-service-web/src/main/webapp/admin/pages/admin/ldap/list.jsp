@@ -52,7 +52,7 @@
 								<input type="checkbox" class="check" name="check" disabled onclick="checkboxEvent();">
 							</td>
 							<td>
-								<a>LDAP</a>
+								LDAP
 							</td>
 							<td class="emailalign"></td>
 						</tr>

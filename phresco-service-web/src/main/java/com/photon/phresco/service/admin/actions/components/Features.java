@@ -25,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -71,6 +72,7 @@ public class Features extends ServiceBaseAction {
 	
 	private static byte[] newtempFeaByteArray = null;
 	
+	private String fileName="";	
 	private String name = "";
 	private String customerId = "";
 	private String description = "";
@@ -87,7 +89,10 @@ public class Features extends ServiceBaseAction {
     private String moduleGroupId = "";
     private String moduleId = "";
     private String license = "";
-    private String versioning = "";
+	private String versioning = "";
+    private InputStream fileInputStream;
+    private String contentType;
+    private int contentLength;
     
     private List<String> dependentModGroupId = null;
     
@@ -105,6 +110,7 @@ public class Features extends ServiceBaseAction {
 	private static String featureJarFileName = "";
 	private static String iconName = "";
 	private boolean tempError = false;
+	private String featureUrl = "";
     
 	public String menu() {
 		if (isDebugEnabled) {
@@ -465,6 +471,29 @@ public class Features extends ServiceBaseAction {
 			throw new PhrescoException(e);
 		}
 	}
+
+	public String downloadFeature() throws PhrescoException {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method  Features.downloadFeature()");
+		}
+		
+		try {
+			setTechnologiesInRequest();
+			ArtifactGroup artiGroup = getServiceManager().getFeature(getModuleGroupId(), getCustomerId(), technology, Type.valueOf(getType()).name());
+			featureUrl = artiGroup.getVersions().get(0).getDownloadURL();
+
+			URL url = new URL(featureUrl);
+			fileInputStream = url.openStream();
+			String[] parts = featureUrl.split("/");
+			fileName = parts[parts.length - 1];
+			contentType = url.openConnection().getContentType();
+			contentLength = url.openConnection().getContentLength();
+		} catch(Exception e) {
+			return showErrorPopup(new PhrescoException(e), getText(DOWNLOAD_FAILED));
+		}
+		
+		return SUCCESS;
+	}
 	
 	public void removeUploadedFile() {
 		if (isDebugEnabled) {
@@ -791,6 +820,46 @@ public class Features extends ServiceBaseAction {
 
 	public void setMultiTechnology(List<String> multiTechnology) {
 		this.multiTechnology = multiTechnology;
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+	public InputStream getFileInputStream() {
+		return fileInputStream;
+	}
+
+	public void setFileInputStream(InputStream fileInputStream) {
+		this.fileInputStream = fileInputStream;
+	}
+
+	public String getContentType() {
+		return contentType;
+	}
+
+	public void setContentType(String contentType) {
+		this.contentType = contentType;
+	}
+
+	public int getContentLength() {
+		return contentLength;
+	}
+
+	public void setContentLength(int contentLength) {
+		this.contentLength = contentLength;
+	}
+
+	public String getFeatureUrl() {
+		return featureUrl;
+	}
+
+	public void setFeatureUrl(String featureUrl) {
+		this.featureUrl = featureUrl;
 	}
 	
 }

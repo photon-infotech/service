@@ -58,6 +58,7 @@
     String name = "";
     String description = "";
     String version = "";
+    String downloadId = "";
     Category category = null;
     String downloadCat = "";
     List<String> downloadInfoPlatforms = null;
@@ -65,6 +66,7 @@
     if (downloadInfo != null) {
    		name = downloadInfo.getName();
    		description = downloadInfo.getDescription();
+   		downloadId = downloadInfo.getArtifactGroup().getId(); 
    		category = downloadInfo.getCategory();
    		downloadCat = downloadInfo.getCategory().toString();
    		//To get the versions
@@ -195,6 +197,16 @@
 			</div>
 			 <span class="help-inline fileError" id="fileError"></span>
 		</div>
+		
+		<% 
+			 if (ServiceUIConstants.EDIT.equals(fromPage) && StringUtils.isNotEmpty(downloadId)) { %>
+		   	 <div class="control-group" >
+                <label class="control-label labelbold"> <s:text name="lbl.hdr.download.download" /> </label>
+			       <div class="controls">
+						<a href="#" onclick="downloadFile();"><%= downloadId %></a>
+          		   </div>
+			 </div>
+		<% } %>	
 		
 		<div class="control-group" id="licenseControl">
 			<label class="control-label labelbold"> 
@@ -466,5 +478,9 @@
 		});
 		jarError('', type);
 		enableDisableUploads(type, $("#" + btnId));
+	}
+	
+	function downloadFile() {
+		window.location.href="admin/downloadUrl?" + $('#formDownloadAdd').serialize();
 	}
 </script>
