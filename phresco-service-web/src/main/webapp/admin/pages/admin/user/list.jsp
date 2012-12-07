@@ -27,7 +27,7 @@
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
 
 <%
-   List<User> userList = (List<User>)request.getAttribute(ServiceUIConstants.REQ_USER_LIST);
+    List<User> userList = (List<User>)request.getAttribute(ServiceUIConstants.REQ_USER_LIST);
 %>
 
 <form class="form-horizontal customer_list" id="userListForm">
@@ -67,8 +67,8 @@
 							</tr>
 						</thead>
 			            <%
-			            	if(CollectionUtils.isNotEmpty(userList)) {
-			            		for(User user : userList) {
+			            	if (CollectionUtils.isNotEmpty(userList)) {
+			            		for (User user : userList) {
 			            %>
 						<tbody>
 						<tr>
@@ -81,7 +81,7 @@
 							<td class="emailalign"><%= StringUtils.isNotEmpty(user.getEmail()) ? user.getEmail() : "" %></td>
 							<td class="userwidth"><%= user.getStatus()!= null ? user.getStatus() : "" %></td>
 							<td  class = "tablealign">
-								<a data-toggle="modal" href="#myModal"><input type="button" class="btn btn-primary addiconAlign" value="Roles"></a>
+								<input type="button" class="btn btn-primary addiconAlign" value="Roles" onclick="showAssignRolesPopup('<%= user.getName() %>');">
 							</td>
 						</tr>
 					</tbody>
@@ -92,14 +92,14 @@
 				</table>
 				
 								
-				<div id="myModal" class="modal hide fade">
+				<div id="rolesPopup" class="modal hide fade">
 					<div class="modal-header">
 					  <a class="close" data-dismiss="modal" >&times;</a>
 					  <h3><s:label key="lbl.hdr.adm.usrlst.role.popup.title" theme="simple"/></h3>
 					</div>
 					<div class="modal-body">
 						<div class="popupbody">
-							<div class="popupusr"><s:label key="lbl.hdr.adm.usrname" cssClass="popuplabel" theme="simple"/></div> <div class="popupusr-name">Smith</div>
+							<div class="popupusr"><s:label key="lbl.hdr.adm.usrname" cssClass="popuplabel" theme="simple"/></div>&nbsp;<div class="popupusr-name"> </div>
 						</div>
 						<div class="pouproles">
 							<div class="popuprls"><s:label key="lbl.hdr.adm.availrole" cssClass="popuplabel" theme="simple"/></div> 
@@ -126,6 +126,7 @@
 							</div>
 						</div>
 					</div>
+					
 					<div class="modal-footer">
 					  <a href="#" class="btn btn-primary" data-dismiss="modal"><s:label key="lbl.btn.cancel" theme="simple"/></a>
 					  <a href="#" class="btn btn-primary" data-dismiss="modal" ><s:label key="lbl.btn.ok" theme="simple"/></a>
@@ -134,7 +135,9 @@
 			</div>
 		</div>
 	</div>
-	<% } %>
+	<%	
+		}
+	%>
 </form>
 
 <script type="text/javascript">
@@ -267,4 +270,8 @@
 		}
 	}
 	
+	function showAssignRolesPopup(userName) {
+		$('#rolesPopup').modal('show');
+		$('.popupusr-name').html(userName);
+	}
 </script>

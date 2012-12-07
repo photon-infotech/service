@@ -116,7 +116,7 @@
 
 						%>		
 								<li>
-									<input type="checkbox" id="appliestoCheckbox" name="appliesTo" value="<%= technology.getId() %>"  <%= checkedStr %>
+									<input type="checkbox" id="appliestoCheckbox" name="appliesTo" onclick= "checkboxEvent()" value="<%= technology.getId() %>"  <%= checkedStr %>
 										class="check applsChk"><%= technology.getName() %>
 								</li>
 						<%  

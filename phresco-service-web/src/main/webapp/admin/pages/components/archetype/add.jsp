@@ -62,7 +62,9 @@
 	List<String> techVersions = null;
 	boolean isSystem = false;
 	String appTypeId = "";
+	String techId = "";
 	String techVer = "";
+	 String selectedTech= "";
 	List<String> selectedReports = null;
 	if (technology != null) {
 		name = technology.getName();
@@ -73,6 +75,7 @@
 		}
 		isSystem = technology.isSystem();
 		appTypeId = technology.getAppTypeId();
+		techId = technology.getTechGroupId();
 		selectedReports = technology.getReports();
 	}
 %>
@@ -154,18 +157,22 @@
 				<select id="techGroup" name="techGroup">
 					<%
 						if (CollectionUtils.isNotEmpty(appTypes)) {
-							for (ApplicationType appType : appTypes) {
-								  List<TechnologyGroup> techGroups = appType.getTechGroups();
-								   if (CollectionUtils.isNotEmpty(techGroups)) {
-									  for (TechnologyGroup techGroup : techGroups) {
+										for (ApplicationType appType : appTypes) {
+											  List<TechnologyGroup> techGroups = appType.getTechGroups();
+											  for (TechnologyGroup techGroup : techGroups) {
+												  if(StringUtils.isNotEmpty(techId)){
+													if (techGroup.getId().equals(techId)) {
+														selectedTech = "selected";
+													}
 					%>
-					   <option <%=disabledVer%> value="<%=techGroup.getId()%>"><%=techGroup.getName()%></option>
-					<%
-						      }
-						    }
-						  }
-						}
-					%>
+				   <option <%= disabledVer %> value="<%= techGroup.getId() %>" <%= selectedTech %>><%= techGroup.getId() %></option>
+				<%
+					    
+					   }
+					  }
+					 }
+					}
+				%>
 				</select> 
 				<span class="help-inline" id="appError"></span>
 			</div>
@@ -388,7 +395,10 @@
 			for (i in techGroups) {
 				var id = techGroups[i].id;
 				var name = techGroups[i].name;
-				$('#techGroup').append($("<option></option>").attr("value", id).text(name));
+				if (id == '<%= techId%>') {
+					selectedTech = "selected";
+					$('#techGroup').append($("<option <%= selectedTech %>></option>").attr("value", id).text(name));
+				}
 			}
 		}
 	}

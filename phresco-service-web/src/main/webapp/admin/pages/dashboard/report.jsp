@@ -75,7 +75,7 @@
 								</tr>
 								
 								<tr>
-									<td>HTML 5</td>
+									<td>Php</td>
 									<td >Macys</td>
 									<td>55</td>
 								</tr>
@@ -211,7 +211,7 @@
 								
 								<tr>
 									<td>Inventory System</td>
-									<td >Macsys</td>
+									<td >Macys</td>
 									<td>56</td>
 								</tr>
 								<tr>
