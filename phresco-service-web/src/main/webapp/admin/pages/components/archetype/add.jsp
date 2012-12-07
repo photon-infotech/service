@@ -156,10 +156,12 @@
 						if (CollectionUtils.isNotEmpty(appTypes)) {
 							for (ApplicationType appType : appTypes) {
 								  List<TechnologyGroup> techGroups = appType.getTechGroups();
+								   if (CollectionUtils.isNotEmpty(techGroups)) {
 									  for (TechnologyGroup techGroup : techGroups) {
 					%>
 					   <option <%=disabledVer%> value="<%=techGroup.getId()%>"><%=techGroup.getName()%></option>
 					<%
+						      }
 						    }
 						  }
 						}
@@ -205,7 +207,8 @@
 		
 		<div class="control-group" id="appFileControl">
 			<label class="control-label labelbold"> 
-				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.archtypejar' />
+			  <% if(fromPage != ServiceUIConstants.EDIT) { %>
+				<span class="mandatory">*</span><% } %>&nbsp;<s:text name='lbl.hdr.comp.archtypejar' />
 			</label>
 			<div class="controls" style="float: left; margin-left: 3%;">
 				<div id="appln-file-uploader" class="file-uploader">
@@ -340,7 +343,6 @@
 
     $(document).ready(function() {
     	hideLoadingIcon();
-        
         createUploader();
         getTechGroup();
         // To focus the name textbox by default

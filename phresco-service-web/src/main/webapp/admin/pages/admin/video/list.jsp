@@ -63,7 +63,7 @@
 							<tr>
 								<th class="first">
 									<div class="th-inner">
-										<input type="checkbox" id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this);">
+										<input type="checkbox" id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this, $('.videoChk'), false);">
 									</div>
 								</th>
 								<th class="second">
@@ -82,8 +82,12 @@
 						<% for (VideoInfo videoInfo : videoInfos) { %>
 							<tr>
 								<td class="checkboxwidth">
-									<input type="checkbox" class="check" name="videoId" value="<%= videoInfo.getId() %>" 
+								   <% if (videoInfo.isSystem()) { %>
+								      <input type="checkbox"  name="videoId" value="<%= videoInfo.getId() %>"  disabled /> 
+								   <% } else { %>
+									<input type="checkbox" class="check videoChk" name="videoId" value="<%= videoInfo.getId() %>" 
 									   onclick="checkboxEvent();" />
+								    <% } %>	   
 								</td>
 								<td>
 									<a href="#" onclick="editVideo('<%= videoInfo.getId() %>');"><%= videoInfo.getName() %></a>
@@ -112,6 +116,7 @@
 	}
 	
 	$(document).ready(function() {
+		toDisableCheckAll();
 		hideLoadingIcon();
 	});
 	

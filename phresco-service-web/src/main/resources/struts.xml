@@ -135,7 +135,7 @@
         </action>
         
         <action name="componentUpdate" class="com.photon.phresco.service.admin.actions.components.Features" method="update">
-            <result name="featuresList">/admin/pages/components/feature/menu.jsp</result>
+            <result name="featuresList">/admin/pages/components/feature/technology.jsp</result>
         </action>
         
         <action name="componentSaveValidate" class="com.photon.phresco.service.admin.actions.components.Features" method="validateForm">

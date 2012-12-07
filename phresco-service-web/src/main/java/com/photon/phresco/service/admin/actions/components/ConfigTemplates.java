@@ -218,7 +218,10 @@ public class ConfigTemplates extends ServiceBaseAction {
 				String propTempMandat = request.getParameter(propTempKey + REQ_CONFIG_MANDATORY);
 				String propTempMulti = request.getParameter(propTempKey + REQ_CONFIG_MULTIPLE);
 				String csvPsblValues = request.getParameter(propTempKey + REQ_CONFIG_PSBL_VAL);
-				List<String> possibleValues = Arrays.asList(csvPsblValues.split(CSV_PATTERN));
+				List<String> possibleValues = new ArrayList<String>();
+				if (StringUtils.isNotEmpty(csvPsblValues)) {
+				   possibleValues = Arrays.asList(csvPsblValues.split(CSV_PATTERN));
+				}
 				PropertyTemplate propertyTemplate = new PropertyTemplate();
 				propertyTemplate.setKey(propTempKey);
 				propertyTemplate.setName(propTempName);

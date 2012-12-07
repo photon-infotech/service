@@ -34,7 +34,7 @@
 							<tr>
 								<th class="first">
 									<div class="th-inner">
-										<input type="checkbox" id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this);">
+										<input type="checkbox" disabled id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this);">
 									</div>
 								</th>
 								<th class="second">
@@ -49,7 +49,7 @@
 						<tbody>
 						<tr>
 							<td class="checkboxwidth">
-								<input type="checkbox" class="check" name="check"  onclick="checkboxEvent();">
+								<input type="checkbox" class="check" name="check" disabled onclick="checkboxEvent();">
 							</td>
 							<td>
 								<a>LDAP</a>

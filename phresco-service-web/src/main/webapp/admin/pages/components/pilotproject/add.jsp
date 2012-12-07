@@ -118,7 +118,8 @@
 		<div id="jarDetailsDiv" class="hideContent">
 			<div class="control-group" id="groupIdControl">
 				<label class="control-label labelbold">
-					<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.groupid'/>
+				  <% if(fromPage != ServiceUIConstants.EDIT) { %>
+					<span class="mandatory">*</span><% } %>&nbsp;<s:text name='lbl.hdr.comp.groupid'/>
 				</label>
 				<div class="controls">
 					<input name="groupId" class="input-xlarge" type="text"
@@ -198,7 +199,7 @@
 	$(document).ready(function() {
 		hideLoadingIcon();
         createUploader();
-        
+    
         <% if (ServiceUIConstants.EDIT.equals(fromPage)) { %>
     		//$("#multiSelect").attr("disabled","disabled");
     	<% } %>
@@ -270,8 +271,8 @@
 			params: {type: 'pilotProZip'}, 
 			debug: true
 		});
-	} 
-	 
+	}
+	
 	function removeUploadedJar(obj, btnId) {
 		$('#jarDetailsDiv').hide();
 		$(obj).parent().remove();

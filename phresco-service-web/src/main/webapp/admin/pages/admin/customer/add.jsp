@@ -53,6 +53,8 @@
 	String repoURL = "";
 	String repoPassword = "";
 	String repoUserName = "";
+	String country = "";
+	LicenseType licenseType = null;
 	Date validFrom = null;
 	Date validUpto = null;
 	if (customer != null) {
@@ -95,6 +97,9 @@
 		if (customer.getValidUpto() != null) {
 			validUpto = customer.getValidUpto();
 		}
+		if (customer.getType() != null) {
+			licenseType = customer.getType();
+		}
 		if (StringUtils.isNotEmpty(customer.getRepoInfo().getRepoName())) {
 			repoName = customer.getRepoInfo().getRepoName();
 		}
@@ -106,6 +111,9 @@
 		}
 		if (StringUtils.isNotEmpty(customer.getRepoInfo().getRepoPassword())) {
 			repoPassword = customer.getRepoInfo().getRepoPassword();
+		}
+		if(StringUtils.isNotEmpty(customer.getCountry())) {
+			country = customer.getCountry();
 		}
 	}
 %>
@@ -166,7 +174,7 @@
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.cust.cntry'/>
 			</label>
 			<div class="controls">
-				<select id="combobox" name="country">
+				<select id="countryList" name="country">
 					<option value="">- select -</option>
 					<option value="AF">Afghanistan</option>
 					<option value="AL">Albania</option>
@@ -477,7 +485,7 @@
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.cust.linctype'/>
 			</label>
 			<div class="controls">
-				<select id="select01" name="licence">
+				<select id="licenseType" name="licence">
 					<option value="">- select -</option>
 					<option value="<%= LicenseType.TYPE_BRONZE %>"><%= LicenseType.TYPE_BRONZE %></option>
 					<option value="<%= LicenseType.TYPE_SILVER %>"><%= LicenseType.TYPE_SILVER %></option>
@@ -575,7 +583,11 @@
 	
 	$(document).ready(function() {
 		hideLoadingIcon();
+		setLicenseType();
 		
+		 // for edit - to show selected country while page loads 
+		 $("#countryList option[value='<%= country %>']").attr('selected', 'selected'); 
+		 
 		// To check for the special character in name
         $('#custmname').bind('input propertychange', function (e) {
             var name = $(this).val();
@@ -640,7 +652,15 @@
 		reponame = allowAlphaNum(reponame);
 		$(this).val(reponame.trim());
 	});
-
+	
+	
+	function setLicenseType() {
+		var license = '<%= licenseType %>';
+		  $("select#licenseType option").filter(function() {
+		     return $(this).text() == license; 
+		 }).attr('selected', true); 
+	} 
+	 
 	function findError(data) {
 		if (!isBlank(data.nameError)) {
 			showError($("#nameControl"), $("#nameError"), data.nameError);

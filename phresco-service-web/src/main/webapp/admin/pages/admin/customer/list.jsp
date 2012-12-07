@@ -62,8 +62,7 @@
 							<tr>
 								<th class="first">
 									<div class="th-inner">
-										<input type="checkbox" id="checkAllAuto" class="checkAllAuto" name="checkAllAuto" 
-											onclick="checkAllEvent(this);">
+										<input type="checkbox" id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this, $('.customerChk'), false);">
 									</div>
 								</th>
 								<th class="second">
@@ -91,8 +90,12 @@
 						%>
 							<tr>
 								<td class="checkboxwidth">
-									<input type="checkbox" class="check" name="customerId" value="<%= customer.getId() %>" 
+								<% if (customer.isSystem()) { %>
+								    <input type="checkbox" name="customerId" value="<%= customer.getId() %>" disabled/>
+								<% } else { %>
+									<input type="checkbox" class="check customerChk" name="customerId" value="<%= customer.getId() %>" 
 									   onclick="checkboxEvent();" />
+							    <% } %>		   
 								</td>
 								<td class="namelabel-width">
 									<a href="#" onclick="editCustomer('<%= customer.getId() %>');"><%= customer.getName() %></a>
@@ -123,6 +126,7 @@
 	}
 
 	$(document).ready(function() {
+		toDisableCheckAll();
 		hideLoadingIcon();
 	});
 	

@@ -500,7 +500,7 @@ public class Archetypes extends ServiceBaseAction {
 	}
 
 	public boolean archJarValidation(boolean isError) {
-		if (archetypeJarByteArray == null) {
+		if (!EDIT.equals(getFromPage())&& archetypeJarByteArray == null) {
 			setFileError(getText(KEY_I18N_ERR_ARCHETYPEJAR_EMPTY));
 			tempError = true;
 		}
