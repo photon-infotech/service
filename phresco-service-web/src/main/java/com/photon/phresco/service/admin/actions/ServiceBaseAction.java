@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.apache.struts2.ServletActionContext;
 
 import com.google.gson.Gson;
@@ -57,6 +58,8 @@ import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.ServiceConstants;
 
 public class ServiceBaseAction extends ActionSupport implements ServiceActions, ServiceUIConstants, ServiceClientConstant, ServiceConstants {
+	private static final Logger S_LOGGER = Logger.getLogger(ServiceBaseAction.class);
+	private static Boolean debugEnabled = S_LOGGER.isDebugEnabled();
 
     private static final long serialVersionUID = 1L;
     
@@ -73,6 +76,7 @@ public class ServiceBaseAction extends ActionSupport implements ServiceActions, 
 	}
 
 	protected User doLogin(String userName, String password) throws PhrescoException {
+		try {
 		StringBuilder serverURL = new StringBuilder();
 		serverURL.append(getHttpRequest().getScheme());
 		serverURL.append(COLON_DOUBLE_SLASH);
@@ -86,6 +90,10 @@ public class ServiceBaseAction extends ActionSupport implements ServiceActions, 
 		context.put(SERVICE_USERNAME, userName);
 		context.put(SERVICE_PASSWORD, password);
 		serviceManager = ServiceClientFactory.getServiceManager(context);
+		} catch (Exception ex) {
+            S_LOGGER.error(ex.getLocalizedMessage());
+            throw new PhrescoException(ex);
+        }
 		return serviceManager.getUserInfo();
     }
 	

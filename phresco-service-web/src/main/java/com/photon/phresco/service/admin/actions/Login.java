@@ -61,11 +61,12 @@ public class Login extends ServiceBaseAction {
 		User user = null;
 		try {
 			user = doLogin(username, password);
-			if (StringUtils.isEmpty(user.getDisplayName())) {
-				setReqAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_ERROR_LOGIN));
-				
-				return LOGIN_FAILURE;
-			}
+			 if (user == null) {
+	                setReqAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_ERROR_LOGIN));
+	                
+	                return LOGIN_FAILURE;
+	            }
+			 
 			if (!user.isPhrescoEnabled()) {
 				setReqAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_ERROR_LOGIN_ACCESS_DENIED));
 				
@@ -73,6 +74,8 @@ public class Login extends ServiceBaseAction {
 			}
 			setSessionAttribute(SESSION_USER_INFO, user);
 		} catch (Exception e) {
+			   setReqAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_LOGIN_INVALID_CRED));
+			   
 			return LOGIN_FAILURE;
 		}
 			
