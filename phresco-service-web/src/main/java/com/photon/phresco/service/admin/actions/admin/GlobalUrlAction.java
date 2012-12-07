@@ -111,9 +111,9 @@ public class GlobalUrlAction extends ServiceBaseAction {
 	
 	private Property createGlobalURL() {
 		Property globalUrl = new Property();
-//		if (StringUtils.isNotEmpty(getFromPage())) {
-//			globalUrl.setId(getGlobalurlId());
-//		}
+		if (StringUtils.isNotEmpty(getFromPage())) {
+			globalUrl.setId(getGlobalurlId());
+		}
 		globalUrl.setName(getName());
 		globalUrl.setDescription(getDescription());
 		globalUrl.setKey(globalUrl.getId());
@@ -127,13 +127,11 @@ public class GlobalUrlAction extends ServiceBaseAction {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method GlobalUrlAction.update()");
 		}
-		
 		try {
 			getServiceManager().updateGlobalUrl(createGlobalURL(), getGlobalurlId());
 		} catch (PhrescoException e) {
 			return showErrorPopup(e, getText(EXCEPTION_GLOBAL_URL_UPDATE));
 		}
-		
 		return list();
 	}
 	
