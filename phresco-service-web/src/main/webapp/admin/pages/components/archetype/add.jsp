@@ -50,7 +50,7 @@
 	String progressTxt = ServiceActionUtil.getProgressTxt(ServiceUIConstants.ARCHETYPES, fromPage);
 	String versioning = (String)request.getAttribute(ServiceUIConstants.REQ_VERSIONING);
 	String disabledVer ="";
-	if(StringUtils.isNotEmpty(versioning)) {
+	if (StringUtils.isNotEmpty(versioning)) {
 		disabledVer = "disabled";
 	}
 	
@@ -141,7 +141,7 @@
 									selectedStr = "selected";
 								}
 					%>
-							<option <%= disabledVer %> value="<%= appType.getId() %>" <%= selectedStr %>><%= appType.getName() %></option>
+								<option <%= disabledVer %> value="<%= appType.getId() %>" <%= selectedStr %>><%= appType.getName() %></option>
 					<%
 							}
 						}
@@ -157,24 +157,7 @@
 			</label>
 			<div class="controls">
 				<select id="techGroup" name="techGroup">
-					<%
-						if (CollectionUtils.isNotEmpty(appTypes)) {
-										for (ApplicationType appType : appTypes) {
-											  List<TechnologyGroup> techGroups = appType.getTechGroups();
-											  for (TechnologyGroup techGroup : techGroups) {
-												  if(StringUtils.isNotEmpty(techId)){
-													if (techGroup.getId().equals(techId)) {
-														selectedTech = "selected";
-													}
-					%>
-				   <option <%= disabledVer %> value="<%= techGroup.getId() %>" <%= selectedTech %>><%= techGroup.getId() %></option>
-				<%
-					    
-					   }
-					  }
-					 }
-					}
-				%>
+					
 				</select> 
 				<span class="help-inline" id="appError"></span>
 			</div>
@@ -216,8 +199,10 @@
 		
 		<div class="control-group" id="appFileControl">
 			<label class="control-label labelbold"> 
-			  <% if(fromPage != ServiceUIConstants.EDIT) { %>
-				<span class="mandatory">*</span><% } %>&nbsp;<s:text name='lbl.hdr.comp.archtypejar' />
+			<% if (!fromPage.equals(ServiceUIConstants.EDIT)) { %>
+				<span class="mandatory">*</span>
+			<% } %>&nbsp;
+				<s:text name='lbl.hdr.comp.archtypejar' />
 			</label>
 			<div class="controls" style="float: left; margin-left: 3%;">
 				<div id="appln-file-uploader" class="file-uploader">
@@ -230,14 +215,13 @@
 			<span class="help-inline fileError" id="fileError"></span>
 		</div>
 		
-			<% 
-			 if (ServiceUIConstants.EDIT.equals(fromPage) && StringUtils.isNotEmpty(archetypeId)) { %>
-		   	 <div class="control-group" >
-                <label class="control-label labelbold"> <s:text name="lbl.hdr.archetype.download" /> </label>
-			       <div class="controls">
-			      		 <a href="#" onclick="downloadFile();"><%= archetypeId %></a>
-          		   </div>
-			 </div>
+		<% if (ServiceUIConstants.EDIT.equals(fromPage) && StringUtils.isNotEmpty(archetypeId)) { %>
+			<div class="control-group" >
+				<label class="control-label labelbold"> <s:text name="lbl.hdr.archetype.download" /> </label>
+		       	<div class="controls">
+					<a href="#" onclick="downloadFile();"><%= archetypeId %></a>
+				</div>
+			</div>
 		<% } %>	
 		
 		<div class="control-group" >
@@ -248,6 +232,7 @@
 					onclick="uploadPluginJar();" />
 			</div>
 		</div>
+		
 		<div class="control-group" id="applicableControl">
 			<label class="control-label labelbold">
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.applicable'/>
@@ -266,7 +251,7 @@
 									for (TechnologyOptions option : options) {
 										List<String> selectedOptions = new ArrayList<String>();
 										if (technology != null) {
-											if(CollectionUtils.isNotEmpty(technology.getOptions())) {
+											if (CollectionUtils.isNotEmpty(technology.getOptions())) {
 												for (TechnologyOptions technologyOption : technology.getOptions()) {
 													selectedOptions.add(technologyOption.getOption());
 												}
@@ -276,12 +261,12 @@
 											} else {
 												checkedStr = "";
 											}
-										}	
+										}
 							%>
 										<li> <input type="checkbox" id="appliestoCheckbox" <%= disabledVer %> name="applicable" value='<%= option.getOption() %>'
 											class="check applsChk" <%= checkedStr %>><%= option.getOption() %>
 										</li>
-							<%		}	
+							<%		}
 								}
 							%>
 						</ul>
@@ -382,24 +367,18 @@
         });
      	
         $("#appTypeLayer").change(function() {
-       	 getTechGroup();
+			getTechGroup();
         });  
         
-        if( '<%= versioning %>' != "versioning" ){
-       	 $("#versionComment").hide();
-       }
-        
-        // To remove the plugin jar file field
-        /* $('.del').live('click', function() {
-            $(this).parent().parent().remove();
-        }); */
+        if ( '<%= versioning %>' != "versioning" ){
+			$("#versionComment").hide();
+		}
     });
     
-     function getTechGroup() {
-    	 loadContent('getTechGroup', $('#formArcheTypeAdd'), '', '', true);
-	      $('#techGroup').empty();
-     }
-    
+	function getTechGroup() {
+		loadContent('getTechGroup', $('#formArcheTypeAdd'), '', '', true);
+		$('#techGroup').empty();
+	}
    
 	function successEvent(pageUrl, data) {
 		if (pageUrl == "getTechGroup") {
@@ -407,9 +386,10 @@
 			for (i in techGroups) {
 				var id = techGroups[i].id;
 				var name = techGroups[i].name;
-				if (id == '<%= techId%>') {
-					selectedTech = "selected";
-					$('#techGroup').append($("<option <%= selectedTech %>></option>").attr("value", id).text(name));
+				if (id == '<%= techId %>') {
+					$('#techGroup').append($("<option selected></option>").attr("value", id).text(name));
+				} else {
+					$('#techGroup').append($("<option></option>").attr("value", id).text(name));
 				}
 			}
 		}
