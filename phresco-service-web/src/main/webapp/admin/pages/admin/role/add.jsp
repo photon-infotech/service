@@ -49,7 +49,7 @@
 			</label>
 			<div class="controls">
 				<input id="input01" placeholder="<s:text name='place.hldr.role.add.name'/>" class="input-xlarge" type="text" 
-					name="name" value="<%= name %>">
+					name="name" value="<%= name %>" maxlength="30" title="30 Characters only">
 				<span class="help-inline" id="nameError"></span>
 			</div>
 		</div>
@@ -59,8 +59,8 @@
 				<s:text name='lbl.desc'/>
 			</label>
 			<div class="controls">
-				<input id="input01" placeholder="<s:text name='place.hldr.role.add.desc'/>" class="input-xlarge" type="text" 
-					name="description" value="<%= description %>" >
+					<textarea id="input01" class="input-xlarge" placeholder='<s:text name="place.hldr.role.add.desc"/>' 
+					rows="3" name="description" maxlength="150" title="150 Characters only"><%= description %></textarea>
 			</div>
 		</div>
 	</div>
