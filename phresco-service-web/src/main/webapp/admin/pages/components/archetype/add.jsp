@@ -59,6 +59,7 @@
 	String desc = "";
 	String version = "";
 	String versionComment = "";
+	String archetypeId = "";
 	List<String> techVersions = null;
 	boolean isSystem = false;
 	String appTypeId = "";
@@ -69,6 +70,7 @@
 	if (technology != null) {
 		name = technology.getName();
 		desc = technology.getDescription();
+		archetypeId = technology.getArchetypeInfo().getArtifactId();
 		techVersions = technology.getTechVersions();
 		if (CollectionUtils.isNotEmpty(techVersions)) {
 			techVer  = techVersions.toString().replace("[", "").replace("]", "");
@@ -227,6 +229,16 @@
 			</div>
 			<span class="help-inline fileError" id="fileError"></span>
 		</div>
+		
+			<% 
+			 if (ServiceUIConstants.EDIT.equals(fromPage) && StringUtils.isNotEmpty(archetypeId)) { %>
+		   	 <div class="control-group" >
+                <label class="control-label labelbold"> <s:text name="lbl.hdr.archetype.download" /> </label>
+			       <div class="controls">
+			      		 <a href="#" onclick="downloadFile();"><%= archetypeId %></a>
+          		   </div>
+			 </div>
+		<% } %>	
 		
 		<div class="control-group" >
 			<label class="control-label labelbold">
@@ -497,5 +509,9 @@
 		disableScreen();
 		loadContent('uploadPluginJar', $('#formArcheTypeAdd'), $('.modal-body'));
 		$("#loadingIconDiv").hide();
+	}
+	
+	function downloadFile() {
+		window.location.href="admin/archetypeUrl?" + $('#formArcheTypeAdd').serialize();
 	}
 </script>

@@ -50,10 +50,12 @@
     String description = "";
     String groupId = "";
     String artifactId = "";
+    String pilotProjectId = "";
     String jarVersion = "";
     boolean isSystem = false;
     if (pilotProjectInfo != null) {
    		name = pilotProjectInfo.getName();
+   		pilotProjectId = pilotProjectInfo.getId();
    		description = pilotProjectInfo.getDescription();
    		version = pilotProjectInfo.getVersion();
     	isSystem = pilotProjectInfo.isSystem();
@@ -167,6 +169,18 @@
 			</div>
 			<span class="help-inline fileError" id="pilotProFileError"></span>
 		</div>
+		
+		<% 
+			 if (ServiceUIConstants.EDIT.equals(fromPage) && StringUtils.isNotEmpty(pilotProjectId)) { %>
+		   	 <div class="control-group" >
+                <label class="control-label labelbold"> <s:text name="lbl.hdr.pilotproject.download" /> </label>
+			      <div class="controls">
+						<a href="#" onclick="downloadFile();"><%= pilotProjectId %></a>
+          		   </div>
+			       
+          		   </div>
+			 </div>
+		<% } %>	
 	</div>
 	
 	<div class="bottom_button">
@@ -291,5 +305,8 @@
 		enableDisableUploads(type, $("#" + btnId));
 		jarError('', type)
 	} 
-	    
+	 
+	function downloadFile() {
+		window.location.href="admin/pilotUrl?" + $('#formPilotProAdd').serialize();
+	}
 </script>

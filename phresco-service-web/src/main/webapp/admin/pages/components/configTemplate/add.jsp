@@ -143,8 +143,8 @@
 				%> 
 				<input type="checkbox" name="defaultCustProp" value="true" <%= checkedStr %>>
 			</div>
+			 <span class="help-inline padd" id="keyvalueError"></span>
 		</div>
-		
 		<fieldset class = "configFieldset">
 			<legend class = "configLegend"><s:label key="lbl.hdr.comp.proptemplate" cssClass="labelbold" theme="simple"/></legend>
 			<div class = "config_table_div">
@@ -215,7 +215,7 @@
 											<input type="hidden" class="1"/>
 											<td class="psblbtnwidth" id="1_psblSinglDiv">
 												<input type="text" placeholder="<s:text name='place.hldr.configTemp.add.possible.values'/>" 
-													class="psbltextwidth" id="1_psblSingl">
+													class="psbltextwidth" id="1_psblSingl" disabled>
 												<a data-toggle="modal" href="#myModal"><img class="addiconAlign imagealign" temp="1" 
 													src="images/add_icon.png"/ onclick="addPsblValPopup(this);"/></a>
 											</td>
@@ -285,7 +285,7 @@
 													</td>
 													<td class="psblbtnwidth" id='<%= dynamicId + "_psblSinglDiv" %>' style="display:none">
 														<input type="text" placeholder="<s:text name='place.hldr.configTemp.add.possible.values'/>" 
-															class="psbltextwidth" id='<%= dynamicId + "_psblSingl" %>'>
+															class="psbltextwidth" id='<%= dynamicId + "_psblSingl" %>' disabled>
 														<a data-toggle="modal" href="#myModal"><img class="addiconAlign imagealign" temp='<%= dynamicId %>' 
 															src="images/add_icon.png"/ onclick="addPsblValPopup(this);"/></a>
 													</td>
@@ -561,7 +561,7 @@
 				"</select><a data-toggle='modal' href='#myModal'><img class='addIcon imagealign' temp='"+ keyId +"' src='images/add_icon.png'" + 
 				"onclick='addPsblValPopup(this);'/></a></td><input type='hidden' class='"+ keyId +"'/><td class='psblbtnwidth' id='"+ psblSinglDivId +"'>" + 
 				"<input type='text' placeholder='<s:text name='place.hldr.configTemp.add.possible.values'/>'class='psbltextwidth' " + 
-				"id='"+ psblValSingleId +"'><a data-toggle='modal' href='#myModal'><img class='addIcon imagealign' temp='"+ keyId +"' " +
+				"id='"+ psblValSingleId +"' disabled><a data-toggle='modal' href='#myModal'><img class='addIcon imagealign' temp='"+ keyId +"' " +
 	 			"src='images/add_icon.png' onclick='addPsblValPopup(this);'/></a></td><td class='tdWidth'><input type='text' id='"+ helpTextId +"' " + 
 	 			"placeholder='<s:text name='place.hldr.configTemp.add.help.text'/>' name='helpText' class='textWidth'></td>" + 
 	 			"<td class='buttonwidth'><input type='checkbox' class='chkBox_config' value='true' id='"+ mandChckId +"'></td><td class='buttonwidth'> " + 
@@ -642,7 +642,7 @@
 	
 	//for edit -- to change names of property template input fields
 	function updateRowInputNamesInEdit() {
-		$(".key").each(function() {
+		$(".keywidth").each(function() {
 			var id = $(this).attr("id");
 			var proptempName = $(this).val() + "_propTempName";
 			var typeName = $(this).val() + "_type";
@@ -673,13 +673,29 @@
 
 	function validatePropTempKey(pageUrl, progressText) {
 		var redirect = true;
-		$(".key").each(function() {
+		$(".keywidth").each(function() {
 			if ($(this).val().replace(/\s/g, "") === "") {
 				$("#" + $(this).attr("id")).focus();
 				redirect = false;
 				return false;
 			}
 		});
+		
+		var count = 0;
+		$(".keywidth").each(function() {
+			if($(this).val() === ""){
+				count++;
+			}
+		});
+		
+		if(count > 0){
+			showError($("#" + $(this).attr("id")), $("#keyvalueError"),'<s:text name='err.msg.key.missing'/>');
+			count = 0;
+		}else{
+			hideError($("#" + $(this).attr("id")), $("#keyvalueError"));
+			count = 0;
+		}
+		
 		if ($("#configname").val().replace(/\s/g, "") === "") {
 			showError($("#nameControl"), $("#nameError"),
 					'<s:text name='err.msg.name.empty'/>');

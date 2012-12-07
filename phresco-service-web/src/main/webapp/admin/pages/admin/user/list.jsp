@@ -27,7 +27,7 @@
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
 
 <%
-    List<User> userList = (List<User>)request.getAttribute(ServiceUIConstants.REQ_USER_LIST);
+   List<User> userList = (List<User>)request.getAttribute(ServiceUIConstants.REQ_USER_LIST);
 %>
 
 <form class="form-horizontal customer_list" id="userListForm">
@@ -76,7 +76,7 @@
 								<input type="checkbox" class="check" name="check"  onclick="checkboxEvent();">
 							</td>
 							<td>
-								<a><%= StringUtils.isNotEmpty(user.getName()) ? user.getName() :"" %></a>
+								<%= StringUtils.isNotEmpty(user.getName()) ? user.getName() :"" %>
 							</td>
 							<td class="emailalign"><%= StringUtils.isNotEmpty(user.getEmail()) ? user.getEmail() : "" %></td>
 							<td class="userwidth"><%= user.getStatus()!= null ? user.getStatus() : "" %></td>
