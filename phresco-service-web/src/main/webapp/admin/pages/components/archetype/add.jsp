@@ -252,8 +252,8 @@
 										List<String> selectedOptions = new ArrayList<String>();
 										if (technology != null) {
 											if (CollectionUtils.isNotEmpty(technology.getOptions())) {
-												for (TechnologyOptions technologyOption : technology.getOptions()) {
-													selectedOptions.add(technologyOption.getOption());
+												for (String technologyOption : technology.getOptions()) {
+													selectedOptions.add(technologyOption);
 												}
 											}
 											if (selectedOptions.contains(option.getOption())) {
