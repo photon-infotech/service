@@ -269,9 +269,9 @@ public class Archetypes extends ServiceBaseAction {
         
         //To set the applicable features
       
-        List<TechnologyOptions> options = new ArrayList<TechnologyOptions>();
+        List<String> options = new ArrayList<String>();
         for (String selectedOption : getApplicable()) {
-        	options.add(new TechnologyOptions(selectedOption));
+        	options.add(selectedOption);
 		}
         technology.setOptions(options);
         //To create the ArtifactGroup with groupId, artifactId and version for archetype jar
