@@ -94,22 +94,14 @@
 		<div class="popupTypeFields" id="typefield">
             <div class="multilist-scroller multiselect" id='multiTechGroup'>
                 <ul>
-                <% for (TechnologyGroup technoGroup : technoGroups ) {
-                	String techJson = gson.toJson(technoGroup);
-                	String disable = "";
-                 %>
 	       			<li>
-						<input type="checkbox" name="groupTech" class="check techCheck" 
-							value='<%= techJson %>' title="<%= technoGroup.getDescription() %>" /><%= technoGroup.getName() %>
 					</li>
-				<% } %>
 				</ul>
             </div>
 		</div>
 		<div class="deleteButton">
 			<input type="button" value="<s:text name='lbl.btn.del' />" tabindex=5 id="removeTechGroup" class="btn btn-primary">
 		</div>
-<%-- 			<img src="images/deleteTech.png"" title="<s:text name='lbl.title.remove'/>" id="removeTechGroup" class="imageremove"><br> --%>
 	</fieldset>
 </form>
 
@@ -117,7 +109,7 @@
 <script language="JavaScript" type="text/javascript">
 	var techGroupToAdd = [];
 	$(document).ready(function() {
-		
+		getTechGroup();
 		$('#popup_div').hide();
 		$('#popupTitle').html("Technology Group"); 
 		$('#popupClose').hide();
@@ -141,6 +133,10 @@
 // 			loadContent('newTechGroup', $('#formTechgroup'), '', '', false);
 		});
 		
+		 $("#appTypeLayer").change(function() {
+	       	 getTechGroup();
+	        });  
+		
 		$('#popupCancel').click(function() {
 			$('#popup_div').empty();
 			showParentPage();
@@ -158,6 +154,7 @@
 				$("#techGroupName").val("");
 				returnValue = false;
 			} else {
+				getTechGroup();
 				$('#multiTechGroup ul li input[type=checkbox]').each(function() {
 					var jsonData = $(this).val();
 					var techGrou = $.parseJSON(jsonData);
@@ -181,14 +178,8 @@
     	 selectTech();
 //     	 To remove the Technologies from the list box which is not in the XML
         $('#multiTechGroup ul li input[type=checkbox]:checked').each( function() {
-			var checkedDataObj = $.parseJSON($(this).val());
-			var tech = checkedDataObj.defaultTech; // selected checkbox
-			if(tech == true){
-				$("#reportMsg").html("<s:text name='you.cant.remove.defaultTech'/>");
-			} else {
 				removeItem(techGroupToAdd, $(this).val())
 				$('#multiTechGroup ul li input[type=checkbox]:checked').parent().remove();
-			}			
         });
     });
 	
@@ -200,6 +191,30 @@
                 }
         }
     }
+    
+    function getTechGroup() {
+   	 loadContent('getTechGroup', $('#formTechgroup'), '', '', true);
+     $("#multiTechGroup ul").empty();
+    }
+   
+  
+	function successEvent(pageUrl, data) {
+		if (pageUrl == "getTechGroup") {
+			var techGroups = data.appTypeTechGroups;
+			for (i in techGroups) {
+				var id = techGroups[i].id;
+				var name = techGroups[i].name;
+				var system = techGroups[i].system;
+				var description = techGroups[i].description;
+				if(system){
+					var checkbox = '<input type="checkbox" name="groupTech" class="check techCheck" value="' + id + '" disabled/>' + name;
+				}else {
+					var checkbox = '<input type="checkbox" name="groupTech" class="check techCheck" value="' + id + '"/>' + name;	
+				}
+				$("#multiTechGroup ul").append('<li>' + checkbox + '</li>');
+			}
+		}
+	}
 	
 	 function addRow() {
 

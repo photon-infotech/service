@@ -86,6 +86,42 @@
         </action>
         
         <action name="saveDependentFeatures" class="com.photon.phresco.service.admin.actions.components.Features" method="saveDependentFeatures" />
+        
+		<action name="featureUrl" class="com.photon.phresco.service.admin.actions.components.Features" method="downloadFeature">
+			<result name="success" type="stream">
+				<param name="contentType">${contentType}</param>
+				<param name="inputName">fileInputStream</param>
+				<param name="contentDisposition">attachment; filename="${fileName}"</param>
+				<param name="bufferSize">${contentLength}</param>
+			</result> 
+		</action>
+		
+		<action name="archetypeUrl" class="com.photon.phresco.service.admin.actions.components.Archetypes" method="downloadArchetype">
+			<result name="success" type="stream">
+				<param name="contentType">${contentType}</param>
+				<param name="inputName">fileInputStream</param>
+				<param name="contentDisposition">attachment; filename="${fileName}"</param>
+				<param name="bufferSize">${contentLength}</param>
+			</result> 
+		</action>
+		
+		<action name="pilotUrl" class="com.photon.phresco.service.admin.actions.components.PilotProjects" method="downloadPilotProjects">
+			<result name="success" type="stream">
+				<param name="contentType">${contentType}</param>
+				<param name="inputName">fileInputStream</param>
+				<param name="contentDisposition">attachment; filename="${fileName}"</param>
+				<param name="bufferSize">${contentLength}</param>
+			</result> 
+		</action>
+		
+		 <action name="downloadUrl" class="com.photon.phresco.service.admin.actions.components.Downloads" method="downloadArchive">
+			<result name="success" type="stream">
+				<param name="contentType">${contentType}</param>
+			  <param name="inputName">fileInputStream</param>
+			  <param name="contentDisposition">attachment;filename="${fileName}"</param>
+			  <param name="bufferSize">${contentLength}</param>
+			</result> 
+		</action>
 		
 		<action name="addFeatures" class="com.photon.phresco.service.admin.actions.components.Features" method="addFeatures">
             <result name="featuresAdd">/admin/pages/components/feature/add.jsp</result>
@@ -135,7 +171,7 @@
         </action>
         
         <action name="componentUpdate" class="com.photon.phresco.service.admin.actions.components.Features" method="update">
-            <result name="featuresList">/admin/pages/components/feature/menu.jsp</result>
+            <result name="featuresList">/admin/pages/components/feature/technology.jsp</result>
         </action>
         
         <action name="componentSaveValidate" class="com.photon.phresco.service.admin.actions.components.Features" method="validateForm">

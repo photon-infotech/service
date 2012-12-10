@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -101,7 +102,11 @@ public class Archetypes extends ServiceBaseAction {
 	private boolean archType = false;
 	private String versioning = "";
 	private boolean tempError = false;
-	
+	private String ArchetypeUrl = "";
+	private String fileName = "";
+	private InputStream fileInputStream;
+	private String contentType = "";
+	private int contentLength;
 	private List<TechnologyGroup> appTypeTechGroups = new ArrayList<TechnologyGroup>();
 	
 	private byte[] newtempApplnByteArray = null;
@@ -264,9 +269,9 @@ public class Archetypes extends ServiceBaseAction {
         
         //To set the applicable features
       
-        List<TechnologyOptions> options = new ArrayList<TechnologyOptions>();
+        List<String> options = new ArrayList<String>();
         for (String selectedOption : getApplicable()) {
-        	options.add(new TechnologyOptions(selectedOption));
+        	options.add(selectedOption);
 		}
         technology.setOptions(options);
         //To create the ArtifactGroup with groupId, artifactId and version for archetype jar
@@ -382,6 +387,29 @@ public class Archetypes extends ServiceBaseAction {
 			writer.print(INVALID_ARCHETYPE_JAR);
 		}
 	}
+	
+	public String downloadArchetype() throws PhrescoException {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method  Archetypes.downloadArchetype()");
+		}
+
+		try {
+			Technology technology = (Technology) getServiceManager().getArcheType(getTechId(), getCustomerId());
+			ArtifactGroup archetypeInfo = technology.getArchetypeInfo();
+			ArchetypeUrl = archetypeInfo.getVersions().get(0).getDownloadURL();
+
+			URL url = new URL(ArchetypeUrl);
+			fileInputStream = url.openStream();
+			String[] parts = ArchetypeUrl.split("/");
+			fileName = parts[parts.length - 1];
+			contentType = url.openConnection().getContentType();
+			contentLength = url.openConnection().getContentLength();
+		} catch(Exception e) {
+			return showErrorPopup(new PhrescoException(e), getText(DOWNLOAD_FAILED));
+		}
+
+		return SUCCESS;
+	}
 
 	public String showPluginJarPopup() {
 		if (isDebugEnabled) {
@@ -439,6 +467,9 @@ public class Archetypes extends ServiceBaseAction {
 		for (ApplicationType appType : appTypes) {
 			if (appType.getId().equals(getApptype())) {
 				setAppTypeTechGroups(appType.getTechGroups());
+				setName(appType.getName());
+				setDescription(appType.getDescription());
+				
 				return SUCCESS;
 			}
 		}
@@ -500,7 +531,7 @@ public class Archetypes extends ServiceBaseAction {
 	}
 
 	public boolean archJarValidation(boolean isError) {
-		if (archetypeJarByteArray == null) {
+		if (!EDIT.equals(getFromPage())&& archetypeJarByteArray == null) {
 			setFileError(getText(KEY_I18N_ERR_ARCHETYPEJAR_EMPTY));
 			tempError = true;
 		}
@@ -746,5 +777,45 @@ public class Archetypes extends ServiceBaseAction {
 
 	public void setTechGroups(List<TechnologyGroup> techGroups) {
 		this.techGroups = techGroups;
+	}
+
+	public String getArchetypeUrl() {
+		return ArchetypeUrl;
+	}
+
+	public void setArchetypeUrl(String archetypeUrl) {
+		ArchetypeUrl = archetypeUrl;
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+	public InputStream getFileInputStream() {
+		return fileInputStream;
+	}
+
+	public void setFileInputStream(InputStream fileInputStream) {
+		this.fileInputStream = fileInputStream;
+	}
+
+	public String getContentType() {
+		return contentType;
+	}
+
+	public void setContentType(String contentType) {
+		this.contentType = contentType;
+	}
+
+	public int getContentLength() {
+		return contentLength;
+	}
+
+	public void setContentLength(int contentLength) {
+		this.contentLength = contentLength;
 	}
 }

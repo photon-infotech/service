@@ -157,7 +157,11 @@
 	
     /** To edit the pilot project **/
     function editPilotProject(id) {
-        var params = "projectId=";
+    	// disable for checkbox
+		jQuery("input[name='projectId']").each(function(i) {
+			jQuery(this).attr('disabled', 'disabled');
+		});
+    	var params = "projectId=";
         params = params.concat(id);
         loadCont(params)
     }

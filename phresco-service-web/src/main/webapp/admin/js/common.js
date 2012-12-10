@@ -497,9 +497,3 @@ function enableDisableUploads(type, controlObj){
 	}
 }
 
-function createDivId(fileupload,divId){
-	var divInput = new qq.UploadButton({
-		element : document.getElementById(fileupload),
-	    divId : divId
-	});
-}

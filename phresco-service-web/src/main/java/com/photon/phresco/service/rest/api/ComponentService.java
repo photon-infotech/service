@@ -1973,7 +1973,7 @@ public class ComponentService extends DbService {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.updateProperties(List<Property> properties)");
 	    }
-		
+	   
 		try {
 			for (Property property : properties) {
 				mongoOperation.save(PROPERTIES_COLLECTION_NAME, property);
@@ -2041,14 +2041,13 @@ public class ComponentService extends DbService {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.updateProperty(String id, Property property)" + id);
 	    }
-		
-		try {
+	   	try {
 			mongoOperation.save(PROPERTIES_COLLECTION_NAME, property);
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
 		}
 		
-		return Response.status(Response.Status.BAD_REQUEST).entity(property).build();
+		return Response.status(Response.Status.OK).entity(property).build();
 	}
 	
 	/**

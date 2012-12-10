@@ -59,6 +59,7 @@
     String groupId = "";
     String artifactId = "";
     String moduleGroupId = "";
+	String featureID = "";
     boolean isDefaultModule = false;
     boolean isCoreModule = false;
     boolean isSystem = false;
@@ -68,7 +69,7 @@
     boolean jslibs = false;
     boolean component = false;
     String title = "";
-  //Get Types
+    //Get Types
 	if (ServiceUIConstants.REQ_FEATURES_TYPE_MODULE.equals(type)) {
 		features = true;
 	}
@@ -97,6 +98,7 @@
 	if (moduleGroup != null) {
 	    name = moduleGroup.getName();
 	    moduleGroupId = moduleGroup.getId();
+		featureID = moduleGroup.getArtifactId();
 	    List<ArtifactInfo> modules = moduleGroup.getVersions();
 	    ArtifactInfo selectedModule = null;
 	    if (CollectionUtils.isNotEmpty(modules)) {
@@ -341,7 +343,16 @@
 			</div>
 			<span class="help-inline fileError" id="featureFileError"></span>
 		</div>
-		
+		<% 
+			 if (ServiceUIConstants.EDIT.equals(fromPage) && StringUtils.isNotEmpty(featureID)) { %>
+		   	 <div class="control-group" >
+               <label class="control-label labelbold"> <s:text name="lbl.hdr.feature.download" /> </label>
+			       <div class="controls">
+						<a href="#" onclick="downloadFile();"><%= featureID %></a>
+          		   </div>
+          		   </div>
+			 </div>
+		<% } %>		
 		<div class="control-group">
 			<label class="control-label labelbold">
 				<s:text name='lbl.hdr.comp.dependency'/>
@@ -559,6 +570,10 @@
 		$('#popup_div').show();
 		disableScreen();
 		loadContent('fetchFeaturesForDependency', $('#formFeatureAdd'), $('#popup_div'));
+	}
+	
+	function downloadFile() {
+		window.location.href="admin/featureUrl?" + $('#formFeatureAdd').serialize();
 	}
 	
 </script>

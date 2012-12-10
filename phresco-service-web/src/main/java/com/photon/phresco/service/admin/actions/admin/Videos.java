@@ -58,6 +58,7 @@ public class Videos extends ServiceBaseAction {
 	private String nameError = "";
 	private String videoError = "";
 	private String imgError = "";
+	private String fromPage = "";
 	private Boolean errorFound = false;
 
 	public String list() throws PhrescoException {
@@ -156,8 +157,6 @@ public class Videos extends ServiceBaseAction {
 		videoInfo.setDescription(getDescription());
 		VideoType videoType = new VideoType();
 		ArtifactGroup artifactGroup = new ArtifactGroup();
-		System.out.println("In Video Action..............");
-		System.out.println("From Action Class,,,,,,,,,,,,,,,,,," + getFileName());
 		artifactGroup.setPackaging(ServerUtil.getFileExtension(getFileName()));
 		videoType.setArtifactGroup(artifactGroup);
 		videoInfo.setVideoList(Arrays.asList(videoType));
@@ -241,12 +240,12 @@ public class Videos extends ServiceBaseAction {
 			isError = true;
 		} 
 		//empty validation for fileupload
-		if (videoByteArray == null) {
+		if (!EDIT.equals(getFromPage()) && videoByteArray == null) {
 			setVideoError(getText(KEY_I18N_ERR_VIDEO_EMPTY));
 			isError = true;
 		}
 
-		if (imgByteArray == null) {
+		if (!EDIT.equals(getFromPage()) && imgByteArray == null) {
 			setImgError(getText(KEY_I18N_ERR_IMAGE_EMPTY));
 			isError = true;
 		}
@@ -312,5 +311,13 @@ public class Videos extends ServiceBaseAction {
 
 	public String getVideoId() {
 		return videoId;
+	}
+
+	public String getFromPage() {
+		return fromPage;
+	}
+
+	public void setFromPage(String fromPage) {
+		this.fromPage = fromPage;
 	}
 }

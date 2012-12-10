@@ -96,7 +96,7 @@
 							</td>
 							<td class="namelabel-width"><%= StringUtils.isNotEmpty(roleList.getDescription()) ? roleList.getDescription() : "" %></td>
 							<td>
-								<a data-toggle="modal" href="#myModal"><input type="button" class="btn btn-primary addiconAlign" value="Assign Permission"></a>
+								<a data-toggle="modal" href="#myModal"><input type="button" class="btn btn-disabled" value="Assign Permission"  disabled = "disabled"></a>
 							</td>
 						</tr>
 						<%

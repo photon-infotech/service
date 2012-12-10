@@ -58,13 +58,17 @@
     String name = "";
     String description = "";
     String version = "";
+    String downloadId = "";
     Category category = null;
+    String downloadCat = "";
     List<String> downloadInfoPlatforms = null;
     ArtifactGroup artifactGroup = null;
     if (downloadInfo != null) {
    		name = downloadInfo.getName();
    		description = downloadInfo.getDescription();
+   		downloadId = downloadInfo.getArtifactGroup().getId(); 
    		category = downloadInfo.getCategory();
+   		downloadCat = downloadInfo.getCategory().toString();
    		//To get the versions
    		artifactGroup = downloadInfo.getArtifactGroup();
    		List<ArtifactInfo> artifactInfos = artifactGroup.getVersions();
@@ -144,6 +148,17 @@
                 <span class="help-inline applyerror" id="techError"></span>
         </div>
         
+        <div class="control-group" id="verControl">
+			<label class="control-label labelbold">
+				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.dwnld.ver'/>
+			</label>
+			<div class="controls">
+				<input id="dwnVersn" <%= disabledVer %> placeholder="<s:text name='place.hldr.download.add.version'/>" value="<%= version %>" 
+					maxlength="30" title="30 Characters only" class="input-xlarge" type="text" name="version">
+				<span class="help-inline" id="verError"></span>
+			</div>
+		</div>
+        
         <!-- POM details starts -->
 		<div id="jarDetailsDiv" class="hideContent">
 			<div class="control-group">
@@ -165,16 +180,6 @@
 						maxlength="40" title="40 Characters only" placeholder="<s:text name='place.hldr.archetype.add.artifactId'/>">
 				</div>
 			</div>
-			
-			<div class="control-group">
-				<label class="control-label labelbold">
-					<s:text name='lbl.hdr.comp.jar.version'/>
-				</label>
-				<div class="controls">
-					<input id="jarVersn" class="jarVersion" class="input-xlarge" maxlength="30" title="30 Characters only" type="text"
-						placeholder="<s:text name='place.hldr.download.add.version'/>">
-				</div>
-			</div>
 		</div>
 		<!-- POM details ends -->
 		
@@ -192,6 +197,16 @@
 			</div>
 			 <span class="help-inline fileError" id="fileError"></span>
 		</div>
+		
+		<% 
+			 if (ServiceUIConstants.EDIT.equals(fromPage) && StringUtils.isNotEmpty(downloadId)) { %>
+		   	 <div class="control-group" >
+                <label class="control-label labelbold"> <s:text name="lbl.hdr.download.download" /> </label>
+			       <div class="controls">
+						<a href="#" onclick="downloadFile();"><%= downloadId %></a>
+          		   </div>
+			 </div>
+		<% } %>	
 		
 		<div class="control-group" id="licenseControl">
 			<label class="control-label labelbold"> 
@@ -275,17 +290,6 @@
 			<span class="help-inline iconError" id="iconError"></span>
 		</div>
 			
-		<div class="control-group" id="verControl">
-			<label class="control-label labelbold">
-				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.dwnld.ver'/>
-			</label>
-			<div class="controls">
-				<input id="dwnVersn" <%= disabledVer %> placeholder="<s:text name='place.hldr.download.add.version'/>" value="<%= version %>" 
-					maxlength="30" title="30 Characters only" class="input-xlarge" type="text" name="version">
-				<span class="help-inline" id="verError"></span>
-			</div>
-		</div>
-			
 		<div class="control-group" id="groupControl">
 			<label class="control-label labelbold">
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.dwnld.group'/>
@@ -293,10 +297,10 @@
 			<div class="controls">
 				<select id="category" name="category" <%= disabledVer %>>
 					<option value="">- select -</option>
-					<option value="Server">Server</option>
-					<option value="Database">Database</option>
-					<option value="Editor">Editor</option>
-					<option value="Tools">Tools</option>
+					<option value="SERVER">Server</option>
+					<option value="DATABASE">Database</option>
+					<option value="EDITOR">Editor</option>
+					<option value="TOOLS">Tools</option>
                     <option value="Others">Others</option>
 				</select>
 				<span class="help-inline" id="groupError"></span>
@@ -344,7 +348,7 @@
 	$(document).ready(function() {
 		hideLoadingIcon();
         createUploader(); 
-        
+     
      	// To check for the special character in name
         $('#downloadName').bind('input propertychange', function (e) {
             var name = $(this).val();
@@ -360,12 +364,12 @@
         });
         
         // for edit - to show selected group while page loads 
-       		 $("#category option[value='<%= category %>']").attr('selected', 'selected'); 
+       		 $("#category option[value='<%= downloadCat %>']").attr('selected', 'selected'); 
       
 	});
 
 	function findError(data) {
-		if (!isBlank()) {
+		if (!isBlank(data.nameError)) {
 			showError($("#nameControl"), $("#nameError"), data.nameError);
 		} else {
 			hideError($("#nameControl"), $("#nameError"));
@@ -474,5 +478,9 @@
 		});
 		jarError('', type);
 		enableDisableUploads(type, $("#" + btnId));
+	}
+	
+	function downloadFile() {
+		window.location.href="admin/downloadUrl?" + $('#formDownloadAdd').serialize();
 	}
 </script>

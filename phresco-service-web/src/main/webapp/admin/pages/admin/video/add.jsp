@@ -72,8 +72,9 @@
 		</div>
 		
 		<div class="control-group" id="videoControl">
-			<label class="control-label labelbold"> <span
-				class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.video' />
+			<label class="control-label labelbold"> 
+			   <% if(fromPage != ServiceUIConstants.EDIT) { %>
+			<span class="mandatory">*</span><% } %>&nbsp;<s:text name='lbl.hdr.adm.video' />
 			</label>
 			<div class="controls" style="float: left; margin-left: 3%;">
 				<div id="video-file-uploader" class="file-uploader">
@@ -87,8 +88,9 @@
 		</div>
 		
 		<div class="control-group" id="imageControl">
-			<label class="control-label labelbold"> <span
-				class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.img' />
+			<label class="control-label labelbold"> 
+			   <% if(fromPage != ServiceUIConstants.EDIT) { %>
+			<span class="mandatory">*</span><% } %>&nbsp;<s:text name='lbl.hdr.adm.img' />
 			</label>
 			<div class="controls" style="float: left; margin-left: 3%;">
 				<div id="image-file-uploader" class="file-uploader">
@@ -113,6 +115,7 @@
     </div>
 	
 	<!-- Hidden Fields -->
+	<input type="hidden" name="fromPage" value="<%= StringUtils.isNotEmpty(fromPage) ? fromPage : "" %>"/>
 	<input type="hidden" name="videoId" value="<%=  videoInfo != null ?  videoInfo.getId() : "" %>"/>
 </form>
 

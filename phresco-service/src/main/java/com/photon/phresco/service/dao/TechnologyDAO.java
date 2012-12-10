@@ -32,7 +32,7 @@ public class TechnologyDAO extends CustomerBaseDAO {
 	private String archetypeGroupDAOId;
 	private List<String> dependencyIds;
 	private List<String> pluginIds;
-	private List<TechnologyOptions> options;
+	private List<String> options;
 	private String techGroupId;
 	private List<String> reports;
 	
@@ -80,11 +80,11 @@ public class TechnologyDAO extends CustomerBaseDAO {
 		this.pluginIds = pluginIds;
 	}
 
-	public List<TechnologyOptions> getOptions() {
+	public List<String> getOptions() {
 		return options;
 	}
 
-	public void setOptions(List<TechnologyOptions> options) {
+	public void setOptions(List<String> options) {
 		this.options = options;
 	}
 

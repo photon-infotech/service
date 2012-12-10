@@ -50,10 +50,12 @@
     String description = "";
     String groupId = "";
     String artifactId = "";
+    String pilotProjectId = "";
     String jarVersion = "";
     boolean isSystem = false;
     if (pilotProjectInfo != null) {
    		name = pilotProjectInfo.getName();
+   		pilotProjectId = pilotProjectInfo.getId();
    		description = pilotProjectInfo.getDescription();
    		version = pilotProjectInfo.getVersion();
     	isSystem = pilotProjectInfo.isSystem();
@@ -118,7 +120,8 @@
 		<div id="jarDetailsDiv" class="hideContent">
 			<div class="control-group" id="groupIdControl">
 				<label class="control-label labelbold">
-					<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.groupid'/>
+				  <% if(fromPage != ServiceUIConstants.EDIT) { %>
+					<span class="mandatory">*</span><% } %>&nbsp;<s:text name='lbl.hdr.comp.groupid'/>
 				</label>
 				<div class="controls">
 					<input name="groupId" class="input-xlarge" type="text"
@@ -166,6 +169,18 @@
 			</div>
 			<span class="help-inline fileError" id="pilotProFileError"></span>
 		</div>
+		
+		<% 
+			 if (ServiceUIConstants.EDIT.equals(fromPage) && StringUtils.isNotEmpty(pilotProjectId)) { %>
+		   	 <div class="control-group" >
+                <label class="control-label labelbold"> <s:text name="lbl.hdr.pilotproject.download" /> </label>
+			      <div class="controls">
+						<a href="#" onclick="downloadFile();"><%= pilotProjectId %></a>
+          		   </div>
+			       
+          		   </div>
+			 </div>
+		<% } %>	
 	</div>
 	
 	<div class="bottom_button">
@@ -198,7 +213,7 @@
 	$(document).ready(function() {
 		hideLoadingIcon();
         createUploader();
-        
+    
         <% if (ServiceUIConstants.EDIT.equals(fromPage)) { %>
     		//$("#multiSelect").attr("disabled","disabled");
     	<% } %>
@@ -270,8 +285,8 @@
 			params: {type: 'pilotProZip'}, 
 			debug: true
 		});
-	} 
-	 
+	}
+	
 	function removeUploadedJar(obj, btnId) {
 		$('#jarDetailsDiv').hide();
 		$(obj).parent().remove();
@@ -290,5 +305,8 @@
 		enableDisableUploads(type, $("#" + btnId));
 		jarError('', type)
 	} 
-	    
+	 
+	function downloadFile() {
+		window.location.href="admin/pilotUrl?" + $('#formPilotProAdd').serialize();
+	}
 </script>

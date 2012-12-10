@@ -73,7 +73,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 		}
 		
 		try {
-			List<SettingsTemplate> configTemplates = getServiceManager().getconfigTemplates(getCustomerId());
+			List<SettingsTemplate> configTemplates = getServiceManager().getConfigTemplates(getCustomerId());
 			setReqAttribute(REQ_CONFIG_TEMPLATES, configTemplates);
 			setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		} catch (PhrescoException e) {
@@ -218,7 +218,10 @@ public class ConfigTemplates extends ServiceBaseAction {
 				String propTempMandat = request.getParameter(propTempKey + REQ_CONFIG_MANDATORY);
 				String propTempMulti = request.getParameter(propTempKey + REQ_CONFIG_MULTIPLE);
 				String csvPsblValues = request.getParameter(propTempKey + REQ_CONFIG_PSBL_VAL);
-				List<String> possibleValues = Arrays.asList(csvPsblValues.split(CSV_PATTERN));
+				List<String> possibleValues = new ArrayList<String>();
+				if (StringUtils.isNotEmpty(csvPsblValues)) {
+				   possibleValues = Arrays.asList(csvPsblValues.split(CSV_PATTERN));
+				}
 				PropertyTemplate propertyTemplate = new PropertyTemplate();
 				propertyTemplate.setKey(propTempKey);
 				propertyTemplate.setName(propTempName);
@@ -274,7 +277,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 			isError = true;
 		} else if(ADD.equals(getFromPage()) || (!getName().equals(getOldName()))) {
 			// to check duplication of name
-			List<SettingsTemplate> configTemplates = getServiceManager().getconfigTemplates(getCustomerId());
+			List<SettingsTemplate> configTemplates = getServiceManager().getConfigTemplates(getCustomerId());
 			if (CollectionUtils.isNotEmpty(configTemplates)) { //TODO: this should handled by query
 				for (SettingsTemplate configTemplate : configTemplates) {
 					if (configTemplate.getName().equalsIgnoreCase(getName())) {
