@@ -30,12 +30,19 @@
    //For edit
    String name = "";
    String description = "";
+   String disabled = "";
+   String disabledClass = "btn-primary";
    if (role != null) {
 	   if (StringUtils.isNotEmpty(role.getName())) {
 		   name = role.getName();
 	   }
 	   if (StringUtils.isNotEmpty(role.getDescription())) {
 		   description = role.getDescription();
+	   }
+	   
+	   if(role.isSystem()) {
+		   disabledClass = "btn-disabled";
+		   disabled = "disabled";
 	   }
    }
 %>
@@ -67,7 +74,7 @@
 	
 	<div class="bottom_button">
 		<% if(StringUtils.isNotEmpty(fromPage)) { %>
-			<input type="button" id="roleUpdate" class="btn btn-primary" value="<s:text name='lbl.btn.edit'/>"
+			<input type="button" id="roleUpdate" class="btn <%= disabledClass %>" <%= disabled %> value="<s:text name='lbl.btn.edit'/>"
 		 		onclick="validate('roleUpdate',$('#formRoleAdd'),$('#subcontainer'), '<s:text name='lbl.prog.role.update'/>');" />
 		<% } else { %> 
 			<input type="button" id="roleSave" class="btn btn-primary" value="<s:text name='lbl.btn.add'/>"

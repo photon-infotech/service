@@ -38,9 +38,15 @@
 
 	String name = "";
 	String description = "";
+	String disabled = "";
+	String disabledClass = "btn-primary";
 	if (videoInfo != null) {
 		name = videoInfo.getName();
 		description = videoInfo.getDescription();
+       if (videoInfo.isSystem()) {
+    	   disabledClass = "btn-disabled";
+		   disabled = "disabled";
+       }
 	}
 %>
 
@@ -107,7 +113,7 @@
 	
 	
 	<div class="bottom_button">
-       	<input type="button" id="" class="btn btn-primary"  value='<%= buttonLbl %>'
+       	<input type="button" id="" class="btn <%= disabledClass %>" <%= disabled %>  value='<%= buttonLbl %>'
            onclick="validate('<%= pageUrl %>', $('#formVideoAdd'), $('#subcontainer'), '<%= progressTxt %>');" />
   
 		<input type="button" id="videoCancel" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>" 

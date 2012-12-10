@@ -54,6 +54,8 @@
 	String repoPassword = "";
 	String repoUserName = "";
 	String country = "";
+	String disabled = "";
+	String disabledClass = "btn-primary";
 	LicenseType licenseType = null;
 	Date validFrom = null;
 	Date validUpto = null;
@@ -99,6 +101,10 @@
 		}
 		if (customer.getType() != null) {
 			licenseType = customer.getType();
+		}
+		if(customer.isSystem()){
+			disabledClass = "btn-disabled";
+			disabled = "disabled";
 		}
 		if (StringUtils.isNotEmpty(customer.getRepoInfo().getRepoName())) {
 			repoName = customer.getRepoInfo().getRepoName();
@@ -563,7 +569,7 @@
 
 	<div class="bottom_button">
 		
-		<input type="button" id="" class="btn btn-primary" value="<%= buttonLbl %>" 
+		<input type="button" id="" class="btn <%= disabledClass %>" <%= disabled %> value="<%= buttonLbl %>" 
 			 onclick="validate('<%= pageUrl %>', $('#formCustomerAdd'), $('#subcontainer'), '<%= progressTxt %>');" />
 		<input type="button" id="customerCancel" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>" 
             onclick="loadContent('customerList', $('#formCustomerAdd'), $('#subcontainer'));" />
