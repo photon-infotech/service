@@ -142,7 +142,6 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
     	if(StringUtils.isEmpty(customerId)) {
     		throw new PhrescoException("Customer Id Should Not Be Null");
     	}
-    	
     	String techId = info.getTechInfo().getId();
     	ArtifactGroup archetypeInfo = dbManager.getArchetypeInfo(techId, customerId);
     	//TODO to sort version 
@@ -162,14 +161,13 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
                 .append(Constants.STR_BLANK_SPACE)
                 .append(ARCHETYPE_GROUPID).append(Constants.STR_EQUALS).append("com.photon.phresco")
                 .append(Constants.STR_BLANK_SPACE)
-                .append(ARCHETYPE_ARTIFACTID).append(Constants.STR_EQUALS).append(STR_DOUBLE_QUOTES).append(info.getAppDirName()).append(STR_DOUBLE_QUOTES) //artifactId --> project name could have space in between
+                .append(ARCHETYPE_ARTIFACTID).append(Constants.STR_EQUALS).append(STR_DOUBLE_QUOTES).append(info.getName()).append(STR_DOUBLE_QUOTES) //artifactId --> project name could have space in between
                 .append(Constants.STR_BLANK_SPACE)
                 .append(ARCHETYPE_VERSION).append(Constants.STR_EQUALS).append(projectVersion)
                 .append(Constants.STR_BLANK_SPACE)
                 .append(ARCHETYPE_ARCHETYPEREPOSITORYURL).append(Constants.STR_EQUALS).append(repoInfo.getGroupRepoURL())
                 .append(Constants.STR_BLANK_SPACE)
                 .append(ARCHETYPE_INTERACTIVEMODE).append(Constants.STR_EQUALS).append(INTERACTIVE_MODE);
-        
         return commandStr.toString();
     }
 
