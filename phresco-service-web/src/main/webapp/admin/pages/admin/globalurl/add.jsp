@@ -38,12 +38,18 @@
     String name = "";
 	String description = "";
 	String url  = "";
+	String disabled = "";
+	String disabledClass = "btn-primary";
 	if (globalUrl != null) {
 		id = globalUrl.getId();
 		name = globalUrl.getName();
 		url = globalUrl.getValue();
 		if (StringUtils.isNotEmpty(globalUrl.getDescription())) {
 			description = globalUrl.getDescription();
+		}
+		if(globalUrl.isSystem()) {
+			disabledClass = "btn-disabled";
+			disabled = "disabled";
 		}
 	}
 %>
@@ -88,7 +94,7 @@
 	</div>
 	
 	<div class="bottom_button">
-			<input type="button" id="" class="btn btn-primary"  value="<%= buttonLbl %>"
+			<input type="button" id="" class="btn <%= disabledClass %>" <%= disabled %>  value="<%= buttonLbl %>"
 				onclick="validate('<%= pageUrl %>', $('#formGlobalUrlAdd'), $('#subcontainer'), '<%= progressTxt %>');" />
     
 			<input type="button" id="globalurlCancel" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>"

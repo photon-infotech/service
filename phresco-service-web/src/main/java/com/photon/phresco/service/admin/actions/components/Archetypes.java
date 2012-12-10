@@ -467,9 +467,7 @@ public class Archetypes extends ServiceBaseAction {
 		for (ApplicationType appType : appTypes) {
 			if (appType.getId().equals(getApptype())) {
 				setAppTypeTechGroups(appType.getTechGroups());
-				setName(appType.getName());
-				setDescription(appType.getDescription());
-				
+							
 				return SUCCESS;
 			}
 		}

@@ -57,6 +57,10 @@ public class PilotProjects extends ServiceBaseAction {
     private String groupId = "";
     private String artifactId = "";
     private String jarVersion = "";
+    private String pilotContentId = "";
+    private String pilotContentArtiId = "";
+    private String pilotContentGroId = "";
+    private String pilotContentVersion = "";
     
 	private String nameError = "";
 	private String artifactIdError = "";
@@ -211,19 +215,32 @@ public class PilotProjects extends ServiceBaseAction {
         }
         List<String> customerIds = new ArrayList<String>();
         customerIds.add(getCustomerId());
-        
         pilotProInfo.setName(getName());
         pilotProInfo.setDescription(getDescription());
        
         ArtifactGroup pilotContent = new ArtifactGroup();
         pilotContent.setName(getName());
-        pilotContent.setGroupId(getGroupId());
-        pilotContent.setArtifactId(getArtifactId());
+        if(StringUtils.isNotEmpty(getPilotContentId())) {
+        	pilotContent.setId(getPilotContentId());
+        }
+        if(StringUtils.isEmpty(getGroupId()) && StringUtils.isEmpty(getArtifactId())) {
+        	pilotContent.setGroupId(getPilotContentGroId());
+        	pilotContent.setArtifactId(getPilotContentArtiId());
+        } else {
+           pilotContent.setGroupId(getGroupId());
+           pilotContent.setArtifactId(getArtifactId());
+        }
+        
         pilotContent.setPackaging(Content.Type.ZIP.name());
         List<ArtifactInfo> jarVersions = new ArrayList<ArtifactInfo>();
         ArtifactInfo jarversion = new ArtifactInfo();
         jarversion.setName(getName());
-        jarversion.setVersion(getJarVersion());
+        if(StringUtils.isEmpty(getJarVersion())) {
+        	jarversion.setVersion(getPilotContentVersion());
+        } else {
+        	jarversion.setVersion(getJarVersion());
+        }
+        
         jarVersions.add(jarversion);
         pilotContent.setVersions(jarVersions);
         pilotContent.setCustomerIds(customerIds);
@@ -575,4 +592,38 @@ public class PilotProjects extends ServiceBaseAction {
 	public void setContentLength(int contentLength) {
 		this.contentLength = contentLength;
 	}
+
+	public String getPilotContentId() {
+		return pilotContentId;
+	}
+
+	public void setPilotContentId(String pilotContentId) {
+		this.pilotContentId = pilotContentId;
+	}
+
+	public String getPilotContentArtiId() {
+		return pilotContentArtiId;
+	}
+
+	public void setPilotContentArtiId(String pilotContentArtiId) {
+		this.pilotContentArtiId = pilotContentArtiId;
+	}
+
+	public String getPilotContentGroId() {
+		return pilotContentGroId;
+	}
+
+	public void setPilotContentGroId(String pilotContentGroId) {
+		this.pilotContentGroId = pilotContentGroId;
+	}
+
+	public String getPilotContentVersion() {
+		return pilotContentVersion;
+	}
+
+	public void setPilotContentVersion(String pilotContentVersion) {
+		this.pilotContentVersion = pilotContentVersion;
+	}
+
+
 }

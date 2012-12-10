@@ -350,8 +350,7 @@
 			       <div class="controls">
 						<a href="#" onclick="downloadFile();"><%= featureID %></a>
           		   </div>
-          		   </div>
-			 </div>
+        	 </div>
 		<% } %>		
 		<div class="control-group">
 			<label class="control-label labelbold">
