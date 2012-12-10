@@ -18,6 +18,7 @@
   ###
   --%>
 
+<%@page import="com.photon.phresco.commons.model.ArtifactGroup"%>
 <%@ taglib uri="/struts-tags" prefix="s" %>
 
 <%@ page import="org.apache.commons.lang.StringUtils" %>
@@ -34,7 +35,7 @@
 	String fromPage = (String)request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE); 
 	List<Technology> technologies = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
-
+	
 	String title = ServiceActionUtil.getTitle(ServiceUIConstants.PILOT_PROJECTS, fromPage);
 	String buttonLbl = ServiceActionUtil.getButtonLabel(fromPage);
 	String pageUrl = ServiceActionUtil.getPageUrl(ServiceUIConstants.PILOT_PROJECTS, fromPage);
@@ -53,12 +54,14 @@
     String pilotProjectId = "";
     String jarVersion = "";
     boolean isSystem = false;
+    ArtifactGroup pilotContent = null;
     if (pilotProjectInfo != null) {
    		name = pilotProjectInfo.getName();
    		pilotProjectId = pilotProjectInfo.getId();
    		description = pilotProjectInfo.getDescription();
    		version = pilotProjectInfo.getVersion();
     	isSystem = pilotProjectInfo.isSystem();
+    	pilotContent = pilotProjectInfo.getPilotContent();
     }
 %>
 
@@ -200,8 +203,12 @@
     <!-- Hidden Fields -->
     <input type="hidden" name="fromPage" value="<%= StringUtils.isNotEmpty(fromPage) ? fromPage : "" %>"/>
     <input type="hidden" name="projectId" value="<%=  pilotProjectInfo != null ?  pilotProjectInfo.getId() : "" %>"/>
-    <input type="hidden" name="oldName" value="<%=  pilotProjectInfo != null ?  pilotProjectInfo.getName() : "" %>"/>  
+    <input type="hidden" name="oldName" value="<%=  pilotProjectInfo != null ?  pilotProjectInfo.getName() : "" %>"/> 
     <input type="hidden" name="customerId" value="<%= customerId %>"> 
+    <input type="hidden" name="pilotContentId" value="<%= pilotContent != null ? pilotContent.getId() : "" %>"/> 
+    <input type="hidden" name="pilotContentArtiId" value="<%= pilotContent != null ? pilotContent.getArtifactId() : "" %>"/> 
+    <input type="hidden" name="pilotContentGroId" value="<%= pilotContent != null ? pilotContent.getGroupId() : "" %>"/> 
+    <input type="hidden" name="pilotContentVersion" value="<%= pilotContent != null ? pilotContent.getVersions().get(0).getVersion() : "" %>"/>
 </form>
 
 <script type="text/javascript">
