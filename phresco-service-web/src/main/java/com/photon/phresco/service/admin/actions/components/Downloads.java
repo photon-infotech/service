@@ -80,7 +80,7 @@ public class Downloads extends ServiceBaseAction {
 	private String type = ""; // type of the file uploaded (file or image) 
 	private String versioning = "";
 	private String downloadURL = "";
-	private String fileName = "";
+	private String extFileName = "";
 	private InputStream fileInputStream;
 	private String contentType = "";
 	private int contentLength;
@@ -135,7 +135,7 @@ public class Downloads extends ServiceBaseAction {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Downloads.edit()");
 		}
-		
+
 		try {
 			ServiceManager serviceManager = getServiceManager();
             DownloadInfo downloadInfo = serviceManager.getDownload(getDownloadId(), getCustomerId());
@@ -147,7 +147,7 @@ public class Downloads extends ServiceBaseAction {
 			setReqAttribute(REQ_FROM_PAGE, EDIT);
 			setReqAttribute(REQ_FEATURES_LICENSE, getServiceManager().getLicenses());
 			setReqAttribute(REQ_VERSIONING, getVersioning());	
-	} catch (PhrescoException e) {
+	  } catch (PhrescoException e) {
 			return showErrorPopup(e, getText(EXCEPTION_DOWNLOADS_EDIT));
 		}
 
@@ -299,7 +299,7 @@ public class Downloads extends ServiceBaseAction {
 			URL url = new URL(archiveUrl);
 			fileInputStream = url.openStream();
 			String[] parts = archiveUrl.split("/");
-			fileName = parts[parts.length - 1];
+			extFileName = parts[parts.length - 1];
 			contentType = url.openConnection().getContentType();
 			contentLength = url.openConnection().getContentLength();
 		} catch (Exception e) {
@@ -587,14 +587,6 @@ public class Downloads extends ServiceBaseAction {
 		this.artifactId = artifactId;
 	}
 	
-	public String getFileName() {
-		return fileName;
-	}
-
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
-
 	public String getContentType() {
 		return contentType;
 	}
@@ -617,5 +609,13 @@ public class Downloads extends ServiceBaseAction {
 	
 	public InputStream getFileInputStream() {
 		return fileInputStream;
+	}
+
+	public String getExtFileName() {
+		return extFileName;
+	}
+
+	public void setExtFileName(String extFileName) {
+		this.extFileName = extFileName;
 	}
 }

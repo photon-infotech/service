@@ -91,7 +91,7 @@
 			<result name="success" type="stream">
 				<param name="contentType">${contentType}</param>
 				<param name="inputName">fileInputStream</param>
-				<param name="contentDisposition">attachment; filename="${fileName}"</param>
+				<param name="contentDisposition">attachment; filename="${extFileName}"</param>
 				<param name="bufferSize">${contentLength}</param>
 			</result> 
 		</action>
@@ -100,7 +100,7 @@
 			<result name="success" type="stream">
 				<param name="contentType">${contentType}</param>
 				<param name="inputName">fileInputStream</param>
-				<param name="contentDisposition">attachment; filename="${fileName}"</param>
+				<param name="contentDisposition">attachment; filename="${extFileName}"</param>
 				<param name="bufferSize">${contentLength}</param>
 			</result> 
 		</action>
@@ -109,7 +109,7 @@
 			<result name="success" type="stream">
 				<param name="contentType">${contentType}</param>
 				<param name="inputName">fileInputStream</param>
-				<param name="contentDisposition">attachment; filename="${fileName}"</param>
+				<param name="contentDisposition">attachment; filename="${extFileName}"</param>
 				<param name="bufferSize">${contentLength}</param>
 			</result> 
 		</action>
@@ -118,7 +118,7 @@
 			<result name="success" type="stream">
 				<param name="contentType">${contentType}</param>
 			  <param name="inputName">fileInputStream</param>
-			  <param name="contentDisposition">attachment;filename="${fileName}"</param>
+			  <param name="contentDisposition">attachment;filename="${extFileName}"</param>
 			  <param name="bufferSize">${contentLength}</param>
 			</result> 
 		</action>
