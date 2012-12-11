@@ -19,6 +19,9 @@
  */
 package com.photon.phresco.service.rest.api;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -29,20 +32,24 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
 import org.sonatype.aether.resolution.VersionRangeResolutionException;
 
+import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.commons.model.VersionInfo;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.PhrescoServerFactory;
-import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.util.ServerConstants;
 import com.photon.phresco.util.ServiceConstants;
 
 @Path(ServiceConstants.REST_API_VERSION)
 public class VersionService implements ServerConstants {
 	
+	private static final String UPDATE_ZIP = "/update.zip";
+	private static final String UPDATE = "/update";
 	private static final String VERSION_PATH = "{version}";
 	private static final String VERSION = "version";
 	private static final String STR_DOT = ".";
@@ -50,6 +57,7 @@ public class VersionService implements ServerConstants {
 	private static final String ALPHA = "alpha";
 	private static final String BETA = "beta";	
 	private static final String SNAPSHOT = "SNAPSHOT";
+	private static final String UPDATE_FILE_PATH = "/com/photon/phresco/framework/release/";
 	private static final Logger S_LOGGER = Logger.getLogger(VersionService.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 
@@ -70,17 +78,34 @@ public class VersionService implements ServerConstants {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method VersionServic.getVersionJSON(@PathParam(version) String currentVersion)");
 		}
-		
 		return getVersion(currentVersion);
 	}
-
+	
+	@GET
+	@Produces({ MediaType.MULTIPART_FORM_DATA })
+	@Path (UPDATE)
+	public Response getLatestVersionContent(@QueryParam(ServiceConstants.REST_QUERY_CUSTOMERID) String customerId) throws PhrescoException, IOException  {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method VersionServic.getVersionJSON(@PathParam(version) String currentVersion)");
+		}
+		DbManager dbManager = PhrescoServerFactory.getDbManager();
+		URL url = null;
+		try {
+			RepoInfo repoInfo = dbManager.getRepoInfo(customerId);
+			url = new URL(repoInfo.getGroupRepoURL() + UPDATE_FILE_PATH + 
+					dbManager.getLatestFrameWorkVersion() + UPDATE_ZIP);
+		} catch (MalformedURLException e) {
+			throw new PhrescoException(e);
+		}
+		return Response.status(Response.Status.OK).entity(url.openStream()).build();
+	}
+	
 	private VersionInfo getVersion(String currentVersion) throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("getVersionJSON() Getting the current Version=" + currentVersion + "");
 		}
 		
-		RepositoryManager repositoryManager = PhrescoServerFactory.getRepositoryManager();
-		String latestVersion = repositoryManager.getFrameworkVersion();
+		String latestVersion = PhrescoServerFactory.getDbManager().getLatestFrameWorkVersion();
 		VersionInfo versionInfo = new VersionInfo();
 		if (isUpdateRequired(currentVersion, latestVersion)) {
 			versionInfo.setUpdateAvailable(true);

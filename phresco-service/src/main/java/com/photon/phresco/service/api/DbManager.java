@@ -76,4 +76,6 @@ public interface DbManager {
     ProjectInfo getProjectInfo(String projectInfoId) throws PhrescoException;
     
     List<VideoInfo> getVideos() throws PhrescoException;
+    
+    String getLatestFrameWorkVersion() throws PhrescoException;
 }
