@@ -161,7 +161,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
                 .append(Constants.STR_BLANK_SPACE)
                 .append(ARCHETYPE_GROUPID).append(Constants.STR_EQUALS).append("com.photon.phresco")
                 .append(Constants.STR_BLANK_SPACE)
-                .append(ARCHETYPE_ARTIFACTID).append(Constants.STR_EQUALS).append(STR_DOUBLE_QUOTES).append(info.getName()).append(STR_DOUBLE_QUOTES) //artifactId --> project name could have space in between
+                .append(ARCHETYPE_ARTIFACTID).append(Constants.STR_EQUALS).append(STR_DOUBLE_QUOTES).append(info.getAppDirName()).append(STR_DOUBLE_QUOTES) //artifactId --> project name could have space in between
                 .append(Constants.STR_BLANK_SPACE)
                 .append(ARCHETYPE_VERSION).append(Constants.STR_EQUALS).append(projectVersion)
                 .append(Constants.STR_BLANK_SPACE)
