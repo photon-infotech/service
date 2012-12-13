@@ -556,26 +556,17 @@ public class ComponentService extends DbService {
 	 * Get the technology by id for the given parameter
 	 * @param id
 	 * @return
+	 * @throws PhrescoException 
 	 */
 	@GET
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_TECHNOLOGIES + REST_API_PATH_ID)
-	public Response getTechnology(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	public Response getTechnology(@PathParam(REST_API_PATH_PARAM_ID) String id) throws PhrescoException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.getTechnology(String id)" + id);
 	    }
-		
-		try {
-			Technology technology = mongoOperation.findOne(TECHNOLOGIES_COLLECTION_NAME, 
-			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), Technology.class);
-			if (technology != null) {
-				return Response.status(Response.Status.OK).entity(technology).build();
-			} 
-		} catch (Exception e) {
-			throw new PhrescoWebServiceException(e, EX_PHEX00005, TECHNOLOGIES_COLLECTION_NAME);
-		}
-		
-		return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
+		Technology technology = getTechnologyById(id);
+		return Response.status(Response.Status.OK).entity(technology).build();
 	}
 	
 //	/**
