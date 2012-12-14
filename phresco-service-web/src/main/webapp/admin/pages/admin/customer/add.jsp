@@ -618,7 +618,6 @@
 						<%
 							for (Technology technology : technologies) {
 								String checkedStr = "";
-								System.out.println("Customer = " + customer);
 								if (customer!= null) {
 									List<String> appliesTos = customer.getApplicableTechnologies();
 									if (appliesTos.contains(technology.getId())) {
