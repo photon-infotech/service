@@ -168,12 +168,11 @@ public class Customers extends ServiceBaseAction  {
 	    }
 	    
 		try {
-			List<Customer> customers = new ArrayList<Customer>();
-			customers.add(createCustomer());
+			Customer customer = createCustomer();
 			if (iconByteArray != null) {
 				inputStreamMap.put(getCustomerId(), new ByteArrayInputStream(iconByteArray));
 			}
-			getServiceManager().createCustomers(customers, inputStreamMap);
+			getServiceManager().createCustomers(customer, inputStreamMap);
 			addActionMessage(getText(CUSTOMER_ADDED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
 		    return showErrorPopup(e, getText(EXCEPTION_CUSTOMERS_SAVE));
