@@ -440,9 +440,19 @@
 			<result name="customerList">/admin/pages/admin/customer/list.jsp</result>
         </action>
         
+        <action name="uploadCustomerIcon" class="com.photon.phresco.service.admin.actions.admin.Customers" method="uploadImage">
+			<result type="json" />
+        </action>
+        
         <action name="customerDelete" class="com.photon.phresco.service.admin.actions.admin.Customers" method="delete">
 			<result name="customerList">/admin/pages/admin/customer/list.jsp</result>
         </action>
+        
+         <action name="removeImage" class="com.photon.phresco.service.admin.actions.admin.Customers" method="removeImage">
+			<result type="json" />
+        </action>
+        
+        
 		<!--- ADMIN CUSTOMER ENDS-->
 		
 		<action name="userList" class="com.photon.phresco.service.admin.actions.admin.Users" method="fetchUsersFromDB">
@@ -561,6 +571,7 @@
         <action name="removeVideo" class="com.photon.phresco.service.admin.actions.admin.Videos" method="removeUploadedFile">
 			<result type="json" />
         </action>
+        
 		<!-- ADMIN VIDEO ENDS-->
 			
 		<!-- ADMIN GLOBALURL STARTS-->
