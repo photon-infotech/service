@@ -35,11 +35,11 @@
 	<div class="operation" id="operation">
 		<%-- <input type="button" id="roleAdd" class="btn btn-primary" name="role_action" onclick="loadContent('roleAdd', '', $('#subcontainer'));" value="<s:text name='lbl.hdr.adm.rlelst.add'/>"/> --%>
 		<input type="button" id="roleAdd" class="btn btn-disabled" 
-		        name="role_action" disabled="disbaled" onclick="loadContent('roleAdd', $('#formRoleList'), $('#subcontainer'));" 
-		            value="<s:text name='lbl.hdr.adm.rlelst.add'/>"/>
+	        name="role_action" disabled="disbaled" onclick="loadContent('roleAdd', $('#formRoleList'), $('#subcontainer'));" 
+            value="<s:text name='lbl.hdr.adm.rlelst.add'/>"/>
 		
 		<input type="button" id="del" class="btn" disabled value="<s:text 
-		        name='lbl.btn.del'/>"  onclick="loadContent('roleDelete', $('#formRoleList'), $('#subcontainer'));"/>
+	        name='lbl.btn.del'/>"  onclick="showDeleteConfirmation('<s:text name='del.confirm.roles'/>');"/>
 		<s:if test="hasActionMessages()">
 			<div class="alert alert-success alert-message"  id="successmsg">
 				<s:actionmessage />
@@ -66,7 +66,7 @@
 						<tr>
 							<th class="first">
 								<div class="th-inner">
-									<input type="checkbox" value="" id="checkAllAuto" class="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this);">
+									<input type="checkbox" value="" id="checkAllAuto" class="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this, $('.roles'), false);">
 								</div>
 							</th>
 							<th class="second">
@@ -83,13 +83,17 @@
 		
 					<tbody>
 					    <% 
-					       if(CollectionUtils.isNotEmpty(roleLists)) { 
+					       if (CollectionUtils.isNotEmpty(roleLists)) { 
 					          for(Role roleList : roleLists) {
 					    %>
 					 
 						<tr>
 							<td class="checkboxwidth">
-								<input type="checkbox" class="check" name="roleId"  value="<%= roleList.getId() %>" onclick="checkboxEvent();">
+								<% if (roleList.isSystem()) { %>
+									<input type="checkbox" name="roleId" value="<%= roleList.getId() %>" disabled/>
+								<% } else { %>
+									<input type="checkbox" class="check roles" name="roleId"  value="<%= roleList.getId() %>" onclick="checkboxEvent();">
+								<% } %>
 							</td>
 							<td  class="namelabel-width">
 								<a href="#" onclick="editRole('<%= roleList.getId() %>');"><%= StringUtils.isNotEmpty(roleList.getName()) ? roleList.getName() : "" %></a>
@@ -99,12 +103,12 @@
 								<a data-toggle="modal" href="#myModal"><input type="button" class="btn btn-disabled" value="Assign Permission"  disabled = "disabled"></a>
 							</td>
 						</tr>
-						<%
-							}
-								}
-						%>
-					</tbody>
-				</table>
+					<%
+						 	}
+						 }
+					%>
+				</tbody>
+			</table>
 				<div id="myModal" class="modal hide fade">
 					<div class="modal-header">
 					  <a class="close" data-dismiss="modal" >&times;</a>
@@ -163,6 +167,7 @@
 	}
 	
 	$(document).ready(function() {
+		toDisableCheckAll();
 		hideLoadingIcon();
 	});
 	
@@ -246,4 +251,9 @@
 			history.go(0);
 		}
 	}
+	
+	function continueDeletion() {
+    	confirmDialog('none','');
+    	loadContent('roleDelete', $('#formRoleList'), $('#subcontainer'));
+    }
 </script>

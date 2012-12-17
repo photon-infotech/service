@@ -19,11 +19,11 @@
   --%>
 <%@ taglib uri="/struts-tags" prefix="s" %>
 
-<%@ page import="org.apache.commons.lang.StringUtils"%>
-<%@ page import="org.apache.commons.collections.CollectionUtils"%>
-<%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="java.util.List"%>
+<%@ page import="org.apache.commons.lang.StringUtils"%>
+
 <%@ page import="com.photon.phresco.commons.model.VideoInfo"%>
+<%@ page import="com.photon.phresco.commons.model.ArtifactGroup"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
 <%@ page import="com.photon.phresco.service.admin.actions.util.ServiceActionUtil"%>
 
@@ -40,9 +40,11 @@
 	String description = "";
 	String disabled = "";
 	String disabledClass = "btn-primary";
+	ArtifactGroup videoArtifact = null;
 	if (videoInfo != null) {
 		name = videoInfo.getName();
 		description = videoInfo.getDescription();
+		videoArtifact = videoInfo.getVideoList().get(0).getArtifactGroup();
        if (videoInfo.isSystem()) {
     	   disabledClass = "btn-disabled";
 		   disabled = "disabled";
@@ -123,6 +125,7 @@
 	<!-- Hidden Fields -->
 	<input type="hidden" name="fromPage" value="<%= StringUtils.isNotEmpty(fromPage) ? fromPage : "" %>"/>
 	<input type="hidden" name="videoId" value="<%=  videoInfo != null ?  videoInfo.getId() : "" %>"/>
+	<input type="hidden" name="videoArtiId" value="<%=  videoArtifact != null ?  videoArtifact.getId() : "" %>"/>
 </form>
 
 <script type="text/javascript">

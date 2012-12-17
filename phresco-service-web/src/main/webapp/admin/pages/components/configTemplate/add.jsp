@@ -556,7 +556,7 @@
 				"<td class='tdWidth'> <input type='text' id = '"+ nameId +"' placeholder='<s:text name='place.hldr.configTemp.add.name'/>' " + 
 				" value='' placeholder='' maxlength='30' class='textWidth'></td><td class='tdWidth'><select id='"+ typeId +"' " + 
 				"class = 'textWidth'><option value='String'>String</option><option value='Integer'>Integer</option><option value='Password'>" + 
-				"Password</option></select></td><td class='tdWidth' id='"+ psblMulDivId +"' style='display:none;'><select type='text' " + 
+				"Password</option><option value='FileType'>FileType</option><option value='Boolean'>Boolean</option></select></td><td class='tdWidth' id='"+ psblMulDivId +"' style='display:none;'><select type='text' " + 
 				"placeholder='<s:text name='place.hldr.configTemp.add.possible.values'/>'class='psblselectwidth' id='"+ psblValMultipleId +"'>" + 
 				"</select><a data-toggle='modal' href='#myModal'><img class='addIcon imagealign' temp='"+ keyId +"' src='images/add_icon.png'" + 
 				"onclick='addPsblValPopup(this);'/></a></td><input type='hidden' class='"+ keyId +"'/><td class='psblbtnwidth' id='"+ psblSinglDivId +"'>" + 

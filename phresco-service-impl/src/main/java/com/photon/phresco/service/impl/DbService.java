@@ -21,14 +21,19 @@
 package com.photon.phresco.service.impl;
 
 import java.io.File;
+import java.io.InputStream;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -36,10 +41,20 @@ import org.springframework.data.document.mongodb.MongoOperations;
 import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
 
+import com.mongodb.DB;
+import com.mongodb.Mongo;
+import com.mongodb.MongoException;
+import com.mongodb.gridfs.GridFS;
+import com.mongodb.gridfs.GridFSDBFile;
+import com.mongodb.gridfs.GridFSInputFile;
 import com.photon.phresco.commons.model.ApplicationInfo;
+import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.DownloadInfo;
 import com.photon.phresco.commons.model.Technology;
+import com.photon.phresco.commons.model.TechnologyGroup;
+import com.photon.phresco.commons.model.TechnologyInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.exception.PhrescoWebServiceException;
 import com.photon.phresco.service.api.Converter;
@@ -52,6 +67,7 @@ import com.photon.phresco.service.dao.ApplicationTypeDAO;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
 import com.photon.phresco.service.dao.DownloadsDAO;
 import com.photon.phresco.service.dao.TechnologyDAO;
+import com.photon.phresco.service.model.ServerConfiguration;
 import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.FileUtil;
 import com.photon.phresco.util.ServiceConstants;
@@ -63,10 +79,11 @@ public class DbService implements ServiceConstants {
 	
 	private static final String MONGO_TEMPLATE = "mongoTemplate";
 	protected MongoOperations mongoOperation;
-
+	private ServerConfiguration serverConfig = null;
 	protected DbService() {
 		ApplicationContext ctx = new AnnotationConfigApplicationContext(MongoConfig.class);
     	mongoOperation = (MongoOperations)ctx.getBean(MONGO_TEMPLATE);
+    	serverConfig = PhrescoServerFactory.getServerConfig();
 	}
 
 	protected Query createCustomerIdQuery(String customerId) {
@@ -196,4 +213,154 @@ public class DbService implements ServiceConstants {
     	return mongoOperation.findOne(collectionName, 
     			new Query(Criteria.whereId().is(id)), Object.class);
     }
+    
+    protected void saveFileToDB(String id, InputStream is) throws PhrescoException {
+		GridFSInputFile file = getGridFs().createFile(is);
+		file.setFilename(id);
+		file.save(); 
+    }
+    
+    protected InputStream getFileFromDB(String id) throws PhrescoException {
+		GridFSDBFile imageForOutput = getGridFs().findOne(id);
+		InputStream inputStream = imageForOutput.getInputStream();
+		return inputStream; 
+    }
+    
+	private GridFS getGridFs() throws PhrescoException {
+
+		try {
+			Mongo mongo = new Mongo(serverConfig.getDbHost(),
+					serverConfig.getDbPort());
+			DB db = mongo.getDB(serverConfig.getDbName());
+			GridFS gfsPhoto = new GridFS(db, "icons");
+			return gfsPhoto;
+		} catch (UnknownHostException e) {
+			throw new PhrescoException(e);
+		} catch (MongoException e) {
+			throw new PhrescoException(e);
+		}
+	}
+	
+	protected List<Customer> findCustomersFromDB() {
+    	try {
+    		List<Customer> customers = new ArrayList<Customer>();
+    		List<Customer> customersInDb = mongoOperation.getCollection(CUSTOMERDAO_COLLECTION_NAME, Customer.class);
+    		if (CollectionUtils.isNotEmpty(customersInDb)) {
+    			for (Customer customer : customersInDb) {
+					List<String> applicableTechnologies = customer.getApplicableTechnologies();
+					List<Technology> technologies = createTechnology(applicableTechnologies);
+					List<TechnologyGroup> technologyGroups = createTechnologyInfo(technologies);
+					Map<String, List<TechnologyGroup>> appTypeMap = new HashMap<String, List<TechnologyGroup>>();
+					createAppTypeMap(technologyGroups, appTypeMap);
+					List<ApplicationType> applicationTypes = createApplicationTypes(appTypeMap);
+					customer.setApplicableAppTypes(applicationTypes);
+					customers.add(customer);
+				}
+    			return customers;
+    		}
+    	} catch (Exception e) {
+    		throw new PhrescoWebServiceException(e, EX_PHEX00005, CUSTOMERS_COLLECTION_NAME);
+		}
+		return null;
+	}
+	
+	private List<Technology> createTechnology(List<String> applicableTechnologies) throws PhrescoException {
+		List<Technology> technologies = new ArrayList<Technology>();
+		try {
+			for (String techId : applicableTechnologies) {
+				technologies.add(getTechnologyById(techId));
+			}
+		} catch (Exception e) {
+			throw new PhrescoException(e);
+		}
+		return technologies;
+	}
+	
+	private List<TechnologyGroup> createTechnologyInfo(List<Technology> technologies) {
+		Map<String, List<TechnologyInfo>> techGroupMap = new HashMap<String, List<TechnologyInfo>>();
+		for (Technology technology : technologies) {
+			createTechGroupMap(technology, techGroupMap);
+		}
+		List<TechnologyGroup> technologyGroups = createTechnologyGroup(techGroupMap);
+		
+		return technologyGroups;
+	}
+	
+	private List<TechnologyGroup> createTechnologyGroup(Map<String, List<TechnologyInfo>> techGroupMap) {
+		Set<String> keySet = techGroupMap.keySet();
+		List<TechnologyGroup> techGroups = new ArrayList<TechnologyGroup>();
+		for (String key : keySet) {
+			List<TechnologyInfo> list = techGroupMap.get(key);
+			TechnologyGroup techGroup = new TechnologyGroup();
+			TechnologyGroup technologyGroup = getTechnologyGroup(key);
+			techGroup.setId(key);
+			techGroup.setName(technologyGroup.getName());
+			techGroup.setAppTypeId(list.get(0).getAppTypeId());
+			techGroup.setTechInfos(list);
+			techGroups.add(techGroup);
+		}
+		
+		return techGroups;
+	}
+	
+	private List<ApplicationType> createApplicationTypes(Map<String, List<TechnologyGroup>> appTypeMap) {
+		Set<String> keySet = appTypeMap.keySet();
+		List<ApplicationType> appTypes = new ArrayList<ApplicationType>();
+		for (String key : keySet) {
+			List<TechnologyGroup> list = appTypeMap.get(key);
+			ApplicationType appType = new ApplicationType();
+			String appTypeId = list.get(0).getAppTypeId();
+			ApplicationTypeDAO apptypeById = getApptypeById(appTypeId);
+			appType.setId(appTypeId);
+			appType.setName(apptypeById.getName());
+			appType.setTechGroups(list);
+			appTypes.add(appType);
+		}
+		
+		return appTypes;
+	}
+	
+	private void createAppTypeMap(List<TechnologyGroup> techGroups, Map<String, List<TechnologyGroup>> appTypeMap) {
+		for (TechnologyGroup technologyGroup : techGroups) {
+			String appTypeId = technologyGroup.getAppTypeId();
+			List<TechnologyGroup> newTechGroups = new ArrayList<TechnologyGroup>();
+			if (appTypeMap.containsKey(appTypeId)) {
+				List<TechnologyGroup> list = appTypeMap.get(appTypeId);
+				list.add(technologyGroup);
+				appTypeMap.put(appTypeId, list);
+			} else {
+				newTechGroups.add(technologyGroup);
+				appTypeMap.put(appTypeId, newTechGroups);
+			}
+		}
+	}
+	
+	private void createTechGroupMap(Technology technology, Map<String, List<TechnologyInfo>> techGroupMap) {
+		TechnologyInfo techInfo = createTechInfo(technology);
+		String techGroupId = technology.getTechGroupId();
+		List<TechnologyInfo> infos = new ArrayList<TechnologyInfo>();
+		if(techGroupMap.containsKey(techGroupId)) {
+			List<TechnologyInfo> list = techGroupMap.get(techGroupId);
+			list.add(techInfo);
+			techGroupMap.put(techGroupId, list);
+		} else {
+			infos.add(techInfo);
+			techGroupMap.put(techGroupId, infos);
+		}
+	}
+
+	private TechnologyInfo createTechInfo(Technology technology) {
+		TechnologyInfo info = new TechnologyInfo();
+		info.setId(technology.getId());
+		info.setName(technology.getName());
+		info.setAppTypeId(technology.getAppTypeId());
+		info.setTechVersions(technology.getTechVersions());
+		return info;
+	}
+	
+	private TechnologyGroup getTechnologyGroup(String id) {
+		return mongoOperation.findOne(TECH_GROUP_COLLECTION_NAME, new Query(Criteria.whereId().is(id)), 
+    			TechnologyGroup.class);
+	}
+	
 }

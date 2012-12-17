@@ -46,7 +46,7 @@ public class Videos extends ServiceBaseAction {
 	private static final long serialVersionUID = -3065717999492844302L;
 
 	private static final Logger S_LOGGER = Logger.getLogger(Videos.class);
-	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
+	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
 	private static Map<String, InputStream> inputStreamMap = new HashMap<String, InputStream>();
 
 	private static byte[] videoByteArray = null;
@@ -55,6 +55,7 @@ public class Videos extends ServiceBaseAction {
 	private String name = "";
 	private String description = "";
 	private String videoId = "";
+	private String videoArtiId = "";
 	private String nameError = "";
 	private String videoError = "";
 	private String imgError = "";
@@ -62,13 +63,17 @@ public class Videos extends ServiceBaseAction {
 	private Boolean errorFound = false;
 
 	public String list() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Videos.list()");
 		}
+		
 		try {
 			List<VideoInfo> videoInfos = getServiceManager().getVideoInfos();
 			setReqAttribute(REQ_VIDEO_INFO, videoInfos);
 		} catch (PhrescoException e) {
+			if(s_isDebugEnabled) {
+				S_LOGGER.debug("Entered into the catch block of Videos.list()" + e.getStackError());
+			}
 			return showErrorPopup(e, getText(EXCEPTION_VIDEO_LIST));
 		}
         
@@ -80,7 +85,7 @@ public class Videos extends ServiceBaseAction {
 	}
 
 	public String add() {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Videos.list()");
 		}
 		setReqAttribute(REQ_FROM_PAGE, ADD);
@@ -89,24 +94,29 @@ public class Videos extends ServiceBaseAction {
 	}
 
 	public String edit() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method PilotProjects.edit()");
 		}
+		
 		try {
 			ServiceManager serviceManager = getServiceManager();
 			VideoInfo videoInfo = serviceManager.getVideo(getVideoId());
 			setReqAttribute(REQ_VIDEO_INFO, videoInfo);
 			setReqAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (PhrescoException e) {
+			if(s_isDebugEnabled) {
+				S_LOGGER.debug("Entered into the catch block of Videos.edit()" + e.getStackError());
+			}
 			return showErrorPopup(e, getText(EXCEPTION_VIDEO_EDIT));
 		}
 
 		return ADMIN_VIDEO_ADD;
 	}
 	public String save() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Videos.save()");
 		}
+		
 		try {
 			VideoInfo videoInfo = createVideoInstance();
 			if(videoByteArray != null){
@@ -120,6 +130,9 @@ public class Videos extends ServiceBaseAction {
 			getServiceManager().createVideos(createVideoInstance(), inputStreamMap);
 			addActionMessage(getText(VIDEO_ADDED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
+			if(s_isDebugEnabled) {
+				S_LOGGER.debug("Entered into the catch block of Videos.save()" + e.getStackError());
+			}
 			return showErrorPopup(e, getText(EXCEPTION_VIDEO_SAVE));
 		}
 
@@ -127,9 +140,10 @@ public class Videos extends ServiceBaseAction {
 	}
 	
 	public String update() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  PilotProjects.update()");
 		}
+		
 		try {
 			VideoInfo videoInfo = createVideoInstance();
 			if(videoByteArray != null){
@@ -141,6 +155,9 @@ public class Videos extends ServiceBaseAction {
 			getServiceManager().updateVideo(createVideoInstance(), inputStreamMap, getVideoId());
 			addActionMessage(getText(PLTPROJ_UPDATED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
+			if(s_isDebugEnabled) {
+				S_LOGGER.debug("Entered into the catch block of Videos.update()" + e.getStackError());
+			}
 			return showErrorPopup(e, getText(EXCEPTION_VIDEO_UPDATE));
 		}
 
@@ -157,6 +174,10 @@ public class Videos extends ServiceBaseAction {
 		videoInfo.setDescription(getDescription());
 		VideoType videoType = new VideoType();
 		ArtifactGroup artifactGroup = new ArtifactGroup();
+		artifactGroup.setName(getName());
+		if(StringUtils.isNotEmpty(getVideoArtiId())) {
+			artifactGroup.setId(getVideoArtiId());
+		}
 		artifactGroup.setPackaging(ServerUtil.getFileExtension(getFileName()));
 		videoType.setArtifactGroup(artifactGroup);
 		videoInfo.setVideoList(Arrays.asList(videoType));
@@ -164,9 +185,10 @@ public class Videos extends ServiceBaseAction {
 	}	 
 
 	public String delete() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method PilotProjects.delete()");
 		}
+		
 		try {
 			String[] videoIds = getHttpRequest().getParameterValues("videoId");
 			if (ArrayUtils.isNotEmpty(videoIds)) {
@@ -176,6 +198,9 @@ public class Videos extends ServiceBaseAction {
 				addActionMessage(getText(VIDEO_DELETED));
 			}
 		}catch (PhrescoException e) {
+			if(s_isDebugEnabled) {
+				S_LOGGER.debug("Entered into the catch block of Videos.delete()" + e.getStackError());
+			}
 			return showErrorPopup(e, getText(EXCEPTION_VIDEO_DELETE));
 		}
 
@@ -183,11 +208,12 @@ public class Videos extends ServiceBaseAction {
 	} 
 
 	public String uploadFile() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Videos.uploadFile()");
 		}
+		
 		String type = getHttpRequest().getParameter(REQ_VIDEO_FILE_TYPE);
-		if(REQ_VIDEO_UPLOAD.equals(type)) {
+		if (REQ_VIDEO_UPLOAD.equals(type)) {
 			videoByteArray = getFileByteArray();
 		} else {
 			imgByteArray = getFileByteArray();
@@ -217,7 +243,7 @@ public class Videos extends ServiceBaseAction {
 	}
 
 	public void removeUploadedFile() {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.removeUploadedJar()");
 		}
 
@@ -230,9 +256,10 @@ public class Videos extends ServiceBaseAction {
 	}
 
 	public String validateForm() throws PhrescoException {
-		if (isDebugEnabled) {
+		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  PilotProjects.validateForm()");
 		}
+		
 		boolean isError = false;
 		//Empty validation for name
 		if (StringUtils.isEmpty(getName())) {
@@ -319,5 +346,13 @@ public class Videos extends ServiceBaseAction {
 
 	public void setFromPage(String fromPage) {
 		this.fromPage = fromPage;
+	}
+
+	public String getVideoArtiId() {
+		return videoArtiId;
+	}
+
+	public void setVideoArtiId(String videoArtiId) {
+		this.videoArtiId = videoArtiId;
 	}
 }

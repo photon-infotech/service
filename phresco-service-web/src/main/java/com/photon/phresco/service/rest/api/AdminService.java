@@ -20,6 +20,7 @@
 package com.photon.phresco.service.rest.api;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -44,7 +45,6 @@ import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
 import org.springframework.stereotype.Component;
 
-import com.mongodb.util.Hash;
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.Customer;
@@ -59,7 +59,6 @@ import com.photon.phresco.commons.model.User;
 import com.photon.phresco.commons.model.User.AuthType;
 import com.photon.phresco.commons.model.VideoInfo;
 import com.photon.phresco.commons.model.VideoType;
-import com.photon.phresco.exception.AIException;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.exception.PhrescoWebServiceException;
 import com.photon.phresco.service.api.Converter;
@@ -72,7 +71,6 @@ import com.photon.phresco.service.dao.ArtifactGroupDAO;
 import com.photon.phresco.service.dao.VideoInfoDAO;
 import com.photon.phresco.service.dao.VideoTypeDAO;
 import com.photon.phresco.service.impl.DbService;
-import com.photon.phresco.service.model.ArtifactInfo;
 import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.Client;
@@ -112,109 +110,62 @@ public class AdminService extends DbService {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.findCustomer()");
         }
-    	try {
-    		List<Customer> customers = new ArrayList<Customer>();
-    		List<Customer> customersInDb = mongoOperation.getCollection(CUSTOMERDAO_COLLECTION_NAME, Customer.class);
-    		if (CollectionUtils.isNotEmpty(customersInDb)) {
-    			for (Customer customer : customersInDb) {
-					List<String> applicableTechnologies = customer.getApplicableTechnologies();
-					List<ApplicationType> applicableApptypes = createApplicableApptypes(applicableTechnologies);
-					customer.setApplicableAppTypes(applicableApptypes);
-					customers.add(customer);
-				}
-    		    return Response.status(Response.Status.OK).entity(customers).build();
-    		}
-    	} catch (Exception e) {
-    		throw new PhrescoWebServiceException(e, EX_PHEX00005, CUSTOMERS_COLLECTION_NAME);
-		}
-    	return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
-    }
-
-    private List<ApplicationType> createApplicableApptypes(List<String> applicableTechnologies) throws PhrescoException {
-    	List<ApplicationType> apptypes = new ArrayList<ApplicationType>();
-    	Map<String, ApplicationType> apptypeMap = new HashMap<String, ApplicationType>();
-    	Map<String, List<TechnologyGroup>> techGroupMap = new HashMap<String, List<TechnologyGroup>>();
-    	for (String techId : applicableTechnologies) {
-			Technology technology = getTechnologyById(techId);
-			String appTypeId = technology.getAppTypeId();
-			apptypeMap.put(appTypeId, getAppType(appTypeId));
-			String techGroupId = technology.getTechGroupId();
-			techGroupMap = createTechGroupMap(appTypeId, techGroupId, technology, techGroupMap);
-		}
-    	for (String appTypeId : apptypeMap.keySet()) {
-    		ApplicationType applicationType = apptypeMap.get(appTypeId);
-    		applicationType.setTechGroups(techGroupMap.get(appTypeId));
-    		apptypes.add(applicationType);
-		}
-    	return apptypes;
-	}
-    
-    private Map<String, List<TechnologyGroup>> createTechGroupMap(
-			String appTypeId, String techGroupId, Technology technology, Map<String, List<TechnologyGroup>> techGroupMap) {
-    	if(techGroupMap.containsKey(appTypeId)) {
-    		List<TechnologyGroup> tgList = techGroupMap.get(appTypeId);
-    		TechnologyGroup newTechGroup = getTechGroup(techGroupId, technology);
-    		ArrayList<TechnologyGroup> tgList1 = null;
-    		for (TechnologyGroup technologyGroup : tgList) {
-				if(technologyGroup.getAppTypeId().equals(newTechGroup.getAppTypeId())) {
-					tgList1 = new ArrayList<TechnologyGroup>();
-					tgList1.addAll(tgList);
-					tgList1.add(newTechGroup);
-				}
-			}
-    		techGroupMap.put(appTypeId, tgList1);
-    	} else {
-    		techGroupMap.put(appTypeId, Arrays.asList(getTechGroup(techGroupId, technology)));
-    	}
-		return techGroupMap;
-	}
-    
-    private TechnologyGroup getTechGroup(String techGroupId, Technology technology) {
-    	TechnologyGroup group = new TechnologyGroup();
-    	group.setId(techGroupId);
-    	TechnologyInfo info = new TechnologyInfo();
-    	info.setId(technology.getId());
-    	info.setAppTypeId(technology.getAppTypeId());
-    	info.setTechVersions(technology.getTechVersions());
-    	info.setName(technology.getName());
-    	group.setAppTypeId(technology.getAppTypeId());
-    	group.setTechInfos(Arrays.asList(info));
-    	return group;
+        List<Customer> customers = findCustomersFromDB();
+    	return Response.status(Response.Status.OK).entity(customers).build();
     }
     
-	private ApplicationType getAppType(String appTypeId) {
-    	ApplicationTypeDAO apptype = getApptypeById(appTypeId);
-    	ApplicationType applicationTypeNew  = new ApplicationType();
-    	applicationTypeNew.setCustomerIds(apptype.getCustomerIds());
-    	applicationTypeNew.setName(apptype.getName());
-    	applicationTypeNew.setId(apptype.getId());
-    	return applicationTypeNew;
+    /**
+     * Returns the icon as stream
+     * @return
+     * @throws PhrescoException 
+     */
+    @GET
+    @Path (REST_API_ICON)
+    @Produces (MediaType.MULTIPART_FORM_DATA)
+    public Response getIcon(@QueryParam(REST_QUERY_ID) String id) throws PhrescoException {
+        if (isDebugEnabled) {
+            S_LOGGER.debug("Entered into AdminService.getIcon(String id)");
+        }
+        InputStream inputStream = getFileFromDB(id);
+    	return Response.status(Response.Status.OK).entity(inputStream).build();
     }
-	/**
+    
+    /**
      * Creates the list of customers
      * @param customer
      * @return 
      */
     @POST
-    @Consumes (MediaType.APPLICATION_JSON)
+    @Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
     @Path (REST_API_CUSTOMERS)
-    public Response createCustomer(List<Customer> customers) {
+    public Response createCustomer(MultiPart multiPart) {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.createCustomer(List<Customer> customer)");
         }
+        Customer customer = new Customer();
+        InputStream iconStream = null;
     	try {
-    		for(Customer customer : customers){
-    			if(validate(customer)) {
-    				RepoInfo repoInfo = customer.getRepoInfo();
-        			String repoName = repoInfo.getRepoName();
-        			if(StringUtils.isEmpty(repoInfo.getReleaseRepoURL())) {
-        				repoInfo = repositoryManager.createCustomerRepository(customer.getId(), repoName);
-        				customer.setRepoInfo(repoInfo);
-        			}
-    		        mongoOperation.insert(CUSTOMERDAO_COLLECTION_NAME, customer);
+    		List<BodyPart> bodyParts = multiPart.getBodyParts();
+    		for (BodyPart bodyPart : bodyParts) {
+    			if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
+    				customer = bodyPart.getEntityAs(Customer.class);
+    	        } else {
+    	        	BodyPartEntity bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
+    	        	iconStream = bodyPartEntity.getInputStream();
+    	        }
+			}
+    		if(validate(customer)) {
+				RepoInfo repoInfo = customer.getRepoInfo();
+    			String repoName = repoInfo.getRepoName();
+    			if(StringUtils.isEmpty(repoInfo.getReleaseRepoURL())) {
+    				repoInfo = repositoryManager.createCustomerRepository(customer.getId(), repoName);
+    				customer.setRepoInfo(repoInfo);
     			}
-    		}
+    			saveFileToDB(customer.getId(), iconStream);
+		        mongoOperation.save(CUSTOMERDAO_COLLECTION_NAME, customer);
+			}	
     	} catch (Exception e) {
+    		e.printStackTrace();
     		throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
 		}
     	
@@ -433,7 +384,17 @@ public class AdminService extends DbService {
 		}
 		
 		if(bodyPartEntity == null && video != null) {
-			saveVideos(video);
+			List<VideoType> videoTypeList = video.getVideoList();
+			for (VideoType videoType : videoTypeList) {
+				ArtifactGroup artifactGroup = videoType.getArtifactGroup();
+				artifactGroup.setGroupId("videos.homepage");
+				artifactGroup.setArtifactId(video.getName().toLowerCase());
+				com.photon.phresco.commons.model.ArtifactInfo info = new com.photon.phresco.commons.model.ArtifactInfo();
+				info.setVersion("1.0");
+				artifactGroup.setVersions(Arrays.asList(info));
+				artifactGroup.setCustomerIds(Arrays.asList(DEFAULT_CUSTOMER_NAME));
+				saveVideos(video);
+			}
 		}
 		
 		return Response.status(Response.Status.OK).entity(video).build();
