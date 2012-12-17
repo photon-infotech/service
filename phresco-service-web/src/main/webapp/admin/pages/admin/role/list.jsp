@@ -35,11 +35,11 @@
 	<div class="operation" id="operation">
 		<%-- <input type="button" id="roleAdd" class="btn btn-primary" name="role_action" onclick="loadContent('roleAdd', '', $('#subcontainer'));" value="<s:text name='lbl.hdr.adm.rlelst.add'/>"/> --%>
 		<input type="button" id="roleAdd" class="btn btn-disabled" 
-		        name="role_action" disabled="disbaled" onclick="loadContent('roleAdd', $('#formRoleList'), $('#subcontainer'));" 
-		            value="<s:text name='lbl.hdr.adm.rlelst.add'/>"/>
+	        name="role_action" disabled="disbaled" onclick="loadContent('roleAdd', $('#formRoleList'), $('#subcontainer'));" 
+            value="<s:text name='lbl.hdr.adm.rlelst.add'/>"/>
 		
 		<input type="button" id="del" class="btn" disabled value="<s:text 
-		        name='lbl.btn.del'/>"  onclick="showDeleteConfirmation('<s:text name='del.confirm.roles'/>');"/>
+	        name='lbl.btn.del'/>"  onclick="showDeleteConfirmation('<s:text name='del.confirm.roles'/>');"/>
 		<s:if test="hasActionMessages()">
 			<div class="alert alert-success alert-message"  id="successmsg">
 				<s:actionmessage />
@@ -83,7 +83,7 @@
 		
 					<tbody>
 					    <% 
-					       if(CollectionUtils.isNotEmpty(roleLists)) { 
+					       if (CollectionUtils.isNotEmpty(roleLists)) { 
 					          for(Role roleList : roleLists) {
 					    %>
 					 

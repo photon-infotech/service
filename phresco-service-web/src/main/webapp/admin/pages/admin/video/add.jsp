@@ -21,8 +21,6 @@
 
 <%@ page import="java.util.List"%>
 <%@ page import="org.apache.commons.lang.StringUtils"%>
-<%@ page import="org.apache.commons.collections.CollectionUtils"%>
-<%@ page import="org.apache.commons.lang.StringUtils" %>
 
 <%@ page import="com.photon.phresco.commons.model.VideoInfo"%>
 <%@ page import="com.photon.phresco.commons.model.ArtifactGroup"%>

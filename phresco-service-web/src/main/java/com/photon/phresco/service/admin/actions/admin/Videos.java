@@ -35,7 +35,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.photon.phresco.commons.model.ArtifactGroup;
-import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.VideoInfo;
 import com.photon.phresco.commons.model.VideoType;
 import com.photon.phresco.exception.PhrescoException;
@@ -67,6 +66,7 @@ public class Videos extends ServiceBaseAction {
 		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Videos.list()");
 		}
+		
 		try {
 			List<VideoInfo> videoInfos = getServiceManager().getVideoInfos();
 			setReqAttribute(REQ_VIDEO_INFO, videoInfos);
@@ -97,6 +97,7 @@ public class Videos extends ServiceBaseAction {
 		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method PilotProjects.edit()");
 		}
+		
 		try {
 			ServiceManager serviceManager = getServiceManager();
 			VideoInfo videoInfo = serviceManager.getVideo(getVideoId());
@@ -115,6 +116,7 @@ public class Videos extends ServiceBaseAction {
 		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Videos.save()");
 		}
+		
 		try {
 			VideoInfo videoInfo = createVideoInstance();
 			if(videoByteArray != null){
@@ -141,6 +143,7 @@ public class Videos extends ServiceBaseAction {
 		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  PilotProjects.update()");
 		}
+		
 		try {
 			VideoInfo videoInfo = createVideoInstance();
 			if(videoByteArray != null){
@@ -185,6 +188,7 @@ public class Videos extends ServiceBaseAction {
 		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method PilotProjects.delete()");
 		}
+		
 		try {
 			String[] videoIds = getHttpRequest().getParameterValues("videoId");
 			if (ArrayUtils.isNotEmpty(videoIds)) {
@@ -207,8 +211,9 @@ public class Videos extends ServiceBaseAction {
 		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Videos.uploadFile()");
 		}
+		
 		String type = getHttpRequest().getParameter(REQ_VIDEO_FILE_TYPE);
-		if(REQ_VIDEO_UPLOAD.equals(type)) {
+		if (REQ_VIDEO_UPLOAD.equals(type)) {
 			videoByteArray = getFileByteArray();
 		} else {
 			imgByteArray = getFileByteArray();
@@ -254,6 +259,7 @@ public class Videos extends ServiceBaseAction {
 		if (s_isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  PilotProjects.validateForm()");
 		}
+		
 		boolean isError = false;
 		//Empty validation for name
 		if (StringUtils.isEmpty(getName())) {

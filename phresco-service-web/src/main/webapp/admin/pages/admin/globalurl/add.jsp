@@ -18,8 +18,10 @@
   ###
   --%>
 <%@ taglib uri="/struts-tags" prefix="s"%>
-<%@ page import="org.apache.commons.lang.StringUtils"%>
+
 <%@ page import="java.util.List"%>
+
+<%@ page import="org.apache.commons.lang.StringUtils"%>
 
 <%@ page import="com.photon.phresco.commons.model.Property"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
