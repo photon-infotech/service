@@ -433,7 +433,17 @@ public class AdminService extends DbService {
 		}
 		
 		if(bodyPartEntity == null && video != null) {
-			saveVideos(video);
+			List<VideoType> videoTypeList = video.getVideoList();
+			for (VideoType videoType : videoTypeList) {
+				ArtifactGroup artifactGroup = videoType.getArtifactGroup();
+				artifactGroup.setGroupId("videos.homepage");
+				artifactGroup.setArtifactId(video.getName().toLowerCase());
+				com.photon.phresco.commons.model.ArtifactInfo info = new com.photon.phresco.commons.model.ArtifactInfo();
+				info.setVersion("1.0");
+				artifactGroup.setVersions(Arrays.asList(info));
+				artifactGroup.setCustomerIds(Arrays.asList(DEFAULT_CUSTOMER_NAME));
+				saveVideos(video);
+			}
 		}
 		
 		return Response.status(Response.Status.OK).entity(video).build();

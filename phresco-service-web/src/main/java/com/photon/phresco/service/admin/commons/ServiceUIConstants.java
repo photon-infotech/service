@@ -332,6 +332,8 @@ public interface ServiceUIConstants {
     String KEY_I18N_SUCCESS_LOGOUT = "succ.logout";
 
     String KEY_I18N_ERR_NAME_EMPTY = "err.msg.name.empty";
+    String KEY_I18N_ERR_URL_EMPTY = "err.msg.url.empty";
+    String KEY_I18N_ERR_URL_NOT_VALID = "err.msg.url.notvalid";
     String KEY_I18N_ERR_GROUPID_EMPTY = "err.msg.groupid.empty";
     String KEY_I18N_ERR_ARTIFACTID_EMPTY = "err.msg.artifactid.empty";
     String KEY_I18N_ERR_NAME_ALREADY_EXIST = "err.msg.name.exists";
@@ -365,7 +367,6 @@ public interface ServiceUIConstants {
     String KEY_I18N_ERR_REPO_URL_INVALID = "err.msg.repourl.invalid";
     String KEY_I18N_ERR_REPO_USERNAME_EMPTY = "err.msg.repousername.empty";
     String KEY_I18N_ERR_REPO_PASSWORD_EMPTY = "err.msg.repopassword.empty";
-    String KEY_I18N_ERR_URL_EMPTY = "err.msg.url.empty";
     String KEY_I18N_ERR_APPLNPLTF_EMPTY = "err.msg.applnpltf.empty";
     String KEY_I18N_ERR_GROUP_EMPTY = "err.msg.group.empty";
     String KEY_I18N_ERR_TECH_EMPTY = "err.msg.tech.empty";
