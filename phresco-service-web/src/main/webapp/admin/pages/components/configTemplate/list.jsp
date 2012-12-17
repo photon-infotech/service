@@ -89,7 +89,7 @@
 										List<Element> applsTos = configTemplate.getAppliesToTechs();
 										String appliesTos = "";
 										for(Element applsTo : applsTos) {
-											appliesTos = appliesTos + applsTo.getId() + ",";
+											appliesTos = appliesTos + applsTo.getName() + ",";
 										}
 										appliesTos  = appliesTos.substring(0, appliesTos.length() - 1);
 							%>
