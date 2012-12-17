@@ -39,6 +39,7 @@ import org.springframework.data.document.mongodb.query.Query;
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.DownloadInfo;
+import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.exception.PhrescoWebServiceException;
 import com.photon.phresco.service.api.Converter;
@@ -47,8 +48,10 @@ import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.converters.ConvertersFactory;
 import com.photon.phresco.service.dao.ApplicationInfoDAO;
+import com.photon.phresco.service.dao.ApplicationTypeDAO;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
 import com.photon.phresco.service.dao.DownloadsDAO;
+import com.photon.phresco.service.dao.TechnologyDAO;
 import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.FileUtil;
 import com.photon.phresco.util.ServiceConstants;
@@ -175,5 +178,22 @@ public class DbService implements ServiceConstants {
         FileUtil.delete(pomFile);
         return addArtifact;
     }
-
+    
+    protected Technology getTechnologyById(String techId) throws PhrescoException {
+    	TechnologyDAO technologyDAO = mongoOperation.findOne(TECHNOLOGIES_COLLECTION_NAME, 
+    			new Query(Criteria.whereId().is(techId)), TechnologyDAO.class);
+    	Converter<TechnologyDAO, Technology> technologyConverter = 
+	          (Converter<TechnologyDAO, Technology>) ConvertersFactory.getConverter(TechnologyDAO.class);
+    	return technologyConverter.convertDAOToObject(technologyDAO, mongoOperation);
+    }
+    
+    protected ApplicationTypeDAO getApptypeById(String id) {
+    	return mongoOperation.findOne(APPTYPES_COLLECTION_NAME, new Query(Criteria.whereId().is(id)), 
+    			ApplicationTypeDAO.class);
+    }
+    
+    protected Object performFindOne(String id, String collectionName) {
+    	return mongoOperation.findOne(collectionName, 
+    			new Query(Criteria.whereId().is(id)), Object.class);
+    }
 }

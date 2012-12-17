@@ -80,7 +80,7 @@ public class PilotProjects extends ServiceBaseAction {
 	private String oldName = "";
 	private String versioning = "";
 	private String pilotURL = "";
-	private String fileName = "";
+	private String extFileName = "";
 	private InputStream fileInputStream;
 	private String contentType = "";
 	private int contentLength;
@@ -321,7 +321,7 @@ public class PilotProjects extends ServiceBaseAction {
     		URL url = new URL(pilotURL);
     		fileInputStream = url.openStream();
     		String[] parts = pilotURL.split("/");
-    		fileName = parts[parts.length - 1];
+    		extFileName = parts[parts.length - 1];
     		contentType = url.openConnection().getContentType();
     		contentLength = url.openConnection().getContentLength();
     	} catch(Exception e) {
@@ -561,14 +561,6 @@ public class PilotProjects extends ServiceBaseAction {
 		this.versioning = versioning;
 	} 
     
-	public String getFileName() {
-		return fileName;
-	}
-
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
-
 	public InputStream getFileInputStream() {
 		return fileInputStream;
 	}
@@ -623,6 +615,14 @@ public class PilotProjects extends ServiceBaseAction {
 
 	public void setPilotContentVersion(String pilotContentVersion) {
 		this.pilotContentVersion = pilotContentVersion;
+	}
+
+	public String getExtFileName() {
+		return extFileName;
+	}
+
+	public void setExtFileName(String extFileName) {
+		this.extFileName = extFileName;
 	}
 
 

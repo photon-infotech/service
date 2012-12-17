@@ -22,7 +22,9 @@ package com.photon.phresco.service.rest.api;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -42,12 +44,17 @@ import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
 import org.springframework.stereotype.Component;
 
+import com.mongodb.util.Hash;
+import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.Permission;
 import com.photon.phresco.commons.model.Property;
 import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.commons.model.Role;
+import com.photon.phresco.commons.model.Technology;
+import com.photon.phresco.commons.model.TechnologyGroup;
+import com.photon.phresco.commons.model.TechnologyInfo;
 import com.photon.phresco.commons.model.User;
 import com.photon.phresco.commons.model.User.AuthType;
 import com.photon.phresco.commons.model.VideoInfo;
@@ -60,6 +67,7 @@ import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.client.impl.ClientHelper;
 import com.photon.phresco.service.converters.ConvertersFactory;
+import com.photon.phresco.service.dao.ApplicationTypeDAO;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
 import com.photon.phresco.service.dao.VideoInfoDAO;
 import com.photon.phresco.service.dao.VideoTypeDAO;
@@ -105,8 +113,15 @@ public class AdminService extends DbService {
             S_LOGGER.debug("Entered into AdminService.findCustomer()");
         }
     	try {
-    		List<Customer> customers = mongoOperation.getCollection(CUSTOMERDAO_COLLECTION_NAME, Customer.class);
-    		if (CollectionUtils.isNotEmpty(customers)) {
+    		List<Customer> customers = new ArrayList<Customer>();
+    		List<Customer> customersInDb = mongoOperation.getCollection(CUSTOMERDAO_COLLECTION_NAME, Customer.class);
+    		if (CollectionUtils.isNotEmpty(customersInDb)) {
+    			for (Customer customer : customersInDb) {
+					List<String> applicableTechnologies = customer.getApplicableTechnologies();
+					List<ApplicationType> applicableApptypes = createApplicableApptypes(applicableTechnologies);
+					customer.setApplicableAppTypes(applicableApptypes);
+					customers.add(customer);
+				}
     		    return Response.status(Response.Status.OK).entity(customers).build();
     		}
     	} catch (Exception e) {
@@ -115,7 +130,67 @@ public class AdminService extends DbService {
     	return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
     }
 
-    /**
+    private List<ApplicationType> createApplicableApptypes(List<String> applicableTechnologies) throws PhrescoException {
+    	List<ApplicationType> apptypes = new ArrayList<ApplicationType>();
+    	Map<String, ApplicationType> apptypeMap = new HashMap<String, ApplicationType>();
+    	Map<String, List<TechnologyGroup>> techGroupMap = new HashMap<String, List<TechnologyGroup>>();
+    	for (String techId : applicableTechnologies) {
+			Technology technology = getTechnologyById(techId);
+			String appTypeId = technology.getAppTypeId();
+			apptypeMap.put(appTypeId, getAppType(appTypeId));
+			String techGroupId = technology.getTechGroupId();
+			techGroupMap = createTechGroupMap(appTypeId, techGroupId, technology, techGroupMap);
+		}
+    	for (String appTypeId : apptypeMap.keySet()) {
+    		ApplicationType applicationType = apptypeMap.get(appTypeId);
+    		applicationType.setTechGroups(techGroupMap.get(appTypeId));
+    		apptypes.add(applicationType);
+		}
+    	return apptypes;
+	}
+    
+    private Map<String, List<TechnologyGroup>> createTechGroupMap(
+			String appTypeId, String techGroupId, Technology technology, Map<String, List<TechnologyGroup>> techGroupMap) {
+    	if(techGroupMap.containsKey(appTypeId)) {
+    		List<TechnologyGroup> tgList = techGroupMap.get(appTypeId);
+    		TechnologyGroup newTechGroup = getTechGroup(techGroupId, technology);
+    		ArrayList<TechnologyGroup> tgList1 = null;
+    		for (TechnologyGroup technologyGroup : tgList) {
+				if(technologyGroup.getAppTypeId().equals(newTechGroup.getAppTypeId())) {
+					tgList1 = new ArrayList<TechnologyGroup>();
+					tgList1.addAll(tgList);
+					tgList1.add(newTechGroup);
+				}
+			}
+    		techGroupMap.put(appTypeId, tgList1);
+    	} else {
+    		techGroupMap.put(appTypeId, Arrays.asList(getTechGroup(techGroupId, technology)));
+    	}
+		return techGroupMap;
+	}
+    
+    private TechnologyGroup getTechGroup(String techGroupId, Technology technology) {
+    	TechnologyGroup group = new TechnologyGroup();
+    	group.setId(techGroupId);
+    	TechnologyInfo info = new TechnologyInfo();
+    	info.setId(technology.getId());
+    	info.setAppTypeId(technology.getAppTypeId());
+    	info.setTechVersions(technology.getTechVersions());
+    	info.setName(technology.getName());
+    	group.setAppTypeId(technology.getAppTypeId());
+    	group.setTechInfos(Arrays.asList(info));
+    	return group;
+    }
+    
+	private ApplicationType getAppType(String appTypeId) {
+    	ApplicationTypeDAO apptype = getApptypeById(appTypeId);
+    	ApplicationType applicationTypeNew  = new ApplicationType();
+    	applicationTypeNew.setCustomerIds(apptype.getCustomerIds());
+    	applicationTypeNew.setName(apptype.getName());
+    	applicationTypeNew.setId(apptype.getId());
+    	return applicationTypeNew;
+    }
+	/**
      * Creates the list of customers
      * @param customer
      * @return 

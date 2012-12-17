@@ -34,12 +34,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-
 
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactGroup.Type;
@@ -72,7 +69,7 @@ public class Features extends ServiceBaseAction {
 	
 	private static byte[] newtempFeaByteArray = null;
 	
-	private String fileName="";	
+	private String extFileName="";	
 	private String name = "";
 	private String customerId = "";
 	private String description = "";
@@ -485,7 +482,7 @@ public class Features extends ServiceBaseAction {
 			URL url = new URL(featureUrl);
 			fileInputStream = url.openStream();
 			String[] parts = featureUrl.split("/");
-			fileName = parts[parts.length - 1];
+			extFileName = parts[parts.length - 1];
 			contentType = url.openConnection().getContentType();
 			contentLength = url.openConnection().getContentLength();
 		} catch(Exception e) {
@@ -822,14 +819,6 @@ public class Features extends ServiceBaseAction {
 		this.multiTechnology = multiTechnology;
 	}
 
-	public String getFileName() {
-		return fileName;
-	}
-
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
-
 	public InputStream getFileInputStream() {
 		return fileInputStream;
 	}
@@ -860,6 +849,14 @@ public class Features extends ServiceBaseAction {
 
 	public void setFeatureUrl(String featureUrl) {
 		this.featureUrl = featureUrl;
+	}
+
+	public String getExtFileName() {
+		return extFileName;
+	}
+
+	public void setExtFileName(String extFileName) {
+		this.extFileName = extFileName;
 	}
 	
 }

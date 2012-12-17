@@ -103,7 +103,7 @@ public class Archetypes extends ServiceBaseAction {
 	private String versioning = "";
 	private boolean tempError = false;
 	private String ArchetypeUrl = "";
-	private String fileName = "";
+	private String extFileName = "";
 	private InputStream fileInputStream;
 	private String contentType = "";
 	private int contentLength;
@@ -262,6 +262,7 @@ public class Archetypes extends ServiceBaseAction {
         if (StringUtils.isNotEmpty(getTechId())) {
         	technology.setId(getTechId());
         }
+     
         technology.setName(getName());
         technology.setDescription(getDescription());
         technology.setAppTypeId(getApptype());
@@ -281,6 +282,7 @@ public class Archetypes extends ServiceBaseAction {
         technology.setTechVersions(Arrays.asList(getTechVersion()));
         technology.setReports(getApplicableReports());
         technology.setPlugins(pluginInfos);
+        
         return technology;
     }
 
@@ -401,7 +403,7 @@ public class Archetypes extends ServiceBaseAction {
 			URL url = new URL(ArchetypeUrl);
 			fileInputStream = url.openStream();
 			String[] parts = ArchetypeUrl.split("/");
-			fileName = parts[parts.length - 1];
+			extFileName = parts[parts.length - 1];
 			contentType = url.openConnection().getContentType();
 			contentLength = url.openConnection().getContentLength();
 		} catch(Exception e) {
@@ -785,14 +787,6 @@ public class Archetypes extends ServiceBaseAction {
 		ArchetypeUrl = archetypeUrl;
 	}
 
-	public String getFileName() {
-		return fileName;
-	}
-
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
-
 	public InputStream getFileInputStream() {
 		return fileInputStream;
 	}
@@ -815,5 +809,13 @@ public class Archetypes extends ServiceBaseAction {
 
 	public void setContentLength(int contentLength) {
 		this.contentLength = contentLength;
+	}
+
+	public String getExtFileName() {
+		return extFileName;
+	}
+
+	public void setExtFileName(String extFileName) {
+		this.extFileName = extFileName;
 	}
 }

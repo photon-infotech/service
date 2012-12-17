@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.data.document.mongodb.MongoOperations;
 import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Order;
@@ -110,9 +111,12 @@ public class ArtifactGroupConverter implements Converter<ArtifactGroupDAO, Artif
 	}
     
 	private String createDownloadURL(String groupId, String artifactId, String packaging, String version, String customerId) {
-		Customer customer = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME, new Query(Criteria.whereId().is(customerId)), Customer.class);
-		String repoGroupURL = customer.getRepoInfo().getGroupRepoURL();
-		return repoGroupURL + ServerUtil.createContentURL(groupId, artifactId, version, packaging);
+		if(StringUtils.isNotEmpty(groupId) && StringUtils.isNotEmpty(artifactId) && StringUtils.isNotEmpty(version)) {
+			Customer customer = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME, new Query(Criteria.whereId().is(customerId)), Customer.class);
+			String repoGroupURL = customer.getRepoInfo().getGroupRepoURL();
+			return repoGroupURL + ServerUtil.createContentURL(groupId, artifactId, version, packaging);
+		}
+		return null;
 	}
 
 }

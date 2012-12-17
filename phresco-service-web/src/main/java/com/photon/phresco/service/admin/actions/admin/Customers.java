@@ -19,10 +19,16 @@
  */
 package com.photon.phresco.service.admin.actions.admin;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,9 +37,11 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.Customer.LicenseType;
 import com.photon.phresco.commons.model.RepoInfo;
+import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 
@@ -43,6 +51,7 @@ public class Customers extends ServiceBaseAction  {
 	
 	private static final Logger S_LOGGER = Logger.getLogger(Customers.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
+	private static Map<String, InputStream> inputStreamMap = new HashMap<String, InputStream>();
 	
 	private String customerId = "";
 	
@@ -78,6 +87,13 @@ public class Customers extends ServiceBaseAction  {
 	private String repoURLError = "";
 	private boolean errorFound = false;
 	private boolean tempError = false;
+	private static String uploadIconName = "";
+	private static byte[] iconByteArray = null;
+	private String icon = "";
+	private String brandingColor = "" ;
+	private List<String> appliesTo = new ArrayList<String>();
+	List<ApplicationType> applicableAppTypes = new ArrayList<ApplicationType>();
+	
 	
 	private String fromPage = "";
 	
@@ -112,9 +128,11 @@ public class Customers extends ServiceBaseAction  {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Customers.add()");
 	    }
+	    List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
+	    setReqAttribute(REQ_ARCHE_TYPES, technologies);
 	    setReqAttribute(REQ_FROM_PAGE, ADD);
 	    
-		return ADMIN_CUSTOMER_ADD;
+	    return ADMIN_CUSTOMER_ADD;
 	}
 	
 	/**
@@ -127,16 +145,15 @@ public class Customers extends ServiceBaseAction  {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Customers.edit()");
 		}
-
 		try {
 			Customer customer = getServiceManager().getCustomer(getCustomerId());
+			List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
+		    setReqAttribute(REQ_ARCHE_TYPES, technologies);
 			setReqAttribute(REQ_CUST_CUSTOMER, customer);
 			setReqAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (PhrescoException e) {
 		    return showErrorPopup(e, getText(EXCEPTION_CUSTOMERS_ADD));
-		    
 		}
-		
 		return ADMIN_CUSTOMER_ADD;
 	}
 	
@@ -151,9 +168,11 @@ public class Customers extends ServiceBaseAction  {
 	    }
 	    
 		try {
-			List<Customer> customers = new ArrayList<Customer>();
-			customers.add(createCustomer());
-			getServiceManager().createCustomers(customers);
+			Customer customer = createCustomer();
+			if (iconByteArray != null) {
+				inputStreamMap.put(getCustomerId(), new ByteArrayInputStream(iconByteArray));
+			}
+			getServiceManager().createCustomers(customer, inputStreamMap);
 			addActionMessage(getText(CUSTOMER_ADDED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
 		    return showErrorPopup(e, getText(EXCEPTION_CUSTOMERS_SAVE));
@@ -161,6 +180,46 @@ public class Customers extends ServiceBaseAction  {
 		
 		return list();
 	}
+
+	/**
+	 * To update image Icon  selected customer
+	 * @param cutomerId
+	 * @throws PhrescoException
+	 */
+	public String uploadImage() throws PhrescoException {
+	    if (isDebugEnabled) {
+	    	S_LOGGER.debug("Entering Method Customers.uploadImage()");
+	    }
+	    PrintWriter writer = null;
+	    try {
+	    	writer = getHttpResponse().getWriter();
+	    	iconByteArray = getByteArray();
+	    	writer.print(SUCCESS_TRUE);
+	    	writer.flush();
+	    	writer.close();
+	    } catch (Exception e) { //If upload fails it will be shown in UI, so need not to throw error popup
+	    	getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
+	    	writer.print(SUCCESS_FALSE);
+	    }
+
+	    return SUCCESS;
+	}
+	
+	
+	/**
+	 * remove the icon image from byteArray and Map 
+	 * @return
+	 * @throws PhrescoException
+	 */
+	public String removeImage() throws PhrescoException {
+	    if (isDebugEnabled) {
+	    	S_LOGGER.debug("Entering Method Customers.removeImage()");
+	    }
+	    inputStreamMap.clear();
+	    iconByteArray = null;
+	    return SUCCESS;
+	}
+	
 
 	/**
 	 * To update the details of the selected customer
@@ -181,6 +240,7 @@ public class Customers extends ServiceBaseAction  {
 		
 		return list();
 	}
+	
 	
 	/**
 	 * To the customer object with the given details
@@ -211,6 +271,9 @@ public class Customers extends ServiceBaseAction  {
         repoInfo.setRepoUserName(getRepoUserName());
         repoInfo.setRepoName(getRepoName());
         customer.setRepoInfo(repoInfo);
+        customer.setBrandingColor(getBrandingColor());
+        List<String> appliesTo = getAppliesTo();
+        customer.setApplicableTechnologies(appliesTo);
         return customer;
     }
 	
@@ -681,5 +744,37 @@ public class Customers extends ServiceBaseAction  {
 
 	public String getRepoURLError() {
 		return repoURLError;
+	}
+
+	public String getIcon() {
+		return icon;
+	}
+
+	public String getBrandingColor() {
+		return brandingColor;
+	}
+	
+	public List<ApplicationType> getApplicableAppTypes() {
+		return applicableAppTypes;
+	}
+
+	public void setIcon(String icon) {
+		this.icon = icon;
+	}
+
+	public void setBrandingColor(String brandingColor) {
+		this.brandingColor = brandingColor;
+	}
+
+	public void setApplicableAppTypes(List<ApplicationType> applicableAppTypes) {
+		this.applicableAppTypes = applicableAppTypes;
+	}
+
+	public List<String> getAppliesTo() {
+		return appliesTo;
+	}
+
+	public void setAppliesTo(List<String> appliesTo) {
+		this.appliesTo = appliesTo;
 	}
 }

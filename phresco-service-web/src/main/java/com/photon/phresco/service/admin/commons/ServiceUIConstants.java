@@ -42,7 +42,7 @@ public interface ServiceUIConstants {
 	String MAVEN_JAR_FALSE = "{\"mavenJar\": false,\"success\": true}";
 	String INVALID_ARCHETYPE_JAR = "{\"isJarTypeValid\": false,\"errorMsg\": \"Not a valid application jar\"}";
 	String INVALID_PLUGIN_JAR = "{\"isJarTypeValid\": false,\"errorMsg\": \"Not a valid plugin jar\"}";
-	String INVALID_MODULE_NAME = "{\"isNameValid\": false,\"errorMsg\": \"ZIP Folder Name and Feature Name Not Matched\"}";
+	String INVALID_MODULE_NAME = "{\"isNameValid\": false,\"errorMsg\": \"ZIP Folder Name and Feature Name Does Not Match\"}";
 	String CSV_PATTERN = "\\s*,\\s*";
 	String REQ_ARTIFACT_ID = "_artifactId";
 	String REQ_GROUP_ID = "_groupId";

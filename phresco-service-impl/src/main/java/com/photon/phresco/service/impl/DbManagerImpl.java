@@ -41,6 +41,7 @@ import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.document.mongodb.query.Criteria;
+import org.springframework.data.document.mongodb.query.Order;
 import org.springframework.data.document.mongodb.query.Query;
 import org.springframework.data.document.mongodb.query.Update;
 
@@ -54,6 +55,7 @@ import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.commons.model.User;
 import com.photon.phresco.commons.model.User.AuthType;
+import com.photon.phresco.commons.model.VersionInfo;
 import com.photon.phresco.commons.model.VideoInfo;
 import com.photon.phresco.commons.model.WebService;
 import com.photon.phresco.exception.PhrescoException;
@@ -285,5 +287,13 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
 			}
 		}
 		return videoInfos;
+	}
+
+	@Override
+	public String getLatestFrameWorkVersion() throws PhrescoException {
+		Query query = new Query();
+		query.sort().on(DB_COLUMN_CREATIONDATE, Order.DESCENDING);
+		List<VersionInfo> versionInfos = mongoOperation.find("versionInfo", query, VersionInfo.class);
+		return versionInfos.get(0).getFrameworkVersion();
 	}
 }

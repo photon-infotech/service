@@ -22,15 +22,21 @@
 
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="java.util.Date" %>
+<%@ page import="java.util.List"%>
+<%@ page import="java.util.ArrayList"%>
 
 <%@ page import="com.photon.phresco.commons.model.Customer" %>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
 <%@ page import="com.photon.phresco.service.admin.actions.util.ServiceActionUtil" %>
-<%@ page import=" com.photon.phresco.commons.model.Customer.LicenseType" %>
+<%@ page import="com.photon.phresco.commons.model.Customer.LicenseType" %>
+<%@ page import="com.photon.phresco.commons.model.ApplicationType" %>
+<%@ page import="org.apache.commons.collections.CollectionUtils" %>
+<%@ page import="com.photon.phresco.commons.model.Technology" %>
 
 <%
 	Customer customer = (Customer) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER);
 	String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
+	List<Technology> technologies = (List<Technology>) request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
 	
 	String title = ServiceActionUtil.getTitle(ServiceUIConstants.CUSTOMERS, fromPage);
 	String buttonLbl = ServiceActionUtil.getButtonLabel(fromPage);
@@ -59,6 +65,11 @@
 	LicenseType licenseType = null;
 	Date validFrom = null;
 	Date validUpto = null;
+	String icon = "";
+	String brandingColor = "" ;
+	List<String> applicableTechnologies = new ArrayList();
+	List<ApplicationType> applicableAppTypes = null;
+	
 	if (customer != null) {
 	    if (StringUtils.isNotEmpty(customer.getId())) {
 			id = customer.getId();
@@ -105,6 +116,9 @@
 		if(customer.isSystem()){
 			disabledClass = "btn-disabled";
 			disabled = "disabled";
+		}
+		if (customer.getBrandingColor() != null) {
+			brandingColor = customer.getBrandingColor();
 		}
 		if (StringUtils.isNotEmpty(customer.getRepoInfo().getRepoName())) {
 			repoName = customer.getRepoInfo().getRepoName();
@@ -565,12 +579,72 @@
 			</div>
 		</div>
 		
-	</div>
+		<div class="control-group">
+			<label class="control-label labelbold">
+				<s:text name='lbl.hdr.adm.cust.brandingcolor'/>
+			</label>
+			<div class="controls">
+				<input id="statefld" placeholder="<s:text name='place.hldr.cust.add.brandingColor'/>" class="input-xlarge" type="text" name="brandingColor"
+				   value="<%= brandingColor%>"  maxlength="50" title="50 Characters only">
+			</div>
+		</div>
+		
+		<div class="control-group" id="iconControl">
+			<label class="control-label labelbold"> 
+			 	<s:text name='lbl.hdr.adm.upload.icon' />
+			</label>
+			<div class="controls" style="float: left; margin-left: 3%;">
+				<div id="image-file-uploader" class="file-uploader">
+					<noscript>
+						<p>Please enable JavaScript to use file uploader.</p>s
+						<!-- or put a simple form for upload here -->
+					</noscript>
+				</div>
+			</div>
+			<span class="help-inline fileError" id="iconError"></span>
+		</div>
+		
+		<div class="control-group" id="applyControl">
+			<label class="control-label labelbold">
+				<s:text name='lbl.hdr.comp.appliesto'/>
+			</label>
+			<div class="controls">
+					<div class="typeFields" id="typefield">
+					<div class="multilist-scroller multiselct" id="appliesToDiv">
+					<ul>
+						<li>
+							<input type="checkbox" value="all" id="checkAllAuto" name="" onclick="checkAllEvent(this,$('.applsChk'), true);" style="margin: 3px 8px 6px 0;">All
+						</li>
+						<%
+							for (Technology technology : technologies) {
+								String checkedStr = "";
+								if (customer!= null) {
+									List<String> appliesTos = customer.getApplicableTechnologies();
+									if (appliesTos.contains(technology.getId())) {
+										checkedStr = "checked";
+									} else {
+										checkedStr = "";
+									}
+								}
+						%>		
+								<li>
+									<input type="checkbox" id="appliestoCheckbox" name="appliesTo" onclick= "checkboxEvent()" value="<%= technology.getId() %>"  <%= checkedStr %>
+										class="check applsChk"><%= technology.getName() %>
+								</li>
+						<%  
+							}
+						%>
+					</ul>
+				</div>
+			</div>
+          		 <span class="help-inline applyerror" id="applyError"></span>
+			</div>
+	 </div>
 
-	<div class="bottom_button">
+	<div class="bottom_button ">
 		
 		<input type="button" id="" class="btn <%= disabledClass %>" <%= disabled %> value="<%= buttonLbl %>" 
-			 onclick="validate('<%= pageUrl %>', $('#formCustomerAdd'), $('#subcontainer'), '<%= progressTxt %>');" />
+			 onclick="validate('<%= pageUrl %>', $('#formCustomerAdd'), $('#subcontainer'), '<%= progressTxt %>', $('.content_adder :input'));" />
 		<input type="button" id="customerCancel" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>" 
             onclick="loadContent('customerList', $('#formCustomerAdd'), $('#subcontainer'));" />
 	</div>
@@ -590,7 +664,7 @@
 	$(document).ready(function() {
 		hideLoadingIcon();
 		setLicenseType();
-		
+		createUploader();
 		 // for edit - to show selected country while page loads 
 		 $("#countryList option[value='<%= country %>']").attr('selected', 'selected'); 
 		 
@@ -628,6 +702,22 @@
 				document.getElementById('todate').value = '';
 		<% } %>
 		
+		
+		function createUploader() {
+			var imgUploader = new qq.FileUploader ({
+	            element: document.getElementById('image-file-uploader'),
+	            action: 'uploadCustomerIcon',
+	            multiple: false,
+	            allowedExtensions : ["png"],
+	            uploadId: 'customerUploadId',
+	            type: 'customerImageFile',
+	            buttonLabel: '<s:label key="lbl.hdr.adm.upload.icon" />',
+	            typeError : '<s:text name="err.invalid.img.file" />',
+	            params: {type: 'customerImageFile'}, 
+	            debug: true
+	        });
+		}
+		
 		$(function() {
 			$("#fromdate").datepicker({
 				showOn : "button",
@@ -642,6 +732,34 @@
 			});
 		});
 	});
+	
+	function removeUploadedJar(obj, btnId) {
+		$(obj).parent().remove();
+		var type = $(obj).attr("tempattr"); 
+		var params = "";
+		$.ajax({
+			url : "removeImage",
+			data : params,
+			type : "POST",
+			success : function(data) {
+			}
+		});
+		enableDisableUploads(type, $("#" + btnId));
+	} 
+	
+	function jarError(data, type) {
+		var controlObj;
+		var msgObj;
+		if (type == "customerImageFile") {
+			controlObj = $("#iconControl");
+			msgObj = $("#iconError");
+		}
+		if (data != undefined && !isBlank(data)) {
+			showError(controlObj, msgObj, data);
+		} else {
+			hideError(controlObj, msgObj);
+		}
+	}
 	
 	//To show/hide the username and password field
 	//It will be enabled only when the user gives the repo URL
