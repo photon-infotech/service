@@ -228,6 +228,7 @@ public class Downloads extends ServiceBaseAction {
         downloadVersion.setVersion(getVersion());
         downloadVersions.add(downloadVersion);
         ArtifactGroup artifactGroup = new ArtifactGroup();
+        artifactGroup.setId(downloadInfo.getId());
         List<String> customerIds = new ArrayList<String>();
         customerIds.add(getCustomerId());
         artifactGroup.setName(getName());
