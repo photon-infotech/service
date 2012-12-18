@@ -26,6 +26,7 @@ public class DownloadsConverter implements Converter<DownloadsDAO, DownloadInfo>
 		downloadInfo.setName(dao.getName());
 		downloadInfo.setPlatformTypeIds(dao.getPlatformTypeIds());
 		downloadInfo.setStatus(dao.getStatus());
+		downloadInfo.setSystem(dao.isSystem());
 		downloadInfo.setArtifactGroup(createArtifactGroup(dao.getArtifactGroupId(), mongoOperation));
 		return downloadInfo;
 	}

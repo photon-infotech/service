@@ -34,13 +34,12 @@
 <%@ page import="com.photon.phresco.commons.model.Technology"%>
 
 <%
-    List<TechnologyGroup> technoGroups = (List<TechnologyGroup>)request.getAttribute(ServiceUIConstants.REQ_TECHNOLOGY_GROUPS);
 	List<ApplicationType> appTypes = (List<ApplicationType>)request.getAttribute(ServiceUIConstants.REQ_APP_TYPES);
     Gson gson = new Gson();
    
     String versioning = (String)request.getAttribute(ServiceUIConstants.REQ_VERSIONING);
 	String disabledVer ="";
-	if(StringUtils.isNotEmpty(versioning)) {
+	if (StringUtils.isNotEmpty(versioning)) {
 		disabledVer = "disabled";
 	}
 %>
@@ -114,7 +113,7 @@
 		$('#popupTitle').html("Technology Group"); 
 		$('#popupClose').hide();
 		$('.popupOk').attr("onclick","popupOnOk(this)");
-		$('#popupPage').css({"width":"570px","position":"relative","left":"49%"});
+		$('#popupPage').css({"width":"590px","position":"relative","left":"49%"});
 		$('.modal-body').css("height","270px");
 		$('#clipboard').hide();
 		$('.popupOk, #popupCancel').show(); // show ok & cancel button
@@ -130,12 +129,12 @@
 			$('#formTechgroupn').hide();
 			$('#popup_div').hide();
 			hideLoadingIcon();
-// 			loadContent('newTechGroup', $('#formTechgroup'), '', '', false);
 		});
 		
-		 $("#appTypeLayer").change(function() {
-	       	 getTechGroup();
-	        });  
+		$("#appTypeLayer").change(function() {
+			techGroupToAdd = [];
+			getTechGroup();
+        });  
 		
 		$('#popupCancel').click(function() {
 			$('#popup_div').empty();
@@ -148,13 +147,12 @@
 			name = $('#techGroupName').val();
 			appTypeId = $('#techappControl :selected').text();
 			desc = $("#techGroDesc").val();
-			if(name == "") {
+			if (name == "") {
 				$("#reportMsg").html("<s:text name='enter.technology.name'/>");
 				$("#techGroupName").focus();
 				$("#techGroupName").val("");
 				returnValue = false;
 			} else {
-				getTechGroup();
 				$('#multiTechGroup ul li input[type=checkbox]').each(function() {
 					var jsonData = $(this).val();
 					var techGrou = $.parseJSON(jsonData);
@@ -167,36 +165,40 @@
 					} 
 				});
 			}
-			 if (returnValue) {
-				addRow();		
-			} 
+			if (returnValue) {
+				addRow();
+				$("#techGroupName").val("");
+				$("#techGroDesc").val("");
+			}
 		});
 	});
 	
-	//To remove the added Technology value in UI
+	//To remove the added Technology value
     $('#removeTechGroup').click(function() {
     	 selectTech();
-//     	 To remove the Technologies from the list box which is not in the XML
+		//To remove the Technologies from the list box which is not in the XML
         $('#multiTechGroup ul li input[type=checkbox]:checked').each( function() {
-				removeItem(techGroupToAdd, $(this).val())
-				$('#multiTechGroup ul li input[type=checkbox]:checked').parent().remove();
+			removeItem(techGroupToAdd, $(this).val())
+			var params = "removeTechGroup=";
+			params = params.concat($.parseJSON($(this).val()).id);
+			loadContent('deleteTechGroup', $('#formTechgroup'), '', params, false);
+			$('#multiTechGroup ul li input[type=checkbox]:checked').parent().remove();
         });
     });
 	
-    function removeItem(array, item){
-        for(var i in array){
-            if(array[i]==item){
+    function removeItem(array, item) {
+        for (var i in array) {
+            if (array[i]==item) {
                 array.splice(i,1);
                 break;
-                }
+			}
         }
     }
     
     function getTechGroup() {
-   	 loadContent('getTechGroup', $('#formTechgroup'), '', '', true);
-     $("#multiTechGroup ul").empty();
+		loadContent('getTechGroup', $('#formTechgroup'), '', '', true);
+		$("#multiTechGroup ul").empty();
     }
-   
   
 	function successEvent(pageUrl, data) {
 		if (pageUrl == "getTechGroup") {
@@ -206,23 +208,24 @@
 				var name = techGroups[i].name;
 				var system = techGroups[i].system;
 				var description = techGroups[i].description;
-				if(system){
-					var checkbox = '<input type="checkbox" name="groupTech" class="check techCheck" value="' + id + '" disabled/>' + name;
+				var appTypeId = techGroups[i].appTypeId;
+				var checkValue = '{"name": "' + name + '", "id": "' + id + '", "description": "' + description + '", "appTypeId": "' + appTypeId + '", "system": "' + system + '"}';
+				if (system) {
+					var checkbox = '<input type="checkbox" name="groupTech" class="techCheck" value=\'' + checkValue + '\' title="' + description + '"  disabled/>' + name;
 				}else {
-					var checkbox = '<input type="checkbox" name="groupTech" class="check techCheck" value="' + id + '"/>' + name;	
+					var checkbox = '<input type="checkbox" name="groupTech" class="techCheck" value=\'' + checkValue + '\' title="' + description + '" />' + name;
 				}
 				$("#multiTechGroup ul").append('<li>' + checkbox + '</li>');
 			}
 		}
 	}
 	
-	 function addRow() {
-
+	function addRow() {
 		var value = $('#techGroupName').val();
 		var desc = $('#techGroDesc').val();
-		var appTypeId = $('#techappControl :selected').text();
-		var checkValue = '{"name": "' + value + '", "description": "' + desc + '", "appTypeId": "' + appTypeId + '"}';
-		var checkbox = '<input type="checkbox" name="groupTech" class="check techCheck" value=\'' + checkValue + '\' title="' + desc + '" />' + value;
+		var appTypeId = $('#techappControl :selected').val();
+		var checkValue = '{"name": "' + value + '", "description": "' + desc + '", "appTypeId": "' + appTypeId + '", "system": "' + false + '"}';
+		var checkbox = '<input type="checkbox" name="groupTech" class="techCheck" value=\'' + checkValue + '\' title="' + desc + '" />' + value;
 		if ($("#multiTechGroup ul").has("li").length === 0) {
 			$("#multiTechGroup ul").append('<li>' + checkbox + '</li>');
 		} else {
@@ -230,7 +233,7 @@
 		}
 		techGroupToAdd.push(checkValue);
 // 		$("#multiTechGroup ul li:last").after('<li>' + checkbox + '</li>');
-	} 
+	}
 	 
 	function selectTech() {
 		var checkedTechSize = $('#multiTechGroup :checked').size();
@@ -239,7 +242,4 @@
 			return false;
 		}
 	}
-	
-	
-	 
 </script>

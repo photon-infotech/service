@@ -73,6 +73,10 @@ Width <= 1024
 	    padding: 0;
 	    width: 709px;
 	}
+	
+	.accordion_panel_inner {
+		height:	278px !important;
+	}
 }
 
 /************************************************************************************
@@ -86,6 +90,10 @@ Width >= 1025 and <= 1152
 	.content_adder {
 		height: 86%;
 	}
+	
+	.accordion_panel_inner {
+		height:	150px !important;
+	}
 }
 
 /************************************************************************************
@@ -98,6 +106,10 @@ Width >= 1152 and < 1280
 	
 	.alert_messagelist {
 		margin-left: 55%;
+	}
+	
+	.accordion_panel_inner {
+		height:	335px !important;
 	}
 }
 
@@ -122,6 +134,10 @@ Width <= 1280 and height <= 720
 	    margin-left: -400px; 
 	    overflow: hidden;
 	}
+	
+	.accordion_panel_inner {
+		height:	245px !important;
+	}
 }
 
 /************************************************************************************
@@ -141,6 +157,10 @@ Width <= 1280 and height <= 768
 	    margin-left: -400px; 
 	    overflow: hidden;
 	}
+	
+	.accordion_panel_inner {
+		height:	260px !important;
+	}
 }
 
 /************************************************************************************
@@ -153,6 +173,10 @@ Width >= 1280 and height <= 800
 	
 	.content_feature {
 		height: 81%;
+	}
+	
+	.accordion_panel_inner {
+		height:	299px !important;
 	}
 }
 
@@ -167,6 +191,10 @@ Width >= 1280 and height > 800 and height <= 960
 	.content_feature {
 		height: 87%;
 	}
+	
+	.accordion_panel_inner {
+		height:	415px !important;
+	}
 }
 
 /************************************************************************************
@@ -179,6 +207,10 @@ Width >= 1280 and height >= 961 and heigth <=1024
 	
 	.content_feature {
 		height: 88%;
+	}
+	
+	.accordion_panel_inner {
+		height:	450px !important;
 	}
 }
 
@@ -200,6 +232,10 @@ Width > 1280 and <= 1360
 	
 	.quick_links_outer {
 		margin-left: 166px;
+	}
+	
+	.accordion_panel_inner {
+		height:	295px !important;
 	}	
 }
 
@@ -221,5 +257,9 @@ Width > 1360 and <= 1600
 	
 	.quick_links_outer {
 		margin-left: 214px;
+	}
+	
+	.accordion_panel_inner {
+		height:	375px !important;
 	}
 }

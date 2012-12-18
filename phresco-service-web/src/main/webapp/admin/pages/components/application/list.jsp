@@ -63,7 +63,7 @@
 							<tr>
 								<th class="first nameTd">
 									<div class="th-inner">
-										<input type="checkbox" value="" id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this,$('.apptype'), false);">
+										<input type="checkbox" value="" class=checkAll id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this,$('.apptype'), false);">
 									</div>
 								</th>
 								<th class="second">

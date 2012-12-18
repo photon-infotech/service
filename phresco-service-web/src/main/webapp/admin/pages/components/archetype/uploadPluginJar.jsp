@@ -76,8 +76,8 @@
 		$('#pluginUpload').click(function() {
 			$('#formPlugin').hide();
 			$('#popup_div').hide();
-			hideLoadingIcon();
 			loadContent('technology', $('#formPlugin'), $('#popupPage'), '', true);
+			hideLoadingIcon();
 		});
 
 		$('#popupCancel').click(function() {

@@ -1269,6 +1269,7 @@ public class ComponentService extends DbService {
 		try {
 			ApplicationInfo appInfo = mongoOperation.findOne(APPLICATION_INFO_COLLECTION_NAME, 
 			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ApplicationInfo.class);
+			
 			if (appInfo != null) {
 				return Response.status(Response.Status.OK).entity(appInfo).build();
 			}
@@ -2163,6 +2164,14 @@ public class ComponentService extends DbService {
 			for (TechnologyGroup technologyGroup : techGroups) {
 				if(validate(technologyGroup)) {
 					mongoOperation.save(TECH_GROUP_COLLECTION_NAME , technologyGroup);
+					
+					ApplicationTypeDAO type = mongoOperation.findOne(APPTYPES_COLLECTION_NAME, 
+							new Query(Criteria.whereId().is(technologyGroup.getAppTypeId())), ApplicationTypeDAO.class);
+					List<String> techGroupIds = type.getTechGroupIds();
+					techGroupIds.add(technologyGroup.getId());
+					type.setTechGroupIds(techGroupIds);
+					
+					mongoOperation.save(APPTYPES_COLLECTION_NAME , type);
 				}
 			}
 		} catch (Exception e) {
@@ -2277,8 +2286,15 @@ public class ComponentService extends DbService {
 	    }
 		
 		try {
-			mongoOperation.remove(TECH_GROUP_COLLECTION_NAME, 
-			        new Query(Criteria.whereId().is(id)), TechnologyGroup.class);
+			mongoOperation.remove(TECH_GROUP_COLLECTION_NAME, new Query(Criteria.whereId().is(id)), TechnologyGroup.class);
+			
+			ApplicationTypeDAO type = mongoOperation.findOne(APPTYPES_COLLECTION_NAME, 
+					new Query(Criteria.where(TECH_GROUP_ID).is(id)), ApplicationTypeDAO.class);
+			List<String> techGroupIds = type.getTechGroupIds();
+			techGroupIds.remove(id);
+			type.setTechGroupIds(techGroupIds);
+			
+			mongoOperation.save(APPTYPES_COLLECTION_NAME , type);
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
 		}

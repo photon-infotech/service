@@ -234,6 +234,10 @@
             <result type="json" />
         </action>
         
+        <action name="deleteTechGroup" class="com.photon.phresco.service.admin.actions.components.Archetypes" method="deleteTechnologyGroup">
+           <result name="techGrpList">admin/pages/components/archetype/technologyGroup.jsp</result>
+        </action>
+        
         <action name="openTechGroupPopup" class="com.photon.phresco.service.admin.actions.components.Archetypes" method="showTechGroupPopup">
             <result name="techGroup">/admin/pages/components/archetype/technologyGroup.jsp</result>
         </action>

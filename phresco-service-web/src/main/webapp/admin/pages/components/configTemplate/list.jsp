@@ -66,7 +66,7 @@
 								<tr>
 									<th class="first">
 										<div class="th-inner tablehead">
-											<input type="checkbox" value="" id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this,$('.configtempltes'), false);">
+											<input type="checkbox" value="" class=checkAll id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this,$('.configtempltes'), false);">
 										</div>
 									</th>
 									<th class="second">

@@ -40,6 +40,7 @@ public class ApplicationInfoConverter implements Converter<ApplicationInfoDAO, A
 		applicationInfo.setPhoneEnabled(dao.isPhoneEnabled());
 		applicationInfo.setTabletEnabled(dao.isTabletEnabled());
 		applicationInfo.setPilot(dao.getPilot());
+		applicationInfo.setSystem(dao.isSystem());
 		return applicationInfo;
 	}
 

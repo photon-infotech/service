@@ -67,7 +67,7 @@
 							<tr>
 								<th class="first">
 									<div class="th-inner">
-										<input type="checkbox" value="" id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this, $('.technolgies'), false);">
+										<input type="checkbox" value="" class=checkAll id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this, $('.technolgies'), false);">
 									</div>
 								</th>
 								<th class="second">
@@ -197,7 +197,7 @@
 		$("#loadingIconDiv").hide();
 	}
     
-function popupOnOk(self) {
+	function popupOnOk(self) {
     	
 		var params = '{"techGroups" : [' + techGroupToAdd.join(',') + ']}';
 		loadJsonContent('newTechGroup', params);

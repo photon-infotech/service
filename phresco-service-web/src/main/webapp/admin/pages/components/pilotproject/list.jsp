@@ -66,7 +66,7 @@
 							<tr>
 								<th class="first">
 									<div class="th-inner">
-										<input type="checkbox" value="" id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this,$('.pilotprojt'), false);">
+										<input type="checkbox" value="" class=checkAll id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this,$('.pilotprojt'), false);">
 									</div>
 								</th>
 								<th class="second">
@@ -99,26 +99,25 @@
 						%>
 								<tr>
 									<td class="checkboxwidth">
-		 					        <% if (proInfo.isSystem()) { %>
-		 					        		<input type="checkbox" name="projectId" value="<%=proInfo.getId() %>" onclick="checkboxEvent();" disabled/>	
-                                        <% } else { %>
+			 					        <% if (proInfo.isSystem()) { %>
+											<input type="checkbox" name="projectId" value="<%=proInfo.getId() %>"  disabled/>	
+										<% } else { %>
 											<input type="checkbox" class="check pilotprojt" name="projectId" value="<%=proInfo.getId() %>" onclick="checkboxEvent();" />
-                                        <% } %>
+										<% } %>
 									</td>
 									<td>
 										<a href="#" onclick="editPilotProject('<%=proInfo.getId() %>');" name="edit" id=""><%= proInfo.getName()%></a>
 									</td>
 									<td class="descwidth"><%= StringUtils.isNotEmpty(proInfo.getDescription()) ? proInfo.getDescription() : ""%></td>
-									 <%  
-									     TechnologyInfo techId = proInfo.getTechInfo();
-									 %> 
-									 <td><%= techId.getVersion() %></td> 
-									
+									<%  
+										TechnologyInfo techId = proInfo.getTechInfo();
+									%> 
+									<td><%= techId.getVersion() %></td> 
 									<td class="psblevalue" id="1_psblSinglDiv">
-									      <a href="#" onclick="versioningPilotPro('<%=proInfo.getId() %>');" name="edit" id=""><img class="addiconAlign imagealign" temp="1" 
-													src="images/versioning.png"/></a>
+										<a href="#" onclick="versioningPilotPro('<%=proInfo.getId() %>');" name="edit" id="">
+											<img class="addiconAlign imagealign" temp="1" src="images/versioning.png"/>
+										</a>
 									</td>
-									
 								</tr>
 						<%			
 								}
@@ -145,7 +144,6 @@
 		toDisableCheckAll(); 
 		hideLoadingIcon();
 	});
-     
 	
 	function versioningPilotPro(id) {
 		 var params = "projectId=";

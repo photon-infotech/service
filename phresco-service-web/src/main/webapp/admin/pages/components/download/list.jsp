@@ -65,8 +65,7 @@
 							<tr>
 								<th class="first">
 									<div class="th-inner">
-										<input type="checkbox" value="" id="checkAllAuto" class="checkAllAuto" name="checkAllAuto" 
-											onclick="checkAllEvent(this,$('.dwnloadInfo'), false);">
+										<input type="checkbox" value="" class=checkAll id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this,$('.dwnloadInfo'), false);">
 									</div>
 								</th>
 								<th class="second">
@@ -94,29 +93,33 @@
 							if (CollectionUtils.isNotEmpty(downloadInfos)) {
 								for (DownloadInfo download : downloadInfos) {
 				       	%>
-							<tr>
-								<td class="checkboxwidth">
-									<input type="checkbox" class="check dwnloadInfo" name="downloadId" value="<%= download.getId() %>" onclick="checkboxEvent();" >
-								</td>
-								<td class="namelabel-width">
-									<a href="#" onclick="editDownload('<%= download.getId() %>');" name="edit" id="" ><%= download.getName() %></a>
-								</td>
-								<td class="namelabel-width">
-									<%= StringUtils.isNotEmpty(download.getDescription()) ? download.getDescription() : "" %>
-								</td>
-								<td>
-									<%=CollectionUtils.isNotEmpty(download.getPlatformTypeIds()) ? download.getPlatformTypeIds() : ""%>
-								</td>
-								<%
-				                   List<ArtifactInfo> versions = download.getArtifactGroup().getVersions();
-								%>
-								
- 								 <td><%= StringUtils.isNotEmpty(versions.get(0).getVersion()) ? versions.get(0).getVersion() : "" %></td> 
-                                 <td class="psblevalue" id="1_psblSinglDiv">
-									      <a href="#" onclick="versioningDownload('<%= download.getId() %>');" name="edit" id=""><img class="addiconAlign imagealign" temp="1" 
-													src="images/versioning.png"/></a>
-							   </td>
-							</tr>
+								<tr>
+									<td class="checkboxwidth">
+									<% if (download.isSystem()) { %>
+										<input type="checkbox"  name="downloadId" value="<%= download.getId() %>" disabled >
+									<% } else { %>
+									  	<input type="checkbox" class="check dwnloadInfo" name="downloadId" value="<%= download.getId() %>" onclick="checkboxEvent();" >
+									<% } %>								
+									</td>
+									<td class="namelabel-width">
+										<a href="#" onclick="editDownload('<%= download.getId() %>');" name="edit" id="" ><%= download.getName() %></a>
+									</td>
+									<td class="namelabel-width">
+										<%= StringUtils.isNotEmpty(download.getDescription()) ? download.getDescription() : "" %>
+									</td>
+									<td>
+										<%= CollectionUtils.isNotEmpty(download.getPlatformTypeIds()) ? download.getPlatformTypeIds() : "" %>
+									</td>
+									<%
+										List<ArtifactInfo> versions = download.getArtifactGroup().getVersions();
+									%>
+										<td><%= StringUtils.isNotEmpty(versions.get(0).getVersion()) ? versions.get(0).getVersion() : "" %></td> 
+	                                 	<td class="psblevalue" id="1_psblSinglDiv">
+											<a href="#" onclick="versioningDownload('<%= download.getId() %>');" name="edit" id="">
+												<img class="addiconAlign imagealign" temp="1" src="images/versioning.png"/>
+											</a>
+										</td>
+								</tr>
 						<%
 								}
 							}
@@ -139,6 +142,7 @@
 	}
 
 	$(document).ready(function() {
+		toDisableCheckAll(); 
 		hideLoadingIcon();
 	});
      

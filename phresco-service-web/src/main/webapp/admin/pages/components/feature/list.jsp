@@ -32,7 +32,7 @@
 	String type = (String) request.getAttribute(ServiceUIConstants.REQ_FEATURES_TYPE);
 %>
     
-   <div class="featuresScrollDiv">
+	<div class="featuresScrollDiv">
    	<% 
 		if (CollectionUtils.isEmpty(moduleGroups)) {
 	%>
@@ -46,7 +46,7 @@
 					<tr>
 						<td>
 							<input type="checkbox" class=checkAll id="checkAllAuto" name="moduleGroup" 
-								onclick="checkAllEvent(this, $('.technology'), false);">
+								onclick="checkAllArchEvent(this, $('.technology'), false); checkAllArchEvent($('.technology'), $('.subtechnology'), false);" value="Call2Functions">
 						</td>
 						<td class="labelbold"><s:text name='lbl.hdr.comp.name'/></td>
 					</tr>
@@ -56,7 +56,7 @@
 		
 		<div class="theme_accordion_container jsLib_accordion_container">
 		    <section class="accordion_panel_wid">
-		        <div class="accordion_panel_inner accordian_height" >
+		        <div class="accordion_panel_inner accordian_height">
 		            <section class="lft_menus_container">
 		            <%
 						for (ArtifactGroup moduleGroup : moduleGroups) {
@@ -68,9 +68,9 @@
 									&nbsp;&nbsp;<%= moduleGroup.getName() %>&nbsp;&nbsp;
 								<% } else { %> 
 			                		<input type="checkbox" class="check technology" name="moduleGroup" value="<%= moduleGroup.getId()%>" 
-			                			id="<%= moduleGroup.getId()%>checkBox" onclick="checkAllEvent(this, $('.<%= moduleGroup.getName()%>'), false); checkboxEvent();" value="Call2Functions" >
+			                			id="<%= moduleGroup.getId()%>checkBox" onclick="checkAllArchEvent(this, $('.<%= moduleGroup.getName()%>'), false); checkboxArchEvent();" value="Call2Functions" >
 			                		&nbsp;&nbsp;<%= moduleGroup.getName() %>&nbsp;&nbsp;
-	                			 <% } %> 
+								<% } %> 
 		                	</span>
 		                </span>
 		                <div class="mfbox siteinnertooltiptxt hideContent">
@@ -97,7 +97,7 @@
 												<% if (moduleGroup.isSystem()) { %>
 													<input type="checkbox"  class ="child_chkBox" name="selectedModuleId" value="<%= module.getId() %> %>" disabled/>
 												<% } else { %> 
-													<input type="checkbox" class ="child_chkBox" id="<%= moduleGroup.getName() %>" class="<%= moduleGroup.getName() %> subtechnology" name="selectedModuleId" value="<%= module.getId() %>"  onclick="checkOneEvent( $('.<%=moduleGroup.getName()%>'), $('#<%=moduleGroup.getId()%>checkBox'));">
+													<input type="checkbox" class ="child_chkBox <%= moduleGroup.getName() %> subtechnology" id="<%= moduleGroup.getName() %>"  name="selectedModuleId" value="<%= module.getId() %>"  onclick="checkOneArchEvent( $('.<%=moduleGroup.getName()%>'), $('#<%=moduleGroup.getId()%>checkBox')); checkboxArchEvent();" value="Call2Functions">
 												<% } %> 
 												</td>
 												<td class="zero_padding">
@@ -163,38 +163,38 @@
 		loadContent("featurseEdit", $('#formFeaturesList'), $('#featureContainer'), params);
     }
 	
-	function checkAllEvent(currentCheckbox, childCheckBox, disable) {
+	function checkAllArchEvent(currentCheckbox, childCheckBox, disable) {
 		var checkAll = $(currentCheckbox).prop('checked');
 		childCheckBox.prop('checked', checkAll);
-		statusButton();
+		archStatusButton();
 		if (!checkAll) {
 			disable = false;
 		}
 		toDisableAllCheckbox(currentCheckbox,childCheckBox, disable);
 	}
 
-	function checkboxEvent() {
-		statusButton();
+	function checkboxArchEvent() {
 		if ($('.check').length == $(".check:checked").length) {
 			$('#checkAllAuto').prop('checked', true);
 		} else {
 			$('#checkAllAuto').prop('checked', false);
 		}
+		archStatusButton();
 	}
-	function checkOneEvent(currentCheckbox,parentCheckBox) {
+	function checkOneArchEvent(currentCheckbox,parentCheckBox) {
 		var id = currentCheckbox.attr("id");
-		statusButton();
 		if ( currentCheckbox.length == $('.' +id +':checked').length){
 			parentCheckBox.prop('checked', true);
 		} else {
 			parentCheckBox.prop('checked', false);
 		}
+		archStatusButton();
 	}
 	
-	function statusButton() {
+	function archStatusButton() {
 		var count = $("input:checked").length;
 		var flag;
-		if( count < 1 ){
+		if ( count < 1 ) {
 			$('#del').attr('disabled', true);
 			flag = true;
 		} else {

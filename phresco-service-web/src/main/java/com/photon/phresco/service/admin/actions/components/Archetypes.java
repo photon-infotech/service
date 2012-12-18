@@ -34,6 +34,7 @@ import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -107,6 +108,7 @@ public class Archetypes extends ServiceBaseAction {
 	private InputStream fileInputStream;
 	private String contentType = "";
 	private int contentLength;
+	private String removeTechGroup = "";
 	private List<TechnologyGroup> appTypeTechGroups = new ArrayList<TechnologyGroup>();
 	
 	private byte[] newtempApplnByteArray = null;
@@ -186,7 +188,6 @@ public class Archetypes extends ServiceBaseAction {
 
 		try {
 			Technology technology = createTechnology();
-//			List<InputStream> inputStreams = new ArrayList<InputStream>();
 			//save application jar files
 			if(archetypeJarByteArray != null){
 				inputStreamMap.put(technology.getName(),  new ByteArrayInputStream(archetypeJarByteArray));
@@ -237,12 +238,12 @@ public class Archetypes extends ServiceBaseAction {
 		try {
 			Technology technology = createTechnology();
 			//update application jar files
-			if(archetypeJarByteArray != null){
+			if (archetypeJarByteArray != null) {
 				inputStreamMap.put(technology.getName(),  new ByteArrayInputStream(archetypeJarByteArray));
 			} 
 			getServiceManager().updateArcheType(technology, inputStreamMap, getCustomerId());
 			addActionMessage(getText(ARCHETYPE_UPDATED, Collections.singletonList(getName())));
-		}catch(PhrescoException e) {
+		} catch (PhrescoException e) {
 			return showErrorPopup(e, getText(EXCEPTION_ARCHETYPE_UPDATE));
 		}
 
@@ -262,14 +263,12 @@ public class Archetypes extends ServiceBaseAction {
         if (StringUtils.isNotEmpty(getTechId())) {
         	technology.setId(getTechId());
         }
-     
         technology.setName(getName());
         technology.setDescription(getDescription());
         technology.setAppTypeId(getApptype());
         technology.setTechGroupId(getTechGroup());
         
         //To set the applicable features
-      
         List<String> options = new ArrayList<String>();
         for (String selectedOption : getApplicable()) {
         	options.add(selectedOption);
@@ -291,6 +290,10 @@ public class Archetypes extends ServiceBaseAction {
 	 * @return
 	 */
 	public void createPluginInfos(ArtifactGroup artifactGroupInfo, String jarName) {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method Archetypes.createPluginInfos(ArtifactGroup artifactGroupInfo, String jarName)");
+		}
+		
 		if (inputStreamMap != null) {
 		    ArtifactGroup pluginInfo = new ArtifactGroup();
 		    pluginInfo.setName(jarName);
@@ -363,7 +366,8 @@ public class Archetypes extends ServiceBaseAction {
 		    if(!inputStreamMap.containsKey(pluginJarName)){
 		    	inputStreamMap.put(pluginJarName, new ByteArrayInputStream(byteArray));
 		    }
-		} catch (Exception e) {
+		} catch (PhrescoException e) {
+			throw new PhrescoException(e);
 		}
 	}
 
@@ -406,7 +410,7 @@ public class Archetypes extends ServiceBaseAction {
 			extFileName = parts[parts.length - 1];
 			contentType = url.openConnection().getContentType();
 			contentLength = url.openConnection().getContentLength();
-		} catch(Exception e) {
+		} catch (Exception e) {
 			return showErrorPopup(new PhrescoException(e), getText(DOWNLOAD_FAILED));
 		}
 
@@ -417,6 +421,7 @@ public class Archetypes extends ServiceBaseAction {
 		if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Archetypes.showPluginJarPopup()");
 	    }
+		
 		setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		
 		return uploadPlugin;
@@ -436,6 +441,7 @@ public class Archetypes extends ServiceBaseAction {
 			archetypeJarByteArray = null;
 		}
 	}
+	
 	public String validateForm() throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.validateForm()");
@@ -469,7 +475,6 @@ public class Archetypes extends ServiceBaseAction {
 		for (ApplicationType appType : appTypes) {
 			if (appType.getId().equals(getApptype())) {
 				setAppTypeTechGroups(appType.getTechGroups());
-							
 				return SUCCESS;
 			}
 		}
@@ -481,14 +486,8 @@ public class Archetypes extends ServiceBaseAction {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.openTechGroup()");
 		}
+		
 		List<ApplicationType> appTypes = getServiceManager().getApplicationTypes(getCustomerId());
-		List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
-		List<TechnologyGroup> techGroups = new ArrayList<TechnologyGroup>();
-		for (ApplicationType appType : appTypes) {
-			techGroups = appType.getTechGroups();
-		}
-        setReqAttribute(REQ_TECHNOLOGY_GROUPS, techGroups);
-		setReqAttribute(REQ_ARCHE_TYPE, technologies);
 		setReqAttribute(REQ_APP_TYPES, appTypes);
 		
 		return REQ_TECH_GROUP;
@@ -496,28 +495,47 @@ public class Archetypes extends ServiceBaseAction {
 	
 	public String createTechGroup() throws PhrescoException {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method Archetypes.addTechGroup()");
+			S_LOGGER.debug("Entering Method Archetypes.createTechGroup()");
 		}
-		List<TechnologyGroup> GroupTech = getTechGroups();
+
+		List<TechnologyGroup> technologyGroups = new ArrayList<TechnologyGroup>();
+		List<TechnologyGroup> GroupTech = new ArrayList<TechnologyGroup>();
+		GroupTech = getTechGroups();
+		for (TechnologyGroup groups : GroupTech) {
+			technologyGroups.add(groups);
+		}
+		getServiceManager().createTechnologyGroups(technologyGroups, getCustomerId());
+
 		return list();
 	}
+	
+	public String deleteTechnologyGroup() throws PhrescoException {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method Archetypes.deleteTechGroup()");
+		}
+		
+		getServiceManager().deleteTechnologyGroups(getRemoveTechGroup(), getCustomerId());
+		
+		return TECHGROUP_LIST;
+	}
 
-	public boolean featureValidation(boolean isError) {
-		if (getApplicable() == null) {
+	private boolean featureValidation(boolean isError) {
+		if (CollectionUtils.isEmpty(getApplicable())) {
 			setApplicableErr(getText(KEY_I18N_ERR_APPLICABLE_EMPTY ));
 			tempError = true;
 		}
+		
 		return tempError;
 	}
 
-	public boolean nameValidation(boolean isError) throws PhrescoException {
+	private boolean nameValidation(boolean isError) throws PhrescoException {
 		if (StringUtils.isEmpty(getName())) {
 			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY ));
 			tempError = true;
 		} else if (ADD.equals(getFromPage()) || (!getName().equals(getOldName()))) {
 			// To check whether the name already exist (Application type wise)
 			List<Technology> archetypes = getServiceManager().getArcheTypes(getCustomerId());
-			if (archetypes != null) {
+			if (CollectionUtils.isNotEmpty(archetypes)) {
 				for (Technology archetype : archetypes) {
 					if (archetype.getAppTypeId().equals(getApptype()) && archetype.getName().equalsIgnoreCase(getName())) {
 						setNameError(getText(KEY_I18N_ERR_NAME_ALREADY_EXIST_APPTYPE));
@@ -527,30 +545,34 @@ public class Archetypes extends ServiceBaseAction {
 				}
 			}
 		}
+		
 		return tempError;
 	}
 
-	public boolean archJarValidation(boolean isError) {
+	private boolean archJarValidation(boolean isError) {
 		if (!EDIT.equals(getFromPage())&& archetypeJarByteArray == null) {
 			setFileError(getText(KEY_I18N_ERR_ARCHETYPEJAR_EMPTY));
 			tempError = true;
 		}
+		
 		return tempError;
 	}
 
-	public boolean appTypeValidation(boolean isError) {
+	private boolean appTypeValidation(boolean isError) {
 		if (StringUtils.isEmpty(getApptype())) {
 			setAppError(getText(KEY_I18N_ERR_APPTYPE_EMPTY));
 			tempError = true;
 		}
+		
 		return tempError;
 	}
 
-	public boolean versionValidation(boolean isError) {
+	private boolean versionValidation(boolean isError) {
 		if (StringUtils.isEmpty(getTechVersion())) {
 			setTechvernError(getText(KEY_I18N_ERR_TECHVER_EMPTY));
 			tempError = true;
 		}
+		
 		return tempError;
 	}
 
@@ -817,5 +839,13 @@ public class Archetypes extends ServiceBaseAction {
 
 	public void setExtFileName(String extFileName) {
 		this.extFileName = extFileName;
+	}
+
+	public String getRemoveTechGroup() {
+		return removeTechGroup;
+	}
+
+	public void setRemoveTechGroup(String removeTechGroup) {
+		this.removeTechGroup = removeTechGroup;
 	}
 }
