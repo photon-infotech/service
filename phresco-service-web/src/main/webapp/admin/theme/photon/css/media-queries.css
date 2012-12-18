@@ -111,6 +111,10 @@ Width >= 1152 and < 1280
 	.accordion_panel_inner {
 		height:	335px !important;
 	}
+	.psbltextwidth{
+		width: 63%;
+	}
+
 }
 
 /************************************************************************************
@@ -161,6 +165,9 @@ Width <= 1280 and height <= 768
 	.accordion_panel_inner {
 		height:	260px !important;
 	}
+	.psbltextwidth{
+		width: 64%;
+	}
 }
 
 /************************************************************************************
@@ -177,6 +184,9 @@ Width >= 1280 and height <= 800
 	
 	.accordion_panel_inner {
 		height:	299px !important;
+	}
+	.psbltextwidth{
+		width: 64%;
 	}
 }
 
@@ -195,6 +205,9 @@ Width >= 1280 and height > 800 and height <= 960
 	.accordion_panel_inner {
 		height:	415px !important;
 	}
+	.psbltextwidth{
+		width: 64%;
+	}
 }
 
 /************************************************************************************
@@ -211,6 +224,9 @@ Width >= 1280 and height >= 961 and heigth <=1024
 	
 	.accordion_panel_inner {
 		height:	450px !important;
+	}
+	.psbltextwidth{
+		width: 64%;
 	}
 }
 
@@ -237,6 +253,9 @@ Width > 1280 and <= 1360
 	.accordion_panel_inner {
 		height:	295px !important;
 	}	
+	.psbltextwidth{
+		width: 64%;
+	}
 }
 
 /************************************************************************************
@@ -261,5 +280,8 @@ Width > 1360 and <= 1600
 	
 	.accordion_panel_inner {
 		height:	375px !important;
+	}
+	.psbltextwidth{
+		width: 64%;
 	}
 }
