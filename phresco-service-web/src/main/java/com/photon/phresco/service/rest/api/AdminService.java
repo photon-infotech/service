@@ -161,7 +161,9 @@ public class AdminService extends DbService {
     				repoInfo = repositoryManager.createCustomerRepository(customer.getId(), repoName);
     				customer.setRepoInfo(repoInfo);
     			}
-    			saveFileToDB(customer.getId(), iconStream);
+    			if(iconStream != null) {
+    				saveFileToDB(customer.getId(), iconStream);
+    			}
 		        mongoOperation.save(CUSTOMERDAO_COLLECTION_NAME, customer);
 			}	
     	} catch (Exception e) {
