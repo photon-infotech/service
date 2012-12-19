@@ -1109,6 +1109,26 @@ public class ComponentService extends DbService {
 	}
 	
 	/**
+	 * Returns the artifactInfo
+	 * @return
+	 */
+	@GET
+	@Path (REST_API_ARTIFACTINFO)
+	@Produces (MediaType.APPLICATION_JSON)
+	public Response getArtifactInfo(@QueryParam(REST_QUERY_ID) String id) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.getArtifactInfo()" + id);
+	    }
+		try {
+			Query query = new Query(Criteria.whereId().is(id));
+			ArtifactInfo info = mongoOperation.findOne(ARTIFACT_INFO_COLLECTION_NAME, query, ArtifactInfo.class);
+			return  Response.status(Response.Status.OK).entity(info).build();
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00005, ARTIFACT_INFO_COLLECTION_NAME);
+		}
+	}
+	
+	/**
 	 * Returns the list of pilots
 	 * @return
 	 */
