@@ -86,6 +86,7 @@ public class Features extends ServiceBaseAction {
     private String moduleGroupId = "";
     private String moduleId = "";
     private String license = "";
+    private String oldName = "";
 	private String versioning = "";
     private InputStream fileInputStream;
     private String contentType;
@@ -579,11 +580,27 @@ public class Features extends ServiceBaseAction {
 		return isError;
 	}
 
-	public boolean nameValidation(boolean isError) {
+	public boolean nameValidation(boolean isError) throws PhrescoException {
+
 		if (StringUtils.isEmpty(getName())) {
-            setNameError(getText(KEY_I18N_ERR_NAME_EMPTY));
-            tempError = true;
-        }
+			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY ));
+			tempError = true;
+		} else if (ADD.equals(getFromPage()) || (!getName().equals(getOldName()))) {
+			// To check whether the name already exist (Application type wise)
+			 for(String technologyList : getMultiTechnology()){
+				 List<ArtifactGroup>  moduleGroups = getServiceManager().getFeatures(getCustomerId(), technologyList, Type.valueOf(getType()).name());
+				if (CollectionUtils.isNotEmpty(moduleGroups)) {
+					for (ArtifactGroup moduleGroup : moduleGroups) {
+						if (moduleGroup.getName().equalsIgnoreCase(getName())) {
+							setNameError(getText(KEY_I18N_ERR_NAME_ALREADY_EXIST_APPTYPE));
+							tempError = true;
+							break;
+						}
+					}
+				}
+			 }
+		}
+		
 		return tempError;
 	}
 	
@@ -857,6 +874,14 @@ public class Features extends ServiceBaseAction {
 
 	public void setExtFileName(String extFileName) {
 		this.extFileName = extFileName;
+	}
+
+	public String getOldName() {
+		return oldName;
+	}
+
+	public void setOldName(String oldName) {
+		this.oldName = oldName;
 	}
 	
 }

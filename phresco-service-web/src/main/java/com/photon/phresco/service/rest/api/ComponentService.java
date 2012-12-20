@@ -299,8 +299,10 @@ public class ComponentService extends DbService {
 			String archetypeGroupDAOId = technologyDAO.getArchetypeGroupDAOId();
 			deleteAttifact(archetypeGroupDAOId);
 			List<String> pluginIds = technologyDAO.getPluginIds();
-			for (String pluginId : pluginIds) {
-				deleteAttifact(pluginId);
+			if (CollectionUtils.isNotEmpty(pluginIds)) {
+				for (String pluginId : pluginIds) {
+					deleteAttifact(pluginId);
+				}
 			}
 			mongoOperation.remove(TECHNOLOGIES_COLLECTION_NAME, query, TechnologyDAO.class);
 		}

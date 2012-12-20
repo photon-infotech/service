@@ -112,6 +112,18 @@
 				$('#clipboard').click(function(){
 					copyToClipboard($('.modal-body').text());
 				});
+
+		    	$(".lefttopnav").click(function(){
+		    		$('#dashboard').attr('class', 'active');
+		    	})
+		    	
+		    	$(".leftbotnav").click(function(){
+		    		$('#components').attr('class', 'active');
+		    	})
+		    	
+		    	$(".rightbotnav").click(function(){
+		    		$('#adminMenu').attr('class', 'active');
+		    	})
 			});
 		    
 		</script>
