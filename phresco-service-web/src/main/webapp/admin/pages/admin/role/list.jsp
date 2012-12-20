@@ -92,7 +92,7 @@
 								<% if (roleList.isSystem()) { %>
 									<input type="checkbox" name="roleId" value="<%= roleList.getId() %>" disabled/>
 								<% } else { %>
-									<input type="checkbox" class="check roles" name="roleId"  value="<%= roleList.getId() %>" onclick="checkboxEvent();">
+									<input type="checkbox" class="check roles" name="roleId"  value="<%= roleList.getId() %>" onclick="checkboxEvent($('#checkAllAuto'),'roles');">
 								<% } %>
 							</td>
 							<td  class="namelabel-width">
@@ -167,7 +167,7 @@
 	}
 	
 	$(document).ready(function() {
-		toDisableCheckAll();
+		toDisableCheckAll($('#checkAllAuto'),'roles');
 		hideLoadingIcon();
 	});
 	

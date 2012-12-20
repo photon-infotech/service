@@ -49,7 +49,7 @@
 							<tr>
 								<th class="first">
 									<div class="th-inner">
-										<input type="checkbox" id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this);">
+										<input type="checkbox" value="" id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this,$('.check'),false);">
 									</div>
 								</th>
 								<th class="second">
@@ -73,7 +73,7 @@
 						<tbody>
 						<tr>
 							<td class="checkboxwidth">
-								<input type="checkbox" class="check" name="check"  onclick="checkboxEvent();">
+								<input type="checkbox" class="check" name="check"  onclick="checkboxEvent($('#checkAllAuto'),'check');">
 							</td>
 							<td>
 								<%= StringUtils.isNotEmpty(user.getName()) ? user.getName() :"" %>
@@ -148,6 +148,7 @@
 	
 	$(document).ready(function() {
 		hideLoadingIcon();
+		toDisableCheckAll($('#checkAllAuto'),'check');
 		
 		$("#addValues").click(function() {
 			var val = $("#txtCombo").val();

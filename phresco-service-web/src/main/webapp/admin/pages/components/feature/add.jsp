@@ -201,7 +201,7 @@
 					<div class="multilist-scroller multiselct" id="applicableToDiv">
 						<ul>
 							<li>
-								<input type="checkbox" value="all" id="checkAllAuto" name="" onclick="checkAllEvent(this,$('.applsChk'), true);"
+								<input type="checkbox" value="" id="checkAllAuto" name="" onclick="checkAllEvent(this,$('.applsChk'), false);"
 									style="margin: 3px 8px 6px 0;" <%= disabledVer %> ><s:text name='lbl.all'/>
 							</li>
 							<%
@@ -215,7 +215,7 @@
 											}
 							%>
 										<li> <input type="checkbox" id="appliestoCheckbox" name="multiTechnology" value='<%= technology.getId() %>'
-											class="check applsChk" <%= checkedStr %> <%= disabledVer %> ><%= technology.getName() %>
+											onclick="checkboxEvent($('#checkAllAuto'), 'applsChk')"	class="check applsChk" <%= checkedStr %> <%= disabledVer %> ><%= technology.getName() %>
 										</li>
 							<%		}	
 								}
@@ -238,7 +238,7 @@
 				        <option value="core"><s:text name="lbl.comp.featr.type.external" /></option>
 				        <option value="custom"><s:text name="lbl.comp.featr.type.custom" /></option>
 	     		 	</select>
-				</div>
+	     		</div>
 			</div>
 		<% } %>
 		
@@ -275,7 +275,7 @@
 									selectedStr = "";
 								}
 							}
-				%>
+				  %>
 							<option value="<%= license.getId() %>" <%= selectedStr %> <%= disabledVer %>><%= license.getName() %></option>
 				<%
                         }
@@ -492,6 +492,7 @@
         } else {
             hideError($("#applyControl"), $("#techError"));
         }
+                      
     }
     
 	//To upload the file upload validation error
@@ -519,6 +520,7 @@
 			element : document.getElementById('feature-file-uploader'),
 			action : 'uploadFeatureFile',
 			multiple : false,
+			uploadId: 'featureUploadId',
 			allowedExtensions : ["zip","jar","dll","so"],
 			fileType : 'featureJar',
 			buttonLabel : '<s:label key="lbl.comp.featr.upload" />',
@@ -533,7 +535,8 @@
 			element : document.getElementById('feature-img-uploader'),
 			action : 'uploadIconFile',
 			multiple : false,
-			allowedExtensions : ["png"],	
+			uploadId: 'featureUploadImg',
+			allowedExtensions : ["png"],
 			fileType : 'featureImg',
 			buttonLabel : '<s:label key="lbl.comp.featricon.upload" />',
 			typeError : '<s:text name="err.invalid.img.file" />',

@@ -157,13 +157,13 @@ function checkAllEvent(currentCheckbox, childCheckBox, disable) {
 	toDisableAllCheckbox(currentCheckbox,childCheckBox, disable);
 }
 
-function checkboxEvent() {
-	var chkboxStatus = $('.check').is(':checked');
+function checkboxEvent(parentChkBoxObj, chldChkBoxCls) {
+	var chkboxStatus = $('.' + chldChkBoxCls).is(':checked');
 	buttonStatus(chkboxStatus);
-	if ($('.check').length == $(".check:checked").length) {
-		$('#checkAllAuto').prop('checked', true);
+	if ($('.' + chldChkBoxCls).length == $("." + chldChkBoxCls + ":checked").length) {
+		parentChkBoxObj.prop('checked', true);
 	} else {
-		$('#checkAllAuto').prop('checked', false);
+		parentChkBoxObj.prop('checked', false);
 	}
 }
 
@@ -176,11 +176,11 @@ function buttonStatus(checkAll) {
 	}
 }
 
-function toDisableCheckAll() {
-	if ($(".check:checkbox").length > 0 ) {
-		$('#checkAllAuto').prop('disabled', false);
+function toDisableCheckAll(parentChkBoxObj, chldChkBoxCls) {
+	if ($('.' + chldChkBoxCls).length > 0 ) {
+		parentChkBoxObj.prop('disabled', false);
 	} else {
-		$('#checkAllAuto').prop('disabled', true);
+		parentChkBoxObj.prop('disabled', true);
 	}
 }
 

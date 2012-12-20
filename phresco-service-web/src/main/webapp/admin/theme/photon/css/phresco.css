@@ -2464,3 +2464,7 @@ input[class="chkBox_config"] {
 .customer_list .controls textarea {
 	max-width: 80% !important; 
 }
+
+.dwnldError{
+	color:#B94A48;
+}	

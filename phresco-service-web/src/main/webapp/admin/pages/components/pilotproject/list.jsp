@@ -102,7 +102,7 @@
 			 					        <% if (proInfo.isSystem()) { %>
 											<input type="checkbox" name="projectId" value="<%=proInfo.getId() %>"  disabled/>	
 										<% } else { %>
-											<input type="checkbox" class="check pilotprojt" name="projectId" value="<%=proInfo.getId() %>" onclick="checkboxEvent();" />
+											<input type="checkbox" class="check pilotprojt" name="projectId" value="<%=proInfo.getId() %>" onclick="checkboxEvent($('#checkAllAuto'),'pilotprojt');" />
 										<% } %>
 									</td>
 									<td>
@@ -141,7 +141,7 @@
 	}
 
 	$(document).ready(function() {
-		toDisableCheckAll(); 
+		toDisableCheckAll($('#checkAllAuto'),'pilotprojt'); 
 		hideLoadingIcon();
 	});
 	

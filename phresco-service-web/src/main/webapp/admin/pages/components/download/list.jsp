@@ -98,7 +98,7 @@
 									<% if (download.isSystem()) { %>
 										<input type="checkbox"  name="downloadId" value="<%= download.getId() %>" disabled >
 									<% } else { %>
-									  	<input type="checkbox" class="check dwnloadInfo" name="downloadId" value="<%= download.getId() %>" onclick="checkboxEvent();" >
+									  	<input type="checkbox" class="check dwnloadInfo" name="downloadId" value="<%= download.getId() %>" onclick="checkboxEvent($('#checkAllAuto'),'dwnloadInfo');" >
 									<% } %>								
 									</td>
 									<td class="namelabel-width">
@@ -142,7 +142,7 @@
 	}
 
 	$(document).ready(function() {
-		toDisableCheckAll(); 
+		toDisableCheckAll($('#checkAllAuto'),'dwnloadInfo'); 
 		hideLoadingIcon();
 	});
      

@@ -67,7 +67,7 @@
 							<tr>
 								<th class="first">
 									<div class="th-inner">
-										<input type="checkbox" value="" class=checkAll id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this, $('.technolgies'), false);">
+										<input type="checkbox" value="" class=checkAll id="checkAllFeature" name="checkAllAuto" onclick="checkAllEvent(this, $('.technolgies'), false);">
 									</div>
 								</th>
 								<th class="second">
@@ -100,7 +100,7 @@
 									<% if (technology.isSystem()) { %>
 										<input type="checkbox" name="techId" value="<%= technology.getId() %>" disabled/>
 									<% } else { %>
-										<input type="checkbox" class="check technolgies" name="techId" value="<%= technology.getId() %>" onclick="checkboxEvent();" />
+										<input type="checkbox" class="checkAll technolgies" name="techId" value="<%= technology.getId() %>" onclick="checkboxEvent($('#checkAllFeature'), 'technolgies');" />
 									<% } %>
 									</td>
 									
@@ -159,7 +159,7 @@
 	}
 	
 	$(document).ready(function() {
-		toDisableCheckAll();
+		toDisableCheckAll($('#checkAllFeature') , 'technolgies');
 		hideLoadingIcon();
 	 	 $("td[id = 'desc']").text(function(index) {
 	        return textTrim($(this));
@@ -202,5 +202,7 @@
 		var params = '{"techGroups" : [' + techGroupToAdd.join(',') + ']}';
 		loadJsonContent('newTechGroup', params);
 	}
+	
+	
     
 </script>

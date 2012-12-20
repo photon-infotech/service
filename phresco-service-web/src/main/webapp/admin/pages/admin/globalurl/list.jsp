@@ -64,7 +64,7 @@
 						<tr>
 							<th class="first">
 								<div class="th-inner">
-									<input type="checkbox" value="" id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this);">
+									<input type="checkbox" value="" id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this,$('.check'),false);">
 								</div>
 							</th>
 							<th class="second">
@@ -89,7 +89,7 @@
 									<% if (globalUrl.isSystem()) { %>
 										<input type="checkbox" disabled>
 									<% } else { %>
-										<input type="checkbox" class="check" name="globalurlId" value="<%= globalUrl.getId() %>" onclick="checkboxEvent();">
+										<input type="checkbox" class="check" name="globalurlId" value="<%= globalUrl.getId() %>" onclick="checkboxEvent($('#checkAllAuto'),'check');">
 									<% } %>
 								</td>
 								<td class="namelabel-width">
@@ -128,6 +128,7 @@
 
 	$(document).ready(function() {
 		hideLoadingIcon();
+		toDisableCheckAll($('#checkAllAuto'),'check');
 	});
 	
 	function editGlobalUrl(id) {

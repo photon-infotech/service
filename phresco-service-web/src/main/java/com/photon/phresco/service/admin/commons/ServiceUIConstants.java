@@ -376,7 +376,9 @@ public interface ServiceUIConstants {
     String KEY_I18N_ERR_IMAGE_EMPTY = "err.msg.img.empty";
     String KEY_I18N_VIDEO_UPDATING = "lbl.prog.vdeo.update";
     String KEY_I18N_VIDEO_CREATING = "lbl.prog.vdeo.save";
-    
+    String KEY_I18N_ERR_DWN_GRPID_EMPTY = "err.msg.grpid.empty";
+    String KEY_I18N_ERR_DWN_ARTFID_EMPTY = "err.msg.artfid.empty";
+        
     String KEY_I18N_BUTTON_SAVE = "lbl.hdr.comp.save";
     String KEY_I18N_BUTTON_UPDATE = "lbl.hdr.comp.update";
     String KEY_I18N_VIDEO_TITLE_ADD = "lbl.hdr.adm.vdeoadd";

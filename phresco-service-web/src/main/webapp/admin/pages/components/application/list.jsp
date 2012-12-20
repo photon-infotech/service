@@ -34,8 +34,8 @@
 
 <form id="formAppTypeList" class="customer_list">
 	<div class="operation" id="operation">
-		<input type="button" class="btn btn-primary" name="application_add" id="applicationAdd" 
-            onclick="loadContent('applicationAdd', $('#formAppTypeList'), $('#subcontainer'));" value="<s:text name='lbl.hdr.comp.apln.add'/>"/>
+		<input type="button" class="btn" name="application_add" id="applicationAdd" 
+            onclick="loadContent('applicationAdd', $('#formAppTypeList'), $('#subcontainer'));" disabled value="<s:text name='lbl.hdr.comp.apln.add'/>"/>
 		<input type="button" class="btn" id="del" disabled value="<s:text name='lbl.btn.del'/>" 
             onclick="showDeleteConfirmation('<s:text name='del.confirm.applicationType'/>');"/>
 		<s:if test="hasActionMessages()">
@@ -86,7 +86,7 @@
                                                <input type="checkbox" name="apptypeId" value="<%= appType.getId() %>" disabled/>
                                         <% } else { %>
                                                <input type="checkbox" class="check apptype" name="apptypeId" value="<%= appType.getId() %>" 
-                                               	onclick="checkboxEvent();"/>
+                                               	onclick="checkboxEvent($('#checkAllAuto'),'apptype');"/>
                                         <% } %>
 										</td>
 										
@@ -119,8 +119,8 @@
 	}
 	
  	$(document).ready(function() {
- 		toDisableCheckAll();
  		hideLoadingIcon();
+ 		toDisableCheckAll($('#checkAllAuto'),'apptype')
    	});
 
 	function editAppType(id) {

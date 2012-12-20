@@ -76,7 +76,7 @@
 		                <div class="mfbox siteinnertooltiptxt hideContent">
 		                    <div class="scrollpanel">
 		                        <section class="scrollpanel_inner">
-		                        	<table class="download_tbl download_feature_tbl">
+		                 	      	<table class="download_tbl download_feature_tbl">
 			                            <tbody>
 			                            <% 
 									    	List<ArtifactInfo> versions = moduleGroup.getVersions();
@@ -137,7 +137,7 @@
 	}
 	
 	$(document).ready(function() {
-		toDisableCheckAll();
+		toDisableCheckAll($('#checkAllAuto'),'technology');
 		hideLoadingIcon();//To hide the loading icon
 	});
 	

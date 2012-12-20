@@ -101,7 +101,7 @@
 											             onclick="checkboxEvent();" disabled/>
 										<% } else { %>
 										<input type="checkbox" class="check configtempltes" name="configId" value="<%= configTemplate.getId() %>" 
-										                onclick="checkboxEvent();" />
+										                onclick="checkboxEvent($('#checkAllAuto'),'configtempltes');" />
 										<% } %>
 										</td>
 										<td class="nameConfig">
@@ -139,7 +139,7 @@
 	}
 
 	$(document).ready(function() {
-		toDisableCheckAll();
+		toDisableCheckAll($('#checkAllAuto'),'configtempltes');
 		hideLoadingIcon();
 		
 		$("td[id = 'hoverAppliesTo']").text(function(index) {

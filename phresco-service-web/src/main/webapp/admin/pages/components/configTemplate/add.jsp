@@ -91,7 +91,7 @@
 					<div class="multilist-scroller multiselct" id="appliesToDiv">
 					<ul>
 						<li>
-							<input type="checkbox" value="all" id="checkAllAuto" name="" onclick="checkAllEvent(this,$('.applsChk'), true);" style="margin: 3px 8px 6px 0;">All
+							<input type="checkbox" value="" id="checkAllAuto" name="" onclick="checkAllEvent(this,$('.applsChk'), false);" style="margin: 3px 8px 6px 0;">All
 						</li>
 
 						<%
@@ -116,7 +116,7 @@
 
 						%>		
 								<li>
-									<input type="checkbox" id="appliestoCheckbox" name="appliesTo" onclick= "checkboxEvent()" value="<%= technology.getId() %>"  <%= checkedStr %>
+									<input type="checkbox" id="appliestoCheckbox" name="appliesTo" onclick= "checkboxEvent($('#checkAllAuto'),'applsChk')" value="<%= technology.getId() %>"  <%= checkedStr %>
 										class="check applsChk"><%= technology.getName() %>
 								</li>
 						<%  
@@ -394,6 +394,7 @@
 	$(document).ready(function() {
 		
 		hideLoadingIcon();
+		checkboxEvent($('#checkAllAuto'), 'applsChk');
 		chkCount();
 		
 		//for edit -- to dynamically populate possible values in property template fieldset 
@@ -533,10 +534,8 @@
 	});
 	
 	
-	var counter = "";
-	
+	var counter = 2;
 	function addconfig() {
-		counter = $(".keywidth").size() + 1;
 		var trId = counter + "_configdynamiadd";
 		var keyId = counter;
 		var keyTmpName = counter+"_key";

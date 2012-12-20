@@ -123,8 +123,7 @@
 		<div id="jarDetailsDiv" class="hideContent">
 			<div class="control-group" id="groupIdControl">
 				<label class="control-label labelbold">
-				  <% if(fromPage != ServiceUIConstants.EDIT) { %>
-					<span class="mandatory">*</span><% } %>&nbsp;<s:text name='lbl.hdr.comp.groupid'/>
+				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.groupid'/>
 				</label>
 				<div class="controls">
 					<input name="groupId" class="input-xlarge" type="text"
@@ -245,18 +244,21 @@
 		} else {
 			hideError($("#pilotProFileControl"), $("#pilotProFileError"));
 		}
+		
 		if (!isBlank(data.groupIdError)) {
 			showError($("#groupIdControl"), $("#groupIdError"), data.groupIdError);
 		} else {
 			hideError($("#groupIdControl"), $("#groupIdError"));
 			disableCtrl($('input[name=groupId]'));
 		}
+		
 		if (!isBlank(data.artifactIdError)) {
 			showError($("#artifactIdControl"), $("#artifactIdError"), data.artifactIdError);
 		} else {
 			hideError($("#artifactIdControl"), $("#artifactIdError"));
 			disableCtrl($('input[name=artifactId]'));
 		}
+		
 		if (!isBlank(data.jarVerError)) {
 			showError($("#verControl"), $("#jarversionError"), data.jarVerError);
 		} else {
@@ -285,6 +287,7 @@
 			element: document.getElementById('pilotPro-file-uploader'),
 			action: 'uploadPilotProjZip',
 			multiple: false,
+			uploadId: 'pilotProjUploadId',
 			allowedExtensions : ["zip"],
 			type: 'pilotProZip',
 			buttonLabel: '<s:label key="lbl.hdr.comp.pilotpro.upload" />',

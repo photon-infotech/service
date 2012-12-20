@@ -44,7 +44,7 @@
 						<tr>
 							<th class="first">
 								<div class="th-inner">
-									<input type="checkbox" id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this);">
+									<input type="checkbox" id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this,$('.check'),false);">
 								</div>
 							</th>
 							<th class="second">
@@ -65,7 +65,7 @@
 						%>
 								<tr>
 									<td class="checkboxwidth">
-										<input type="checkbox" class="check" name="permissionId" value="<%= permission.getId() %>" onclick="checkboxEvent();">
+										<input type="checkbox" class="check" name="permissionId" value="<%= permission.getId() %>" onclick="checkboxEvent($('#checkAllAuto'),'check');">
 									</td>
 									<td class="namelabel-width"><%= permission.getName()  %></td>
 <%-- 								<td><%= permission.getPermission()  %></td> --%>
@@ -90,6 +90,7 @@
 
 	$(document).ready(function() {
 		hideLoadingIcon();
+		toDisableCheckAll($('#checkAllAuto'),'check');
 	});
 	
 	function continueDeletion() {

@@ -72,6 +72,9 @@ public class Downloads extends ServiceBaseAction {
 	private String techError = "";
 	private String fileError = "";
 	private String licenseError = "";
+	private String groupIdError="";
+	private String artifactIdError="";
+	private String iconError="";
 	private boolean errorFound = false;
 	
 	private String fromPage = "";
@@ -88,7 +91,7 @@ public class Downloads extends ServiceBaseAction {
 	private static Map<String, InputStream> inputStreamMap = new HashMap<String, InputStream>();
 	private static byte[] downloadByteArray = null;
 	private static byte[] imgByteArray = null;
-	private static String featureJarFileName = "";
+	private static String downloadZipFileName = "";
 
 	public String list() throws PhrescoException {
 		if (isDebugEnabled) {
@@ -237,7 +240,7 @@ public class Downloads extends ServiceBaseAction {
         artifactGroup.setLicenseId(getLicense());
         artifactGroup.setGroupId(getGroupId());
         artifactGroup.setArtifactId(getArtifactId());
-        artifactGroup.setPackaging(ServerUtil.getFileExtension(featureJarFileName));
+        artifactGroup.setPackaging(ServerUtil.getFileExtension(downloadZipFileName));
         downloadInfo.setArtifactGroup(artifactGroup);
       
         return downloadInfo;
@@ -274,7 +277,7 @@ public class Downloads extends ServiceBaseAction {
 	        InputStream is = getHttpRequest().getInputStream();
 	       
 	        getByteArray();
-	        featureJarFileName = getFileName();
+	        downloadZipFileName = getFileName();
 	        downloadByteArray = IOUtils.toByteArray(is);
         	writer.print(MAVEN_JAR_FALSE);
         	getHttpResponse().setStatus(getHttpResponse().SC_OK);
@@ -372,7 +375,17 @@ public class Downloads extends ServiceBaseAction {
 					}
 				}
 			}
-		}*/
+		} */
+		
+		if(StringUtils.isEmpty(getGroupId())) {
+			setGroupIdError(getText(KEY_I18N_ERR_GROUPID_EMPTY));
+			isError = true;
+		}
+		
+		if(StringUtils.isEmpty(getArtifactId())) {
+			setArtifactIdError(getText(KEY_I18N_ERR_ARTIFACTID_EMPTY));
+			isError = true;
+		}
 		
 		if(StringUtils.isEmpty(getLicense())) {
         	setLicenseError(getText(KEY_I18N_ERR_LICEN_EMPTY));
@@ -394,6 +407,16 @@ public class Downloads extends ServiceBaseAction {
 		//Empty validation for technology
 		if (CollectionUtils.isEmpty(getTechnology())) {
 			setTechError(getText(KEY_I18N_ERR_TECH_EMPTY));
+			isError = true;
+		}
+		
+		if(downloadByteArray == null) {
+			setFileError(getText(KEY_I18N_ERR_FILE_EMPTY));
+			isError = true;
+		}
+		
+		if(imgByteArray == null) {
+			setIconError(getText(KEY_I18N_ERR_IMAGE_EMPTY));
 			isError = true;
 		}
 		
@@ -619,4 +642,30 @@ public class Downloads extends ServiceBaseAction {
 	public void setExtFileName(String extFileName) {
 		this.extFileName = extFileName;
 	}
+
+	public void setGroupIdError(String groupIdError) {
+		this.groupIdError = groupIdError;
+	}
+
+	public String getGroupIdError() {
+		return groupIdError;
+	}
+
+	public void setArtifactIdError(String atrifactIdError) {
+		this.artifactIdError = atrifactIdError;
+	}
+
+	public String getArtifactIdError() {
+		return artifactIdError;
+	}
+
+	public void setIconError(String iconError) {
+		this.iconError = iconError;
+	}
+
+	public String getIconError() {
+		return iconError;
+	}
+
+	
 }

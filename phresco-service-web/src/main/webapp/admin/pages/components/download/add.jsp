@@ -118,7 +118,7 @@
 	                <div class="multilist-scroller multiselct" style="height: 95px; width:300px;">
 		                <ul>
 							<li>
-								<input type="checkbox" <%= disabledVer %> id="checkAllAuto" onclick="checkAllEvent(this, $('.techCheck'), true);"
+								<input type="checkbox" <%= disabledVer %> id="checkAllTechnology" value="" onclick="checkAllEvent(this, $('.techCheck'), false);"
 									style="margin: 3px 8px 6px 0;">All
 							</li>
 		                    <%
@@ -135,7 +135,7 @@
 		                    %>
 	                   			<li>
 									<input type="checkbox" name="technology" <%= disabledVer %>  value="<%= technology.getId() %>"  <%= checkedStr %>
-										class="check techCheck"><%= technology.getName() %>
+										onclick="checkboxEvent($('#checkAllTechnology'),'techCheck');" class="check techCheck"><%= technology.getName() %>
 								</li>
 							<% 	 
 									}
@@ -161,23 +161,27 @@
         
         <!-- POM details starts -->
 		<div id="jarDetailsDiv" class="hideContent">
-			<div class="control-group">
+			<div class="control-group" id="groupIdControl">
 				<label class="control-label labelbold">
+				<span class="mandatory">*</span>&nbsp;
 					<s:text name='lbl.hdr.comp.groupid'/>
 				</label>
 				<div class="controls">
 					<input id="grpId" name="groupId" class="input-xlarge" type="text"
 						maxlength="40" title="40 Characters only" placeholder="<s:text name='place.hldr.archetype.add.groupId'/>">
+					<span class="help-inline dwnldError" id="groupIdError"></span>
 				</div>
 			</div>
 			
-			<div class="control-group">
+			<div class="control-group" id="artifactIdControl">
 				<label class="control-label labelbold">
+				<span class="mandatory">*</span>&nbsp;
 					<s:text name='lbl.hdr.comp.artifactid'/>
 				</label>
 				<div class="controls">
 					<input id="arftId" name="artifactId" class="input-xlarge" type="text"
 						maxlength="40" title="40 Characters only" placeholder="<s:text name='place.hldr.archetype.add.artifactId'/>">
+						<span class="help-inline dwnldError" id="artifactIdError"></span>
 				</div>
 			</div>
 		</div>
@@ -185,9 +189,10 @@
 		
 		<div class="control-group" id="downloadFileControl">
 			<label class="control-label labelbold">
+			<span class="mandatory">*</span>&nbsp;
 				<s:text name='lbl.hdr.adm.dwnld.fle'/>
 			</label>
-			<div class="controls" style="float: left; margin-left: 3%;">
+			<div class="controls dwnldError" style="float: left; margin-left: 3%;">
 				<div id="download-file-uploader" class="file-uploader">
 					<noscript>
 						<p>Please enable JavaScript to use file uploader.</p>
@@ -195,7 +200,7 @@
 					</noscript>
 				</div>
 			</div>
-			 <span class="help-inline fileError" id="fileError"></span>
+			 <span class="help-inline dwnldError" id="fileError"></span>
 		</div>
 		
 		<% 
@@ -246,7 +251,7 @@
 				<div class="multilist-scroller multiselct" style="height: 95px; width:300px;">
 					<ul>
 						<li>
-							<input type="checkbox" <%= disabledVer %> id="checkAll" onclick="checkAllEvent(this, $('.platFormCheck'), true);" 
+							<input type="checkbox" <%= disabledVer %> id="checkAllPlatform" value="" onclick="checkAllEvent(this, $('.platFormCheck'), false);" 
 								style="margin: 3px 8px 6px 0;">All
 						</li>
 						<%
@@ -261,7 +266,7 @@
 										}
 						%>
 								<li>
-									<input type="checkbox" <%= disabledVer %> name="platform" class="check platFormCheck" value="<%= platform.getId() %>" <%= checkedStr %>>
+									<input type="checkbox" <%= disabledVer %> name="platform" onclick="checkboxEvent($('#checkAllPlatform'),'platFormCheck');" class="check platFormCheck" value="<%= platform.getId() %>" <%= checkedStr %>>
 									<%= platform.getType() + platform.getBit() %>
 								</li>
 						<% 
@@ -277,6 +282,7 @@
 			
 		<div class="control-group"  id="iconControl">
 			<label class="control-label labelbold">
+			<span class="mandatory">*</span>&nbsp;
 				<s:text name='lbl.hdr.adm.dwnld.icon'/>
 			</label>
 			<div class="controls" style="float: left; margin-left: 3%;">
@@ -287,7 +293,7 @@
 					</noscript> 
 				</div>
 			</div>
-			<span class="help-inline iconError" id="iconError"></span>
+			<span class="help-inline dwnldError" id="iconError"></span>
 		</div>
 			
 		<div class="control-group" id="groupControl">
@@ -348,6 +354,8 @@
 	$(document).ready(function() {
 		hideLoadingIcon();
         createUploader(); 
+        checkboxEvent($('#checkAllTechnology'),'techCheck');
+        checkboxEvent($('#checkAllPlatform'),'platFormCheck');
      
      	// To check for the special character in name
         $('#downloadName').bind('input propertychange', function (e) {
@@ -403,6 +411,31 @@
 			showError($("#techControl"), $("#techError"), data.techError);
 		} else {
 			hideError($("#techControl"), $("#techError"));
+		}
+		
+		if(!isBlank(data.groupIdError)) {
+			showError($("#" + $(this).attr("id")), $("#groupIdError"),'<s:text name='err.msg.grpid.empty'/>');
+		} else {
+			hideError($("#groupIdControl"), $("groupIdError"));
+			
+		}
+		
+		if(!isBlank(data.artifactIdError)) {
+			showError($("#" + $(this).attr("id")), $("#artifactIdError"),'<s:text name='err.msg.artfid.empty'/>');
+		} else {
+			hideError($("artifactIdControl"), $("artifactIdError"));
+		}
+		
+		if(!isBlank(data.fileError)) {
+			showError($("#" + $(this).attr("id")), $("#fileError"),'<s:text name='err.msg.file.empty'/>');
+		} else {
+			hideError($("downloadFileControl"),$("fileError"))
+		}
+		
+		if(!isBlank(data.iconError)) {
+			showError($("#" + $(this).attr("id")), $("#iconError"),'<s:text name='err.msg.img.empty'/>');
+		} else {
+			hideError($("iconControl"),$("iconError"))
 		}
 	}
 	 

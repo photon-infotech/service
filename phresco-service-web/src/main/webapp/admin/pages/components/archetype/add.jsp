@@ -242,7 +242,7 @@
 					<div class="multilist-scroller multiselct" id="applicableToDiv">
 						<ul>
 							<li>
-								<input type="checkbox" value="all" id="checkAllAuto" name="" onclick="checkAllEvent(this,$('.applsChk'), true);"
+								<input type="checkbox" value="" id="checkAllFeatures" name="applicableFeatures" onclick="checkAllEvent(this,$('.applsChk'), false);"
 									style="margin: 3px 8px 6px 0;"><s:text name='lbl.all'/>
 							</li>
 							<%
@@ -263,8 +263,9 @@
 											}
 										}
 							%>
-										<li> <input type="checkbox" id="appliestoCheckbox" <%= disabledVer %> name="applicable" value='<%= option.getOption() %>'
-											class="check applsChk" <%= checkedStr %>><%= option.getOption() %>
+										<li>
+											<input type="checkbox" id="appliestoCheckbox" <%= disabledVer %> name="applicable" value="<%= option.getOption() %>"
+												onclick="checkboxEvent($('#checkAllFeatures'), 'applsChk')" class="applsChk" <%= checkedStr %>><%= option.getOption() %> 
 										</li>
 							<%		}
 								}
@@ -284,7 +285,7 @@
 					<div class="multilist-scroller multiselct" id="applicableToDiv">
 						<ul>
 							<li>
-								<input type="checkbox" value="all" id="checkAllAuto" name="" onclick="checkAllEvent(this,$('.reportsChk'), true);"
+								<input type="checkbox" value="" id="checkAllReports" name="" onclick="checkAllEvent(this,$('.reportsChk'), false);"
 								style="margin: 3px 8px 6px 0;"><s:text name='lbl.all'/>
 							</li>
 							<%
@@ -299,8 +300,8 @@
 											}
 										}
 							%>
-										<li> <input type="checkbox" id="reportsCheckbox" name="applicableReports" value='<%= report.getId() %>'
-											class="check reportsChk" <%= checkedStr %>><%= report.getDisplayName() %>
+										<li> <input type="checkbox" id="reportsCheckbox" <%= disabledVer %> name="applicableReports" value="<%= report.getId() %>"  onclick="checkboxEvent($('#checkAllReports'), 'reportsChk')"
+											 class="reportsChk" <%= checkedStr %>><%= report.getDisplayName() %> 
 										</li>
 							<%		}	
 								}
@@ -349,6 +350,8 @@
     	hideLoadingIcon();
         createUploader();
         getTechGroup();
+        checkboxEvent($('#checkAllFeatures'), 'applsChk');
+        checkboxEvent($('#checkAllReports'), 'reportsChk');
         // To focus the name textbox by default
         $('#archename').focus();
 
@@ -488,10 +491,12 @@
 		$('#popup_div').empty();
 		disableScreen();
 		loadContent('uploadPluginJar', $('#formArcheTypeAdd'), $('.modal-body'));
-		$("#loadingIconDiv").hide();
+		hideLoadingIcon(); 
 	}
 	
 	function downloadFile() {
 		window.location.href="admin/archetypeUrl?" + $('#formArcheTypeAdd').serialize();
 	}
+	
+	
 </script>

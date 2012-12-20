@@ -94,7 +94,7 @@
 								    <input type="checkbox" name="customerId" value="<%= customer.getId() %>" disabled/>
 								<% } else { %>
 									<input type="checkbox" class="check customerChk" name="customerId" value="<%= customer.getId() %>" 
-									   onclick="checkboxEvent();" />
+									   onclick="checkboxEvent($('#checkAllAuto'),'customerChk');" />
 							    <% } %>		   
 								</td>
 								<td class="namelabel-width">
@@ -126,7 +126,7 @@
 	}
 
 	$(document).ready(function() {
-		toDisableCheckAll();
+		toDisableCheckAll($('#checkAllAuto'),'customerChk');
 		hideLoadingIcon();
 	});
 	

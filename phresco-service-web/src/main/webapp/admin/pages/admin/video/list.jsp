@@ -63,7 +63,7 @@
 							<tr>
 								<th class="first">
 									<div class="th-inner">
-										<input type="checkbox" id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this, $('.videoChk'), false);">
+										<input type="checkbox" value="" id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this, $('.videoChk'), false);">
 									</div>
 								</th>
 								<th class="second">
@@ -86,7 +86,7 @@
 								      <input type="checkbox"  name="videoId" value="<%= videoInfo.getId() %>"  disabled /> 
 								   <% } else { %>
 									<input type="checkbox" class="check videoChk" name="videoId" value="<%= videoInfo.getId() %>" 
-									   onclick="checkboxEvent();" />
+									   onclick="checkboxEvent($('#checkAllAuto'),'videoChk');" />
 								    <% } %>	   
 								</td>
 								<td>
@@ -116,7 +116,7 @@
 	}
 	
 	$(document).ready(function() {
-		toDisableCheckAll();
+		toDisableCheckAll($('#checkAllAuto'),'videoChk');
 		hideLoadingIcon();
 	});
 	
