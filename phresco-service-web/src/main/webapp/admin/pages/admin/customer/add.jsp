@@ -552,7 +552,7 @@
 			</label>
 			<div class="controls">
 				<input id="repourl" placeholder="<s:text name='lbl.hdr.adm.cust.repoURL'/>" class="input-xlarge" name="repoURL" type="text" 
-				    value="<%= repoURL %>" maxlength="30" title="30 Characters only"/>
+				    value="<%= repoURL %>" />
 				    <span class="help-inline" id="repoURLError"></span>
 			</div>
 		</div>
