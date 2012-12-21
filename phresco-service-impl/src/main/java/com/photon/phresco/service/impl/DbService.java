@@ -248,6 +248,10 @@ public class DbService implements ServiceConstants {
     		if (CollectionUtils.isNotEmpty(customersInDb)) {
     			for (Customer customer : customersInDb) {
 					List<String> applicableTechnologies = customer.getApplicableTechnologies();
+					List<String> fromDB= getApplicableForomDB(customer.getId());
+					if(CollectionUtils.isNotEmpty(fromDB)) {
+						applicableTechnologies.addAll(fromDB);
+					}
 					List<Technology> technologies = createTechnology(applicableTechnologies);
 					List<TechnologyGroup> technologyGroups = createTechnologyInfo(technologies);
 					Map<String, List<TechnologyGroup>> appTypeMap = new HashMap<String, List<TechnologyGroup>>();
@@ -264,6 +268,22 @@ public class DbService implements ServiceConstants {
 		return null;
 	}
 	
+	private List<String> getApplicableForomDB(String customerId) {
+		if(customerId.equals(DEFAULT_CUSTOMER_NAME)) {
+			return null;
+		}
+		System.out.println(customerId);
+		List<TechnologyDAO> techs = mongoOperation.find(TECHNOLOGIES_COLLECTION_NAME, 
+				new Query(Criteria.where(DB_COLUMN_CUSTOMERIDS).is(customerId)), TechnologyDAO.class);
+		List<String> techIds = new ArrayList<String>();
+		if(CollectionUtils.isNotEmpty(techs)) {
+			for (TechnologyDAO dao : techs) {
+				techIds.add(dao.getId());
+			}
+		}
+		return techIds;
+	}
+
 	private List<Technology> createTechnology(List<String> applicableTechnologies) throws PhrescoException {
 		List<Technology> technologies = new ArrayList<Technology>();
 		try {
