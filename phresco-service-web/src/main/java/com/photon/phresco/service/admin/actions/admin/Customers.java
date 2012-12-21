@@ -23,7 +23,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -44,6 +43,7 @@ import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
+import com.photon.phresco.util.ServiceConstants;
 
 public class Customers extends ServiceBaseAction  { 
 	
@@ -128,7 +128,8 @@ public class Customers extends ServiceBaseAction  {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Customers.add()");
 	    }
-	    List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
+	    
+	    List<Technology> technologies = getServiceManager().getArcheTypes(ServiceConstants.DEFAULT_CUSTOMER_NAME);
 	    setReqAttribute(REQ_ARCHE_TYPES, technologies);
 	    setReqAttribute(REQ_FROM_PAGE, ADD);
 	    
@@ -145,15 +146,17 @@ public class Customers extends ServiceBaseAction  {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Customers.edit()");
 		}
+		
 		try {
 			Customer customer = getServiceManager().getCustomer(getCustomerId());
-			List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
+			List<Technology> technologies = getServiceManager().getArcheTypes(ServiceConstants.DEFAULT_CUSTOMER_NAME);
 		    setReqAttribute(REQ_ARCHE_TYPES, technologies);
 			setReqAttribute(REQ_CUST_CUSTOMER, customer);
 			setReqAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (PhrescoException e) {
 		    return showErrorPopup(e, getText(EXCEPTION_CUSTOMERS_ADD));
 		}
+		
 		return ADMIN_CUSTOMER_ADD;
 	}
 	
