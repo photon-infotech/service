@@ -77,6 +77,9 @@ public class LoginService extends DbService {
         if(user != null){
         	user.setValidLogin(true);
         	user.setToken(createAuthToken(credentials.getUsername()));
+        	user.setPhrescoEnabled(true);
+            user.setValidLogin(true);
+            user.setCustomers(findCustomersFromDB());
         	return user;
         }
 		return loginUsingAuth(credentials);
