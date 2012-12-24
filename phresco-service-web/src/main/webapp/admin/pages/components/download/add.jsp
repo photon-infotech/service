@@ -63,6 +63,7 @@
     String downloadCat = "";
     List<String> downloadInfoPlatforms = null;
     ArtifactGroup artifactGroup = null;
+    ArtifactInfo artifactInfo = null;
     if (downloadInfo != null) {
    		name = downloadInfo.getName();
    		description = downloadInfo.getDescription();
@@ -73,9 +74,8 @@
    		artifactGroup = downloadInfo.getArtifactGroup();
    		List<ArtifactInfo> artifactInfos = artifactGroup.getVersions();
    		if (CollectionUtils.isNotEmpty(artifactInfos)) {
-   		    for (ArtifactInfo artifactInfo : artifactInfos) {
-   		     	version = artifactInfo.getVersion();
-   		    }
+   			artifactInfo = artifactInfos.get(0);
+   			version = artifactInfo.getVersion();
    		}
    		
    		downloadInfoPlatforms = downloadInfo.getPlatformTypeIds();
@@ -204,11 +204,11 @@
 		</div>
 		
 		<% 
-			 if (ServiceUIConstants.EDIT.equals(fromPage) && StringUtils.isNotEmpty(downloadId)) { %>
+			 if (ServiceUIConstants.EDIT.equals(fromPage) && StringUtils.isNotEmpty(downloadId) && StringUtils.isNotEmpty(artifactInfo.getDownloadURL())) { %>
 		   	 <div class="control-group" >
                 <label class="control-label labelbold"> <s:text name="lbl.hdr.download.download" /> </label>
 			       <div class="controls">
-						<a href="#" onclick="downloadFile();"><%= downloadId %></a>
+						<a href="#" onclick="downloadFile();"><%= name %></a>
           		   </div>
 			 </div>
 		<% } %>	
