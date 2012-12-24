@@ -142,7 +142,12 @@ public class AdminService extends DbService {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.createCustomer(List<Customer> customer)");
         }
-        Customer customer = new Customer();
+        saveCustomer(multiPart);
+    	return Response.status(Response.Status.OK).build();
+    }
+
+    private Customer saveCustomer(MultiPart multiPart) {
+    	Customer customer = new Customer();
         InputStream iconStream = null;
     	try {
     		List<BodyPart> bodyParts = multiPart.getBodyParts();
@@ -167,40 +172,25 @@ public class AdminService extends DbService {
 		        mongoOperation.save(CUSTOMERDAO_COLLECTION_NAME, customer);
 			}	
     	} catch (Exception e) {
-    		e.printStackTrace();
     		throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
 		}
-    	
-    	return Response.status(Response.Status.OK).build();
+		return customer;
     }
-
     /**
      * Updates the list of customers
      * @param customers
      * @return
      */
     @PUT
-    @Consumes (MediaType.APPLICATION_JSON)
+    @Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
     @Produces (MediaType.APPLICATION_JSON)
     @Path (REST_API_CUSTOMERS)
-    public Response updateCustomer(List<Customer> customers) {
+    public Response updateCustomer(MultiPart multiPart) {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.updateCustomer(List<Customer> customers)");
         }
-    	
-    	try {
-    		for (Customer customer : customers) {
-        		Customer updateCustomers = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME , 
-        		        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(customer.getId())), Customer.class);
-        		if (updateCustomers != null) {
-        			mongoOperation.save(CUSTOMERS_COLLECTION_NAME, customer);
-        		}
-        	}
-    	} catch (Exception e) {
-    		throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
-		}
-    	
-    	return Response.status(Response.Status.OK).entity(customers).build();
+    	Customer customer = saveCustomer(multiPart);
+    	return Response.status(Response.Status.OK).entity(customer).build();
     }
 
     /**
