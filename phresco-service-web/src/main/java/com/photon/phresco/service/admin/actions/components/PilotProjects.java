@@ -86,6 +86,7 @@ public class PilotProjects extends ServiceBaseAction {
 	private int contentLength;
 	private static byte[] pilotProByteArray = null;
 	private boolean tempError = false;
+	private static String versionFile=""; 
 	
 	 /**
      * To get all Pilot Projects form DB
@@ -143,6 +144,7 @@ public class PilotProjects extends ServiceBaseAction {
     		S_LOGGER.debug("Entering Method PilotProjects.edit()");
     	}
     	try {
+    		versionFile = getVersioning();
     		ServiceManager serviceManager = getServiceManager();
 			ApplicationInfo applicationInfo = serviceManager.getPilotProject(getProjectId(), getCustomerId());
     		setReqAttribute(REQ_PILOT_PROINFO, applicationInfo);
@@ -390,7 +392,7 @@ public class PilotProjects extends ServiceBaseAction {
 	}
 
 	public boolean fileuploadValidation(boolean isError) {
-		if (!EDIT.equals(getFromPage()) && pilotProByteArray == null) {
+		if ((!EDIT.equals(getFromPage()) && pilotProByteArray == null) || (StringUtils.isNotEmpty(versionFile) && pilotProByteArray == null)) {
     		setFileError(getText(KEY_I18N_ERR_PLTPROJ_EMPTY));
     		tempError = true;
     	}

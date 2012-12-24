@@ -109,6 +109,7 @@ public class Features extends ServiceBaseAction {
 	private static String iconName = "";
 	private boolean tempError = false;
 	private String featureUrl = "";
+	private static String versionFile = "";
     
 	public String menu() {
 		if (isDebugEnabled) {
@@ -247,6 +248,7 @@ public class Features extends ServiceBaseAction {
 		
 		try {
 		    setTechnologiesInRequest();
+		    versionFile = getVersioning();
 		    ArtifactGroup moduleGroup = getServiceManager().getFeature(getModuleGroupId(), getCustomerId(), technology, Type.valueOf(getType()).name());
 	        setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
 	        setReqAttribute(REQ_FEATURES_TYPE, getType());
@@ -520,7 +522,7 @@ public class Features extends ServiceBaseAction {
         isError = techValidation(isError);
         
         //Validate whether file is selected during add
-        if (!EDIT.equals(getFromPage()) && featureByteArray == null) {
+        if ((!EDIT.equals(getFromPage()) && featureByteArray == null) || (StringUtils.isNotEmpty(versionFile) && featureByteArray == null)) {
             setFileError(getText(KEY_I18N_ERR_APPLNJAR_EMPTY));
             isError = true;
         }

@@ -199,7 +199,7 @@
 		
 		<div class="control-group" id="appFileControl">
 			<label class="control-label labelbold"> 
-			<% if (!fromPage.equals(ServiceUIConstants.EDIT)) { %>
+			<% if (!fromPage.equals(ServiceUIConstants.EDIT) || StringUtils.isNotEmpty(versioning)) { %>
 				<span class="mandatory">*</span>
 			<% } %>&nbsp;
 				<s:text name='lbl.hdr.comp.archtypejar' />

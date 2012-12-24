@@ -92,7 +92,7 @@ public class Downloads extends ServiceBaseAction {
 	private static byte[] downloadByteArray = null;
 	private static byte[] imgByteArray = null;
 	private static String downloadZipFileName = "";
-
+	
 	public String list() throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Downloads.list()");
@@ -407,16 +407,6 @@ public class Downloads extends ServiceBaseAction {
 		//Empty validation for technology
 		if (CollectionUtils.isEmpty(getTechnology())) {
 			setTechError(getText(KEY_I18N_ERR_TECH_EMPTY));
-			isError = true;
-		}
-		
-		if(downloadByteArray == null) {
-			setFileError(getText(KEY_I18N_ERR_FILE_EMPTY));
-			isError = true;
-		}
-		
-		if(imgByteArray == null) {
-			setIconError(getText(KEY_I18N_ERR_IMAGE_EMPTY));
 			isError = true;
 		}
 		

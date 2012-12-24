@@ -110,6 +110,7 @@ public class Archetypes extends ServiceBaseAction {
 	private int contentLength;
 	private String removeTechGroup = "";
 	private List<TechnologyGroup> appTypeTechGroups = new ArrayList<TechnologyGroup>();
+	private static String versionFile= "";
 	
 	private byte[] newtempApplnByteArray = null;
 	
@@ -164,6 +165,7 @@ public class Archetypes extends ServiceBaseAction {
 
 		try {
 		    ServiceManager serviceManager = getServiceManager();
+		    versionFile = getVersioning();
 			Technology technology = serviceManager.getArcheType(getTechId(), getCustomerId());
             List<ApplicationType> appTypes = serviceManager.getApplicationTypes(getCustomerId());
             List<TechnologyOptions> options = serviceManager.getOptions();
@@ -550,7 +552,7 @@ public class Archetypes extends ServiceBaseAction {
 	}
 
 	private boolean archJarValidation(boolean isError) {
-		if (!EDIT.equals(getFromPage())&& archetypeJarByteArray == null) {
+		if ((!EDIT.equals(getFromPage())&& archetypeJarByteArray == null) || (StringUtils.isNotEmpty(versionFile)&& archetypeJarByteArray == null)) {
 			setFileError(getText(KEY_I18N_ERR_ARCHETYPEJAR_EMPTY));
 			tempError = true;
 		}

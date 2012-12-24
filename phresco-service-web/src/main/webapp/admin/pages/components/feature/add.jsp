@@ -329,7 +329,7 @@
 		
 		<div class="control-group" id="featureFileControl">
 			<label class="control-label labelbold">
-				<% if(fromPage != ServiceUIConstants.EDIT) { %>
+				<% if(fromPage != ServiceUIConstants.EDIT || StringUtils.isNotEmpty(versioning)) { %>
 				<span class="mandatory">*</span><% } %>&nbsp;<s:text name='lbl.hdr.comp.file'/>
 			</label>
 			

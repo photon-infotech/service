@@ -189,7 +189,7 @@
 		
 		<div class="control-group" id="downloadFileControl">
 			<label class="control-label labelbold">
-			<span class="mandatory">*</span>&nbsp;
+			<span class="mandatory"></span>&nbsp;
 				<s:text name='lbl.hdr.adm.dwnld.fle'/>
 			</label>
 			<div class="controls dwnldError" style="float: left; margin-left: 3%;">
@@ -282,7 +282,7 @@
 			
 		<div class="control-group"  id="iconControl">
 			<label class="control-label labelbold">
-			<span class="mandatory">*</span>&nbsp;
+			<span class="mandatory"></span>&nbsp;
 				<s:text name='lbl.hdr.adm.dwnld.icon'/>
 			</label>
 			<div class="controls" style="float: left; margin-left: 3%;">
