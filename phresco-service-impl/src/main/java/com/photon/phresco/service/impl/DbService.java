@@ -272,7 +272,6 @@ public class DbService implements ServiceConstants {
 		if(customerId.equals(DEFAULT_CUSTOMER_NAME)) {
 			return null;
 		}
-		System.out.println(customerId);
 		List<TechnologyDAO> techs = mongoOperation.find(TECHNOLOGIES_COLLECTION_NAME, 
 				new Query(Criteria.where(DB_COLUMN_CUSTOMERIDS).is(customerId)), TechnologyDAO.class);
 		List<String> techIds = new ArrayList<String>();

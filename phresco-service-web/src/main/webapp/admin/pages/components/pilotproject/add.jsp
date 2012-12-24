@@ -51,13 +51,13 @@
     String description = "";
     String groupId = "";
     String artifactId = "";
-    String pilotProjectId = "";
+    String pilotProjectName = "";
     String jarVersion = "";
     boolean isSystem = false;
     ArtifactGroup pilotContent = null;
     if (pilotProjectInfo != null) {
    		name = pilotProjectInfo.getName();
-   		pilotProjectId = pilotProjectInfo.getId();
+   		pilotProjectName = pilotProjectInfo.getName();
    		description = pilotProjectInfo.getDescription();
    		version = pilotProjectInfo.getVersion();
     	isSystem = pilotProjectInfo.isSystem();
@@ -173,11 +173,11 @@
 		</div>
 		
 		<% 
-			 if (ServiceUIConstants.EDIT.equals(fromPage) && StringUtils.isNotEmpty(pilotProjectId)) { %>
+			 if (ServiceUIConstants.EDIT.equals(fromPage) && StringUtils.isNotEmpty(pilotProjectName)) { %>
 		   	 <div class="control-group" >
                 <label class="control-label labelbold"> <s:text name="lbl.hdr.pilotproject.download" /> </label>
 			      <div class="controls">
-						<a href="#" onclick="downloadFile();"><%= pilotProjectId %></a>
+						<a href="#" onclick="downloadFile();"><%= pilotProjectName %></a>
           		   </div>
 			       
           		   </div>
