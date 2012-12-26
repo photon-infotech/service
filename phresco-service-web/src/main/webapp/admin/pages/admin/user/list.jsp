@@ -130,6 +130,7 @@
 					<div class="modal-footer">
 					  <a href="#" class="btn btn-primary" data-dismiss="modal"><s:label key="lbl.btn.cancel" theme="simple"/></a>
 					  <a href="#" class="btn btn-primary" data-dismiss="modal" ><s:label key="lbl.btn.ok" theme="simple"/></a>
+					  <div id="errMsg" class="errMsg"></div>
 					</div>
 				</div>
 			</div>
@@ -217,23 +218,29 @@
 	  	var selectedValues = new Array();
 	  	var selectedCount = 0;
 	  	var i;
-	  
+	  	
+	  		  	
 	  	// Find the selected Options in reverse order
 	  	// and delete them from the 'from' Select.
 	  	for (i=selLength-1; i>=0; i--) {
-			if (theSelFrom.options[i].selected) {
-	      		selectedText[selectedCount] = theSelFrom.options[i].text;
+	  		if (theSelFrom.options[i].selected) {
+				selectedText[selectedCount] = theSelFrom.options[i].text;
 	      		selectedValues[selectedCount] = theSelFrom.options[i].value;
 	      		deleteOption(theSelFrom, i);
 	      		selectedCount++;
 	    	}
 	  	}
 	  
+	  	if (selectedCount == 0) {
+	  		$('#errMsg').html("<s:text name='err.msg.slt.rle'/>");
+	  	}
+	  	
 	  	// Add the selected text/values in reverse order.
 	  	// This will add the Options to the 'to' Select
 	  	// in the same order as they were in the 'from' Select.
 	  	for (i=selectedCount-1; i>=0; i--) {
 	    	addOption(theSelTo, selectedText[i], selectedValues[i]);
+	    	$('#errMsg').empty();
 	  	}
 	  
 	  	if (NS4) {
@@ -250,9 +257,9 @@
 		  
 		// Find the selected Options in reverse order
 		// and delete them from the 'from' Select.
-		for (i=selLength-1; i>=0; i--) {
+		for (i = selLength-1; i >= 0; i--) {
 			if (theSelFrom.options[i]) {
-		      	selectedText[selectedCount] = theSelFrom.options[i].text;
+				selectedText[selectedCount] = theSelFrom.options[i].text;
 		      	selectedValues[selectedCount] = theSelFrom.options[i].value;
 		      	deleteOption(theSelFrom, i);
 		      	selectedCount++;
