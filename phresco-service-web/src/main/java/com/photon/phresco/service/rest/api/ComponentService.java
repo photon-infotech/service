@@ -626,13 +626,16 @@ public class ComponentService extends DbService {
 	@GET
 	@Path (REST_API_SETTINGS)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findSettings(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
+	public Response findSettings(@QueryParam(REST_QUERY_CUSTOMERID) String customerId, @QueryParam(REST_QUERY_TECHID) String techId) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.findSettings()" + customerId);
 	    }
 		List<SettingsTemplate> settings = new ArrayList<SettingsTemplate>();
 		try {
 			Query query = createCustomerIdQuery(customerId);
+			if(StringUtils.isNotEmpty(techId)) {
+			    query.addCriteria(Criteria.where("appliesToTechs._id").is(techId));
+			}
 			List<SettingsTemplate> settingsList = mongoOperation.find(SETTINGS_COLLECTION_NAME, query, SettingsTemplate.class);
 			for (SettingsTemplate settingsTemplate : settingsList) {
 				List<Element> types = getTypes(settingsTemplate.getName(), customerId);
