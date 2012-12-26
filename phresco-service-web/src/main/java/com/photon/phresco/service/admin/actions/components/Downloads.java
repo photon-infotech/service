@@ -92,6 +92,7 @@ public class Downloads extends ServiceBaseAction {
 	private static byte[] downloadByteArray = null;
 	private static byte[] imgByteArray = null;
 	private static String downloadZipFileName = "";
+	private static long size;
 	
 	public String list() throws PhrescoException {
 		if (isDebugEnabled) {
@@ -229,6 +230,7 @@ public class Downloads extends ServiceBaseAction {
         List<ArtifactInfo> downloadVersions = new ArrayList<ArtifactInfo>();
         ArtifactInfo downloadVersion = new ArtifactInfo();
         downloadVersion.setVersion(getVersion());
+        downloadVersion.setFileSize(size);
         downloadVersions.add(downloadVersion);
         ArtifactGroup artifactGroup = new ArtifactGroup();
         artifactGroup.setId(downloadInfo.getId());
@@ -278,6 +280,7 @@ public class Downloads extends ServiceBaseAction {
 	       
 	        getByteArray();
 	        downloadZipFileName = getFileName();
+	        size = getFileSize();
 	        downloadByteArray = IOUtils.toByteArray(is);
         	writer.print(MAVEN_JAR_FALSE);
         	getHttpResponse().setStatus(getHttpResponse().SC_OK);
