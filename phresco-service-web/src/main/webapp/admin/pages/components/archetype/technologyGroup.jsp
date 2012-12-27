@@ -196,7 +196,10 @@
     }
     
     function getTechGroup() {
-		loadContent('getTechGroup', $('#formTechgroup'), '', '', true);
+    	var customerId = $('select[name=customerId]').val();
+		var params = "customerId=";
+		params = params.concat(customerId);
+		loadContent('getTechGroup', $('#formTechgroup'), '', params, true);
 		$("#multiTechGroup ul").empty();
     }
   

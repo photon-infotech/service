@@ -490,11 +490,19 @@ function enableDivCtrls(disabledDiv) {
 
 function enableDisableUploads(type, controlObj){
 	if ($('ul[temp='+type+'] > li').length === 1) {
-		controlObj.find("input[type='file']").attr('disabled', 'disabled');
-		controlObj.find($(".qq-upload-button")).removeClass("btn-primary qq-upload-button").addClass("disabled");
+		disableUploadButton(controlObj);
 	} else {
-		controlObj.find("input[type='file']").attr('disabled', false);
-		controlObj.find($(".btn")).removeClass("disabled").addClass("btn-primary qq-upload-button");
+		enableUploadButton(controlObj);
 	}
+}
+
+function disableUploadButton(controlObj) {
+	controlObj.find("input[type='file']").attr('disabled', 'disabled');
+	controlObj.find($(".qq-upload-button")).removeClass("btn-primary qq-upload-button").addClass("disabled");
+}
+
+function enableUploadButton(controlObj) {
+	controlObj.find("input[type='file']").attr('disabled', false);
+	controlObj.find($(".btn")).removeClass("disabled").addClass("btn-primary qq-upload-button");
 }
 

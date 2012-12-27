@@ -223,6 +223,10 @@
         <% if (ServiceUIConstants.EDIT.equals(fromPage)) { %>
     		//$("#multiSelect").attr("disabled","disabled");
     	<% } %>
+    	
+    	if (<%=isSystem%>) { 
+    		disableUploadButton($("#pilotPro-file-uploader"));
+        }
         
      	// To check for the special character in name
         $('#pilotname').bind('input propertychange', function (e) {

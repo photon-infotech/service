@@ -98,6 +98,9 @@ public class Archetypes extends ServiceBaseAction {
 	private String groupId = "";
 	private String artifactId = "";
 	private String uploadPlugin = "";
+	private String archArchetypeId = "";
+	private String archGroupId = "";
+	private String archVersions = "";
 	private List<String> applicable = null;
 	private List<String> applicableReports = null;
 	private boolean archType = false;
@@ -260,7 +263,10 @@ public class Archetypes extends ServiceBaseAction {
     	if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.getTechnology()");
 		}
-   	
+    	
+    	String artifactId = getArtifactId();
+    	String groupId = getGroupId();
+    	String version = getVersion();
         Technology technology = new Technology();
         if (StringUtils.isNotEmpty(getTechId())) {
         	technology.setId(getTechId());
@@ -277,12 +283,22 @@ public class Archetypes extends ServiceBaseAction {
 		}
         technology.setOptions(options);
         //To create the ArtifactGroup with groupId, artifactId and version for archetype jar
-        ArtifactGroup archetypeArtfGroup = getArtifactGroupInfo(getName(), getArtifactId(), getGroupId(), REQ_JAR_FILE, getVersion(), getCustomerId());
-        technology.setArchetypeInfo(archetypeArtfGroup);
+        if ((StringUtils.isEmpty(artifactId) && StringUtils.isEmpty(groupId) && StringUtils.isEmpty(version))) {
+        	artifactId = getArchArchetypeId();
+        	groupId = getArchGroupId();
+        	version = getArchVersions();
+        }
+        if (StringUtils.isNotEmpty(artifactId) && StringUtils.isNotEmpty(groupId) && StringUtils.isNotEmpty(version)) {
+	        ArtifactGroup archetypeArtfGroup = getArtifactGroupInfo(getName(), artifactId, groupId, REQ_JAR_FILE, version, getCustomerId());
+	        technology.setArchetypeInfo(archetypeArtfGroup);
+        } else {
+        	throw new PhrescoException(EXCEPTION_ARTIFACTINFO_MISSING);
+        }
         technology.setCustomerIds(Arrays.asList(getCustomerId()));
         technology.setTechVersions(Arrays.asList(getTechVersion()));
         technology.setReports(getApplicableReports());
         technology.setPlugins(pluginInfos);
+        
         
         return technology;
     }
@@ -501,10 +517,10 @@ public class Archetypes extends ServiceBaseAction {
 		}
 
 		List<TechnologyGroup> technologyGroups = new ArrayList<TechnologyGroup>();
-		List<TechnologyGroup> GroupTech = new ArrayList<TechnologyGroup>();
-		GroupTech = getTechGroups();
-		for (TechnologyGroup groups : GroupTech) {
-			technologyGroups.add(groups);
+		if (CollectionUtils.isNotEmpty(getTechGroups())) {
+			for (TechnologyGroup groups : getTechGroups()) {
+				technologyGroups.add(groups);
+			}
 		}
 		getServiceManager().createTechnologyGroups(technologyGroups, getCustomerId());
 
@@ -849,5 +865,29 @@ public class Archetypes extends ServiceBaseAction {
 
 	public void setRemoveTechGroup(String removeTechGroup) {
 		this.removeTechGroup = removeTechGroup;
+	}
+
+	public String getArchArchetypeId() {
+		return archArchetypeId;
+	}
+
+	public void setArchArchetypeId(String archArchetypeId) {
+		this.archArchetypeId = archArchetypeId;
+	}
+
+	public String getArchGroupId() {
+		return archGroupId;
+	}
+
+	public void setArchGroupId(String archGroupId) {
+		this.archGroupId = archGroupId;
+	}
+
+	public String getArchVersions() {
+		return archVersions;
+	}
+
+	public void setArchVersions(String archVersions) {
+		this.archVersions = archVersions;
 	}
 }

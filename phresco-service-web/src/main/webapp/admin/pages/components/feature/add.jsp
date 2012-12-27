@@ -59,7 +59,9 @@
     String groupId = "";
     String artifactId = "";
     String moduleGroupId = "";
-	String featureID = "";
+	String featureArtifactId = "";
+	String featureGroupId = "";
+	String featureVersions = "";
     boolean isDefaultModule = false;
     boolean isCoreModule = false;
     boolean isSystem = false;
@@ -98,7 +100,9 @@
 	if (moduleGroup != null) {
 	    name = moduleGroup.getName();
 	    moduleGroupId = moduleGroup.getId();
-		featureID = moduleGroup.getArtifactId();
+	    featureArtifactId = moduleGroup.getArtifactId();
+		featureGroupId = moduleGroup.getGroupId();
+		featureVersions = moduleGroup.getVersions().get(0).getVersion();
 	    List<ArtifactInfo> modules = moduleGroup.getVersions();
 	    ArtifactInfo selectedModule = null;
 	    if (CollectionUtils.isNotEmpty(modules)) {
@@ -344,11 +348,11 @@
 			<span class="help-inline fileError" id="featureFileError"></span>
 		</div>
 		<% 
-			 if (ServiceUIConstants.EDIT.equals(fromPage) && StringUtils.isNotEmpty(featureID)) { %>
+			 if (ServiceUIConstants.EDIT.equals(fromPage) && StringUtils.isNotEmpty(featureArtifactId)) { %>
 		   	 <div class="control-group" >
                <label class="control-label labelbold"> <s:text name="lbl.hdr.feature.download" /> </label>
 			       <div class="controls">
-						<a href="#" onclick="downloadFile();"><%= featureID %></a>
+						<a href="#" onclick="downloadFile();"><%= featureArtifactId %></a>
           		   </div>
         	 </div>
 		<% } %>		
@@ -394,6 +398,9 @@
     <input type="hidden" name="oldName" value="<%= name %>"/>
     <input type="hidden" name="oldVersion" value="<%= version %>"/>
     <input type="hidden" name="type" value="<%= type %>">
+    <input type="hidden" name="featureArtifactId" value="<%= moduleGroup != null ? featureArtifactId : "" %>"/> 
+    <input type="hidden" name="featureGroupId" value="<%= moduleGroup != null ? featureGroupId : "" %>"/> 
+    <input type="hidden" name="featureVersions" value="<%= moduleGroup != null ? featureVersions : "" %>"/>
 </form>
 
 <script type="text/javascript">
@@ -414,6 +421,11 @@
               name = checkForSplChrExceptDot(name);
             $(this).val(name);
         });
+		
+        if (<%=isSystem%>) { 
+            disableUploadButton($("#feature-file-uploader"));
+            disableUploadButton($("#feature-img-uploader"))
+        }
 	
 		// To check for the special character in version
         $('#featureversn').bind('input propertychange', function (e) {

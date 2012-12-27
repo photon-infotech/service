@@ -59,18 +59,22 @@
 	String desc = "";
 	String version = "";
 	String versionComment = "";
-	String archetypeId = "";
+	String archArchetypeId = "";
+	String archGroupId = "";
+	String archVersions = "";
 	List<String> techVersions = null;
 	boolean isSystem = false;
 	String appTypeId = "";
 	String techId = "";
 	String techVer = "";
-	 String selectedTech= "";
+	String selectedTech= "";
 	List<String> selectedReports = null;
 	if (technology != null) {
 		name = technology.getName();
 		desc = technology.getDescription();
-		archetypeId = technology.getArchetypeInfo().getArtifactId();
+		archArchetypeId = technology.getArchetypeInfo().getArtifactId();
+		archGroupId = technology.getArchetypeInfo().getGroupId();
+		archVersions = technology.getArchetypeInfo().getVersions().get(0).getVersion();
 		techVersions = technology.getTechVersions();
 		if (CollectionUtils.isNotEmpty(techVersions)) {
 			techVer  = techVersions.toString().replace("[", "").replace("]", "");
@@ -215,11 +219,11 @@
 			<span class="help-inline fileError" id="fileError"></span>
 		</div>
 		
-		<% if (ServiceUIConstants.EDIT.equals(fromPage) && StringUtils.isNotEmpty(archetypeId)) { %>
+		<% if (ServiceUIConstants.EDIT.equals(fromPage) && StringUtils.isNotEmpty(archArchetypeId)) { %>
 			<div class="control-group" >
 				<label class="control-label labelbold"> <s:text name="lbl.hdr.archetype.download" /> </label>
 		       	<div class="controls">
-					<a href="#" onclick="downloadFile();"><%= archetypeId %></a>
+					<a href="#" onclick="downloadFile();"><%= archArchetypeId %></a>
 				</div>
 			</div>
 		<% } %>	
@@ -337,6 +341,9 @@
 	<input type="hidden" name="oldName" value="<%= technology != null ? technology.getName() : "" %>"/>
 	<input type="hidden" name="customerId" value="<%= customerId %>">
 	<input type="hidden" name="uploadPlugin" value="uploadPlugin">
+	<input type="hidden" name="archArchetypeId" value="<%= technology != null ? archArchetypeId : "" %>"/> 
+    <input type="hidden" name="archGroupId" value="<%= technology != null ? archGroupId : "" %>"/> 
+    <input type="hidden" name="archVersions" value="<%= technology != null ? archVersions : "" %>"/>
 </form>
 
 <script type="text/javascript">
@@ -354,6 +361,10 @@
         checkboxEvent($('#checkAllReports'), 'reportsChk');
         // To focus the name textbox by default
         $('#archename').focus();
+        
+        if (<%= isSystem %>) { 
+        	disableUploadButton($("#appln-file-uploader"));
+        }
 
         // To check for the special character in name
         $('#archename').bind('input propertychange', function (e) {
@@ -497,6 +508,4 @@
 	function downloadFile() {
 		window.location.href="admin/archetypeUrl?" + $('#formArcheTypeAdd').serialize();
 	}
-	
-	
 </script>

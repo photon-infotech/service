@@ -720,4 +720,11 @@
 		configname = checkForSplChr(configname);
 		$(this).val(configname);
 	});
+	
+	// To check for the special character in PossibleValues
+	$('#txtCombo').bind('input propertychange', function(e) {
+		var configname = $(this).val();
+		configname = allowAlphaNum(configname);
+		$(this).val(configname);
+	});
 </script>

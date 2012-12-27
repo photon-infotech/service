@@ -198,11 +198,8 @@
 	}
     
 	function popupOnOk(self) {
-    	
-		var params = '{"techGroups" : [' + techGroupToAdd.join(',') + ']}';
+		var customerId = $('select[name=customerId]').val();
+		var params = '{"techGroups" : [' + techGroupToAdd.join(',') + '], "customerId" : "' + customerId + '"}';
 		loadJsonContent('newTechGroup', params);
 	}
-	
-	
-    
 </script>

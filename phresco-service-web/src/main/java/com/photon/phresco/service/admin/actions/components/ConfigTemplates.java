@@ -193,7 +193,11 @@ public class ConfigTemplates extends ServiceBaseAction {
 			List<String> techIds = getAppliesTo();
 			List<Element> appliesTos = new ArrayList<Element>();
 			for (String techId : techIds) {
-				appliesTos.add(new Element(techId));
+				String techName = getServiceManager().getTechnology(techId).getName();
+				Element element = new Element();
+				element.setId(techId);
+				element.setName(techName);
+				appliesTos.add(element);
 			}
 
 			settingTemplate.setAppliesToTechs(appliesTos);

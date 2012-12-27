@@ -59,6 +59,10 @@
     String description = "";
     String version = "";
     String downloadId = "";
+    String downloadAtrifactId = "";
+    String downloadGroupId = "";
+    String downloadVersions = "";
+    boolean isSystem = false;
     Category category = null;
     String downloadCat = "";
     List<String> downloadInfoPlatforms = null;
@@ -68,6 +72,9 @@
    		name = downloadInfo.getName();
    		description = downloadInfo.getDescription();
    		downloadId = downloadInfo.getArtifactGroup().getId(); 
+   		downloadAtrifactId = downloadInfo.getArtifactGroup().getArtifactId();
+   		downloadGroupId = downloadInfo.getArtifactGroup().getGroupId();
+   		downloadVersions = downloadInfo.getArtifactGroup().getVersions().get(0).getVersion();
    		category = downloadInfo.getCategory();
    		downloadCat = downloadInfo.getCategory().toString();
    		//To get the versions
@@ -77,9 +84,13 @@
    			artifactInfo = artifactInfos.get(0);
    			version = artifactInfo.getVersion();
    		}
-   		
+   		isSystem = downloadInfo.isSystem();
    		downloadInfoPlatforms = downloadInfo.getPlatformTypeIds();
     }
+    String disabled = "";
+	if (isSystem) {
+		disabled = "disabled";
+	}
 %>
 
 <form id="formDownloadAdd" class="form-horizontal customer_list">
@@ -94,7 +105,7 @@
 			</label>
 			<div class="controls">
 				<input id="downloadName" <%= disabledVer %> placeholder="<s:text name='place.hldr.download.add.name'/>" 
-					value="<%= name %>" maxlength="30" title="30 Characters only" class="input-xlarge" type="text" name="name">
+					value="<%= name %>" maxlength="30" title="30 Characters only" class="input-xlarge" type="text" name="name" <%= disabled %>>
 				<span class="help-inline" id="nameError"></span>
 			</div>
 		</div>
@@ -105,7 +116,7 @@
 			</label>
 			<div class="controls">
 				<textarea id="downloadDesc"  placeholder="<s:text name='place.hldr.download.add.desc'/>" class="input-xlarge"
-					maxlength="150" title="150 Characters only" name="description"><%= description %></textarea>
+					maxlength="150" title="150 Characters only" name="description" <%= disabled %>><%= StringUtils.isNotEmpty(description) ? description : "" %></textarea>
 			</div>
 		</div>
 		
@@ -134,7 +145,7 @@
    										}
 		                    %>
 	                   			<li>
-									<input type="checkbox" name="technology" <%= disabledVer %>  value="<%= technology.getId() %>"  <%= checkedStr %>
+									<input type="checkbox" name="technology" <%= disabledVer %> id="techCheck" value="<%= technology.getId() %>"  <%= checkedStr %>
 										onclick="checkboxEvent($('#checkAllTechnology'),'techCheck');" class="check techCheck"><%= technology.getName() %>
 								</li>
 							<% 	 
@@ -154,7 +165,7 @@
 			</label>
 			<div class="controls">
 				<input id="dwnVersn" <%= disabledVer %> placeholder="<s:text name='place.hldr.download.add.version'/>" value="<%= version %>" 
-					maxlength="30" title="30 Characters only" class="input-xlarge" type="text" name="version">
+					maxlength="30" title="30 Characters only" class="input-xlarge" type="text" name="version" <%= disabled %>>
 				<span class="help-inline" id="verError"></span>
 			</div>
 		</div>
@@ -180,7 +191,7 @@
 				</label>
 				<div class="controls">
 					<input id="arftId" name="artifactId" class="input-xlarge" type="text"
-						maxlength="40" title="40 Characters only" placeholder="<s:text name='place.hldr.archetype.add.artifactId'/>">
+						maxlength="40" title="40 Characters only" placeholder="<s:text name='place.hldr.archetype.add.artifactId'/>" <%= disabled %>>
 						<span class="help-inline dwnldError" id="artifactIdError"></span>
 				</div>
 			</div>
@@ -218,7 +229,7 @@
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.comp.featr.license'/>
 			 </label>
 			<div class="controls">
-				<select name="license">
+				<select name="license" id="license" <%= disabled %>>
 				<option value=""><s:text name='lbl.comp.featr.license.select'/></option>
 				<%	
 					if (CollectionUtils.isNotEmpty(licenses)) {
@@ -252,7 +263,7 @@
 					<ul>
 						<li>
 							<input type="checkbox" <%= disabledVer %> id="checkAllPlatform" value="" onclick="checkAllEvent(this, $('.platFormCheck'), false);" 
-								style="margin: 3px 8px 6px 0;">All
+								style="margin: 3px 8px 6px 0;" <%= disabled %>>All
 						</li>
 						<%
 							if (CollectionUtils.isNotEmpty(platforms)) {
@@ -266,7 +277,7 @@
 										}
 						%>
 								<li>
-									<input type="checkbox" <%= disabledVer %> name="platform" onclick="checkboxEvent($('#checkAllPlatform'),'platFormCheck');" class="check platFormCheck" value="<%= platform.getId() %>" <%= checkedStr %>>
+									<input type="checkbox" <%= disabledVer %> name="platform" onclick="checkboxEvent($('#checkAllPlatform'),'platFormCheck');" class="check platFormCheck" value="<%= platform.getId() %>" <%= checkedStr %> <%= disabled %>>
 									<%= platform.getType() + platform.getBit() %>
 								</li>
 						<% 
@@ -301,13 +312,13 @@
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.dwnld.group'/>
 			</label>	
 			<div class="controls">
-				<select id="category" name="category" <%= disabledVer %>>
+				<select id="category" name="category" <%= disabledVer %> <%= disabled %>>
 					<option value="">- select -</option>
 					<option value="SERVER">Server</option>
 					<option value="DATABASE">Database</option>
 					<option value="EDITOR">Editor</option>
 					<option value="TOOLS">Tools</option>
-                    <option value="Others">Others</option>
+                    <option value="OTHERS">Others</option>
 				</select>
 				<span class="help-inline" id="groupError"></span>
 			</div>
@@ -337,6 +348,10 @@
     <input type="hidden" name="downloadId" value="<%= downloadInfo != null ? downloadInfo.getId() : "" %>"/>
     <input type="hidden" name="oldName" value="<%= name %>"/>
     <input type="hidden" name="customerId" value="<%= customerId %>">
+    <input type="hidden" name="system" value="<%= isSystem %>">
+    <input type="hidden" name="downloadAtrifactId" value="<%= downloadInfo != null ? downloadAtrifactId : "" %>"/> 
+    <input type="hidden" name="downloadGroupId" value="<%= downloadInfo != null ? downloadGroupId : "" %>"/> 
+    <input type="hidden" name="downloadVersions" value="<%= downloadInfo != null ? downloadVersions : "" %>"/>
 </form>
 
 <script type="text/javascript">
@@ -356,6 +371,11 @@
         createUploader(); 
         checkboxEvent($('#checkAllTechnology'),'techCheck');
         checkboxEvent($('#checkAllPlatform'),'platFormCheck');
+        
+        if (<%= isSystem %>) {
+        	disableUploadButton($("#download-file-uploader"));
+        	disableUploadButton($("#icon-file-uploader"));
+        }
      
      	// To check for the special character in name
         $('#downloadName').bind('input propertychange', function (e) {
@@ -409,6 +429,14 @@
 		
 		if (!isBlank( data.techError)) {
 			showError($("#techControl"), $("#techError"), data.techError);
+			<% if (isSystem) { %>
+				$('input[type="text"], input[type="checkbox"][id!="checkAllTechnology"][id!=techCheck], select').prop("disabled", true);
+				$('#downloadDesc').prop("disabled", true);
+				if ( <%= isSystem %> ) { 
+					disableUploadButton($("#download-file-uploader"));
+					disableUploadButton($("#icon-file-uploader"))
+		        }
+			<% } %>
 		} else {
 			hideError($("#techControl"), $("#techError"));
 		}

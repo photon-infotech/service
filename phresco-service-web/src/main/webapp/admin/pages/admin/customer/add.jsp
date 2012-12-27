@@ -640,6 +640,7 @@
           		 <span class="help-inline applyerror" id="applyError"></span>
 			</div>
 	 </div>
+ 	</div>
 
 	<div class="bottom_button ">
 		

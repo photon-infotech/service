@@ -91,6 +91,9 @@ public class Features extends ServiceBaseAction {
     private InputStream fileInputStream;
     private String contentType;
     private int contentLength;
+    private String featureArtifactId = "";
+    private String featureGroupId = "";
+    private String featureVersions = "";
     
     private List<String> dependentModGroupId = null;
     
@@ -287,24 +290,36 @@ public class Features extends ServiceBaseAction {
 	
 	private ArtifactGroup createModuleGroup(Type type) throws PhrescoException {
 	    if (isDebugEnabled) {
-            S_LOGGER.debug("Entering Method  Features.createModuleGroup()");
+            S_LOGGER.debug("Entering Method  Features.createModuleGroup(Type type)");
         }
         
         try {
+        	String artifactId = getArtifactId();
+        	String groupId = getGroupId();
+        	String version = getVersion();
+        	if ((StringUtils.isEmpty(artifactId) && StringUtils.isEmpty(groupId) && StringUtils.isEmpty(version))) {
+        		artifactId = getFeatureArtifactId();
+        		groupId = getFeatureGroupId();
+        		version = getFeatureVersions();
+        	}
             ArtifactGroup artifactGroup = new ArtifactGroup();
             artifactGroup.setName(getName());
             if (StringUtils.isNotEmpty(getModuleGroupId())) {
                 artifactGroup.setId(getModuleGroupId());
             }
             artifactGroup.setDescription(getDescription());
-            artifactGroup.setGroupId(getGroupId());
-            artifactGroup.setArtifactId(getArtifactId());
+            if (StringUtils.isNotEmpty(artifactId) && StringUtils.isNotEmpty(groupId)) {
+	            artifactGroup.setGroupId(groupId);
+	            artifactGroup.setArtifactId(artifactId);
+            } else {
+            	throw new PhrescoException(EXCEPTION_ARTIFACTINFO_MISSING);
+            }
             artifactGroup.setType(type);
             artifactGroup.setPackaging(ServerUtil.getFileExtension(featureJarFileName));
             // To set appliesto tech and core
             List<CoreOption> appliesTo = new ArrayList<CoreOption>();
             CoreOption moduleCoreOption = null;
-            for(String multiTech : getMultiTechnology()){
+            for (String multiTech : getMultiTechnology()){
             	moduleCoreOption = new CoreOption(multiTech, Boolean.parseBoolean(getModuleType()));
             	appliesTo.add(moduleCoreOption);
             }
@@ -317,12 +332,16 @@ public class Features extends ServiceBaseAction {
             ArtifactInfo artifactInfo = new ArtifactInfo();
             artifactInfo.setDescription(getDescription());
             artifactInfo.setHelpText(getHelpText());
-            artifactInfo.setVersion(getVersion());
+            if (StringUtils.isNotEmpty(version)) {
+            	artifactInfo.setVersion(version);
+            } else {
+            	throw new PhrescoException(EXCEPTION_ARTIFACTINFO_MISSING);
+            }
             
             //To set whether the feature is default to the technology or not
             List<RequiredOption> required = new ArrayList<RequiredOption>();
             RequiredOption requiredOption = null;
-            for(String technology : getMultiTechnology()) {
+            for (String technology : getMultiTechnology()) {
             	requiredOption = new RequiredOption(technology, Boolean.parseBoolean(getDefaultType()));
             	required.add(requiredOption);
             }
@@ -884,6 +903,30 @@ public class Features extends ServiceBaseAction {
 
 	public void setOldName(String oldName) {
 		this.oldName = oldName;
+	}
+
+	public String getFeatureArtifactId() {
+		return featureArtifactId;
+	}
+
+	public void setFeatureArtifactId(String featureArtifactId) {
+		this.featureArtifactId = featureArtifactId;
+	}
+
+	public String getFeatureGroupId() {
+		return featureGroupId;
+	}
+
+	public void setFeatureGroupId(String featureGroupId) {
+		this.featureGroupId = featureGroupId;
+	}
+
+	public String getFeatureVersions() {
+		return featureVersions;
+	}
+
+	public void setFeatureVersions(String featureVersions) {
+		this.featureVersions = featureVersions;
 	}
 	
 }

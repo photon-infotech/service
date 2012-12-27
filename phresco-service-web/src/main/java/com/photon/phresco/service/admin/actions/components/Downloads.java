@@ -75,9 +75,13 @@ public class Downloads extends ServiceBaseAction {
 	private String groupIdError="";
 	private String artifactIdError="";
 	private String iconError="";
+	private String downloadAtrifactId = "";
+	private String downloadGroupId = "";
+	private String downloadVersions = "";
 	private boolean errorFound = false;
 	
 	private String fromPage = "";
+	private String system = "";
 	private String customerId = "";
 	private String oldVersion = "";
 	private String type = ""; // type of the file uploaded (file or image) 
@@ -172,7 +176,6 @@ public class Downloads extends ServiceBaseAction {
 				inputStreamMap.put(downloadInfo.getName(),  new ByteArrayInputStream(imgByteArray));
 			} 
 		    
-		    
 			getServiceManager().createDownloads(getDownloadInfo(), inputStreamMap, getCustomerId());
 			addActionMessage(getText(DOWNLOAD_ADDED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
@@ -206,6 +209,15 @@ public class Downloads extends ServiceBaseAction {
 	
 	 private DownloadInfo getDownloadInfo() throws PhrescoException {
         DownloadInfo downloadInfo = new DownloadInfo();
+        
+        String artifactId = getArtifactId();
+    	String groupId = getGroupId();
+    	String version = getVersion();
+    	 if ((StringUtils.isEmpty(artifactId) && StringUtils.isEmpty(groupId))) {
+         	artifactId = getDownloadAtrifactId();
+         	groupId = getDownloadGroupId();
+         	version = getDownloadVersions();
+         }
         //To set the id for update
         if (StringUtils.isNotEmpty(getDownloadId())) {
             downloadInfo.setId(getDownloadId());
@@ -229,7 +241,11 @@ public class Downloads extends ServiceBaseAction {
         //To set the versions of the download items
         List<ArtifactInfo> downloadVersions = new ArrayList<ArtifactInfo>();
         ArtifactInfo downloadVersion = new ArtifactInfo();
-        downloadVersion.setVersion(getVersion());
+        if (StringUtils.isNotEmpty(version)) {
+        	downloadVersion.setVersion(version);
+        } else {
+        	throw new PhrescoException(EXCEPTION_ARTIFACTINFO_MISSING);
+        }
         downloadVersion.setFileSize(size);
         downloadVersions.add(downloadVersion);
         ArtifactGroup artifactGroup = new ArtifactGroup();
@@ -240,8 +256,12 @@ public class Downloads extends ServiceBaseAction {
         artifactGroup.setCustomerIds(customerIds);
         artifactGroup.setVersions(downloadVersions);
         artifactGroup.setLicenseId(getLicense());
-        artifactGroup.setGroupId(getGroupId());
-        artifactGroup.setArtifactId(getArtifactId());
+        if (StringUtils.isNotEmpty(artifactId) && StringUtils.isNotEmpty(groupId)) {
+	        artifactGroup.setGroupId(groupId);
+	        artifactGroup.setArtifactId(artifactId);
+        } else {
+        	throw new PhrescoException(EXCEPTION_ARTIFACTINFO_MISSING);
+        }
         artifactGroup.setPackaging(ServerUtil.getFileExtension(downloadZipFileName));
         downloadInfo.setArtifactGroup(artifactGroup);
       
@@ -355,56 +375,49 @@ public class Downloads extends ServiceBaseAction {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Downloads.validateForm()");
 		}
-		
 		boolean isError = false;
-		//Empty validation for name
-		if (StringUtils.isEmpty(getName())) {
-			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY));
-			isError = true;
-		}
-
-		if (StringUtils.isEmpty(getVersion())) {//Empty validation for version
-			setVerError(getText(KEY_I18N_ERR_VER_EMPTY));
-			isError = true;
-		}  /*else if (StringUtils.isEmpty(getFromPage()) || (!getVersion().equals(getOldVersion()))) {
-			//To check whether the version already exist
-			List<DownloadInfo> downloads = getServiceManager().getDownloads(getCustomerId());
-			if (CollectionUtils.isNotEmpty(downloads)) {
-				for (DownloadInfo download : downloads) {
-					if (download.getName().equalsIgnoreCase(getName()) && download.getVersions().equals(getVersion())) {
-						setVerError(getText(KEY_I18N_ERR_VER_ALREADY_EXISTS));
-						isError = true;
-						break;
+		
+		if (!Boolean.parseBoolean(getSystem())) {
+			//Empty validation for name
+			if (StringUtils.isEmpty(getName())) {
+				setNameError(getText(KEY_I18N_ERR_NAME_EMPTY));
+				isError = true;
+			}
+	
+			if (StringUtils.isEmpty(getVersion())) {//Empty validation for version
+				setVerError(getText(KEY_I18N_ERR_VER_EMPTY));
+				isError = true;
+			}  /*else if (StringUtils.isEmpty(getFromPage()) || (!getVersion().equals(getOldVersion()))) {
+				//To check whether the version already exist
+				List<DownloadInfo> downloads = getServiceManager().getDownloads(getCustomerId());
+				if (CollectionUtils.isNotEmpty(downloads)) {
+					for (DownloadInfo download : downloads) {
+						if (download.getName().equalsIgnoreCase(getName()) && download.getVersions().equals(getVersion())) {
+							setVerError(getText(KEY_I18N_ERR_VER_ALREADY_EXISTS));
+							isError = true;
+							break;
+						}
 					}
 				}
+			} */
+			
+			if(StringUtils.isEmpty(getLicense())) {
+	        	setLicenseError(getText(KEY_I18N_ERR_LICEN_EMPTY));
+	            isError = true;
+	        }
+			
+			//Empty validation for platform 
+			if (CollectionUtils.isEmpty(getPlatform())) {
+				setPlatformTypeError(getText(KEY_I18N_ERR_APPLNPLTF_EMPTY));
+				isError = true;
+			} 
+	
+			//Empty validation for group
+			
+			if (StringUtils.isEmpty(getCategory())) {
+				setGroupError(getText(KEY_I18N_ERR_GROUP_EMPTY));
+				isError = true;
 			}
-		} */
-		
-		if(StringUtils.isEmpty(getGroupId())) {
-			setGroupIdError(getText(KEY_I18N_ERR_GROUPID_EMPTY));
-			isError = true;
-		}
-		
-		if(StringUtils.isEmpty(getArtifactId())) {
-			setArtifactIdError(getText(KEY_I18N_ERR_ARTIFACTID_EMPTY));
-			isError = true;
-		}
-		
-		if(StringUtils.isEmpty(getLicense())) {
-        	setLicenseError(getText(KEY_I18N_ERR_LICEN_EMPTY));
-            isError = true;
-        }
-		
-		//Empty validation for platform 
-		if (CollectionUtils.isEmpty(getPlatform())) {
-			setPlatformTypeError(getText(KEY_I18N_ERR_APPLNPLTF_EMPTY));
-			isError = true;
-		} 
-
-		//Empty validation for group
-		if (StringUtils.isEmpty(getCategory())) {
-			setGroupError(getText(KEY_I18N_ERR_GROUP_EMPTY));
-			isError = true;
 		}
 		
 		//Empty validation for technology
@@ -660,5 +673,36 @@ public class Downloads extends ServiceBaseAction {
 		return iconError;
 	}
 
+	public String getSystem() {
+		return system;
+	}
+
+	public void setSystem(String system) {
+		this.system = system;
+	}
+
+	public String getDownloadAtrifactId() {
+		return downloadAtrifactId;
+	}
+
+	public void setDownloadAtrifactId(String downloadAtrifactId) {
+		this.downloadAtrifactId = downloadAtrifactId;
+	}
+
+	public String getDownloadGroupId() {
+		return downloadGroupId;
+	}
+
+	public void setDownloadGroupId(String downloadGroupId) {
+		this.downloadGroupId = downloadGroupId;
+	}
+
+	public String getDownloadVersions() {
+		return downloadVersions;
+	}
+
+	public void setDownloadVersions(String downloadVersions) {
+		this.downloadVersions = downloadVersions;
+	}
 	
 }

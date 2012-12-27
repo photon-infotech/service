@@ -319,6 +319,7 @@ public interface ServiceUIConstants {
 	String EXCEPTION_DOWNLOADS_EDIT = "excep.hdr.comp.download.edit";
 	String EXCEPTION_DOWNLOADS_ADD = "excep.hdr.comp.download.add";
 	String EXCEPTION_DOWNLOADS_LIST = "excep.hdr.comp.download.list";
+	String EXCEPTION_ARTIFACTINFO_MISSING = "excep.hdr.comp.comp.artifactInfos.missing";
 	
 	/*****************************
      * I18N Keys Constants
