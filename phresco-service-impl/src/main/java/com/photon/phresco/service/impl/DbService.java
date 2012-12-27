@@ -215,6 +215,7 @@ public class DbService implements ServiceConstants {
     }
     
     protected void saveFileToDB(String id, InputStream is) throws PhrescoException {
+    	getGridFs().remove(id);
 		GridFSInputFile file = getGridFs().createFile(is);
 		file.setFilename(id);
 		file.save(); 
