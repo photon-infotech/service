@@ -453,7 +453,7 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
         repoInfo.setCustomerId(customerId);
         repoInfo.setBaseRepoURL(repoBaseURL);
         repoInfo.setRepoUserName(config.getRepoUserName());
-        repoInfo.setRepoPassword(ServerUtil.encryptString(config.getRepoPassword()));
+        repoInfo.setRepoPassword(config.getRepoPassword());
         String releaseRepo = createHostedRepo(repoName, repoBaseURL, REPOTYPE_RELEASE);
         if(StringUtils.isNotEmpty(releaseRepo)) {
             repoInfo.setReleaseRepoURL(releaseRepo);
@@ -470,30 +470,55 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
     }
 
     private String createGroupRepo(String repoName, String repoBaseURL, String repoType) throws PhrescoException {
-        Client client = new Client();
-        client.addFilter(new HTTPBasicAuthFilter(config.getRepoUserName(), config.getRepoPassword()));
-        WebResource resource = client.resource(repoBaseURL + REPO_GROUP_PATH);
-        ClientResponse response = resource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).
-            post(ClientResponse.class, createGroupRepoData(repoName, repoBaseURL, repoType));
-        if(response.getStatus() == MAGICNUMBER.RESPONSECODESUCCESS) {
-            return repoBaseURL + REPO_GROUP_CONTENT + repoName + repoType.toLowerCase();
-        } else {
-            throw new PhrescoException(REPO_FAILURE_MSG);
-        }
+    	String repoURL = repoBaseURL + REPO_GROUP_CONTENT + repoName + repoType.toLowerCase();
+		if(!isRepoAvailable(repoURL )) {
+    		Client client = new Client();
+            client.addFilter(new HTTPBasicAuthFilter(config.getRepoUserName(), ServerUtil.decryptString(config.getRepoPassword())));
+            WebResource resource = client.resource(repoBaseURL + REPO_GROUP_PATH);
+            ClientResponse response = resource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).
+                post(ClientResponse.class, createGroupRepoData(repoName, repoBaseURL, repoType));
+            if(response.getStatus() == MAGICNUMBER.RESPONSECODESUCCESS) {
+                return repoURL;
+            } else {
+                throw new PhrescoException(REPO_FAILURE_MSG);
+            }
+    	}
+		return repoURL;
     }
     
     private String createHostedRepo(String customerId, String repoBaseURL,
             String repoType) throws PhrescoException {
-        Client client = new Client();
-        client.addFilter(new HTTPBasicAuthFilter(config.getRepoUserName(), config.getRepoPassword()));
-        WebResource resource = client.resource(repoBaseURL + REPO_HOSTED_PATH);
-        ClientResponse response = resource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).
-            post(ClientResponse.class, createReleaseRepoData(customerId, repoBaseURL, repoType));
-        if(response.getStatus() == MAGICNUMBER.RESPONSECODESUCCESS) {
-            return repoBaseURL + REPO_HOSTED_CONTENT + customerId + repoType.toLowerCase();
-        } else {
-            throw new PhrescoException(REPO_FAILURE_MSG);
-        }
+    	String repoURL = repoBaseURL + REPO_HOSTED_CONTENT + customerId + repoType.toLowerCase();
+		if(!isRepoAvailable(repoURL )) {
+    		Client client = new Client();
+            client.addFilter(new HTTPBasicAuthFilter(config.getRepoUserName(), ServerUtil.decryptString(config.getRepoPassword())));
+            WebResource resource = client.resource(repoBaseURL + REPO_HOSTED_PATH);
+            ClientResponse response = resource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).
+                post(ClientResponse.class, createReleaseRepoData(customerId, repoBaseURL, repoType));
+            if(response.getStatus() == MAGICNUMBER.RESPONSECODESUCCESS) {
+                return repoURL;
+            } else {
+                throw new PhrescoException(REPO_FAILURE_MSG);
+            }
+    	}
+		return repoURL;
+    }
+    
+    private boolean isRepoAvailable(String repoURL) throws PhrescoException {
+    	URL url;
+		try {
+			url = new URL(repoURL);
+			HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+			int rc = conn.getResponseCode();
+			if(rc == RES_CODE_200) {
+				return true;
+			}
+		} catch (MalformedURLException e) {
+			throw new PhrescoException(e);
+		} catch (IOException e) {
+			throw new PhrescoException(e);
+		}
+		return false;
     }
     
     private String createReleaseRepoData(String customerId, String repoBaseURL, String repoType) {

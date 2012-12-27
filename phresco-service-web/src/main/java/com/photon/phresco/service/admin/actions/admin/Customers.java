@@ -235,7 +235,11 @@ public class Customers extends ServiceBaseAction  {
 	        S_LOGGER.debug("Entering Method Customers.update()");
 	    }
 		try {
-			getServiceManager().updateCustomer(createCustomer(), getCustomerId());
+			Customer customer = createCustomer();
+			if (iconByteArray != null) {
+				inputStreamMap.put(getCustomerId(), new ByteArrayInputStream(iconByteArray));
+			}
+			getServiceManager().updateCustomer(customer, inputStreamMap);
 			addActionMessage(getText(CUSTOMER_UPDATED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
 		    return showErrorPopup(e, getText(EXCEPTION_CUSTOMERS_UPDATE));
