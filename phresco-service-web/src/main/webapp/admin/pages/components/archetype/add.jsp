@@ -269,7 +269,7 @@
 							%>
 										<li>
 											<input type="checkbox" id="appliestoCheckbox" <%= disabledVer %> name="applicable" value="<%= option.getOption() %>"
-												onclick="checkboxEvent($('#checkAllFeatures'), 'applsChk')" class="applsChk" <%= checkedStr %>><%= option.getOption() %> 
+												onclick="checkboxEvent($('#checkAllFeatures'), 'applsChk')" class="check applsChk" <%= checkedStr %>><%= option.getOption() %> 
 										</li>
 							<%		}
 								}
@@ -305,7 +305,7 @@
 										}
 							%>
 										<li> <input type="checkbox" id="reportsCheckbox" <%= disabledVer %> name="applicableReports" value="<%= report.getId() %>"  onclick="checkboxEvent($('#checkAllReports'), 'reportsChk')"
-											 class="reportsChk" <%= checkedStr %>><%= report.getDisplayName() %> 
+											 class="check reportsChk" <%= checkedStr %>><%= report.getDisplayName() %> 
 										</li>
 							<%		}	
 								}
