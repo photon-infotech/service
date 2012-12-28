@@ -356,7 +356,8 @@ public class AdminService extends DbService {
 //		}
 
 		if(bodyPartEntity != null) {
-			videoFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null, video.getVideoList().get(0).getArtifactGroup().getPackaging());
+			videoFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null, 
+					video.getVideoList().get(0).getArtifactGroup().getPackaging(), video.getName());
 			List<VideoType> videoTypeList = video.getVideoList();
 			for (VideoType videoType : videoTypeList) {
 					ArtifactGroup artifactGroup = videoType.getArtifactGroup();

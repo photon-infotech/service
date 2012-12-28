@@ -418,7 +418,8 @@ public class ComponentService extends DbService {
 
 	private void createArtifacts(ArtifactGroup artifactGroup, BodyPart bodyPart) throws PhrescoException {
 		BodyPartEntity bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
-		File artifactFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null, artifactGroup.getPackaging());
+		File artifactFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null, 
+				artifactGroup.getPackaging(), artifactGroup.getName());
 		uploadBinary(artifactGroup, artifactFile);
 	}
 
@@ -890,7 +891,8 @@ public class ComponentService extends DbService {
 					moduleGroup.setGroupId(JS_GROUP_ID);
 					moduleGroup.setArtifactId(moduleGroup.getName().toLowerCase());
 				}
-        		moduleFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null, moduleGroup.getPackaging());
+        		moduleFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null, 
+        				moduleGroup.getPackaging(), moduleGroup.getName());
         		boolean uploadBinary = uploadBinary(moduleGroup, moduleFile);
                 if (uploadBinary) {
                 	saveModuleGroup(moduleGroup);
@@ -899,7 +901,7 @@ public class ComponentService extends DbService {
 			}
         	if(bodyPartEntityMap.get(Type.ICON.name()) != null) {
         		BodyPartEntity iconEntity = bodyPartEntityMap.get(Type.ICON.name());
-            	File iconFile = ServerUtil.writeFileFromStream(iconEntity.getInputStream(), null, ICON_EXT);
+            	File iconFile = ServerUtil.writeFileFromStream(iconEntity.getInputStream(), null, ICON_EXT, moduleGroup.getName());
             	moduleGroup.setPackaging(ICON_EXT);
         		boolean uploadBinary = uploadBinary(moduleGroup, iconFile);
         		FileUtil.delete(iconFile);
@@ -1209,7 +1211,7 @@ public class ComponentService extends DbService {
         
         if(bodyPartEntity != null) {
         	 pilotFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null, 
-             		applicationInfo.getPilotContent().getPackaging());
+             		applicationInfo.getPilotContent().getPackaging(), applicationInfo.getName());
              boolean uploadBinary = uploadBinary(applicationInfo.getPilotContent(), pilotFile);
              if(uploadBinary) {
              	saveApplicationInfo(applicationInfo);
@@ -1601,7 +1603,8 @@ public class ComponentService extends DbService {
         }
 
         if(bodyPartEntity != null) {
-            downloadFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null,downloadInfo.getArtifactGroup().getPackaging());
+            downloadFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null,
+            		downloadInfo.getArtifactGroup().getPackaging(), downloadInfo.getName());
             boolean uploadBinary = uploadBinary(downloadInfo.getArtifactGroup(), downloadFile);
             if(uploadBinary) {
                 saveDownloads(downloadInfo);

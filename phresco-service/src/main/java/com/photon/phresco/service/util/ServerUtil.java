@@ -51,7 +51,7 @@ public class ServerUtil {
      */
     public static ArtifactGroup getArtifactinfo(InputStream inputJarStream)
             throws PhrescoException {
-        File jarFile = writeFileFromStream(inputJarStream, null, "jar");
+        File jarFile = writeFileFromStream(inputJarStream, null, "jar", "validate");
         ArtifactGroup artifactInfo = getArtifactInfoFromJar(jarFile); 
         FileUtil.delete(jarFile);
         return artifactInfo;
@@ -232,13 +232,13 @@ public class ServerUtil {
      * @return
      * @throws PhrescoException
      */
-    public static File writeFileFromStream(InputStream inputStream, String path, String packaging)
+    public static File writeFileFromStream(InputStream inputStream, String path, String packaging, String fileName)
             throws PhrescoException {
         File artifactFile = null;
         FileOutputStream fileOutStream = null;
         if (path == null) {
             artifactFile = new File(ServerUtil.getTempFolderPath() + "/"
-                    + "temp" + "." + packaging);
+                    + fileName + "." + packaging);
         } else {
             artifactFile = new File(path);
         }
