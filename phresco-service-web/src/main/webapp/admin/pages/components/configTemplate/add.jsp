@@ -204,6 +204,7 @@
 													<option value="Password"><s:text name='lbl.hdr.comp.cnfigtmplt.password'/></option>
 													<option value="FileType"><s:text name='lbl.hdr.comp.cnfigtmplt.filetype'/></option>
 													<option value="Boolean"><s:text name='lbl.hdr.comp.cnfigtmplt.boolean'/></option>
+													<option value="Actions"><s:text name='lbl.hdr.comp.cnfigtmplt.actions'/></option>
 												</select>
 											</td>
 											 <td class="tdWidth" id="1_psblMulDiv" style="display:none;">
