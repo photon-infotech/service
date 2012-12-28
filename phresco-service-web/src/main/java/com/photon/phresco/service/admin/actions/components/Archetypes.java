@@ -292,7 +292,7 @@ public class Archetypes extends ServiceBaseAction {
 	        ArtifactGroup archetypeArtfGroup = getArtifactGroupInfo(getName(), artifactId, groupId, REQ_JAR_FILE, version, getCustomerId());
 	        technology.setArchetypeInfo(archetypeArtfGroup);
         } else {
-        	throw new PhrescoException(EXCEPTION_ARTIFACTINFO_MISSING);
+        	throw new PhrescoException(getText(EXCEPTION_ARTIFACTINFO_MISSING));
         }
         technology.setCustomerIds(Arrays.asList(getCustomerId()));
         technology.setTechVersions(Arrays.asList(getTechVersion()));

@@ -401,6 +401,7 @@
     <input type="hidden" name="featureArtifactId" value="<%= moduleGroup != null ? featureArtifactId : "" %>"/> 
     <input type="hidden" name="featureGroupId" value="<%= moduleGroup != null ? featureGroupId : "" %>"/> 
     <input type="hidden" name="featureVersions" value="<%= moduleGroup != null ? featureVersions : "" %>"/>
+    <input type="hidden" name="moduleId" value="<%= selectedModuleId %>">
 </form>
 
 <script type="text/javascript">

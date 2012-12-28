@@ -199,7 +199,7 @@ public class Downloads extends ServiceBaseAction {
 				inputStreamMap.put(downloadInfo.getName(),  new ByteArrayInputStream(imgByteArray));
 			} 
 			getServiceManager().updateDownload(getDownloadInfo(), inputStreamMap, getCustomerId());
-			addActionMessage(getText(DOWNLOAD_ADDED, Collections.singletonList(getName())));
+			addActionMessage(getText(DOWNLOAD_UPDATED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
 			return showErrorPopup(e, getText(EXCEPTION_DOWNLOADS_UPDATE));
 		}
@@ -244,7 +244,7 @@ public class Downloads extends ServiceBaseAction {
         if (StringUtils.isNotEmpty(version)) {
         	downloadVersion.setVersion(version);
         } else {
-        	throw new PhrescoException(EXCEPTION_ARTIFACTINFO_MISSING);
+        	throw new PhrescoException(getText(EXCEPTION_ARTIFACTINFO_MISSING));
         }
         downloadVersion.setFileSize(size);
         downloadVersions.add(downloadVersion);
@@ -260,7 +260,7 @@ public class Downloads extends ServiceBaseAction {
 	        artifactGroup.setGroupId(groupId);
 	        artifactGroup.setArtifactId(artifactId);
         } else {
-        	throw new PhrescoException(EXCEPTION_ARTIFACTINFO_MISSING);
+        	throw new PhrescoException(getText(EXCEPTION_ARTIFACTINFO_MISSING));
         }
         artifactGroup.setPackaging(ServerUtil.getFileExtension(downloadZipFileName));
         downloadInfo.setArtifactGroup(artifactGroup);

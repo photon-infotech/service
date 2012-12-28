@@ -279,7 +279,7 @@ public class Features extends ServiceBaseAction {
 				inputStreamMap.put(moduleGroup.getName(),  new ByteArrayInputStream(featureByteArray));
 			}*/ 
             getServiceManager().updateFeature(moduleGroup, inputStreamMap, getCustomerId());
-            addActionMessage(getText(FEATURE_ADDED, Collections.singletonList(getName())));
+            addActionMessage(getText(FEATURE_UPDATED, Collections.singletonList(getName())));
             setTechnologiesInRequest();
         } catch (PhrescoException e) {
             showErrorPopup(e, getText(EXCEPTION_FEATURE_SAVE));
@@ -312,7 +312,7 @@ public class Features extends ServiceBaseAction {
 	            artifactGroup.setGroupId(groupId);
 	            artifactGroup.setArtifactId(artifactId);
             } else {
-            	throw new PhrescoException(EXCEPTION_ARTIFACTINFO_MISSING);
+            	throw new PhrescoException(getText(EXCEPTION_ARTIFACTINFO_MISSING));
             }
             artifactGroup.setType(type);
             artifactGroup.setPackaging(ServerUtil.getFileExtension(featureJarFileName));
@@ -330,12 +330,15 @@ public class Features extends ServiceBaseAction {
             artifactGroup.setLicenseId(getLicense());
             //To set the details of the version
             ArtifactInfo artifactInfo = new ArtifactInfo();
+            if (StringUtils.isNotEmpty(getModuleId())) {
+            	artifactInfo.setId(getModuleId());
+            }
             artifactInfo.setDescription(getDescription());
             artifactInfo.setHelpText(getHelpText());
             if (StringUtils.isNotEmpty(version)) {
             	artifactInfo.setVersion(version);
             } else {
-            	throw new PhrescoException(EXCEPTION_ARTIFACTINFO_MISSING);
+            	throw new PhrescoException(getText(EXCEPTION_ARTIFACTINFO_MISSING));
             }
             
             //To set whether the feature is default to the technology or not
