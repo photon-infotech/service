@@ -418,6 +418,16 @@ public class Downloads extends ServiceBaseAction {
 				setGroupError(getText(KEY_I18N_ERR_GROUP_EMPTY));
 				isError = true;
 			}
+			
+			if(StringUtils.isEmpty(getGroupId())) {
+				setGroupIdError(getText(KEY_I18N_ERR_GROUPID_EMPTY));
+				isError = true;
+			}
+			
+			if(StringUtils.isEmpty(getArtifactId())) {
+				setArtifactIdError(getText(KEY_I18N_ERR_ARTIFACTID_EMPTY));
+				isError = true;
+			}
 		}
 		
 		//Empty validation for technology
