@@ -54,6 +54,7 @@ import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.ArchiveUtil;
 import com.photon.phresco.util.ArchiveUtil.ArchiveType;
 import com.photon.phresco.util.FileUtil;
+import com.photon.phresco.util.ServiceConstants;
 import com.photon.phresco.util.Utility;
 
 public class Features extends ServiceBaseAction {
@@ -307,11 +308,11 @@ public class Features extends ServiceBaseAction {
                 artifactGroup.setId(getModuleGroupId());
             }
             artifactGroup.setDescription(getDescription());
-            if (StringUtils.isNotEmpty(artifactId) && StringUtils.isNotEmpty(groupId)) {
-	            artifactGroup.setGroupId(groupId);
-	            artifactGroup.setArtifactId(artifactId);
-            } else {
+            if(!type.toString().equals(ServiceConstants.FEATURE_TYPE_JS) && StringUtils.isEmpty(artifactId) && StringUtils.isEmpty(groupId)) {
             	throw new PhrescoException(getText(EXCEPTION_ARTIFACTINFO_MISSING));
+            } else if (!type.equals(ServiceConstants.FEATURE_TYPE_JS)) {
+                artifactGroup.setGroupId(groupId);
+                artifactGroup.setArtifactId(artifactId);
             }
             artifactGroup.setType(type);
             artifactGroup.setPackaging(ServerUtil.getFileExtension(featureJarFileName));
