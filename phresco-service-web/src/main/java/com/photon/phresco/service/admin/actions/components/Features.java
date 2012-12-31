@@ -217,8 +217,7 @@ public class Features extends ServiceBaseAction {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entering Method  Features.saveDependentFeatures()");
         }
-        
-        List<String> dependentModuleIds = new ArrayList<String>(dependentModGroupId.size());
+        List<String> dependentModuleIds = new ArrayList<String>();
         if (CollectionUtils.isNotEmpty(dependentModGroupId)) {
             for (String dependentModGroup : dependentModGroupId) {
                 dependentModuleIds.add(getHttpRequest().getParameter(dependentModGroup));
