@@ -249,7 +249,7 @@ public class DbService implements ServiceConstants {
     		if (CollectionUtils.isNotEmpty(customersInDb)) {
     			for (Customer customer : customersInDb) {
 					List<String> applicableTechnologies = customer.getApplicableTechnologies();
-					List<String> fromDB= getApplicableForomDB(customer.getId());
+					List<String> fromDB= getApplicableForomDB(customer.getId(), applicableTechnologies);
 					if(CollectionUtils.isNotEmpty(fromDB)) {
 						applicableTechnologies.addAll(fromDB);
 					}
@@ -269,13 +269,18 @@ public class DbService implements ServiceConstants {
 		return null;
 	}
 	
-	private List<String> getApplicableForomDB(String customerId) {
-		if(customerId.equals(DEFAULT_CUSTOMER_NAME)) {
-			return null;
-		}
+	private List<String> getApplicableForomDB(String customerId, List<String> applicableTechnologies) {
+		List<String> techIds = new ArrayList<String>();
 		List<TechnologyDAO> techs = mongoOperation.find(TECHNOLOGIES_COLLECTION_NAME, 
 				new Query(Criteria.where(DB_COLUMN_CUSTOMERIDS).is(customerId)), TechnologyDAO.class);
-		List<String> techIds = new ArrayList<String>();
+		if(customerId.equals(DEFAULT_CUSTOMER_NAME)) {
+			for (TechnologyDAO tech : techs) {
+				if(!applicableTechnologies.contains(tech.getId())) {
+					techIds.add(tech.getId());
+				}
+			}
+			return techIds;
+		}
 		if(CollectionUtils.isNotEmpty(techs)) {
 			for (TechnologyDAO dao : techs) {
 				techIds.add(dao.getId());
