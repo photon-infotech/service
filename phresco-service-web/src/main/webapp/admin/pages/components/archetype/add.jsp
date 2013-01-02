@@ -268,7 +268,7 @@
 										}
 							%>
 										<li>
-											<input type="checkbox" id="appliestoCheckbox" <%= disabledVer %> name="applicable" value="<%= option.getOption() %>"
+											<input type="checkbox" id="appliestoCheckbox" <%= disabledVer %> name="applicable" value="<%= option.getId() %>"
 												onclick="checkboxEvent($('#checkAllFeatures'), 'applsChk')" class="check applsChk" <%= checkedStr %>><%= option.getOption() %> 
 										</li>
 							<%		}
