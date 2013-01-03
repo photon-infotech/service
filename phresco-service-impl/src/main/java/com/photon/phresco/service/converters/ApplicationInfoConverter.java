@@ -26,8 +26,8 @@ public class ApplicationInfoConverter implements Converter<ApplicationInfoDAO, A
 		applicationInfo.setId(dao.getId());
 		applicationInfo.setName(dao.getName());
 		applicationInfo.setPilotInfo(dao.getPilotInfo());
-		applicationInfo.setSelectedComponents(applicationInfo.getSelectedComponents());
-		applicationInfo.setSelectedDatabases(applicationInfo.getSelectedDatabases());
+		applicationInfo.setSelectedComponents(dao.getSelectedComponents());
+		applicationInfo.setSelectedDatabases(dao.getSelectedDatabases());
 		applicationInfo.setSelectedFrameworks(dao.getSelectedFrameworks());
 		applicationInfo.setSelectedJSLibs(dao.getSelectedJSLibs());
 		applicationInfo.setSelectedModules(dao.getSelectedModules());
