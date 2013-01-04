@@ -611,18 +611,20 @@ public class Features extends ServiceBaseAction {
 			tempError = true;
 		} else if (ADD.equals(getFromPage()) || (!getName().equals(getOldName()))) {
 			// To check whether the name already exist (Application type wise)
-			 for(String technologyList : getMultiTechnology()){
-				 List<ArtifactGroup>  moduleGroups = getServiceManager().getFeatures(getCustomerId(), technologyList, Type.valueOf(getType()).name());
-				if (CollectionUtils.isNotEmpty(moduleGroups)) {
-					for (ArtifactGroup moduleGroup : moduleGroups) {
-						if (moduleGroup.getName().equalsIgnoreCase(getName())) {
-							setNameError(getText(KEY_I18N_ERR_NAME_ALREADY_EXIST_APPTYPE));
-							tempError = true;
-							break;
+			if (CollectionUtils.isNotEmpty(getMultiTechnology())) {	 
+				for(String technologyList : getMultiTechnology()){
+					List<ArtifactGroup>  moduleGroups = getServiceManager().getFeatures(getCustomerId(), technologyList, Type.valueOf(getType()).name());
+					if (CollectionUtils.isNotEmpty(moduleGroups)) {
+						for (ArtifactGroup moduleGroup : moduleGroups) {
+							if (moduleGroup.getName().equalsIgnoreCase(getName())) {
+								setNameError(getText(KEY_I18N_ERR_NAME_ALREADY_EXIST_APPTYPE));
+								tempError = true;
+								break;
+							}
 						}
 					}
 				}
-			 }
+			}
 		}
 		
 		return tempError;
