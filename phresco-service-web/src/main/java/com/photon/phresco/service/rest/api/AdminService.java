@@ -48,6 +48,7 @@ import org.springframework.stereotype.Component;
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.Customer;
+import com.photon.phresco.commons.model.LogInfo;
 import com.photon.phresco.commons.model.Permission;
 import com.photon.phresco.commons.model.Property;
 import com.photon.phresco.commons.model.RepoInfo;
@@ -1173,4 +1174,30 @@ public class AdminService extends DbService {
     	
     	return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
     }
+    
+    /**
+	 * Creates the list of LogInfo
+	 * @param logInfo
+	 * @return 
+	 */
+	@POST
+	@Consumes (MediaType.APPLICATION_JSON)
+	@Path (REST_API_LOG)
+	public Response createLog(List<LogInfo> logInfos) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into AdminService.createLog(List<LogInfo> logInfos)");
+	    }
+		
+		try {
+			for (LogInfo logInfo : logInfos) {
+				mongoOperation.save(LOG_COLLECTION_NAME, logInfo);
+			}
+			
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
+		}
+		
+		return Response.status(Response.Status.OK).build();
+	}
+	
  }
