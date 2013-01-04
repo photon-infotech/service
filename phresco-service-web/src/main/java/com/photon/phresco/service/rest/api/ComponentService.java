@@ -964,9 +964,6 @@ public class ComponentService extends DbService {
         		newVersion.setArtifactGroupId(moduleGroupDAO.getId());
                 mongoOperation.save(ARTIFACT_INFO_COLLECTION_NAME, newVersion);
         }
-        if(CollectionUtils.isEmpty(versionIds)) {
-        	versionIds = moduleDAO.getVersionIds();
-        }
         moduleGroupDAO.setVersionIds(versionIds);
         mongoOperation.save(ARTIFACT_GROUP_COLLECTION_NAME, moduleGroupDAO);
     }

@@ -245,11 +245,15 @@ public class DbService implements ServiceConstants {
 	protected List<Customer> findCustomersFromDB() {
     	try {
     		List<Customer> customers = new ArrayList<Customer>();
+    		List<String> applicableTechnologies = new ArrayList<String>();
     		List<Customer> customersInDb = mongoOperation.getCollection(CUSTOMERDAO_COLLECTION_NAME, Customer.class);
     		if (CollectionUtils.isNotEmpty(customersInDb)) {
     			for (Customer customer : customersInDb) {
-					List<String> applicableTechnologies = customer.getApplicableTechnologies();
-					List<String> fromDB= getApplicableForomDB(customer.getId(), applicableTechnologies);
+    				List<String> customerApplicableTechnologies = customer.getApplicableTechnologies();
+					List<String> fromDB = getApplicableForomDB(customer.getId(), customerApplicableTechnologies);
+					if(CollectionUtils.isNotEmpty(customerApplicableTechnologies)) {
+						applicableTechnologies.addAll(customerApplicableTechnologies);
+					}
 					if(CollectionUtils.isNotEmpty(fromDB)) {
 						applicableTechnologies.addAll(fromDB);
 					}
