@@ -831,11 +831,13 @@ public class ComponentService extends DbService {
 			Criteria typeQuery = Criteria.where(DB_COLUMN_ARTIFACT_GROUP_TYPE).is(type);
 			List<String> technologies = new ArrayList<String>();
 			technologies.add(techId);
-			Technology techInDB = getTechnologyById(techId);
-			if(CollectionUtils.isNotEmpty(techInDB.getArchetypeFeatures())) {
-				technologies.addAll(techInDB.getArchetypeFeatures());
+			if(StringUtils.isNotEmpty(techId)) {
+				Technology techInDB = getTechnologyById(techId);
+				if(CollectionUtils.isNotEmpty(techInDB.getArchetypeFeatures())) {
+					technologies.addAll(techInDB.getArchetypeFeatures());
+				}
 			}
-			Criteria techIdQuery = Criteria.where(DB_COLUMN_APPLIESTOTECHID).in(technologies.toArray());
+			Criteria techIdQuery = Criteria.where(DB_COLUMN_APPLIESTOTECHID).is(techId);
 			query = query.addCriteria(typeQuery);
 			query = query.addCriteria(techIdQuery);
 			if(StringUtils.isNotEmpty(count)){
