@@ -39,6 +39,7 @@ import org.apache.log4j.Logger;
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.Customer.LicenseType;
+import com.photon.phresco.commons.model.FrameWorkTheme;
 import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
@@ -91,6 +92,14 @@ public class Customers extends ServiceBaseAction  {
 	private static byte[] iconByteArray = null;
 	private String icon = "";
 	private String brandingColor = "" ;
+	private String bodyBackGroundColor = "";
+	private String accordionBackGroundColor = "";
+	private String menuBackGround = "";
+	private String menufontColor = "";
+	private String buttonColor = "";
+	private String backGroundGradientColor = "";
+	private String labelColor = "";
+	private String copyRightColor = "";
 	private List<String> appliesTo = new ArrayList<String>();
 	List<ApplicationType> applicableAppTypes = new ArrayList<ApplicationType>();
 	
@@ -255,6 +264,7 @@ public class Customers extends ServiceBaseAction  {
 	 */
 	private Customer createCustomer() {
         Customer customer = new Customer();
+        FrameWorkTheme theme = new FrameWorkTheme();
         if (StringUtils.isNotEmpty(customerId)) {
         	customer.setId(customerId);
         }
@@ -278,9 +288,19 @@ public class Customers extends ServiceBaseAction  {
         repoInfo.setRepoUserName(getRepoUserName());
         repoInfo.setRepoName(getRepoName());
         customer.setRepoInfo(repoInfo);
-        customer.setBrandingColor(getBrandingColor());
         List<String> appliesTo = getAppliesTo();
         customer.setApplicableTechnologies(appliesTo);
+        theme.setBrandingColor(getBrandingColor());
+        theme.setAccordionBackGroundColor(getAccordionBackGroundColor());
+        theme.setBodyBackGroundColor(getBodyBackGroundColor());
+        theme.setBrandingColor(getBrandingColor());
+        theme.setButtonColor(getButtonColor());
+        theme.setBackGroundGradientColor(getBackGroundGradientColor());
+        theme.setCopyRightColor(getCopyRightColor());
+        theme.setLabelColor(getLabelColor());
+        theme.setMenuBackGround(getMenuBackGround());
+        theme.setMenufontColor(getMenufontColor());
+        customer.setFrameworkTheme(theme);
         return customer;
     }
 	
@@ -783,5 +803,69 @@ public class Customers extends ServiceBaseAction  {
 
 	public void setAppliesTo(List<String> appliesTo) {
 		this.appliesTo = appliesTo;
+	}
+
+	public String getBodyBackGroundColor() {
+		return bodyBackGroundColor;
+	}
+
+	public String getAccordionBackGroundColor() {
+		return accordionBackGroundColor;
+	}
+
+	public String getMenuBackGround() {
+		return menuBackGround;
+	}
+
+	public String getMenufontColor() {
+		return menufontColor;
+	}
+
+	public String getButtonColor() {
+		return buttonColor;
+	}
+
+	public String getBackGroundGradientColor() {
+		return backGroundGradientColor;
+	}
+
+	public String getLabelColor() {
+		return labelColor;
+	}
+
+	public String getCopyRightColor() {
+		return copyRightColor;
+	}
+
+	public void setBodyBackGroundColor(String bodyBackGroundColor) {
+		this.bodyBackGroundColor = bodyBackGroundColor;
+	}
+
+	public void setAccordionBackGroundColor(String accordionBackGroundColor) {
+		this.accordionBackGroundColor = accordionBackGroundColor;
+	}
+
+	public void setMenuBackGround(String menuBackGround) {
+		this.menuBackGround = menuBackGround;
+	}
+
+	public void setMenufontColor(String menufontColor) {
+		this.menufontColor = menufontColor;
+	}
+
+	public void setButtonColor(String buttonColor) {
+		this.buttonColor = buttonColor;
+	}
+
+	public void setButtonGradientColor(String buttonGradientColor) {
+		this.backGroundGradientColor = buttonGradientColor;
+	}
+
+	public void setLabelColor(String labelColor) {
+		this.labelColor = labelColor;
+	}
+
+	public void setCopyRightColor(String copyRightColor) {
+		this.copyRightColor = copyRightColor;
 	}
 }

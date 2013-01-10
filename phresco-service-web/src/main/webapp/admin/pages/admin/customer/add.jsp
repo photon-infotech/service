@@ -32,6 +32,7 @@
 <%@ page import="com.photon.phresco.commons.model.ApplicationType" %>
 <%@ page import="org.apache.commons.collections.CollectionUtils" %>
 <%@ page import="com.photon.phresco.commons.model.Technology" %>
+<%@ page import="com.photon.phresco.commons.model.FrameWorkTheme" %>
 
 <%
 	Customer customer = (Customer) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER);
@@ -67,6 +68,16 @@
 	Date validUpto = null;
 	String icon = "";
 	String brandingColor = "" ;
+	String bodyBackGroundColor = "";
+	String accordionBackGroundColor = "";
+	String menuBackGround = "";
+	String menufontColor = "";
+	String buttonColor = "";
+	String backGroundGradientColor = "";
+	String labelColor = "";
+	String copyRightColor = "";
+	
+	
 	List<String> applicableTechnologies = new ArrayList();
 	List<ApplicationType> applicableAppTypes = null;
 	
@@ -117,21 +128,62 @@
 			disabledClass = "btn-disabled";
 			disabled = "disabled";
 		}
-		if (customer.getBrandingColor() != null) {
-			brandingColor = customer.getBrandingColor();
+		
+		FrameWorkTheme theme = customer.getFrameworkTheme();
+		if (theme != null) {
+			if (theme.getBrandingColor() != null) {
+				brandingColor = customer.getFrameworkTheme().getBrandingColor();
+			}
+			
+			if (theme.getBodyBackGroundColor() != null) {
+				bodyBackGroundColor = customer.getFrameworkTheme().getBodyBackGroundColor();
+			}
+			
+			if (theme.getAccordionBackGroundColor() != null) {
+				accordionBackGroundColor = customer.getFrameworkTheme().getAccordionBackGroundColor();
+			}
+			
+			if (theme.getMenuBackGround() != null) {
+				menuBackGround = customer.getFrameworkTheme().getMenuBackGround();
+			}
+			
+			if (theme.getMenufontColor() != null) {
+				menufontColor = customer.getFrameworkTheme().getMenufontColor();
+			}
+			
+			if (theme.getButtonColor() != null) {
+				buttonColor = customer.getFrameworkTheme().getButtonColor();
+			}
+			
+			if (theme.getBackGroundGradientColor() != null) {
+				backGroundGradientColor = customer.getFrameworkTheme().getBackGroundGradientColor();
+			}
+			
+			if (theme.getLabelColor() != null) {
+				labelColor = customer.getFrameworkTheme().getLabelColor();
+			}
+			
+			if (theme.getCopyRightColor() != null) {
+				copyRightColor = customer.getFrameworkTheme().getCopyRightColor();
+			}
 		}
+		
 		if (StringUtils.isNotEmpty(customer.getRepoInfo().getRepoName())) {
 			repoName = customer.getRepoInfo().getRepoName();
 		}
+		
 		if (StringUtils.isNotEmpty(customer.getRepoInfo().getReleaseRepoURL())) {
 			repoURL = customer.getRepoInfo().getReleaseRepoURL();
 		}
+		
 		if (StringUtils.isNotEmpty(customer.getRepoInfo().getRepoUserName())) {
 			repoUserName = customer.getRepoInfo().getRepoUserName();
 		}
+		
 		if (StringUtils.isNotEmpty(customer.getRepoInfo().getRepoPassword())) {
 			repoPassword = customer.getRepoInfo().getRepoPassword();
 		}
+		
 		if(StringUtils.isNotEmpty(customer.getCountry())) {
 			country = customer.getCountry();
 		}
@@ -579,31 +631,6 @@
 			</div>
 		</div>
 		
-		<div class="control-group">
-			<label class="control-label labelbold">
-				<s:text name='lbl.hdr.adm.cust.brandingcolor'/>
-			</label>
-			<div class="controls">
-				<input id="statefld" placeholder="<s:text name='place.hldr.cust.add.brandingColor'/>" class="input-xlarge" type="text" name="brandingColor"
-				   value="<%= brandingColor%>"  maxlength="50" title="50 Characters only">
-			</div>
-		</div>
-		
-		<div class="control-group" id="iconControl">
-			<label class="control-label labelbold"> 
-			 	<s:text name='lbl.hdr.adm.upload.icon' />
-			</label>
-			<div class="controls" style="float: left; margin-left: 3%;">
-				<div id="image-file-uploader" class="file-uploader">
-					<noscript>
-						<p>Please enable JavaScript to use file uploader.</p>s
-						<!-- or put a simple form for upload here -->
-					</noscript>
-				</div>
-			</div>
-			<span class="help-inline fileError" id="iconError"></span>
-		</div>
-		
 		<div class="control-group" id="applyControl">
 			<label class="control-label labelbold">
 				<s:text name='lbl.hdr.comp.appliesto'/>
@@ -640,16 +667,136 @@
           		 <span class="help-inline applyerror" id="applyError"></span>
 			</div>
 	 </div>
- 	</div>
 
-	<div class="bottom_button ">
+	<div class="theme_accordion_container">
+		<section class="accordion_panel_wid">
+		<div class="accordion_panel_inner">
+			<section class="lft_menus_container"> 
+				<span class="siteaccordion closereg">
+					 <span><s:text name='place.hldr.cust.add.frameworktheme' /></span>
+				 </span>
+			<div class="mfbox siteinnertooltiptxt downloadContent">
+				<div class="scrollpanel">
+					<section class="scrollpanel_inner">
+						<div class="control-group">
+							<label class="control-label labelbold"> <s:text
+									name='lbl.hdr.adm.cust.brandingcolor' /> </label>
+							<div class="controls">
+								<input id="brandcolor" placeholder="<s:text name='place.hldr.cust.add.brandingcolor'/>"class="input-xlarge" type="text" name="brandingColor"
+									value="<%=brandingColor%>" maxlength="50" title="50 Characters only">
+							</div>
+						</div>
+						<div class="control-group">
+							<label class="control-label labelbold">
+								<s:text name='lbl.hdr.adm.cust.backgroudcolor'/>
+							</label>
+							<div class="controls">
+								<input id="backgroundcolor" placeholder="<s:text name='place.hldr.cust.add.backgroundcolor'/>" class="input-xlarge" type="text" name="bodyBackGroundColor"
+								   value="<%=bodyBackGroundColor%>"  maxlength="50" title="50 Characters only">
+							</div>
+						</div>
+						
+						<div class="control-group">
+							<label class="control-label labelbold">
+								<s:text name='lbl.hdr.adm.cust.accordionbackgroundcolor'/>
+							</label>
+							<div class="controls">
+								<input id="accordionbackcolor" placeholder="<s:text name='place.hldr.cust.add.accordionbackgroundcolor'/>" class="input-xlarge" type="text" name="accordionBackGroundColor"
+								   value="<%=accordionBackGroundColor%>"  maxlength="50" title="50 Characters only">
+							</div>
+						</div>
+						
+						<div class="control-group">
+							<label class="control-label labelbold">
+								<s:text name='lbl.hdr.adm.cust.menubackground'/>
+							</label>
+							<div class="controls">
+								<input id="labelcolor" placeholder="<s:text name='place.hldr.cust.add.menubackgroundcolor'/>" class="input-xlarge" type="text" name="MenuBackGround"
+								   value="<%=menuBackGround%>"  maxlength="50" title="50 Characters only">
+							</div>
+						</div>
+						
+						
+						<div class="control-group">
+							<label class="control-label labelbold">
+								<s:text name='lbl.hdr.adm.cust.menufontcolor'/>
+							</label>
+							<div class="controls">
+								<input id="menufontcolor" placeholder="<s:text name='place.hldr.cust.add.menufontcolor'/>" class="input-xlarge" type="text" name="MenufontColor"
+								   value="<%=menufontColor%>"  maxlength="50" title="50 Characters only">
+							</div>
+						</div>
+						
+						<div class="control-group">
+							<label class="control-label labelbold">
+								<s:text name='lbl.hdr.adm.cust.buttoncolor'/>
+							</label>
+							<div class="controls">
+								<input id="buttoncolor" placeholder="<s:text name='place.hldr.cust.add.buttoncolor'/>" class="input-xlarge" type="text" name="ButtonColor"
+								   value="<%=buttonColor%>"  maxlength="50" title="50 Characters only">
+							</div>
+						</div>
+						
+						<div class="control-group">
+							<label class="control-label labelbold">
+								<s:text name='lbl.hdr.adm.cust.backgroundgradientcolor'/>
+							</label>
+							<div class="controls">
+								<input id="backgroundgradientcolor" placeholder="<s:text name='place.hldr.cust.add.buttongradientcolor'/>" class="input-xlarge" type="text" name="ButtonGradientColor"
+								   value="<%= backGroundGradientColor%>"  maxlength="50" title="50 Characters only">
+							</div>
+						</div>
+						
+						<div class="control-group">
+							<label class="control-label labelbold">
+								<s:text name='lbl.hdr.adm.cust.labelcolor'/>
+							</label>
+							<div class="controls">
+								<input id="labelcolor" placeholder="<s:text name='place.hldr.cust.add.labelcolor'/>" class="input-xlarge" type="text" name="LabelColor"
+								   value="<%=labelColor%>"  maxlength="50" title="50 Characters only">
+							</div>
+						</div>
+						
+						<div class="control-group">
+							<label class="control-label labelbold">
+								<s:text name='lbl.hdr.adm.cust.copyrightcolor'/>
+							</label>
+							<div class="controls">
+								<input id="copyrightcolor" placeholder="<s:text name='place.hldr.cust.add.copyrightcolor'/>" class="input-xlarge" type="text" name="CopyRightColor"
+								   value="<%=copyRightColor%>"  maxlength="50" title="50 Characters only">
+							</div>
+						</div>
+						
+						<div class="control-group" id="iconControl">
+							<label class="control-label labelbold"> 
+							 	<s:text name='lbl.hdr.adm.upload.logo' />
+							</label>
+							<div class="controls" style="float: left; margin-left: 3%;">
+								<div id="image-file-uploader" class="file-uploader">
+									<noscript>
+										<p>Please enable JavaScript to use file uploader.</p>s
+										<!-- or put a simple form for upload here -->
+									</noscript>
+								</div>
+							</div>
+							<span class="help-inline fileError" id="iconError"></span>
+						</div>
+					</section>
+				</div>
+			</div>
+		 </section>
+		</div>
+	  </section>
+	</div>
+
+		<div class="bottom_button ">
 		
 		<input type="button" id="" class="btn <%= disabledClass %>" <%= disabled %> value="<%= buttonLbl %>" 
 			 onclick="validate('<%= pageUrl %>', $('#formCustomerAdd'), $('#subcontainer'), '<%= progressTxt %>', $('.content_adder :input'));" />
 		<input type="button" id="customerCancel" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>" 
             onclick="loadContent('customerList', $('#formCustomerAdd'), $('#subcontainer'));" />
 	</div>
-	
+	</div>
 	<!-- Hidden Fields -->
 	<input type="hidden" name="fromPage" value="<%= StringUtils.isNotEmpty(fromPage) ? fromPage : "" %>"/>
 	<input type="hidden" name="customerId" value="<%= id %>"/>
@@ -658,6 +805,7 @@
 
 <script type="text/javascript">
 	//To check whether the device is ipad or not and then apply jquery scrollbar
+	
 	if (!isiPad()) {
 		$(".content_adder").scrollbars();  
 	}
@@ -713,7 +861,7 @@
 	            allowedExtensions : ["png"],
 	            uploadId: 'customerUploadId',
 	            type: 'customerImageFile',
-	            buttonLabel: '<s:label key="lbl.hdr.adm.upload.icon" />',
+	            buttonLabel: '<s:label key="lbl.hdr.adm.upload.logo" />',
 	            typeError : '<s:text name="err.invalid.img.file" />',
 	            params: {type: 'customerImageFile'}, 
 	            debug: true

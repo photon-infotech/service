@@ -1165,7 +1165,7 @@ legend {
 
 .scrollpanel_inner li {
 	list-style-type: none;
-	width: 96%;
+	width: auto;
 	float: left;
 	padding-bottom: 10px;
 }
