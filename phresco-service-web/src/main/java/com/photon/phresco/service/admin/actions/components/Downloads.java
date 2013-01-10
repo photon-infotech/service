@@ -172,9 +172,9 @@ public class Downloads extends ServiceBaseAction {
 			if(downloadByteArray != null){
 				inputStreamMap.put(downloadInfo.getName(),  new ByteArrayInputStream(downloadByteArray));
 			} 
-			if(imgByteArray != null){
-				inputStreamMap.put(downloadInfo.getName(),  new ByteArrayInputStream(imgByteArray));
-			} 
+//			if(imgByteArray != null){
+//				inputStreamMap.put(downloadInfo.getName(),  new ByteArrayInputStream(imgByteArray));
+//			} 
 		    
 			getServiceManager().createDownloads(getDownloadInfo(), inputStreamMap, getCustomerId());
 			addActionMessage(getText(DOWNLOAD_ADDED, Collections.singletonList(getName())));
@@ -195,9 +195,9 @@ public class Downloads extends ServiceBaseAction {
 			if(downloadByteArray != null){
 				inputStreamMap.put(downloadInfo.getName(),  new ByteArrayInputStream(downloadByteArray));
 			} 
-			if(imgByteArray != null){
-				inputStreamMap.put(downloadInfo.getName(),  new ByteArrayInputStream(imgByteArray));
-			} 
+//			if(imgByteArray != null){
+//				inputStreamMap.put(downloadInfo.getName(),  new ByteArrayInputStream(imgByteArray));
+//			} 
 			getServiceManager().updateDownload(getDownloadInfo(), inputStreamMap, getCustomerId());
 			addActionMessage(getText(DOWNLOAD_UPDATED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
@@ -298,10 +298,9 @@ public class Downloads extends ServiceBaseAction {
             writer = getHttpResponse().getWriter();
 	        InputStream is = getHttpRequest().getInputStream();
 	       
-	        getByteArray();
+	        downloadByteArray = getByteArray();
 	        downloadZipFileName = getFileName();
 	        size = getFileSize();
-	        downloadByteArray = IOUtils.toByteArray(is);
         	writer.print(MAVEN_JAR_FALSE);
         	getHttpResponse().setStatus(getHttpResponse().SC_OK);
 	        writer.flush();
