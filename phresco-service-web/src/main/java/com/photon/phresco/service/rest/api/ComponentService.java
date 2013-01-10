@@ -23,7 +23,6 @@ package com.photon.phresco.service.rest.api;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,10 +46,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
-import org.springframework.data.document.mongodb.query.Update;
 import org.springframework.stereotype.Component;
 
-import com.google.gson.Gson;
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
@@ -66,7 +63,6 @@ import com.photon.phresco.commons.model.TechnologyGroup;
 import com.photon.phresco.commons.model.TechnologyInfo;
 import com.photon.phresco.commons.model.TechnologyOptions;
 import com.photon.phresco.commons.model.WebService;
-import com.photon.phresco.exception.AIException;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.exception.PhrescoWebServiceException;
 import com.photon.phresco.service.api.Converter;
@@ -778,15 +774,21 @@ public class ComponentService extends DbService {
 	    }
 		
 		try {
-			if (id.equals(settingsTemplate.getId())) {
-				mongoOperation.save(SETTINGS_COLLECTION_NAME, settingsTemplate);
-				return Response.status(Response.Status.OK).entity(settingsTemplate).build();
+			SettingsTemplate fromDb = mongoOperation.findOne(SETTINGS_COLLECTION_NAME, 
+			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), SettingsTemplate.class);
+			List<String> customerIds = fromDb.getCustomerIds();
+			if(!customerIds.contains(settingsTemplate.getCustomerIds().get(0))) {
+				System.out.println("New Customer Found................... " + settingsTemplate.getCustomerIds().get(0));
+				customerIds.add(settingsTemplate.getCustomerIds().get(0));
 			}
+			settingsTemplate.setCustomerIds(customerIds);
+			System.out.println(settingsTemplate);
+			mongoOperation.save(SETTINGS_COLLECTION_NAME, settingsTemplate);
+			System.out.println("Updation Done...................... ");
+			return Response.status(Response.Status.OK).entity(settingsTemplate).build();
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
 		}
-		
-		return Response.status(Response.Status.OK).entity(settingsTemplate).build();
 	}
 	
 	/**
@@ -827,7 +829,13 @@ public class ComponentService extends DbService {
 		try {
 			Query query = createCustomerIdQuery(customerId);
 			Criteria typeQuery = Criteria.where(DB_COLUMN_ARTIFACT_GROUP_TYPE).is(type);
-			Criteria techIdQuery = Criteria.where(DB_COLUMN_APPLIESTOTECHID).is(techId);
+			List<String> technologies = new ArrayList<String>();
+			technologies.add(techId);
+			Technology techInDB = getTechnologyById(techId);
+			if(CollectionUtils.isNotEmpty(techInDB.getArchetypeFeatures())) {
+				technologies.addAll(techInDB.getArchetypeFeatures());
+			}
+			Criteria techIdQuery = Criteria.where(DB_COLUMN_APPLIESTOTECHID).in(technologies.toArray());
 			query = query.addCriteria(typeQuery);
 			query = query.addCriteria(techIdQuery);
 			if(StringUtils.isNotEmpty(count)){
@@ -1578,7 +1586,6 @@ public class ComponentService extends DbService {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into ComponentService.createModules(List<ModuleGroup> modules)");
         }
-        
         return createOrUpdateDownloads(downloadPart);
     }
     
@@ -1591,14 +1598,12 @@ public class ComponentService extends DbService {
         if(CollectionUtils.isNotEmpty(bodyParts)) {
             for (BodyPart bodyPart : bodyParts) {
                 if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
-                    downloadInfo = new DownloadInfo();
                     downloadInfo = bodyPart.getEntityAs(DownloadInfo.class);
                 } else if(bodyPart.getMediaType().equals(MediaType.APPLICATION_OCTET_STREAM_TYPE)){
                     bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
                 }
             }
         }
-
         if(bodyPartEntity != null) {
             downloadFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null,
             		downloadInfo.getArtifactGroup().getPackaging(), downloadInfo.getName());
