@@ -778,13 +778,10 @@ public class ComponentService extends DbService {
 			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), SettingsTemplate.class);
 			List<String> customerIds = fromDb.getCustomerIds();
 			if(!customerIds.contains(settingsTemplate.getCustomerIds().get(0))) {
-				System.out.println("New Customer Found................... " + settingsTemplate.getCustomerIds().get(0));
 				customerIds.add(settingsTemplate.getCustomerIds().get(0));
 			}
 			settingsTemplate.setCustomerIds(customerIds);
-			System.out.println(settingsTemplate);
 			mongoOperation.save(SETTINGS_COLLECTION_NAME, settingsTemplate);
-			System.out.println("Updation Done...................... ");
 			return Response.status(Response.Status.OK).entity(settingsTemplate).build();
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
