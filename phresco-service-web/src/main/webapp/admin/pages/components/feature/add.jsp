@@ -20,6 +20,7 @@
 <%@ taglib uri="/struts-tags" prefix="s" %>
 
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.apache.commons.collections.CollectionUtils"%>
 
@@ -44,11 +45,20 @@
 	String buttonLbl = ServiceActionUtil.getButtonLabel(fromPage);
 	String pageUrl = ServiceActionUtil.getPageUrl(ServiceUIConstants.FEATURES, fromPage);
 	String progressTxt = ServiceActionUtil.getProgressTxt(ServiceUIConstants.FEATURES, fromPage);
-	String versioning = (String)request.getAttribute(ServiceUIConstants.REQ_VERSIONING);
+	String versioning = (String) request.getAttribute(ServiceUIConstants.REQ_VERSIONING);
+	
 	String disabledVer ="";
 	if(StringUtils.isNotEmpty(versioning)) {
 		disabledVer = "disabled";
 	}
+	
+	List<RequiredOption> selectedTech = new ArrayList<RequiredOption>();
+	 if (moduleGroup != null){
+		List<ArtifactInfo> versionIds= moduleGroup.getVersions();
+   		 for (ArtifactInfo versionId : versionIds ){
+    		selectedTech = versionId.getAppliesTo();
+   	 	}
+    }
   
   	//For edit
   	String moduleId = "";
@@ -208,20 +218,25 @@
 								<input type="checkbox" value="" id="checkAllAuto" name="" onclick="checkAllEvent(this,$('.applsChk'), false);"
 									style="margin: 3px 8px 6px 0;" <%= disabledVer %> ><s:text name='lbl.all'/>
 							</li>
-							<%
+							 <%
 								if (CollectionUtils.isNotEmpty(technologies)) {
 									String checkedStr = "";
 									for (Technology technology : technologies) {
-										 if (technology.getId().equals(selectedTechnology)) {
-												checkedStr = "checked";
-											} else {
-												checkedStr = "";
+										if (CollectionUtils.isNotEmpty(selectedTech)){
+											checkedStr = "";
+											for(RequiredOption selectedTechId : selectedTech) {
+										 		if (technology.getId().equals(selectedTechId.getTechId())) {
+														checkedStr = "checked";
+														break;
+												} 
 											}
+										}
 							%>
 										<li> <input type="checkbox" id="appliestoCheckbox" name="multiTechnology" value='<%= technology.getId() %>'
 											onclick="checkboxEvent($('#checkAllAuto'), 'applsChk')"	class="check applsChk" <%= checkedStr %> <%= disabledVer %> ><%= technology.getName() %>
 										</li>
-							<%		}	
+							<%		
+								   }
 								}
 							%>
 						</ul>
@@ -384,7 +399,7 @@
 	
 	<div class="bottom_button">
      
-     		<input type="button" id="featuresUpdate" class="btn <%= disabledClass %>" <%= disabled %> 
+     		<input type="button" id="featuresUpdate" class="btn <%= disabledClass %>"  <%= disabled %>
 						onclick="validate('<%= pageUrl %>', $('#formFeatureAdd'), $('#featureContainer'), '<%= progressTxt %>', $('.content_feature :input'));"
 						value="<%= buttonLbl %>"/>
 			<input type="button" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>"
@@ -401,7 +416,7 @@
     <input type="hidden" name="featureArtifactId" value="<%= moduleGroup != null ? featureArtifactId : "" %>"/> 
     <input type="hidden" name="featureGroupId" value="<%= moduleGroup != null ? featureGroupId : "" %>"/> 
     <input type="hidden" name="featureVersions" value="<%= moduleGroup != null ? featureVersions : "" %>"/>
-    <input type="hidden" name="moduleId" value="<%= selectedModuleId %>">
+    <input type="hidden" name="moduleId" value="<%= StringUtils.isNotEmpty(selectedModuleId) ? selectedModuleId : "" %>">
 </form>
 
 <script type="text/javascript">
@@ -427,6 +442,13 @@
             disableUploadButton($("#feature-file-uploader"));
             disableUploadButton($("#feature-img-uploader"))
         }
+        
+        if ('<%= fromPage %>' === "edit") {
+        	var checkedLen = $("input:checked").length;
+    		if ($('.applsChk').length == checkedLen){
+    		  $('#checkAllAuto').prop('checked', true);
+    		} 
+    	} 
 	
 		// To check for the special character in version
         $('#featureversn').bind('input propertychange', function (e) {
