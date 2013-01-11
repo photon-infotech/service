@@ -454,6 +454,7 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
         repoInfo.setBaseRepoURL(repoBaseURL);
         repoInfo.setRepoUserName(config.getRepoUserName());
         repoInfo.setRepoPassword(config.getRepoPassword());
+        repoInfo.setRepoName(repoName);
         String releaseRepo = createHostedRepo(repoName, repoBaseURL, REPOTYPE_RELEASE);
         if(StringUtils.isNotEmpty(releaseRepo)) {
             repoInfo.setReleaseRepoURL(releaseRepo);

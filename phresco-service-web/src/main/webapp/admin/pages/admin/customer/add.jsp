@@ -60,6 +60,9 @@
 	String repoURL = "";
 	String repoPassword = "";
 	String repoUserName = "";
+	String snapShotRepoUrl = "";
+	String groupRepoUrl = "";
+	String baseRepoUrl = "";
 	String country = "";
 	String disabled = "";
 	String disabledClass = "btn-primary";
@@ -114,6 +117,15 @@
 		}
 		if (StringUtils.isNotEmpty(customer.getRepoInfo().getReleaseRepoURL())) {
 			repoUrl = customer.getRepoInfo().getReleaseRepoURL();
+		}
+		if (StringUtils.isNotEmpty(customer.getRepoInfo().getSnapshotRepoURL())) {
+			snapShotRepoUrl = customer.getRepoInfo().getSnapshotRepoURL();
+		}
+		if (StringUtils.isNotEmpty(customer.getRepoInfo().getGroupRepoURL())) {
+			groupRepoUrl = customer.getRepoInfo().getGroupRepoURL();
+		}
+		if (StringUtils.isNotEmpty(customer.getRepoInfo().getBaseRepoURL())) {
+			baseRepoUrl = customer.getRepoInfo().getBaseRepoURL();
 		}
 		if (customer.getValidFrom() != null) {
 			validFrom = customer.getValidFrom();
@@ -801,6 +813,9 @@
 	<input type="hidden" name="fromPage" value="<%= StringUtils.isNotEmpty(fromPage) ? fromPage : "" %>"/>
 	<input type="hidden" name="customerId" value="<%= id %>"/>
 	<input type="hidden" name="oldName" value="<%= name %>"/>
+	<input type="hidden" name="snapshotRepoUrl" value="<%= snapShotRepoUrl %>">
+	<input type="hidden" name="groupRepoUrl" value="<%= groupRepoUrl %>">
+	<input type="hidden" name="baseRepoUrl" value="<%= baseRepoUrl %>">
 </form>
 
 <script type="text/javascript">

@@ -100,6 +100,9 @@ public class Customers extends ServiceBaseAction  {
 	private String backGroundGradientColor = "";
 	private String labelColor = "";
 	private String copyRightColor = "";
+	private String snapshotRepoUrl = "";
+	private String groupRepoUrl = "";
+	private String baseRepoUrl = "";
 	private List<String> appliesTo = new ArrayList<String>();
 	List<ApplicationType> applicableAppTypes = new ArrayList<ApplicationType>();
 	
@@ -265,9 +268,7 @@ public class Customers extends ServiceBaseAction  {
 	private Customer createCustomer() {
         Customer customer = new Customer();
         FrameWorkTheme theme = new FrameWorkTheme();
-        if (StringUtils.isNotEmpty(customerId)) {
-        	customer.setId(customerId);
-        }
+        
         customer.setName(getName());
         customer.setDescription(getDescription());
         customer.setEmailId(getEmail());
@@ -283,10 +284,25 @@ public class Customers extends ServiceBaseAction  {
         customer.setValidFrom(getValidFrom());
         customer.setValidUpto(getValidUpTo());
         RepoInfo repoInfo = new RepoInfo();
+        if (StringUtils.isNotEmpty(customerId)) {
+        	customer.setId(customerId);
+        	repoInfo.setCustomerId(customerId);
+        }
         repoInfo.setReleaseRepoURL(getRepoURL());
         repoInfo.setRepoPassword(getRepoPassword());
         repoInfo.setRepoUserName(getRepoUserName());
         repoInfo.setRepoName(getRepoName());
+        if (StringUtils.isNotEmpty(getSnapshotRepoUrl())){
+        	repoInfo.setSnapshotRepoURL(getSnapshotRepoUrl());
+        }
+        if (StringUtils.isNotEmpty(getGroupRepoUrl())){
+        	repoInfo.setGroupRepoURL(getGroupRepoUrl());
+        }
+        if (StringUtils.isNotEmpty(getBaseRepoUrl())){
+        	repoInfo.setBaseRepoURL(getBaseRepoUrl());
+        }
+        
+        
         customer.setRepoInfo(repoInfo);
         List<String> appliesTo = getAppliesTo();
         customer.setApplicableTechnologies(appliesTo);
@@ -867,5 +883,29 @@ public class Customers extends ServiceBaseAction  {
 
 	public void setCopyRightColor(String copyRightColor) {
 		this.copyRightColor = copyRightColor;
+	}
+
+	public String getSnapshotRepoUrl() {
+		return snapshotRepoUrl;
+	}
+
+	public void setSnapshotRepoUrl(String snapshotRepoUrl) {
+		this.snapshotRepoUrl = snapshotRepoUrl;
+	}
+
+	public String getGroupRepoUrl() {
+		return groupRepoUrl;
+	}
+
+	public void setGroupRepoUrl(String groupRepoUrl) {
+		this.groupRepoUrl = groupRepoUrl;
+	}
+
+	public String getBaseRepoUrl() {
+		return baseRepoUrl;
+	}
+
+	public void setBaseRepoUrl(String baseRepoUrl) {
+		this.baseRepoUrl = baseRepoUrl;
 	}
 }
