@@ -97,7 +97,7 @@ public class Customers extends ServiceBaseAction  {
 	private String menuBackGround = "";
 	private String menufontColor = "";
 	private String buttonColor = "";
-	private String backGroundGradientColor = "";
+	private String pageHeaderColor = "";
 	private String labelColor = "";
 	private String copyRightColor = "";
 	private String snapshotRepoUrl = "";
@@ -311,7 +311,7 @@ public class Customers extends ServiceBaseAction  {
         theme.setBodyBackGroundColor(getBodyBackGroundColor());
         theme.setBrandingColor(getBrandingColor());
         theme.setButtonColor(getButtonColor());
-        theme.setBackGroundGradientColor(getBackGroundGradientColor());
+        theme.setPageHeaderColor(getPageHeaderColor());
         theme.setCopyRightColor(getCopyRightColor());
         theme.setLabelColor(getLabelColor());
         theme.setMenuBackGround(getMenuBackGround());
@@ -840,11 +840,7 @@ public class Customers extends ServiceBaseAction  {
 	public String getButtonColor() {
 		return buttonColor;
 	}
-
-	public String getBackGroundGradientColor() {
-		return backGroundGradientColor;
-	}
-
+	
 	public String getLabelColor() {
 		return labelColor;
 	}
@@ -873,12 +869,16 @@ public class Customers extends ServiceBaseAction  {
 		this.buttonColor = buttonColor;
 	}
 
-	public void setButtonGradientColor(String buttonGradientColor) {
-		this.backGroundGradientColor = buttonGradientColor;
-	}
-
 	public void setLabelColor(String labelColor) {
 		this.labelColor = labelColor;
+	}
+
+	public String getPageHeaderColor() {
+		return pageHeaderColor;
+	}
+
+	public void setPageHeaderColor(String pageHeaderColor) {
+		this.pageHeaderColor = pageHeaderColor;
 	}
 
 	public void setCopyRightColor(String copyRightColor) {

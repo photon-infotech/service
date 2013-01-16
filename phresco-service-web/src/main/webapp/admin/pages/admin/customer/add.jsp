@@ -76,7 +76,7 @@
 	String menuBackGround = "";
 	String menufontColor = "";
 	String buttonColor = "";
-	String backGroundGradientColor = "";
+	String pageHeaderColor = "";
 	String labelColor = "";
 	String copyRightColor = "";
 	
@@ -167,8 +167,8 @@
 				buttonColor = customer.getFrameworkTheme().getButtonColor();
 			}
 			
-			if (theme.getBackGroundGradientColor() != null) {
-				backGroundGradientColor = customer.getFrameworkTheme().getBackGroundGradientColor();
+			if (theme.getPageHeaderColor() != null) {
+				pageHeaderColor = customer.getFrameworkTheme().getPageHeaderColor();
 			}
 			
 			if (theme.getLabelColor() != null) {
@@ -751,11 +751,11 @@
 						
 						<div class="control-group">
 							<label class="control-label labelbold">
-								<s:text name='lbl.hdr.adm.cust.backgroundgradientcolor'/>
+								<s:text name='lbl.hdr.adm.cust.pageheadercolor'/>
 							</label>
 							<div class="controls">
-								<input id="backgroundgradientcolor" placeholder="<s:text name='place.hldr.cust.add.buttongradientcolor'/>" class="input-xlarge" type="text" name="ButtonGradientColor"
-								   value="<%= backGroundGradientColor%>"  maxlength="50" title="50 Characters only">
+								<input id="pageheadercolor" placeholder="<s:text name='place.hldr.cust.add.pageHeadercolor'/>" class="input-xlarge" type="text" name="PageHeaderColor"
+								   value="<%= pageHeaderColor%>"  maxlength="50" title="50 Characters only">
 							</div>
 						</div>
 						
