@@ -714,7 +714,20 @@
 					progressText, $('#appliesToDiv :input'));
 		}
 	}
-
+	//To check for the special character in Key Value
+	$('.keywidth').bind('input propertychange', function(e) {
+		var key = $(this).val();
+		key = checkForSplChr(key);
+		$(this).val(key);
+	});
+	
+	//To check for the special character in Name Value 
+	$('.textWidth').bind('input propertychange', function(e) {
+		var key = $(this).val();
+		key = checkForSplChr(key);
+		$(this).val(key);
+	});
+	
 	// To check for the special character in configname
 	$('#configname').bind('input propertychange', function(e) {
 		var configname = $(this).val();

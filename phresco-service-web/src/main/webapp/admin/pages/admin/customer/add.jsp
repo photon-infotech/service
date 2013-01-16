@@ -559,8 +559,8 @@
 				<s:text name='lbl.hdr.adm.cust.hlptxt'/>
 			</label>
 			<div class="controls">
-				<input id="hlptext" placeholder="<s:text name='place.hldr.cust.add.help.text'/>" class="input-xlarge" type="text" name="helpText"
-				    value="<%= helpText %>"  maxlength="150" title="150 Characters only">
+				<textarea id="hlptext" class="input-xlarge" title="150 Characters only" maxlength="150" name="helpText" 
+						placeholder="Help Text"></textarea>
 			</div>
 		</div>
 
