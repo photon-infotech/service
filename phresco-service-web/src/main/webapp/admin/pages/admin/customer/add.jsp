@@ -861,6 +861,25 @@
             $(this).val(numbr);        
 		});
      	
+        $("#repourl").blur(function(event) {
+        	if ($(this).val() != "") {
+				$('#repousername').addClass('outLineColor');
+				$('#repopassword').addClass('outLineColor');
+        	}
+ 		});
+        
+        $("#repousername").blur(function(event) {
+        	if ($(this).val() != "") {
+				$('#repousername').removeClass('outLineColor');
+        	}
+ 		});
+        
+        $("#repopassword").blur(function(event) {
+        	if ($(this).val() != "") {
+				$('#repopassword').removeClass('outLineColor');
+        	}
+ 		});
+     	
 		// Date picker
 		<% if (StringUtils.isEmpty(fromPage)) { %>
 				document.getElementById('fromdate').value = '';

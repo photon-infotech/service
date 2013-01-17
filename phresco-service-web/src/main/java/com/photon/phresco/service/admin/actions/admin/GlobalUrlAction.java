@@ -143,6 +143,7 @@ public class GlobalUrlAction extends ServiceBaseAction {
 		}
 		try {
 			getServiceManager().updateGlobalUrl(createGlobalURL(), getGlobalurlId());
+			addActionMessage(getText(URL_UPDATED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
 			if(s_isDebugEnabled) {
 				S_LOGGER.error("Entered into catch block of GlobalUrlAction.update()" + e.getStackError());

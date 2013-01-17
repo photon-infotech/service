@@ -424,7 +424,7 @@ public class Archetypes extends ServiceBaseAction {
 
 			URL url = new URL(ArchetypeUrl);
 			fileInputStream = url.openStream();
-			String[] parts = ArchetypeUrl.split("/");
+			String[] parts = ArchetypeUrl.split(FORWARD_SLASH);
 			extFileName = parts[parts.length - 1];
 			contentType = url.openConnection().getContentType();
 			contentLength = url.openConnection().getContentLength();

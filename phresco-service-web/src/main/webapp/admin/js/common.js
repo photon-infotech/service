@@ -452,7 +452,7 @@ function copyToClipboard(data) {
 //trim the long content
 function textTrim(obj) {
     var val = $(obj).text();
-    $(obj).attr("title", val);
+    $(obj).attr("title", $.trim(val));
     var len = val.length;
     if(len > 50) {
         val = val.substr(0, 50) + "...";

@@ -152,6 +152,8 @@ public class Features extends ServiceBaseAction {
     	
     	try {
     		List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
+    		Collections.sort(technologies, Technology.TECHNAME_COMPARATOR);
+    		
     		setReqAttribute(REQ_ARCHE_TYPES, technologies);
     		featureByteArray = null;
     	} catch (PhrescoException e) {
@@ -374,7 +376,6 @@ public class Features extends ServiceBaseAction {
             String type = getType();
             CacheKey key = new CacheKey(customerId, type, tech);
             ServiceManager serviceManager = getServiceManager(); 
-            
 			if (ArrayUtils.isNotEmpty(moduleIds)) {
                 for (String moduleId : moduleIds) {
                 	serviceManager.deleteFeature(moduleId, key);
@@ -406,8 +407,8 @@ public class Features extends ServiceBaseAction {
             writer = getHttpResponse().getWriter();
 	        byte[] tempFeaByteArray = getByteArray();
 	        
-	        featureJarFileName = getFileName();
-	        String ext = ServerUtil.getFileExtension(featureJarFileName);
+	        String tempName = getFileName();
+	        String ext = ServerUtil.getFileExtension(tempName);
 	        if(ext.equalsIgnoreCase(FILE_FORMAT)) {
 	        	zipNameValidate = extractArchive( new ByteArrayInputStream(tempFeaByteArray));
 	        }
@@ -506,7 +507,7 @@ public class Features extends ServiceBaseAction {
 
 			URL url = new URL(featureUrl);
 			fileInputStream = url.openStream();
-			String[] parts = featureUrl.split("/");
+			String[] parts = featureUrl.split(FORWARD_SLASH);
 			extFileName = parts[parts.length - 1];
 			contentType = url.openConnection().getContentType();
 			contentLength = url.openConnection().getContentLength();

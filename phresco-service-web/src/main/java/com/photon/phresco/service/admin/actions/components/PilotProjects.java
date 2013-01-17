@@ -125,6 +125,7 @@ public class PilotProjects extends ServiceBaseAction {
     	
     	try {
     		List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
+    		Collections.sort(technologies, Technology.TECHNAME_COMPARATOR);
     		setReqAttribute(REQ_ARCHE_TYPES, technologies);
     		setReqAttribute(REQ_FROM_PAGE, ADD);
     	} catch (PhrescoException e) {
@@ -322,7 +323,7 @@ public class PilotProjects extends ServiceBaseAction {
 
     		URL url = new URL(pilotURL);
     		fileInputStream = url.openStream();
-    		String[] parts = pilotURL.split("/");
+    		String[] parts = pilotURL.split(FORWARD_SLASH);
     		extFileName = parts[parts.length - 1];
     		contentType = url.openConnection().getContentType();
     		contentLength = url.openConnection().getContentLength();

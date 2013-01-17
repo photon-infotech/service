@@ -2467,4 +2467,9 @@ input[class="chkBox_config"] {
 
 .dwnldError{
 	color:#B94A48;
-}	
+}
+
+.outLineColor {
+	border-color: #B94A48;
+	color : #B94A48;	
+}
