@@ -295,7 +295,10 @@ public class Archetypes extends ServiceBaseAction {
         	throw new PhrescoException(getText(EXCEPTION_ARTIFACTINFO_MISSING));
         }
         technology.setCustomerIds(Arrays.asList(getCustomerId()));
-        technology.setTechVersions(Arrays.asList(getTechVersion()));
+        
+        String[] techVersions = getTechVersion().split(",");
+        List<String> listTechVersion = Arrays.asList(techVersions);
+        technology.setTechVersions(listTechVersion);
         technology.setReports(getApplicableReports());
         technology.setPlugins(pluginInfos);
         
