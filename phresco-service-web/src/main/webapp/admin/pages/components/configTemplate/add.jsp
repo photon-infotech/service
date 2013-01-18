@@ -22,7 +22,7 @@
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.apache.commons.collections.CollectionUtils" %>
 <%@ page import="java.util.List"%>
-<%@page import="java.util.ArrayList"%>
+<%@ page import="java.util.ArrayList"%>
 
 <%@ page import="com.photon.phresco.commons.model.SettingsTemplate" %>
 <%@ page import="com.photon.phresco.commons.model.PropertyTemplate" %>
@@ -57,7 +57,7 @@
 <form id="formConfigTempAdd" name="configForm" class="form-horizontal customer_list">
 	<h4 class="hdr">
 		<%= title %>   
-	 </h4>	
+	</h4>	
 	
 	<div class="content_adder">
 		<div class="control-group" id="nameControl">
@@ -93,26 +93,24 @@
 						<li>
 							<input type="checkbox" value="" id="checkAllAuto" name="" onclick="checkAllEvent(this,$('.applsChk'), false);" style="margin: 3px 8px 6px 0;">All
 						</li>
-
 						<%
 						    if (CollectionUtils.isNotEmpty(technologies)) {
-										for (Technology technology : technologies) {
-													String checkedStr = "";
-														if (settingsTemplate != null) {
-															
- 															List<Element> appliesTos = settingsTemplate.getAppliesToTechs();
- 															if (CollectionUtils.isNotEmpty(appliesTos)) {
- 																List<String> techIds = new ArrayList<String>();
- 																for (Element appliesTo : appliesTos) {
- 																	techIds.add(appliesTo.getId());
- 																}
- 																if (techIds.contains(technology.getId())) {
- 																	checkedStr = "checked";
- 																} else {
- 																	checkedStr = "";
- 																}
- 															}
-														}
+								for (Technology technology : technologies) {
+									String checkedStr = "";
+									if (settingsTemplate != null) {
+										List<Element> appliesTos = settingsTemplate.getAppliesToTechs();
+										if (CollectionUtils.isNotEmpty(appliesTos)) {
+											List<String> techIds = new ArrayList<String>();
+											for (Element appliesTo : appliesTos) {
+												techIds.add(appliesTo.getId());
+											}
+											if (techIds.contains(technology.getId())) {
+												checkedStr = "checked";
+											} else {
+												checkedStr = "";
+											}
+										}
+									}
 
 						%>		
 								<li>
@@ -135,7 +133,7 @@
 				<s:text name="lbl.hdr.comp.system.properties" />
 			</label>
 			<div class="controls">
-				 <%
+				<%
 					String checkedStr = "";
 					if (isCustProp) {
 					    checkedStr = "checked";
@@ -282,6 +280,7 @@
 															<option value="Password"><s:text name='lbl.hdr.comp.cnfigtmplt.password'/></option>
 															<option value="FileType"><s:text name='lbl.hdr.comp.cnfigtmplt.filetype'/></option>
 															<option value="Boolean"><s:text name='lbl.hdr.comp.cnfigtmplt.boolean'/></option>
+															<option value="Actions"><s:text name='lbl.hdr.comp.cnfigtmplt.actions'/></option>
 														</select>
 													</td>
 													<td class="psblbtnwidth" id='<%= dynamicId + "_psblSinglDiv" %>' style="display:none">
@@ -311,10 +310,10 @@
 													</td>
 													<td class="buttonwidth">
 														<a><img class="add imagealign" temp='<%= dynamicId %>' src="images/add_icon.png" onclick="addconfig(this);"></a>
-													</td class="buttonwidth">
-														<td class="buttonwidth">
-															<img onclick="removeTag(this);" id="deleteIcon" src="images/minus_icon.png" class="del imagealign">
-														</td>
+													</td>
+													<td class="buttonwidth">
+														<img onclick="removeTag(this);" id="deleteIcon" src="images/minus_icon.png" class="del imagealign">
+													</td>
 												</tr>
 									<%
 												dynamicId++;
@@ -371,11 +370,11 @@
 	 
 	<div class="bottom_config">
 		<input type="button" id="" class="btn btn-primary" 
-				onclick="validatePropTempKey('<%= pageUrl %>', '<%= progressTxt %>');" 
-		        value='<%= buttonLbl %>'/>
+			onclick="validatePropTempKey('<%= pageUrl %>', '<%= progressTxt %>');" 
+			value='<%= buttonLbl %>'/>
 		<input type="button" id="configtempCancel" class="btn btn-primary" 
-		      onclick="loadContent('configtempList', $('#formConfigTempAdd'), $('#subcontainer'));" 
-		      value="<s:text name='lbl.btn.cancel'/>"/>
+			onclick="loadContent('configtempList', $('#formConfigTempAdd'), $('#subcontainer'));" 
+			value="<s:text name='lbl.btn.cancel'/>"/>
 	</div>
 	
 	<!-- Hidden Fields -->
@@ -393,7 +392,6 @@
 	}
 
 	$(document).ready(function() {
-		
 		hideLoadingIcon();
 		checkboxEvent($('#checkAllAuto'), 'applsChk');
 		chkCount();
@@ -714,6 +712,7 @@
 					progressText, $('#appliesToDiv :input'));
 		}
 	}
+	
 	//To check for the special character in Key Value
 	$('.keywidth').bind('input propertychange', function(e) {
 		var key = $(this).val();
