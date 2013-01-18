@@ -23,6 +23,7 @@ package com.photon.phresco.service.admin.actions.admin;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -51,7 +52,8 @@ public class Videos extends ServiceBaseAction {
 
 	private static byte[] videoByteArray = null;
 	private static byte[] imgByteArray = null;
-
+	private static String videoName;
+	
 	private String name = "";
 	private String description = "";
 	private String videoId = "";
@@ -60,6 +62,11 @@ public class Videos extends ServiceBaseAction {
 	private String videoError = "";
 	private String imgError = "";
 	private String fromPage = "";
+	private String extFileName="";	
+	private String videoUrl = "";
+	private InputStream fileInputStream;
+    private String contentType;
+    private int contentLength;
 	private Boolean errorFound = false;
 
 	public String list() throws PhrescoException {
@@ -126,7 +133,6 @@ public class Videos extends ServiceBaseAction {
 				inputStreamMap.put(videoInfo.getName(),  new ByteArrayInputStream(imgByteArray));
 			} 
 			
-			
 			getServiceManager().createVideos(createVideoInstance(), inputStreamMap);
 			addActionMessage(getText(VIDEO_ADDED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
@@ -178,7 +184,7 @@ public class Videos extends ServiceBaseAction {
 		if(StringUtils.isNotEmpty(getVideoArtiId())) {
 			artifactGroup.setId(getVideoArtiId());
 		}
-		artifactGroup.setPackaging(ServerUtil.getFileExtension(getFileName()));
+		artifactGroup.setPackaging(ServerUtil.getFileExtension(videoName));
 		videoType.setArtifactGroup(artifactGroup);
 		videoInfo.setVideoList(Arrays.asList(videoType));
 		return videoInfo;
@@ -212,11 +218,24 @@ public class Videos extends ServiceBaseAction {
 			S_LOGGER.debug("Entering Method Videos.uploadFile()");
 		}
 		
-		String type = getHttpRequest().getParameter(REQ_VIDEO_FILE_TYPE);
-		if (REQ_VIDEO_UPLOAD.equals(type)) {
-			videoByteArray = getFileByteArray();
-		} else {
-			imgByteArray = getFileByteArray();
+		PrintWriter writer = null;
+		try {
+            writer = getHttpResponse().getWriter();
+			String type = getReqParameter(REQ_VIDEO_FILE_TYPE);
+			if (REQ_VIDEO_UPLOAD.equals(type)) {
+				videoByteArray = getByteArray();
+				videoName = getFileName();
+			     
+			} else {
+				imgByteArray = getFileByteArray();
+			}
+			writer.print(MAVEN_JAR_FALSE);
+        	getHttpResponse().setStatus(getHttpResponse().SC_OK);
+	        writer.flush();
+	        writer.close();
+		} catch (Exception e) {
+			getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
+            writer.print(SUCCESS_FALSE);
 		}
 
 		return SUCCESS;
@@ -253,6 +272,29 @@ public class Videos extends ServiceBaseAction {
 		} else {
 			imgByteArray = null;
 		}
+	}
+	
+	public String downloadVideo() throws PhrescoException {
+		if (s_isDebugEnabled) {
+			S_LOGGER.debug("Entering Method  Features.downloadVideo()");
+		}
+		
+		try {
+			VideoInfo videoInfo = getServiceManager().getVideo(videoId);
+			ArtifactGroup artifactGroup = videoInfo.getVideoList().get(0).getArtifactGroup();
+			videoUrl = artifactGroup.getVersions().get(0).getDownloadURL();
+
+			URL url = new URL(videoUrl);
+			fileInputStream = url.openStream();
+			String[] parts = videoUrl.split(FORWARD_SLASH);
+			extFileName = parts[parts.length - 1];
+			contentType = url.openConnection().getContentType();
+			contentLength = url.openConnection().getContentLength();
+		} catch(Exception e) {
+			return showErrorPopup(new PhrescoException(e), getText(DOWNLOAD_FAILED));
+		}
+		
+		return SUCCESS;
 	}
 
 	public String validateForm() throws PhrescoException {
@@ -354,5 +396,45 @@ public class Videos extends ServiceBaseAction {
 
 	public void setVideoArtiId(String videoArtiId) {
 		this.videoArtiId = videoArtiId;
+	}
+
+	public String getExtFileName() {
+		return extFileName;
+	}
+
+	public void setExtFileName(String extFileName) {
+		this.extFileName = extFileName;
+	}
+
+	public String getVideoUrl() {
+		return videoUrl;
+	}
+
+	public void setVideoUrl(String videoUrl) {
+		this.videoUrl = videoUrl;
+	}
+
+	public InputStream getFileInputStream() {
+		return fileInputStream;
+	}
+
+	public void setFileInputStream(InputStream fileInputStream) {
+		this.fileInputStream = fileInputStream;
+	}
+
+	public String getContentType() {
+		return contentType;
+	}
+
+	public void setContentType(String contentType) {
+		this.contentType = contentType;
+	}
+
+	public int getContentLength() {
+		return contentLength;
+	}
+
+	public void setContentLength(int contentLength) {
+		this.contentLength = contentLength;
 	}
 }

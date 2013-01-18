@@ -241,11 +241,11 @@ public class Downloads extends ServiceBaseAction {
         //To set the versions of the download items
         List<ArtifactInfo> downloadVersions = new ArrayList<ArtifactInfo>();
         ArtifactInfo downloadVersion = new ArtifactInfo();
-        if (StringUtils.isNotEmpty(version)) {
-        	downloadVersion.setVersion(version);
-        } else {
+        
+        if (downloadByteArray != null && (StringUtils.isEmpty(version))) {
         	throw new PhrescoException(getText(EXCEPTION_ARTIFACTINFO_MISSING));
         }
+        downloadVersion.setVersion(version);
         downloadVersion.setFileSize(size);
         downloadVersions.add(downloadVersion);
         ArtifactGroup artifactGroup = new ArtifactGroup();
@@ -256,12 +256,13 @@ public class Downloads extends ServiceBaseAction {
         artifactGroup.setCustomerIds(customerIds);
         artifactGroup.setVersions(downloadVersions);
         artifactGroup.setLicenseId(getLicense());
-        if (StringUtils.isNotEmpty(artifactId) && StringUtils.isNotEmpty(groupId)) {
-	        artifactGroup.setGroupId(groupId);
-	        artifactGroup.setArtifactId(artifactId);
-        } else {
+        
+        if (downloadByteArray != null && (StringUtils.isEmpty(groupId) || StringUtils.isEmpty(artifactId))) {
         	throw new PhrescoException(getText(EXCEPTION_ARTIFACTINFO_MISSING));
         }
+        artifactGroup.setGroupId(groupId);
+        artifactGroup.setArtifactId(artifactId);
+        
         artifactGroup.setPackaging(ServerUtil.getFileExtension(downloadZipFileName));
         downloadInfo.setArtifactGroup(artifactGroup);
       
@@ -296,7 +297,6 @@ public class Downloads extends ServiceBaseAction {
 		PrintWriter writer = null;
 		try {
             writer = getHttpResponse().getWriter();
-	        InputStream is = getHttpRequest().getInputStream();
 	       
 	        downloadByteArray = getByteArray();
 	        downloadZipFileName = getFileName();
@@ -324,7 +324,7 @@ public class Downloads extends ServiceBaseAction {
 
 			URL url = new URL(archiveUrl);
 			fileInputStream = url.openStream();
-			String[] parts = archiveUrl.split("/");
+			String[] parts = archiveUrl.split(FORWARD_SLASH);
 			extFileName = parts[parts.length - 1];
 			contentType = url.openConnection().getContentType();
 			contentLength = url.openConnection().getContentLength();
@@ -418,12 +418,12 @@ public class Downloads extends ServiceBaseAction {
 				isError = true;
 			}
 			
-			if(StringUtils.isEmpty(getGroupId())) {
+			if((downloadByteArray != null) && (StringUtils.isEmpty(getGroupId()))) {
 				setGroupIdError(getText(KEY_I18N_ERR_GROUPID_EMPTY));
 				isError = true;
 			}
 			
-			if(StringUtils.isEmpty(getArtifactId())) {
+			if((downloadByteArray != null) && (StringUtils.isEmpty(getArtifactId()))) {
 				setArtifactIdError(getText(KEY_I18N_ERR_ARTIFACTID_EMPTY));
 				isError = true;
 			}

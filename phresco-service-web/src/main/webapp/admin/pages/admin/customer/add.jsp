@@ -822,7 +822,8 @@
 	//To check whether the device is ipad or not and then apply jquery scrollbar
 	
 	if (!isiPad()) {
-		$(".content_adder").scrollbars();  
+		$(".content_adder").scrollbars();
+		$(".multilist-scroller").scrollbars();
 	}
 	
 	$(document).ready(function() {
@@ -860,6 +861,25 @@
             numbr = allowNumHyphenPlus(numbr);
             $(this).val(numbr);        
 		});
+     	
+        $("#repourl").blur(function(event) {
+        	if ($(this).val() != "") {
+				$('#repousername').addClass('outLineColor');
+				$('#repopassword').addClass('outLineColor');
+        	}
+ 		});
+        
+        $("#repousername").blur(function(event) {
+        	if ($(this).val() != "") {
+				$('#repousername').removeClass('outLineColor');
+        	}
+ 		});
+        
+        $("#repopassword").blur(function(event) {
+        	if ($(this).val() != "") {
+				$('#repopassword').removeClass('outLineColor');
+        	}
+ 		});
      	
 		// Date picker
 		<% if (StringUtils.isEmpty(fromPage)) { %>

@@ -95,6 +95,15 @@
 			<span class="help-inline fileError" id="videoError"></span>
 		</div>
 		
+		<%  if (ServiceUIConstants.EDIT.equals(fromPage) && StringUtils.isNotEmpty(name)) { %>
+		   	 <div class="control-group" >
+               <label class="control-label labelbold"> <s:text name="lbl.hdr.video.download" /> </label>
+			       <div class="controls">
+						<a href="#" onclick="downloadVideo();"><%= name %></a>
+          		   </div>
+        	 </div>
+		<% } %>	
+		
 		<div class="control-group" id="imageControl">
 			<label class="control-label labelbold"> 
 			   <% if(fromPage != ServiceUIConstants.EDIT) { %>
@@ -227,5 +236,9 @@
 		} else {
 			hideError(controlObj, msgObj);
 		}
+	}
+	
+	function downloadVideo() {
+		window.location.href="admin/videoUrl?" + $('#formVideoAdd').serialize();
 	}
 </script>

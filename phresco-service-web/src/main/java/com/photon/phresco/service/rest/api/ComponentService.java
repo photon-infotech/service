@@ -367,49 +367,51 @@ public class ComponentService extends DbService {
 	}
 	
 	private Response saveOrUpdateTechnology(MultiPart multiPart) throws PhrescoException {
-	    List<BodyPart> entities = new ArrayList<BodyPart>();
-	    Technology technology = null;
-	    Map<ArtifactGroup, BodyPart> archetypeMap = new HashMap<ArtifactGroup, BodyPart>();
-	    Map<ArtifactGroup, BodyPart> pluginMap = new HashMap<ArtifactGroup, BodyPart>();
-	    
-	    //To separete the object and binary file
-	    List<BodyPart> bodyParts = multiPart.getBodyParts();
-	    for (BodyPart bodyPart : bodyParts) {
-	        if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
-	            technology = bodyPart.getEntityAs(Technology.class);
-	        } else {
-	            entities.add(bodyPart);
-	        }
-        }
-	    
-	    if(technology == null) {
-	    	throw new PhrescoException("Technology Is Null");
-	    }
-	    
-	    for (BodyPart bodyPart : entities) {
-			if(bodyPart.getContentDisposition().getFileName().equals(technology.getName())) {
+		Technology technology = null;
+		List<BodyPart> entities = new ArrayList<BodyPart>();
+		Map<ArtifactGroup, BodyPart> archetypeMap = new HashMap<ArtifactGroup, BodyPart>();
+		Map<ArtifactGroup, BodyPart> pluginMap = new HashMap<ArtifactGroup, BodyPart>();
+
+		// To separete the object and binary file
+		List<BodyPart> bodyParts = multiPart.getBodyParts();
+		for (BodyPart bodyPart : bodyParts) {
+			if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
+				technology = bodyPart.getEntityAs(Technology.class);
+			} else {
+				entities.add(bodyPart);
+			}
+		}
+
+		if (technology == null) {
+			throw new PhrescoException("Technology Is Null");
+		}
+
+		for (BodyPart bodyPart : entities) {
+			if (bodyPart.getContentDisposition().getFileName()
+					.equals(technology.getName())) {
 				archetypeMap.put(technology.getArchetypeInfo(), bodyPart);
 			} else {
 				List<ArtifactGroup> plugins = technology.getPlugins();
 				for (ArtifactGroup artifactGroup : plugins) {
-					if(artifactGroup.getName().equals(bodyPart.getContentDisposition().getFileName())) {
+					if (artifactGroup.getName().equals(
+							bodyPart.getContentDisposition().getFileName())) {
 						pluginMap.put(artifactGroup, bodyPart);
 					}
 				}
 			}
 		}
-	    
-	    Set<ArtifactGroup> archetypeSet = archetypeMap.keySet();
-	    for (ArtifactGroup artifactGroup : archetypeSet) {
+
+		Set<ArtifactGroup> archetypeSet = archetypeMap.keySet();
+		for (ArtifactGroup artifactGroup : archetypeSet) {
 			createArtifacts(artifactGroup, archetypeMap.get(artifactGroup));
 		}
-	    
-	    Set<ArtifactGroup> pluginSet = pluginMap.keySet();
-	    for (ArtifactGroup artifactGroup : pluginSet) {
+
+		Set<ArtifactGroup> pluginSet = pluginMap.keySet();
+		for (ArtifactGroup artifactGroup : pluginSet) {
 			createArtifacts(artifactGroup, pluginMap.get(artifactGroup));
 		}
-	    saveTechnology(technology);
-	   return Response.status(Response.Status.OK).entity(ERROR_MSG_NOT_FOUND).build();
+		saveTechnology(technology);
+	   return Response.status(Response.Status.OK).entity(technology).build();
 	}
 
 	private void createArtifacts(ArtifactGroup artifactGroup, BodyPart bodyPart) throws PhrescoException {
@@ -834,7 +836,7 @@ public class ComponentService extends DbService {
 					technologies.addAll(techInDB.getArchetypeFeatures());
 				}
 			}
-			Criteria techIdQuery = Criteria.where(DB_COLUMN_APPLIESTOTECHID).is(techId);
+			Criteria techIdQuery = Criteria.where(DB_COLUMN_APPLIESTOTECHID).in(technologies.toArray());
 			query = query.addCriteria(typeQuery);
 			query = query.addCriteria(techIdQuery);
 			if(StringUtils.isNotEmpty(count)){
@@ -947,6 +949,15 @@ public class ComponentService extends DbService {
         
         ArtifactGroupDAO moduleDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
 		        new Query(Criteria.whereId().is(moduleGroupDAO.getId())), ArtifactGroupDAO.class);
+        String newCustomerId = moduleGroup.getCustomerIds().get(0);
+        List<String> customerIds = new ArrayList<String>();
+        if(moduleDAO != null) {
+        	 customerIds = moduleDAO.getCustomerIds();
+             if(!moduleDAO.getCustomerIds().contains(newCustomerId)) {
+             	customerIds.add(newCustomerId);
+             	moduleGroupDAO.setCustomerIds(customerIds);
+             }
+        }
         com.photon.phresco.commons.model.ArtifactInfo newVersion = moduleGroup.getVersions().get(0);
         if(moduleDAO != null && StringUtils.isNotEmpty(moduleGroupDAO.getGroupId())) {
         	moduleGroupDAO.setId(moduleDAO.getId());
@@ -1534,7 +1545,8 @@ public class ComponentService extends DbService {
     @Path (REST_API_DOWNLOADS)
     @Produces (MediaType.APPLICATION_JSON)
     public Response findDownloadInfo(@QueryParam(REST_QUERY_CUSTOMERID) String customerId, 
-    		@QueryParam(REST_QUERY_TECHID) String techId, @QueryParam(REST_QUERY_TYPE) String type) {
+    		@QueryParam(REST_QUERY_TECHID) String techId, @QueryParam(REST_QUERY_TYPE) String type, 
+    		@QueryParam(REST_QUERY_PLATFORM) String platform) {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.findDownloadInfo()");
         }
@@ -1542,6 +1554,9 @@ public class ComponentService extends DbService {
         Query query = new Query();
         try {
         	query = createCustomerIdQuery(customerId);
+        	if(StringUtils.isNotEmpty(platform)) {
+        		query.addCriteria(Criteria.where(DB_COLUMN_PLATFORM).is(platform));
+        	}
         	if(StringUtils.isNotEmpty(techId) && StringUtils.isNotEmpty(type)) {
         		Criteria techIdCriteria = Criteria.where(APPLIES_TO_TECHIDS).in(techId);
             	Criteria typeCriteria = Criteria.where(CATEGORY).is(type);

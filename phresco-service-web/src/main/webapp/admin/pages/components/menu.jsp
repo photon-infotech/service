@@ -28,6 +28,7 @@
 <%@ page import="com.photon.phresco.commons.model.Customer"%>
 <%@ page import="com.photon.phresco.commons.model.User"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
+<%@ page import="com.photon.phresco.util.ServiceConstants"%>
 
 
 <script type="text/javascript">
@@ -76,9 +77,13 @@
 				<select name="customerId" class="customer_listbox">
 	                <% 
 	                    if (CollectionUtils.isNotEmpty(customers)) { 
-				            for (Customer customer : customers) { 
+				            for (Customer customer : customers) {
+				            	String selectedStr= "";
+				            		 if (customer.getName().equalsIgnoreCase(ServiceConstants.DEFAULT_CUSTOMER_NAME)) {
+				            			 selectedStr = "selected";
+				            	 	}
 				    %>
-	                            <option value="<%= customer.getId() %>"><%= customer.getName() %></option>
+	                            <option value="<%= customer.getId() %>" <%= selectedStr %>><%= customer.getName() %></option>
 					<% 
 				            }
 				        } 

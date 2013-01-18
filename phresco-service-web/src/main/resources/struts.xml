@@ -123,6 +123,15 @@
 			</result> 
 		</action>
 		
+		<action name="videoUrl" class="com.photon.phresco.service.admin.actions.admin.Videos" method="downloadVideo">
+			<result name="success" type="stream">
+				<param name="contentType">${contentType}</param>
+				<param name="inputName">fileInputStream</param>
+				<param name="contentDisposition">attachment; filename="${extFileName}"</param>
+				<param name="bufferSize">${contentLength}</param>
+			</result> 
+		</action>
+		
 		<action name="addFeatures" class="com.photon.phresco.service.admin.actions.components.Features" method="addFeatures">
             <result name="featuresAdd">/admin/pages/components/feature/add.jsp</result>
         </action>

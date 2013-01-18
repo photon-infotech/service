@@ -440,6 +440,7 @@ public interface ServiceUIConstants {
     String URL_NOT_ADDED = "fail.url.add";
     String URL_DELETED = "succ.globurl.delete";
     String URL_NOT_DELETED = "fail.globurl.delete";
+    String URL_UPDATED = "succ.url.update";
     
     
     String DOWNLOAD_ADDED = "succ.download.add";

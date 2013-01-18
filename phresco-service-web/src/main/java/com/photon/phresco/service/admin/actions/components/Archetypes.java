@@ -295,7 +295,10 @@ public class Archetypes extends ServiceBaseAction {
         	throw new PhrescoException(getText(EXCEPTION_ARTIFACTINFO_MISSING));
         }
         technology.setCustomerIds(Arrays.asList(getCustomerId()));
-        technology.setTechVersions(Arrays.asList(getTechVersion()));
+        
+        String[] techVersions = getTechVersion().split(",");
+        List<String> listTechVersion = Arrays.asList(techVersions);
+        technology.setTechVersions(listTechVersion);
         technology.setReports(getApplicableReports());
         technology.setPlugins(pluginInfos);
         
@@ -424,7 +427,7 @@ public class Archetypes extends ServiceBaseAction {
 
 			URL url = new URL(ArchetypeUrl);
 			fileInputStream = url.openStream();
-			String[] parts = ArchetypeUrl.split("/");
+			String[] parts = ArchetypeUrl.split(FORWARD_SLASH);
 			extFileName = parts[parts.length - 1];
 			contentType = url.openConnection().getContentType();
 			contentLength = url.openConnection().getContentLength();
