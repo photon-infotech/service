@@ -155,7 +155,7 @@
 	}
 
 	// Wont allow to update for System generated Features
-	String disabledClass = "";
+	String disabledClass = "btn-primary";
 	String disabled = "";
 	/* if (isSystem) {
 		disabledClass = "btn-disabled";
