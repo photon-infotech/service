@@ -100,7 +100,9 @@ public class PilotProjects extends ServiceBaseAction {
 
 		try {
 			List<ApplicationInfo> pilotProjects = getServiceManager().getPilotProjects(getCustomerId());
+			List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
 			setReqAttribute(REQ_PILOT_PROJECTS, pilotProjects);
+			setReqAttribute(REQ_ARCHE_TYPES, technologies);
 			setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		} catch (PhrescoException e) {
 			return showErrorPopup(e, getText(EXCEPTION_PILOT_PROJECTS_LIST));

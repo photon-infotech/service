@@ -32,6 +32,7 @@
 
 <%
 	List<ApplicationInfo> pilotProjectInfo = (List<ApplicationInfo>) request.getAttribute(ServiceUIConstants.REQ_PILOT_PROJECTS);
+    List<Technology> technologies = (List<Technology>) request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
 %>
 
@@ -111,16 +112,20 @@
 									<td class="descwidth"><%= StringUtils.isNotEmpty(proInfo.getDescription()) ? proInfo.getDescription() : ""%></td>
 									<%  
 										TechnologyInfo techId = proInfo.getTechInfo();
+									        for (Technology technology : technologies ){ 
+									    	   if(techId.getVersion().equalsIgnoreCase(technology.getId())) {
 									%> 
-									<td><%= techId.getVersion() %></td> 
-									<td class="psblevalue" id="1_psblSinglDiv">
+									   	<td><%= technology.getName() %></td> 
+										<td class="psblevalue" id="1_psblSinglDiv">
 										<a href="#" onclick="versioningPilotPro('<%=proInfo.getId() %>');" name="edit" id="">
 											<img class="addiconAlign imagealign" temp="1" src="images/versioning.png"/>
 										</a>
 									</td>
 								</tr>
 						<%			
+							      }
 								}
+							  }
 							}
 						%>
 						</tbody>

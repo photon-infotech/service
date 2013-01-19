@@ -260,7 +260,7 @@
 													selectedOptions.add(technologyOption);
 												}
 											}
-											if (selectedOptions.contains(option.getOption())) {
+											if (selectedOptions.contains(option.getId())) {
 												checkedStr = "checked";
 											} else {
 												checkedStr = "";
