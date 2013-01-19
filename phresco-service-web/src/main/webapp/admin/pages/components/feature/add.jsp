@@ -157,9 +157,18 @@
 	// Wont allow to update for System generated Features
 	String disabledClass = "btn-primary";
 	String disabled = "";
-	if (isSystem) {
+	/* if (isSystem) {
 		disabledClass = "btn-disabled";
 		disabled = "disabled";
+	} */
+	if ("edit".equals(fromPage)) {
+		if ("photon".equalsIgnoreCase(customerId)) {
+			disabled = "";
+			disabledClass = "btn-primary";
+		} else {
+			disabled = "disabled";
+			disabledClass = "btn-disabled";
+		}
 	}
 	//from page is not empty
 	if (StringUtils.isNotEmpty(fromPage)) {
@@ -179,7 +188,7 @@
 			</label>
 			<div class="controls">
 				<input id="featureName" placeholder="<s:text name='place.hldr.feature.add.name'/>" 
-				     maxlength="40" title="30 Characters only" class="input-xlarge" type="text" name="name" <%= disabledVer %> value="<%= name %>">
+				     maxlength="40" title="30 Characters only" class="input-xlarge" type="text" name="name" <%= disabledVer %> value="<%= name %>"  <%= disabled %>>
 				<span class="help-inline" id="nameError"></span>
 			</div>
 		</div>
@@ -189,8 +198,8 @@
 				<s:text name='lbl.hdr.comp.desc'/>
 			</label>
 			<div class="controls">
-				<textarea id="featureDesc" placeholder="<s:text name='place.hldr.feature.add.desc'/>" 
-				     maxlength="150" title="150 Characters only" class="input-xlarge" name="description"><%= description %></textarea>
+				<textarea <%= disabled %> id="featureDesc" placeholder="<s:text name='place.hldr.feature.add.desc'/>" 
+				     maxlength="150" title="150 Characters only" class="input-xlarge" name="description"><%= description %> </textarea>
 			</div>
 		</div>
 		
@@ -200,7 +209,7 @@
 				<s:text name='lbl.hdr.comp.help'/>
 			</label>
 			<div class="controls">
-				<textarea name="helpText" id="hlptext" placeholder="<s:text name='place.hldr.feature.add.help.text'/>" 
+				<textarea <%= disabled %> name="helpText" id="hlptext" placeholder="<s:text name='place.hldr.feature.add.help.text'/>" 
 					maxlength="150" title="150 Characters only" class="input-xlarge" 
 					rows="2" cols="10" ><%= helpText %></textarea>
 			</div>
@@ -253,7 +262,7 @@
 					<span class="mandatory">*</span>&nbsp;<s:text name="lbl.comp.featr.module.type" />
 				</label>
 				<div class="controls">
-					<select name="moduleType" id="type" <%= disabledVer %>>
+					<select name="moduleType" id="type" <%= disabledVer %> <%= disabled %>>
 				        <option value="core"><s:text name="lbl.comp.featr.type.external" /></option>
 				        <option value="custom"><s:text name="lbl.comp.featr.type.custom" /></option>
 	     		 	</select>
@@ -272,7 +281,7 @@
 					    checkedStr = "checked";
 					}
 				%>
-				<input type="checkbox" name="defaultType" value="true" <%= checkedStr %> <%= disabledVer %>>
+				<input type="checkbox" name="defaultType" value="true" <%= checkedStr %> <%= disabledVer %> <%= disabled %>>
 			</div>
 		</div>
 		
@@ -281,7 +290,7 @@
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.comp.featr.license'/>
 			 </label>
 			<div class="controls">
-				<select name="license">
+				<select name="license" <%= disabled %>>
 				<option value=""><s:text name='lbl.comp.featr.license.select'/></option>
 				<%	
 					if (CollectionUtils.isNotEmpty(licenses)) {
@@ -376,7 +385,7 @@
 				<s:text name='lbl.hdr.comp.dependency'/>
 			</label>
 			<div class="controls">
-				<input type="button" class="btn btn-primary" value="Select Dependency" onclick="getFeatures();" />
+				<input type="button" class="btn <%= disabledClass %>" <%= disabled %> value="Select Dependency" onclick="getFeatures();" />
 			</div>
 		</div>
 		
@@ -399,7 +408,7 @@
 	
 	<div class="bottom_button">
      
-     		<input type="button" id="featuresUpdate" class="btn <%= disabledClass %>"  <%= disabled %>
+     		<input type="button" id="featuresUpdate" class="btn btn-primary" 
 						onclick="validate('<%= pageUrl %>', $('#formFeatureAdd'), $('#featureContainer'), '<%= progressTxt %>', $('.content_feature :input'));"
 						value="<%= buttonLbl %>"/>
 			<input type="button" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>"
@@ -438,7 +447,9 @@
             $(this).val(name);
         });
 		
-        if (<%=isSystem%>) { 
+		
+		
+        if ( '<%= fromPage %>' === "edit" &&  '<%= customerId %>' != "photon" ) { 
             disableUploadButton($("#feature-file-uploader"));
             disableUploadButton($("#feature-img-uploader"))
         }

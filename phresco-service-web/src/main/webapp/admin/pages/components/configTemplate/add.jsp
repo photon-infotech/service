@@ -52,6 +52,27 @@
 		isSystem = settingsTemplate.isSystem();
 		isCustProp = settingsTemplate.isCustomProp();
 	}
+	
+	String disabledStr = "";
+	String addImgFunction = "";
+	String removeImgFunction = "";
+	String possibleValFunction = "";
+	String possibleValueHref = ""; 
+	if ("edit".equals(fromPage)) {
+		if ("photon".equalsIgnoreCase(customerId)) {
+			disabledStr = "";
+			addImgFunction = "addconfig(this);";
+			removeImgFunction = "removeTag(this);";
+			possibleValFunction = "addPsblValPopup(this);";
+			possibleValueHref = "#myModal";
+		} else {
+			disabledStr = "disabled";
+			addImgFunction = "";
+			removeImgFunction = "";
+			possibleValFunction = "";
+			possibleValueHref = "";
+		}
+	}
 %>
 
 <form id="formConfigTempAdd" name="configForm" class="form-horizontal customer_list">
@@ -67,7 +88,7 @@
 			
 			<div class="controls">
 				<input id="configname" placeholder="<s:text name='place.hldr.configTemp.add.name'/>" class="input-xlarge" 
-					type="text" name="name"  value="<%=name%>" maxlength="30" title="30 Characters only">
+					type="text" name="name"  value="<%=name%>" maxlength="30" title="30 Characters only" <%= disabledStr %>>
 				<span class="help-inline" id="nameError"></span>
 			</div>
 		</div>
@@ -78,7 +99,7 @@
 			</label>
 			<div class="controls">
 				<textarea placeholder="<s:text name='place.hldr.configTemp.add.desc'/>" class="input-xlarge" 
-					name="description" maxlength="150" title="150 Characters only"><%=desc%></textarea>
+					name="description" maxlength="150" title="150 Characters only" <%= disabledStr %>><%=desc%></textarea>
 			</div>
 		</div>
 		
@@ -266,15 +287,15 @@
 														<input type="text" id='<%= dynamicId %>' value='<%= propertyTemplate.getKey()%>' 
 															placeholder="<s:text name='place.hldr.configTemp.add.key'/>" name="propTempKey"  
 															temp='<%= dynamicId + "_key" %>' class="keywidth" onblur="updateRowInputNames(this)" 
-															maxlength="30" title="30 Characters only">
+															maxlength="30" title="30 Characters only" <%= disabledStr %>>
 													</td>
 													<td class="tdWidth">
 														<input type="text" placeholder="<s:text name='place.hldr.configTemp.add.name'/>" 
 															id=<%= dynamicId + "_propTempName"%> class="textWidth" maxlength="30" 
-															title="30 Characters only" value='<%= propName %>'>
+															title="30 Characters only" value='<%= propName %>' <%= disabledStr %>>
 													</td>
 													<td class="tdWidth">
-														<select id='<%= dynamicId + "_type" %>' class = "textWidth">
+														<select id='<%= dynamicId + "_type" %>' class = "textWidth" <%= disabledStr %>>
 															<option value="String"><s:text name='lbl.hdr.comp.cnfigtmplt.string'/></option>
 															<option value="Number"><s:text name='lbl.hdr.comp.cnfigtmplt.number'/></option>
 															<option value="Password"><s:text name='lbl.hdr.comp.cnfigtmplt.password'/></option>
@@ -286,34 +307,34 @@
 													<td class="psblbtnwidth" id='<%= dynamicId + "_psblSinglDiv" %>' style="display:none">
 														<input type="text" placeholder="<s:text name='place.hldr.configTemp.add.possible.values'/>" 
 															class="psbltextwidth" id='<%= dynamicId + "_psblSingl" %>' disabled>
-														<a data-toggle="modal" href="#myModal"><img class="addiconAlign imagealign" temp='<%= dynamicId %>' 
-															src="images/add_icon.png"/ onclick="addPsblValPopup(this);"/></a>
+														<a data-toggle="modal" href='<%= possibleValueHref %>'><img class="addiconAlign imagealign" temp='<%= dynamicId %>' 
+															src="images/add_icon.png"/ onclick='<%=possibleValFunction%>'/></a>
 													</td>
 													<input type="hidden" class='<%= dynamicId %>'>
 													<td class="psblbtnwidth" id='<%= dynamicId + "_psblMulDiv" %>' style="display:none">
 														<select type="text" placeholder="<s:text name='place.hldr.configTemp.add.possible.values'/>" 
-															class="psblselectwidth" id='<%= dynamicId + "_psblMul" %>'>
+															class="psblselectwidth" id='<%= dynamicId + "_psblMul" %>' <%= disabledStr %>>
 														</select>
-														<a data-toggle="modal" href="#myModal"><img class="addiconAlign imagealign" temp='<%= dynamicId %>' 
-															src="images/add_icon.png" onclick="addPsblValPopup(this);"></a>
+														<a data-toggle="modal" href='<%= possibleValueHref %>'><img class="addiconAlign imagealign" temp='<%= dynamicId %>' 
+															src="images/add_icon.png" onclick='<%=possibleValFunction%>'></a>
 													</td>
 													<td class="tdWidth">
 														<input type="text" placeholder="<s:text name='place.hldr.configTemp.add.help.text'/>" 
 															id=<%= dynamicId + "_helpText"%> class="textWidth" maxlength="150" 
-															title="150 Characters only" value='<%= StringUtils.isNotEmpty(propertyTemplate.getHelpText()) ? propertyTemplate.getHelpText() : ""  %>'>
+															title="150 Characters only" value='<%= StringUtils.isNotEmpty(propertyTemplate.getHelpText()) ? propertyTemplate.getHelpText() : ""  %>' <%= disabledStr %>>
 													</td>
 													<td class="buttonwidth">
-														<input type="checkbox" class="chkBox_config" value="true" id='<%= dynamicId + "_propMand" %>' <%= mndtryChck %>>
+														<input type="checkbox" class="chkBox_config" value="true" id='<%= dynamicId + "_propMand" %>' <%= mndtryChck %> <%= disabledStr %>>
 													</td>
 													<td class="buttonwidth">
-														<input type="checkbox" class="chkBox_config" value="true" id='<%= dynamicId + "_propMul" %>' <%= mulChck %>>
+														<input type="checkbox" class="chkBox_config" value="true" id='<%= dynamicId + "_propMul" %>' <%= mulChck %> <%= disabledStr %>>
 													</td>
 													<td class="buttonwidth">
-														<a><img class="add imagealign" temp='<%= dynamicId %>' src="images/add_icon.png" onclick="addconfig(this);"></a>
-													</td>
-													<td class="buttonwidth">
-														<img onclick="removeTag(this);" id="deleteIcon" src="images/minus_icon.png" class="del imagealign">
-													</td>
+														<a><img class="add imagealign" temp='<%= dynamicId %>' src="images/add_icon.png" onclick='<%=addImgFunction%>'></a>
+													</td class="buttonwidth">
+														<td class="buttonwidth">
+															<img onclick='<%=removeImgFunction %>' id="deleteIcon" src="images/minus_icon.png" class="del imagealign">
+														</td>
 												</tr>
 									<%
 												dynamicId++;

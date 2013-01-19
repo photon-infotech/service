@@ -959,7 +959,7 @@ public class ComponentService extends DbService {
              }
         }
         com.photon.phresco.commons.model.ArtifactInfo newVersion = moduleGroup.getVersions().get(0);
-        if(moduleDAO != null && StringUtils.isNotEmpty(moduleGroupDAO.getGroupId())) {
+        if(moduleDAO != null) {
         	moduleGroupDAO.setId(moduleDAO.getId());
         	versionIds.addAll(moduleDAO.getVersionIds());
         	List<com.photon.phresco.commons.model.ArtifactInfo> info = mongoOperation.find(ARTIFACT_INFO_COLLECTION_NAME, 
@@ -977,7 +977,8 @@ public class ComponentService extends DbService {
         	}
 			newVersion.setId(id);
     		mongoOperation.save(ARTIFACT_INFO_COLLECTION_NAME, newVersion);
-        }  else if(moduleDAO == null && StringUtils.isNotEmpty(moduleGroupDAO.getGroupId())){
+        }  else if(moduleDAO == null){
+        	
         		versionIds.add(newVersion.getId());
         		newVersion.setArtifactGroupId(moduleGroupDAO.getId());
                 mongoOperation.save(ARTIFACT_INFO_COLLECTION_NAME, newVersion);

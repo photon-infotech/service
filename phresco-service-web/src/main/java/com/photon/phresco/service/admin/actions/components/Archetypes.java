@@ -103,6 +103,7 @@ public class Archetypes extends ServiceBaseAction {
 	private String archVersions = "";
 	private List<String> applicable = null;
 	private List<String> applicableReports = null;
+	private List<String> applicableAtchetypeFeatures = null;
 	private boolean archType = false;
 	private String versioning = "";
 	private boolean tempError = false;
@@ -154,6 +155,7 @@ public class Archetypes extends ServiceBaseAction {
 			setReqAttribute(REQ_TECHNOLOGY_OPTION, options);
 			setReqAttribute(REQ_FROM_PAGE, ADD);
 			setReqAttribute(REQ_TECHNOLOGY_REPORTS, reports);
+			setReqAttribute(REQ_ARCHE_TYPES, getServiceManager().getTechnologyByCustomer(getCustomerId()));
 		} catch (PhrescoException e) {
 		    return showErrorPopup(e, getText(EXCEPTION_ARCHETYPE_ADD));
 		}
@@ -179,6 +181,7 @@ public class Archetypes extends ServiceBaseAction {
 			List<Reports> reports = serviceManager.getReports();
 			setReqAttribute(REQ_TECHNOLOGY_REPORTS, reports);
             setReqAttribute(REQ_VERSIONING, getVersioning()); 
+            setReqAttribute(REQ_ARCHE_TYPES, getServiceManager().getTechnologyByCustomer(getCustomerId()));
 		} catch (PhrescoException e) {
 		    return showErrorPopup(e, getText(EXCEPTION_ARCHETYPE_EDIT));
 		}
@@ -301,7 +304,7 @@ public class Archetypes extends ServiceBaseAction {
         technology.setTechVersions(listTechVersion);
         technology.setReports(getApplicableReports());
         technology.setPlugins(pluginInfos);
-        
+        technology.setArchetypeFeatures(getApplicableAtchetypeFeatures());
         
         return technology;
     }
@@ -892,5 +895,14 @@ public class Archetypes extends ServiceBaseAction {
 
 	public void setArchVersions(String archVersions) {
 		this.archVersions = archVersions;
+	}
+
+	public void setApplicableAtchetypeFeatures(
+			List<String> applicableAtchetypeFeatures) {
+		this.applicableAtchetypeFeatures = applicableAtchetypeFeatures;
+	}
+
+	public List<String> getApplicableAtchetypeFeatures() {
+		return applicableAtchetypeFeatures;
 	}
 }

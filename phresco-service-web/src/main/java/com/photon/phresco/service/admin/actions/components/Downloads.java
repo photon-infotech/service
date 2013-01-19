@@ -212,11 +212,11 @@ public class Downloads extends ServiceBaseAction {
         
         String artifactId = getArtifactId();
     	String groupId = getGroupId();
-    	String version = getVersion();
+    	//String version = getVersion();
     	 if ((StringUtils.isEmpty(artifactId) && StringUtils.isEmpty(groupId))) {
          	artifactId = getDownloadAtrifactId();
          	groupId = getDownloadGroupId();
-         	version = getDownloadVersions();
+         	//version = getDownloadVersions();
          }
         //To set the id for update
         if (StringUtils.isNotEmpty(getDownloadId())) {
@@ -241,11 +241,9 @@ public class Downloads extends ServiceBaseAction {
         //To set the versions of the download items
         List<ArtifactInfo> downloadVersions = new ArrayList<ArtifactInfo>();
         ArtifactInfo downloadVersion = new ArtifactInfo();
-        
-        if (downloadByteArray != null && (StringUtils.isEmpty(version))) {
-        	throw new PhrescoException(getText(EXCEPTION_ARTIFACTINFO_MISSING));
-        }
-        downloadVersion.setVersion(version);
+        if (StringUtils.isNotEmpty(version)) {
+        	downloadVersion.setVersion(version);
+        } 
         downloadVersion.setFileSize(size);
         downloadVersions.add(downloadVersion);
         ArtifactGroup artifactGroup = new ArtifactGroup();
@@ -256,13 +254,10 @@ public class Downloads extends ServiceBaseAction {
         artifactGroup.setCustomerIds(customerIds);
         artifactGroup.setVersions(downloadVersions);
         artifactGroup.setLicenseId(getLicense());
-        
-        if (downloadByteArray != null && (StringUtils.isEmpty(groupId) || StringUtils.isEmpty(artifactId))) {
-        	throw new PhrescoException(getText(EXCEPTION_ARTIFACTINFO_MISSING));
-        }
-        artifactGroup.setGroupId(groupId);
-        artifactGroup.setArtifactId(artifactId);
-        
+        if (StringUtils.isNotEmpty(artifactId) && StringUtils.isNotEmpty(groupId)) {
+	        artifactGroup.setGroupId(groupId);
+	        artifactGroup.setArtifactId(artifactId);
+        } 
         artifactGroup.setPackaging(ServerUtil.getFileExtension(downloadZipFileName));
         downloadInfo.setArtifactGroup(artifactGroup);
       
@@ -418,15 +413,15 @@ public class Downloads extends ServiceBaseAction {
 				isError = true;
 			}
 			
-			if((downloadByteArray != null) && (StringUtils.isEmpty(getGroupId()))) {
-				setGroupIdError(getText(KEY_I18N_ERR_GROUPID_EMPTY));
-				isError = true;
-			}
-			
-			if((downloadByteArray != null) && (StringUtils.isEmpty(getArtifactId()))) {
-				setArtifactIdError(getText(KEY_I18N_ERR_ARTIFACTID_EMPTY));
-				isError = true;
-			}
+//			if(StringUtils.isEmpty(getGroupId())) {
+//				setGroupIdError(getText(KEY_I18N_ERR_GROUPID_EMPTY));
+//				isError = true;
+//			}
+//			
+//			if(StringUtils.isEmpty(getArtifactId())) {
+//				setArtifactIdError(getText(KEY_I18N_ERR_ARTIFACTID_EMPTY));
+//				isError = true;
+//			}
 		}
 		
 		//Empty validation for technology

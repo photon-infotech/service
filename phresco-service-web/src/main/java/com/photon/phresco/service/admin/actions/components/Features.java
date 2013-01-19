@@ -296,6 +296,11 @@ public class Features extends ServiceBaseAction {
         }
         
         try {
+        	if(!DEFAULT_CUSTOMER_NAME.equalsIgnoreCase(getCustomerId()) && "edit".equalsIgnoreCase(fromPage)) {
+        		ArtifactGroup artifactGroup = getServiceManager().getFeatureById(getModuleGroupId());
+        		artifactGroup.setCustomerIds(Arrays.asList(getCustomerId()));
+        		artifactGroup.setAppliesTo(getAppliesTo());
+        	}
         	String artifactId = getArtifactId();
         	String groupId = getGroupId();
         	String version = getVersion();
@@ -332,7 +337,8 @@ public class Features extends ServiceBaseAction {
             artifactGroup.setLicenseId(getLicense());
             //To set the details of the version
             ArtifactInfo artifactInfo = new ArtifactInfo();
-            if (StringUtils.isNotEmpty(getModuleId())) {
+            if (StringUtils.isNotEmpty(getModuleId()) && !"null".equals(getModuleId())) {
+            	System.out.println("In Action Class   " + getModuleId());
             	artifactInfo.setId(getModuleId());
             }
             artifactInfo.setDescription(getDescription());
@@ -361,6 +367,15 @@ public class Features extends ServiceBaseAction {
         } catch (Exception e) {
             throw new PhrescoException(e);
         }
+    }
+    private List<CoreOption> getAppliesTo() {
+    	List<CoreOption> appliesTo = new ArrayList<CoreOption>();
+        CoreOption moduleCoreOption = null;
+        for (String multiTech : getMultiTechnology()){
+        	moduleCoreOption = new CoreOption(multiTech, Boolean.parseBoolean(getModuleType()));
+        	appliesTo.add(moduleCoreOption);
+        }
+        return appliesTo;
     }
     
     public String delete() throws PhrescoException {
@@ -536,8 +551,13 @@ public class Features extends ServiceBaseAction {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Features.validateForm()");
 		}
-		
 		boolean isError = false;
+		if (!"photon".equalsIgnoreCase(customerId) && "edit".equalsIgnoreCase(fromPage)) {
+			//Empty validation for applies to technology
+	        isError = techValidation(isError);
+			return SUCCESS;
+		}
+		
         //Empty validation for name
         isError = nameValidation(isError);
         

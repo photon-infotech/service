@@ -81,6 +81,9 @@ public class TechnologyConverter implements Converter<TechnologyDAO, Technology>
         if(CollectionUtils.isNotEmpty(technologyDAO.getReports())) {
         	technology.setReports(technologyDAO.getReports());
         }
+        if(CollectionUtils.isNotEmpty(technologyDAO.getArchetypeFeatures())) {
+        	technology.setArchetypeFeatures(technologyDAO.getArchetypeFeatures());
+        }
         return technology;
     }
 
@@ -105,6 +108,7 @@ public class TechnologyConverter implements Converter<TechnologyDAO, Technology>
         techDAO.setOptions(technology.getOptions());
         techDAO.setTechGroupId(technology.getTechGroupId());
         techDAO.setReports(technology.getReports());
+        techDAO.setArchetypeFeatures(technology.getArchetypeFeatures());
         return techDAO;
     }
 
