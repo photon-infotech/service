@@ -43,7 +43,7 @@
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
 	List<TechnologyOptions> options = (List<TechnologyOptions>) request.getAttribute(ServiceUIConstants.REQ_TECHNOLOGY_OPTION);
 	List<Reports> reports = (List<Reports>)request.getAttribute(ServiceUIConstants.REQ_TECHNOLOGY_REPORTS);
-	
+	List<Technology> technologies = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
 	String title = ServiceActionUtil.getTitle(ServiceUIConstants.ARCHETYPES, fromPage);
 	String buttonLbl = ServiceActionUtil.getButtonLabel(fromPage);
 	String pageUrl = ServiceActionUtil.getPageUrl(ServiceUIConstants.ARCHETYPES, fromPage);
@@ -316,6 +316,49 @@
           		 <span class="help-inline applyerror" id="applicableError"></span>
 			</div>
 		</div>
+		
+		<div class="control-group" id="applyControl">
+				<label class="control-label labelbold">
+					<s:text name='lbl.comp.featr.archetypefeatures'/>
+				</label>
+				<div class="controls">
+						<div class="typeFields" id="typefield">
+						<div class="multilist-scroller multiselct" id="applicableToDiv">
+							<ul>
+								<li>
+									<input type="checkbox" value="" id="checkAllArchetype" name="" onclick="checkAllEvent(this,$('.applicableFeatures'), false);"
+										style="margin: 3px 8px 6px 0;" <%= disabledVer %> ><s:text name='lbl.all'/>
+								</li>
+								<%
+								if (CollectionUtils.isNotEmpty(technologies)) {
+									String checkedStr = "";
+									for (Technology tech : technologies) {
+										List<String> selectedOptions = new ArrayList<String>();
+										if (technology != null) {
+											if (CollectionUtils.isNotEmpty(technology.getArchetypeFeatures())) {
+												for (String selectedTechId : technology.getArchetypeFeatures()) {
+													selectedOptions.add(selectedTechId);
+												}
+											}
+											if (selectedOptions.contains(tech.getId())) {
+												checkedStr = "checked";
+											} else {
+												checkedStr = "";
+											}
+										}
+								%>
+											<li> <input type="checkbox" id="applicableFeatures" name="applicableAtchetypeFeatures" value='<%= tech.getId() %>'
+												onclick="checkboxEvent($('#checkAllArchetype'), 'applicableFeatures')"	class="check applicableFeatures" <%= checkedStr %> ><%= tech.getName() %>
+											</li>
+								<%		}	
+									}
+								%>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		
 	</div>
 
 	<div class="bottom_button">

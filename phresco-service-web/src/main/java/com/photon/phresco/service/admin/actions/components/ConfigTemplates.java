@@ -181,27 +181,44 @@ public class ConfigTemplates extends ServiceBaseAction {
 		}
 		SettingsTemplate settingTemplate = null;
 		try {
-			settingTemplate = new SettingsTemplate();
-			settingTemplate.setName(getName());
-			settingTemplate.setDescription(getDescription());
-			boolean customProp = Boolean.parseBoolean(getDefaultCustProp());
-			settingTemplate.setCustomProp(customProp);
-			settingTemplate.setCustomerIds(Arrays.asList(getCustomerId()));
-			if (StringUtils.isNotEmpty(getConfigId())) {
-				settingTemplate.setId(getConfigId());
-			}
 			List<String> techIds = getAppliesTo();
-			List<Element> appliesTos = new ArrayList<Element>();
-			for (String techId : techIds) {
-				String techName = getServiceManager().getTechnology(techId).getName();
-				Element element = new Element();
-				element.setId(techId);
-				element.setName(techName);
-				appliesTos.add(element);
-			}
+			if(!DEFAULT_CUSTOMER_NAME.equalsIgnoreCase(getCustomerId()) && EDIT.equalsIgnoreCase(fromPage)) {
+				settingTemplate = getServiceManager().getConfigTemplate(getConfigId());
+				settingTemplate.setCustomerIds(Arrays.asList(getCustomerId()));
+				boolean customProp = Boolean.parseBoolean(getDefaultCustProp());
+				settingTemplate.setCustomProp(customProp);
+				List<Element> appliesTos = new ArrayList<Element>();
+				for (String techId : techIds) {
+					String techName = getServiceManager().getTechnology(techId).getName();
+					Element element = new Element();
+					element.setId(techId);
+					element.setName(techName);
+					appliesTos.add(element);
+				}
+				settingTemplate.setAppliesToTechs(appliesTos);
+			} else {
+				settingTemplate = new SettingsTemplate();
+				settingTemplate.setName(getName());
+				settingTemplate.setDescription(getDescription());
+				boolean customProp = Boolean.parseBoolean(getDefaultCustProp());
+				settingTemplate.setCustomProp(customProp);
+				settingTemplate.setCustomerIds(Arrays.asList(getCustomerId()));
+				if (StringUtils.isNotEmpty(getConfigId())) {
+					settingTemplate.setId(getConfigId());
+				}
+				List<Element> appliesTos = new ArrayList<Element>();
+				for (String techId : techIds) {
+					String techName = getServiceManager().getTechnology(techId).getName();
+					Element element = new Element();
+					element.setId(techId);
+					element.setName(techName);
+					appliesTos.add(element);
+				}
 
-			settingTemplate.setAppliesToTechs(appliesTos);
-			setPropertTemplate(settingTemplate);
+				settingTemplate.setAppliesToTechs(appliesTos);
+				setPropertTemplate(settingTemplate);
+			}
+			
 		} catch (Exception e) {
 			throw new PhrescoException(e);
 		}
@@ -275,6 +292,16 @@ public class ConfigTemplates extends ServiceBaseAction {
 			S_LOGGER.debug("Entering Method ConfigTemplates.validateForm()");
 		}
 		boolean isError = false;
+		
+		if (!DEFAULT_CUSTOMER_NAME.equalsIgnoreCase(customerId) && EDIT.equalsIgnoreCase(fromPage)) {
+			//Empty validation for applies to technology
+			if (getAppliesTo() == null) {
+				setApplyError(getText(KEY_I18N_ERR_APPLIES_EMPTY ));
+				isError = true;
+			}
+			
+			return SUCCESS;
+		}
 		
 		if (StringUtils.isEmpty(getName())) {//Empty validation for name
 			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY ));

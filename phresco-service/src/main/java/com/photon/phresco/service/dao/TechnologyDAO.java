@@ -22,8 +22,6 @@ package com.photon.phresco.service.dao;
 
 import java.util.List;
 
-import com.photon.phresco.commons.model.TechnologyOptions;
-
 public class TechnologyDAO extends CustomerBaseDAO {
 	
     private static final long serialVersionUID = 1L;
@@ -35,6 +33,7 @@ public class TechnologyDAO extends CustomerBaseDAO {
 	private List<String> options;
 	private String techGroupId;
 	private List<String> reports;
+	private List<String> archetypeFeatures; 
 	
 	public TechnologyDAO() {
 		super();
@@ -102,6 +101,14 @@ public class TechnologyDAO extends CustomerBaseDAO {
 
 	public List<String> getReports() {
 		return reports;
+	}
+
+	public void setArchetypeFeatures(List<String> archetypeFeatures) {
+		this.archetypeFeatures = archetypeFeatures;
+	}
+
+	public List<String> getArchetypeFeatures() {
+		return archetypeFeatures;
 	}
 
 }
