@@ -429,7 +429,13 @@
 			$("#versionComment").hide();
 		}
     });
-    
+
+	$(document).keyup(function(e) {
+    	if (e.keyCode == 27) {    		  
+    		$("#progressBar").hide();
+    	} 
+    }); 
+	   
 	function getTechGroup() {
 		loadContent('getTechGroup', $('#formArcheTypeAdd'), '', '', true);
 		$('#techGroup').empty();
