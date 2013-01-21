@@ -460,8 +460,13 @@ public class ComponentService extends DbService {
 			info.setId(technologyDAO.getId());
 			info.setAppTypeId(technologyDAO.getAppTypeId());
 			info.setName(technologyDAO.getName());
-			info.setCreationDate(technologyDAO.getCreationDate());
-			foundTechInfos.add(info);
+			info.setCreationDate(technologyDAO.getCreationDate());			
+			if(CollectionUtils.isEmpty(foundTechInfos)) {
+				foundTechInfos = new ArrayList<TechnologyInfo>();
+				foundTechInfos.add(info);
+			} else {
+				foundTechInfos.add(info);    
+			}
 			technologyGroup.setTechInfos(foundTechInfos);
 			mongoOperation.save(TECH_GROUP_COLLECTION_NAME, technologyGroup);
 		}

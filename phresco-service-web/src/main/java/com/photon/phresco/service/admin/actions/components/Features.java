@@ -338,7 +338,6 @@ public class Features extends ServiceBaseAction {
             //To set the details of the version
             ArtifactInfo artifactInfo = new ArtifactInfo();
             if (StringUtils.isNotEmpty(getModuleId()) && !"null".equals(getModuleId())) {
-            	System.out.println("In Action Class   " + getModuleId());
             	artifactInfo.setId(getModuleId());
             }
             artifactInfo.setDescription(getDescription());
