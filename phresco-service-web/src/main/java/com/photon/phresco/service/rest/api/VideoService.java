@@ -44,7 +44,7 @@ import com.photon.phresco.commons.model.VideoInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
-import com.photon.phresco.service.docs.impl.MAGICNUMBER;
+import com.photon.phresco.service.util.MAGICNUMBER;
 import com.photon.phresco.service.util.ServerConstants;
 import com.photon.phresco.util.ServiceConstants;
 

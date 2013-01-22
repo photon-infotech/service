@@ -43,7 +43,7 @@ import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.ProjectServiceManager;
-import com.photon.phresco.service.docs.impl.MAGICNUMBER;
+import com.photon.phresco.service.util.MAGICNUMBER;
 import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.ArchiveUtil;
 import com.photon.phresco.util.ArchiveUtil.ArchiveType;

@@ -13,7 +13,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.service.docs.impl.MAGICNUMBER;
+import com.photon.phresco.service.util.MAGICNUMBER;
 public class AuthenticationUtil {
 	
 	private static final String AUTH_TOKEN_CACHE_TIME = "auth.token.cache.ttl";

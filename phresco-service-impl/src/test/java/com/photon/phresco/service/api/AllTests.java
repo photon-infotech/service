@@ -41,7 +41,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({ ArchetypeExecutorTest.class,
-        DependencyProcessorTest.class, DocumentGeneratorTest.class })
+        DependencyProcessorTest.class })
 public class AllTests {
 
 }
