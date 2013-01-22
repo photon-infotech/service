@@ -99,10 +99,6 @@ public class PhrescoServerFactory {
         return (ArchetypeExecutor) constructClass(ARCHETYPE_EXECUTOR_IMPL_CLASS, serverConfig);
     }
 
-    public static DocumentGenerator getDocumentGenerator() throws PhrescoException {
-        return (DocumentGenerator) constructClass(DOCUMENT_GENERATOR_IMPL_CLASS);
-    }
-    
     public static synchronized ProjectServiceManager getProjectService() throws PhrescoException {
 		return (ProjectServiceManager) constructClass(PROJECT_SERVICE_MANAGER_IMPL_CLASS);
 	}
