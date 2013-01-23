@@ -262,7 +262,9 @@
 											}
 											if (selectedOptions.contains(option.getId())) {
 												checkedStr = "checked";
-											} 
+											} else {
+											    checkedStr = "";
+											}
 										}
 							%>
 										<li>

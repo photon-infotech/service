@@ -231,12 +231,12 @@
 								if (CollectionUtils.isNotEmpty(technologies)) {
 									String checkedStr = "";
 									for (Technology technology : technologies) {
-										if (CollectionUtils.isNotEmpty(selectedTech)){
+										if (CollectionUtils.isNotEmpty(selectedTech)) {
 											checkedStr = "";
-											for(RequiredOption selectedTechId : selectedTech) {
+											for (RequiredOption selectedTechId : selectedTech) {
 										 		if (technology.getId().equals(selectedTechId.getTechId())) {
-														checkedStr = "checked";
-														break;
+													checkedStr = "checked";
+													break;
 												} 
 											}
 										}
@@ -245,7 +245,7 @@
 											onclick="checkboxEvent($('#checkAllAuto'), 'applsChk')"	class="check applsChk" <%= checkedStr %> <%= disabledVer %> ><%= technology.getName() %>
 										</li>
 							<%		
-								   }
+									}
 								}
 							%>
 						</ul>
@@ -255,7 +255,6 @@
 			</div>
 		</div>
 		
-		
 		<% if (features) { %>
 			<div class="control-group" id="moduleSelection">
 				<label class="control-label labelbold">
@@ -263,8 +262,8 @@
 				</label>
 				<div class="controls">
 					<select name="moduleType" id="type" <%= disabledVer %> <%= disabled %>>
-				        <option value="core"><s:text name="lbl.comp.featr.type.external" /></option>
-				        <option value="custom"><s:text name="lbl.comp.featr.type.custom" /></option>
+				        <option value="true"><s:text name="lbl.comp.featr.type.external" /></option>
+				        <option value="false"><s:text name="lbl.comp.featr.type.custom" /></option>
 	     		 	</select>
 	     		</div>
 			</div>
@@ -325,7 +324,7 @@
 				<div class="controls">
 					<input name="groupId" class="groupId" class="input-xlarge" maxlength="40" title="40 Characters only" type="text"
 						placeholder="<s:text name='place.hldr.archetype.add.groupId'/>">
-						<span class="help-inline" id="groupIdError"></span>
+					<span class="help-inline" id="groupIdError"></span>
 				</div>
 			</div>
 			
@@ -336,7 +335,7 @@
 				<div class="controls">
 					<input name="artifactId" class="artifactId" class="input-xlarge" maxlength="40" title="40 Characters only" type="text"
 						placeholder="<s:text name='place.hldr.archetype.add.artifactId'/>">
-						<span class="help-inline" id="artifactIdError"></span>
+					<span class="help-inline" id="artifactIdError"></span>
 				</div>
 			</div>
 			
@@ -349,7 +348,7 @@
 				<div class="controls">
 					<input name="version" class="jarVersion" maxlength="30" title="30 Characters only" class="input-xlarge" type="text"
 						placeholder="<s:text name='place.hldr.archetype.add.version'/>">
-						<span class="help-inline" id="verError"></span>
+					<span class="help-inline" id="verError"></span>
 				</div>
 			</div>
 		</div>
@@ -447,8 +446,6 @@
             $(this).val(name);
         });
 		
-		
-		
         if ( '<%= fromPage %>' === "edit" &&  '<%= customerId %>' != "photon" ) { 
             disableUploadButton($("#feature-file-uploader"));
             disableUploadButton($("#feature-img-uploader"))
@@ -490,6 +487,14 @@
 	        }
 	    });
 		
+		//To make the module type selected during edit
+		$('#type option').each(function() {
+			var value = $(this).val();
+			if (value === '<%= isCoreModule %>') {
+				$(this).attr("selected", true);
+				return false;
+			}
+		});
 	});
 
 	//To show the validation error
@@ -538,7 +543,6 @@
         } else {
             hideError($("#applyControl"), $("#techError"));
         }
-                      
     }
     
 	//To upload the file upload validation error
@@ -623,5 +627,4 @@
 	function downloadFile() {
 		window.location.href="admin/featureUrl?" + $('#formFeatureAdd').serialize();
 	}
-	
 </script>
