@@ -24,9 +24,12 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import com.photon.phresco.commons.model.User;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.exception.PhrescoWebServiceException;
 import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
@@ -93,6 +96,9 @@ public class LoginService extends DbService {
 		
         resource.accept(MediaType.APPLICATION_JSON_TYPE);
         ClientResponse response = resource.type(MediaType.APPLICATION_JSON_TYPE).post(ClientResponse.class, credentials);
+        if(response.getStatus() == 204) {
+        	throw new PhrescoWebServiceException(Response.status(Status.NO_CONTENT).build());
+        }
         GenericType<User> genericType = new GenericType<User>() {};
         User user = response.getEntity(genericType);
         user.setToken(createAuthToken(credentials.getUsername()));
