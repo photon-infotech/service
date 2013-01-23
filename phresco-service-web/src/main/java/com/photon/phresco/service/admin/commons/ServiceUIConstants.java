@@ -333,7 +333,8 @@ public interface ServiceUIConstants {
     String KEY_I18N_LOGIN_ACCESS_DENIED	= "err.login.invalid.cred";
     String KEY_I18N_SESSION_EXPIRED = "err.login.session.expired";
     String KEY_I18N_SUCCESS_LOGOUT = "succ.logout";
-
+    String KEY_I18N_SERVER_DOWN = "err.login.server.down";
+    
     String KEY_I18N_ERR_NAME_EMPTY = "err.msg.name.empty";
     String KEY_I18N_ERR_URL_EMPTY = "err.msg.url.empty";
     String KEY_I18N_ERR_URL_NOT_VALID = "err.msg.url.notvalid";

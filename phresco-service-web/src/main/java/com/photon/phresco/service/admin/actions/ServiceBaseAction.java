@@ -47,6 +47,7 @@ import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.LogInfo;
 import com.photon.phresco.commons.model.User;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.exception.PhrescoWebServiceException;
 import com.photon.phresco.service.admin.commons.ServiceActions;
 import com.photon.phresco.service.admin.commons.ServiceUIConstants;
 import com.photon.phresco.service.client.api.ServiceClientConstant;
@@ -77,7 +78,7 @@ public class ServiceBaseAction extends ActionSupport implements ServiceActions, 
 		return serviceManager;
 	}
 
-	protected User doLogin(String userName, String password) throws PhrescoException {
+	protected User doLogin(String userName, String password)  {
 		try {
 		StringBuilder serverURL = new StringBuilder();
 		serverURL.append(getHttpRequest().getScheme());
@@ -92,9 +93,9 @@ public class ServiceBaseAction extends ActionSupport implements ServiceActions, 
 		context.put(SERVICE_USERNAME, userName);
 		context.put(SERVICE_PASSWORD, password);
 		serviceManager = ServiceClientFactory.getServiceManager(context);
-		} catch (Exception ex) {
+		} catch (PhrescoWebServiceException ex) {
             S_LOGGER.error(ex.getLocalizedMessage());
-            throw new PhrescoException(ex);
+            throw new PhrescoWebServiceException(ex.getResponse());
         }
 		return serviceManager.getUserInfo();
     }

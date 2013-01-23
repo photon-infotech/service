@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import com.photon.phresco.commons.model.User;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.PhrescoServerFactory;
+import com.photon.phresco.exception.PhrescoWebServiceException;
 
 public class Login extends ServiceBaseAction {
 
@@ -20,7 +21,7 @@ public class Login extends ServiceBaseAction {
 	
 	private String currentVersion = "";
 	
-	public String login() {
+	public String login() throws PhrescoException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method  Login.login()");
 	    }
@@ -99,11 +100,15 @@ public class Login extends ServiceBaseAction {
 				return LOGIN_FAILURE;
 			}
 			setSessionAttribute(SESSION_USER_INFO, user);
-		} catch (Exception e) {
-			   setReqAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_LOGIN_INVALID_CRED));
-			   
-			return LOGIN_FAILURE;
-		}
+		} catch (PhrescoWebServiceException e) {
+			if(e.getResponse().getStatus() == 204) {
+				setReqAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_ERROR_LOGIN));
+				return LOGIN_FAILURE;
+			} else {
+				setReqAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_SERVER_DOWN));
+				return LOGIN_FAILURE;
+			}
+		} 
 			
 		return SUCCESS;
 	}
