@@ -62,6 +62,7 @@ public interface ServiceUIConstants {
 	String FILE_FORMAT = "zip";
 	String TEMP_FOLDER = "newtemp";
 	String TECHGROUP_LIST = "techGrpList";
+	String ABOUT = "about";
     
 	/*****************************
      * Login Request Constants

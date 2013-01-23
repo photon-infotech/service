@@ -4,6 +4,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.photon.phresco.commons.model.User;
+import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.service.api.PhrescoServerFactory;
 
 public class Login extends ServiceBaseAction {
 
@@ -15,6 +17,8 @@ public class Login extends ServiceBaseAction {
 	private String username = null;
 	private String password = null;
 	private boolean loginFirst = true;
+	
+	private String currentVersion = "";
 	
 	public String login() {
 	    if (isDebugEnabled) {
@@ -52,6 +56,28 @@ public class Login extends ServiceBaseAction {
 		
         return SUCCESS;
     }
+	
+	public String about() {
+		if (debugEnabled) {
+			S_LOGGER.debug("Entering Method VersionUpdate.about()");
+		}
+
+		return ABOUT;
+	}
+
+	public String versionInfo() throws PhrescoException {
+		if (debugEnabled) {
+			S_LOGGER.debug("Entering Method VersionUpdate.versionInfo()");
+		}
+		try {
+			String latestFrameWorkVersion = PhrescoServerFactory.getDbManager().getLatestFrameWorkVersion();
+			setCurrentVersion(latestFrameWorkVersion);
+		} catch (PhrescoException e) {
+			throw new PhrescoException(e);
+		}
+
+		return SUCCESS;
+	}
 	
 	private String authenticate() {
 	    if (isDebugEnabled) {
@@ -117,5 +143,13 @@ public class Login extends ServiceBaseAction {
 
 	public void setLoginFirst(boolean loginFirst) {
 		this.loginFirst = loginFirst;
+	}
+	
+	public void setCurrentVersion(String currentVersion) {
+		this.currentVersion = currentVersion;
+	}
+
+	public String getCurrentVersion() {
+		return currentVersion;
 	}
 }

@@ -2465,11 +2465,19 @@ input[class="chkBox_config"] {
 	max-width: 80% !important; 
 }
 
-.dwnldError{
+.dwnldError {
 	color:#B94A48;
 }
 
 .outLineColor {
 	border-color: #B94A48;
 	color : #B94A48;	
+}
+
+#popupClose {
+	margin-top: -17px;
+}
+
+.abt_logo_img {
+	padding-top: 16px;
 }

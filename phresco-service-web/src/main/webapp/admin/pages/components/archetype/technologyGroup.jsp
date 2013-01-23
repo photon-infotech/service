@@ -141,10 +141,6 @@
 			showParentPage();
 		});
 		
-		$('.class').click(function() {
-		    showParentPage(); 
-		});
-		
 		$('#add').click(function() {
 			$('#reportMsg').html("");
 			var returnValue = true;

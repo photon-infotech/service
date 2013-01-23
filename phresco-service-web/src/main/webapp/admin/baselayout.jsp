@@ -124,6 +124,17 @@
 		    	$(".rightbotnav").click(function(){
 		    		$('#adminMenu').attr('class', 'active');
 		    	})
+		    	
+		    	//Call for about service
+				$("#about").click(function() {
+					yesnoPopup('about', '<s:text name="lbl.abt.service"/>');
+				});
+		    	
+		    	$(".close, #popupClose").click(function() {
+		    		 showParentPage(); 
+	    			$("#updateMsg").empty();
+	    			$("#reportMsg").empty();
+		    	});
 			});
 		    
 		</script>
@@ -196,7 +207,7 @@
 								<img src="images/blue_themer.jpg" class="skinImage">
 							</a>
                         </div>
-                        <div class="userInfo"><a href="#" class="abtPopUp about"><s:label key="lbl.usrset.abtservice"/></a></div>
+                        <div class="userInfo"><a href="#"  id="about" class="abtPopUp about"><s:label key="lbl.usrset.abtservice"/></a></div>
                         <div class="userInfo"><a href="<s:url action='admin/logout'/>" id="signOut"><s:label key="lbl.usrset.signout"/></a></div>
 					</li>
 				</div>
@@ -291,13 +302,11 @@
 		</footer>
 		<!-- Footer Ends Here -->
 		
-		<!-- Delete confirmation dialog starts -->
-		<!-- Delete confirmation dialog ends -->
-		
-		<!-- Popup Starts-->
+		<!-- Popup div Starts-->
 	    <div class="popup_div" id="popup_div">
 	    
 	    </div>
+	    <!-- Popup div Ends-->
 	    
 	    <!-- Popup Starts-->
 	    <div id="popupPage" class="modal hide fade">
@@ -306,10 +315,11 @@
 				<h3 id="popupTitle"><s:text name='lbl.progress'/></h3>
 				<img src="images/clipboard-copy.png" alt="clipboard" id="clipboard" class="close progressClipboard" title="Copy to clipboard"/>
 			</div>
-			<div class="modal-body">
+			<div class="modal-body" id="popupPage_modal-body">
 			</div>
 			<div class="modal-footer">
 				<div class="errMsg" id="reportMsg"></div>
+				<div id="updateMsg" class="updateMsg"></div>
 				<a href="#" class="btn btn-primary" data-dismiss="modal" id="popupCancel"><s:text name='lbl.btn.cancel'/></a>
 				<a href="#" class="btn btn-primary popupOk" data-dismiss="modal" id="" onclick="popupOnOk(this);" ><s:text name='lbl.btn.ok'/></a>
 				<a href="#" class="btn btn-primary" data-dismiss="modal" id="popupClose"><s:text name='lbl.btn.close'/></a>
@@ -317,11 +327,8 @@
 		</div>
 	    <!-- Popup Ends -->
 	    
-	    
-	    <!-- Popup Ends -->
-	    
 	    <!-- Command Display starts -->
-				<div class="build_cmd_div" id="build-output">
-				</div>
+		<div class="build_cmd_div" id="build-output">
+		</div>
 	</body>
 </html>
