@@ -496,6 +496,48 @@ function enableDisableUploads(type, controlObj){
 	}
 }
 
+function yesnoPopup(url, title, okUrl, okLabel, form, additionalParams) {
+	$('#popupPage').modal('show');//To show the popup
+	$('.popupClose').hide();
+	$('#popupTitle').html(title); // Title for the popup
+	$('.popupClose').hide(); //no need close button since yesno popup
+	$('.popupOk, #popupCancel').show(); // show ok & cancel button
+	$(".popupOk").attr('id', okUrl); // popup action mapped to id
+	if (okLabel !== undefined && !isBlank(okLabel)) {
+		$('#' + okUrl).val(okLabel); // label for the ok button
+	}
+	
+	var params = "";
+	if (form != undefined && form != "" && !isBlank(form.serialize())) {
+		params = form.serialize();
+		if (!isBlank(additionalParams)) {
+			params = params.concat("&");
+			params = params.concat(additionalParams);	
+		} 
+	} else if (additionalParams != undefined && additionalParams != "")  {
+		params = additionalParams;
+	}
+	
+	$("#errMsg").empty();
+	$("#updateMsg").empty();
+	$('#successMsg').empty();
+	$('#popupPage_modal-body').empty();
+	$('#popupPage_modal-body').css("height", "300px");
+	$('#popupPage_modal-body').load(url, params); //url to render the body content for the popup
+}
+
+//To enable the given button object
+function enableButton(buttonObj) {
+	buttonObj.addClass('btn-primary');
+	buttonObj.attr("disabled", false);
+}
+
+function disableButton(buttonObj) {
+	buttonObj.removeClass('btn-primary');
+	buttonObj.attr("disabled", true);
+}
+
+
 function disableUploadButton(controlObj) {
 	controlObj.find("input[type='file']").attr('disabled', 'disabled');
 	controlObj.find($(".qq-upload-button")).removeClass("btn-primary qq-upload-button").addClass("disabled");

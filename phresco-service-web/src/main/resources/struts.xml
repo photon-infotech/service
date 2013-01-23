@@ -634,5 +634,13 @@
 			<result type="json"/>
 		</action>
 		
+		<action name="about" method="about" class="com.photon.phresco.service.admin.actions.Login">
+        	<result name="about">/admin/pages/about.jsp</result>
+        </action>
+                
+     	<action name="versionInfo" method="versionInfo" class="com.photon.phresco.service.admin.actions.Login">
+        	<result type="json"/>
+        </action>
+		
     </package>
 </struts>

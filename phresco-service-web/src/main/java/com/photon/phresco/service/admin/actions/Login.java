@@ -58,6 +58,28 @@ public class Login extends ServiceBaseAction {
         return SUCCESS;
     }
 	
+	public String about() {
+		if (debugEnabled) {
+			S_LOGGER.debug("Entering Method VersionUpdate.about()");
+		}
+
+		return ABOUT;
+	}
+
+	public String versionInfo() throws PhrescoException {
+		if (debugEnabled) {
+			S_LOGGER.debug("Entering Method VersionUpdate.versionInfo()");
+		}
+		try {
+			String latestFrameWorkVersion = PhrescoServerFactory.getDbManager().getLatestFrameWorkVersion();
+			setCurrentVersion(latestFrameWorkVersion);
+		} catch (PhrescoException e) {
+			throw new PhrescoException(e);
+		}
+
+		return SUCCESS;
+	}
+	
 	private String authenticate() {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method  Login.authenticate()");
@@ -126,5 +148,13 @@ public class Login extends ServiceBaseAction {
 
 	public void setLoginFirst(boolean loginFirst) {
 		this.loginFirst = loginFirst;
+	}
+	
+	public void setCurrentVersion(String currentVersion) {
+		this.currentVersion = currentVersion;
+	}
+
+	public String getCurrentVersion() {
+		return currentVersion;
 	}
 }
