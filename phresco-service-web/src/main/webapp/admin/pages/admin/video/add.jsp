@@ -85,7 +85,7 @@
 			<span class="mandatory">*</span><% } %>&nbsp;<s:text name='lbl.hdr.adm.video' />
 			</label>
 			<div class="controls" style="float: left; margin-left: 3%;">
-				<div id="video-file-uploader" class="file-uploader">
+				<div id="video-file-uploader" class="file-uploader" title="upload less than 40MB file">
 					<noscript>
 						<p>Please enable JavaScript to use file uploader.</p>
 						<!-- or put a simple form for upload here -->
@@ -110,7 +110,7 @@
 			<span class="mandatory">*</span><% } %>&nbsp;<s:text name='lbl.hdr.adm.img' />
 			</label>
 			<div class="controls" style="float: left; margin-left: 3%;">
-				<div id="image-file-uploader" class="file-uploader">
+				<div id="image-file-uploader" class="file-uploader" title="upload only .png file">
 					<noscript>
 						<p>Please enable JavaScript to use file uploader.</p>
 						<!-- or put a simple form for upload here -->
