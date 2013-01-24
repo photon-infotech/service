@@ -36,6 +36,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.ArtifactGroup.Type;
 import com.photon.phresco.commons.model.VideoInfo;
 import com.photon.phresco.commons.model.VideoType;
 import com.photon.phresco.exception.PhrescoException;
@@ -130,7 +131,7 @@ public class Videos extends ServiceBaseAction {
 				inputStreamMap.put(videoInfo.getName(),  new ByteArrayInputStream(videoByteArray));
 			} 
 			if(imgByteArray != null){
-				inputStreamMap.put(videoInfo.getName(),  new ByteArrayInputStream(imgByteArray));
+				inputStreamMap.put(Type.ICON.name(),  new ByteArrayInputStream(imgByteArray));
 			} 
 			
 			getServiceManager().createVideos(createVideoInstance(), inputStreamMap);
