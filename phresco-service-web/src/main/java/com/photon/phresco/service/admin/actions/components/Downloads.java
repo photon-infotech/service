@@ -741,5 +741,11 @@ public class Downloads extends ServiceBaseAction {
 	public void setDownloadVersions(String downloadVersions) {
 		this.downloadVersions = downloadVersions;
 	}
-	
+	public void setOldName(String oldName) {
+		this.oldName = oldName;
+	}
+
+	public String getOldName() {
+		return oldName;
+	}
 }
