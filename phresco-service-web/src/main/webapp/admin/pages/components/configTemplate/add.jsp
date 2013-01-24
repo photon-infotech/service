@@ -178,7 +178,8 @@
 												<s:label key="lbl.hdr.comp.cnfigtmplt.key.title" cssClass="keyMandtory" theme="simple"/></div>
 										</th>
 										<th class="second">
-											<div class="th-inner tablehead fixTableHdr"><s:label key="lbl.hdr.comp.cnfigtmplt.name.title" theme="simple"/></div>
+											<div class="th-inner tablehead fixTableHdr"><span class="mandatory">*</span>&nbsp;
+												<s:label key="lbl.hdr.comp.cnfigtmplt.name.title" cssClass="keyMandtory" theme="simple"/></div>
 										</th>
 										<th class="second">
 											<div class="th-inner tablehead fixTableHdr"><s:label key="lbl.hdr.comp.cnfigtmplt.type.title" theme="simple"/></div>
@@ -214,10 +215,11 @@
 													temp="1_key" class="keywidth" onblur="updateRowInputNames(this)" maxlength="30" title="30 Characters only">
 											</td>
 											<td class="tdWidth">
-												<input type="text" id = "1_propTempName" value="" placeholder="<s:text name='place.hldr.configTemp.add.name'/>" maxlength="30" title="30 Characters only" class="textWidth" >
+												<input type="text" id = "1_propTempName" value="" placeholder="<s:text name='place.hldr.configTemp.add.name'/>" 
+													onblur="checkNameUnique(this);" maxlength="30" title="30 Characters only" tempAttr="configNameField" class="textWidth" >
 											</td>
 											<td class="tdWidth">
-												<select id="1_type" class = "textWidth">
+												<select id="1_type" class = "textWidth" onchange="typeChange(this);">
 													<option value="String"><s:text name='lbl.hdr.comp.cnfigtmplt.string'/></option>
 													<option value="Number"><s:text name='lbl.hdr.comp.cnfigtmplt.number'/></option>
 													<option value="Password"><s:text name='lbl.hdr.comp.cnfigtmplt.password'/></option>
@@ -229,14 +231,14 @@
 											 <td class="tdWidth" id="1_psblMulDiv" style="display:none;">
 												<select type="text" placeholder="<s:text name='place.hldr.configTemp.add.possible.values'/>" 
 													class="psblselectwidth" id="1_psblMul"></select>
-												<a data-toggle="modal" href="#myModal"><img class="addiconAlign imagealign" temp="1" src="images/add_icon.png"/ 
+												<a data-toggle="modal" class="togglePopup" href="#myModal"><img class="addiconAlign imagealign" temp="1" src="images/add_icon.png"/ 
 													onclick="addPsblValPopup(this);"></a>
 											</td>
 											<input type="hidden" class="1"/>
 											<td class="psblbtnwidth" id="1_psblSinglDiv">
 												<input type="text" placeholder="<s:text name='place.hldr.configTemp.add.possible.values'/>" 
 													class="psbltextwidth" id="1_psblSingl" disabled>
-												<a data-toggle="modal" href="#myModal"><img class="addiconAlign imagealign" temp="1" 
+												<a data-toggle="modal" class="togglePopup" href="#myModal"><img class="addiconAlign imagealign" temp="1" 
 													src="images/add_icon.png"/ onclick="addPsblValPopup(this);"/></a>
 											</td>
 											<td class="tdWidth">
@@ -247,7 +249,7 @@
 												<input class="chkBox_config" type="checkbox" value="true" id="1_propMand">
 											</td>
 											<td class="buttonwidth">
-												<input class="chkBox_config" type="checkbox" value="true" id="1_propMul">
+												<input class="multiple_chkBox_config" type="checkbox" value="true" id="1_propMul">
 											</td>
 											<td class="buttonwidth">
 												<a><img class="add imagealign" temp="1" src="images/add_icon.png" onclick="addconfig(this);"></a>
@@ -281,6 +283,7 @@
 													if (StringUtils.isNotEmpty(propertyTemplate.getName())) {
 														propName = propertyTemplate.getName();
 													}
+													
 									%>
 												<tr class='<%= dynamicId + "_configdynamiadd" %>'>
 													<td class="tdWidth">
@@ -292,10 +295,11 @@
 													<td class="tdWidth">
 														<input type="text" placeholder="<s:text name='place.hldr.configTemp.add.name'/>" 
 															id=<%= dynamicId + "_propTempName"%> class="textWidth" maxlength="30" 
-															title="30 Characters only" value='<%= propName %>' <%= disabledStr %>>
+															title="30 Characters only" onblur='checkNameUnique(this);' tempAttr='configNameField' 
+															value='<%= propName %>' <%= disabledStr %>>
 													</td>
 													<td class="tdWidth">
-														<select id='<%= dynamicId + "_type" %>' class = "textWidth" <%= disabledStr %>>
+														<select id='<%= dynamicId + "_type" %>' class = "textWidth" <%= disabledStr %> onchange="typeChange(this);">
 															<option value="String"><s:text name='lbl.hdr.comp.cnfigtmplt.string'/></option>
 															<option value="Number"><s:text name='lbl.hdr.comp.cnfigtmplt.number'/></option>
 															<option value="Password"><s:text name='lbl.hdr.comp.cnfigtmplt.password'/></option>
@@ -307,7 +311,7 @@
 													<td class="psblbtnwidth" id='<%= dynamicId + "_psblSinglDiv" %>' style="display:none">
 														<input type="text" placeholder="<s:text name='place.hldr.configTemp.add.possible.values'/>" 
 															class="psbltextwidth" id='<%= dynamicId + "_psblSingl" %>' disabled>
-														<a data-toggle="modal" href='<%= possibleValueHref %>'><img class="addiconAlign imagealign" temp='<%= dynamicId %>' 
+														<a data-toggle="modal" class='togglePopup' href='<%= possibleValueHref %>'><img class="addiconAlign imagealign" temp='<%= dynamicId %>' 
 															src="images/add_icon.png"/ onclick='<%=possibleValFunction%>'/></a>
 													</td>
 													<input type="hidden" class='<%= dynamicId %>'>
@@ -315,7 +319,7 @@
 														<select type="text" placeholder="<s:text name='place.hldr.configTemp.add.possible.values'/>" 
 															class="psblselectwidth" id='<%= dynamicId + "_psblMul" %>' <%= disabledStr %>>
 														</select>
-														<a data-toggle="modal" href='<%= possibleValueHref %>'><img class="addiconAlign imagealign" temp='<%= dynamicId %>' 
+														<a data-toggle="modal" class='togglePopup' href='<%= possibleValueHref %>'><img class="addiconAlign imagealign" temp='<%= dynamicId %>' 
 															src="images/add_icon.png" onclick='<%=possibleValFunction%>'></a>
 													</td>
 													<td class="tdWidth">
@@ -327,10 +331,10 @@
 														<input type="checkbox" class="chkBox_config" value="true" id='<%= dynamicId + "_propMand" %>' <%= mndtryChck %> <%= disabledStr %>>
 													</td>
 													<td class="buttonwidth">
-														<input type="checkbox" class="chkBox_config" value="true" id='<%= dynamicId + "_propMul" %>' <%= mulChck %> <%= disabledStr %>>
+														<input type="checkbox" class="multiple_chkBox_config" value="true" id='<%= dynamicId + "_propMul" %>' <%= mulChck %> <%= disabledStr %>>
 													</td>
 													<td class="buttonwidth">
-														<a><img class="add imagealign" temp='<%= dynamicId %>' src="images/add_icon.png" onclick='<%=addImgFunction%>'></a>
+														<a><img class="add imagealign" temp='<%= dynamicId %>' src="images/add_icon.png" onclick='<%= addImgFunction %>'></a>
 													</td class="buttonwidth">
 														<td class="buttonwidth">
 															<img onclick='<%=removeImgFunction %>' id="deleteIcon" src="images/minus_icon.png" class="del imagealign">
@@ -555,6 +559,10 @@
 	
 	
 	var counter = 2;
+	if ("edit" == '<%= fromPage %>') {
+		counter = $('.keywidth').size() + 1;
+	} 
+	
 	function addconfig() {
 		var trId = counter + "_configdynamiadd";
 		var keyId = counter;
@@ -573,18 +581,18 @@
 	 	newPropTempRow.html("<td class='tdWidth'><input type='text' id='"+ keyId +"' class='keywidth' name='propTempKey' value='' "+
 	 			" temp='"+ keyTmpName +"' placeholder='<s:text name='place.hldr.configTemp.add.key'/>' onblur='updateRowInputNames(this)'></td>" + 
 				"<td class='tdWidth'> <input type='text' id = '"+ nameId +"' placeholder='<s:text name='place.hldr.configTemp.add.name'/>' " + 
-				" value='' placeholder='' maxlength='30' class='textWidth'></td><td class='tdWidth'><select id='"+ typeId +"' " + 
-				"class = 'textWidth'><option value='String'>String</option><option value='Integer'>Integer</option><option value='Password'>" + 
-				"Password</option><option value='FileType'>FileType</option><option value='Boolean'>Boolean</option></select></td><td class='tdWidth' id='"+ psblMulDivId +"' style='display:none;'><select type='text' " + 
+				" value='' placeholder='' maxlength='30' onblur='checkNameUnique(this);' tempAttr='configNameField' class='textWidth'></td><td class='tdWidth'><select id='"+ typeId +"' " + 
+				"class = 'textWidth'  onchange='typeChange(this);'><option value='String'>String</option><option value='Number'>Number</option><option value='Password'>" + 
+				"Password</option><option value='FileType'>FileType</option><option value='Boolean'>Boolean</option><option value='Actions'>Actions</option></select></td><td class='tdWidth' id='"+ psblMulDivId +"' style='display:none;'><select type='text' " + 
 				"placeholder='<s:text name='place.hldr.configTemp.add.possible.values'/>'class='psblselectwidth' id='"+ psblValMultipleId +"'>" + 
-				"</select><a data-toggle='modal' href='#myModal'><img class='addIcon imagealign' temp='"+ keyId +"' src='images/add_icon.png'" + 
+				"</select><a data-toggle='modal' class='togglePopup' href='#myModal'><img class='addIcon imagealign' temp='"+ keyId +"' src='images/add_icon.png'" + 
 				"onclick='addPsblValPopup(this);'/></a></td><input type='hidden' class='"+ keyId +"'/><td class='psblbtnwidth' id='"+ psblSinglDivId +"'>" + 
 				"<input type='text' placeholder='<s:text name='place.hldr.configTemp.add.possible.values'/>'class='psbltextwidth' " + 
-				"id='"+ psblValSingleId +"' disabled><a data-toggle='modal' href='#myModal'><img class='addIcon imagealign' temp='"+ keyId +"' " +
+				"id='"+ psblValSingleId +"' disabled><a data-toggle='modal' class='togglePopup' href='#myModal'><img class='addIcon imagealign' temp='"+ keyId +"' " +
 	 			"src='images/add_icon.png' onclick='addPsblValPopup(this);'/></a></td><td class='tdWidth'><input type='text' id='"+ helpTextId +"' " + 
 	 			"placeholder='<s:text name='place.hldr.configTemp.add.help.text'/>' name='helpText' class='textWidth'></td>" + 
 	 			"<td class='buttonwidth'><input type='checkbox' class='chkBox_config' value='true' id='"+ mandChckId +"'></td><td class='buttonwidth'> " + 
-	 			"<input type='checkbox' class='chkBox_config' value='true' id='"+ mulChckId +"'></td><td class='buttonwidth'><a ><img class='add imagealign' " + 
+	 			"<input type='checkbox' class='multiple_chkBox_config' value='true' id='"+ mulChckId +"'></td><td class='buttonwidth'><a ><img class='add imagealign' " + 
 	 			" temp='"+ keyId +"' src='images/add_icon.png' onclick='addconfig(this);'></a></td><td class='buttonwidth'><img class = 'del imagealign'" + 
 	 			"src='images/minus_icon.png' id='deleteIcon' onclick='removeTag(this);'></td>")
 	 	newPropTempRow.appendTo("#propTempTbody");		
@@ -631,12 +639,15 @@
 		//to check duplications of entered key value
 		var keyClass = $(obj).attr("class");
 		$("." + keyClass).each(function() {
-			if ($(obj).attr("temp") !== $(this).attr("temp")
-					&& $(obj).val() === $(this).val()) {
-				$(obj).val("");
-				showError($("#" + $(obj).attr("id")
-						+ "_configdynamiadd"));
-				return false;
+			if ($(obj).val() != "" && !isBlank($(obj).val())) {
+				if ($(obj).attr("temp") !== $(this).attr("temp")
+						&& $(obj).val() === $(this).val()) {
+					$(obj).val("");
+					showError($("#" + $(this).attr("id")), $("#keyvalueError"),'<s:text name='err.msg.key.unique'/>');
+					return false;
+				} else {
+					$("#keyvalueError").empty();
+				}				
 			}
 		});
 
@@ -657,6 +668,22 @@
 			$("#" + id + "_propMand").attr("name", mandChckName);
 			$("#" + id + "_propMul").attr("name", mulChckName);
 		}
+	}
+	
+	//to check for duplicate property template name field
+	function checkNameUnique(obj) {
+		$('input[tempAttr=configNameField]').each(function() {
+			if ($(obj).val() != "" && !isBlank($(obj).val())) {
+				if ($(obj).attr("id") !== $(this).attr("id")
+						&& $(obj).val() === $(this).val()) {
+					$(obj).val("");
+					showError($("#" + $(this).attr("id")), $("#keyvalueError"),'<s:text name='err.msg.name.unique'/>');
+					return false;
+				} else {
+					$("#keyvalueError").empty();
+				}	
+			}
+		});
 	}
 	
 	//for edit -- to change names of property template input fields
@@ -681,6 +708,17 @@
 
 	//for edit -- to preselect type select box value in property template 
 	function selectType(type, id) {
+		//To disable multiple checkbox and adding possible value while edit if the customer is photon
+		if ("photon" == '<%= customerId %>') {
+			if (type == "String" || type == "Number") {
+				$("#" + id + "_type").parent().parent().find($('input[class*=multiple_chkBox_config]')).attr("disabled", false);				
+				$("#" + id + "_type").parent().parent().find($('a[class*=togglePopup]')).attr("href","#myModal");
+			} else {
+				$("#" + id + "_type").parent().parent().find($('input[class*=multiple_chkBox_config]')).attr("disabled", true);
+				$("#" + id + "_type").parent().parent().find($('input[class*=multiple_chkBox_config]')).attr("checked", false);
+				$("#" + id + "_type").parent().parent().find($('a[class*=togglePopup]')).removeAttr("href");
+			}
+		}	
 		$("#" + id + "_type > option").each(function() {
 			if ($(this).val() === type) {
 				$("#" + id + "_type  option[value='" + type + "']")
@@ -692,13 +730,29 @@
 
 	function validatePropTempKey(pageUrl, progressText) {
 		var redirect = true;
+		var checkName = true;
+		var showNameMissingError = false;
 		$(".keywidth").each(function() {
 			if ($(this).val().replace(/\s/g, "") === "") {
-				$("#" + $(this).attr("id")).focus();
+				//$("#" + $(this).attr("id")).focus();
+				$(this).focus();
 				redirect = false;
+				checkName = false;
 				return false;
 			}
 		});
+		
+		if (checkName) {
+			$('input[tempAttr=configNameField]').each(function() {
+				if ($(this).val().replace(/\s/g, "") === "") {
+					//$("#" + $(this).attr("id")).focus();
+					$(this).focus();
+					showNameMissingError = true;
+					redirect = false;
+					return false;
+				}
+			});			
+		}
 		
 		var count = 0;
 		$(".keywidth").each(function() {
@@ -708,12 +762,16 @@
 		});
 		
 		if(count > 0){
-			showError($("#" + $(this).attr("id")), $("#keyvalueError"),'<s:text name='err.msg.key.missing'/>');
+			showError($("#" + $(this).attr("id")), $("#keyvalueError"),'<s:text name='err.msg.key.missing'/>');				
 			count = 0;
 		}else{
 			hideError($("#" + $(this).attr("id")), $("#keyvalueError"));
 			count = 0;
 		}
+		
+		if (showNameMissingError) {
+			showError($("#" + $(this).attr("id")), $("#keyvalueError"),'<s:text name='err.msg.name.missing'/>');
+		} 
 		
 		if ($("#configname").val().replace(/\s/g, "") === "") {
 			showError($("#nameControl"), $("#nameError"),
@@ -761,4 +819,19 @@
 		configname = allowAlphaNum(configname);
 		$(this).val(configname);
 	});
+	
+	//to disable multiple checkbox if we select password
+	function typeChange(obj) {
+		if ($(obj).val() == "String" || $(obj).val() == "Number") {
+			$(obj).parent().parent().find($('input[class*=multiple_chkBox_config]')).attr("disabled", false);
+			$(obj).parent().parent().find($('a[class*=togglePopup]')).attr("href","#myModal");
+		} else {
+			$(obj).parent().parent().find($('input[class*=multiple_chkBox_config]')).attr("disabled", true);//To make multiple checkbox disable
+			$(obj).parent().parent().find($('input[class*=multiple_chkBox_config]')).attr("checked", false);//To make multiple checkbox unchecked
+			$(obj).parent().parent().find($('a[class*=togglePopup]')).removeAttr("href");//To disable adding possible values
+			$(obj).parent().parent().find($('input[type=hidden]')).val("");//To empty already added possible values in hidden field
+			$(obj).parent().parent().find($('.psblselectwidth option')).remove();//To empty already added possible values
+			$(obj).parent().parent().find($('.psbltextwidth')).val('');//To empty already added possible values
+		}
+	}
 </script>
