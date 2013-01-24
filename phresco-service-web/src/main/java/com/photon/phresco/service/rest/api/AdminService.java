@@ -47,6 +47,7 @@ import org.springframework.stereotype.Component;
 
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.ArtifactGroup.Type;
 import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.LogInfo;
 import com.photon.phresco.commons.model.Permission;
@@ -335,41 +336,53 @@ public class AdminService extends DbService {
 	private Response createOrUpdateVideo(MultiPart videosinfo)
 			throws PhrescoException {
 		VideoInfo video = null;
-		BodyPartEntity bodyPartEntity = null;
+		BodyPartEntity videoBodyPartEntity = null;
+		BodyPartEntity iconBodyPartEntity = null;
 		File videoFile = null;
 		List<BodyPart> bodyParts = videosinfo.getBodyParts();
-
+		File iconFile = null;
+		
 		if (CollectionUtils.isNotEmpty(bodyParts)) {
 			for (BodyPart bodyPart : bodyParts) {
-				if (bodyPart.getMediaType().equals(
-						MediaType.APPLICATION_JSON_TYPE)) {
+				if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
 					video = bodyPart.getEntityAs(VideoInfo.class);
-					// FIXME : Need To Fix CustomerIds For Videos
 					video.setCustomerIds(Arrays.asList(DEFAULT_CUSTOMER_NAME));
 				} else {
-					bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
+					if(bodyPart.getContentDisposition().getFileName().equals(Type.ICON.name())) {
+						iconBodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
+					} else {
+						videoBodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
+					}
 				}
 			}
 		}
 
-//		if (video == null) {
-//			// TODO:Throw exception
-//		}
-
-		if(bodyPartEntity != null) {
-			videoFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null, 
+		String groupId = "videos.homepage";
+		String version = "1.0";
+		String artifactId = video.getName().toLowerCase().replace(" ", "");
+		video.setImageurl("/" + groupId.replace(".", "/") + "/" + artifactId + "/" + version
+				+ "/" + artifactId + "-" + version + "." + "png");
+		
+		if(videoBodyPartEntity != null && iconBodyPartEntity != null) {
+			videoFile = ServerUtil.writeFileFromStream(videoBodyPartEntity.getInputStream(), null, 
 					video.getVideoList().get(0).getArtifactGroup().getPackaging(), video.getName());
+			iconFile = ServerUtil.writeFileFromStream(iconBodyPartEntity.getInputStream(), null, 
+					"png", video.getName());
 			List<VideoType> videoTypeList = video.getVideoList();
 			for (VideoType videoType : videoTypeList) {
 					ArtifactGroup artifactGroup = videoType.getArtifactGroup();
-					artifactGroup.setGroupId("videos.homepage");
-					artifactGroup.setArtifactId(video.getName().toLowerCase());
+					videoType.setUrl("/" + groupId.replace(".", "/") + "/" + artifactId + "/" + version
+					+ "/" + artifactId + "-" + version + "." + artifactGroup.getPackaging());
+					videoType.setType(artifactGroup.getPackaging());
+					artifactGroup.setGroupId(groupId);
+					artifactGroup.setArtifactId(artifactId);
 					com.photon.phresco.commons.model.ArtifactInfo info = new com.photon.phresco.commons.model.ArtifactInfo();
-					info.setVersion("1.0");
+					info.setVersion(version);
 					artifactGroup.setVersions(Arrays.asList(info));
 					artifactGroup.setCustomerIds(Arrays.asList(DEFAULT_CUSTOMER_NAME));
 				if (artifactGroup != null) {
 					boolean uploadBinary = uploadBinary(artifactGroup, videoFile);
+					uploadIcon(artifactGroup, iconFile);
 					if (uploadBinary) {
 						saveVideos(video);
 					}
@@ -377,7 +390,7 @@ public class AdminService extends DbService {
 			}
 		}
 		
-		if(bodyPartEntity == null && video != null) {
+		if(videoBodyPartEntity == null && video != null) {
 			List<VideoType> videoTypeList = video.getVideoList();
 			for (VideoType videoType : videoTypeList) {
 				ArtifactGroup artifactGroup = videoType.getArtifactGroup();
@@ -392,6 +405,12 @@ public class AdminService extends DbService {
 		}
 		
 		return Response.status(Response.Status.OK).entity(video).build();
+	}
+	
+	private boolean uploadIcon(ArtifactGroup artifactGroup, File iconFile) throws PhrescoException {
+		ArtifactGroup iconGroup = artifactGroup;
+		iconGroup.setPackaging("png");
+		return uploadBinary(iconGroup, iconFile);
 	}
 
 	private void saveVideos(VideoInfo video) throws PhrescoException {
@@ -409,10 +428,12 @@ public class AdminService extends DbService {
             (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
 		for (VideoType videoType : videoList) {
 			mongoOperation.save(VIDEOTYPESDAO_COLLECTION_NAME, videoTypeconverter.convertObjectToDAO(videoType));
+			
 			saveModuleGroup(videoType.getArtifactGroup());
 		}
 	}
-
+	
+	
 	private void saveModuleGroup(ArtifactGroup moduleGroup) throws PhrescoException {
         Converter<ArtifactGroupDAO, ArtifactGroup> converter = 
             (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
