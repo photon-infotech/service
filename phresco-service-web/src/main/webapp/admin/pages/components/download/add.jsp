@@ -442,29 +442,23 @@
 		}
 		
 		if(!isBlank(data.groupIdError)) {
-			showError($("#" + $(this).attr("id")), $("#groupIdError"),'<s:text name='err.msg.grpid.empty'/>');
+			showError($("#groupIdControl"), $("#groupIdError"), data.groupIdError);
 		} else {
-			hideError($("#groupIdControl"), $("groupIdError"));
+			hideError($("#groupIdControl"), $("#groupIdError"));
 			
 		}
 		
 		if(!isBlank(data.artifactIdError)) {
-			showError($("#" + $(this).attr("id")), $("#artifactIdError"),'<s:text name='err.msg.artfid.empty'/>');
+			showError($("#artifactIdControl"), $("#artifactIdError"), data.artifactIdError);
 		} else {
-			hideError($("artifactIdControl"), $("artifactIdError"));
+			hideError($("#artifactIdControl"), $("#artifactIdError"));
 		}
 		
 		if(!isBlank(data.fileError)) {
-			showError($("#" + $(this).attr("id")), $("#fileError"),'<s:text name='err.msg.file.empty'/>');
+			showError($("#downloadFileControl"), $("#fileError"), data.fileError);
 		} else {
-			hideError($("downloadFileControl"),$("fileError"))
-		}
-		
-		if(!isBlank(data.iconError)) {
-			showError($("#" + $(this).attr("id")), $("#iconError"),'<s:text name='err.msg.img.empty'/>');
-		} else {
-			hideError($("iconControl"),$("iconError"))
-		}
+			hideError($("#downloadFileControl"),$("#fileError"))
+		}		
 	}
 	 
 	function showDiv() {
