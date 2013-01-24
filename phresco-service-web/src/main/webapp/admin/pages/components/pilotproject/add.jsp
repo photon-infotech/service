@@ -253,21 +253,18 @@
 			showError($("#groupIdControl"), $("#groupIdError"), data.groupIdError);
 		} else {
 			hideError($("#groupIdControl"), $("#groupIdError"));
-			disableCtrl($('input[name=groupId]'));
 		}
 		
 		if (!isBlank(data.artifactIdError)) {
 			showError($("#artifactIdControl"), $("#artifactIdError"), data.artifactIdError);
 		} else {
 			hideError($("#artifactIdControl"), $("#artifactIdError"));
-			disableCtrl($('input[name=artifactId]'));
 		}
 		
 		if (!isBlank(data.jarVerError)) {
 			showError($("#verControl"), $("#jarversionError"), data.jarVerError);
 		} else {
 			hideError($("#verControl"), $("#jarversionError"));
-			disableCtrl($('input[name=jarVersion]'));
 		}
 		
 	}
