@@ -65,6 +65,7 @@ import com.photon.phresco.service.converters.ConvertersFactory;
 import com.photon.phresco.service.dao.ApplicationInfoDAO;
 import com.photon.phresco.service.dao.ApplicationTypeDAO;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
+import com.photon.phresco.service.dao.CustomerDAO;
 import com.photon.phresco.service.dao.DownloadsDAO;
 import com.photon.phresco.service.dao.TechnologyDAO;
 import com.photon.phresco.service.model.ServerConfiguration;
@@ -245,7 +246,13 @@ public class DbService implements ServiceConstants {
 	protected List<Customer> findCustomersFromDB() {
     	try {
     		List<Customer> customers = new ArrayList<Customer>();
-    		List<Customer> customersInDb = mongoOperation.getCollection(CUSTOMERDAO_COLLECTION_NAME, Customer.class);
+    		List<CustomerDAO> customersDAOs = mongoOperation.getCollection(CUSTOMERDAO_COLLECTION_NAME, CustomerDAO.class);
+    		List<Customer> customersInDb = new ArrayList<Customer>();
+    		Converter<CustomerDAO, Customer> customerConverter = 
+    			(Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
+    		for (CustomerDAO customerDAO : customersDAOs) {
+				customersInDb.add(customerConverter.convertDAOToObject(customerDAO, mongoOperation));
+			}
     		if (CollectionUtils.isNotEmpty(customersInDb)) {
     			for (Customer customer : customersInDb) {
     				List<String> applicableTechnologies = new ArrayList<String>();
