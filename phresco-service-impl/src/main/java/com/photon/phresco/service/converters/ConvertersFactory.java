@@ -29,6 +29,7 @@ import com.photon.phresco.service.dao.ApplicationInfoDAO;
 import com.photon.phresco.service.dao.ApplicationTypeDAO;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
 import com.photon.phresco.service.dao.BaseDAO;
+import com.photon.phresco.service.dao.CustomerDAO;
 import com.photon.phresco.service.dao.DownloadsDAO;
 import com.photon.phresco.service.dao.ProjectInfoDAO;
 import com.photon.phresco.service.dao.TechnologyDAO;
@@ -57,6 +58,7 @@ public class ConvertersFactory {
 		CONVERTERS_MAP.put(VideoTypeDAO.class, new VideoTypeConverter());
 		CONVERTERS_MAP.put(VideoInfoDAO.class, new VideoConverter());
 		CONVERTERS_MAP.put(ApplicationTypeDAO.class, new ApplicationTypeConverter());
+		CONVERTERS_MAP.put(CustomerDAO.class, new CustomerConverter());
 	}
 
 	public static final Converter<? extends BaseDAO, ? extends Element> getConverter(Class<? extends BaseDAO> clazz) {

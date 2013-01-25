@@ -49,6 +49,7 @@ import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactGroup.Type;
 import com.photon.phresco.commons.model.Customer;
+import com.photon.phresco.commons.model.FrameWorkTheme;
 import com.photon.phresco.commons.model.LogInfo;
 import com.photon.phresco.commons.model.Permission;
 import com.photon.phresco.commons.model.Property;
@@ -70,6 +71,7 @@ import com.photon.phresco.service.client.impl.ClientHelper;
 import com.photon.phresco.service.converters.ConvertersFactory;
 import com.photon.phresco.service.dao.ApplicationTypeDAO;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
+import com.photon.phresco.service.dao.CustomerDAO;
 import com.photon.phresco.service.dao.VideoInfoDAO;
 import com.photon.phresco.service.dao.VideoTypeDAO;
 import com.photon.phresco.service.impl.DbService;
@@ -171,7 +173,13 @@ public class AdminService extends DbService {
     			if(iconStream != null) {
     				saveFileToDB(customer.getId(), iconStream);
     			}
-		        mongoOperation.save(CUSTOMERDAO_COLLECTION_NAME, customer);
+    			Converter<CustomerDAO, Customer> customerConverter = 
+        			(Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
+    			CustomerDAO customerDAO = customerConverter.convertObjectToDAO(customer);
+		        mongoOperation.save(CUSTOMERDAO_COLLECTION_NAME, customerDAO);
+		        FrameWorkTheme frameworkTheme = customer.getFrameworkTheme();
+		        frameworkTheme.setCustomerId(customerDAO.getId());
+		        mongoOperation.save(FRAMEWORK_THEME_COLLECTION_NAME, frameworkTheme);
 			}	
     	} catch (Exception e) {
     		throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
@@ -226,10 +234,13 @@ public class AdminService extends DbService {
         }
     	
     	try {
-    		Customer customer = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME, 
-    		        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), Customer.class);
+    		CustomerDAO customer = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME, 
+    		        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), CustomerDAO.class);
     		if (customer != null) {
-    			return Response.status(Response.Status.OK).entity(customer).build();
+    			Converter<CustomerDAO, Customer> customerConverter = 
+        			(Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
+    			Customer foundcustomer = customerConverter.convertDAOToObject(customer, mongoOperation);
+    			return Response.status(Response.Status.OK).entity(foundcustomer).build();
     		}
     	} catch (Exception e) {
     		throw new PhrescoWebServiceException(e, EX_PHEX00005, CUSTOMERS_COLLECTION_NAME);
@@ -254,7 +265,10 @@ public class AdminService extends DbService {
     	
     	try {
     		if (id.equals(updateCustomers.getId())) {
-        		mongoOperation.save(CUSTOMERS_COLLECTION_NAME, updateCustomers);
+    			Converter<CustomerDAO, Customer> customerConverter = 
+        			(Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
+    			CustomerDAO customerDao = customerConverter.convertObjectToDAO(updateCustomers);
+        		mongoOperation.save(CUSTOMERS_COLLECTION_NAME, customerDao);
         		return Response.status(Response.Status.OK).entity(updateCustomers).build();
          	} 
     	} catch (Exception e) {
@@ -278,7 +292,7 @@ public class AdminService extends DbService {
         }
     	
     	try {
-    		mongoOperation.remove(CUSTOMERS_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), Customer.class);
+    		mongoOperation.remove(CUSTOMERS_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), CustomerDAO.class);
     	} catch (Exception e) {
     		throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
     	}
