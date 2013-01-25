@@ -575,32 +575,32 @@ public class ComponentService extends DbService {
 		return Response.status(Response.Status.OK).entity(technology).build();
 	}
 	
-//	/**
-//	 * Updates the technology given by the parameter
-//	 * @param id
-//	 * @param technology
-//	 * @return
-//	 */
-//	@PUT
-//	@Consumes (MediaType.APPLICATION_JSON)
-//	@Produces (MediaType.APPLICATION_JSON)
-//	@Path (REST_API_TECHNOLOGIES + REST_API_PATH_ID)
-//	public Response updateTechnology(@PathParam(REST_API_PATH_PARAM_ID) String id , Technology technology) {
-//	    if (isDebugEnabled) {
-//	        S_LOGGER.debug("Entered into ComponentService.getTechnology(String id, Technology technology)" + id);
-//	    }
-//		
-//		try {
-//			if (id.equals(technology.getId())) {
-//				mongoOperation.save(TECHNOLOGIES_COLLECTION_NAME, technology);
-//				return Response.status(Response.Status.OK).entity(technology).build();
-//			} 
-//		} catch (Exception e) {
-//			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
-//		}
-//		
-//		return Response.status(Response.Status.BAD_REQUEST).entity(ERROR_MSG_ID_NOT_EQUAL).build();
-//	}
+	/**
+	 * Updates the technology given by the parameter
+	 * @param id
+	 * @param technology
+	 * @return
+	 */
+	@PUT
+	@Consumes (MediaType.APPLICATION_JSON)
+	@Produces (MediaType.APPLICATION_JSON)
+	@Path (REST_API_TECHNOLOGIES + REST_API_PATH_ID)
+	public Response updateTechnology(@PathParam(REST_API_PATH_PARAM_ID) String id , Technology technology) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.getTechnology(String id, Technology technology)" + id);
+	    }
+		
+		try {
+			if (id.equals(technology.getId())) {
+				mongoOperation.save(TECHNOLOGIES_COLLECTION_NAME, technology);
+				return Response.status(Response.Status.OK).entity(technology).build();
+			} 
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
+		}
+		
+		return Response.status(Response.Status.BAD_REQUEST).entity(ERROR_MSG_ID_NOT_EQUAL).build();
+	}
 	
 	/**
 	 * Deletes the server by id for the given parameter
@@ -1251,19 +1251,12 @@ public class ComponentService extends DbService {
 		if(!validate(applicationInfo)) {
 			return;
 		}
-		ApplicationInfoDAO applicationInfoDAOs = mongoOperation.findOne(APPLICATION_INFO_COLLECTION_NAME, 
-				new Query(Criteria.where(REST_API_NAME).is(applicationInfo.getName())), ApplicationInfoDAO.class);
-		if(applicationInfoDAOs == null){
 			Converter<ApplicationInfoDAO, ApplicationInfo> appConverter = 
 			(Converter<ApplicationInfoDAO, ApplicationInfo>) ConvertersFactory.getConverter(ApplicationInfoDAO.class);
 			ApplicationInfoDAO applicationInfoDAO = appConverter.convertObjectToDAO(applicationInfo);
 			mongoOperation.save(APPLICATION_INFO_COLLECTION_NAME, applicationInfoDAO);
 			ArtifactGroup pilotContent = applicationInfo.getPilotContent();
 			saveModuleGroup(pilotContent);
-		}else{
-			ArtifactGroup pilotContent = applicationInfo.getPilotContent();
-			saveModuleGroup(pilotContent);
-		}
 	}
 	
 	/**
