@@ -907,15 +907,18 @@ label {
 	color:green;
 }
 
-.progress .bar {
-	background-color: #EE5F5B;
-	background-image: -ms-linear-gradient(top, #EE5F5B, #EE5F5B);
-	background-image : -moz-linear-gradient(top,  #EE5F5B, #EE5F5B);
-	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#EE5F5B), to(#EE5F5B));
-	background-image: -webkit-linear-gradient(top, #EE5F5B, #EE5F5B);
-	background-image: -o-linear-gradient(top, #EE5F5B, #EE5F5B);
-	background-image: linear-gradient(top, #EE5F5B, #EE5F5B);
+/*** loading image starts ***/
+#indicator {
+/* 	background-image:url("../images/pggreen.png"); */
+	background-color: #C1131C;
+	color: #FFFFFF;
 }
+
+#progressbar {
+  	border:1px solid #C1131C;
+  	color: #FFFFFF;
+}
+/*** loading image ends ***/
 
 /* scrollbar starts */
 .scroll-bar .scroll-slider {

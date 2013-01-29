@@ -27,11 +27,11 @@ var loadDots = 0;
 function prog() {
     if (actualprogress >= maxprogress) {
         actualprogress = 0;
-        $("#progress-bar").css("width", "0%");
+        $("#indicator").css("width", "0%");
         //return;
     }
-    actualprogress += 3;
-    $("#progress-bar").css("width", actualprogress + "%");
+    actualprogress += 2;
+    $("#indicator").css("width", actualprogress + "%");
 }
 
 /*setInterval(prog, 100);

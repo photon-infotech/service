@@ -46,6 +46,8 @@
 		<!-- document resizer -->
 		<script type="text/javascript" src="js/windowResizer.js"></script>
 		
+		<!-- Progress Bar -->
+		<script type="text/javascript" src="js/jquery.loadmask.js"></script>
 		<script type="text/javascript" src="js/loading.js"></script>
 		
 		<!-- Pop Up box -->
@@ -149,9 +151,14 @@
         %>
 	   
 		<div class="modal-backdrop fade in popupalign"></div>
-	    
-	    <div id="progressBar" class="progress active progress_bar">
-		    <div id="progress-bar" class="bar progress_text"></div>
+		
+		
+		<!-- In Progress starts -->
+		<div id="progressbar" class="progressPosition">
+			<div id="indicatorInnerElem">
+				<span id="progressnum"></span>
+			</div>
+			<div id="indicator"></div>
 		</div>
 		
 		<div id="loadingIconDiv" class="hideContent"> 

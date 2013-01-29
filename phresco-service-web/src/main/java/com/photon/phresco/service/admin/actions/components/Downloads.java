@@ -26,6 +26,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -106,6 +107,7 @@ public class Downloads extends ServiceBaseAction {
 		
 		try {
 			List<DownloadInfo> downloadInfo = getServiceManager().getDownloads(getCustomerId());
+			Collections.sort(downloadInfo, sortByName());
 			setReqAttribute(REQ_DOWNLOAD_INFO, downloadInfo);
 			setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		} catch (PhrescoException e) {
@@ -118,6 +120,16 @@ public class Downloads extends ServiceBaseAction {
 		imgByteArray = null;
 		
 		return COMP_DOWNLOAD_LIST;	
+	}
+	
+	private Comparator sortByName() {
+		return new Comparator() {
+			public int compare(Object firstObject, Object secondObject) {
+				DownloadInfo firstDownloadinfo = (DownloadInfo) firstObject;
+				DownloadInfo SecondDownloadinfo = (DownloadInfo) secondObject;
+				return firstDownloadinfo.getName().compareToIgnoreCase(SecondDownloadinfo.getName());
+			}
+		};
 	}
 	
 	public String add() throws PhrescoException {

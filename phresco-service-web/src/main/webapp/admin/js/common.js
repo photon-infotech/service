@@ -259,15 +259,15 @@ function hideLoadingIcon() {
 }
 
 function showProgressBar(progressText) {
-	$(".bar").html(progressText);
+	$("#progressnum").html(progressText);
 	$(".modal-backdrop").show();
-	$(".progress").show();
+	$("#progressbar").show();
 	setInterval(prog, 100);
 }
 
 function hideProgressBar() {
 	$(".modal-backdrop").hide();
-	$(".progress").hide();
+	$("#progressbar").hide();
 }
 
 // It allows A-Z, a-z, 0-9, - and _ 
