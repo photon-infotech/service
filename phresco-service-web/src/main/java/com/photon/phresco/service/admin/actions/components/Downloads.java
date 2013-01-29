@@ -403,6 +403,24 @@ public class Downloads extends ServiceBaseAction {
 			isError = true;
 		}
 		
+		//Empty validation for version
+		 if (StringUtils.isEmpty(getVersion())) {
+             setVerError(getText(KEY_I18N_ERR_VER_EMPTY));
+             isError = true;
+         }  /*else if (StringUtils.isEmpty(getFromPage()) || (!getVersion().equals(getOldVersion()))) {
+			//To check whether the version already exist
+			List<DownloadInfo> downloads = getServiceManager().getDownloads(getCustomerId());
+			if (CollectionUtils.isNotEmpty(downloads)) {
+				for (DownloadInfo download : downloads) {
+					if (download.getName().equalsIgnoreCase(getName()) && download.getVersions().equals(getVersion())) {
+						setVerError(getText(KEY_I18N_ERR_VER_ALREADY_EXISTS));
+						isError = true;
+						break;
+					}
+				}
+			}
+		} */
+		
 		if (isError) {
 			setErrorFound(true);
 		}
@@ -423,26 +441,8 @@ public class Downloads extends ServiceBaseAction {
             if (StringUtils.isEmpty(getArtifactId())) {
                 setArtifactIdError(getText(KEY_I18N_ERR_ARTIFACTID_EMPTY));
                 errorFound = true;
-            }
-            //Empty validation for version if file is selected
-            if (StringUtils.isEmpty(getVersion())) {
-                setVerError(getText(KEY_I18N_ERR_VER_EMPTY));
-                errorFound = true;
-            }
-            /*else if (StringUtils.isEmpty(getFromPage()) || (!getVersion().equals(getOldVersion()))) {
-			//To check whether the version already exist
-			List<DownloadInfo> downloads = getServiceManager().getDownloads(getCustomerId());
-			if (CollectionUtils.isNotEmpty(downloads)) {
-				for (DownloadInfo download : downloads) {
-					if (download.getName().equalsIgnoreCase(getName()) && download.getVersions().equals(getVersion())) {
-						setVerError(getText(KEY_I18N_ERR_VER_ALREADY_EXISTS));
-						isError = true;
-						break;
-					}
-				}
-			}
-		} */
-		}
+            }             
+        }
 		return errorFound;
 	}
 

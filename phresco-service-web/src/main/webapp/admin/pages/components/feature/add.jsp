@@ -361,7 +361,7 @@
 			</label>
 			
 			 <div class="controls" style="float: left; margin-left: 3%;">
-				<div id="feature-file-uploader" class="file-uploader">
+				<div id="feature-file-uploader" class="file-uploader" title="<s:text name='title.file.size'/>">
 					<noscript>
 						<p>Please enable JavaScript to use file uploader.</p>
 						<!-- or put a simple form for upload here -->
@@ -394,7 +394,7 @@
 			</label>
 			
 			 <div class="controls" style="float: left; margin-left: 3%;">
-				<div id="feature-img-uploader" class="file-uploader">
+				<div id="feature-img-uploader" class="file-uploader" title="<s:text name='title.icon.size'/>">
 					<noscript>
 						<p>Please enable JavaScript to use file uploader.</p>
 						<!-- or put a simple form for upload here -->
@@ -435,7 +435,20 @@
 	}
 
 	$(document).ready(function() {
-		createUploader();
+		
+		var allowedFiles = "";
+		var fileErr = "";
+		if (<%= ServiceUIConstants.REQ_FEATURES_TYPE_MODULE.equals(type)%>) {			
+			allowedFiles = ["jar","zip","war"];
+			fileErr = "<s:text name='err.invalid.module.selection'/>";
+		} else if (<%= ServiceUIConstants.REQ_FEATURES_TYPE_JS.equals(type)%>) {			
+			allowedFiles = ["js","zip","war"];
+			fileErr = "<s:text name='err.invalid.js.selection'/>";
+		}else if (<%= ServiceUIConstants.REQ_FEATURES_TYPE_COMPONENT.equals(type)%>) {			
+			allowedFiles = ["jar","zip"];
+			fileErr = "<s:text name='err.invalid.file.selection'/>";
+		}
+		createUploader(allowedFiles,fileErr);
 		enableScreen();
 		hideLoadingIcon();
 	
@@ -536,6 +549,9 @@
             showError($("#featureFileControl"), $("#featureFileError"), data.fileError);
         } else {
             hideError($("#featureFileControl"), $("#featureFileError"));
+            if (<%= fromPage.equalsIgnoreCase(ServiceUIConstants.ADD)%> ) {
+                disableUploadButton($("#feature-file-uploader"));
+        	}
         }
         
         if (!isBlank(data.techError)) {
@@ -565,18 +581,19 @@
 	}
 
 	//To create the file upload control
-	function createUploader() {
+	function createUploader(allowedFiles,fileErr) {
 		var featureUploader = new qq.FileUploader({
 			element : document.getElementById('feature-file-uploader'),
 			action : 'uploadFeatureFile',
 			multiple : false,
 			uploadId: 'featureUploadId',
-			allowedExtensions : ["zip","jar","dll","so"],
+			allowedExtensions : allowedFiles,
 			fileType : 'featureJar',
 			buttonLabel : '<s:label key="lbl.comp.featr.upload" />',
-			typeError : '<s:text name="err.invalid.file.selection" />',
+			typeError : fileErr,
 			params : {
 				fileType : 'featureJar',
+				type : '<%= type %>'
 			},
 			debug : true
 		});
@@ -591,7 +608,8 @@
 			buttonLabel : '<s:label key="lbl.comp.featricon.upload" />',
 			typeError : '<s:text name="err.invalid.img.file" />',
 			params : {
-				fileType : 'featureImg'
+				fileType : 'featureImg',
+				type : '<%= type %>'
 			},
 			debug : true
 		});

@@ -47,6 +47,7 @@ import com.photon.phresco.commons.model.RequiredOption;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
+import com.photon.phresco.service.admin.commons.ServiceUIConstants;
 import com.photon.phresco.service.client.api.Content;
 import com.photon.phresco.service.client.api.ServiceManager;
 import com.photon.phresco.service.client.impl.CacheKey;
@@ -95,6 +96,7 @@ public class Features extends ServiceBaseAction {
     private String featureArtifactId = "";
     private String featureGroupId = "";
     private String featureVersions = "";
+    private String fileName = "";
     
     private List<String> dependentModGroupId = null;
     
@@ -420,9 +422,7 @@ public class Features extends ServiceBaseAction {
 		try {
             writer = getHttpResponse().getWriter();
 	        byte[] tempFeaByteArray = getByteArray();
-	        
-	        String tempName = getFileName();
-	        String ext = ServerUtil.getFileExtension(tempName);
+	        String ext = ServerUtil.getFileExtension(getFileName());
 	        if(ext.equalsIgnoreCase(FILE_FORMAT)) {
 	        	zipNameValidate = extractArchive( new ByteArrayInputStream(tempFeaByteArray));
 	        }
@@ -492,6 +492,7 @@ public class Features extends ServiceBaseAction {
 	}
 
 	private void uploadFeature(PrintWriter writer, byte[] tempFeaByteArray) throws PhrescoException {
+		
 		try {
 			if (tempFeaByteArray == null) {
 				Features.newtempFeaByteArray = new byte[0];
@@ -500,7 +501,11 @@ public class Features extends ServiceBaseAction {
 			}
 			featureJarFileName = getFileName();
     		featureByteArray = newtempFeaByteArray;
-    		getArtifactGroupInfo(writer, newtempFeaByteArray);
+    		if(!getType().equalsIgnoreCase(REQ_FEATURES_TYPE_JS)) {
+    			getArtifactGroupInfo(writer, newtempFeaByteArray);	
+    		} else {
+    			writer.print(MAVEN_JAR_FALSE);
+    		}    		
     		inputStreamMap.put(Content.Type.ARCHETYPE.name(), new ByteArrayInputStream(newtempFeaByteArray));
 		} catch (Exception e) {
 			getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
@@ -550,10 +555,11 @@ public class Features extends ServiceBaseAction {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Features.validateForm()");
 		}
+		
 		boolean isError = false;
 		if (!"photon".equalsIgnoreCase(customerId) && "edit".equalsIgnoreCase(fromPage)) {
-			//Empty validation for applies to technology
-	        isError = techValidation(isError);
+			//Empty validation for applies to technology			
+			isError = techValidation(isError);
 			return SUCCESS;
 		}
 		
@@ -563,40 +569,69 @@ public class Features extends ServiceBaseAction {
         //Empty Multiple Technology selection
         isError = techValidation(isError);
         
+        //Empty validation for License
+        isError = licenseValidation();
+                
         //Validate whether file is selected during add
-        if ((!EDIT.equals(getFromPage()) && featureByteArray == null) || (StringUtils.isNotEmpty(versionFile) && featureByteArray == null)) {
-            setFileError(getText(KEY_I18N_ERR_APPLNJAR_EMPTY));
-            isError = true;
-        }
+        isError = fileValidation();
         
-        if(StringUtils.isEmpty(getLicense())) {
-        	setLicenseError(getText(KEY_I18N_ERR_LICEN_EMPTY));
-            isError = true;
-        }
-        
-        isError = featureValidation(isError);
+        if(getType().equals(REQ_FEATURES_TYPE_JS)) {        	
+        	isError = jsValidation();	
+        } else {        	
+        	isError = featureValidation();	
+        }             
+                
         if (isError) {
             setErrorFound(true);
         }
         
         return SUCCESS;
+	}	
+
+	private boolean fileValidation() {
+		// TODO Auto-generated method stub
+		if ((!EDIT.equals(getFromPage()) && featureByteArray == null) || (StringUtils.isNotEmpty(versionFile) && featureByteArray == null)) {
+            setFileError(getText(KEY_I18N_ERR_APPLNJAR_EMPTY));
+            tempError = true;
+        }
+		return tempError;
 	}
 
-	public boolean featureValidation(boolean isError) {
+	private boolean licenseValidation() {
+		// TODO Auto-generated method stub
+		if(StringUtils.isEmpty(getLicense())) {
+        	setLicenseError(getText(KEY_I18N_ERR_LICEN_EMPTY));
+        	tempError = true;
+        }
+		return tempError;
+	}
+
+	private boolean jsValidation() {
+		// TODO Auto-generated method stub		
+		if(featureByteArray != null) {						
+			if(StringUtils.isEmpty(getVersion())) {
+				setVerError(getText(KEY_I18N_ERR_VER_EMPTY));
+				tempError = true;
+			}
+		}
+		return tempError;
+	}
+
+	public boolean featureValidation() {		
 		if (featureByteArray != null) {
-            //Empty validation for groupId if file is selected
+            //Empty validation for groupId if file is selected						
             if (StringUtils.isEmpty(getGroupId())) {
-                setGroupIdError(getText(KEY_I18N_ERR_GROUPID_EMPTY));
+                setGroupIdError(getText(KEY_I18N_ERR_GROUPID_EMPTY));                
                 tempError = true;
             }
             //Empty validation for artifactId if file is selected
             if (StringUtils.isEmpty(getArtifactId())) {
-                setArtifactIdError(getText(KEY_I18N_ERR_ARTIFACTID_EMPTY));
+                setArtifactIdError(getText(KEY_I18N_ERR_ARTIFACTID_EMPTY));                
                 tempError = true;
             }
             //Empty validation for version if file is selected
             if (StringUtils.isEmpty(getVersion())) {
-                setVerError(getText(KEY_I18N_ERR_VER_EMPTY));
+                setVerError(getText(KEY_I18N_ERR_VER_EMPTY));                
                 tempError = true;
             }
             //To check whether the version already exist
@@ -621,7 +656,7 @@ public class Features extends ServiceBaseAction {
                 }
             }*/
         }
-		return isError;
+		return tempError;
 	}
 
 	public boolean nameValidation(boolean isError) throws PhrescoException {

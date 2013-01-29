@@ -68,7 +68,7 @@
 			<div class="controls">
 				<input id="globalUrlName" placeholder="<s:text name='place.hldr.globalurl.add.name'/>" value= "<%= name %>" maxlength="30" title="30 Characters only"
 					class="input-xlarge" type="text" name="name">
-				<span class="help-inline" id="nameError"></span>
+				<span class="help-inline dwnldError" id="nameError"></span>
 			</div>
 		</div>
 		
@@ -90,7 +90,7 @@
 			<div class="controls">
 				<input id="globalUrl" placeholder="<s:text name='place.hldr.globalurl.add.url'/>" 
 					value="<%= url %>" class="input-xlarge" type="text" name="url">
-				<span class="help-inline" id="urlError"></span>
+				<span class="help-inline dwnldError" id="urlError"></span>
 			</div>
 		</div>
 	</div>
@@ -126,13 +126,13 @@
 	});
 	
 	function findError(data) {
-		if (data.nameError != undefined) {
+		if (!isBlank(data.nameError)) {
 			showError($("#nameControl"), $("#nameError"), data.nameError);
 		} else {
 			hideError($("#nameControl"), $("#nameError"));
 		}
 		
-		if (data.urlError != undefined) {
+		if (!isBlank(data.urlError)) {
 			showError($("#urlControl"), $("#urlError"), data.urlError);
 		} else {
 			hideError($("#urlControl"), $("#urlError"));

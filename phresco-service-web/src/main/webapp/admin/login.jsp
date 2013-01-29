@@ -124,7 +124,7 @@
 		<div class="footer_div login">
 		   <footer>
 			  <div class="copyrit">
-				 &copy; 2012.Photon Infotech Pvt Ltd. |
+				 &copy; 2013.Photon Infotech Pvt Ltd. |
 			   <a href="http://www.photon.in/"> www.photon.in</a>
 			 </div>
 		   </footer>

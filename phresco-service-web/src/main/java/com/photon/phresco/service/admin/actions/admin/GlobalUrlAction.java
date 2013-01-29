@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -51,7 +52,8 @@ public class GlobalUrlAction extends ServiceBaseAction {
 	private String globalurlId = "";
 	
 	private String fromPage = "";
-	
+	private String oldName = "";
+			
 	//To get the all the globalURLs from the DB
 	public String list() throws PhrescoException {
 		if (s_isDebugEnabled) {
@@ -185,7 +187,7 @@ public class GlobalUrlAction extends ServiceBaseAction {
 
 		boolean isError = false;
 		//Empty validation for name
-		isError=nameValidation();
+		isError = nameValidation();
 
 		//validation for URL
 		isError = UrlValidation();
@@ -197,21 +199,31 @@ public class GlobalUrlAction extends ServiceBaseAction {
 		return SUCCESS;
 	}
 	
-	public boolean nameValidation() {
+	public boolean nameValidation() throws PhrescoException {
 		if (StringUtils.isEmpty(getName())) {
 			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY));
-			errorUrl= true;
-		} 
-
+			errorUrl = true;
+		} else if (StringUtils.isEmpty(getFromPage()) || (!getName().equals(getOldName()))) {
+			List<Property> globalUrl = getServiceManager().getGlobalUrls();
+			if (CollectionUtils.isNotEmpty(globalUrl)) {
+				for (Property property : globalUrl) {
+					if(property.getName().equalsIgnoreCase(getName())) {
+						setNameError(getText(KEY_I18N_ERR_NAME_ALREADY_EXIST));
+						errorUrl=true;
+						break;
+					}
+				}
+			}			
+		}
 		return errorUrl ;
 	}
 
-	public boolean UrlValidation() {
+	public boolean UrlValidation() throws PhrescoException {
 		if (StringUtils.isEmpty(getUrl())) {
 			setUrlError(getText(KEY_I18N_ERR_URL_EMPTY));
 			errorUrl= true;
-		} else if (StringUtils.isNotEmpty(getUrl())){
-			String urlPattern = "^(http|https|ftp)://.*$";
+		} else if (StringUtils.isNotEmpty(getUrl())){			
+			String urlPattern = "^http(s{0,1})://[a-zA-Z0-9_/\\-\\.]+\\.([A-Za-z/]{2,5})[a-zA-Z0-9_/\\&\\?\\=\\-\\.\\~\\%]*";
 			Pattern pattern = Pattern.compile(urlPattern);
 			Matcher matcher = pattern.matcher(getUrl());
 			boolean matchFound = matcher.matches();
@@ -219,8 +231,7 @@ public class GlobalUrlAction extends ServiceBaseAction {
 				setUrlError(getText(KEY_I18N_ERR_URL_NOT_VALID));
 				errorUrl=true;
 			}
-		}
-
+		 }
 		return errorUrl;
 	}
 
@@ -295,4 +306,14 @@ public class GlobalUrlAction extends ServiceBaseAction {
 	public String getFromPage() {
 		return fromPage;
 	}
+
+	public String getOldName() {
+		return oldName;
+	}
+
+	public void setOldName(String oldName) {
+		this.oldName = oldName;
+	}
+	
+	
 }

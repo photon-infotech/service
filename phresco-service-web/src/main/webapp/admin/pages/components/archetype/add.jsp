@@ -70,10 +70,10 @@
 	String selectedTech= "";
 	List<String> selectedReports = null;
 	if (technology != null) {
-		name = technology.getName();
+		name = technology.getName();		
 		desc = technology.getDescription();
-		archArchetypeId = technology.getArchetypeInfo().getArtifactId();
-		archGroupId = technology.getArchetypeInfo().getGroupId();
+		archArchetypeId = technology.getArchetypeInfo().getArtifactId();		
+		archGroupId = technology.getArchetypeInfo().getGroupId();		
 		archVersions = technology.getArchetypeInfo().getVersions().get(0).getVersion();
 		techVersions = technology.getTechVersions();
 		if (CollectionUtils.isNotEmpty(techVersions)) {
@@ -83,6 +83,7 @@
 		appTypeId = technology.getAppTypeId();
 		techId = technology.getTechGroupId();
 		selectedReports = technology.getReports();
+	
 	}
 %>
 
@@ -209,7 +210,7 @@
 				<s:text name='lbl.hdr.comp.archtypejar' />
 			</label>
 			<div class="controls" style="float: left; margin-left: 3%;">
-				<div id="appln-file-uploader" class="file-uploader">
+				<div id="appln-file-uploader" class="file-uploader" title = "<s:text name='title.file.size'/>">
 					<noscript>
 						<p>Please enable JavaScript to use file uploader.</p>
 						<!-- or put a simple form for upload here -->
@@ -487,6 +488,9 @@
 			showError($("#appFileControl"), $("#fileError"), data.fileError);
 		} else {
 			hideError($("#appFileControl"), $("#fileError"));
+			if (<%= fromPage.equalsIgnoreCase(ServiceUIConstants.ADD) %>) {
+                disableUploadButton($("#appln-file-uploader"));
+			}
 		}
 
 		if (!isBlank(data.applicableErr)) {

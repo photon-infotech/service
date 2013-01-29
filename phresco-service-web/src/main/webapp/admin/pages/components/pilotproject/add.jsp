@@ -162,7 +162,7 @@
 			</label>
 			
 			<div class="controls" style="float: left; margin-left: 3%;">
-				<div id="pilotPro-file-uploader" class="file-uploader">
+				<div id="pilotPro-file-uploader" class="file-uploader" title = "<s:text name='title.file.size'/>">
 					<noscript>
 						<p>Please enable JavaScript to use file uploader.</p>
 						<!-- or put a simple form for upload here -->
@@ -247,6 +247,9 @@
 			showError($("#pilotProFileControl"), $("#pilotProFileError"), data.fileError);
 		} else {
 			hideError($("#pilotProFileControl"), $("#pilotProFileError"));
+			if ( <%= fromPage.equalsIgnoreCase(ServiceUIConstants.ADD) %> ) {
+                disableUploadButton($("#pilotPro-file-uploader"));
+        }
 		}
 		
 		if (!isBlank(data.groupIdError)) {

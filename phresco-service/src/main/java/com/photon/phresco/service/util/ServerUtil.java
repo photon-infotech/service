@@ -386,7 +386,12 @@ public class ServerUtil {
 			fileExt = "ogg";
 		} else if(fileName.endsWith("png")) {
 			fileExt = "png";
+		} else if(fileName.endsWith("js")) {
+			fileExt = "js";
+		} else if(fileName.endsWith("war")) {
+			fileExt = "war";
 		}
+		
 		return fileExt;
 	}
 }

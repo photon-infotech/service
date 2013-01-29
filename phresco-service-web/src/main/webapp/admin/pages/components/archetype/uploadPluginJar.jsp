@@ -25,7 +25,7 @@
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
 %>
 <form id="formPlugin">
-	<div id="plugin-popup-file-uploader" class="file-uploader">
+	<div id="plugin-popup-file-uploader" class="file-uploader" title="<s:text name='title.file.size'/>">
 		<noscript>
 			<p>Please enable JavaScript to use file uploader.</p>
 			<!-- or put a simple form for upload here -->

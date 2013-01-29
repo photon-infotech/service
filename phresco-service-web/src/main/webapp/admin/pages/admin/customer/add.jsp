@@ -784,7 +784,7 @@
 							 	<s:text name='lbl.hdr.adm.upload.logo' />
 							</label>
 							<div class="controls" style="float: left; margin-left: 3%;">
-								<div id="image-file-uploader" class="file-uploader">
+								<div id="image-file-uploader" class="file-uploader" title ="<s:text name='title.icon.size'/>">
 									<noscript>
 										<p>Please enable JavaScript to use file uploader.</p>s
 										<!-- or put a simple form for upload here -->
@@ -824,6 +824,7 @@
 	if (!isiPad()) {
 		$(".content_adder").scrollbars();
 		$(".multilist-scroller").scrollbars();
+		$(".accordion_panel_inner").scrollbars();		
 	}
 	
 	$(document).ready(function() {
@@ -851,8 +852,9 @@
      	// To check for the special character in zipcode
         $('#zipcodefld').bind('input propertychange', function (e) {
             var zipcode = $(this).val();
-            zipcode = allowAlphaNum(zipcode);
-            $(this).val(zipcode);        
+            zipcode = checkForSplChr(zipcode);
+            $(this).val(zipcode); 
+            $(this).focus();
 		});
      	
      	// To check for the special character in ContactNumber and fax
@@ -942,7 +944,7 @@
 		if (data != undefined && !isBlank(data)) {
 			showError(controlObj, msgObj, data);
 		} else {
-			hideError(controlObj, msgObj);
+			hideError(controlObj, msgObj);			 
 		}
 	}
 	

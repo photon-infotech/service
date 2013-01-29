@@ -240,7 +240,7 @@
 			</label>
 			
 			 <div class="controls" style="float: left; margin-left: 3%;">
-				<div id="feature-file-uploader" class="file-uploader">
+				<div id="feature-file-uploader" class="file-uploader" title="<s:text name='title.file.size'/>">
 					<noscript>
 						<p>Please enable JavaScript to use file uploader.</p>
 						<!-- or put a simple form for upload here -->

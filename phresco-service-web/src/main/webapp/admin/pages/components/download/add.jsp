@@ -204,7 +204,7 @@
 				<s:text name='lbl.hdr.adm.dwnld.fle'/>
 			</label>
 			<div class="controls dwnldError" style="float: left; margin-left: 3%;">
-				<div id="download-file-uploader" class="file-uploader">
+				<div id="download-file-uploader" class="file-uploader" title="<s:text name='title.file.size'/>">
 					<noscript>
 						<p>Please enable JavaScript to use file uploader.</p>
 						<!-- or put a simple form for upload here -->
@@ -297,7 +297,7 @@
 				<s:text name='lbl.hdr.adm.dwnld.icon'/>
 			</label>
 			<div class="controls" style="float: left; margin-left: 3%;">
-				<div id="icon-file-uploader" class="file-uploader">
+				<div id="icon-file-uploader" class="file-uploader" title="<s:text name='title.icon.size'/>" >
 					<noscript>
 						<p>Please enable JavaScript to use file uploader.</p>
 						<!-- or put a simple form for upload here -->
@@ -428,20 +428,12 @@
 		}
 		
 		if (!isBlank( data.techError)) {
-			showError($("#techControl"), $("#techError"), data.techError);
-			<% if (isSystem) { %>
-				$('input[type="text"], input[type="checkbox"][id!="checkAllTechnology"][id!=techCheck], select').prop("disabled", true);
-				$('#downloadDesc').prop("disabled", true);
-				if ( <%= isSystem %> ) { 
-					disableUploadButton($("#download-file-uploader"));
-					disableUploadButton($("#icon-file-uploader"))
-		        }
-			<% } %>
+			showError($("#techControl"), $("#techError"), data.techError);		
 		} else {
 			hideError($("#techControl"), $("#techError"));
 		}
 		
-		if(!isBlank(data.groupIdError)) {
+		if(!isBlank(data.groupIdError)) {			
 			showError($("#groupIdControl"), $("#groupIdError"), data.groupIdError);
 		} else {
 			hideError($("#groupIdControl"), $("#groupIdError"));
@@ -457,7 +449,10 @@
 		if(!isBlank(data.fileError)) {
 			showError($("#downloadFileControl"), $("#fileError"), data.fileError);
 		} else {
-			hideError($("#downloadFileControl"),$("#fileError"))
+			hideError($("#downloadFileControl"),$("#fileError"));
+			 if (( <%= fromPage.equalsIgnoreCase(ServiceUIConstants.ADD) %> ) && (fileError != null)) {
+	           	disableUploadButton($("#download-file-uploader"));
+	       	 }
 		}		
 	}
 	 
