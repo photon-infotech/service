@@ -78,6 +78,7 @@
 	String buttonColor = "";
 	String pageHeaderColor = "";
 	String labelColor = "";
+	String disabledLabelColor = "";
 	String copyRightColor = "";
 	
 	
@@ -173,6 +174,10 @@
 			
 			if (theme.getLabelColor() != null) {
 				labelColor = customer.getFrameworkTheme().getLabelColor();
+			}
+			
+			if (theme.getDisabledLabelColor() != null) {
+				disabledLabelColor = customer.getFrameworkTheme().getDisabledLabelColor();
 			}
 			
 			if (theme.getCopyRightColor() != null) {
@@ -768,6 +773,17 @@
 								   value="<%=labelColor%>"  maxlength="50" title="50 Characters only">
 							</div>
 						</div>
+						
+						<div class="control-group">
+							<label class="control-label labelbold">
+								<s:text name='lbl.hdr.adm.cust.disablelabelcolor'/>
+							</label>
+							<div class="controls">
+								<input id="labelcolor" placeholder="<s:text name='place.hldr.cust.add.disabledlabelcolor'/>" class="input-xlarge" type="text" name="DisabledLabelColor"
+								   value="<%=disabledLabelColor%>"  maxlength="50" title="50 Characters only">
+							</div>
+						</div>
+						
 						
 						<div class="control-group">
 							<label class="control-label labelbold">

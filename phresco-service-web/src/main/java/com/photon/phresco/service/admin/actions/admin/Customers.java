@@ -99,6 +99,7 @@ public class Customers extends ServiceBaseAction  {
 	private String buttonColor = "";
 	private String pageHeaderColor = "";
 	private String labelColor = "";
+	private String disabledLabelColor = "";
 	private String copyRightColor = "";
 	private String snapshotRepoUrl = "";
 	private String groupRepoUrl = "";
@@ -316,6 +317,7 @@ public class Customers extends ServiceBaseAction  {
         theme.setLabelColor(getLabelColor());
         theme.setMenuBackGround(getMenuBackGround());
         theme.setMenufontColor(getMenufontColor());
+        theme.setDisabledLabelColor(getDisabledLabelColor());
         customer.setFrameworkTheme(theme);
         return customer;
     }
@@ -907,5 +909,13 @@ public class Customers extends ServiceBaseAction  {
 
 	public void setBaseRepoUrl(String baseRepoUrl) {
 		this.baseRepoUrl = baseRepoUrl;
+	}
+	
+	public String getDisabledLabelColor() {
+		return disabledLabelColor;
+	}
+
+	public void setDisabledLabelColor(String disabledLabelColor) {
+		this.disabledLabelColor = disabledLabelColor;
 	}
 }
