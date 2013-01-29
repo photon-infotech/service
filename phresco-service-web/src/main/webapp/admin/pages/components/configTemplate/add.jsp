@@ -501,13 +501,13 @@
 			var textComboVal = $("#txtCombo").val();
 			var alreadyExists = false;
 			if ($("#txtCombo").val().replace(/\s/g, "") === "") {
-				$("#errMsg").html("Please enter Key");
+				$("#errMsg").html('<s:text name='err.msg.enter.key'/>');
 				alreadyExists = true;
 			}
 			
 			$('#valuesCombo option').each( function() {
 				if ($(this).val() == textComboVal) {
-					$("#errMsg").html("Key value already exists");
+					$("#errMsg").html('<s:text name='err.msg.key.exist.already'/>');
 					alreadyExists = true;
 					return false;
 				}
@@ -551,9 +551,14 @@
 		});
 	
 		$('#remove').click(function() {
-			$('#valuesCombo option:selected').each( function() {
-				$(this).remove();
-			});
+			if ($('#valuesCombo option:selected').size() == 0) {
+				$("#errMsg").text('<s:text name='err.msg.select.key'/>');
+			} else {
+				$("#errMsg").empty();
+				$('#valuesCombo option:selected').each( function() {
+					$(this).remove();
+				});
+			}	
 		});
 	});
 	
