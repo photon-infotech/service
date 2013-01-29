@@ -1635,25 +1635,17 @@ public class ComponentService extends DbService {
 		
 	}
 
-	private void saveDownloads(DownloadInfo info) throws PhrescoException {
-		if(!validate(info)) {
-			return;
-		}
-		DownloadsDAO downloadsDAO = mongoOperation.findOne(DOWNLOAD_COLLECTION_NAME, 
-				new Query(Criteria.where(REST_API_NAME).is(info.getName())), DownloadsDAO.class);
-		if(downloadsDAO == null) {
-			Converter<DownloadsDAO, DownloadInfo> downlodConverter = 
-					(Converter<DownloadsDAO, DownloadInfo>) ConvertersFactory.getConverter(DownloadsDAO.class);
-				DownloadsDAO downloadDAO = downlodConverter.convertObjectToDAO(info);
-				ArtifactGroup artifactGroup = info.getArtifactGroup();
-				saveModuleGroup(artifactGroup);
-				mongoOperation.save(DOWNLOAD_COLLECTION_NAME, downloadDAO);
-		} else {
-			saveModuleGroup(info.getArtifactGroup());
-		}
-		
-		
-	}
+    private void saveDownloads(DownloadInfo info) throws PhrescoException {
+    	if(!validate(info)) {
+    		return;
+    	}
+    	Converter<DownloadsDAO, DownloadInfo> downlodConverter = 
+    		(Converter<DownloadsDAO, DownloadInfo>) ConvertersFactory.getConverter(DownloadsDAO.class);
+    	DownloadsDAO downloadDAO = downlodConverter.convertObjectToDAO(info);
+    	ArtifactGroup artifactGroup = info.getArtifactGroup();
+    	saveModuleGroup(artifactGroup);
+    	mongoOperation.save(DOWNLOAD_COLLECTION_NAME, downloadDAO);
+    }
     
     /**
      * Updates the list of downloadInfos
