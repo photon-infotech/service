@@ -80,7 +80,7 @@
 	String labelColor = "";
 	String disabledLabelColor = "";
 	String copyRightColor = "";
-	
+	String frameworkThemeId = "";
 	
 	List<String> applicableTechnologies = new ArrayList();
 	List<ApplicationType> applicableAppTypes = null;
@@ -144,6 +144,7 @@
 		
 		FrameWorkTheme theme = customer.getFrameworkTheme();
 		if (theme != null) {
+			frameworkThemeId = theme.getId();
 			if (theme.getBrandingColor() != null) {
 				brandingColor = customer.getFrameworkTheme().getBrandingColor();
 			}
@@ -832,6 +833,7 @@
 	<input type="hidden" name="snapshotRepoUrl" value="<%= snapShotRepoUrl %>">
 	<input type="hidden" name="groupRepoUrl" value="<%= groupRepoUrl %>">
 	<input type="hidden" name="baseRepoUrl" value="<%= baseRepoUrl %>">
+	<input type="hidden" name="frameworkThemeId" value="<%= frameworkThemeId %>">
 </form>
 
 <script type="text/javascript">

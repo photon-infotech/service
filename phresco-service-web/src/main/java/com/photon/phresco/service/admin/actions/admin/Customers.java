@@ -104,6 +104,7 @@ public class Customers extends ServiceBaseAction  {
 	private String snapshotRepoUrl = "";
 	private String groupRepoUrl = "";
 	private String baseRepoUrl = "";
+	private String frameworkThemeId = "";
 	private List<String> appliesTo = new ArrayList<String>();
 	List<ApplicationType> applicableAppTypes = new ArrayList<ApplicationType>();
 	
@@ -268,8 +269,6 @@ public class Customers extends ServiceBaseAction  {
 	 */
 	private Customer createCustomer() {
         Customer customer = new Customer();
-        FrameWorkTheme theme = new FrameWorkTheme();
-        
         customer.setName(getName());
         customer.setDescription(getDescription());
         customer.setEmailId(getEmail());
@@ -307,18 +306,22 @@ public class Customers extends ServiceBaseAction  {
         customer.setRepoInfo(repoInfo);
         List<String> appliesTo = getAppliesTo();
         customer.setApplicableTechnologies(appliesTo);
-        theme.setBrandingColor(getBrandingColor());
-        theme.setAccordionBackGroundColor(getAccordionBackGroundColor());
-        theme.setBodyBackGroundColor(getBodyBackGroundColor());
-        theme.setBrandingColor(getBrandingColor());
-        theme.setButtonColor(getButtonColor());
-        theme.setPageHeaderColor(getPageHeaderColor());
-        theme.setCopyRightColor(getCopyRightColor());
-        theme.setLabelColor(getLabelColor());
-        theme.setMenuBackGround(getMenuBackGround());
-        theme.setMenufontColor(getMenufontColor());
-        theme.setDisabledLabelColor(getDisabledLabelColor());
-        customer.setFrameworkTheme(theme);
+        FrameWorkTheme frameworkTheme = new FrameWorkTheme();
+        if (StringUtils.isNotEmpty(getFrameworkThemeId())) {
+        	frameworkTheme.setId(getFrameworkThemeId());
+    	}
+        frameworkTheme.setBrandingColor(getBrandingColor());
+        frameworkTheme.setAccordionBackGroundColor(getAccordionBackGroundColor());
+        frameworkTheme.setBodyBackGroundColor(getBodyBackGroundColor());
+        frameworkTheme.setBrandingColor(getBrandingColor());
+        frameworkTheme.setButtonColor(getButtonColor());
+        frameworkTheme.setPageHeaderColor(getPageHeaderColor());
+        frameworkTheme.setCopyRightColor(getCopyRightColor());
+        frameworkTheme.setLabelColor(getLabelColor());
+        frameworkTheme.setMenuBackGround(getMenuBackGround());
+        frameworkTheme.setMenufontColor(getMenufontColor());
+        frameworkTheme.setDisabledLabelColor(getDisabledLabelColor());
+        customer.setFrameworkTheme(frameworkTheme);
         return customer;
     }
 	
@@ -917,5 +920,13 @@ public class Customers extends ServiceBaseAction  {
 
 	public void setDisabledLabelColor(String disabledLabelColor) {
 		this.disabledLabelColor = disabledLabelColor;
+	}
+
+	public void setFrameworkThemeId(String frameworkThemeId) {
+		this.frameworkThemeId = frameworkThemeId;
+	}
+
+	public String getFrameworkThemeId() {
+		return frameworkThemeId;
 	}
 }
