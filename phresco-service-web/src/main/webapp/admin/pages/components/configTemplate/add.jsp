@@ -544,6 +544,13 @@
 					psblVal = psblVal.concat(",");
 				}
 			});
+			
+			//To clear value of text box if no key is added
+			if ($('#valuesCombo option').size() == 0) {
+				$("#"+ id +"_psblSingl").val('');
+				$("#"+ id +"_psblMulDiv").hide();
+				$("#"+ id +"_psblSinglDiv").show();
+			}
 			if (length !== 1) {
 				$("."+id).val(psblVal.substring(0, psblVal.length-1));
 				$("."+id).attr("name", psblValName);
