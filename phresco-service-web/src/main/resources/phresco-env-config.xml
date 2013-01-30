@@ -1,5 +1,5 @@
 <environments>
-    <environment default="true" name="Production">
+    <environment default="false" name="Production">
         <WebService name="webservice">
             <port>7070</port>
             <password/>
@@ -65,12 +65,12 @@
         </Server>
 	</environment>
 	
-    <environment default="false" name="Testing">
+    <environment default="true" name="Testing">
         <WebService name="webservice">
-            <port>7070</port>
+            <port>9990</port>
             <password/>
             <context>auth-2.0</context>
-            <host>172.16.18.174</host>
+            <host>172.16.18.86</host>
             <protocol>http</protocol>
             <username/>
         </WebService>	
@@ -79,7 +79,7 @@
 		<port>27017</port>
 		<username></username>
 		<password/>
-		<dbname>phresco-testing</dbname>
+		<dbname>testing</dbname>
 		<type>mongodb</type>
 		<version>2.0.4</version>
 	</Database>
