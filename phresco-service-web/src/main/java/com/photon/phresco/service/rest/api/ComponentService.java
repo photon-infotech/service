@@ -1792,10 +1792,15 @@ public class ComponentService extends DbService {
 	    List<Reports> reports = new ArrayList<Reports>();
 		try {
 			if(StringUtils.isEmpty(techId)) {
-				reports = mongoOperation.getCollection("reports-all", Reports.class);
+				reports = mongoOperation.getCollection(REPORTS_COLLECTION_NAME, Reports.class);
 			} else {
-				reports = mongoOperation.find(REPORTS_COLLECTION_NAME, 
-						new Query(Criteria.where(REST_QUERY_TECHID).is(techId)), Reports.class);
+				TechnologyDAO tech = mongoOperation.findOne(TECHNOLOGIES_COLLECTION_NAME, 
+						new Query(Criteria.whereId().is(techId)), TechnologyDAO.class);
+				if(tech != null) {
+					List<String> reportIds = tech.getReports();
+					reports = mongoOperation.find(REPORTS_COLLECTION_NAME, 
+							new Query(Criteria.whereId().in(reportIds.toArray())), Reports.class);
+				}
 			}
 			return  Response.status(Response.Status.OK).entity(reports).build();
 		} catch (Exception e) {

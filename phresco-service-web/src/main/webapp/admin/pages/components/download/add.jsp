@@ -278,7 +278,7 @@
 						%>
 								<li>
 									<input type="checkbox" <%= disabledVer %> name="platform" onclick="checkboxEvent($('#checkAllPlatform'),'platFormCheck');" class="check platFormCheck" value="<%= platform.getId() %>" <%= checkedStr %> <%= disabled %>>
-									<%= platform.getType() + platform.getBit() %>
+									<%= platform.getName() %>
 								</li>
 						<% 
 								}
