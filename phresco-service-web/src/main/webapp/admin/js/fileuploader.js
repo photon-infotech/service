@@ -566,7 +566,7 @@ qq.FileUploader = function(o){
                 '<span class="qq-upload-size"></span>' +
                 '<a class="qq-upload-cancel" href="#">Cancel</a>' +
                 '<span class="qq-upload-failed-text">Failed</span>' +
-                '<img class="qq-upload-remove" src="images/delete.png" alt="Remove" tempAttr="'+ type +'"  onclick="removeUploadedJar(this,\'' + btnId + '\');"/>' +
+                '<img class="qq-upload-remove" src="images/delete.png" title="Remove" alt="Remove" tempAttr="'+ type +'"  onclick="removeUploadedJar(this,\'' + btnId + '\');"/>' +
             '</li>',        
         
         classes: {

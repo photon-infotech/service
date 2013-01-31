@@ -373,7 +373,7 @@ public interface ServiceUIConstants {
     String KEY_I18N_ERR_REPO_PASSWORD_EMPTY = "err.msg.repopassword.empty";
     String KEY_I18N_ERR_APPLNPLTF_EMPTY = "err.msg.applnpltf.empty";
     String KEY_I18N_ERR_GROUP_EMPTY = "err.msg.group.empty";
-    String KEY_I18N_ERR_TECH_EMPTY = "err.msg.tech.empty";
+    String KEY_I18N_ERR_TECH_EMPTY = "err.msg.applies.empty";
     
     String KEY_I18N_ERR_VIDEO_EMPTY = "err.msg.vdeo.empty";
     String KEY_I18N_ERR_IMAGE_EMPTY = "err.msg.img.empty";

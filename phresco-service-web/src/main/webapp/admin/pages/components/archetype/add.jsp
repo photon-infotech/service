@@ -161,7 +161,7 @@
 				class="mandatory"></span>&nbsp;<s:text name='lbl.hdr.archetype.techgroup' />
 			</label>
 			<div class="controls">
-				<select id="techGroup" name="techGroup">
+				<select id="techGroup" name="techGroup" <%= disabledVer %>>
 					
 				</select> 
 				<span class="help-inline" id="appError"></span>
@@ -233,7 +233,7 @@
 			<label class="control-label labelbold">
 				<s:text name='lbl.hdr.comp.plugindependencies'/></label>
 			<div class="controls">
-				<input type="button" class="btn btn-primary" value="Upload PluginJar" 
+				<input id="pluginjarUpload" type="button" class="btn btn-primary" value="Upload PluginJar" 
 					onclick="uploadPluginJar();" />
 			</div>
 		</div>
@@ -247,7 +247,7 @@
 					<div class="multilist-scroller multiselct" id="applicableToDiv">
 						<ul>
 							<li>
-								<input type="checkbox" value="" id="checkAllFeatures" name="applicableFeatures" onclick="checkAllEvent(this,$('.applsChk'), false);"
+								<input type="checkbox" value="" <%= disabledVer %> id="checkAllFeatures" name="applicableFeatures" onclick="checkAllEvent(this,$('.applsChk'), false);"
 									style="margin: 3px 8px 6px 0;"><s:text name='lbl.all'/>
 							</li>
 							<%
@@ -290,7 +290,7 @@
 					<div class="multilist-scroller multiselct" id="applicableToDiv">
 						<ul>
 							<li>
-								<input type="checkbox" value="" id="checkAllReports" name="" onclick="checkAllEvent(this,$('.reportsChk'), false);"
+								<input type="checkbox" value="" <%= disabledVer %> id="checkAllReports" name="" onclick="checkAllEvent(this,$('.reportsChk'), false);"
 								style="margin: 3px 8px 6px 0;"><s:text name='lbl.all'/>
 							</li>
 							<%
@@ -348,7 +348,7 @@
 											}
 										}
 								%>
-											<li> <input type="checkbox" id="applicableFeatures" name="applicableAtchetypeFeatures" value='<%= tech.getId() %>'
+											<li> <input type="checkbox" id="applicableFeatures" <%= disabledVer %> name="applicableAtchetypeFeatures" value='<%= tech.getId() %>'
 												onclick="checkboxEvent($('#checkAllArchetype'), 'applicableFeatures')"	class="check applicableFeatures" <%= checkedStr %> ><%= tech.getName() %>
 											</li>
 								<%		}	
@@ -384,6 +384,7 @@
 	<input type="hidden" name="techId" value="<%= technology != null ? technology.getId() : "" %>"/>
 	<input type="hidden" name="oldName" value="<%= technology != null ? technology.getName() : "" %>"/>
 	<input type="hidden" name="customerId" value="<%= customerId %>">
+	<input type="hidden" name="versioning" value="<%= versioning %>">
 	<input type="hidden" name="uploadPlugin" value="uploadPlugin">
 	<input type="hidden" name="archArchetypeId" value="<%= technology != null ? archArchetypeId : "" %>"/> 
     <input type="hidden" name="archGroupId" value="<%= technology != null ? archGroupId : "" %>"/> 

@@ -112,6 +112,11 @@ function validate(pageUrl, form, tag, progressText, disabledDiv) {
 		type : "POST",
 		success : function(data) {
 			if (data.errorFound != undefined && data.errorFound) {
+				if (data.versioning == "versioning") {
+					disableCtrl(disabledDiv);
+					$(".upload").attr("disabled", false);
+					$("#pluginjarUpload").attr("disabled", false);
+				}
 				findError(data);
 			} else {
 				clickSave(pageUrl, params, tag, progressText);

@@ -82,7 +82,7 @@
 														//To check the already selected dependent modules
 														String checkedStr = "";
 														if (CollectionUtils.isNotEmpty(dependentModuleIds)) {
-													        if (dependentModuleIds.contains(module.getVersion())) {
+													        if (dependentModuleIds.contains(module.getId())) {
 													            checkedStr = "checked";
 													        } else {
 													            checkedStr = "";
@@ -91,7 +91,7 @@
 											%>
 												<tr>
 													<td class="editFeatures_td1">
-														<input type="radio" class="module" name="<%= moduleGroup.getId() %>" value="<%= module.getVersion() %>"
+														<input type="radio" class="module" name="<%= moduleGroup.getId() %>" value="<%= module.getId() %>"
 															<%= checkedStr %> onchange="selectCheckBox('<%= moduleGroup.getId()%>', this);">
 													</td>
 													<td class="fontColor"><%= moduleGroup.getName() %></td>

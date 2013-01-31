@@ -164,7 +164,7 @@
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.dwnld.ver'/>
 			</label>
 			<div class="controls">
-				<input id="dwnVersn" <%= disabledVer %> placeholder="<s:text name='place.hldr.download.add.version'/>" value="<%= version %>" 
+				<input id="dwnVersn"  placeholder="<s:text name='place.hldr.download.add.version'/>" value="<%= version %>" 
 					maxlength="30" title="30 Characters only" class="input-xlarge" type="text" name="version" <%= disabled %>>
 				<span class="help-inline" id="verError"></span>
 			</div>
@@ -229,8 +229,8 @@
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.comp.featr.license'/>
 			 </label>
 			<div class="controls">
-				<select name="license" id="license" <%= disabled %>>
-				<option value=""><s:text name='lbl.comp.featr.license.select'/></option>
+				<select name="license" id="license" <%= disabled %> <%= disabledVer %>>
+				<option  value=""><s:text name='lbl.comp.featr.license.select'/></option>
 				<%	
 					if (CollectionUtils.isNotEmpty(licenses)) {
 					    String selectedStr = "";

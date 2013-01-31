@@ -126,7 +126,7 @@
 		}); 
 		
 		$('#techGroupOk').click(function() {
-			$('#formTechgroupn').hide();
+			$('#formTechgroup').hide();
 			$('#popup_div').hide();
 			hideLoadingIcon();
 		});

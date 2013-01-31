@@ -96,7 +96,8 @@
 								<% } %>
 							</td>
 							<td  class="namelabel-width">
-								<a href="#" onclick="editRole('<%= roleList.getId() %>');"><%= StringUtils.isNotEmpty(roleList.getName()) ? roleList.getName() : "" %></a>
+								<%-- <a href="#" onclick="editRole('<%= roleList.getId() %>');"><%= StringUtils.isNotEmpty(roleList.getName()) ? roleList.getName() : "" %></a> --%>
+							    <%= StringUtils.isNotEmpty(roleList.getName()) ? roleList.getName() : "" %>  
 							</td>
 							<td class="namelabel-width"><%= StringUtils.isNotEmpty(roleList.getDescription()) ? roleList.getDescription() : "" %></td>
 							<td>
