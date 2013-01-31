@@ -343,7 +343,7 @@ public class Features extends ServiceBaseAction {
             	artifactInfo.setId(getModuleId());
             }
             artifactInfo.setDescription(getDescription());
-            artifactInfo.setHelpText(getHelpText());
+            artifactGroup.setHelpText(getHelpText());
             if (StringUtils.isNotEmpty(version)) {
             	artifactInfo.setVersion(version);
             } else {
