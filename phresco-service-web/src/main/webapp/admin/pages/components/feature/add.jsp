@@ -385,6 +385,7 @@
 			</label>
 			<div class="controls">
 				<input type="button" class="btn <%= disabledClass %>" <%= disabled %> value="Select Dependency" onclick="getFeatures();" />
+				<span id="totalSize" style="color:white;"></span>
 			</div>
 		</div>
 		

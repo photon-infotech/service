@@ -154,6 +154,10 @@
 		//To save the selected dependency module ids
 		$('#saveDependency').click(function() {
 			showParentPage();
+			var size = $('input[name="dependentModGroupId"]:checked').size();
+			if(size > 0) {
+				$('#totalSize').html(size+" Dependencies Added");
+			}
 			loadContent('saveDependentFeatures', $('#formDependency'), $('#popup_div'), '', true);
 			hideLoadingIcon();
 		});
