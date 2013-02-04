@@ -686,16 +686,14 @@
 			</div>
 	 </div>
 
-	<div class="theme_accordion_container">
-		<section class="accordion_panel_wid">
-		<div class="accordion_panel_inner">
-			<section class="lft_menus_container"> 
-				<span class="siteaccordion closereg">
-					 <span><s:text name='place.hldr.cust.add.frameworktheme' /></span>
-				 </span>
-			<div class="mfbox siteinnertooltiptxt downloadContent">
-				<div class="scrollpanel">
-					<section class="scrollpanel_inner">
+	
+	<section class="lft_menus_container adminaddtheme">
+               <span class="siteaccordion openreg">
+						<span><s:text name='place.hldr.cust.add.frameworktheme' /></span>
+               </span>
+               <div class="mfbox siteinnertooltiptxt hideContent" style="display: none;">
+                   <div class="scrollpanel">
+   					<section class="scrollpanel_inner">
 						<div class="control-group">
 							<label class="control-label labelbold"> <s:text
 									name='lbl.hdr.adm.cust.brandingcolor' /> </label>
@@ -810,15 +808,13 @@
 							</div>
 							<span class="help-inline fileError" id="iconError"></span>
 						</div>
-					</section>
-				</div>
-			</div>
-		 </section>
-		</div>
-	  </section>
-	</div>
-
-		<div class="bottom_button ">
+				</section>
+              </div>
+            </div>
+	</section>
+	
+	
+		<div class="bottom_button">
 		
 		<input type="button" id="" class="btn <%= disabledClass %>" <%= disabled %> value="<%= buttonLbl %>" 
 			 onclick="validate('<%= pageUrl %>', $('#formCustomerAdd'), $('#subcontainer'), '<%= progressTxt %>', $('.content_adder :input'));" />

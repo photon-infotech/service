@@ -972,3 +972,7 @@ label {
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#C7141C), color-stop(44%,#B1121D), color-stop(100%,#9D111E));
 }
 
+.adminaddtheme {
+	margin-bottom: 10px;
+	border: 1px solid #3A090B;
+}

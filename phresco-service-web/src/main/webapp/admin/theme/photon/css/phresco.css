@@ -1195,7 +1195,6 @@ legend {
 	margin: 0px;
 	padding: 0px;
 	font-weight: bold;
-	height: 20px;
 	background: #470411; /* Old browsers */
 	background: -moz-linear-gradient(top, #470411 1%, #2b0007 100%);
 	/* FF3.6+ */
@@ -2508,4 +2507,8 @@ input[class="chkBox_config"] {
 
 .abt_logo_img {
 	padding-top: 16px;
+}
+
+.download_feature_tbl thead tr th {
+	height : 30px !important;
 }

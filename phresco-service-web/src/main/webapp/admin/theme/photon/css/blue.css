@@ -1106,3 +1106,8 @@ h3 label {
     background: linear-gradient(top,  #049cdb 42%,#0064cd 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#049cdb', endColorstr='#0064cd',GradientType=0 ); /* IE6-9 */
 }
+
+.adminaddtheme {
+	margin-bottom: 10px;
+	border: 1px solid #cccccc;
+}

@@ -77,6 +77,14 @@
 		                    <div class="scrollpanel">
 		                        <section class="scrollpanel_inner">
 		                 	      	<table class="download_tbl download_feature_tbl">
+		                 	      	<thead class="header-background">
+		                 	      		<tr>
+		                 	      			<th></th>
+		                 	      		`	<th><s:text name='lbl.hdr.comp.name'/></th>
+			                 	      		<th><s:text name='lbl.hdr.comp.version'/></th>
+			                 	      		<th><s:text name='lbl.hdr.pilot.version'/></th>
+		                 	      		</tr>
+		                 	      	</thead>
 			                            <tbody>
 			                            <% 
 									    	List<ArtifactInfo> versions = moduleGroup.getVersions();
