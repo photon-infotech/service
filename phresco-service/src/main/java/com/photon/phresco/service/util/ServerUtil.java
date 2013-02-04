@@ -1,12 +1,12 @@
 package com.photon.phresco.service.util;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.net.URLConnection;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -18,6 +18,7 @@ import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 import java.util.zip.ZipEntry;
 
+import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
@@ -29,6 +30,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.commons.codec.binary.Base64;
 import org.w3c.dom.Element;
 
+import com.mongodb.util.Util;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.exception.PhrescoException;
@@ -64,38 +66,48 @@ public class ServerUtil {
      * @throws IOException
      * @throws JAXBException
      */
-    public static ArtifactGroup getArtifactInfoFromJar(File jarFile)
-            throws PhrescoException {
-        ArtifactGroup info = null;
-        String pomFile = null;
-        try {
-            JarFile jarfile = new JarFile(jarFile);
-            for (Enumeration<JarEntry> em = jarfile.entries(); em
-                    .hasMoreElements();) {
-                JarEntry jarEntry = em.nextElement();
-                if (jarEntry.getName().endsWith("pom.xml")) {
-                    pomFile = jarEntry.getName();
-                }
-            }
-            if (pomFile != null) {
-                ZipEntry entry = jarfile.getEntry(pomFile);
-                InputStream inputStream = jarfile.getInputStream(entry);
-                PomProcessor processor = new PomProcessor(inputStream);
-                info = new ArtifactGroup();
-                info.setGroupId(processor.getGroupId());
-                info.setArtifactId(processor.getArtifactId());
-                ArtifactInfo artifactInfo = new ArtifactInfo();
-                artifactInfo.setVersion(processor.getVersion());
-                List<ArtifactInfo> artifactInfos = new ArrayList<ArtifactInfo>();
-                artifactInfos.add(artifactInfo);
-                info.setVersions(artifactInfos);
-            }
-        } catch (Exception e) {
-            throw new PhrescoException(e);
-        }
-        return info;
-    }
-
+	public static ArtifactGroup getArtifactInfoFromJar(File jarFile)
+			throws PhrescoException {
+		ArtifactGroup info = null;
+		try {
+			InputStream artifactStream = getArtifactPomStream(jarFile);
+			PomProcessor processor = new PomProcessor(artifactStream);
+			info = new ArtifactGroup();
+			info.setGroupId(processor.getGroupId());
+			info.setArtifactId(processor.getArtifactId());
+			ArtifactInfo artifactInfo = new ArtifactInfo();
+			artifactInfo.setVersion(processor.getVersion());
+			List<ArtifactInfo> artifactInfos = new ArrayList<ArtifactInfo>();
+			artifactInfos.add(artifactInfo);
+			info.setVersions(artifactInfos);
+		} catch (Exception e) {
+			throw new PhrescoException(e);
+		}
+		return info;
+	}
+    
+	public static InputStream getArtifactPomStream(File artifactFile) throws PhrescoException {
+		String pomFile = null;
+		try {
+			JarFile jarfile = new JarFile(artifactFile);
+			for (Enumeration<JarEntry> em = jarfile.entries(); em
+					.hasMoreElements();) {
+				JarEntry jarEntry = em.nextElement();
+				if (jarEntry.getName().endsWith("pom.xml")) {
+					pomFile = jarEntry.getName();
+				}
+			}
+			if (pomFile != null) {
+				ZipEntry entry = jarfile.getEntry(pomFile);
+				InputStream inputStream = jarfile.getInputStream(entry);
+				return inputStream;
+			}
+		} catch (Exception e) {
+			throw new PhrescoException(e);
+		}
+		return null;
+	}
+    
     /**
      * Validate the given jar is valid maven jar
      * 
@@ -268,7 +280,7 @@ public class ServerUtil {
      */
     public static File createPomFile(ArtifactGroup info) throws PhrescoException {
         FileWriter writer = null;
-        File pomFile = new File(getTempFolderPath(), ServerConstants.POM_FILE_NAME);
+        File pomFile = getPomFile();
         DocumentBuilderFactory domFactory = DocumentBuilderFactory
                 .newInstance();
         try {
@@ -324,6 +336,11 @@ public class ServerUtil {
         return pomFile;
     }
     
+    private static File getPomFile() throws PhrescoException {
+    	File pomFile = null;
+    	pomFile = new File(getTempFolderPath(), UUID.randomUUID().toString());
+    	return pomFile;
+    }
     
     /**
      * Create Content Url Using given artifactinfo
@@ -363,6 +380,32 @@ public class ServerUtil {
 		return stringBuffer.toString();
    }
    
+	public static File getArtifactPomFile(File artifactFile) throws PhrescoException {
+		FileOutputStream fileOutStream = null;
+		InputStream pomStream  = null;
+		File pomFile = null;
+		try {
+			pomFile = getPomFile();
+			pomStream = getArtifactPomStream(artifactFile);
+			fileOutStream = new FileOutputStream(pomFile);
+            byte buf[] = new byte[MAGICNUMBER.BYTESIZE];
+            int len;
+            while ((len = pomStream.read(buf)) > 0) {
+                fileOutStream.write(buf, 0, len);
+            }
+		} catch (PhrescoException e) {
+			throw new PhrescoException(e);
+		} catch (FileNotFoundException e) {
+			throw new PhrescoException(e);
+		} catch (IOException e) {
+			throw new PhrescoException(e);
+		} finally {
+			Utility.closeStream(pomStream);
+			Utility.closeStream(fileOutStream);
+		}
+		return pomFile;
+	}
+	
 	/**
 	 * It will return the extension of the file
 	 * @param fileName
