@@ -1896,6 +1896,13 @@ input[class *='sample'] {
 	top: 8px;
 }
 
+.pluginErrorMsg  {
+	position: fixed !important;
+	right:	503px !important; 
+	width: auto !important;
+	top: 238px !important;
+}
+
 .hideContent {
 	display: none;
 }

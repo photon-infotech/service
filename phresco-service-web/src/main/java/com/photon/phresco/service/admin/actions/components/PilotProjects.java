@@ -127,7 +127,7 @@ public class PilotProjects extends ServiceBaseAction {
     	
     	try {
     		List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
-    		Collections.sort(technologies, Technology.TECHNAME_COMPARATOR);
+    		Collections.sort(technologies, TECHNAME_COMPARATOR);
     		setReqAttribute(REQ_ARCHE_TYPES, technologies);
     		setReqAttribute(REQ_FROM_PAGE, ADD);
     	} catch (PhrescoException e) {

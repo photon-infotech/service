@@ -22,6 +22,7 @@
 <%@ page import="org.apache.commons.collections.CollectionUtils"%>
 <%@ page import="org.apache.commons.lang.StringUtils"%>
 <%@ page import="java.util.List"%>
+<%@ page import="java.util.Collections"%>
 
 <%@ page import="com.photon.phresco.commons.model.Technology" %>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
@@ -113,8 +114,16 @@
 										<%= StringUtils.isNotEmpty(technology.getDescription()) ? technology.getDescription() : "" %>
 									</td>	
 									
+										<% 
+											List<String> techVer = technology.getTechVersions(); 
+											if(CollectionUtils.isNotEmpty(techVer)) {
+												Collections.sort(techVer);
+												Collections.reverse(techVer);
+											}
+										%>
+											
 									<td class="namelabel-width">
-										<%= CollectionUtils.isNotEmpty(technology.getTechVersions()) ? technology.getTechVersions() : "" %>
+										<%= CollectionUtils.isNotEmpty(techVer) ? StringUtils.join(techVer, ", ") : ""  %>
 									</td>
 									
 									<td class="namelabel-width">

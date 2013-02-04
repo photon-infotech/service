@@ -300,6 +300,11 @@ function allowNumHyphenPlus(numbr) {
 	return numbr.replace(/[^0-9\-\+]+/g, '');
 }
 
+//To strip the Space
+function stripSpace(inputStr) {
+	return inputStr.replace(/\s/g,'');
+}
+
 function changeTheme() {
   	if (localStorage["color"] != null) {
         $("link[title='phresco']").attr("href", localStorage["color"]);

@@ -47,7 +47,6 @@ import com.photon.phresco.commons.model.RequiredOption;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
-import com.photon.phresco.service.admin.commons.ServiceUIConstants;
 import com.photon.phresco.service.client.api.Content;
 import com.photon.phresco.service.client.api.ServiceManager;
 import com.photon.phresco.service.client.impl.CacheKey;
@@ -154,7 +153,7 @@ public class Features extends ServiceBaseAction {
     	
     	try {
     		List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
-    		Collections.sort(technologies, Technology.TECHNAME_COMPARATOR);
+    		Collections.sort(technologies, TECHNAME_COMPARATOR);
     		
     		setReqAttribute(REQ_ARCHE_TYPES, technologies);
     		featureByteArray = null;
@@ -170,6 +169,7 @@ public class Features extends ServiceBaseAction {
     	inputStreamMap.clear();
     	featureByteArray = null;
 		List<ArtifactGroup> moduleGroups = getServiceManager().getFeatures(getCustomerId(), getTechnology(), Type.valueOf(getType()).name());
+		Collections.sort(moduleGroups, ARTIFACTGROUP_COMPARATOR_ASCEND);
 		setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroups);
 		setReqAttribute(REQ_FEATURES_TYPE, getType());
 		setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());

@@ -47,11 +47,13 @@ public class ConfigTemplates extends ServiceBaseAction {
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
 	private String name = "";
+	private String dispName = "";
 	private String description = "";
 	private List<String> appliesTo = null;
 	private String defaultCustProp = "";
 	
 	private String nameError = "";
+	private String dispError = "";
 	private String applyError = "";
 	private boolean errorFound = false;
 	
@@ -199,6 +201,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 			} else {
 				settingTemplate = new SettingsTemplate();
 				settingTemplate.setName(getName());
+				settingTemplate.setDisplayName(StringUtils.isEmpty(getDispName()) ? getName() : getDispName());
 				settingTemplate.setDescription(getDescription());
 				boolean customProp = Boolean.parseBoolean(getDefaultCustProp());
 				settingTemplate.setCustomProp(customProp);
@@ -307,7 +310,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY ));
 			isError = true;
 		} else if(ADD.equals(getFromPage()) || (!getName().equals(getOldName()))) {
-			// to check duplication of name
+			// to check duplication of dispname
 			List<SettingsTemplate> configTemplates = getServiceManager().getConfigTemplates(getCustomerId());
 			if (CollectionUtils.isNotEmpty(configTemplates)) { //TODO: this should handled by query
 				for (SettingsTemplate configTemplate : configTemplates) {
@@ -315,6 +318,22 @@ public class ConfigTemplates extends ServiceBaseAction {
 						setNameError(getText(KEY_I18N_ERR_NAME_ALREADY_EXIST));
 			    		isError = true;
 						break;
+					}
+				}
+			}
+		}
+		
+		if ((StringUtils.isNotEmpty(getDispName())) && (ADD.equals(getFromPage()))) {//Empty validation for dispName
+			// to check duplication of dispName
+			List<SettingsTemplate> configTemplates = getServiceManager().getConfigTemplates(getCustomerId());
+			if (CollectionUtils.isNotEmpty(configTemplates)) { 
+				for (SettingsTemplate configTemplate : configTemplates) {
+					if(StringUtils.isNotEmpty(configTemplate.getDisplayName())) {
+						if (configTemplate.getDisplayName().equalsIgnoreCase(getDispName())) {
+							setDispError(getText(KEY_I18N_ERR_DISPLAYNAME_ALREADY_EXIST));
+				    		isError = true;
+							break;
+						}
 					}
 				}
 			}
@@ -419,6 +438,22 @@ public class ConfigTemplates extends ServiceBaseAction {
 
 	public void setDefaultCustProp(String defaultCustProp) {
 		this.defaultCustProp = defaultCustProp;
+	}
+
+	public String getDispName() {
+		return dispName;
+	}
+
+	public void setDispName(String dispName) {
+		this.dispName = dispName;
+	}
+
+	public String getDispError() {
+		return dispError;
+	}
+
+	public void setDispError(String dispError) {
+		this.dispError = dispError;
 	}
 
 }

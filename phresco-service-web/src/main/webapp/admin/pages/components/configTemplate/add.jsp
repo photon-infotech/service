@@ -43,11 +43,13 @@
 	
 	//For edit
 	String name = "";
+	String dispName = "";
 	String desc = "";
 	boolean isSystem = false;
 	boolean isCustProp = false;
 	if (settingsTemplate != null) {
 		name = settingsTemplate.getName();
+		dispName = settingsTemplate.getDisplayName();
 		desc = settingsTemplate.getDescription();
 		isSystem = settingsTemplate.isSystem();
 		isCustProp = settingsTemplate.isCustomProp();
@@ -90,6 +92,18 @@
 				<input id="configname" placeholder="<s:text name='place.hldr.configTemp.add.name'/>" class="input-xlarge" 
 					type="text" name="name"  value="<%=name%>" maxlength="30" title="30 Characters only" <%= disabledStr %>>
 				<span class="help-inline" id="nameError"></span>
+			</div>
+		</div>
+		
+		<div class="control-group" id="dispNameControl">
+			<label class="control-label labelbold">
+				<s:text name='lbl.disp.name'/>
+			</label>
+			
+			<div class="controls">
+				<input id="dispName" placeholder="<s:text name='place.hldr.configTemp.add.disp.name'/>" class="input-xlarge" 
+					type="text" name="dispName"  value="<%= StringUtils.isEmpty(dispName) ? "" : dispName %>" maxlength="30" title="30 Characters only" <%= disabledStr %>>
+				<span class="help-inline" id="dispNameError"></span>
 			</div>
 		</div>
 		
@@ -149,7 +163,7 @@
 			</div>
 		</div>
 		
-		<div class="control-group">
+		<div class="control-group" id="keyControl">
 			<label class="control-label labelbold">
 				<s:text name="lbl.hdr.comp.system.properties" />
 			</label>
@@ -782,7 +796,7 @@
 		}
 		
 		if (showNameMissingError) {
-			showError($("#" + $(this).attr("id")), $("#keyvalueError"),'<s:text name='err.msg.name.missing'/>');
+			showError($("#" + $(this).attr("id")), $("#keyvalueError"),'<s:text name='err.msg.name.propTemp.missing'/>');
 		} 
 		
 		if ($("#configname").val().replace(/\s/g, "") === "") {
@@ -797,31 +811,53 @@
 		} else {
 			hideError($("#applyControl"), $("#applyError"));
 		}
-
+		
+		var value = $('#configname').val().charAt(0).replace(/[0-9]+/, '.');
+		if (value.startsWith("-") || value.startsWith(".")) {
+			showError($("#nameControl"), $("#nameError"), '<s:text name='err.msg.name.invalid'/>');
+		} 
+		
+		$('.keywidth').each( function() {
+			var val = $(this).val().charAt(0).replace(/[0-9]+/, '.');
+			if (val.startsWith("-") || val.startsWith(".")) {
+				showError($("#keyControl"), $("#keyvalueError"), '<s:text name='err.msg.key.invalid'/>');
+			} 
+		});
+		
 		if (redirect) {
 			validate(pageUrl, $('#formConfigTempAdd'), $('#subcontainer'),
 					progressText, $('#appliesToDiv :input'));
 		}
 	}
 	
-	//To check for the special character in Key Value
-	$('.keywidth').bind('input propertychange', function(e) {
-		var key = $(this).val();
-		key = checkForSplChr(key);
-		$(this).val(key);
-	});
+
+	function findError(data) {
+		if (!isBlank(data.nameError)) {
+			showError($("#nameControl"), $("#nameError"), data.nameError);
+		} else {
+			hideError($("#nameControl"), $("#nameError"));
+		}
+		
+		if (!isBlank(data.dispError)) {
+			showError($("#dispNameControl"), $("#dispNameError"), data.dispError);
+		} else {
+			hideError($("#dispNameControl"), $("#dispNameError"));
+		}
+	}
 	
-	//To check for the special character in Name Value 
-	$('.textWidth').bind('input propertychange', function(e) {
-		var key = $(this).val();
-		key = checkForSplChr(key);
-		$(this).val(key);
+	//To check for the special character in Key Value
+	$('input[name=propTempKey]').on('input propertychange', function(e) {
+		var propTempKey = $(this).val();
+		propTempKey = checkForSplChrExceptDot(propTempKey);
+		propTempKey = stripSpace(propTempKey);
+		$(this).val(propTempKey);
 	});
 	
 	// To check for the special character in configname
 	$('#configname').bind('input propertychange', function(e) {
 		var configname = $(this).val();
-		configname = checkForSplChr(configname);
+		configname = checkForSplChrExceptDot(configname);
+	    configname = stripSpace(configname);
 		$(this).val(configname);
 	});
 	

@@ -25,12 +25,14 @@
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
 %>
 <form id="formPlugin">
-	<div id="plugin-popup-file-uploader" class="file-uploader" title="<s:text name='title.file.size'/>">
-		<noscript>
-			<p>Please enable JavaScript to use file uploader.</p>
-			<!-- or put a simple form for upload here -->
-		</noscript>
-		<span class="help-inline pluginError" id="popupPluginError"></span>
+	<div class="control-group" id="pluginpopupfileuploader">
+		<div id="plugin-popup-file-uploader" class="file-uploader" title="<s:text name='title.file.size'/> style="width: 50%;"">
+			<noscript>
+				<p>Please enable JavaScript to use file uploader.</p>
+				<!-- or put a simple form for upload here -->
+			</noscript>
+		</div>
+		<span class="help-inline pluginErrorMsg" id="popupPluginError" style="width: 50%;"></span>
 	</div>
 	<div id="jarDetailsDivPopup" class="hideContent" style="padding: 0px 10px; float: left; width: 97%;">
 		<table class="table table-bordered table-striped jarTable">
@@ -92,17 +94,8 @@
 		
 	});
 
-	
-	function findError(data) {
-		if (data.popupPluginError != undefined) {
-			showError($("#plugin-popup-file-uploader"), $("#popupPluginError"),	data.popupPluginError);
-		} else {
-			hideError($("#plugin-popup-file-uploader"), $("#popupPluginError"));
-		}
-	}
-
 	function jarPopupError(data, type) {
-		var	controlpluginObj = $("#plugin-popup-file-uploader");
+		var	controlpluginObj = $("#pluginpopupfileuploader");
 		var	msgpluginObj = $("#popupPluginError");
 		if (data != undefined && !isBlank(data)) {
 			showError(controlpluginObj, msgpluginObj, data);

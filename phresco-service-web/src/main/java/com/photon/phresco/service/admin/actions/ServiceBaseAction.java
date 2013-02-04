@@ -29,6 +29,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,6 +46,7 @@ import com.opensymphony.xwork2.ActionSupport;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.LogInfo;
+import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.commons.model.User;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.exception.PhrescoWebServiceException;
@@ -189,6 +191,41 @@ public class ServiceBaseAction extends ActionSupport implements ServiceActions, 
         return artifactGroup;
 	}
 	
+    public void copyToClipboard () {
+    	Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+    	clipboard.setContents(new StringSelection(copyToClipboard.replaceAll(" ", "").replaceAll("(?m)^[ \t]*\r?\n", "")), null);
+    }
+    
+    public static Comparator<ArtifactGroup> ARTIFACTGROUP_COMPARATOR_ASCEND  = new Comparator<ArtifactGroup>() {
+
+		public int compare(ArtifactGroup artiFirst, ArtifactGroup artiSecond) {
+			String artiNameFirst = artiFirst.getName().toUpperCase();
+			String artiNameSecond = artiSecond.getName().toUpperCase();
+			//ascending order
+			return artiNameFirst.compareTo(artiNameSecond);
+		}
+	};
+	
+	 public static Comparator<ArtifactInfo> ARTIFACTINFO__COMPARATOR_DESCEND  = new Comparator<ArtifactInfo>() {
+
+		public int compare(ArtifactInfo artiFirst, ArtifactInfo artiSecond) {
+			String artiNameFirst = artiFirst.getVersion();
+			String artiNameSecond = artiSecond.getVersion();
+			//descending  order
+			return artiNameSecond.compareTo(artiNameFirst);
+		}
+	};
+	
+	public static Comparator<Technology> TECHNAME_COMPARATOR  = new Comparator<Technology>() {
+
+		public int compare(Technology techFirst, Technology techSecond) {
+			String techNameFirst = techFirst.getName().toUpperCase();
+			String techNameSecond = techSecond.getName().toUpperCase();
+			//ascending order
+			return techNameFirst.compareTo(techNameSecond);
+		}
+	};
+	
 	protected void setReqAttribute(String key, Object value) {
 	    getHttpRequest().setAttribute(key, value);
 	}
@@ -229,11 +266,6 @@ public class ServiceBaseAction extends ActionSupport implements ServiceActions, 
         return (HttpServletResponse) ActionContext.getContext().get(ServletActionContext.HTTP_RESPONSE);
     }
 
-    public void copyToClipboard () {
-    	Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-    	clipboard.setContents(new StringSelection(copyToClipboard.replaceAll(" ", "").replaceAll("(?m)^[ \t]*\r?\n", "")), null);
-    }
-    
     public void setCopyToClipboard(String copyToClipboard) {
 		this.copyToClipboard = copyToClipboard;
 	}
