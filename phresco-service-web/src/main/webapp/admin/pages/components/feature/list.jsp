@@ -22,8 +22,6 @@
 <%@ page import="java.util.List" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.apache.commons.collections.CollectionUtils"%>
-<%@ page import="java.util.Collections"%>
-<%@ page import="com.photon.phresco.service.admin.actions.ServiceBaseAction"%>
 
 <%@ page import="com.photon.phresco.commons.model.ArtifactInfo" %>
 <%@ page import=" com.photon.phresco.commons.model.ArtifactGroup" %>
@@ -79,18 +77,17 @@
 		                    <div class="scrollpanel">
 		                        <section class="scrollpanel_inner">
 		                 	      	<table class="download_tbl download_feature_tbl">
-		                 	      	<thead class="header-background">
+		                 	      	<thead>
 		                 	      		<tr>
 		                 	      			<th></th>
 		                 	      		`	<th><s:text name='lbl.hdr.comp.name'/></th>
-			                 	      		<th><s:text name='lbl.hdr.comp.version'/></th>
-			                 	      		<th><s:text name='lbl.hdr.pilot.version'/></th>
+			                 	      		<th><s:text name='lbl.hdr.comp.ver'/></th>
+			                 	      		<th><s:text name='lbl.hdr.comp.versioning'/></th>
 		                 	      		</tr>
 		                 	      	</thead>
 			                            <tbody>
 			                            <% 
 									    	List<ArtifactInfo> versions = moduleGroup.getVersions();
-			                            	Collections.sort(versions, ServiceBaseAction.ARTIFACTINFO__COMPARATOR_DESCEND);
 									    	if (CollectionUtils.isNotEmpty(versions)) {
 												for (ArtifactInfo module : versions) {
 												    String descContent = "";

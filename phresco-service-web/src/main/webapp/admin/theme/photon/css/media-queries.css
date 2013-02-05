@@ -46,6 +46,29 @@
 /************************************************************************************
 Width <= 1024
 *************************************************************************************/
+@media screen and (max-width : 1024px){
+	#subcontainer {
+		width: 77%;
+		float: right;
+		margin-right: 5px;
+		}
+	.syncTable .fixed-table-container {
+		height: 350px !important;	
+	}
+	#formFeatureAdd {
+		width: 92%;
+	}
+	#subTabcontent {
+		width: 76%;
+	}
+	.customer_select_div .dd-select {
+		width: 162px !important;
+	}
+	.customer_select_div .dd-options {
+		width: 178px !important;
+		left: 232px;
+	}	
+	}
 @media screen and (min-width : 781px) and (max-width : 1024px) and (max-height:768px) {
 	.content_adder {
 		height: 84%;
@@ -94,6 +117,13 @@ Width >= 1025 and <= 1152
 	.accordion_panel_inner {
 		height:	150px !important;
 	}
+	#subcontainer {
+		float: right;
+		width: 79%;
+	}
+	.syncTable .fixed-table-container {
+		height: 250px !important;	
+	}
 }
 
 /************************************************************************************
@@ -114,12 +144,36 @@ Width >= 1152 and < 1280
 	.psbltextwidth{
 		width: 63%;
 	}
-
+	#subcontainer {
+		width: 80%;
+		float: right;
+		margin-right: 2px;
+	}
+	.syncTable .fixed-table-container {
+		height: 425px !important;	
+	}
+	#subTabcontent {
+		width: 79%;
+	}
 }
 
 /************************************************************************************
 Width <= 1280 and height <= 720
 *************************************************************************************/
+@media screen and (width : 1280px){
+	#subcontainer {
+		float: right;
+		width: 82%;
+		margin-right: 2px;
+	}
+	.syncTable .fixed-table-container {
+		height: 330px !important;	
+	}
+	#subTabcontent {
+		width: 81%;
+	}
+}	
+
 @media screen and (device-aspect-ratio: 1280/720) {
 	.content_adder {
 		height: 83%;
@@ -188,6 +242,9 @@ Width >= 1280 and height <= 800
 	.psbltextwidth{
 		width: 64%;
 	}
+	.syncTable .fixed-table-container {
+		height: 400px !important;	
+	}
 }
 
 /************************************************************************************
@@ -208,6 +265,9 @@ Width >= 1280 and height > 800 and height <= 960
 	.psbltextwidth{
 		width: 64%;
 	}
+	.syncTable .fixed-table-container {
+		height: 450px !important;	
+	}
 }
 
 /************************************************************************************
@@ -227,6 +287,9 @@ Width >= 1280 and height >= 961 and heigth <=1024
 	}
 	.psbltextwidth{
 		width: 64%;
+	}
+	.syncTable .fixed-table-container {
+		height: 480px !important;	
 	}
 }
 
@@ -256,12 +319,23 @@ Width > 1280 and <= 1360
 	.psbltextwidth{
 		width: 64%;
 	}
+	#subcontainer {
+		width: 83%;
+		margin-right: 2px;
+		float: right;
+	}
+	.syncTable .fixed-table-container {
+		height: 360px !important;	
+	}
+	#subTabcontent {
+		width: 82%;
+	}
 }
 
 /************************************************************************************
 Width > 1360 and <= 1600
 *************************************************************************************/
-@media only screen and (min-width : 1361px) and (max-width : 1600px) {
+@media only screen and (min-width : 1361px) and (max-width : 1440px) {
 	.content_adder {
 		height: 89%;
 	}
@@ -283,5 +357,55 @@ Width > 1360 and <= 1600
 	}
 	.psbltextwidth{
 		width: 64%;
+	}
+	#subcontainer {
+		width: 83.5%;
+		margin-right: 2px;
+		float: right;
+	}
+	.syncTable .fixed-table-container {
+		height: 420px !important;	
+	}
+	#subTabcontent {
+		width: 83%;
+	}
+}
+
+/************************************************************************************
+Width > 1440 and <= 1600
+*************************************************************************************/
+@media only screen and (min-width : 1441px) and (max-width : 1600px) {
+	.content_adder {
+		height: 89%;
+	}
+	
+	.content_feature {
+		height: 85%;
+	}
+	
+	.headerInnerTop {
+		margin-left: 106px;
+	}
+	
+	.quick_links_outer {
+		margin-left: 214px;
+	}
+	
+	.accordion_panel_inner {
+		height:	375px !important;
+	}
+	.psbltextwidth{
+		width: 64%;
+	}
+	#subcontainer {
+		width: 84%;
+		margin-right: 6px;
+		float: right;
+	}
+	.syncTable .fixed-table-container {
+		height: 420px !important;	
+	}
+	#subTabcontent {
+		width: 84%;
 	}
 }

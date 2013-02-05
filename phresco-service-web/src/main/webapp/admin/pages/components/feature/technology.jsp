@@ -68,7 +68,7 @@
 					if (CollectionUtils.isNotEmpty(technologies)) {
 						for (Technology technology : technologies) {
 				%>
-							<option value="<%= technology.getId() %>"><%= technology.getName() %></option>
+							<option selected="selected" value="<%= technology.getId() %>"><%= technology.getName() %></option>
 				<%
 						}
 					}
@@ -99,13 +99,14 @@
 </form>
 
 <script language="JavaScript" type="text/javascript">
+	var selectedTechId = "";
 	$(document).ready(function() {
-		featurelist();
-		
-		//To get the list based on the selected technology
-		$('#tech_id').change(function() {
-			featurelist();
-		});
+		$('#tech_id').ddslick({
+        	onSelected: function(data) {
+        		selectedTechId = data.selectedData.value;
+        		featurelist();
+        	}
+        });
 	});
 	
 	// This method calling from confirm_dialog.jsp
@@ -116,6 +117,7 @@
 	
 	//To list the features based on the type
     function featurelist() {
-		loadContent('listFeatures', $('#formFeaturesList'), $('#feature_list'));
+   		var params = 'technology=' + selectedTechId;
+		loadContent('listFeatures', $('#formFeaturesList'), $('#feature_list'), params, '', true);
     }
 </script>

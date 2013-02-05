@@ -41,7 +41,7 @@
 		} else {
 	%>
 	<div class="table_div" >
-		<div class="fixed-table-container" style="height : 500px !important;">
+		<div class="fixed-table-container">
 			<div class="header-background"> </div>
 			<div class="fixed-table-container-inner">
 				<table cellspacing="0" class="zebra-striped">

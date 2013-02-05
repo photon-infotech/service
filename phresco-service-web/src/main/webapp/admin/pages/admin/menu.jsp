@@ -27,6 +27,10 @@
 		activateMenu($("#customerList"));
 	});
 </script>
+
+<div class="control-group customer_name">
+	<s:label key="lbl.hdr.bottomrightnavlab" cssClass="control-label admin_label labelbold" theme="simple"/>
+</div>
 <nav>
 	<ul class="tabs">
 		<li>

@@ -32,9 +32,9 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
 		
 		<link rel="stylesheet" href="css/bootstrap.css">
-		<link rel="stylesheet" href="theme/photon/css/phresco.css">
-		<link rel="stylesheet" href="" class="changeme" title="phresco">
-		<link rel="stylesheet" href="theme/photon/css/media-queries.css">
+		<link rel="stylesheet" href="theme/photon/css/phresco_default.css" id="phresco">
+		<link rel="stylesheet" href="theme/photon/css/photon_theme.css" class="changeme" title="phresco">
+		<link rel="stylesheet" href="theme/photon/css/media-queries.css" id="media-query">
 		<link rel="stylesheet" href="css/datepicker.css"> <!-- used for date picker-->
 		<link rel="stylesheet" href="css/jquery.ui.all.css"> <!-- used for date picker -->
  		<link rel="stylesheet" href="css/fileuploader.css"> <!-- used for file upload -->
@@ -75,35 +75,33 @@
 		<script type="text/javascript" src="js/jquery.fileDownload.js"></script>
 		<!-- Editable ComboBox -->
 		<script type="text/javascript" src="js/jquery.editable.combobox.js"></script>
+		<script type="text/javascript" src="js/ddslick.js"></script>
 		
 			
 		<script type="text/javascript">
-		    changeTheme(); 
-		
+			applyTheme();
 		    $(document).ready(function() {
 		    	enableScreen();
 		    	
-				$(".styles").click(function() {
+		    	$(".styles").click(function() {
 					localStorage.clear();
-		             var value = $(this).attr("rel");
-		             localStorage["color"]= value;
-		             localstore = localStorage["color"];
-		             $("link[title='phresco']").attr("href",localstore);
-		             showWelcomeImage();
+					var value = $(this).attr("rel");
+					localStorage["color"]= value;
+					applyTheme();
 				});
 
 				// function to show user info in toggle 
-				$('div li.usersettings div').hide(0);
-				$('div li.usersettings').click(function() {
-					$('div li.usersettings div').slideToggle(0);
+				$('div aside.usersettings div').hide(0);
+				$('div aside.usersettings').click(function() {
+					$('div aside.usersettings div').slideToggle(0);
 				});
 
 				// to show user info on mouse over
-				$('#signOut li').mouseenter(function() {
-					$("div li.usersettings div").hide(0);
-					$(this).children("div li.usersettings div").show(0);
+				$('#signOut aside').mouseenter(function() {
+					$("div aside.usersettings div").hide(0);
+					$(this).children("div aside.usersettings div").show(0);
 				}).mouseleave(function() {
-					$("div li.usersettings div").hide(0);
+					$("div aside.usersettings div").hide(0);
 				});
 
 				clickMenu($("a[name='headerMenu']"), $("#container"));
@@ -203,20 +201,25 @@
 					</div>
 				</div>
 				<div id="signOut" class="signOut">
-					<li class="usersettings">
+					<aside class="usersettings">
 						<%= displayName %>
 						<img src="images/downarrow.png" class="arrow">
-                        <div class="userInfo">&nbsp;<s:label key="lbl.usrset.skins"  theme="simple"/>&nbsp;
-                            <a class="styles" href="#"  rel="theme/photon/css/red.css">
-								<img src="images/red_themer.jpg" class="skinImage">
-							</a>
-							<a class="styles" href="#"  rel="theme/photon/css/blue.css">
-								<img src="images/blue_themer.jpg" class="skinImage">
-							</a>
+                        <div class="userInfo" >
+                            <ul>
+                            	<li id="themeContainer" class="theme_change"><a href="#">Themes</a>
+                                	<ul>
+                                    	<li>Photon&nbsp;<a href="#" class="styles" href="#" rel="theme/photon/css/photon_theme.css"><img src="images/photon_theme.png"></a></li>
+                                        <li>Red-Blue&nbsp;
+                                            <a class="styles" href="#" rel="theme/red_blue/css/blue.css"><img src="images/blue_themer.jpg" class="skinImage"></a>
+											<a class="styles" href="#" rel="theme/red_blue/css/red.css"><img src="images/red_themer.jpg"></a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li><a href="#" id="about" ><s:text name="lbl.usrset.abtservice"/></a></li>
+                                <li><a href="<s:url action='logout'/>"><s:text name="lbl.usrset.signout"/></a></li>
+                            </ul>
                         </div>
-                        <div class="userInfo"><a href="#"  id="about" class="abtPopUp about"><s:label key="lbl.usrset.abtservice"/></a></div>
-                        <div class="userInfo"><a href="<s:url action='admin/logout'/>" id="signOut"><s:label key="lbl.usrset.signout"/></a></div>
-					</li>
+					</aside>
 				</div>
 			</div>
 		</header>
@@ -238,7 +241,7 @@
 						</a>
 					</div>
 					<div class="righttopnav">
-						<a href="JavaScript:void(0);" id="abtPopUp" class="abtPopUp arrow_links_top"><span
+						<a href="JavaScript:void(0);" class="abtPopUp" class="arrow_links_top"><span
 							class="shortcutRed" id=""></span><span class="shortcutWh"
 							id="">
 							<s:label key="lbl.hdr.toprightnavlab" theme="simple"/></span>

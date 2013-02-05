@@ -32,6 +32,7 @@
 
 
 <script type="text/javascript">
+	var customerId = "";
 	$(document).ready(function() {
 		var customerId = localStorage["selectedCustomerId"];
 		$("#customerId").val(customerId);
@@ -40,24 +41,81 @@
 		loadContent("featuresMenu", $('#formCustomerId'), $("#subcontainer"));
 		activateMenu($("#features"));
 		
-		$("select[name='customerId']").change(function() {
-			var selectedMenu = $("a[name='compTab'][class='active']").prop("id");
-			loadContent(selectedMenu, $('#formCustomerId'), $("#subcontainer"));
-			var selectedId = $('#customerId').val();
-        	localStorage["selectedCustomerId"] = selectedId;
-		});
+	  	$(".tabs li a").click(function() {
+			if($(this).attr("id")=="featuresMenu") {
+				$("#testmenu").slideDown();
+			} else if($(this).attr("name")=="compTab") {
+				$("#testmenu").slideUp();
+			}
+	    });
+	  	
+		//Customer change event	  	
+	  	$('.customer_listbox').ddslick({
+        	onSelected: function(data) {
+        		customerId = data.selectedData.value;
+				customerChangeEvent();
+        	}
+        });
 	});
+	
+	function customerChangeEvent() {
+		var selectedMenu = $("a[name='compTab'][class='active']").prop("id");
+		var params = "customerId=";
+		params = params.concat(customerId);
+		loadContent(selectedMenu, $('#formCustomerId'), $("#subcontainer"), params);
+		var selectedId = $('#customerId').val();
+        	localStorage["selectedCustomerId"] = selectedId;
+	}
 </script>
 
 <%
     User userInfo = (User) session.getAttribute(ServiceUIConstants.SESSION_USER_INFO);
     List<Customer> customers = userInfo.getCustomers();
 %>
-
+	<form id="formCustomerId" class="form">
+		<div class="control-group customer_name">
+			<s:label key="lbl.hdr.bottomleftnavlab" cssClass="control-label admin_label labelbold" theme="simple"/>
+			<div class="ddright">
+				<s:label key="lbl.hdr.comp.customer" cssClass="control-label custom_label labelbold" theme="simple"/>
+				<div class="controls customer_select_div">
+					<select id="customerId" name="customerId" class="customer_listbox">
+		                <% 
+		                    if (CollectionUtils.isNotEmpty(customers)) { 
+					            for (Customer customer : customers) { 
+					    %>
+		                            <option value="<%= customer.getId() %>"><%= customer.getName() %></option>
+						<% 
+					            }
+					        } 
+					    %>
+					</select>
+				</div>
+			</div>
+		</div>
+		<div class="clear"></div>
+	</form>
 <nav>
 	<ul class="tabs">
 		<li>
 			<a href="#" class="active" name="compTab" id="featuresMenu"><s:label key="lbl.hdr.comp.featrs" theme="simple"/></a>
+				<ul id="testmenu">
+					<li>
+						<a href="#" class="active" id="technologies" name="featureTab" additionalParam="type=<%= Type.FEATURE.name() %>">
+							<s:text name="lbl.hdr.comp.featrs.modules" />
+						</a>
+					</li>
+					<li>
+						<a href="#" class="inactive" id="technologies" name="featureTab" additionalParam="type=<%= Type.JAVASCRIPT.name() %>">
+							<s:text name="lbl.hdr.comp.featrs.jslib"/>
+						</a>
+					</li>
+					<li>
+						<a href="#" class="inactive" id="technologies" name="featureTab" additionalParam="type=<%= Type.COMPONENT.name() %>">
+							<s:text name="lbl.hdr.comp.component"/>
+						</a>
+					</li>
+					
+				</ul>
 		</li>
 		<li>
 			<a href="#" class="inactive" name="compTab" id="archetypesList"><s:label key="lbl.hdr.comp.arhtyp" theme="simple"/></a>
@@ -75,28 +133,7 @@
 			<a href="#" class="inactive" name="compTab" id="downloadList"><s:label key="lbl.hdr.adm.dwnld"  theme="simple"/></a>
 		</li>
 	</ul>
-	<form id="formCustomerId" class="form">
-		<div class="control-group customer_name">
-			<s:label key="lbl.hdr.comp.customer" cssClass="control-label custom_label labelbold" theme="simple"/>
-			<div class="controls customer_select_div">
-				<select id="customerId" name="customerId" class="customer_listbox">
-	                <% 
-	                    if (CollectionUtils.isNotEmpty(customers)) { 
-				            for (Customer customer : customers) {
-				            	String selectedStr= "";
-				            		 if (customer.getName().equalsIgnoreCase(ServiceConstants.DEFAULT_CUSTOMER_NAME)) {
-				            			 selectedStr = "selected";
-				            	 	}
-				    %>
-	                            <option value="<%= customer.getId() %>" <%= selectedStr %>><%= customer.getName() %></option>
-					<% 
-				            }
-				        } 
-				    %>
-				</select>
-			</div>
-		</div>
-	</form>			
+			
 </nav>			
 
 <section id="subcontainer" class="navTopBorder">

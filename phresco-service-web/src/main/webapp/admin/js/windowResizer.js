@@ -18,7 +18,7 @@
  * ###
  */
 // JavaScript Document
-$(document).ready(function() {
+$(window).resize(function() {
 	$(window).bind("resize", resizeWindow);
 	var heightDiff_MainWrpr = $(window).height()- $(".main_wrapper").height();
 	var heightDiff_Wrpr = $(".main_wrapper").height()- $(".wrapper").height();
