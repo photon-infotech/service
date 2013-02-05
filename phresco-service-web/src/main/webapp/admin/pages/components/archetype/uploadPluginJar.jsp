@@ -19,10 +19,18 @@
   --%>
 
 <%@ taglib uri="/struts-tags" prefix="s"%>
-<%@ page
-	import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
+
+<%@ page import="java.util.List"%>
+
+<%@ page import="org.apache.commons.collections.CollectionUtils"%>
+
+<%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
+<%@ page import="com.photon.phresco.commons.model.ArtifactGroup"%>
+<%@ page import="com.photon.phresco.commons.model.ArtifactInfo"%>
+
 <%
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
+	List<ArtifactGroup> pluginInfos = (List<ArtifactGroup>) request.getAttribute(ServiceUIConstants.REQ_PLUGIN_INFO);
 %>
 <form id="formPlugin">
 	<div class="control-group" id="pluginpopupfileuploader">
@@ -34,7 +42,7 @@
 		</div>
 		<span class="help-inline pluginErrorMsg" id="popupPluginError" style="width: 50%;"></span>
 	</div>
-	<div id="jarDetailsDivPopup" class="hideContent" style="padding: 0px 10px; float: left; width: 97%;">
+	<div id="jarDetailsDivPopup" style="padding: 0px 10px; float: left; width: 97%;">
 		<table class="table table-bordered table-striped jarTable">
 			<thead>
 				<tr id="plugintable" class="header-background">
@@ -47,7 +55,41 @@
 			</thead>
 			<tbody>
 				<tr>
-					<td id="table" class="borderBottom-none"></td>
+					<td id="table" class="borderBottom-none">
+						<% if(CollectionUtils.isNotEmpty(pluginInfos)) {
+							String version = "";
+							String artifactId = "";
+							String groupId = "";
+							String fileName = "";
+								for (ArtifactGroup pluginInfo : pluginInfos) {
+									artifactId = pluginInfo.getArtifactId();
+									groupId = pluginInfo.getGroupId();
+									fileName = pluginInfo.getName();
+									List<ArtifactInfo> artifactInfoVersions = pluginInfo.getVersions();
+									for (ArtifactInfo artifactInfoVersion : artifactInfoVersions) {
+										version = artifactInfoVersion.getVersion();
+						%>
+							<div style="float: left; margin: 0px 10px 0px 0px;">
+								<div class="controls" style="margin-left: 0%;">
+									<input style="text-align:center;" id="grouId" class="groupId" class="input-xlarge" name="<%= fileName %>_groupId" maxlength='40' title="40 Characters only" type="text"  value='<%= groupId %>' >
+								</div>
+							</div>
+							<div style="float: left; margin: 0px 10px 0px 0px;">
+								<div class="controls" style="margin-left: 0%;">
+									<input style="text-align:center;" id="artifId" class="artifactId" class="input-xlarge" name="<%= fileName %>_artifactId" maxlength='40' title="40 Characters only" type="text" value='<%= artifactId %>' >
+				              	</div>
+				            </div>
+				            <div style="float: left; margin: 0px 10px 0px 0px;">
+				            	<div class="controls"  style="margin-left: 0%;">
+				            		<input style="text-align:center;" id="versnId" class="jarVersion" class="input-xlarge" name="<%= fileName %>_version"  maxlength='30' title="30 Characters only" type='text' value='<%= version %>' >
+		                   		</div>
+		                   	</div>
+						<% 
+									}
+								}	
+							}	
+						%>
+					</td>
 				</tr>
 			</tbody>
 		</table>
@@ -57,6 +99,11 @@
 <script language="JavaScript" type="text/javascript">
  	
 	$(document).ready(function() {
+		
+		<% if (CollectionUtils.isEmpty(pluginInfos)) { %>
+			$("#jarDetailsDivPopup").addClass("hideContent");
+		<% } %>
+		
 		createPluginUploader();
 		$('#popup_div').hide();
 		$('#popupTitle').html("Upload Plugin Jar"); 

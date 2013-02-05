@@ -199,7 +199,7 @@ public class Archetypes extends ServiceBaseAction {
 			//save application jar files
 			if(archetypeJarByteArray != null){
 				inputStreamMap.put(technology.getName(),  new ByteArrayInputStream(archetypeJarByteArray));
-			} 
+			}
 			getServiceManager().createArcheTypes(technology, inputStreamMap, getCustomerId());
 			addActionMessage(getText(ARCHETYPE_ADDED, Collections.singletonList(name)));
 		} catch (PhrescoException e) {
@@ -209,6 +209,7 @@ public class Archetypes extends ServiceBaseAction {
 	}
 	
 	public void createPluginInfo() {
+		pluginInfos.clear();
 		String key = "";
 		if (MapUtils.isNotEmpty(inputStreamMap)) {
 			Iterator iter = inputStreamMap.keySet().iterator();
@@ -445,7 +446,7 @@ public class Archetypes extends ServiceBaseAction {
 		if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Archetypes.showPluginJarPopup()");
 	    }
-		
+		setReqAttribute(REQ_PLUGIN_INFO, pluginInfos);
 		setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		
 		return uploadPlugin;

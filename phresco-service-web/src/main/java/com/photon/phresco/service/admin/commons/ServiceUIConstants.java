@@ -47,6 +47,7 @@ public interface ServiceUIConstants {
 	String REQ_ARTIFACT_ID = "_artifactId";
 	String REQ_GROUP_ID = "_groupId";
 	String REQ_VERSION = "_version";
+	String REQ_PLUGIN_INFO = "pluginInfo";
 	String REQ_VERSIONING = "versioning";
     
 	String VIDEOS = "video";
