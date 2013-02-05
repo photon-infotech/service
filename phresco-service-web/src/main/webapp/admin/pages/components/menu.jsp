@@ -33,6 +33,9 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
+		var customerId = localStorage["selectedCustomerId"];
+		$("#customerId").val(customerId);
+		
 		clickMenu($("a[name='compTab']"), $("#subcontainer"), $('#formCustomerId'));
 		loadContent("featuresMenu", $('#formCustomerId'), $("#subcontainer"));
 		activateMenu($("#features"));
@@ -40,6 +43,8 @@
 		$("select[name='customerId']").change(function() {
 			var selectedMenu = $("a[name='compTab'][class='active']").prop("id");
 			loadContent(selectedMenu, $('#formCustomerId'), $("#subcontainer"));
+			var selectedId = $('#customerId').val();
+        	localStorage["selectedCustomerId"] = selectedId;
 		});
 	});
 </script>
@@ -74,7 +79,7 @@
 		<div class="control-group customer_name">
 			<s:label key="lbl.hdr.comp.customer" cssClass="control-label custom_label labelbold" theme="simple"/>
 			<div class="controls customer_select_div">
-				<select name="customerId" class="customer_listbox">
+				<select id="customerId" name="customerId" class="customer_listbox">
 	                <% 
 	                    if (CollectionUtils.isNotEmpty(customers)) { 
 				            for (Customer customer : customers) {
