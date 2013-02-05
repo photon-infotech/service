@@ -163,7 +163,7 @@
 			</div>
 		</div>
 		
-		<div class="control-group" id="keyControl">
+		<div class="control-group">
 			<label class="control-label labelbold">
 				<s:text name="lbl.hdr.comp.system.properties" />
 			</label>
@@ -815,12 +815,14 @@
 		var value = $('#configname').val().charAt(0).replace(/[0-9]+/, '.');
 		if (value.startsWith("-") || value.startsWith(".")) {
 			showError($("#nameControl"), $("#nameError"), '<s:text name='err.msg.name.invalid'/>');
+			redirect = false;
 		} 
 		
 		$('.keywidth').each( function() {
 			var val = $(this).val().charAt(0).replace(/[0-9]+/, '.');
 			if (val.startsWith("-") || val.startsWith(".")) {
-				showError($("#keyControl"), $("#keyvalueError"), '<s:text name='err.msg.key.invalid'/>');
+				showError($("#" + $(this).attr("id")), $("#keyvalueError"),'<s:text name='err.msg.key.invalid'/>');	
+				redirect = false;
 			} 
 		});
 		
@@ -846,7 +848,7 @@
 	}
 	
 	//To check for the special character in Key Value
-	$('input[name=propTempKey]').on('input propertychange', function(e) {
+	$('input[name=propTempKey]').live('input propertychange', function(e) {
 		var propTempKey = $(this).val();
 		propTempKey = checkForSplChrExceptDot(propTempKey);
 		propTempKey = stripSpace(propTempKey);
