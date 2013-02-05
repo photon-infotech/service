@@ -151,21 +151,20 @@
 	     params = params.concat(id);
 	     params = params.concat("&versioning=")
 	     params = params.concat("versioning");
-	     loadDownloadCont(params);
+	     loadContent("downloadEdit", $('#formDownloadList'), $('#subcontainer'), params);
 	}
 	
     /** To edit the download **/
     function editDownload(id) {
+		var customerId = $('input[name=customerId]').val();
         var params = "downloadId=";
         params = params.concat(id);
-        loadDownloadCont(params);
+        params = params.concat("&customerId=");
+        params = params.concat(customerId);
+        loadContent("downloadEdit", '', $('#subcontainer'), params);
     }
     
-    function loadDownloadCont(params) {
-    	loadContent("downloadEdit", $("#formDownloadList"), $('#subcontainer'), params);
-    }
-    
- 	// This method calling from confirm_dialog.jsp
+    // This method calling from confirm_dialog.jsp
     function continueDeletion() {
     	confirmDialog('none','');
     	loadContent('downloadDelete', $('#formDownloadList'), $('#subcontainer'));

@@ -151,7 +151,7 @@
     function editConfigTemp(id) {
 		var params = "configId=";
 		params = params.concat(id);
-		loadContent("configtempEdit", $("#formConfigTempList"), $('#subcontainer'), params);
+		loadContent("configtempEdit", '', $('#subcontainer'), params);
 	}
     
  	// This method calling from confirm_dialog.jsp

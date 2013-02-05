@@ -395,15 +395,15 @@ public class Features extends ServiceBaseAction {
 			if (ArrayUtils.isNotEmpty(moduleIds)) {
                 for (String moduleId : moduleIds) {
                 	serviceManager.deleteFeature(moduleId, key);
-                } addActionMessage(getText(FEATURE_DELETED));
+                }
             }
             
             if (ArrayUtils.isNotEmpty(moduleGroupIds)) {
                 for (String moduleGroupid : moduleGroupIds) {
                 	serviceManager.deleteFeature(moduleGroupid, key);
                 }
-                addActionMessage(getText(FEATURE_DELETED));
             }
+            addActionMessage(getText(FEATURE_DELETED));
             setTechnologiesInRequest();
         } catch (PhrescoException e) {
             showErrorPopup(e, getText(EXCEPTION_FEATURE_DELETE));

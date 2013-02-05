@@ -131,10 +131,10 @@
 		toDisableCheckAll($('#checkAllAuto'),'check');
 	});
 	
-	function editGlobalUrl(id) {
+	function editGlobalUrl(id) {		
 		var params = "globalurlId=";
 		params = params.concat(id);
-		loadContent("globalurlEdit",$("#formGlobalUrlList"), $('#subcontainer'), params);
+		loadContent("globalurlEdit",'', $('#subcontainer'), params);
 	}
 	
 	// This method calling from confirm_dialog.jsp

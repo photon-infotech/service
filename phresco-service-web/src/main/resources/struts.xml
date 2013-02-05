@@ -161,7 +161,7 @@
         </action>
         
         <action name="featuresDelete" class="com.photon.phresco.service.admin.actions.components.Features" method="delete">
-            <result name="featuresList">/admin/pages/components/feature/menu.jsp</result>
+            <result name="featuresList">/admin/pages/components/feature/technology.jsp</result>
         </action>
         
         <action name="featuresSaveValidate" class="com.photon.phresco.service.admin.actions.components.Features" method="validateForm">
@@ -244,7 +244,7 @@
         </action>
         
         <action name="deleteTechGroup" class="com.photon.phresco.service.admin.actions.components.Archetypes" method="deleteTechnologyGroup">
-           <result name="techGrpList">admin/pages/components/archetype/technologyGroup.jsp</result>
+           <result name="techGrpList">/admin/pages/components/archetype/technologyGroup.jsp</result>
         </action>
         
         <action name="openTechGroupPopup" class="com.photon.phresco.service.admin.actions.components.Archetypes" method="showTechGroupPopup">
@@ -252,7 +252,7 @@
         </action>
         
         <action name="newTechGroup" class="com.photon.phresco.service.admin.actions.components.Archetypes" method="createTechGroup">
-        	 <interceptor-ref name="json"/>
+        	<interceptor-ref name="json"/>
             <result name="archetypesList">/admin/pages/components/archetype/list.jsp</result>
         </action>
         

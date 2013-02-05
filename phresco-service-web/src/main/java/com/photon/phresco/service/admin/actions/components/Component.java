@@ -282,7 +282,7 @@ public class Component extends ServiceBaseAction {
             byte[] tempFeaByteArray = IOUtils.toByteArray(is);
             componentByteArray = tempFeaByteArray;
             
-            ArtifactGroup artifactGroupInfo = ServerUtil.getArtifactinfo(new ByteArrayInputStream(tempFeaByteArray));
+            ArtifactGroup artifactGroupInfo = ServerUtil.getArtifactinfo(new ByteArrayInputStream(tempFeaByteArray), ServerUtil.getFileExtension(getFileName()));
             FileInfo fileInfo = new FileInfo();
             getHttpResponse().setStatus(getHttpResponse().SC_OK);
             if (artifactGroupInfo != null) {

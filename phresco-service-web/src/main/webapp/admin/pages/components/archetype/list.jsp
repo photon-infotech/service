@@ -180,19 +180,18 @@
 		params = params.concat(id);
 		params = params.concat("&versioning=")
 	    params = params.concat("versioning");
-		loadTechCont(params);
+		loadContent("archetypeEdit", $('#formArchetypeList'), $('#subcontainer'), params);
 	}
 	
-    function editTech(id) {
+    function editTech(id) {   
+    	var customerId = $('input[name=customerId]').val();
 		var params = "techId=";
 		params = params.concat(id);
-		loadTechCont(params);
-	}
-    
-    function loadTechCont(params) {
-    	loadContent("archetypeEdit", $("#formArchetypeList"), $('#subcontainer'), params);
-    }
-    
+		params = params.concat("&customerId=");
+        params = params.concat(customerId);
+		loadContent("archetypeEdit", '', $('#subcontainer'), params);
+	}    
+   
     // This method calling from confirm_dialog.jsp
     function continueDeletion() {
     	confirmDialog('none','');
@@ -209,6 +208,6 @@
 	function popupOnOk(self) {
 		var customerId = $('select[name=customerId]').val();
 		var params = '{"techGroups" : [' + techGroupToAdd.join(',') + '], "customerId" : "' + customerId + '"}';
-		loadJsonContent('newTechGroup', params);
+		loadJsonContent('newTechGroup',params,$("#subcontainer"));
 	}
 </script>

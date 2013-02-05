@@ -154,7 +154,8 @@ public class ServiceBaseAction extends ActionSupport implements ServiceActions, 
 	
 	// To get groupId, artfId, version from byteArray
 	protected ArtifactGroup getArtifactGroupInfo(PrintWriter writer, byte[] tempByteArray) throws PhrescoException {
-		ArtifactGroup artifactGroupInfo = ServerUtil.getArtifactinfo(new ByteArrayInputStream(tempByteArray));
+		ArtifactGroup artifactGroupInfo = 
+			ServerUtil.getArtifactinfo(new ByteArrayInputStream(tempByteArray), ServerUtil.getFileExtension(getFileName()));
 		FileInfo fileInfo = new FileInfo();
 		getHttpResponse().setStatus(getHttpResponse().SC_OK);
 		if (artifactGroupInfo != null) {

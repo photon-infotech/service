@@ -112,7 +112,7 @@
 	// This method calling from confirm_dialog.jsp
     function continueDeletion() {
     	confirmDialog('none', '');
-    	loadContent('featuresDelete', $('#formFeaturesList'), $('#feature_list'));
+    	loadContent('featuresDelete', $('#formFeaturesList'), $("#featureContainer"));
     }
 	
 	//To list the features based on the type

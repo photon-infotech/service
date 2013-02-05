@@ -121,10 +121,10 @@
 	});
 	
 	 /** To edit the pilot project **/
-    function editVideo(id) {
+    function editVideo(id) {    	
         var params = "videoId=";
         params = params.concat(id);
-        loadContent("videoEdit", $("#formVideoList"), $('#subcontainer'), params);
+        loadContent("videoEdit", '', $('#subcontainer'), params);
     }
 	 
  // This method calling from confirm_dialog.jsp

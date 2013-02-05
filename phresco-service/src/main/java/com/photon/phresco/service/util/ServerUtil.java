@@ -28,6 +28,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Element;
 
 import com.mongodb.util.Util;
@@ -51,9 +52,9 @@ public class ServerUtil {
      * @return
      * @throws PhrescoException
      */
-    public static ArtifactGroup getArtifactinfo(InputStream inputJarStream)
+    public static ArtifactGroup getArtifactinfo(InputStream inputJarStream, String fileExt)
             throws PhrescoException {
-        File jarFile = writeFileFromStream(inputJarStream, null, "jar", "validate");
+        File jarFile = writeFileFromStream(inputJarStream, null, fileExt, "validate");
         ArtifactGroup artifactInfo = getArtifactInfoFromJar(jarFile); 
         FileUtil.delete(jarFile);
         return artifactInfo;
@@ -71,40 +72,43 @@ public class ServerUtil {
 		ArtifactGroup info = null;
 		try {
 			InputStream artifactStream = getArtifactPomStream(jarFile);
-			PomProcessor processor = new PomProcessor(artifactStream);
-			info = new ArtifactGroup();
-			info.setGroupId(processor.getGroupId());
-			info.setArtifactId(processor.getArtifactId());
-			ArtifactInfo artifactInfo = new ArtifactInfo();
-			artifactInfo.setVersion(processor.getVersion());
-			List<ArtifactInfo> artifactInfos = new ArrayList<ArtifactInfo>();
-			artifactInfos.add(artifactInfo);
-			info.setVersions(artifactInfos);
+			if(artifactStream != null) {
+				PomProcessor processor = new PomProcessor(artifactStream);
+				info = new ArtifactGroup();
+				info.setGroupId(processor.getGroupId());
+				info.setArtifactId(processor.getArtifactId());
+				ArtifactInfo artifactInfo = new ArtifactInfo();
+				artifactInfo.setVersion(processor.getVersion());
+				List<ArtifactInfo> artifactInfos = new ArrayList<ArtifactInfo>();
+				artifactInfos.add(artifactInfo);
+				info.setVersions(artifactInfos);
+			}
 		} catch (Exception e) {
 			throw new PhrescoException(e);
 		}
 		return info;
 	}
     
-	public static InputStream getArtifactPomStream(File artifactFile) throws PhrescoException {
-		String pomFile = null;
-		try {
-			JarFile jarfile = new JarFile(artifactFile);
-			for (Enumeration<JarEntry> em = jarfile.entries(); em
-					.hasMoreElements();) {
-				JarEntry jarEntry = em.nextElement();
-				if (jarEntry.getName().endsWith("pom.xml")) {
-					pomFile = jarEntry.getName();
+	public static InputStream getArtifactPomStream(File artifactFile)
+			throws PhrescoException {
+			String pomFile = null;
+			try {
+				JarFile jarfile = new JarFile(artifactFile);
+				for (Enumeration<JarEntry> em = jarfile.entries(); em
+						.hasMoreElements();) {
+					JarEntry jarEntry = em.nextElement();
+					if (jarEntry.getName().endsWith("pom.xml")) {
+						pomFile = jarEntry.getName();
+					}
 				}
+				if (pomFile != null) {
+					ZipEntry entry = jarfile.getEntry(pomFile);
+					InputStream inputStream = jarfile.getInputStream(entry);
+					return inputStream;
+				}
+			} catch (Exception e) {
+				throw new PhrescoException(e);
 			}
-			if (pomFile != null) {
-				ZipEntry entry = jarfile.getEntry(pomFile);
-				InputStream inputStream = jarfile.getInputStream(entry);
-				return inputStream;
-			}
-		} catch (Exception e) {
-			throw new PhrescoException(e);
-		}
 		return null;
 	}
     
@@ -381,9 +385,12 @@ public class ServerUtil {
    }
    
 	public static File getArtifactPomFile(File artifactFile) throws PhrescoException {
+		
+		String fileExt = getFileExtension(artifactFile.getName());		
+		File pomFile = null;
+		if (StringUtils.equals(fileExt, "jar")) {
 		FileOutputStream fileOutStream = null;
 		InputStream pomStream  = null;
-		File pomFile = null;
 		try {
 			pomFile = getPomFile();
 			pomStream = getArtifactPomStream(artifactFile);
@@ -393,7 +400,7 @@ public class ServerUtil {
             while ((len = pomStream.read(buf)) > 0) {
                 fileOutStream.write(buf, 0, len);
             }
-		} catch (PhrescoException e) {
+		} catch (PhrescoException e) {			
 			throw new PhrescoException(e);
 		} catch (FileNotFoundException e) {
 			throw new PhrescoException(e);
@@ -402,6 +409,7 @@ public class ServerUtil {
 		} finally {
 			Utility.closeStream(pomStream);
 			Utility.closeStream(fileOutStream);
+		}
 		}
 		return pomFile;
 	}
@@ -433,6 +441,8 @@ public class ServerUtil {
 			fileExt = "js";
 		} else if(fileName.endsWith("war")) {
 			fileExt = "war";
+		} else if(fileName.endsWith("ZIP")) {
+			fileExt = "zip";
 		}
 		
 		return fileExt;

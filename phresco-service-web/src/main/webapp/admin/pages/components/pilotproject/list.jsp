@@ -155,22 +155,17 @@
 	      params = params.concat(id);
 	      params = params.concat("&versioning=")
 	      params = params.concat("versioning");
-	      loadCont(params)
+	      loadContent("pilotprojEdit",'', $('#subcontainer'), params);
 	}
 	
     /** To edit the pilot project **/
-    function editPilotProject(id) {
-    	// disable for checkbox
-		jQuery("input[name='projectId']").each(function(i) {
-			jQuery(this).attr('disabled', 'disabled');
-		});
+    function editPilotProject(id) {  
+    	var customerId = $('input[name = customerId]').val();
     	var params = "projectId=";
         params = params.concat(id);
-        loadCont(params)
-    }
-    
-    function loadCont(params) {
-    	loadContent("pilotprojEdit", $("#formPilotProjList"), $('#subcontainer'), params);
+        params = params.concat("&customerId=");
+        params = params.concat(customerId);
+        loadContent("pilotprojEdit", '', $('#subcontainer'), params);
     }
     
  	// This method calling from confirm_dialog.jsp
