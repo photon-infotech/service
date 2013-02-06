@@ -35,7 +35,7 @@
 	var customerId = "";
 	$(document).ready(function() {
 		var customerId = localStorage["selectedCustomerId"];
-		$("#customerId").val(customerId);
+		$("#customerSelect").val(customerId);
 		
 		clickMenu($("a[name='compTab']"), $("#subcontainer"), $('#formCustomerId'));
 		loadContent("featuresMenu", $('#formCustomerId'), $("#subcontainer"));
@@ -52,19 +52,19 @@
 		//Customer change event	  	
 	  	$('.customer_listbox').ddslick({
         	onSelected: function(data) {
-        		customerId = data.selectedData.value;
-				customerChangeEvent();
+        		var selectedId = data.selectedData.value;
+				customerChangeEvent(selectedId);
         	}
         });
 	});
 	
-	function customerChangeEvent() {
+	function customerChangeEvent(selectedId) {
+		$('#customerId').val(selectedId);
+		localStorage["selectedCustomerId"] = selectedId;
 		var selectedMenu = $("a[name='compTab'][class='active']").prop("id");
 		var params = "customerId=";
 		params = params.concat(customerId);
-		loadContent(selectedMenu, $('#formCustomerId'), $("#subcontainer"), params);
-		var selectedId = $('#customerId').val();
-        	localStorage["selectedCustomerId"] = selectedId;
+		loadContent(selectedMenu, $('#formCustomerId'), $("#subcontainer"), params);	
 	}
 </script>
 
@@ -78,7 +78,7 @@
 			<div class="ddright">
 				<s:label key="lbl.hdr.comp.customer" cssClass="control-label custom_label labelbold" theme="simple"/>
 				<div class="controls customer_select_div">
-					<select id="customerId" name="customerId" class="customer_listbox">
+					<select id="customerSelect" name="customerSelect" class="customer_listbox">
 		                <% 
 		                    if (CollectionUtils.isNotEmpty(customers)) { 
 					            for (Customer customer : customers) { 
@@ -89,6 +89,7 @@
 					        } 
 					    %>
 					</select>
+					<input type="hidden" id="customerId" name="customerId" value=""/>
 				</div>
 			</div>
 		</div>

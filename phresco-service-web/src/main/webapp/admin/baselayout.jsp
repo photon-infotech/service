@@ -216,7 +216,7 @@
                                     </ul>
                                 </li>
                                 <li><a href="#" id="about" ><s:text name="lbl.usrset.abtservice"/></a></li>
-                                <li><a href="<s:url action='logout'/>"><s:text name="lbl.usrset.signout"/></a></li>
+                                <li><a href="<s:url action='admin/logout'/>"><s:text name="lbl.usrset.signout"/></a></li>
                             </ul>
                         </div>
 					</aside>
