@@ -5065,6 +5065,8 @@ input[class="chkBox_config"] {
 
 .download_feature_tbl thead tr th {
 	height : 30px !important;
+	background: #3c3c3c;
+	color: #ffffff !important;
 }
 
 .adminaddtheme {
@@ -5073,4 +5075,8 @@ input[class="chkBox_config"] {
 
 .adminaddtheme .mfbox  {
 	border: 1px solid #3c3c3c;
+}
+
+.controls a {
+	color: #3c3c3c !important;
 }
