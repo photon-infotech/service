@@ -301,9 +301,9 @@ function showLoadingIcon() {
 	var src = "theme/photon/images/loading_blue.gif";
 	var theme =localStorage["color"];
     if (theme == "theme/red_blue/css/red.css") {
-    	src = "theme/photon/images/loading_red.gif";
+    	src = "theme/red_blue/images/loading_red.gif";
     } else if (theme == "theme/red_blue/css/blue.css") {
-    	src = "theme/photon/images/loading_blue.gif";
+    	src = "theme/red_blue/images/loading_blue.gif";
     } else if (theme == undefined || theme == "theme/photon/css/photon_theme.css") {
     	src = "theme/photon/images/loading_green.gif";
     }
