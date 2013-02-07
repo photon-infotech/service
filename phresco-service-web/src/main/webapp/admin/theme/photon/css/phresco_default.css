@@ -184,14 +184,6 @@ div.lgnBtnLabel {
 	overflow-x: hidden;
 }
 
-.content_feature {
-	height: 85%;
-	overflow-y: auto;
-	padding-top: 0px;
-	width: 100%;
-	overflow-x: hidden;
-}
-
 /*** page header ends***/
 .table_div {
 	border-radius: 6px 6px 6px 6px;
@@ -1997,6 +1989,12 @@ input[class *='sample'] {
 	overflow-y: auto;
 }
 
+.config-fixed-table-container-inner table tbody {
+	height: 55px;
+	overflow-x: visible;
+	overflow-y: auto;
+}
+
 .fixTableHdr {
 	top: 0;
 	position: absolute;
@@ -2688,7 +2686,7 @@ div.lgnBtnLabel {
 }
 
 .content_adder {
-	height: 83%;
+	height: 492px;
 	overflow-y: auto;
 	padding-top: 0px;
 	width: 100%;
@@ -3625,6 +3623,7 @@ legend {
 	padding: 0px;
 	overflow-x: hidden;
 	overflow-y: auto;
+	height: 430px;
 }
 
 .lft_menus_container {
@@ -4867,12 +4866,14 @@ div[class *='syncTable'] {
 	width: 230px;
 	float: left;
 	text-align: center;
+	color: #FFFFFF !important;
 }
 .tableCoordinate {
 	height: 20px;
 	width: 220px;
 	float: left;
 	text-align: center;
+	color: #FFFFFF !important;
 }
 
 .popupimage {
@@ -5108,4 +5109,12 @@ input[class="chkBox_config"] {
 
 .controls a {
 	color: #3c3c3c !important;
+}
+
+.tablelegend #propTempTbody tr td:nth-child(3) select{
+	width: 100px !important;
+}
+
+.adminaddtheme .closereg {
+	padding: 0px 0px 3px !important;
 }

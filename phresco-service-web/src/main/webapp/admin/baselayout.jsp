@@ -79,10 +79,10 @@
 		
 			
 		<script type="text/javascript">
-			applyTheme();
+			
 		    $(document).ready(function() {
 		    	enableScreen();
-		    	
+		    	applyTheme();
 		    	$(".styles").click(function() {
 					localStorage.clear();
 					var value = $(this).attr("rel");
@@ -168,7 +168,7 @@
 		<header>
 			<div class="header">
 				<div class="Logo">
-					 <a href="#" id="goToHome"><img class="headerlogoimg" src="theme/photon/images/phresco_header_red.png" alt="logo"></a>
+					 <a href="#" id="goToHome"><img class="headerlogoimg" src="" alt="logo"></a>
 				</div>
 				<div class="headerInner">
 					<div class="nav_slider">

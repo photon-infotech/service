@@ -175,7 +175,7 @@ div.lgnBtnLabel {
 }
 
 .content_adder {
-	height: 83%;
+	height: 435px;
 	overflow-y: auto;
 	padding-top: 0px;
 	width: 100%;
@@ -1121,6 +1121,7 @@ legend {
 	padding: 0px;
 	overflow-x: hidden;
 	overflow-y: auto;
+	height: 390px;
 }
 
 .lft_menus_container {
@@ -2628,4 +2629,8 @@ input[class="chkBox_config"] {
 
 #subTabcontent nav {
 	margin-top:0px !important;
+}
+
+.tablelegend #propTempTbody tr td:nth-child(3) select{
+	width: 100px !important;
 }
