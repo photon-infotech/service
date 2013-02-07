@@ -39,7 +39,6 @@ import org.apache.log4j.Logger;
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.Customer.LicenseType;
-import com.photon.phresco.commons.model.FrameWorkTheme;
 import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
@@ -101,10 +100,10 @@ public class Customers extends ServiceBaseAction  {
 	private String labelColor = "";
 	private String disabledLabelColor = "";
 	private String copyRightColor = "";
+	private String copyRight = "";
 	private String snapshotRepoUrl = "";
 	private String groupRepoUrl = "";
 	private String baseRepoUrl = "";
-	private String frameworkThemeId = "";
 	private List<String> appliesTo = new ArrayList<String>();
 	List<ApplicationType> applicableAppTypes = new ArrayList<ApplicationType>();
 	
@@ -301,27 +300,23 @@ public class Customers extends ServiceBaseAction  {
         if (StringUtils.isNotEmpty(getBaseRepoUrl())){
         	repoInfo.setBaseRepoURL(getBaseRepoUrl());
         }
-        
-        
         customer.setRepoInfo(repoInfo);
         List<String> appliesTo = getAppliesTo();
         customer.setApplicableTechnologies(appliesTo);
-        FrameWorkTheme frameworkTheme = new FrameWorkTheme();
-        if (StringUtils.isNotEmpty(getFrameworkThemeId())) {
-        	frameworkTheme.setId(getFrameworkThemeId());
-    	}
-        frameworkTheme.setBrandingColor(getBrandingColor());
-        frameworkTheme.setAccordionBackGroundColor(getAccordionBackGroundColor());
-        frameworkTheme.setBodyBackGroundColor(getBodyBackGroundColor());
-        frameworkTheme.setBrandingColor(getBrandingColor());
-        frameworkTheme.setButtonColor(getButtonColor());
-        frameworkTheme.setPageHeaderColor(getPageHeaderColor());
-        frameworkTheme.setCopyRightColor(getCopyRightColor());
-        frameworkTheme.setLabelColor(getLabelColor());
-        frameworkTheme.setMenuBackGround(getMenuBackGround());
-        frameworkTheme.setMenufontColor(getMenufontColor());
-        frameworkTheme.setDisabledLabelColor(getDisabledLabelColor());
+        Map<String, String> frameworkTheme = new HashMap<String, String>();
+        frameworkTheme.put(BRANDING_COLOR , getBrandingColor());
+        frameworkTheme.put(ACCORDION_BACKGROUND_COLOR, getAccordionBackGroundColor());
+        frameworkTheme.put(BODYBACKGROUND_COLOR, getBodyBackGroundColor());
+        frameworkTheme.put(BUTTON_COLOR, getButtonColor());
+        frameworkTheme.put(PAGEHEADER_COLOR, getPageHeaderColor());
+        frameworkTheme.put(COPYRIGHT_COLOR, getCopyRightColor());
+        frameworkTheme.put(LABEL_COLOR, getLabelColor());
+        frameworkTheme.put(MENU_FONT_COLOR, getMenufontColor());
+        frameworkTheme.put(MENU_BACKGROUND_COLOR, getMenuBackGround());
+        frameworkTheme.put(COPYRIGHT, getCopyRight());
+        frameworkTheme.put(DISABLED_LABEL_COLOR, getDisabledLabelColor());
         customer.setFrameworkTheme(frameworkTheme);
+       
         return customer;
     }
 	
@@ -922,11 +917,11 @@ public class Customers extends ServiceBaseAction  {
 		this.disabledLabelColor = disabledLabelColor;
 	}
 
-	public void setFrameworkThemeId(String frameworkThemeId) {
-		this.frameworkThemeId = frameworkThemeId;
+	public String getCopyRight() {
+		return copyRight;
 	}
 
-	public String getFrameworkThemeId() {
-		return frameworkThemeId;
+	public void setCopyRight(String copyRight) {
+		this.copyRight = copyRight;
 	}
 }

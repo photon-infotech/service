@@ -18,6 +18,8 @@
   ###
   --%>
 
+<%@page import="org.apache.commons.collections.MapUtils"%>
+<%@page import="java.util.Map"%>
 <%@ taglib uri="/struts-tags" prefix="s" %>
 
 <%@ page import="org.apache.commons.lang.StringUtils" %>
@@ -32,7 +34,6 @@
 <%@ page import="com.photon.phresco.commons.model.ApplicationType" %>
 <%@ page import="org.apache.commons.collections.CollectionUtils" %>
 <%@ page import="com.photon.phresco.commons.model.Technology" %>
-<%@ page import="com.photon.phresco.commons.model.FrameWorkTheme" %>
 
 <%
 	Customer customer = (Customer) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER);
@@ -80,10 +81,11 @@
 	String labelColor = "";
 	String disabledLabelColor = "";
 	String copyRightColor = "";
-	String frameworkThemeId = "";
+	String copyRight = "";
 	
 	List<String> applicableTechnologies = new ArrayList();
 	List<ApplicationType> applicableAppTypes = null;
+	Map<String, String> frameworkTheme = null;
 	
 	if (customer != null) {
 	    if (StringUtils.isNotEmpty(customer.getId())) {
@@ -141,49 +143,20 @@
 			disabledClass = "btn-disabled";
 			disabled = "disabled";
 		}
+		frameworkTheme = customer.getFrameworkTheme();
 		
-		FrameWorkTheme theme = customer.getFrameworkTheme();
-		if (theme != null) {
-			frameworkThemeId = theme.getId();
-			if (theme.getBrandingColor() != null) {
-				brandingColor = customer.getFrameworkTheme().getBrandingColor();
-			}
-			
-			if (theme.getBodyBackGroundColor() != null) {
-				bodyBackGroundColor = customer.getFrameworkTheme().getBodyBackGroundColor();
-			}
-			
-			if (theme.getAccordionBackGroundColor() != null) {
-				accordionBackGroundColor = customer.getFrameworkTheme().getAccordionBackGroundColor();
-			}
-			
-			if (theme.getMenuBackGround() != null) {
-				menuBackGround = customer.getFrameworkTheme().getMenuBackGround();
-			}
-			
-			if (theme.getMenufontColor() != null) {
-				menufontColor = customer.getFrameworkTheme().getMenufontColor();
-			}
-			
-			if (theme.getButtonColor() != null) {
-				buttonColor = customer.getFrameworkTheme().getButtonColor();
-			}
-			
-			if (theme.getPageHeaderColor() != null) {
-				pageHeaderColor = customer.getFrameworkTheme().getPageHeaderColor();
-			}
-			
-			if (theme.getLabelColor() != null) {
-				labelColor = customer.getFrameworkTheme().getLabelColor();
-			}
-			
-			if (theme.getDisabledLabelColor() != null) {
-				disabledLabelColor = customer.getFrameworkTheme().getDisabledLabelColor();
-			}
-			
-			if (theme.getCopyRightColor() != null) {
-				copyRightColor = customer.getFrameworkTheme().getCopyRightColor();
-			}
+		if (MapUtils.isNotEmpty(frameworkTheme)) {
+			brandingColor = frameworkTheme.get("brandingColor");
+			bodyBackGroundColor = frameworkTheme.get("bodyBackGroundColor");
+			accordionBackGroundColor = frameworkTheme.get("accordionBackGroundColor");
+			menuBackGround = frameworkTheme.get("MenuBackGround");
+			menufontColor = frameworkTheme.get("MenufontColor");
+			buttonColor = frameworkTheme.get("ButtonColor");
+			pageHeaderColor = frameworkTheme.get("PageHeaderColor");
+			labelColor = frameworkTheme.get("LabelColor");
+			disabledLabelColor = frameworkTheme.get("DisabledLabelColor");
+			copyRightColor = frameworkTheme.get("CopyRightColor");
+			copyRight = frameworkTheme.get("CopyRight");
 		}
 		
 		if (StringUtils.isNotEmpty(customer.getRepoInfo().getRepoName())) {
@@ -699,7 +672,7 @@
 									name='lbl.hdr.adm.cust.brandingcolor' /> </label>
 							<div class="controls">
 								<input id="brandcolor" placeholder="<s:text name='place.hldr.cust.add.brandingcolor'/>"class="input-xlarge" type="text" name="brandingColor"
-									value="<%=brandingColor%>" maxlength="50" title="50 Characters only">
+									value="<%= brandingColor %>" maxlength="50" title="50 Characters only">
 							</div>
 						</div>
 						<div class="control-group">
@@ -794,6 +767,19 @@
 							</div>
 						</div>
 						
+							
+						<div class="control-group">
+							<label class="control-label labelbold">
+								<s:text name='lbl.hdr.adm.cust.copyright'/>
+							</label>
+							<div class="controls">
+								<input id="copyright" placeholder="<s:text name='place.hldr.cust.add.copyright'/>" class="input-xlarge" type="text" name="CopyRight"
+								   value="<%=copyRight%>"  maxlength="50" title="50 Characters only">
+							</div>
+						</div>
+						
+						
+						
 						<div class="control-group" id="iconControl">
 							<label class="control-label labelbold"> 
 							 	<s:text name='lbl.hdr.adm.upload.logo' />
@@ -829,7 +815,6 @@
 	<input type="hidden" name="snapshotRepoUrl" value="<%= snapShotRepoUrl %>">
 	<input type="hidden" name="groupRepoUrl" value="<%= groupRepoUrl %>">
 	<input type="hidden" name="baseRepoUrl" value="<%= baseRepoUrl %>">
-	<input type="hidden" name="frameworkThemeId" value="<%= frameworkThemeId %>">
 </form>
 
 <script type="text/javascript">

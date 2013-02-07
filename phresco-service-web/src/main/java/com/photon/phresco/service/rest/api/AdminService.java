@@ -177,9 +177,6 @@ public class AdminService extends DbService {
         			(Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
     			CustomerDAO customerDAO = customerConverter.convertObjectToDAO(customer);
 		        mongoOperation.save(CUSTOMERDAO_COLLECTION_NAME, customerDAO);
-		        FrameWorkTheme frameworkTheme = customer.getFrameworkTheme();
-		        frameworkTheme.setCustomerId(customerDAO.getId());
-		        mongoOperation.save(FRAMEWORK_THEME_COLLECTION_NAME, frameworkTheme);
 			}	
     	} catch (Exception e) {
     		throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
