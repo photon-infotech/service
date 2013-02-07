@@ -1,15 +1,11 @@
 package com.photon.phresco.service.converters;
 
 import org.springframework.data.document.mongodb.MongoOperations;
-import org.springframework.data.document.mongodb.query.Criteria;
-import org.springframework.data.document.mongodb.query.Query;
 
 import com.photon.phresco.commons.model.Customer;
-import com.photon.phresco.commons.model.FrameWorkTheme;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.dao.CustomerDAO;
-import com.photon.phresco.util.ServiceConstants;
 
 public class CustomerConverter implements Converter<CustomerDAO, Customer> {
 
@@ -35,11 +31,7 @@ public class CustomerConverter implements Converter<CustomerDAO, Customer> {
 		customer.setValidFrom(dao.getValidFrom());
 		customer.setValidUpto(dao.getValidUpto());
 		customer.setZipcode(dao.getZipcode());
-		FrameWorkTheme frameWorkTheme = mongoOperation.findOne(ServiceConstants.FRAMEWORK_THEME_COLLECTION_NAME, 
-				new Query(Criteria.whereId().is(dao.getFrameworkThemeId())), FrameWorkTheme.class);
-		if(frameWorkTheme != null) {
-			customer.setFrameworkTheme(frameWorkTheme);
-		}
+		customer.setFrameworkTheme(dao.getFrameworkTheme());
 		return customer;
 	}
 
@@ -65,7 +57,7 @@ public class CustomerConverter implements Converter<CustomerDAO, Customer> {
 		customerDAO.setValidFrom(customer.getValidFrom());
 		customerDAO.setValidUpto(customer.getValidUpto());
 		customerDAO.setZipcode(customer.getZipcode());
-		customerDAO.setFrameworkThemeId(customer.getFrameworkTheme().getId());
+		customerDAO.setFrameworkTheme(customer.getFrameworkTheme());
 		return customerDAO;
 	}
 

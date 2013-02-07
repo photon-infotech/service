@@ -2,10 +2,11 @@ package com.photon.phresco.service.dao;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.photon.phresco.commons.model.ApplicationType;
-import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.commons.model.Customer.LicenseType;
+import com.photon.phresco.commons.model.RepoInfo;
 
 public class CustomerDAO extends BaseDAO {
 
@@ -25,7 +26,7 @@ public class CustomerDAO extends BaseDAO {
 	private String icon;
 	private List<String> applicableTechnologies;
 	private List<ApplicationType> applicableAppTypes;
-	private String frameworkThemeId;
+	private Map<String, String> frameworkTheme;
 	
 	public String getEmailId() {
 		return emailId;
@@ -131,11 +132,12 @@ public class CustomerDAO extends BaseDAO {
 		this.applicableTechnologies = applicableTechnologies;
 	}
 			
-	public String getFrameworkThemeId() {
-		return frameworkThemeId;
+	public Map<String, String> getFrameworkTheme() {
+		return frameworkTheme;
 	}
-	public void setFrameworkThemeId(String frameworkThemeId) {
-		this.frameworkThemeId = frameworkThemeId;
+	
+	public void setFrameworkTheme(Map<String, String> frameworkTheme) {
+		this.frameworkTheme = frameworkTheme;
 	}
 	
 }
