@@ -158,6 +158,7 @@
 			</div>
 			<div id="indicator"></div>
 		</div>
+		<!-- In Progress Ends -->
 		
 		<div id="loadingIconDiv" class="hideContent"> 
 			<img class="loadingIcon" id="loadingIconImg" src="" />
