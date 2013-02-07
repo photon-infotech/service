@@ -92,7 +92,7 @@
 												<tr>
 													<td class="editFeatures_td1">
 														<input type="radio" class="module" name="<%= moduleGroup.getId() %>" value="<%= module.getId() %>"
-															<%= checkedStr %> onchange="selectCheckBox('<%= moduleGroup.getId()%>', this);">
+															<%= checkedStr %> version="<%= module.getVersion() %>" onchange="selectCheckBox('<%= moduleGroup.getId()%>', this);">
 													</td>
 													<td class="fontColor"><%= moduleGroup.getName() %></td>
 													<td class="fontColor"><%= module.getVersion() %></td>
@@ -143,7 +143,7 @@
 			var isCheckboxChecked = $(this).is(":checked");
 			if (isCheckboxChecked) {
 				$("input:radio[name='" + modGrpId + "']:first").prop("checked", true);
-				var version = $("input:radio[name='" + modGrpId + "']:first").val();
+				var version = $("input:radio[name='" + modGrpId + "']:first").attr("version");
 				$("p[id='" + modGrpId + "version']").html(version);
 			} else {
 				$("input:radio[name='" + modGrpId + "']").prop("checked", false);
@@ -157,6 +157,8 @@
 			var size = $('input[name="dependentModGroupId"]:checked').size();
 			if(size > 0) {
 				$('#totalSize').html(size+" Dependencies Added");
+			} else {
+				$('#totalSize').empty();
 			}
 			loadContent('saveDependentFeatures', $('#formDependency'), $('#popup_div'), '', true);
 			hideLoadingIcon();
@@ -164,7 +166,7 @@
 		
 		//To check the selected modules group checkbox and show the selected version
 		$("input[type=radio]:checked").each(function() {
-			var version = $(this).val();
+			var version = $(this).attr('version');
 			var moduleGroupId = $(this).attr('name');
 			$("p[id='" + moduleGroupId + "version']").html(version);
 			$("#" + moduleGroupId + "checkBox").prop("checked", true);
@@ -173,7 +175,7 @@
 	
 	//Radio button click function to check the checkbox and show the selected version
 	function selectCheckBox(moduleId, currentElement) {
-		var version = currentElement.value;
+		var version = $(currentElement).attr("version");
 		$("input[id='" + moduleId + "checkBox']").prop("checked", true);
 		$("p[id='" + moduleId + "version']").html(version);
 	}

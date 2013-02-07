@@ -62,9 +62,7 @@
 		$('#customerId').val(selectedId);
 		localStorage["selectedCustomerId"] = selectedId;
 		var selectedMenu = $("a[name='compTab'][class='active']").prop("id");
-		var params = "customerId=";
-		params = params.concat(customerId);
-		loadContent(selectedMenu, $('#formCustomerId'), $("#subcontainer"), params);	
+		loadContent(selectedMenu, $('#formCustomerId'), $("#subcontainer"));	
 	}
 </script>
 

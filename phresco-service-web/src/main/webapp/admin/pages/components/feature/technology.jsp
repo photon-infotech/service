@@ -63,12 +63,12 @@
 		
 		<div class="featurelist_tech">
 			<s:text name='lbl.comp.featr.technology'/>
-			<select name="technology" id="tech_id">
+			<select name="" id="tech_id">
 				<%
 					if (CollectionUtils.isNotEmpty(technologies)) {
 						for (Technology technology : technologies) {
 				%>
-							<option selected="selected" value="<%= technology.getId() %>"><%= technology.getName() %></option>
+							<option value="<%= technology.getId() %>"><%= technology.getName() %></option>
 				<%
 						}
 					}
@@ -88,12 +88,12 @@
 			</div>
 		</s:if>
 	</div>	
-	
 	<div class="featurelist_height" id="feature_list">
 	
 	</div>
     
 	<!-- Hidden Fields -->
+	<input type="hidden" id="" name="technology" value=""/>
     <input type="hidden" name="customerId" value="<%= customerId %>">
     <input type="hidden" name="type" value="<%= type %>">
 </form>
@@ -104,6 +104,8 @@
 		$('#tech_id').ddslick({
         	onSelected: function(data) {
         		selectedTechId = data.selectedData.value;
+        		$("tech_id").val(selectedTechId);
+        		$("input[name=technology]").val(selectedTechId);
         		featurelist();
         	}
         });
@@ -117,7 +119,6 @@
 	
 	//To list the features based on the type
     function featurelist() {
-   		var params = 'technology=' + selectedTechId;
-		loadContent('listFeatures', $('#formFeaturesList'), $('#feature_list'), params, '', true);
+		loadContent('listFeatures', $('#formFeaturesList'), $('#feature_list'), '', '', true);
     }
 </script>

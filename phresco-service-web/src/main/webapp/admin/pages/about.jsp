@@ -36,7 +36,6 @@
 		$(".popupOk").hide();
 		$("#clipboard").hide();
 		$('#popupClose').show();
-		popupClose
 		showVersionInfo();
 	});
 	
