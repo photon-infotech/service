@@ -363,6 +363,11 @@ function disableScreen() {
 	$(".modal-backdrop").show();
 }
 
+//To strip the Space
+function stripSpace(inputStr) {
+	return inputStr.replace(/\s/g,'');
+}
+
 //To enable the screen by hiding an overlay
 function enableScreen() {
 	$(".modal-backdrop").hide();

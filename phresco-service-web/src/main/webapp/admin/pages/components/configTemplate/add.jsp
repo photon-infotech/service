@@ -813,14 +813,14 @@
 		}
 		
 		var value = $('#configname').val().charAt(0).replace(/[0-9]+/, '.');
-		if (value.startsWith("-") || value.startsWith(".")) {
+		if (value === "-" || value === ".") {
 			showError($("#nameControl"), $("#nameError"), '<s:text name='err.msg.name.invalid'/>');
 			redirect = false;
 		} 
 		
 		$('.keywidth').each( function() {
 			var val = $(this).val().charAt(0).replace(/[0-9]+/, '.');
-			if (val.startsWith("-") || val.startsWith(".")) {
+			if (val === "-" || val === ".") {
 				showError($("#" + $(this).attr("id")), $("#keyvalueError"),'<s:text name='err.msg.key.invalid'/>');	
 				redirect = false;
 			} 

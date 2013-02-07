@@ -21,7 +21,9 @@
 
 <%@ page import="java.util.List" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="java.util.Collections"%>
 <%@ page import="org.apache.commons.collections.CollectionUtils"%>
+<%@ page import="com.photon.phresco.service.admin.actions.ServiceBaseAction"%>
 
 <%@ page import="com.photon.phresco.commons.model.ArtifactInfo" %>
 <%@ page import=" com.photon.phresco.commons.model.ArtifactGroup" %>
@@ -88,6 +90,7 @@
 			                            <tbody>
 			                            <% 
 									    	List<ArtifactInfo> versions = moduleGroup.getVersions();
+			                            	Collections.sort(versions, ServiceBaseAction.ARTIFACTINFO__COMPARATOR_DESCEND);
 									    	if (CollectionUtils.isNotEmpty(versions)) {
 												for (ArtifactInfo module : versions) {
 												    String descContent = "";
