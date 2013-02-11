@@ -272,6 +272,12 @@ function setTimeOut() {
 			$('#errormsg').remove();
 		});
 	}, 2000);
+	
+	setTimeout(function() {
+		$('.errMsg').empty("slow", function () {
+			$('.errMsg').remove();
+		});
+	}, 2000);
 }
 
 function accordion() {
@@ -413,17 +419,32 @@ function arrayPushPop(fileName, isEnable){
 
 function disableEnableTextBox(groupId, artifactId, jarVersion, isEnable, type, fileName) {
 	if (type === "pluginJar") {
+		var groupIdDisable = "disabled";
+		if (groupId == undefined || isBlank(groupId)) {
+			groupIdDisable = false;
+		}
+	
+		var artifactIdDisable = "disabled";
+		if (artifactId == undefined || isBlank(artifactId)) {
+			artifactIdDisable = false;
+		}
+	
+		var jarVersionDisable = "disabled";
+		if (jarVersion == undefined || isBlank(jarVersion)) {
+			jarVersionDisable = false;
+		}
+		
 		var duplicate = checkExistence(fileName);
 		arrayPushPop(fileName, true);
 		var groupid = "grouId" ;
 		var artifId = "artifId" ;
 		var versnId = "versnId" ;
 		var fileDetParentDiv = $(document.createElement('div')).attr("id", fileName).attr("class","fileClass");
-		fileDetParentDiv.html("<div style='float: left; margin: 0px 10px 0px 0px;'><div class='controls' style='margin-left: 0%;'><input style='text-align:center;'id='" +groupid +"' class='groupId' class='input-xlarge' name='"+fileName+"_groupId" +"' maxlength='40' title='40 Characters only' type='text'  value='" + groupId +"' >" +
+		fileDetParentDiv.html("<div style='float: left; margin: 0px 10px 0px 0px;'><div class='controls' style='margin-left: 0%;'><input style='text-align:center;'id='" +groupid +"' class='pluginGroupId' class='input-xlarge' name='"+fileName+"_groupId" +"' maxlength='40' title='40 Characters only' type='text'  value='" + groupId +"' "+groupIdDisable+" >" +
 				           "</div></div></td>"); 
-		fileDetParentDiv.append("<div style='float: left; margin: 0px 10px 0px 0px;'><div class='controls' style='margin-left: 0%;'><input style='text-align:center;'id='" +artifId +"'class='artifactId' class='input-xlarge' name='"+fileName+"_artifactId" +"' maxlength='40' title='40 Characters only' type='text' value='" + artifactId +"' >" +
+		fileDetParentDiv.append("<div style='float: left; margin: 0px 10px 0px 0px;'><div class='controls' style='margin-left: 0%;'><input style='text-align:center;'id='" +artifId +"'class='pluginArtifactId' class='input-xlarge' name='"+fileName+"_artifactId" +"' maxlength='40' title='40 Characters only' type='text' value='" + artifactId +"' "+artifactIdDisable+">" +
 				              "</div></div>");
-		fileDetParentDiv.append("<div style='float: left; margin: 0px 10px 0px 0px;'><div class='controls'  style='margin-left: 0%;'><input style='text-align:center;'id='" +versnId +"'class='jarVersion' name='"+fileName+"_version" +"'  maxlength='30' title='30 Characters only' class='input-xlarge' type='text' value='" +jarVersion +"' > " +
+		fileDetParentDiv.append("<div style='float: left; margin: 0px 10px 0px 0px;'><div class='controls'  style='margin-left: 0%;'><input style='text-align:center;'id='" +versnId +"'class='pluginJarVersion' name='"+fileName+"_version" +"'  maxlength='30' title='30 Characters only' class='input-xlarge' type='text' value='" +jarVersion +"' "+jarVersionDisable+"> " +
 		                   "</div></div>");
 		fileDetParentDiv.append("</div>");
 		fileDetParentDiv.appendTo("#tableAdd");

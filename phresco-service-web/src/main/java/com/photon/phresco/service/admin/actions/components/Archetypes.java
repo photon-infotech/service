@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.bind.JAXBException;
 
@@ -137,6 +138,7 @@ public class Archetypes extends ServiceBaseAction {
 		inputStreamMap.clear();
 		pluginArtfactInfoMap.clear();
 		archetypeJarByteArray = null;
+		pluginInfos.clear();
 
 		return COMP_ARCHETYPE_LIST;
 	}
@@ -234,7 +236,8 @@ public class Archetypes extends ServiceBaseAction {
 				int pos = name.lastIndexOf('.');
 				String ext = key.substring(pos+1);
 				pluginInfo.setPackaging(ext);
-				pluginInfos.add(pluginInfo);
+				//pluginInfos.add(pluginInfo);
+				pluginArtfactInfoMap.put(key, pluginInfo);
 			}
 		}
 	}
@@ -304,6 +307,11 @@ public class Archetypes extends ServiceBaseAction {
         List<String> listTechVersion = Arrays.asList(techVersions);
         technology.setTechVersions(listTechVersion);
         technology.setReports(getApplicableReports());
+        Set<String> keySet = pluginArtfactInfoMap.keySet();
+        for (String key : keySet) {
+        	ArtifactGroup artifactGroup = pluginArtfactInfoMap.get(key);
+        	pluginInfos.add(artifactGroup);
+		}
         technology.setPlugins(pluginInfos);
         technology.setArchetypeFeatures(getApplicableAtchetypeFeatures());
         
@@ -390,6 +398,7 @@ public class Archetypes extends ServiceBaseAction {
 		    getArtifactGroupInfo(writer, tempApplnByteArray);
 		    if(!inputStreamMap.containsKey(pluginJarName)){
 		    	inputStreamMap.put(pluginJarName, new ByteArrayInputStream(byteArray));
+		    	
 		    }
 		} catch (PhrescoException e) {
 			throw new PhrescoException(e);
@@ -446,7 +455,7 @@ public class Archetypes extends ServiceBaseAction {
 		if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method Archetypes.showPluginJarPopup()");
 	    }
-		setReqAttribute(REQ_PLUGIN_INFO, pluginInfos);
+		setReqAttribute(REQ_PLUGIN_INFO, pluginArtfactInfoMap);
 		setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		
 		return uploadPlugin;

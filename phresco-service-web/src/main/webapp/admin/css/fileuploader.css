@@ -42,6 +42,9 @@
     margin-right: 7px;
 }
 
+.uploadedPluginsList { margin-left: 314px; padding:0; list-style:disc;}
+.uploadedPluginsList li { margin:0; padding:0; line-height:15px; font-size:12px;}
+
 .qq-upload-file {color: #3c3c3c;}
 .qq-upload-spinner {display:inline-block; background: url("../images/loading.gif"); width:15px; height:15px; vertical-align:text-bottom;}
 .qq-upload-size,.qq-upload-cancel {font-size:11px;}

@@ -153,6 +153,7 @@
 		
 		//To save the selected dependency module ids
 		$('#saveDependency').click(function() {
+			$('#popupPage').modal('hide');
 			showParentPage();
 			var size = $('input[name="dependentModGroupId"]:checked').size();
 			if(size > 0) {

@@ -206,8 +206,10 @@
 	}
     
 	function popupOnOk(self) {
-		var customerId = $('select[name=customerId]').val();
-		var params = '{"techGroups" : [' + techGroupToAdd.join(',') + '], "customerId" : "' + customerId + '"}';
-		loadJsonContent('newTechGroup',params,$("#subcontainer"));
+		if ($(self).attr("id") == "techGroupOk") {
+			var customerId = $('select[name=customerId]').val();
+			var params = '{"techGroups" : [' + techGroupToAdd.join(',') + '], "customerId" : "' + customerId + '"}';
+			loadJsonContent('newTechGroup',params,$("#subcontainer"));
+		}
 	}
 </script>

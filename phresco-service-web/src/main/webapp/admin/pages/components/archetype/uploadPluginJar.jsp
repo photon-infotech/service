@@ -18,10 +18,13 @@
   ###
   --%>
 
+
 <%@ taglib uri="/struts-tags" prefix="s"%>
 
 <%@ page import="java.util.List"%>
 
+<%@ page import="java.util.Set"%>
+<%@ page import="java.util.Map"%>
 <%@ page import="org.apache.commons.collections.CollectionUtils"%>
 
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
@@ -30,7 +33,7 @@
 
 <%
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
-	List<ArtifactGroup> pluginInfos = (List<ArtifactGroup>) request.getAttribute(ServiceUIConstants.REQ_PLUGIN_INFO);
+  	Map<String, ArtifactGroup> pluginInfos = (Map<String, ArtifactGroup>) request.getAttribute(ServiceUIConstants.REQ_PLUGIN_INFO);
 %>
 <form id="formPlugin">
 	<div class="control-group" id="pluginpopupfileuploader">
@@ -40,7 +43,31 @@
 				<!-- or put a simple form for upload here -->
 			</noscript>
 		</div>
-		<span class="help-inline pluginErrorMsg" id="popupPluginError" style="width: 50%;"></span>
+		<span class="help-inline pluginErrorMsg" id="popupPluginError" style="width: 33%;"></span>
+		<% if (!pluginInfos.isEmpty()) { %>
+		<span id="tempText"><b>Selected PluginJars</b></span>
+		<% } %>
+		<% if (!pluginInfos.isEmpty()) {
+			Set<String> keySet = pluginInfos.keySet();
+			for (String filename : keySet) {
+				ArtifactGroup artifactGroup = pluginInfos.get(filename);
+				String artifactId = artifactGroup.getArtifactId();
+				List<ArtifactInfo> artifactInfoVersions = artifactGroup.getVersions();
+				for (ArtifactInfo artifactInfoVersion : artifactInfoVersions) {
+					String version = artifactInfoVersion.getVersion();
+		%>
+		<ul class="qq-upload-list uploadedPluginsList">
+			<li>
+				<span class='qq-upload-file'><%= filename %></span>
+				<span class='qq-upload-size' style='display: inline;'></span>
+				<img class='qq-upload-remove' onclick='removeUploadedJar(this, "plugin-popup-file-uploader");'  tempattr='pluginJar' 
+					alt='Remove' title='Remove' src='images/delete.png' filename='<%= filename %>'>
+			</li>
+		</ul>
+		<%		}
+			}
+		}	
+		%>
 	</div>
 	<div id="jarDetailsDivPopup" style="padding: 0px 10px; float: left; width: 97%;">
 		<table class="table table-bordered table-striped jarTable">
@@ -56,34 +83,36 @@
 			<tbody>
 				<tr>
 					<td id="table" class="borderBottom-none">
-						<% if(CollectionUtils.isNotEmpty(pluginInfos)) {
+						<% if(!pluginInfos.isEmpty()) {
 							String version = "";
 							String artifactId = "";
 							String groupId = "";
-							String fileName = "";
-								for (ArtifactGroup pluginInfo : pluginInfos) {
-									artifactId = pluginInfo.getArtifactId();
-									groupId = pluginInfo.getGroupId();
-									fileName = pluginInfo.getName();
-									List<ArtifactInfo> artifactInfoVersions = pluginInfo.getVersions();
+							Set<String> keySet = pluginInfos.keySet();
+							for (String filename : keySet) {
+								ArtifactGroup artifactGroup = pluginInfos.get(filename);
+									artifactId = artifactGroup.getArtifactId();
+									groupId = artifactGroup.getGroupId();
+									List<ArtifactInfo> artifactInfoVersions = artifactGroup.getVersions();
 									for (ArtifactInfo artifactInfoVersion : artifactInfoVersions) {
 										version = artifactInfoVersion.getVersion();
 						%>
+						<div id='<%= filename %>' class='fileClass'>
 							<div style="float: left; margin: 0px 10px 0px 0px;">
 								<div class="controls" style="margin-left: 0%;">
-									<input style="text-align:center;" id="grouId" class="groupId" class="input-xlarge" name="<%= fileName %>_groupId" maxlength='40' title="40 Characters only" type="text"  value='<%= groupId %>' >
+									<input style="text-align:center;" id="grouId" class="pluginGroupId" class="input-xlarge" name="<%= filename %>_groupId" maxlength='40' title="40 Characters only" type="text"  value='<%= groupId %>' disabled=true >
 								</div>
 							</div>
 							<div style="float: left; margin: 0px 10px 0px 0px;">
 								<div class="controls" style="margin-left: 0%;">
-									<input style="text-align:center;" id="artifId" class="artifactId" class="input-xlarge" name="<%= fileName %>_artifactId" maxlength='40' title="40 Characters only" type="text" value='<%= artifactId %>' >
+									<input style="text-align:center;" id="artifId" class="pluginArtifactId" class="input-xlarge" name="<%= filename %>_artifactId" maxlength='40' title="40 Characters only" type="text" value='<%= artifactId %>' disabled=true >
 				              	</div>
 				            </div>
 				            <div style="float: left; margin: 0px 10px 0px 0px;">
 				            	<div class="controls"  style="margin-left: 0%;">
-				            		<input style="text-align:center;" id="versnId" class="jarVersion" class="input-xlarge" name="<%= fileName %>_version"  maxlength='30' title="30 Characters only" type='text' value='<%= version %>' >
+				            		<input style="text-align:center;" id="versnId" class="pluginJarVersion" class="input-xlarge" name="<%= filename %>_version"  maxlength='30' title="30 Characters only" type='text' value='<%= version %>' disabled=true>
 		                   		</div>
 		                   	</div>
+		                </div>   	
 						<% 
 									}
 								}	
@@ -100,15 +129,15 @@
  	
 	$(document).ready(function() {
 		
-		<% if (CollectionUtils.isEmpty(pluginInfos)) { %>
+		<% if (pluginInfos.isEmpty()) { %>
 			$("#jarDetailsDivPopup").addClass("hideContent");
+			$("#tempText").addClass("hideContent");
 		<% } %>
-		
 		createPluginUploader();
 		$('#popup_div').hide();
 		$('#popupTitle').html("Upload Plugin Jar"); 
 		$('#popupClose').hide();
-		$('.popupOk').attr("onclick","popupOnOk(this)");
+		$('.popupOk').attr("onclick","");
 		$('#popupPage').css({"width":"780px","position":"relative","left":"40%"});
 		$('#plugin-popup-file-uploader').css("margin-left","300px");
 		$('.modal-body').css("height","200px");
@@ -122,11 +151,23 @@
 			show: true
 		});
 
+		function popupOnOk(obj) {
+			if ($(obj).attr("id") == "pluginUpload") {
+				
+			}
+		}
 		$('#pluginUpload').click(function() {
-			$('#formPlugin').hide();
-			$('#popup_div').hide();
-			loadContent('technology', $('#formPlugin'), $('#popupPage'), '', true);
-			hideLoadingIcon();
+			$(".pluginGroupId").attr("disabled", false); 
+			$(".pluginArtifactId").attr("disabled", false); 
+			$(".pluginJarVersion").attr("disabled", false); 
+			var createPluginInfo = validationForArtifactId();
+			if (createPluginInfo) {
+				$('#popupPage').modal('hide');
+				$('#formPlugin').hide();
+				$('#popup_div').hide();
+				loadContent('technology', $('#formPlugin'), $('#popupPage'), '', true);
+				hideLoadingIcon();
+			}
 		});
 
 		$('#popupCancel').click(function() {
@@ -141,6 +182,48 @@
 		
 	});
 
+	function validationForArtifactId() {
+		var redirect = true;
+		$(".pluginJarVersion").each(function() {
+			var value = $(this).val();
+			if(value == undefined || isBlank(value)) {
+				//$(".errMsg").html("<s:text name='popup.err.msg.empty.jar.version'/>");
+				$(".errMsg").html("Enter Version");
+				setTimeOut();
+				$(this).focus();
+				redirect = false;
+				return false;
+			}
+		});
+		
+		$(".pluginArtifactId").each(function() {
+			var value = $(this).val();
+			if(value == undefined || isBlank(value)) {
+				//$(".errMsg").html("<s:text name='popup.err.msg.empty.artifact.id'/>"); 
+				$(".errMsg").html("Enter ArtifactId");
+				setTimeOut();
+				$(this).focus();
+				redirect = false;
+				return false;
+			}
+		});
+		
+
+		$(".pluginGroupId").each(function() {
+			var value = $(this).val();
+			if(value == undefined || isBlank(value)) {
+				//$(".errMsg").html("<s:text name='popup.err.msg.empty.group.id'/>");
+				$(".errMsg").html("Enter GroupId");
+				setTimeOut();
+				$(this).focus();
+				redirect = false;
+				return false;
+			}
+		});
+		
+		return redirect;
+	}
+	
 	function jarPopupError(data, type) {
 		var	controlpluginObj = $("#pluginpopupfileuploader");
 		var	msgpluginObj = $("#popupPluginError");
@@ -156,6 +239,11 @@
 		$(obj).parent().remove();
 		
 		var type = $(obj).attr("tempattr");
+		var size = $('.qq-upload-file').size();
+		if (size == 0) {
+			$("#jarDetailsDivPopup").hide();
+			$("#tempText").addClass("hideContent");
+		}
 		var tempFile = $(obj).attr("filename");
 		if(btnId != "appln-file-uploader"){	
 		$(".fileClass").each(function() {
@@ -167,7 +255,7 @@
 		arrayPushPop(tempFile, false);
 		}
 		var params = "uploadedJar=";
-		params = params.concat($(obj).attr("id"));
+		params = params.concat($(obj).attr("filename"));
 		params = params.concat("&type=");
 		params = params.concat(type);
 		$.ajax({
