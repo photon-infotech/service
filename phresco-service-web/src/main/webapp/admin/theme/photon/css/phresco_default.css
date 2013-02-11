@@ -1982,7 +1982,7 @@ input[class *='sample'] {
 	margin-right: 6px;
 }
 
-.config-fixed-table-container-inner,.dashbrd-fixed-table-container-inner
+.dashbrd-fixed-table-container-inner
 	{
 	height: 110px;
 	overflow-x: visible;
@@ -4473,7 +4473,7 @@ input[class *='sample'] {
 	margin-right: 6px;
 }
 
-.config-fixed-table-container-inner,.dashbrd-fixed-table-container-inner
+.dashbrd-fixed-table-container-inner
 	{
 	height: 110px;
 	overflow-x: visible;
@@ -5117,4 +5117,8 @@ input[class="chkBox_config"] {
 
 .adminaddtheme .closereg {
 	padding: 0px 0px 3px !important;
+}
+
+.dashboard-panel table thead tr th {
+	width: 42% !important;
 }
