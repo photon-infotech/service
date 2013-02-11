@@ -151,6 +151,8 @@
     function editConfigTemp(id) {
 		var params = "configId=";
 		params = params.concat(id);
+		params = params.concat("&customerId=");
+		params = params.concat("<%= customerId %>");
 		loadContent("configtempEdit", '', $('#subcontainer'), params);
 	}
     

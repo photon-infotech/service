@@ -130,6 +130,14 @@
 					yesnoPopup('about', '<s:text name="lbl.abt.service"/>');
 				});
 		    	
+		    	$("#goToHome").click(function() {
+		    		var custId = $(".dd-selected-value").val();
+		    		if ('photon' == custId) {
+		    			window.location.href = "http://www.photon.in";
+		    		}
+		    	});
+		    		
+		    	
 		    	$(".close, #popupClose").click(function() {
 		    		 showParentPage(); 
 	    			$("#updateMsg").empty();

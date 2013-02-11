@@ -120,6 +120,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 		    ServiceManager serviceManager = getServiceManager();
 			SettingsTemplate configTemp = serviceManager.getConfigTemplate(getConfigId(), getCustomerId());
 			List<Technology> technologies = serviceManager.getArcheTypes(getCustomerId());
+			setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		    setReqAttribute(REQ_CONFIG_TEMP, configTemp);
 			setReqAttribute(REQ_ARCHE_TYPES, technologies);
 			setReqAttribute(REQ_FROM_PAGE, EDIT);

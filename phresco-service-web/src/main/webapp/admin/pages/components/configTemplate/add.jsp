@@ -24,6 +24,7 @@
 <%@ page import="java.util.List"%>
 <%@ page import="java.util.ArrayList"%>
 
+<%@ page import="com.photon.phresco.util.ServiceConstants"%>
 <%@ page import="com.photon.phresco.commons.model.SettingsTemplate" %>
 <%@ page import="com.photon.phresco.commons.model.PropertyTemplate" %>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
@@ -60,8 +61,8 @@
 	String removeImgFunction = "";
 	String possibleValFunction = "";
 	String possibleValueHref = ""; 
-	if ("edit".equals(fromPage)) {
-		if ("photon".equalsIgnoreCase(customerId)) {
+	if (ServiceUIConstants.EDIT.equals(fromPage)) {
+		if (ServiceConstants.DEFAULT_CUSTOMER_NAME.equalsIgnoreCase(customerId)) {
 			disabledStr = "";
 			addImgFunction = "addconfig(this);";
 			removeImgFunction = "removeTag(this);";
@@ -240,6 +241,7 @@
 													<option value="FileType"><s:text name='lbl.hdr.comp.cnfigtmplt.filetype'/></option>
 													<option value="Boolean"><s:text name='lbl.hdr.comp.cnfigtmplt.boolean'/></option>
 													<option value="Actions"><s:text name='lbl.hdr.comp.cnfigtmplt.actions'/></option>
+													<option value="Scheduler"><s:text name='lbl.hdr.comp.cnfigtmplt.scheduler'/></option>
 												</select>
 											</td>
 											 <td class="tdWidth" id="1_psblMulDiv" style="display:none;">
@@ -320,6 +322,7 @@
 															<option value="FileType"><s:text name='lbl.hdr.comp.cnfigtmplt.filetype'/></option>
 															<option value="Boolean"><s:text name='lbl.hdr.comp.cnfigtmplt.boolean'/></option>
 															<option value="Actions"><s:text name='lbl.hdr.comp.cnfigtmplt.actions'/></option>
+															<option value="Scheduler"><s:text name='lbl.hdr.comp.cnfigtmplt.scheduler'/></option>
 														</select>
 													</td>
 													<td class="psblbtnwidth" id='<%= dynamicId + "_psblSinglDiv" %>' style="display:none">
@@ -609,7 +612,7 @@
 				"<td class='tdWidth'> <input type='text' id = '"+ nameId +"' placeholder='<s:text name='place.hldr.configTemp.add.name'/>' " + 
 				" value='' placeholder='' maxlength='30' onblur='checkNameUnique(this);' tempAttr='configNameField' class='textWidth'></td><td class='tdWidth'><select id='"+ typeId +"' " + 
 				"class = 'textWidth'  onchange='typeChange(this);'><option value='String'>String</option><option value='Number'>Number</option><option value='Password'>" + 
-				"Password</option><option value='FileType'>FileType</option><option value='Boolean'>Boolean</option><option value='Actions'>Actions</option></select></td><td class='tdWidth' id='"+ psblMulDivId +"' style='display:none;'><select type='text' " + 
+				"Password</option><option value='FileType'>FileType</option><option value='Boolean'>Boolean</option><option value='Actions'>Actions</option><option value='Scheduler'>Scheduler</option></select></td><td class='tdWidth' id='"+ psblMulDivId +"' style='display:none;'><select type='text' " + 
 				"placeholder='<s:text name='place.hldr.configTemp.add.possible.values'/>'class='psblselectwidth' id='"+ psblValMultipleId +"'>" + 
 				"</select><a data-toggle='modal' class='togglePopup' href='#myModal'><img class='addIcon imagealign' temp='"+ keyId +"' src='images/add_icon.png'" + 
 				"onclick='addPsblValPopup(this);'/></a></td><input type='hidden' class='"+ keyId +"'/><td class='psblbtnwidth' id='"+ psblSinglDivId +"'>" + 
