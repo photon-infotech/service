@@ -75,7 +75,7 @@
             <username/>
         </WebService>	
 	<Database  desc="" name="database">
-		<host>172.16.17.227</host>
+		<host>localhost</host>
 		<port>27017</port>
 		<username></username>
 		<password/>
