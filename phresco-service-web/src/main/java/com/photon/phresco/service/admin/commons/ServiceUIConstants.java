@@ -80,6 +80,11 @@ public interface ServiceUIConstants {
     String REQ_APP_TYPES = "appTypes";  
     String REQ_APP_TYPEID = "apptypeId";
     
+    /*****************************
+     * Login Request Constants
+     *****************************/
+    String REQ_USER_NAME = "username";
+	String REQ_PASSWORD = "password";
     
     /*****************************
      * Archetype Request Constants
@@ -330,7 +335,8 @@ public interface ServiceUIConstants {
     String KEY_I18N_ERROR_LOGIN = "err.login.invalid.cred";
     String KEY_I18N_ERROR_LOGIN_ACCESS_DENIED = "err.login.access.denied";
     String KEY_I18N_LOGIN_INVALID_CRED = "err.login.invalid.cred";
-    String KEY_I18N_LOGIN_EMPTY_CRED = "err.login.empty.cred";
+    String KEY_I18N_LOGIN_USER_NAME_EMPTY = "err.login.user.name.empty";
+    String KEY_I18N_LOGIN_PASSWORD_EMPTY = "err.login.password.empty";
     String KEY_I18N_LOGIN_ACCESS_DENIED	= "err.login.invalid.cred";
     String KEY_I18N_SESSION_EXPIRED = "err.login.session.expired";
     String KEY_I18N_SUCCESS_LOGOUT = "succ.logout";

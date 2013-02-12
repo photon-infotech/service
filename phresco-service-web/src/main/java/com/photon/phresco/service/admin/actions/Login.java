@@ -118,11 +118,17 @@ public class Login extends ServiceBaseAction {
 	        S_LOGGER.debug("Entering Method  Login.validateLogin()");
 	    }
 		
-		if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
-			setReqAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_LOGIN_EMPTY_CRED));
-			return false;
-		}
+		if (StringUtils.isEmpty(getUsername())) {
+            setReqAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_LOGIN_USER_NAME_EMPTY));
+            return false;
+        }
+        if (StringUtils.isEmpty(getPassword())) {
+            setReqAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_LOGIN_PASSWORD_EMPTY));
+            return false;
+        }
 		
+		setReqAttribute(REQ_USER_NAME, getUsername());
+        setReqAttribute(REQ_PASSWORD, getPassword());
 		return true;
 	}
 	

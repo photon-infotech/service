@@ -92,14 +92,28 @@
 					<!--  UserName starts -->
 					<div class="clearfix">
 						 <label class="labellg"><s:text name="lbl.login.username"/></label>
-						 <input class="xlarge settings_text lgnField" id="xlInput" name="username" autofocus placeholder="<s:text name="place.hldr.login.name"/>" type="text">
+						<%
+							String userName = (String)request.getAttribute(ServiceUIConstants.REQ_USER_NAME);
+						%>
+						 <input class="xlarge settings_text lgnField" id="xlInput" name="username" autofocus placeholder="<s:text name="place.hldr.login.name"/>" 
+						 		value="<%= StringUtils.isNotEmpty(userName) ? userName : "" %>" type="text">
 						</div>
 					<!--  UserName ends -->
 						  
 					<!--  Password starts -->
 					<div class="clearfix">
 						<label class="labellg"><s:text name="lbl.login.pwd"/></label>
-						<input class="xlarge settings_text lgnField" id="xlInput" name="password" value="" type="password" placeholder="<s:text name="place.hldr.login.pwd"/>">
+						<%
+							String password = (String)request.getAttribute(ServiceUIConstants.REQ_PASSWORD);
+						%>
+						<input class="xlarge settings_text lgnField" id="xlInput" name="password" value="" 
+								type="password" placeholder="<s:text name="place.hldr.login.pwd"/>">
+						
+						<script type="text/javascript">
+							<% if (StringUtils.isNotEmpty(userName) && StringUtils.isEmpty(password)) { %>
+									$('input[name="password"]').focus();
+							<% } %>	
+						</script>
 					</div>
 					<!--  Password ends -->
 						  
