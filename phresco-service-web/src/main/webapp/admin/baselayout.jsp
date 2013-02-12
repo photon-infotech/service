@@ -133,7 +133,7 @@
 		    	$("#goToHome").click(function() {
 		    		var custId = $(".dd-selected-value").val();
 		    		if ('photon' == custId) {
-		    			window.location.href = "http://www.photon.in";
+		    			window.open("http://www.photon.in", '_blank');
 		    		}
 		    	});
 		    		
