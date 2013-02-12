@@ -5116,9 +5116,29 @@ input[class="chkBox_config"] {
 }
 
 .adminaddtheme .closereg {
-	padding: 0px 0px 3px !important;
+	padding: 4px 0px 3px !important;
 }
 
 .dashboard-panel table thead tr th {
 	width: 42% !important;
+}
+
+.qq-upload-size {
+	color: #3c3c3c;
+}
+
+#formDependency .feat_modal-body {
+	overflow-y: hidden !important;
+}
+
+#formDependency .accordion_panel_inner {
+	height: 298px !important;
+}
+
+#formDependency .dependencySpan {
+	padding-top: 4px !important;
+}
+
+#formDependency .dependencySpan input[type="checkbox"] {
+	margin: 4px 0 !important;
 }

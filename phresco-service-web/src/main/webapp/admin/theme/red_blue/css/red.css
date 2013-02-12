@@ -990,3 +990,6 @@ label {
 	border-bottom: 1px solid #3A090B;
 	box-shadow: 0 0px 0 rgba(255, 255, 255, 0.5);
 }
+.qq-upload-file {
+	color: #ffffff !important;
+}
