@@ -75,6 +75,7 @@ public interface ServerConstants {
     /*
      * Constants for jar processor
      */
+    String JAR_FILE = "jar";
     String ARCHETYPE_FILE = "META-INF/maven/archetype.xml";
     String ARCHETYPE_METADATA_FILE = "META-INF/maven/archetype-metadata.xml";
     String PLUGIN_XML_FILE = "META-INF/maven/plugin.xml";

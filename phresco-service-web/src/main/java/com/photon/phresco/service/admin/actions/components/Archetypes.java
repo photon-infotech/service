@@ -531,14 +531,19 @@ public class Archetypes extends ServiceBaseAction {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.createTechGroup()");
 		}
-
-		List<TechnologyGroup> technologyGroups = new ArrayList<TechnologyGroup>();
-		if (CollectionUtils.isNotEmpty(getTechGroups())) {
-			for (TechnologyGroup groups : getTechGroups()) {
-				technologyGroups.add(groups);
+		
+		try {
+			List<TechnologyGroup> technologyGroups = new ArrayList<TechnologyGroup>();
+			if (CollectionUtils.isNotEmpty(getTechGroups())) {
+				for (TechnologyGroup groups : getTechGroups()) {
+					technologyGroups.add(groups);
+				}
 			}
+			getServiceManager().createTechnologyGroups(technologyGroups, getCustomerId());
+			addActionMessage(getText(TECH_GROUP_UPDATED));
+		} catch (Exception e) {			
+			throw new PhrescoException(e);
 		}
-		getServiceManager().createTechnologyGroups(technologyGroups, getCustomerId());
 
 		return list();
 	}
@@ -546,9 +551,12 @@ public class Archetypes extends ServiceBaseAction {
 	public String deleteTechnologyGroup() throws PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.deleteTechGroup()");
+		} 
+		if(StringUtils.isNotEmpty(getRemoveTechGroup())) {		
+			getServiceManager().deleteTechnologyGroups(getRemoveTechGroup(), getCustomerId());			
 		}
 		
-		getServiceManager().deleteTechnologyGroups(getRemoveTechGroup(), getCustomerId());
+		
 		
 		return TECHGROUP_LIST;
 	}

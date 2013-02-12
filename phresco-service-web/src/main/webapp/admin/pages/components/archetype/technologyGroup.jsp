@@ -121,6 +121,10 @@
 		$('.popupOk').attr('id', "techGroupOk");
 		$('.borderBottom-none').attr('id', "tableAdd");
 		$('#reportMsg').html("");
+		//To disable ok button 
+		document.getElementById('techGroupOk').disabled = true;
+		$("#techGroupOk").removeClass("btn-primary");
+		
 		$('#popupPage').modal({
 			show: true
 		}); 
@@ -164,6 +168,8 @@
 						returnValue = false;
 						return false;
 					} 
+					document.getElementById('techGroupOk').disabled = false;
+					$("#techGroupOk").addClass("btn-primary");
 				});
 			}
 			if (returnValue) {
@@ -185,6 +191,8 @@
 			loadContent('deleteTechGroup', $('#formTechgroup'), '', params, false);
 			$('#multiTechGroup ul li input[type=checkbox]:checked').parent().remove();
         });
+        document.getElementById('techGroupOk').disabled = false;
+		$("#techGroupOk").addClass("btn-primary");
     });
 	
     function removeItem(array, item) {

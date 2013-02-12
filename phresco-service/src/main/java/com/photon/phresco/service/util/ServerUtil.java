@@ -91,25 +91,27 @@ public class ServerUtil {
     
 	public static InputStream getArtifactPomStream(File artifactFile)
 			throws PhrescoException {
-			String pomFile = null;
-			try {
-				JarFile jarfile = new JarFile(artifactFile);
-				for (Enumeration<JarEntry> em = jarfile.entries(); em
-						.hasMoreElements();) {
-					JarEntry jarEntry = em.nextElement();
-					if (jarEntry.getName().endsWith("pom.xml")) {
-						pomFile = jarEntry.getName();
+			String pomFile = null;			
+			if(getFileExtension(artifactFile.getName()).equals(ServerConstants.JAR_FILE)) {			
+				try {
+					JarFile jarfile = new JarFile(artifactFile);
+					for (Enumeration<JarEntry> em = jarfile.entries(); em
+							.hasMoreElements();) {
+						JarEntry jarEntry = em.nextElement();
+						if (jarEntry.getName().endsWith("pom.xml")) {
+							pomFile = jarEntry.getName();
+						}
 					}
+					if (pomFile != null) {
+						ZipEntry entry = jarfile.getEntry(pomFile);
+						InputStream inputStream = jarfile.getInputStream(entry);
+						return inputStream;
+					}
+				} catch (Exception e) {					
+					throw new PhrescoException(e);
 				}
-				if (pomFile != null) {
-					ZipEntry entry = jarfile.getEntry(pomFile);
-					InputStream inputStream = jarfile.getInputStream(entry);
-					return inputStream;
-				}
-			} catch (Exception e) {
-				throw new PhrescoException(e);
 			}
-		return null;
+			return null;
 	}
     
     /**
@@ -386,9 +388,7 @@ public class ServerUtil {
    
 	public static File getArtifactPomFile(File artifactFile) throws PhrescoException {
 		
-		String fileExt = getFileExtension(artifactFile.getName());		
 		File pomFile = null;
-		if (StringUtils.equals(fileExt, "jar")) {
 		FileOutputStream fileOutStream = null;
 		InputStream pomStream  = null;
 		try {
@@ -409,7 +409,6 @@ public class ServerUtil {
 		} finally {
 			Utility.closeStream(pomStream);
 			Utility.closeStream(fileOutStream);
-		}
 		}
 		return pomFile;
 	}

@@ -256,7 +256,7 @@ public class Component extends ServiceBaseAction {
             CacheKey key = new CacheKey(customerId, type, tech);
 			if (ArrayUtils.isNotEmpty(techIds)) {
 				for (String techId : techIds) {
-					ClientResponse clientResponse = getServiceManager().deleteFeature(techId, key);
+					ClientResponse clientResponse = getServiceManager().deleteFeature(techId);
 					if (clientResponse.getStatus() != RES_CODE_200) {
 						addActionError(getText(COMPONENT_NOT_DELETED));
 					}

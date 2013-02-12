@@ -135,7 +135,7 @@ public class Features extends ServiceBaseAction {
 	    
 	    try {
             setReqAttribute(REQ_FEATURES_TYPE, getType()); //for handle in feature sub menu
-    	    setTechnologiesInRequest();
+    	    setTechnologiesInRequest();    	    
     	    setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
     	    //To remove the selected dependent moduleIds from the session
     	    removeSessionAttribute(SESSION_FEATURES_DEPENDENT_MOD_IDS);
@@ -182,7 +182,7 @@ public class Features extends ServiceBaseAction {
             S_LOGGER.debug("Entering Method  Features.addModules()");
         }
       
-        try {
+        try {        	
             setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
             setReqAttribute(REQ_FEATURES_TYPE, getType());
             setReqAttribute(REQ_FROM_PAGE, ADD);
@@ -238,6 +238,7 @@ public class Features extends ServiceBaseAction {
             /*if(featureByteArray != null){
 				inputStreamMap.put(moduleGroup.getName(),  new ByteArrayInputStream(featureByteArray));
 			} */
+                        
             getServiceManager().createFeatures(moduleGroup, inputStreamMap, getCustomerId());
             setTechnologiesInRequest();
             addActionMessage(getText(FEATURE_ADDED, Collections.singletonList(getName())));
@@ -387,22 +388,26 @@ public class Features extends ServiceBaseAction {
         try {
             String[] moduleGroupIds = getHttpRequest().getParameterValues(REQ_FEATURES_MOD_GRP);
             String[] moduleIds = getHttpRequest().getParameterValues(REQ_FEATURES_SELECTED_MODULEID);
-            String customerId = getCustomerId();
-            String tech = getTechnology();
-            String type = getType();
-            CacheKey key = new CacheKey(customerId, type, tech);
             ServiceManager serviceManager = getServiceManager(); 
 			if (ArrayUtils.isNotEmpty(moduleIds)) {
                 for (String moduleId : moduleIds) {
-                	serviceManager.deleteFeature(moduleId, key);
+                	serviceManager.deleteFeature(moduleId);
                 }
             }
             
             if (ArrayUtils.isNotEmpty(moduleGroupIds)) {
                 for (String moduleGroupid : moduleGroupIds) {
-                	serviceManager.deleteFeature(moduleGroupid, key);
+                	serviceManager.deleteFeature(moduleGroupid);
                 }
             }
+            
+            List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
+            if (CollectionUtils.isNotEmpty(technologies)) {
+            	for (Technology technology : technologies) {
+            		serviceManager.getFeatures(getCustomerId(), technology.getId(), getType());
+				}
+            }
+            
             addActionMessage(getText(FEATURE_DELETED));
             setTechnologiesInRequest();
         } catch (PhrescoException e) {

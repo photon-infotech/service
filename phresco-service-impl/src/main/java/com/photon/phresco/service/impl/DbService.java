@@ -179,12 +179,13 @@ public class DbService implements ServiceConstants {
     protected boolean uploadBinary(ArtifactGroup archetypeInfo, File artifactFile) throws PhrescoException {
     	PhrescoServerFactory.initialize();
     	RepositoryManager repositoryManager = PhrescoServerFactory.getRepositoryManager();
-        File pomFile = null; 
-        pomFile = ServerUtil.getArtifactPomFile(artifactFile);
-        if(pomFile == null || pomFile.length() == 0 || !pomFile.exists()) {
+        File pomFile = null;       
+        InputStream artifactPomStream = ServerUtil.getArtifactPomStream(artifactFile);
+        if(artifactPomStream != null) {        	
+        	pomFile = ServerUtil.getArtifactPomFile(artifactFile);
+        } else {        	
         	pomFile= ServerUtil.createPomFile(archetypeInfo);
         }
-        
         //Assuming there will be only one version for the artifactGroup
         List<com.photon.phresco.commons.model.ArtifactInfo> versions = archetypeInfo.getVersions();
         com.photon.phresco.commons.model.ArtifactInfo artifactInfo = versions.get(0);

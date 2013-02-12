@@ -96,7 +96,7 @@ public interface ServiceUIConstants {
     String REQ_JAR_TYPE = "type";
     String REQ_PLUGIN_JAR = "pluginJar";
     String REQ_UPLOADED_JAR = "uploadedJar";
-    String REQ_JAR_FILE_EXTENSION = ".jar";
+    String REQ_JAR_FILE_EXTENSION = ".jar";    
     String REQ_ZIP_FILE_EXTENSION  = ".zip";
     String REQ_TAR_GZ_FILE_EXTENSION = ".gz";
     String REQ_IMAGE_JPG_EXTENSION = "jpg";
@@ -422,6 +422,7 @@ public interface ServiceUIConstants {
     String ARCHETYPE_NOT_UPDATED = "fail.archetype.update";
     String ARCHETYPE_DELETED = "succ.archetype.delete";
     String ARCHETYPE_NOT_DELETED = "fail.archetype.delete" ;
+    String TECH_GROUP_UPDATED = "succ.techgroup.update";
     
     String PLTPROJ_ADDED = "succ.pltproj.add";
     String PLTPROJ_UPDATED = "succ.pltproj.updated";

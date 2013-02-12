@@ -340,7 +340,7 @@
 				<div class="errMsg" id="reportMsg"></div>
 				<div id="updateMsg" class="updateMsg"></div>
 				<a href="#" class="btn btn-primary" data-dismiss="modal" id="popupCancel"><s:text name='lbl.btn.cancel'/></a>
-				<a href="#" class="btn btn-primary popupOk" id="" onclick="popupOnOk(this);" ><s:text name='lbl.btn.ok'/></a>
+				<input type="button" class="btn btn-primary popupOk" data-dismiss="modal" id="" onclick="popupOnOk(this);" value="<s:text name='lbl.btn.ok'/>">
 				<a href="#" class="btn btn-primary" data-dismiss="modal" id="popupClose"><s:text name='lbl.btn.close'/></a>
 			</div>
 		</div>
