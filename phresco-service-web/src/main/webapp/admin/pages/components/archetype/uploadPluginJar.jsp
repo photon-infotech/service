@@ -187,8 +187,7 @@
 		$(".pluginJarVersion").each(function() {
 			var value = $(this).val();
 			if(value == undefined || isBlank(value)) {
-				//$(".errMsg").html("<s:text name='popup.err.msg.empty.jar.version'/>");
-				$(".errMsg").html("Enter Version");
+				$(".errMsg").html("<s:text name='err.msg.ver.empty'/>");
 				setTimeOut();
 				$(this).focus();
 				redirect = false;
@@ -199,8 +198,7 @@
 		$(".pluginArtifactId").each(function() {
 			var value = $(this).val();
 			if(value == undefined || isBlank(value)) {
-				//$(".errMsg").html("<s:text name='popup.err.msg.empty.artifact.id'/>"); 
-				$(".errMsg").html("Enter ArtifactId");
+				$(".errMsg").html("<s:text name='err.msg.artfid.empty'/>"); 
 				setTimeOut();
 				$(this).focus();
 				redirect = false;
@@ -212,8 +210,7 @@
 		$(".pluginGroupId").each(function() {
 			var value = $(this).val();
 			if(value == undefined || isBlank(value)) {
-				//$(".errMsg").html("<s:text name='popup.err.msg.empty.group.id'/>");
-				$(".errMsg").html("Enter GroupId");
+				$(".errMsg").html("<s:text name='err.msg.grpid.empty'/>");
 				setTimeOut();
 				$(this).focus();
 				redirect = false;
