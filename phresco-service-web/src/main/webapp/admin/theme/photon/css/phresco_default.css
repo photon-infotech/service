@@ -5142,3 +5142,15 @@ input[class="chkBox_config"] {
 #formDependency .dependencySpan input[type="checkbox"] {
 	margin: 4px 0 !important;
 }
+
+#loadingIconDiv {
+	position: relative;
+    text-align: center;
+    top: 46%;
+    z-index: 1041;
+	left: 47%;
+}
+
+#loadingIconDiv > div {
+	margin-left: 0px !important;
+}
