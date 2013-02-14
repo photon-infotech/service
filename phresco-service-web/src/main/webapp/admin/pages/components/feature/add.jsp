@@ -63,6 +63,7 @@
   	//For edit
   	String moduleId = "";
     String name = "";
+    String displayName = "";
     String description = "";
     String helpText = "";
     String version = "";
@@ -109,6 +110,7 @@
  
 	if (moduleGroup != null) {
 	    name = moduleGroup.getName();
+	    displayName = moduleGroup.getDisplayName(); 
 	    moduleGroupId = moduleGroup.getId();
 	    featureArtifactId = moduleGroup.getArtifactId();
 		featureGroupId = moduleGroup.getGroupId();
@@ -190,6 +192,17 @@
 				<input id="featureName" placeholder="<s:text name='place.hldr.feature.add.name'/>" 
 				     maxlength="40" title="30 Characters only" class="input-xlarge" type="text" name="name" <%= disabledVer %> value="<%= name %>"  <%= disabled %>>
 				<span class="help-inline" id="nameError"></span>
+			</div>
+		</div>
+		
+		<div class="control-group" id="dispNameControl">
+			<label class="control-label labelbold">
+				<s:text name='lbl.disp.name'/>
+			</label>
+			<div class="controls">
+				<input id="featureDisplayName" placeholder="<s:text name='place.hldr.feature.add.dispname'/>" 
+				     maxlength="40" title="30 Characters only" class="input-xlarge" type="text" name="displayName" <%= disabledVer %> value="<%= displayName %>"  <%= disabled %>>
+				<span class="help-inline" id="dispNameError"></span>
 			</div>
 		</div>
 		

@@ -49,7 +49,6 @@ import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.client.api.Content;
 import com.photon.phresco.service.client.api.ServiceManager;
-import com.photon.phresco.service.client.impl.CacheKey;
 import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.ArchiveUtil;
 import com.photon.phresco.util.ArchiveUtil.ArchiveType;
@@ -72,6 +71,7 @@ public class Features extends ServiceBaseAction {
 	
 	private String extFileName="";	
 	private String name = "";
+	private String displayName = "";
 	private String customerId = "";
 	private String description = "";
     private String helpText = "";
@@ -314,6 +314,11 @@ public class Features extends ServiceBaseAction {
         	}
             ArtifactGroup artifactGroup = new ArtifactGroup();
             artifactGroup.setName(getName());
+            if (StringUtils.isNotEmpty(getDisplayName())) {
+            	artifactGroup.setDisplayName(getDisplayName());
+            } else {
+            	artifactGroup.setDisplayName(getName());
+            }
             if (StringUtils.isNotEmpty(getModuleGroupId())) {
                 artifactGroup.setId(getModuleGroupId());
             }
@@ -993,5 +998,12 @@ public class Features extends ServiceBaseAction {
 	public void setFeatureVersions(String featureVersions) {
 		this.featureVersions = featureVersions;
 	}
-	
+
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
+	}
+
+	public String getDisplayName() {
+		return displayName;
+	}
 }
