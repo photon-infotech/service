@@ -76,6 +76,7 @@
 		<!-- Editable ComboBox -->
 		<script type="text/javascript" src="js/jquery.editable.combobox.js"></script>
 		<script type="text/javascript" src="js/ddslick.js"></script>
+		<script type="text/javascript" src="js/jquery.activity-indicator-1.0.0.js"></script>
 		
 			
 		<script type="text/javascript">
@@ -169,7 +170,7 @@
 		<!-- In Progress Ends -->
 		
 		<div id="loadingIconDiv" class="hideContent"> 
-			<img class="loadingIcon" id="loadingIconImg" src="" />
+			
 		</div>
 		
 		<!-- Header Starts Here -->

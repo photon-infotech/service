@@ -2634,3 +2634,15 @@ input[class="chkBox_config"] {
 .tablelegend #propTempTbody tr td:nth-child(3) select{
 	width: 100px !important;
 }
+
+#loadingIconDiv {
+	position: relative;
+    text-align: center;
+    top: 46%;
+    z-index: 1041;
+	left: 47%;
+}
+
+#loadingIconDiv > div {
+	margin-left: 0px !important;
+}

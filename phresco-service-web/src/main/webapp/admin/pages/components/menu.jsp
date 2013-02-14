@@ -44,6 +44,8 @@
 	  	$(".tabs li a").click(function() {
 			if($(this).attr("id")=="featuresMenu") {
 				$("#testmenu").slideDown();
+				$("#testmenu .active").removeClass("active").addClass("inactive");
+				$("#testmenu li:first-child a").addClass("active");
 			} else if($(this).attr("name")=="compTab") {
 				$("#testmenu").slideUp();
 			}
