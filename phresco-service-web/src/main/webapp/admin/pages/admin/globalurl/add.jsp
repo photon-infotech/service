@@ -106,6 +106,7 @@
 	<!-- Hidden Fields -->
 	<input type="hidden" name="fromPage" value="<%= fromPage %>">
 	<input type="hidden" name="globalurlId" value="<%= id %>">
+	<input type="hidden" name="oldName" value="<%= name %>">
 </form>
 
 <script type="text/javascript">
