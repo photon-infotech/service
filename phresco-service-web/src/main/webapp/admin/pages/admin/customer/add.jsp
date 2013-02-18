@@ -18,13 +18,15 @@
   ###
   --%>
 
-<%@page import="org.apache.commons.collections.MapUtils"%>
-<%@page import="java.util.Map"%>
+
 <%@ taglib uri="/struts-tags" prefix="s" %>
 
+<%@ page import="org.apache.commons.collections.MapUtils"%>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="java.text.SimpleDateFormat"%>
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.List"%>
+<%@ page import="java.util.Map"%>
 <%@ page import="java.util.ArrayList"%>
 
 <%@ page import="com.photon.phresco.commons.model.Customer" %>
@@ -68,8 +70,8 @@
 	String disabled = "";
 	String disabledClass = "btn-primary";
 	LicenseType licenseType = null;
-	Date validFrom = null;
-	Date validUpto = null;
+	String validFrom = null;
+	String validUpto = null;
 	String icon = "";
 	String brandingColor = "" ;
 	String bodyBackGroundColor = "";
@@ -131,10 +133,16 @@
 			baseRepoUrl = customer.getRepoInfo().getBaseRepoURL();
 		}
 		if (customer.getValidFrom() != null) {
-			validFrom = customer.getValidFrom();
+			Date formattedString = customer.getValidFrom();
+			SimpleDateFormat newDateFormat = new SimpleDateFormat("MM/dd/yy");      
+		 	Date d =newDateFormat.parse(newDateFormat.format(formattedString));  
+		 	validFrom = newDateFormat.format(formattedString);  
 		}
 		if (customer.getValidUpto() != null) {
-			validUpto = customer.getValidUpto();
+			Date formattedString = customer.getValidUpto();
+			SimpleDateFormat newDateFormat = new SimpleDateFormat("MM/dd/yy");      
+		 	Date d =newDateFormat.parse(newDateFormat.format(formattedString));  
+		 	validUpto = newDateFormat.format(formattedString);  
 		}
 		if (customer.getType() != null) {
 			licenseType = customer.getType();

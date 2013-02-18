@@ -138,8 +138,8 @@
 			if (selectedModule.getDescription() != null) {
 				description = selectedModule.getDescription();
 			}
-			if (selectedModule.getHelpText() != null) {
-			    helpText = selectedModule.getHelpText();
+			if (moduleGroup.getHelpText() != null) {
+			    helpText = moduleGroup.getHelpText();
 			}
 	    }
 		
