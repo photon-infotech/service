@@ -607,6 +607,10 @@ function disableUploadButton(controlObj) {
 	controlObj.find($(".qq-upload-button")).removeClass("btn-primary qq-upload-button").addClass("disabled");
 }
 
+function removeSpaces(str) {
+	return str.replace(/\s+/g, '');
+}
+
 function enableUploadButton(controlObj) {
 	controlObj.find("input[type='file']").attr('disabled', false);
 	controlObj.find($(".btn")).removeClass("disabled").addClass("btn-primary qq-upload-button");
