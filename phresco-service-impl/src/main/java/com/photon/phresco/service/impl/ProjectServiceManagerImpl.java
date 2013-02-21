@@ -77,7 +77,7 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 			S_LOGGER.debug("Entering Method DefaultProjectService.createProject(ProjectInfo projectInfo)");
 			S_LOGGER.debug("createProject() ProjectInfo =" + projectInfo.getProjectCode());
 		}
-		
+
 		PhrescoServerFactory.initialize();
 		PhrescoServerFactory.getArchetypeExecutor().execute(projectInfo, tempFolderPath);
 	}
@@ -124,12 +124,11 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 	public void findNewlyAddedProject(Map<String, String> appInfoMap, List<ApplicationInfo> appInfosInDB,
 			List<ApplicationInfo> appInfos, List<ApplicationInfo> createdAppInfos) {
 		for (ApplicationInfo appInfoInDB : appInfosInDB) {
-			String techType = appInfoInDB.getTechInfo().getId();
-			appInfoMap.put(techType, techType);
+			appInfoMap.put(appInfoInDB.getId(), appInfoInDB.getId());
 		}
 		
 		for (ApplicationInfo appInfo : appInfos) {
-			if (!appInfoMap.containsKey(appInfo.getTechInfo().getId())) {
+			if (!appInfoMap.containsKey(appInfo.getId())) {
 				createdAppInfos.add(appInfo);
 			}
 		}
