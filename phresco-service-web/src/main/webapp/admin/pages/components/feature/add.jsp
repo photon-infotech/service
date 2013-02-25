@@ -82,6 +82,7 @@
     boolean jslibs = false;
     boolean component = false;
     String title = "";
+    String packaging = "";
     //Get Types
 	if (ServiceUIConstants.REQ_FEATURES_TYPE_MODULE.equals(type)) {
 		features = true;
@@ -117,6 +118,7 @@
 		featureVersions = moduleGroup.getVersions().get(0).getVersion();
 	    List<ArtifactInfo> modules = moduleGroup.getVersions();
 	    ArtifactInfo selectedModule = null;
+	    packaging = moduleGroup.getPackaging();
 	    if (CollectionUtils.isNotEmpty(modules)) {
 	        for (ArtifactInfo module : modules) {
 	            if (module.getId().equals(selectedModuleId)) {
@@ -438,7 +440,9 @@
     <input type="hidden" name="featureArtifactId" value="<%= moduleGroup != null ? featureArtifactId : "" %>"/> 
     <input type="hidden" name="featureGroupId" value="<%= moduleGroup != null ? featureGroupId : "" %>"/> 
     <input type="hidden" name="featureVersions" value="<%= moduleGroup != null ? featureVersions : "" %>"/>
-    <input type="hidden" name="moduleId" value="<%= StringUtils.isNotEmpty(selectedModuleId) ? selectedModuleId : "" %>">
+    <input type="hidden" name="moduleId" value="<%= StringUtils.isNotEmpty(selectedModuleId) ? selectedModuleId : "" %>">    
+   	<input type="hidden" name="packaging" value="<%= packaging %>">
+    
 </form>
 
 <script type="text/javascript">

@@ -49,7 +49,8 @@
 						<tbody>
 						<tr>
 							<td class="checkboxwidth">
-								<input type="checkbox" class="check" name="check" disabled onclick="checkboxEvent($('#checkAllAuto'),'check');">
+								<input type="checkbox" disabled>
+								<!-- <input type="checkbox" class="check" name="check" disabled onclick="checkboxEvent($('#checkAllAuto'),'check');"> -->
 							</td>
 							<td>
 								LDAP

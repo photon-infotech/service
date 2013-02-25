@@ -107,6 +107,7 @@ public interface ServiceUIConstants {
     String REQ_TECHNOLOGY_REPORTS = "reports";
     String REQ_TECHNOLOGY_GROUPS = "TechnologyGroups";
     String REQ_TECH_GROUP = "techGroup";
+    String REQ_ZIP_FILE = "zip";
     
     
     /*****************************
@@ -359,6 +360,7 @@ public interface ServiceUIConstants {
     String KEY_I18N_ERR_VER_ALREADY_EXISTS = "err.msg.ver.exists";
     String KEY_I18N_ERR_FILE_EMPTY	= "err.msg.file.empty";
     String KEY_I18N_MULTI_TECH_EMPTY = "err.msg.multitech.empty";
+    String KEY_I18N_NAME_CHANGE_NOT_APPLICABLE = "err.msg.name.chnge.not.appl";
     
     String KEY_I18N_ERR_APPTYPE_EMPTY = "err.msg.apptye.empty";
     String KEY_I18N_ERR_APPLIES_EMPTY = "err.msg.applies.empty";

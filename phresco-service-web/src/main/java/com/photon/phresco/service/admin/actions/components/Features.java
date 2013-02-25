@@ -25,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -95,7 +96,7 @@ public class Features extends ServiceBaseAction {
     private String featureArtifactId = "";
     private String featureGroupId = "";
     private String featureVersions = "";
-    private String fileName = "";
+    private String packaging = "";
     
     private List<String> dependentModGroupId = null;
     
@@ -111,7 +112,6 @@ public class Features extends ServiceBaseAction {
 	private boolean errorFound = false;
 	private String fileType = "";
 	private static String featureJarFileName = "";
-	private static String iconName = "";
 	private boolean tempError = false;
 	private String featureUrl = "";
 	private static String versionFile = "";
@@ -391,8 +391,8 @@ public class Features extends ServiceBaseAction {
         }
         
         try {
-            String[] moduleGroupIds = getHttpRequest().getParameterValues(REQ_FEATURES_MOD_GRP);
-            String[] moduleIds = getHttpRequest().getParameterValues(REQ_FEATURES_SELECTED_MODULEID);
+            String[] moduleGroupIds = getReqParameterValues(REQ_FEATURES_MOD_GRP);
+            String[] moduleIds = getReqParameterValues(REQ_FEATURES_SELECTED_MODULEID);
             ServiceManager serviceManager = getServiceManager(); 
 			if (ArrayUtils.isNotEmpty(moduleIds)) {
                 for (String moduleId : moduleIds) {
@@ -444,7 +444,6 @@ public class Features extends ServiceBaseAction {
 	        		writer.print(INVALID_MODULE_NAME);
 	        	}
 	        } else {
-	        	iconName = getFileName();
 	        	inputStreamMap.put(Content.Type.ICON.name(), new ByteArrayInputStream(tempFeaByteArray));
 	        	writer.print(SUCCESS_TRUE);
 	        }
@@ -460,7 +459,7 @@ public class Features extends ServiceBaseAction {
 		
 	}
 	
-	public boolean extractArchive(ByteArrayInputStream inputStream) throws  IOException, PhrescoException {
+	private boolean extractArchive(ByteArrayInputStream inputStream) throws  IOException, PhrescoException {
 		FileOutputStream fileOutputStream = null;
 		String sysTemp = Utility.getSystemTemp();
 		File uploadFile = new File(sysTemp + getFileName());
@@ -493,6 +492,8 @@ public class Features extends ServiceBaseAction {
 						FileUtil.delete(new File(sysTemp + getFileName()));
 						return false;
 					}
+		} catch(PhrescoException e) { 
+			
 		} finally {
 			Utility.closeStream(inputStream);
 			Utility.closeStream(fileOutputStream);
@@ -524,7 +525,7 @@ public class Features extends ServiceBaseAction {
 		}
 	}
 
-	public String downloadFeature() throws PhrescoException {
+	public String downloadFeature() {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method  Features.downloadFeature()");
 		}
@@ -540,7 +541,11 @@ public class Features extends ServiceBaseAction {
 			extFileName = parts[parts.length - 1];
 			contentType = url.openConnection().getContentType();
 			contentLength = url.openConnection().getContentLength();
-		} catch(Exception e) {
+		} catch(PhrescoException e) {
+			return showErrorPopup(new PhrescoException(e), getText(DOWNLOAD_FAILED));
+		} catch (MalformedURLException e) {
+			return showErrorPopup(new PhrescoException(e), getText(DOWNLOAD_FAILED));
+		} catch (IOException e) {
 			return showErrorPopup(new PhrescoException(e), getText(DOWNLOAD_FAILED));
 		}
 		
@@ -556,7 +561,6 @@ public class Features extends ServiceBaseAction {
 			 featureJarFileName = "";
 		 } else {
 			inputStreamMap.remove(Content.Type.ICON.name());
-			iconName = "";
 		 }
 		
 	}
@@ -599,7 +603,6 @@ public class Features extends ServiceBaseAction {
 	}	
 
 	private boolean fileValidation() {
-		// TODO Auto-generated method stub
 		if ((!EDIT.equals(getFromPage()) && featureByteArray == null) || (StringUtils.isNotEmpty(versionFile) && featureByteArray == null)) {
             setFileError(getText(KEY_I18N_ERR_APPLNJAR_EMPTY));
             tempError = true;
@@ -607,9 +610,8 @@ public class Features extends ServiceBaseAction {
 		return tempError;
 	}
 
-	private boolean licenseValidation() {
-		// TODO Auto-generated method stub
-		if(StringUtils.isEmpty(getLicense())) {
+	private boolean licenseValidation() {		
+		if (StringUtils.isEmpty(getLicense())) {
         	setLicenseError(getText(KEY_I18N_ERR_LICEN_EMPTY));
         	tempError = true;
         }
@@ -617,17 +619,14 @@ public class Features extends ServiceBaseAction {
 	}
 
 	private boolean jsValidation() {
-		// TODO Auto-generated method stub		
-		if(featureByteArray != null) {						
-			if(StringUtils.isEmpty(getVersion())) {
-				setVerError(getText(KEY_I18N_ERR_VER_EMPTY));
-				tempError = true;
-			}
+		if (featureByteArray != null && StringUtils.isEmpty(getVersion())) {
+			setVerError(getText(KEY_I18N_ERR_VER_EMPTY));
+			tempError = true;
 		}
 		return tempError;
 	}
 
-	public boolean featureValidation() {		
+	private boolean featureValidation() {		
 		if (featureByteArray != null) {
             //Empty validation for groupId if file is selected						
             if (StringUtils.isEmpty(getGroupId())) {
@@ -643,35 +642,16 @@ public class Features extends ServiceBaseAction {
             if (StringUtils.isEmpty(getVersion())) {
                 setVerError(getText(KEY_I18N_ERR_VER_EMPTY));                
                 tempError = true;
-            }
-            //To check whether the version already exist
-            // TODO: Lohes(check must be done by querying the DB)
-            /*if (StringUtils.isNotEmpty(getVersion()) && (StringUtils.isEmpty(getFromPage()) 
-                    || (!getVersion().equals(getOldVersion())))) {
-                List<ArtifactGroup> moduleGroups = getServiceManager().getFeatures(getCustomerId(), getTechnology(), getType());
-                if (StringUtils.isNotEmpty(getVersion())) {
-                    for (ArtifactGroup moduleGroup : moduleGroups) {
-                        List<ArtifactInfo> versions = moduleGroup.getVersions();
-                        if (CollectionUtils.isNotEmpty(versions)) {
-                            for (ArtifactInfo module : versions) {
-                                if (module.getName().equalsIgnoreCase(getName())
-                                        && module.getVersion().equals(getVersion())) {
-                                    setVerError(getText(KEY_I18N_ERR_VER_ALREADY_EXISTS));
-                                    isError = true;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }*/
+            }           
         }
 		return tempError;
 	}
 
-	public boolean nameValidation(boolean isError) throws PhrescoException {
-
-		if (StringUtils.isEmpty(getName())) {
+	private boolean nameValidation(boolean isError) throws PhrescoException {		
+		if (EDIT.equals(getFromPage()) && REQ_ZIP_FILE.equals(getPackaging()) && featureByteArray == null && !getName().equals(getOldName())) {			
+			setNameError(getText(KEY_I18N_NAME_CHANGE_NOT_APPLICABLE));
+			tempError = true;
+		} else if (StringUtils.isEmpty(getName())) {
 			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY ));
 			tempError = true;
 		} else if (ADD.equals(getFromPage()) || (!getName().equals(getOldName()))) {
@@ -695,7 +675,7 @@ public class Features extends ServiceBaseAction {
 		return tempError;
 	}
 	
-	public boolean techValidation(boolean isError) {
+	private boolean techValidation(boolean isError) {
 		if (CollectionUtils.isEmpty(getMultiTechnology())) {
             setTechError(getText(KEY_I18N_MULTI_TECH_EMPTY));
             tempError = true;
@@ -1005,5 +985,13 @@ public class Features extends ServiceBaseAction {
 
 	public String getDisplayName() {
 		return displayName;
+	}
+
+	public void setPackaging(String packaging) {
+		this.packaging = packaging;
+	}
+
+	public String getPackaging() {
+		return packaging;
 	}
 }
