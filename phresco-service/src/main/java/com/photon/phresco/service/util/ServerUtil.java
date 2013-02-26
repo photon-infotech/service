@@ -442,6 +442,8 @@ public class ServerUtil {
 			fileExt = "war";
 		} else if(fileName.endsWith("ZIP")) {
 			fileExt = "zip";
+		} else if(fileName.endsWith("apklib")) {
+			fileExt = "apklib";
 		}
 		
 		return fileExt;

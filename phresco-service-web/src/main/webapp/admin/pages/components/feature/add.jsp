@@ -457,7 +457,7 @@
 		var allowedFiles = "";
 		var fileErr = "";
 		if (<%= ServiceUIConstants.REQ_FEATURES_TYPE_MODULE.equals(type)%>) {			
-			allowedFiles = ["jar","zip","war"];
+			allowedFiles = ["jar","zip","war","apklib"];
 			fileErr = "<s:text name='err.invalid.module.selection'/>";
 		} else if (<%= ServiceUIConstants.REQ_FEATURES_TYPE_JS.equals(type)%>) {			
 			allowedFiles = ["js","zip","war"];
