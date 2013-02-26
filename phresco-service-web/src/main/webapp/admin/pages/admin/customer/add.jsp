@@ -134,13 +134,13 @@
 		}
 		if (customer.getValidFrom() != null) {
 			Date formattedString = customer.getValidFrom();
-			SimpleDateFormat newDateFormat = new SimpleDateFormat("MM/dd/yy");      
+			SimpleDateFormat newDateFormat = new SimpleDateFormat("MM/dd/yyyy");      
 		 	Date d =newDateFormat.parse(newDateFormat.format(formattedString));  
 		 	validFrom = newDateFormat.format(formattedString);  
 		}
 		if (customer.getValidUpto() != null) {
 			Date formattedString = customer.getValidUpto();
-			SimpleDateFormat newDateFormat = new SimpleDateFormat("MM/dd/yy");      
+			SimpleDateFormat newDateFormat = new SimpleDateFormat("MM/dd/yyyy");      
 		 	Date d =newDateFormat.parse(newDateFormat.format(formattedString));  
 		 	validUpto = newDateFormat.format(formattedString);  
 		}

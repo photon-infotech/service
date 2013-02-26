@@ -19,9 +19,12 @@
   --%>
 <%@ taglib uri="/struts-tags" prefix="s" %>
 
+<%@ page import="java.util.List"%>
+<%@ page import="java.text.SimpleDateFormat"%>
+<%@ page import="java.util.Date" %>
+
 <%@ page import="org.apache.commons.collections.CollectionUtils"%>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
-<%@ page import="java.util.List"%>
 
 <%@ page import="com.photon.phresco.commons.model.Customer"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
@@ -87,6 +90,13 @@
 						<tbody>
 						<%
 							for (Customer customer : customers) {
+								String validUpto = "";
+								if (customer.getValidUpto() != null) {
+									Date formattedString = customer.getValidUpto();
+									SimpleDateFormat newDateFormat = new SimpleDateFormat("MM/dd/yyyy");      
+								 	Date d =newDateFormat.parse(newDateFormat.format(formattedString));  
+								 	validUpto = newDateFormat.format(formattedString);  
+								}
 						%>
 							<tr>
 								<td class="checkboxwidth">
@@ -104,7 +114,7 @@
 									<%= StringUtils.isNotEmpty(customer.getDescription()) ? customer.getDescription() : "" %>
 								</td>
 								<td class="namelabel-width">
-									<%= customer.getValidUpto() != null ? customer.getValidUpto() : "" %>
+									<%= validUpto %>
 								</td>
 								<td class="namelabel-width"><%= customer.getType() %></td>		
 							</tr>	
