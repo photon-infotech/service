@@ -463,7 +463,7 @@
 			allowedFiles = ["js","zip","war"];
 			fileErr = "<s:text name='err.invalid.js.selection'/>";
 		}else if (<%= ServiceUIConstants.REQ_FEATURES_TYPE_COMPONENT.equals(type)%>) {			
-			allowedFiles = ["jar","zip"];
+			allowedFiles = ["jar","zip","apklib"];
 			fileErr = "<s:text name='err.invalid.file.selection'/>";
 		}
 		createUploader(allowedFiles,fileErr);
