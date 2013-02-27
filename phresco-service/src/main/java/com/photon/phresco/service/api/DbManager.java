@@ -78,4 +78,6 @@ public interface DbManager {
     List<VideoInfo> getVideos() throws PhrescoException;
     
     String getLatestFrameWorkVersion() throws PhrescoException;
+    
+    RepoInfo getRepoInfoById(String id) throws PhrescoException;
 }

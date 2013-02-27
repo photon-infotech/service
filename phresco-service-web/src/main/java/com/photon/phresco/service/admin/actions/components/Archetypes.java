@@ -126,7 +126,7 @@ public class Archetypes extends ServiceBaseAction {
 
 		try {
 			List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
-			List<ApplicationType> appTypes = getServiceManager().getApplicationTypes(getCustomerId());
+			List<ApplicationType> appTypes = getServiceManager().getApplicationTypes();
 			setReqAttribute(REQ_APP_TYPES, appTypes);
 			setReqAttribute(REQ_ARCHE_TYPES, technologies);
 			setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
@@ -150,7 +150,7 @@ public class Archetypes extends ServiceBaseAction {
 
 		try {
 			ServiceManager serviceManager = getServiceManager();
-			List<ApplicationType> appTypes = serviceManager.getApplicationTypes(getCustomerId());
+			List<ApplicationType> appTypes = serviceManager.getApplicationTypes();
 			setReqAttribute(REQ_APP_TYPES, appTypes);
 			List<TechnologyOptions> options = serviceManager.getOptions();
 			List<Reports> reports = serviceManager.getReports();
@@ -174,7 +174,7 @@ public class Archetypes extends ServiceBaseAction {
 		    ServiceManager serviceManager = getServiceManager();
 		    versionFile = getVersioning();
 			Technology technology = serviceManager.getArcheType(getTechId(), getCustomerId());
-            List<ApplicationType> appTypes = serviceManager.getApplicationTypes(getCustomerId());
+            List<ApplicationType> appTypes = serviceManager.getApplicationTypes();
             List<TechnologyOptions> options = serviceManager.getOptions();
             setReqAttribute(REQ_ARCHE_TYPE,  technology);
             setReqAttribute(REQ_APP_TYPES, appTypes);
@@ -505,7 +505,7 @@ public class Archetypes extends ServiceBaseAction {
 			S_LOGGER.debug("Entering Method Archetypes.getTechnologyGroup()");
 		}
 
-		List<ApplicationType> appTypes = getServiceManager().getApplicationTypes(getCustomerId());
+		List<ApplicationType> appTypes = getServiceManager().getApplicationTypes();
 		for (ApplicationType appType : appTypes) {
 			if (appType.getId().equals(getApptype())) {
 				setAppTypeTechGroups(appType.getTechGroups());
@@ -521,7 +521,7 @@ public class Archetypes extends ServiceBaseAction {
 			S_LOGGER.debug("Entering Method Archetypes.openTechGroup()");
 		}
 		
-		List<ApplicationType> appTypes = getServiceManager().getApplicationTypes(getCustomerId());
+		List<ApplicationType> appTypes = getServiceManager().getApplicationTypes();
 		setReqAttribute(REQ_APP_TYPES, appTypes);
 		
 		return REQ_TECH_GROUP;

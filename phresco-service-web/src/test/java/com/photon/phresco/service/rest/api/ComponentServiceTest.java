@@ -1,9 +1,35 @@
 package com.photon.phresco.service.rest.api;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.X509TrustManager;
+
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.junit.Test;
+import org.springframework.data.document.mongodb.query.Criteria;
+import org.springframework.data.document.mongodb.query.Query;
+
+import com.photon.phresco.commons.model.ArtifactGroup.Type;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.DbManager;
+import com.photon.phresco.service.dao.ArtifactGroupDAO;
 import com.photon.phresco.service.impl.DbManagerImpl;
 import com.photon.phresco.util.ServiceConstants;
+import com.phresco.pom.site.Reports;
 
 
 public class ComponentServiceTest extends DbManagerImpl implements ServiceConstants{
@@ -593,4 +619,169 @@ public class ComponentServiceTest extends DbManagerImpl implements ServiceConsta
 //		property.setValue("http://172.16.18.86:7070/jforum");
 //		mongoOperation.save("properties", property);
 //	}
+	
+//	@Test
+	public void testReports() throws PhrescoException, IOException {
+		List<Reports> reporesList = new ArrayList<Reports>();
+		Reports report = new Reports();
+		report.setDisplayName("Project-Info-Report");
+		report.setArtifactId("maven-project-info-reports-plugin");
+		report.setVersion("2.4");
+		report.setEnabled(false);
+		report.setGroupId("org.apache.maven.plugins");
+		reporesList.add(report);
+		
+		report = new Reports();
+		report.setDisplayName("Javadoc Report");
+		report.setArtifactId("maven-javadoc-plugin");
+		report.setVersion("2.8");
+		report.setEnabled(false);
+		report.setGroupId("org.apache.maven.plugins");
+		reporesList.add(report);
+		
+		report = new Reports();
+		report.setDisplayName("Cobertura-Report");
+		report.setArtifactId("maven-project-info-reports-plugin");
+		report.setVersion("2.5.1");
+		report.setEnabled(false);
+		report.setGroupId("org.apache.maven.plugins");
+		reporesList.add(report);
+		
+		report = new Reports();
+		report.setDisplayName("Jdepend-Report");
+		report.setArtifactId("jdepend-maven-plugin");
+		report.setVersion("2.0-beta-2");
+		report.setEnabled(false);
+		report.setGroupId("org.codehaus.mojo");
+		reporesList.add(report);
+		
+		report = new Reports();
+		report.setDisplayName("JXR-Report");
+		report.setArtifactId("maven-jxr-plugin");
+		report.setVersion("2.3");
+		report.setEnabled(false);
+		report.setGroupId("org.apache.maven.plugins");
+		reporesList.add(report);
+		
+		report = new Reports();
+		report.setDisplayName("PMD-Report");
+		report.setArtifactId("maven-pmd-plugin");
+		report.setVersion("2.7.1");
+		report.setEnabled(false);
+		report.setGroupId("org.apache.maven.plugins");
+		reporesList.add(report);
+		
+		report = new Reports();
+		report.setDisplayName("Surefire Report");
+		report.setArtifactId("maven-surefire-report-plugin");
+		report.setVersion("2.12");
+		report.setEnabled(false);
+		report.setGroupId("org.apache.maven.plugins");
+		reporesList.add(report);
+		
+		report = new Reports();
+		report.setDisplayName("Project-Info-Report Coberturac");
+		report.setArtifactId("cobertura-maven-plugin");
+		report.setVersion("2.4");
+		report.setEnabled(false);
+		report.setGroupId("org.codehaus.mojo");
+		reporesList.add(report);
+		
+		mongoOperation.insertList("reportsfinal", reporesList);
+		
+	}
+	
+//	@Test
+//	public void testTechReports() throws PhrescoException  {
+//		File artifactFile = new File("D:/work/phresco/MasterNew/commons/target/phresco-commons-2.0.0.36004.jar");
+//		ArtifactGroup archetypeInfo = new ArtifactGroup();
+//		archetypeInfo.setGroupId("com.photon.phresco.commons");
+//		archetypeInfo.setArtifactId("phresco-commons");
+//		ArtifactInfo info = new ArtifactInfo();
+//		info.setVersion("2.0.0.36004");
+//		archetypeInfo.setVersions(Arrays.asList(info));
+//		archetypeInfo.setPackaging("jar");
+//		archetypeInfo.setCustomerIds(Arrays.asList("photon"));
+//		uploadBinary(archetypeInfo, artifactFile);
+//	}
+	
+//	@Test
+	public void createRepository() throws JsonParseException, JsonMappingException, IOException {
+//		Query query = new Query(Criteria.where("type").is(Type.FEATURE.name()));
+		Query query = new Query(Criteria.where("type").is(Type.COMPONENT.name()));
+		List<ArtifactGroupDAO> artifactGroupDAOs = mongoOperation.find(ARTIFACT_GROUP_COLLECTION_NAME, query, ArtifactGroupDAO.class);
+		for (ArtifactGroupDAO artifactGroupDAO : artifactGroupDAOs) {
+			artifactGroupDAO.setDisplayName(artifactGroupDAO.getName());
+			System.out.println(artifactGroupDAO.getName());
+			mongoOperation.save(ARTIFACT_GROUP_COLLECTION_NAME, artifactGroupDAO);
+		}
+	}
+	
+//	@Test
+	public void alignFirst() {
+		String defaultId = "photon";
+		List<String> customerIds = Arrays.asList("JJ","BT","WG","ML","photon","LR","SS");
+		List<String> customerNew = new ArrayList<String>();
+		customerNew.add(defaultId);
+		for (String string : customerIds) {
+			if(!string.equals(defaultId)) {
+				customerNew.add(string);
+			}
+		}
+		System.out.println(customerNew);
+	}
+	
+	@Test
+	public void addImage() throws FileNotFoundException, PhrescoException {
+		System.setProperty("https.proxyHost", "172.16.22.169");
+		  System.setProperty("https.proxyPort", "2470");
+		        String uri = "https://172.16.22.169:2470/sonar/?username=admin&password=admin";
+
+		    try{
+		        SSLContext sslctx = SSLContext.getInstance("SSL");
+		        sslctx.init(null, new X509TrustManager[] { new MyTrustManager()}, null);
+		        HttpsURLConnection.setDefaultSSLSocketFactory(sslctx.getSocketFactory());
+		        URL url = new URL(uri);
+		        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+		        con.setRequestMethod("GET");
+		        con.setDoOutput(true);
+		        con.connect();
+		        if (con.getResponseCode() == HttpsURLConnection.HTTP_OK) {
+		        	System.out.println("Response Code Caught  ");
+		            BufferedReader br = new BufferedReader(new
+		            InputStreamReader(con.getInputStream()));
+		            String line;
+		            while((line = br.readLine()) != null) {
+		            System.out.println(line);
+		            }
+		            br.close();
+		        }
+		        con.disconnect();
+
+		        }
+		        catch(Exception e){
+		        System.out.println(e.toString());
+		        }
+	}
 }
+
+class MyTrustManager implements X509TrustManager {
+
+	public void checkClientTrusted(X509Certificate[] chain, String authType)
+			throws CertificateException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void checkServerTrusted(X509Certificate[] chain, String authType)
+			throws CertificateException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public X509Certificate[] getAcceptedIssuers() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}    

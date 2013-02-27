@@ -76,7 +76,8 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
     @Override
     public ArtifactGroup getArchetypeInfo(String techId, String customerId)
             throws PhrescoException {
-    	Query techQuery = createCustomerIdQuery(customerId);
+//    	Query techQuery = createCustomerIdQuery(customerId);
+    	Query techQuery = new Query();
     	Criteria criteria = Criteria.whereId().is(techId);
     	techQuery.addCriteria(criteria);
     	TechnologyDAO techDAO = mongoOperation.findOne(TECHNOLOGIES_COLLECTION_NAME, 
@@ -107,7 +108,10 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
     @Override
     public RepoInfo getRepoInfo(String customerId) throws PhrescoException {
     	Customer customer = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME, new Query(Criteria.whereId().is(customerId)), Customer.class);
-        return customer.getRepoInfo();
+    	if(customer != null) {
+    		return customer.getRepoInfo();
+    	}
+        return null;
     }
 
     @Override
@@ -295,5 +299,10 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
 		query.sort().on(DB_COLUMN_CREATIONDATE, Order.DESCENDING);
 		List<VersionInfo> versionInfos = mongoOperation.find("versionInfo", query, VersionInfo.class);
 		return versionInfos.get(0).getFrameworkVersion();
+	}
+
+	@Override
+	public RepoInfo getRepoInfoById(String id) throws PhrescoException {
+		return mongoOperation.findOne(REPOINFO_COLLECTION_NAME, new Query(Criteria.whereId().is(id)), RepoInfo.class);
 	}
 }

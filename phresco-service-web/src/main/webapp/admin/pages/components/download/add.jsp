@@ -126,7 +126,7 @@
             </label>
             <div class="controls">
             	<div class="typeFields" id="typefield">
-	                <div class="multilist-scroller multiselct" style="height: 95px; width:300px;">
+	                <div id="downloadTech" class="multilist-scroller multiselct" style="height: 95px; width:300px;">
 		                <ul>
 							<li>
 								<input type="checkbox" <%= disabledVer %> id="checkAllTechnology" value="" onclick="checkAllEvent(this, $('.techCheck'), false);"
@@ -367,6 +367,7 @@
 	});
 	
 	$(document).ready(function() {
+		checkedTechDisbaled();
 		hideLoadingIcon();
         createUploader(); 
         checkboxEvent($('#checkAllTechnology'),'techCheck');
@@ -532,5 +533,11 @@
 	
 	function downloadFile() {
 		window.location.href="admin/downloadUrl?" + $('#formDownloadAdd').serialize();
+	}
+	
+	function checkedTechDisbaled() {
+		if('<%= customerId %>' != 'photon'){
+		 $('#downloadTech input[type="checkbox"]:checked').prop("disabled","disbaled");
+		}
 	}
 </script>

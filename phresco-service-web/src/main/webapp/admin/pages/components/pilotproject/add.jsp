@@ -242,6 +242,12 @@
 		} else {
 			hideError($("#nameControl"), $("#nameError"));
 		}
+		
+		if (!isBlank(data.technologyError)) {
+			showError($("#applyControl"), $("#techError"), data.technologyError);
+		} else {
+			hideError($("#applyControl"), $("#techError"));
+		}
 
 		if (!isBlank(data.fileError)) {
 			showError($("#pilotProFileControl"), $("#pilotProFileError"), data.fileError);

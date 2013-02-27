@@ -38,7 +38,6 @@
 		$("#customerSelect").val(customerId);
 		
 		clickMenu($("a[name='compTab']"), $("#subcontainer"), $('#formCustomerId'));
-		loadContent("featuresMenu", $('#formCustomerId'), $("#subcontainer"));
 		activateMenu($("#features"));
 		
 	  	$(".tabs li a").click(function() {

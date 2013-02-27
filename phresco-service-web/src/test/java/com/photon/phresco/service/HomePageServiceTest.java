@@ -22,7 +22,7 @@ public class HomePageServiceTest {
 		PhrescoServerFactory.initialize();
 		Gson gson = new Gson();
 		RepositoryManager repoMgr = PhrescoServerFactory.getRepositoryManager();
-		String videoInfoJSON = repoMgr.getArtifactAsString(repoMgr.getHomePageJsonFile(), ServiceConstants.DEFAULT_CUSTOMER_NAME);
+		String videoInfoJSON = repoMgr.getArtifactAsString(repoMgr.getHomePageJsonFile(), "");
 		Type type = new TypeToken<List<VideoInfo>>() {
 		}.getType();
 		List<VideoInfo> videoInfoList = gson.fromJson(videoInfoJSON, type);

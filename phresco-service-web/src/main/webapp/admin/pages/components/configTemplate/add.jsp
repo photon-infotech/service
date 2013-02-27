@@ -82,7 +82,7 @@
 	<h4 class="hdr">
 		<%= title %>   
 	</h4>	
-	
+
 	<div class="content_adder">
 		<div class="control-group" id="nameControl">
 			<label class="control-label labelbold">
@@ -434,6 +434,7 @@
 	}
 
 	$(document).ready(function() {
+		checkedTechDisbaled();
 		hideLoadingIcon();
 		checkboxEvent($('#checkAllAuto'), 'applsChk');
 		chkCount();
@@ -885,6 +886,12 @@
 			$(obj).parent().parent().find($('input[type=hidden]')).val("");//To empty already added possible values in hidden field
 			$(obj).parent().parent().find($('.psblselectwidth option')).remove();//To empty already added possible values
 			$(obj).parent().parent().find($('.psbltextwidth')).val('');//To empty already added possible values
+		}
+	}
+	
+	function checkedTechDisbaled() {
+		if('<%= customerId %>' != 'photon'){
+		 $('#appliesToDiv input[type="checkbox"]:checked').prop("disabled","disbaled");
 		}
 	}
 </script>

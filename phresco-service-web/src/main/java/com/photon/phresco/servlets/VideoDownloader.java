@@ -132,7 +132,15 @@ public class VideoDownloader extends Thread implements ServerConstants {
 	}
 	
 	private String getRepositoryUrl() throws PhrescoException {
-	    RepoInfo repoInfo = PhrescoServerFactory.getDbManager().getRepoInfo(ServiceConstants.DEFAULT_CUSTOMER_NAME);
-        return repoInfo.getGroupRepoURL();
+		DbManager dbManager = PhrescoServerFactory.getDbManager();
+	    RepoInfo repoInfo = dbManager.getRepoInfo(ServiceConstants.DEFAULT_CUSTOMER_NAME);
+	    String repoURL = "";
+	    if(repoInfo == null) {
+			repoInfo = dbManager.getRepoInfoById(ServiceConstants.VIDEO_REPO_ID);
+			repoURL = repoInfo.getReleaseRepoURL();
+		} else {
+			repoURL = repoInfo.getGroupRepoURL();
+		}
+        return repoURL;
 	}
 }

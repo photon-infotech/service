@@ -23,7 +23,7 @@ public class VideoDownloaderTest {
 		PhrescoServerFactory.initialize();
 		Gson gson = new Gson();
 		RepositoryManager repoMgr = PhrescoServerFactory.getRepositoryManager();
-		String videoInfoJSON = repoMgr.getArtifactAsString(ServerConstants.HOMEPAGE_JSON_FILE, ServiceConstants.DEFAULT_CUSTOMER_NAME);
+		String videoInfoJSON = repoMgr.getArtifactAsString(ServerConstants.HOMEPAGE_JSON_FILE, "");
 		Type type = new TypeToken<List<VideoInfo>>() {
 		}.getType();
 		List<VideoInfo> videoInfoList = gson.fromJson(videoInfoJSON, type);

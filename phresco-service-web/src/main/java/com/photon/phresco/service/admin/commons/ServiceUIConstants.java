@@ -361,6 +361,7 @@ public interface ServiceUIConstants {
     String KEY_I18N_ERR_FILE_EMPTY	= "err.msg.file.empty";
     String KEY_I18N_MULTI_TECH_EMPTY = "err.msg.multitech.empty";
     String KEY_I18N_NAME_CHANGE_NOT_APPLICABLE = "err.msg.name.chnge.not.appl";
+	String KEY_I18N_SINGLE_TECH_EMPTY = "err.msg.singletech.empty";
     
     String KEY_I18N_ERR_APPTYPE_EMPTY = "err.msg.apptye.empty";
     String KEY_I18N_ERR_APPLIES_EMPTY = "err.msg.applies.empty";

@@ -630,6 +630,9 @@
 			</div>
 		</div>
 		
+		<%
+			if(CollectionUtils.isNotEmpty(technologies)) {
+		%>
 		<div class="control-group" id="applyControl">
 			<label class="control-label labelbold">
 				<s:text name='lbl.hdr.comp.appliesto'/>
@@ -665,8 +668,10 @@
 			</div>
           		 <span class="help-inline applyerror" id="applyError"></span>
 			</div>
-	 </div>
-
+	 	</div>
+		<%  
+			}
+		%>
 	
 	<section class="lft_menus_container adminaddtheme">
                <span class="siteaccordion openreg">

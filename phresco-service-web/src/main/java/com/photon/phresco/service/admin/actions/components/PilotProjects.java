@@ -66,6 +66,7 @@ public class PilotProjects extends ServiceBaseAction {
 	private String artifactIdError = "";
     private String groupIdError = "";
 	private String verError = "";
+	private String technologyError = "";
 	private String jarVerError = "";
 
 	private String fileError = "";
@@ -356,13 +357,17 @@ public class PilotProjects extends ServiceBaseAction {
     	boolean isError = false;
     	//Empty validation for name
     	isError = nameValidation(isError);
-    	    	
+    	  
     	//empty validation for fileupload
     	isError = fileuploadValidation(isError);
     	
     	//Empty Validation for pilot Project
     	isError = pilotProjectValidation(isError);
-
+    	
+    	if (StringUtils.isEmpty(getTechId())) {
+    		setTechnologyError(getText(KEY_I18N_SINGLE_TECH_EMPTY));
+    		isError = true;
+    	}
 
     	if (isError) {
     		setErrorFound(true);
@@ -628,6 +633,14 @@ public class PilotProjects extends ServiceBaseAction {
 
 	public void setExtFileName(String extFileName) {
 		this.extFileName = extFileName;
+	}
+
+	public void setTechnologyError(String technologyError) {
+		this.technologyError = technologyError;
+	}
+
+	public String getTechnologyError() {
+		return technologyError;
 	}
 
 

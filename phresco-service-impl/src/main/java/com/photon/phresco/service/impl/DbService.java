@@ -91,10 +91,6 @@ public class DbService implements ServiceConstants {
 		List<String> customerIds = new ArrayList<String>();
 		customerIds.add(customerId);
 		
-		if(!customerId.equals(DEFAULT_CUSTOMER_NAME)) {
-			customerIds.add(DEFAULT_CUSTOMER_NAME);
-		}
-
 		Criteria criteria = Criteria.where(DB_COLUMN_CUSTOMERIDS).in(customerIds.toArray());
 		Query query = new Query(criteria);
 
@@ -289,7 +285,7 @@ public class DbService implements ServiceConstants {
 		List<String> techIds = new ArrayList<String>();
 		List<TechnologyDAO> techs = mongoOperation.find(TECHNOLOGIES_COLLECTION_NAME, 
 				new Query(Criteria.where(DB_COLUMN_CUSTOMERIDS).is(customerId)), TechnologyDAO.class);
-		if(customerId.equals(DEFAULT_CUSTOMER_NAME)) {
+		if(CollectionUtils.isNotEmpty(techs)) {
 			for (TechnologyDAO tech : techs) {
 				if(!applicableTechnologies.contains(tech.getId())) {
 					techIds.add(tech.getId());
@@ -297,11 +293,11 @@ public class DbService implements ServiceConstants {
 			}
 			return techIds;
 		}
-		if(CollectionUtils.isNotEmpty(techs)) {
-			for (TechnologyDAO dao : techs) {
-				techIds.add(dao.getId());
-			}
-		}
+//		if(CollectionUtils.isNotEmpty(techs)) {
+//			for (TechnologyDAO dao : techs) {
+//				techIds.add(dao.getId());
+//			}
+//		}
 		return techIds;
 	}
 

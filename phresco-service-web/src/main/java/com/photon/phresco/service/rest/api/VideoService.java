@@ -120,7 +120,7 @@ public class VideoService implements ServerConstants {
 			InputStream fis = null;
 			try {
 				PhrescoServerFactory.initialize();
-				RepoInfo repo = PhrescoServerFactory.getDbManager().getRepoInfo(ServiceConstants.DEFAULT_CUSTOMER_NAME);
+				RepoInfo repo = PhrescoServerFactory.getDbManager().getRepoInfo("");
 				URL url = new URL(repo.getGroupRepoURL() + projectPath);
 				fis = url.openStream();
 				byte[] buf = new byte[MAGICNUMBER.BYTESMALLSIZE];

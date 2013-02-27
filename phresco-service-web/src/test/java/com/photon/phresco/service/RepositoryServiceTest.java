@@ -24,7 +24,7 @@ public class RepositoryServiceTest {
 		PhrescoServerFactory.initialize();
 		repoMgr = PhrescoServerFactory.getRepositoryManager();
 		repositoryURL = PhrescoServerFactory.getDbManager()
-		    .getRepoInfo(ServiceConstants.DEFAULT_CUSTOMER_NAME).getGroupRepoURL();
+		    .getRepoInfo("").getGroupRepoURL();
 	}
 	
 	@Ignore

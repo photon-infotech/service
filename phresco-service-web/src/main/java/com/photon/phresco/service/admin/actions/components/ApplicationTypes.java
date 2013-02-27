@@ -58,7 +58,7 @@ public class ApplicationTypes extends ServiceBaseAction {
 	    }
 
 		try {
-		    List<ApplicationType> applicationTypes = getServiceManager().getApplicationTypes(getCustomerId());
+		    List<ApplicationType> applicationTypes = getServiceManager().getApplicationTypes();
 		    setReqAttribute(REQ_APP_TYPES, applicationTypes);
 		    setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		} catch (PhrescoException e) {

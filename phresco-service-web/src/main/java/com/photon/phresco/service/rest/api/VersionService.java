@@ -91,8 +91,15 @@ public class VersionService implements ServerConstants {
 		DbManager dbManager = PhrescoServerFactory.getDbManager();
 		URL url = null;
 		try {
+			String repoURL = "";
 			RepoInfo repoInfo = dbManager.getRepoInfo(customerId);
-			url = new URL(repoInfo.getGroupRepoURL() + UPDATE_FILE_PATH + 
+			if(repoInfo == null) {
+				repoInfo = dbManager.getRepoInfoById(ServiceConstants.UPDATE_REPO_ID);
+				repoURL = repoInfo.getReleaseRepoURL();
+			} else {
+				repoURL = repoInfo.getGroupRepoURL();
+			}
+			url = new URL(repoURL + UPDATE_FILE_PATH + 
 					dbManager.getLatestFrameWorkVersion() + UPDATE_ZIP);
 		} catch (MalformedURLException e) {
 			throw new PhrescoException(e);

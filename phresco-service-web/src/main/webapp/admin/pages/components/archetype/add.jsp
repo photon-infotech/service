@@ -317,7 +317,9 @@
           		 <span class="help-inline applyerror" id="applicableError"></span>
 			</div>
 		</div>
-		
+		<%
+			if (CollectionUtils.isNotEmpty(technologies)) {
+		%>						
 		<div class="control-group" id="applyControl">
 				<label class="control-label labelbold">
 					<s:text name='lbl.comp.featr.archetypefeatures'/>
@@ -359,7 +361,8 @@
 					</div>
 				</div>
 			</div>
-		
+		<%		}	
+		%>	
 	</div>
 
 	<div class="bottom_button">

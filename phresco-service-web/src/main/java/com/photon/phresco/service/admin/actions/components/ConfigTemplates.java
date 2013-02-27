@@ -218,7 +218,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 					element.setName(techName);
 					appliesTos.add(element);
 				}
-
+				
 				settingTemplate.setAppliesToTechs(appliesTos);
 				setPropertTemplate(settingTemplate);
 			}

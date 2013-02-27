@@ -23,6 +23,7 @@ package com.photon.phresco.service.rest.api;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +53,7 @@ import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactInfo;
+import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.DownloadInfo;
 import com.photon.phresco.commons.model.Element;
 import com.photon.phresco.commons.model.License;
@@ -73,6 +75,7 @@ import com.photon.phresco.service.converters.ConvertersFactory;
 import com.photon.phresco.service.dao.ApplicationInfoDAO;
 import com.photon.phresco.service.dao.ApplicationTypeDAO;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
+import com.photon.phresco.service.dao.CustomerDAO;
 import com.photon.phresco.service.dao.DownloadsDAO;
 import com.photon.phresco.service.dao.TechnologyDAO;
 import com.photon.phresco.service.impl.DbService;
@@ -110,18 +113,21 @@ public class ComponentService extends DbService {
 	@GET
 	@Path (REST_API_APPTYPES)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findAppTypes(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) throws PhrescoException {
+	public Response findAppTypes() throws PhrescoException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.findAppTypes()");
 	    }
 		try {
 			List<ApplicationType> applicationTypes = new ArrayList<ApplicationType>();
-			Query query = createCustomerIdQuery(customerId);
-			List<ApplicationTypeDAO> applicationTypeDAOs = mongoOperation.find(APPTYPES_COLLECTION_NAME, query, ApplicationTypeDAO.class);
+//			Query query = createCustomerIdQuery(DEFAULT_CUSTOMER_NAME);
+			List<ApplicationTypeDAO> applicationTypeDAOs = mongoOperation.getCollection(APPTYPES_COLLECTION_NAME, ApplicationTypeDAO.class);
 			Converter<ApplicationTypeDAO, ApplicationType> converter = (Converter<ApplicationTypeDAO, ApplicationType>) 
 				ConvertersFactory.getConverter(ApplicationTypeDAO.class);
 			for (ApplicationTypeDAO applicationTypeDAO : applicationTypeDAOs) {
 				applicationTypes.add(converter.convertDAOToObject(applicationTypeDAO, mongoOperation));
+			}
+			if(CollectionUtils.isEmpty(applicationTypes)) {
+				return Response.status(Response.Status.NO_CONTENT).build();
 			}
 	        return Response.status(Response.Status.OK).entity(applicationTypes).build();
 		} catch (Exception e) {
@@ -315,18 +321,27 @@ public class ComponentService extends DbService {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.findTechnologies() " + customerId);
 	    }
+	    List<TechnologyDAO> techDAOList = new ArrayList<TechnologyDAO>();
 	    try {
-	        List<TechnologyDAO> techDAOList = new ArrayList<TechnologyDAO>();
 			Query query = createCustomerIdQuery(customerId);
 		   
 			if(StringUtils.isNotEmpty(appTypeId)) {
 			    query.addCriteria(Criteria.where(REST_QUERY_APPTYPEID).is(appTypeId));
-			    techDAOList = mongoOperation.find(TECHNOLOGIES_COLLECTION_NAME, query, TechnologyDAO.class);
-		    } else {
-		        techDAOList = mongoOperation.find(TECHNOLOGIES_COLLECTION_NAME, query, TechnologyDAO.class);
-		    }
-		    
-		    List<Technology> techList = new ArrayList<Technology>(techDAOList.size() * 2);
+		    } 
+			
+			techDAOList = mongoOperation.find(TECHNOLOGIES_COLLECTION_NAME, query, TechnologyDAO.class);
+			if(StringUtils.isEmpty(appTypeId) && !StringUtils.equals(customerId, DEFAULT_CUSTOMER_NAME)) {
+				CustomerDAO customerDAO = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME, 
+						new Query(Criteria.whereId().is(customerId)), CustomerDAO.class);
+				List<String> applicableTechnologies = customerDAO.getApplicableTechnologies();
+				if(CollectionUtils.isNotEmpty(applicableTechnologies)) {
+					List<TechnologyDAO> customerTechs = mongoOperation.find(TECHNOLOGIES_COLLECTION_NAME, 
+							new Query(Criteria.whereId().in(applicableTechnologies.toArray())), TechnologyDAO.class);
+					techDAOList.addAll(customerTechs);
+				}
+			}
+			
+		    List<Technology> techList = new ArrayList<Technology>();
 			Converter<TechnologyDAO, Technology> technologyConverter = 
 		          (Converter<TechnologyDAO, Technology>) ConvertersFactory.getConverter(TechnologyDAO.class);
 
@@ -335,9 +350,8 @@ public class ComponentService extends DbService {
 				techList.add(technology);
 			}
 			
-			//if empty send error message
-			if (techList.isEmpty()) {
-				return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();	
+			if (CollectionUtils.isEmpty(techList)) {
+				return Response.status(Response.Status.NO_CONTENT).build();	
 			}
 			
 			ResponseBuilder response = Response.status(Response.Status.OK);
@@ -634,11 +648,14 @@ public class ComponentService extends DbService {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.findSettings()" + customerId);
 	    }
-		List<SettingsTemplate> settings = new ArrayList<SettingsTemplate>();
+	    List<SettingsTemplate> settings = new ArrayList<SettingsTemplate>();
 		try {
 			Query query = createCustomerIdQuery(customerId);
 			if(StringUtils.isNotEmpty(techId)) {
 			    query.addCriteria(Criteria.where("appliesToTechs._id").is(techId));
+			} else {
+				Criteria customerCri = Criteria.where(DB_COLUMN_CUSTOMERIDS).in(Arrays.asList(DEFAULT_CUSTOMER_NAME, customerId).toArray());
+				query.addCriteria(customerCri);
 			}
 			List<SettingsTemplate> settingsList = mongoOperation.find(SETTINGS_COLLECTION_NAME, query, SettingsTemplate.class);
 			for (SettingsTemplate settingsTemplate : settingsList) {
@@ -646,7 +663,10 @@ public class ComponentService extends DbService {
 				settingsTemplate.setPossibleTypes(types);
 				settings.add(settingsTemplate);
 			}
-			return Response.status(Response.Status.NO_CONTENT).entity(settings).build();
+			if(CollectionUtils.isEmpty(settings)) {
+				return Response.status(Response.Status.NO_CONTENT).build();
+			}
+			return Response.status(Response.Status.OK).entity(settings).build();
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, SETTINGS_COLLECTION_NAME);
 		}
@@ -831,7 +851,22 @@ public class ComponentService extends DbService {
 	        S_LOGGER.debug("Entered into ComponentService.findModules()" + type);
 	    }
 		try {
-			Query query = createCustomerIdQuery(customerId);
+			Query query = new Query();
+			if(StringUtils.isNotEmpty(customerId)) {
+        		List<String> customers = new ArrayList<String>();
+        		customers.add(customerId);
+        		if(StringUtils.isNotEmpty(techId)) {
+        			CustomerDAO customer = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME, 
+        					new Query(Criteria.whereId().is(customerId)), CustomerDAO.class);
+        			if(CollectionUtils.isNotEmpty(customer.getApplicableTechnologies())) {
+        				if(customer.getApplicableTechnologies().contains(techId)) {
+        					customers.add(DEFAULT_CUSTOMER_NAME);
+        				}
+        			}
+        		}
+        		Criteria customerCriteria = Criteria.where(DB_COLUMN_CUSTOMERIDS).in(customers.toArray());
+        		query.addCriteria(customerCriteria);
+        	}
 			Criteria typeQuery = Criteria.where(DB_COLUMN_ARTIFACT_GROUP_TYPE).is(type);
 			List<String> technologies = new ArrayList<String>();
 			technologies.add(techId);
@@ -850,6 +885,9 @@ public class ComponentService extends DbService {
 			List<ArtifactGroupDAO> artifactGroupDAOs = mongoOperation.find(ARTIFACT_GROUP_COLLECTION_NAME,
 					query, ArtifactGroupDAO.class);
 		    List<ArtifactGroup> modules = convertDAOToModule(artifactGroupDAOs);
+		    if(CollectionUtils.isEmpty(modules)) {
+		    	return Response.status(Response.Status.NO_CONTENT).build();
+		    }
 		    ResponseBuilder response = Response.status(Response.Status.OK);
 		    response.header(Constants.ARTIFACT_COUNT_RESULT, count(ARTIFACT_GROUP_COLLECTION_NAME, query));
 			return response.entity(modules).build();
@@ -1170,24 +1208,37 @@ public class ComponentService extends DbService {
 	    List<ApplicationInfo> applicationInfos = new ArrayList<ApplicationInfo>();
 		try {
 		    List<ApplicationInfoDAO> appInfos = new ArrayList<ApplicationInfoDAO>();
-			Query query = createCustomerIdQuery(customerId);
+			Query query = new Query();
+			if(StringUtils.isNotEmpty(customerId)) {
+        		List<String> customers = new ArrayList<String>();
+        		customers.add(customerId);
+        		if(StringUtils.isNotEmpty(techId)) {
+        			CustomerDAO customer = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME, 
+        					new Query(Criteria.whereId().is(customerId)), CustomerDAO.class);
+        			if(CollectionUtils.isNotEmpty(customer.getApplicableTechnologies())) {
+        				if(customer.getApplicableTechnologies().contains(techId)) {
+        					customers.add(DEFAULT_CUSTOMER_NAME);
+        				}
+        			}
+        		}
+        		Criteria customerCriteria = Criteria.where(DB_COLUMN_CUSTOMERIDS).in(customers.toArray());
+        		query.addCriteria(customerCriteria);
+        	}
 			query.addCriteria(Criteria.where(REST_QUERY_ISPILOT).is(true));
 			Converter<ApplicationInfoDAO, ApplicationInfo> pilotConverter = 
             		(Converter<ApplicationInfoDAO, ApplicationInfo>) ConvertersFactory.getConverter(ApplicationInfoDAO.class);
 			if (StringUtils.isNotEmpty(techId)) {
                 query.addCriteria(Criteria.where(TECHINFO_VERSION).is(techId));
-                appInfos = mongoOperation.find(APPLICATION_INFO_COLLECTION_NAME, query, ApplicationInfoDAO.class);
-                for (ApplicationInfoDAO applicationInfoDAO : appInfos) {
-	               	 ApplicationInfo applicationInfo = pilotConverter.convertDAOToObject(applicationInfoDAO, mongoOperation);
-	                 applicationInfos.add(applicationInfo);
-					}
-            } else {
-                appInfos = mongoOperation.find(APPLICATION_INFO_COLLECTION_NAME, query, ApplicationInfoDAO.class);
-                for (ApplicationInfoDAO applicationInfoDAO : appInfos) {
-                	 ApplicationInfo applicationInfo = pilotConverter.convertDAOToObject(applicationInfoDAO, mongoOperation);
-                	 applicationInfos.add(applicationInfo);
-				}
-            }
+			}
+            appInfos = mongoOperation.find(APPLICATION_INFO_COLLECTION_NAME, query, ApplicationInfoDAO.class);
+            for (ApplicationInfoDAO applicationInfoDAO : appInfos) {
+	            ApplicationInfo applicationInfo = pilotConverter.convertDAOToObject(applicationInfoDAO, mongoOperation);
+	            applicationInfos.add(applicationInfo);
+			}
+            
+			if(CollectionUtils.isEmpty(applicationInfos)) {
+				return Response.status(Response.Status.NO_CONTENT).build();
+			}
 			ResponseBuilder response = Response.status(Response.Status.OK);
 			response.header(Constants.ARTIFACT_COUNT_RESULT, count(APPLICATION_INFO_COLLECTION_NAME, query));
 			return response.entity(applicationInfos).build();
@@ -1380,9 +1431,11 @@ public class ComponentService extends DbService {
 	        S_LOGGER.debug("Entered into ComponentService.findWebServices()");
 	    }
 		
-		List<WebService> webServiceList = new ArrayList<WebService>();
 		try {
-			webServiceList.addAll(mongoOperation.getCollection(WEBSERVICES_COLLECTION_NAME, WebService.class));
+			List<WebService> webServiceList = mongoOperation.getCollection(WEBSERVICES_COLLECTION_NAME, WebService.class);
+			if(CollectionUtils.isEmpty(webServiceList)) {
+				return  Response.status(Response.Status.NO_CONTENT).build();
+			}
 			return  Response.status(Response.Status.OK).entity(webServiceList).build();
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, WEBSERVICES_COLLECTION_NAME);
@@ -1552,20 +1605,35 @@ public class ComponentService extends DbService {
         List<DownloadInfo> downloads = new ArrayList<DownloadInfo>();
         Query query = new Query();
         try {
-        	query = createCustomerIdQuery(customerId);
+        	if(StringUtils.isNotEmpty(customerId)) {
+        		List<String> customers = new ArrayList<String>();
+        		customers.add(customerId);
+        		if(StringUtils.isNotEmpty(techId)) {
+        			CustomerDAO customer = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME, 
+        					new Query(Criteria.whereId().is(customerId)), CustomerDAO.class);
+        			if(CollectionUtils.isNotEmpty(customer.getApplicableTechnologies())) {
+        				if(customer.getApplicableTechnologies().contains(techId)) {
+        					customers.add(DEFAULT_CUSTOMER_NAME);
+        				}
+        			}
+        		}
+        		Criteria customerCriteria = Criteria.where(DB_COLUMN_CUSTOMERIDS).in(customers.toArray());
+        		query.addCriteria(customerCriteria);
+        	}
         	if(StringUtils.isNotEmpty(platform)) {
         		query.addCriteria(Criteria.where(DB_COLUMN_PLATFORM).is(platform));
         	}
-        	if(StringUtils.isNotEmpty(techId) && StringUtils.isNotEmpty(type)) {
+        	if(StringUtils.isNotEmpty(techId)) {
         		Criteria techIdCriteria = Criteria.where(APPLIES_TO_TECHIDS).in(techId);
-            	Criteria typeCriteria = Criteria.where(CATEGORY).is(type);
             	query.addCriteria(techIdCriteria);
-            	query.addCriteria(typeCriteria);
         	}
-        	if(StringUtils.isEmpty(techId) && StringUtils.isEmpty(customerId)) {
+        	if(StringUtils.isNotEmpty(type)) {
         		Criteria typeCriteria = Criteria.where(CATEGORY).is(type);
-        		query = new Query();
-        		query = query.addCriteria(typeCriteria);
+        		query.addCriteria(typeCriteria);
+        	}
+        	if(StringUtils.isEmpty(techId) && StringUtils.isEmpty(type) && StringUtils.isEmpty(platform)) {
+        		Criteria customerCri = Criteria.where(DB_COLUMN_CUSTOMERIDS).in(Arrays.asList(DEFAULT_CUSTOMER_NAME, customerId).toArray());
+				query.addCriteria(customerCri);
         	}
         	List<DownloadsDAO> downloadList = mongoOperation.find(DOWNLOAD_COLLECTION_NAME, query, DownloadsDAO.class);
             if (downloadList != null) {
@@ -1576,7 +1644,11 @@ public class ComponentService extends DbService {
 					downloads.add(downloadInfo);
 				}
             } 
+            if(CollectionUtils.isEmpty(downloads)) {
+            	return  Response.status(Response.Status.NO_CONTENT).build();
+            }
         } catch (Exception e) {
+        	e.printStackTrace();
             throw new PhrescoWebServiceException(e, EX_PHEX00006, DOWNLOAD_COLLECTION_NAME);
         }
         ResponseBuilder response = Response.status(Response.Status.OK);
@@ -1772,7 +1844,10 @@ public class ComponentService extends DbService {
 		
 		try {
 			List<PlatformType> platformList = mongoOperation.getCollection(PLATFORMS_COLLECTION_NAME, PlatformType.class);
-			return Response.status(Response.Status.NO_CONTENT).entity(platformList).build();
+			if(CollectionUtils.isEmpty(platformList)) {
+				return Response.status(Response.Status.NO_CONTENT).build();
+			}
+			return Response.status(Response.Status.OK).entity(platformList).build();
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, SETTINGS_COLLECTION_NAME);
 		}
@@ -1801,6 +1876,9 @@ public class ComponentService extends DbService {
 					reports = mongoOperation.find(REPORTS_COLLECTION_NAME, 
 							new Query(Criteria.whereId().in(reportIds.toArray())), Reports.class);
 				}
+			}
+			if(CollectionUtils.isEmpty(reports)) {
+				return  Response.status(Response.Status.NO_CONTENT).build();
 			}
 			return  Response.status(Response.Status.OK).entity(reports).build();
 		} catch (Exception e) {
@@ -1960,6 +2038,9 @@ public class ComponentService extends DbService {
 	    }
 		try {
 			List<Property> properties = mongoOperation.getCollection(PROPERTIES_COLLECTION_NAME, Property.class);
+			if(CollectionUtils.isEmpty(properties)) {
+				return  Response.status(Response.Status.NO_CONTENT).build();
+			}
 			return  Response.status(Response.Status.OK).entity(properties).build();
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, WEBSERVICES_COLLECTION_NAME);
@@ -2117,6 +2198,9 @@ public class ComponentService extends DbService {
 	    }
 		try {
 			List<TechnologyOptions> techOptions = mongoOperation.getCollection(OPTIONS_COLLECTION_NAME, TechnologyOptions.class);
+			if(CollectionUtils.isEmpty(techOptions)) {
+				return  Response.status(Response.Status.NO_CONTENT).build();
+			}
 			return  Response.status(Response.Status.OK).entity(techOptions).build();
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, OPTIONS_COLLECTION_NAME);
@@ -2136,6 +2220,9 @@ public class ComponentService extends DbService {
 	    }
 		try {
 			List<License> licenses = mongoOperation.getCollection(LICENSE_COLLECTION_NAME, License.class);
+			if(CollectionUtils.isEmpty(licenses)) {
+				return  Response.status(Response.Status.NO_CONTENT).build();
+			}
 			return  Response.status(Response.Status.OK).entity(licenses).build();
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, OPTIONS_COLLECTION_NAME);
@@ -2181,6 +2268,9 @@ public class ComponentService extends DbService {
 	    }
 		try {
 			List<TechnologyGroup> technologyGroups = mongoOperation.getCollection(TECH_GROUP_COLLECTION_NAME, TechnologyGroup.class);
+			if(CollectionUtils.isEmpty(technologyGroups)) {
+				return  Response.status(Response.Status.NO_CONTENT).build();
+			}
 			return  Response.status(Response.Status.OK).entity(technologyGroups).build();
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, TECH_GROUP_COLLECTION_NAME);
