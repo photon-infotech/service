@@ -115,6 +115,7 @@ public class Features extends ServiceBaseAction {
 	private boolean tempError = false;
 	private String featureUrl = "";
 	private static String versionFile = "";
+	private static long size;
     
 	public String menu() {
 		if (isDebugEnabled) {
@@ -348,6 +349,7 @@ public class Features extends ServiceBaseAction {
             if (StringUtils.isNotEmpty(getModuleId()) && !"null".equals(getModuleId())) {
             	artifactInfo.setId(getModuleId());
             }
+            artifactInfo.setFileSize(size);
             artifactInfo.setDescription(getDescription());
             artifactGroup.setHelpText(getHelpText());
             if (StringUtils.isNotEmpty(version)) {
@@ -433,6 +435,7 @@ public class Features extends ServiceBaseAction {
             writer = getHttpResponse().getWriter();
 	        byte[] tempFeaByteArray = getByteArray();
 	        String ext = ServerUtil.getFileExtension(getFileName());
+	        size = getFileSize();
 	        if(ext.equalsIgnoreCase(FILE_FORMAT)) {
 	        	zipNameValidate = extractArchive( new ByteArrayInputStream(tempFeaByteArray));
 	        }
@@ -532,9 +535,9 @@ public class Features extends ServiceBaseAction {
 		
 		try {
 			setTechnologiesInRequest();
-			ArtifactGroup artiGroup = getServiceManager().getFeature(getModuleGroupId(), getCustomerId(), technology, Type.valueOf(getType()).name());
-			featureUrl = artiGroup.getVersions().get(0).getDownloadURL();
-
+			ArtifactGroup artiGroup = getServiceManager().getFeature(getModuleGroupId(), getCustomerId(), technology, Type.valueOf(getType()).name());						
+			featureUrl = artiGroup.getVersions().get(0).getDownloadURL();			
+			
 			URL url = new URL(featureUrl);
 			fileInputStream = url.openStream();
 			String[] parts = featureUrl.split(FORWARD_SLASH);

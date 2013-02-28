@@ -112,14 +112,11 @@ public class ArtifactGroupConverter implements Converter<ArtifactGroupDAO, Artif
 		return artifactGroup;
 	}
     
-	private String createDownloadURL(String groupId, String artifactId, String packaging, String version, String customerId, long fileSize) {
-		if(fileSize==0)  {
-			return null; 
-	    }
+	private String createDownloadURL(String groupId, String artifactId, String packaging, String version, String customerId, long fileSize) {		
 		if(StringUtils.isNotEmpty(groupId) && StringUtils.isNotEmpty(artifactId) && StringUtils.isNotEmpty(version)) {
-			Customer customer = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME, new Query(Criteria.whereId().is(customerId)), Customer.class);
+			Customer customer = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME, new Query(Criteria.whereId().is(customerId)), Customer.class);			
 			if(customer != null) {
-				RepoInfo repoInfo = customer.getRepoInfo();
+				RepoInfo repoInfo = customer.getRepoInfo();				
 				if(StringUtils.isNotEmpty(repoInfo.getGroupRepoURL())) {
 					return repoInfo.getGroupRepoURL() + ServerUtil.createContentURL(groupId, artifactId, version, packaging);
 				}
