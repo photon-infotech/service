@@ -799,7 +799,6 @@ public class ComponentService extends DbService {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.updateAppType(String id , SettingsTemplate settingsTemplate)" + id);
 	    }
-		
 		try {
 			SettingsTemplate fromDb = mongoOperation.findOne(SETTINGS_COLLECTION_NAME, 
 			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), SettingsTemplate.class);
@@ -807,12 +806,29 @@ public class ComponentService extends DbService {
 			if(!customerIds.contains(settingsTemplate.getCustomerIds().get(0))) {
 				customerIds.add(settingsTemplate.getCustomerIds().get(0));
 			}
+			List<Element> appliesToTechs = fromDb.getAppliesToTechs();
+			List<Element> newAppliesToTechs = settingsTemplate.getAppliesToTechs();
+			for (Element element : newAppliesToTechs) {
+				if(! checkPreviouslyAvail(appliesToTechs, element)) {
+					appliesToTechs.add(element);
+				}
+			}
+			settingsTemplate.setAppliesToTechs(appliesToTechs);
 			settingsTemplate.setCustomerIds(customerIds);
 			mongoOperation.save(SETTINGS_COLLECTION_NAME, settingsTemplate);
 			return Response.status(Response.Status.OK).entity(settingsTemplate).build();
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
 		}
+	}
+	
+	private boolean checkPreviouslyAvail(List<Element> appliesToTechsInDb, Element newTech) {
+		for (Element element : appliesToTechsInDb) {
+			if(element.getId().equals(newTech.getId())) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/**
@@ -1714,6 +1730,22 @@ public class ComponentService extends DbService {
     	Converter<DownloadsDAO, DownloadInfo> downlodConverter = 
     		(Converter<DownloadsDAO, DownloadInfo>) ConvertersFactory.getConverter(DownloadsDAO.class);
     	DownloadsDAO downloadDAO = downlodConverter.convertObjectToDAO(info);
+    	DownloadsDAO dDao = mongoOperation.findOne(DOWNLOAD_COLLECTION_NAME,  new Query(Criteria.whereId().is(info.getId())), DownloadsDAO.class);
+    	if(dDao != null) {
+    		List<String> appliesToTechIdsDB = dDao.getAppliesToTechIds();
+    		List<String> appliesToTechIds = info.getAppliesToTechIds();
+    		for (String techId : appliesToTechIds) {
+				if(!appliesToTechIdsDB.contains(techId)) {
+					appliesToTechIdsDB.add(techId);
+				}
+			}
+    		downloadDAO.setAppliesToTechIds(appliesToTechIdsDB);
+    		List<String> customerIdsInDb = dDao.getCustomerIds();
+    		if(!customerIdsInDb.contains(info.getCustomerIds().get(0))) {
+    			customerIdsInDb.add(info.getCustomerIds().get(0));
+    		}
+    		downloadDAO.setCustomerIds(customerIdsInDb);
+    	}
     	ArtifactGroup artifactGroup = info.getArtifactGroup();
     	saveModuleGroup(artifactGroup);
     	mongoOperation.save(DOWNLOAD_COLLECTION_NAME, downloadDAO);
