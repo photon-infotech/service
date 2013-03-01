@@ -330,7 +330,7 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 				S_LOGGER.debug("getArtifactAsStream() FilePath=" + filePath);
 			}
 			RepoInfo repoInfo = getDBManager().getRepoInfo(customerId);
-			URL url = new URL(repoInfo.getGroupRepoURL() + filePath);
+			URL url = new URL(repoInfo.getGroupRepoURL() + "/" + filePath);
 			return url.openStream();
 		} catch (MalformedURLException e) {
 			S_LOGGER.debug("getArtifactAsStream =" + filePath, e);

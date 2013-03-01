@@ -1905,8 +1905,10 @@ public class ComponentService extends DbService {
 						new Query(Criteria.whereId().is(techId)), TechnologyDAO.class);
 				if(tech != null) {
 					List<String> reportIds = tech.getReports();
-					reports = mongoOperation.find(REPORTS_COLLECTION_NAME, 
-							new Query(Criteria.whereId().in(reportIds.toArray())), Reports.class);
+					if(CollectionUtils.isNotEmpty(reportIds)) {
+						reports = mongoOperation.find(REPORTS_COLLECTION_NAME, 
+								new Query(Criteria.whereId().in(reportIds.toArray())), Reports.class);
+					}
 				}
 			}
 			if(CollectionUtils.isEmpty(reports)) {

@@ -118,7 +118,7 @@ public class ArtifactGroupConverter implements Converter<ArtifactGroupDAO, Artif
 			if(customer != null) {
 				RepoInfo repoInfo = customer.getRepoInfo();				
 				if(StringUtils.isNotEmpty(repoInfo.getGroupRepoURL())) {
-					return repoInfo.getGroupRepoURL() + ServerUtil.createContentURL(groupId, artifactId, version, packaging);
+					return repoInfo.getGroupRepoURL() + "/" + ServerUtil.createContentURL(groupId, artifactId, version, packaging);
 				}
 			}
 		}
