@@ -650,7 +650,22 @@ public class ComponentService extends DbService {
 	    }
 	    List<SettingsTemplate> settings = new ArrayList<SettingsTemplate>();
 		try {
-			Query query = createCustomerIdQuery(customerId);
+			Query query = new Query();
+			if(StringUtils.isNotEmpty(customerId)) {
+        		List<String> customers = new ArrayList<String>();
+        		customers.add(customerId);
+        		if(StringUtils.isNotEmpty(techId)) {
+        			CustomerDAO customer = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME, 
+        					new Query(Criteria.whereId().is(customerId)), CustomerDAO.class);
+        			if(CollectionUtils.isNotEmpty(customer.getApplicableTechnologies())) {
+        				if(customer.getApplicableTechnologies().contains(techId)) {
+        					customers.add(DEFAULT_CUSTOMER_NAME);
+        				}
+        			}
+        		}
+        		Criteria customerCriteria = Criteria.where(DB_COLUMN_CUSTOMERIDS).in(customers.toArray());
+        		query.addCriteria(customerCriteria);
+        	}
 			if(StringUtils.isNotEmpty(techId)) {
 			    query.addCriteria(Criteria.where("appliesToTechs._id").is(techId));
 			} else {
