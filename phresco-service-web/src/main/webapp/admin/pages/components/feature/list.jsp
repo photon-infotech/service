@@ -90,10 +90,8 @@
 			                            <tbody>
 			                            <% 
 									    	List<ArtifactInfo> versions = moduleGroup.getVersions();
-			                            	if (CollectionUtils.isNotEmpty(versions)) {
-			                            		Collections.sort(versions, ServiceBaseAction.ARTIFACTINFO__COMPARATOR_DESCEND);
-			                            	}
 									    	if (CollectionUtils.isNotEmpty(versions)) {
+									    		Collections.sort(versions, ServiceBaseAction.ARTIFACTINFO__COMPARATOR_DESCEND);
 												for (ArtifactInfo module : versions) {
 												    String descContent = "";
 													if (module.getDescription() != null) { 
