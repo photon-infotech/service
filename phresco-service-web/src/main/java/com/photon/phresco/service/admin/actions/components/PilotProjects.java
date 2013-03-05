@@ -25,10 +25,12 @@ import java.io.PrintWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -37,6 +39,7 @@ import org.apache.log4j.Logger;
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactInfo;
+import com.photon.phresco.commons.model.SettingsTemplate;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.commons.model.TechnologyInfo;
 import com.photon.phresco.exception.PhrescoException;
@@ -102,6 +105,9 @@ public class PilotProjects extends ServiceBaseAction {
 		try {
 			List<ApplicationInfo> pilotProjects = getServiceManager().getPilotProjects(getCustomerId());
 			List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
+			if (CollectionUtils.isNotEmpty(pilotProjects)) {
+				Collections.sort(pilotProjects, sortPilotProjectInAlphaOrder());
+			}
 			setReqAttribute(REQ_PILOT_PROJECTS, pilotProjects);
 			setReqAttribute(REQ_ARCHE_TYPES, technologies);
 			setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
@@ -116,6 +122,16 @@ public class PilotProjects extends ServiceBaseAction {
 		return COMP_PILOTPROJ_LIST;
 	}
 	
+	private Comparator sortPilotProjectInAlphaOrder() {
+		return new Comparator() {
+		    public int compare(Object firstObject, Object secondObject) {
+		    	ApplicationInfo pilotProject1 = (ApplicationInfo) firstObject;
+		    	ApplicationInfo pilotProject2 = (ApplicationInfo) secondObject;
+		       return pilotProject1.getName().compareToIgnoreCase(pilotProject2.getName());
+		    }
+		};
+	}
+	
 	 /**
      * To return to the page to add Pilot projects
      * @return 
@@ -128,7 +144,9 @@ public class PilotProjects extends ServiceBaseAction {
     	
     	try {
     		List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
-    		Collections.sort(technologies, TECHNAME_COMPARATOR);
+    		if (CollectionUtils.isNotEmpty(technologies)) {
+    			Collections.sort(technologies, TECHNAME_COMPARATOR);
+    		}
     		setReqAttribute(REQ_ARCHE_TYPES, technologies);
     		setReqAttribute(REQ_FROM_PAGE, ADD);
     	} catch (PhrescoException e) {

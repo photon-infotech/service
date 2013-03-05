@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -124,12 +125,25 @@ public class Customers extends ServiceBaseAction  {
 		
 		try {
             List<Customer> customers = getServiceManager().getCustomers();
+            if (CollectionUtils.isNotEmpty(customers)) {
+            	Collections.sort(customers, sortCustomerInAlphaOrder());
+            }
 			setReqAttribute(REQ_CUST_CUSTOMERS, customers);
 		} catch (PhrescoException e) {
 			return showErrorPopup(e, getText(EXCEPTION_CUSTOMERS_LIST));
 		}
 		
 		return ADMIN_CUSTOMER_LIST;	
+	}
+    
+    private Comparator sortCustomerInAlphaOrder() {
+		return new Comparator() {
+		    public int compare(Object firstObject, Object secondObject) {
+		    	Customer cus1 = (Customer) firstObject;
+		    	Customer cus2 = (Customer) secondObject;
+		       return cus1.getName().compareToIgnoreCase(cus2.getName());
+		    }
+		};
 	}
 	
 	/**

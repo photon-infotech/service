@@ -22,6 +22,7 @@ package com.photon.phresco.service.admin.actions.components;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,6 +32,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.photon.phresco.commons.model.DownloadInfo;
 import com.photon.phresco.commons.model.Element;
 import com.photon.phresco.commons.model.PropertyTemplate;
 import com.photon.phresco.commons.model.SettingsTemplate;
@@ -76,6 +78,9 @@ public class ConfigTemplates extends ServiceBaseAction {
 		
 		try {
 			List<SettingsTemplate> configTemplates = getServiceManager().getConfigTemplates(getCustomerId());
+			if (CollectionUtils.isNotEmpty(configTemplates)) {
+				Collections.sort(configTemplates, sortTemplateInAlphaOrder());
+			}
 			setReqAttribute(REQ_CONFIG_TEMPLATES, configTemplates);
 			setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		} catch (PhrescoException e) {
@@ -83,6 +88,16 @@ public class ConfigTemplates extends ServiceBaseAction {
 		}
 		
 		return COMP_CONFIGTEMPLATE_LIST;
+	}
+	
+	private Comparator sortTemplateInAlphaOrder() {
+		return new Comparator() {
+		    public int compare(Object firstObject, Object secondObject) {
+		    	SettingsTemplate configTemplate1 = (SettingsTemplate) firstObject;
+		    	SettingsTemplate configTemplate2 = (SettingsTemplate) secondObject;
+		       return configTemplate1.getName().compareToIgnoreCase(configTemplate2.getName());
+		    }
+		};
 	}
 	
 	/**

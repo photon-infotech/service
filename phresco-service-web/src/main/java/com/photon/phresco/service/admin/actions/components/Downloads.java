@@ -107,7 +107,9 @@ public class Downloads extends ServiceBaseAction {
 		
 		try {
 			List<DownloadInfo> downloadInfo = getServiceManager().getDownloads(getCustomerId());
-			Collections.sort(downloadInfo, sortByName());
+			if (CollectionUtils.isNotEmpty(downloadInfo)) {
+				Collections.sort(downloadInfo, sortByName());
+			}
 			setReqAttribute(REQ_DOWNLOAD_INFO, downloadInfo);
 			setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		} catch (PhrescoException e) {

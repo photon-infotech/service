@@ -116,7 +116,7 @@
 									
 										<% 
 											List<String> techVer = technology.getTechVersions(); 
-											if(CollectionUtils.isNotEmpty(techVer)) {
+											if (CollectionUtils.isNotEmpty(techVer)) {
 												Collections.sort(techVer);
 												Collections.reverse(techVer);
 											}

@@ -1,8 +1,14 @@
 package com.photon.phresco.service.admin.actions;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.User;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.PhrescoServerFactory;
@@ -88,15 +94,19 @@ public class Login extends ServiceBaseAction {
 		User user = null;
 		try {
 			user = doLogin(username, password);
-			 if (user == null) {
-	                setReqAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_ERROR_LOGIN));
-	                
-	                return LOGIN_FAILURE;
-	            }
+			List<Customer> customers = user.getCustomers();
+			if (CollectionUtils.isNotEmpty(customers)) {
+				Collections.sort(customers, sortingCusNameInAlphaOrder());
+			}
+        	setSessionAttribute(REQ_CUST_CUSTOMERS, customers);
+        	
+        	if (user == null) {
+				setReqAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_ERROR_LOGIN));
+				return LOGIN_FAILURE;
+		 	}
 			 
 			if (!user.isPhrescoEnabled()) {
 				setReqAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_ERROR_LOGIN_ACCESS_DENIED));
-				
 				return LOGIN_FAILURE;
 			}
 			setSessionAttribute(SESSION_USER_INFO, user);
@@ -111,6 +121,16 @@ public class Login extends ServiceBaseAction {
 		} 
 			
 		return SUCCESS;
+	}
+	
+	private Comparator sortingCusNameInAlphaOrder() {
+		return new Comparator(){
+		    public int compare(Object firstObject, Object secondObject) {
+		    	Customer customerName1 = (Customer) firstObject;
+		    	Customer customerName2 = (Customer) secondObject;
+		       return customerName1.getName().compareToIgnoreCase(customerName2.getName());
+		    }
+		};
 	}
 
 	private boolean validateLogin() {

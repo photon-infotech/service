@@ -69,7 +69,7 @@
 
 <%
     User userInfo = (User) session.getAttribute(ServiceUIConstants.SESSION_USER_INFO);
-    List<Customer> customers = userInfo.getCustomers();
+	List<Customer> customers  = (List<Customer>) session.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMERS);
 %>
 	<form id="formCustomerId" class="form">
 		<div class="control-group customer_name">
@@ -85,7 +85,7 @@
 		                            <option value="<%= customer.getId() %>"><%= customer.getName() %></option>
 						<% 
 					            }
-					        } 
+					        }
 					    %>
 					</select>
 					<input type="hidden" id="customerId" name="customerId" value=""/>

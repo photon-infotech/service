@@ -154,8 +154,9 @@ public class Features extends ServiceBaseAction {
     	
     	try {
     		List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
-    		Collections.sort(technologies, TECHNAME_COMPARATOR);
-    		
+    		if (CollectionUtils.isNotEmpty(technologies)) {
+    			Collections.sort(technologies, TECHNAME_COMPARATOR);
+    		}
     		setReqAttribute(REQ_ARCHE_TYPES, technologies);
     		featureByteArray = null;
     	} catch (PhrescoException e) {
@@ -170,7 +171,9 @@ public class Features extends ServiceBaseAction {
     	inputStreamMap.clear();
     	featureByteArray = null;
 		List<ArtifactGroup> moduleGroups = getServiceManager().getFeatures(getCustomerId(), getTechnology(), Type.valueOf(getType()).name());
-		Collections.sort(moduleGroups, ARTIFACTGROUP_COMPARATOR_ASCEND);
+		if (CollectionUtils.isNotEmpty(moduleGroups)) {
+			Collections.sort(moduleGroups, ARTIFACTGROUP_COMPARATOR_ASCEND);
+		}
 		setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroups);
 		setReqAttribute(REQ_FEATURES_TYPE, getType());
 		setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
