@@ -157,37 +157,31 @@
 		hidePopuploadingIcon();
 		$('.errMsg').html("");
 		
-	if (value != null) {
+		if (value != null) {
 			var jsonObj = JSON.parse(value);
 			if (jsonObj != null) {
-
 				$('#key').val(jsonObj.key);
 				$('#name').val(jsonObj.name);
 				$('#type').val(jsonObj.type);
 				$('#helpText').val(jsonObj.helpText);
-
 				var psblValues = jsonObj.possibleValues;
-
 				for ( var i = 0; i < psblValues.length; i++) {
 					$('#posblVal').append($('<option>', {
 						value : psblValues[i],
 						text : psblValues[i]
 					}));
 				}
-
 				if (jsonObj.multiple == "true") {
 					$('#multiple').prop('checked', true);
 				} else {
 					$('#multiple').prop('checked', false);
 				}
-
 				if (jsonObj.required == "true") {
 					$('#mandatory').prop('checked', true);
 				} else {
 					$('#mandatory').prop('checked', false);
 				}
 			}
-			
 			oldKey = jsonObj.key;
 			oldName = jsonObj.name;
 		}
@@ -204,7 +198,7 @@
 			}	
 			showHideMultiple();
 		});
-		
+			
 		//To move up the values
 		$('.imageup').bind('click', function() {
 			$('#posblVal option:selected').each( function() {
@@ -215,7 +209,7 @@
 				}
 			});
 		});
-	
+		
 		//To move down the values
 		$('.imagedown').bind('click', function() {
 			var countOptions = $('#posblVal option').size();
@@ -227,7 +221,7 @@
 				}
 			});
 		});
-		
+			
 		//change value of chkboxs
 		$('#multiple').click(function(){
 			changeChckBoxValue(this);
@@ -236,7 +230,7 @@
 		$('#mandatory').click(function(){
 			changeChckBoxValue(this);
 		});
-		
+			
 		//To check for the special character in Key Value
 		$('input[name=key]').live('input propertychange', function(e) {
 			var propTempKey = $(this).val();
@@ -244,14 +238,14 @@
 			propTempKey = stripSpace(propTempKey);
 			$(this).val(propTempKey);
 		});
-		
+			
 		// To check for the special character in PossibleValues
 		$('#addPosblText').bind('input propertychange', function(e) {
 			var configname = $(this).val();
 			configname = allowAlphaNum(configname);
 			$(this).val(configname);
 		});
-		
+			
 		//to empty possblevalues while changing type
 		$('#type').change(function() {
 			$('#addPosblText').val("");
@@ -265,7 +259,7 @@
 		$('#key').focus();
 		showHideMultiple();
 	});
-	
+		
 
 	//Show Divs as per type
 	function typeChange(obj) {
@@ -313,7 +307,6 @@
 				}
 			});
 		}
-	
 		if (flag == false) {
 			$('#posblVal').append($('<option>', {
 				value : newOption,
@@ -333,7 +326,6 @@
 			$('.errMsg').html('<s:text name='err.msg.key.invalid'/>');
 			return false;
 		} 
-		
 		var name = $('#name').val();
 		if(name === "") {
 			$('.errMsg').html('<s:text name='err.msg.name.empty'/>');
