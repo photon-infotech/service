@@ -300,8 +300,13 @@
 		<action name="configtempAdd" class="com.photon.phresco.service.admin.actions.components.ConfigTemplates" method="add">
             <result name="configtempAdd">/admin/pages/components/configTemplate/add.jsp</result>
         </action>
+        
+        <action name="showPropTempPopup" class="com.photon.phresco.service.admin.actions.components.ConfigTemplates" method="showPropTempPopup">
+            <result name="success">/admin/pages/components/configTemplate/addPropTemp.jsp</result>
+        </action>
 		
 		<action name="configtempSave" class="com.photon.phresco.service.admin.actions.components.ConfigTemplates" method="save">
+            <interceptor-ref name="json"/>
             <result name="configtempList">/admin/pages/components/configTemplate/list.jsp</result>
 			<result type="json" />
         </action>
@@ -311,6 +316,7 @@
         </action>
         
          <action name="configtempUpdate" class="com.photon.phresco.service.admin.actions.components.ConfigTemplates" method="update">
+         	<interceptor-ref name="json"/>
             <result name="configtempList">/admin/pages/components/configTemplate/list.jsp</result>
             <result type="json" />
         </action>
@@ -320,10 +326,12 @@
         </action>
         
          <action name="configtempSaveValidate" class="com.photon.phresco.service.admin.actions.components.ConfigTemplates" method="validateForm">
+            <interceptor-ref name="json"/>
             <result type="json" />
         </action>
         
         <action name="configtempUpdateValidate" class="com.photon.phresco.service.admin.actions.components.ConfigTemplates" method="validateForm">
+       		 <interceptor-ref name="json"/>
             <result type="json" />
         </action>
 		<!-- COMPONENT CONFIG TEMPLATE ENDS-->

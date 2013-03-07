@@ -98,7 +98,10 @@ function clickButton(button, tag) {
 	});
 }
 
-function loadJsonContent(url, jsonParam, containerTag) {
+function loadJsonContent(url, jsonParam, containerTag, progressText) {
+	if (progressText !== undefined && !isBlank(progressText)) {
+		showProgressBar(progressText);
+	}
 	$.ajax({
 		url : url,
 		data : jsonParam,
@@ -106,6 +109,7 @@ function loadJsonContent(url, jsonParam, containerTag) {
 		contentType: "application/json; charset=utf-8",
 		success : function(data) {
 			if (containerTag != undefined) {
+				hideProgressBar();
 				loadData(data, containerTag);
 			}
 		}
@@ -326,6 +330,10 @@ function hideLoadingIcon() {
     enableScreen();
 }
 
+function hidePopuploadingIcon() {
+	$(".popuploadingIcon").hide();
+}
+
 function showProgressBar(progressText) {
 	$("#progressnum").html(progressText);
 	$(".modal-backdrop").show();
@@ -487,20 +495,12 @@ function showDeleteConfirmation(confirmMsg) {
 	$('.popupOk').text("Ok");
 	$('.popupOk').attr("onclick","continueDeletion()");
 	$('#popupClose').hide();
-	$('#popupPage').modal({
-		show: true
-	});
+	$('#popupPage').modal("show");
 }
 
-$('#popupCancel').click(function() {
-	confirmDialog('none');
-});
-
-function confirmDialog(enableProp, msg) {
-    $(".modal-backdrop").css("display", enableProp);
-    $(".confirm").show().css("display", enableProp);
+function hidePopup() {
+	$('#popupPage').modal("hide");
 }
-
 
 function copyToClipboard(data) {
     var params = "copyToClipboard=";
@@ -561,9 +561,28 @@ function enableDisableUploads(type, controlObj){
 	}
 }
 
+function validateJson(url, form, containerTag, jsonParam, progressText, disabledDiv) {
+	if (disabledDiv != undefined && disabledDiv != "") {
+		enableDivCtrls(disabledDiv);
+	}
+	$.ajax({
+		url : url + "Validate",
+		data : jsonParam,
+		type : "POST",
+		contentType: "application/json; charset=utf-8",
+		success : function(data) {
+			if (data.errorFound != undefined && data.errorFound) {
+				findError(data);
+			} else {
+				loadJsonContent(url, jsonParam, containerTag, progressText);
+			}
+		}
+	});
+}
+
 function yesnoPopup(url, title, okUrl, okLabel, form, additionalParams) {
 	$('#popupPage').modal('show');//To show the popup
-	$('.popupClose').hide();
+	$('#popupClose').hide();
 	$('#popupTitle').html(title); // Title for the popup
 	$('.popupClose').hide(); //no need close button since yesno popup
 	$('.popupOk, #popupCancel').show(); // show ok & cancel button
@@ -582,7 +601,6 @@ function yesnoPopup(url, title, okUrl, okLabel, form, additionalParams) {
 	} else if (additionalParams != undefined && additionalParams != "")  {
 		params = additionalParams;
 	}
-	
 	$("#errMsg").empty();
 	$("#updateMsg").empty();
 	$('#successMsg').empty();
@@ -614,6 +632,14 @@ function removeSpaces(str) {
 function enableUploadButton(controlObj) {
 	controlObj.find("input[type='file']").attr('disabled', false);
 	controlObj.find($(".btn")).removeClass("disabled").addClass("btn-primary qq-upload-button");
+}
+
+function changeChckBoxValue(obj) {
+	if ($(obj).is(':checked')) {
+		$(obj).val("true");
+	} else {
+		$(obj).val("false");
+	}
 }
 
 document.onkeydown = function(evt) {

@@ -158,8 +158,7 @@
     
  	// This method calling from confirm_dialog.jsp
     function continueDeletion() {
-    	confirmDialog('none','');
+    	hidePopup();
     	loadContent('configtempDelete', $('#formConfigTempList'), $('#subcontainer'));
     }
- 	
 </script>

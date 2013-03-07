@@ -178,6 +178,7 @@
 				$("#techGroDesc").val("");
 			}
 		});
+		$('#techGroupName').focus();
 	});
 	
 	//To remove the added Technology value
@@ -185,7 +186,7 @@
     	 selectTech();
 		//To remove the Technologies from the list box which is not in the XML
         $('#multiTechGroup ul li input[type=checkbox]:checked').each( function() {
-			removeItem(techGroupToAdd, $(this).val())
+			removeItem(techGroupToAdd, $(this).val());
 			var params = "removeTechGroup=";
 			params = params.concat($.parseJSON($(this).val()).id);
 			loadContent('deleteTechGroup', $('#formTechgroup'), '', params, false);

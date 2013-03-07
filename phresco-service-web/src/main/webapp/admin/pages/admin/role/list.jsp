@@ -254,7 +254,7 @@
 	}
 	
 	function continueDeletion() {
-    	confirmDialog('none','');
+    	hidePopup();
     	loadContent('roleDelete', $('#formRoleList'), $('#subcontainer'));
     }
 </script>

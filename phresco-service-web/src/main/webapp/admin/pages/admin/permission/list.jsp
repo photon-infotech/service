@@ -94,7 +94,7 @@
 	});
 	
 	function continueDeletion() {
-		confirmDialog('none','');
+		hidePopup();
     	loadContent('permissionDelete', $('#formPermissionList'), $('#subcontainer'));
     }
 </script>

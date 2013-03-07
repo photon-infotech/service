@@ -194,20 +194,17 @@
    
     // This method calling from confirm_dialog.jsp
     function continueDeletion() {
-    	confirmDialog('none','');
+    	hidePopup();
     	loadContent('archetypeDelete', $('#formArchetypeList'), $('#subcontainer'));
     }
     
     function addTechGroup() {
-		$('#popup_div').show();
-		$('#popup_div').empty();
-		loadContent('openTechGroupPopup', $('#formArchetypeList'), $('.modal-body'));
-		$("#loadingIconDiv").hide();
+		yesnoPopup('openTechGroupPopup', 'Add Technology Group', '', 'Ok', $('#formArchetypeList'));
 	}
     
 	function popupOnOk(self) {
 		if ($(self).attr("id") == "techGroupOk") {
-			var customerId = $('select[name=customerId]').val();
+			var customerId = $('input[name=customerId]').val();
 			var params = '{"techGroups" : [' + techGroupToAdd.join(',') + '], "customerId" : "' + customerId + '"}';
 			loadJsonContent('newTechGroup',params,$("#subcontainer"));
 		}

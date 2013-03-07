@@ -53,6 +53,8 @@ public class ConfigTemplates extends ServiceBaseAction {
 	private String description = "";
 	private List<String> appliesTo = null;
 	private String defaultCustProp = "";
+	private List<PropertyTemplate> propTemps = null;
+    private String propTempKey = null;
 	
 	private String nameError = "";
 	private String dispError = "";
@@ -214,6 +216,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 					appliesTos.add(element);
 				}
 				settingTemplate.setAppliesToTechs(appliesTos);
+				settingTemplate.setProperties(getPropTemps());
 			} else {
 				settingTemplate = new SettingsTemplate();
 				settingTemplate.setName(getName());
@@ -235,7 +238,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 				}
 				
 				settingTemplate.setAppliesToTechs(appliesTos);
-				setPropertTemplate(settingTemplate);
+				settingTemplate.setProperties(getPropTemps());
 			}
 			
 		} catch (Exception e) {
@@ -244,36 +247,11 @@ public class ConfigTemplates extends ServiceBaseAction {
 		
 		return settingTemplate;
 	}
-
-	private void setPropertTemplate(SettingsTemplate settingTemplate) {
-		List<PropertyTemplate> propertyTemplates = new ArrayList<PropertyTemplate>();
-		HttpServletRequest request = getHttpRequest();
-		String[] propTempKeys = request.getParameterValues(REQ_CONFIG_KEY);
-
-		if (ArrayUtils.isNotEmpty(propTempKeys)) {
-			for (String propTempKey : propTempKeys) {
-				String propTempName = request.getParameter(propTempKey + REQ_CONFIG_NAME);
-				String propTempType = request.getParameter(propTempKey + REQ_CONFIG_TYPE);
-				String propTempHlpTxt = request.getParameter(propTempKey + REQ_CONFIG_HELP_TEXT);
-				String propTempMandat = request.getParameter(propTempKey + REQ_CONFIG_MANDATORY);
-				String propTempMulti = request.getParameter(propTempKey + REQ_CONFIG_MULTIPLE);
-				String csvPsblValues = request.getParameter(propTempKey + REQ_CONFIG_PSBL_VAL);
-				List<String> possibleValues = new ArrayList<String>();
-				if (StringUtils.isNotEmpty(csvPsblValues)) {
-				   possibleValues = Arrays.asList(csvPsblValues.split(CSV_PATTERN));
-				}
-				PropertyTemplate propertyTemplate = new PropertyTemplate();
-				propertyTemplate.setKey(propTempKey);
-				propertyTemplate.setName(propTempName);
-				propertyTemplate.setType(propTempType);
-				propertyTemplate.setPossibleValues(possibleValues);
-				propertyTemplate.setHelpText(propTempHlpTxt);
-				propertyTemplate.setRequired(Boolean.parseBoolean(propTempMandat));
-				propertyTemplate.setMultiple(Boolean.parseBoolean(propTempMulti));
-				propertyTemplates.add(propertyTemplate);
-			}
-		}
-		settingTemplate.setProperties(propertyTemplates);
+	
+	public String showPropTempPopup() {
+		setReqAttribute("propTempKey", getPropTempKey());
+		setReqAttribute(REQ_FROM_PAGE, fromPage);
+		return SUCCESS;
 	}
 
 	/**
@@ -314,7 +292,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 		
 		if (!DEFAULT_CUSTOMER_NAME.equalsIgnoreCase(customerId) && EDIT.equalsIgnoreCase(fromPage)) {
 			//Empty validation for applies to technology
-			if (getAppliesTo() == null) {
+			if (CollectionUtils.isEmpty(getAppliesTo())) {
 				setApplyError(getText(KEY_I18N_ERR_APPLIES_EMPTY ));
 				isError = true;
 			}
@@ -325,8 +303,8 @@ public class ConfigTemplates extends ServiceBaseAction {
 		if (StringUtils.isEmpty(getName())) {//Empty validation for name
 			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY ));
 			isError = true;
-		} else if(ADD.equals(getFromPage()) || (!getName().equals(getOldName()))) {
-			// to check duplication of dispname
+		} else if (ADD.equals(getFromPage()) || (!getName().equals(getOldName()))) {
+			// to check duplication of name
 			List<SettingsTemplate> configTemplates = getServiceManager().getConfigTemplates(getCustomerId());
 			if (CollectionUtils.isNotEmpty(configTemplates)) { //TODO: this should handled by query
 				for (SettingsTemplate configTemplate : configTemplates) {
@@ -356,7 +334,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 		}
 		
 		//Empty validation for applies to technology
-		if (getAppliesTo() == null) {
+		if (CollectionUtils.isEmpty(getAppliesTo())) {
 			setApplyError(getText(KEY_I18N_ERR_APPLIES_EMPTY ));
 			isError = true;
 		}
@@ -472,4 +450,19 @@ public class ConfigTemplates extends ServiceBaseAction {
 		this.dispError = dispError;
 	}
 
+	public List<PropertyTemplate> getPropTemps() {
+		return propTemps;
+	}
+
+	public void setPropTemps(List<PropertyTemplate> propTemps) {
+		this.propTemps = propTemps;
+	}
+
+	public void setPropTempKey(String propTempKey) {
+		this.propTempKey = propTempKey;
+	}
+
+	public String getPropTempKey() {
+		return propTempKey;
+	}
 }
