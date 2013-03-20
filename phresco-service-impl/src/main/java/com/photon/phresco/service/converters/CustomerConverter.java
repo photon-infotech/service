@@ -33,6 +33,7 @@ public class CustomerConverter implements Converter<CustomerDAO, Customer> {
 		customer.setZipcode(dao.getZipcode());
 		customer.setFrameworkTheme(dao.getFrameworkTheme());
 		customer.setSystem(dao.isSystem());
+		customer.setOptions(dao.getOptions());
 		return customer;
 	}
 
@@ -60,6 +61,7 @@ public class CustomerConverter implements Converter<CustomerDAO, Customer> {
 		customerDAO.setZipcode(customer.getZipcode());
 		customerDAO.setFrameworkTheme(customer.getFrameworkTheme());
 		customerDAO.setSystem(customer.isSystem());
+		customerDAO.setOptions(customer.getOptions());
 		return customerDAO;
 	}
 

@@ -42,6 +42,7 @@ import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.Customer.LicenseType;
 import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.commons.model.Technology;
+import com.photon.phresco.commons.model.TechnologyOptions;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.util.ServiceConstants;
@@ -73,6 +74,7 @@ public class Customers extends ServiceBaseAction  {
 	private String repoUserName = "";
 	private String repoPassword = "";
 	private String repoURL = "";
+	private List<String> options = null;
 	
 	private String nameError = "";
 	private String mailError = "";
@@ -156,7 +158,9 @@ public class Customers extends ServiceBaseAction  {
 	        S_LOGGER.debug("Entering Method Customers.add()");
 	    }
 	    
+	    List<TechnologyOptions> options = getServiceManager().getCustomerOptions();
 	    List<Technology> technologies = getServiceManager().getArcheTypes(ServiceConstants.DEFAULT_CUSTOMER_NAME);
+	    setReqAttribute(REQ_TECHNOLOGY_OPTION, options);
 	    setReqAttribute(REQ_ARCHE_TYPES, technologies);
 	    setReqAttribute(REQ_FROM_PAGE, ADD);
 	    
@@ -176,6 +180,8 @@ public class Customers extends ServiceBaseAction  {
 		
 		try {
 			Customer customer = getServiceManager().getCustomer(getCustomerId());
+			List<TechnologyOptions> options = getServiceManager().getCustomerOptions();
+	        setReqAttribute(REQ_TECHNOLOGY_OPTION, options);
 			List<Technology> technologies = getServiceManager().getArcheTypes(ServiceConstants.DEFAULT_CUSTOMER_NAME);
 		    setReqAttribute(REQ_ARCHE_TYPES, technologies);
 			setReqAttribute(REQ_CUST_CUSTOMER, customer);
@@ -279,57 +285,64 @@ public class Customers extends ServiceBaseAction  {
 	/**
 	 * To the customer object with the given details
 	 * @return customer object
+	 * @throws PhrescoException 
 	 */
-	private Customer createCustomer() {
-        Customer customer = new Customer();
-        customer.setName(getName());
-        customer.setDescription(getDescription());
-        customer.setEmailId(getEmail());
-        customer.setAddress(getAddress());
-        customer.setCountry(getCountry());
-        customer.setState(getState());
-        customer.setZipcode(getZipcode());
-        customer.setContactNumber(getNumber());
-        customer.setFax(getFax());
-        customer.setHelpText(getHelpText());
-        LicenseType licenceType = LicenseType.valueOf(getLicence());
-        customer.setType(licenceType);
-        customer.setValidFrom(getValidFrom());
-        customer.setValidUpto(getValidUpTo());
-        RepoInfo repoInfo = new RepoInfo();
-        if (StringUtils.isNotEmpty(customerId)) {
-        	customer.setId(customerId);
-        	repoInfo.setCustomerId(customerId);
+	private Customer createCustomer() throws PhrescoException {
+	    Customer customer = new Customer();
+	    try {
+	        System.out.println("getOptions() in createCustomer()::::" + getOptions());
+	        customer.setName(getName());
+	        customer.setDescription(getDescription());
+	        customer.setEmailId(getEmail());
+	        customer.setAddress(getAddress());
+	        customer.setCountry(getCountry());
+	        customer.setState(getState());
+	        customer.setZipcode(getZipcode());
+	        customer.setContactNumber(getNumber());
+	        customer.setFax(getFax());
+	        customer.setHelpText(getHelpText());
+	        LicenseType licenceType = LicenseType.valueOf(getLicence());
+	        customer.setType(licenceType);
+	        customer.setValidFrom(getValidFrom());
+	        customer.setValidUpto(getValidUpTo());
+	        customer.setOptions(getOptions());
+	        RepoInfo repoInfo = new RepoInfo();
+	        if (StringUtils.isNotEmpty(getCustomerId())) {
+	            customer.setId(getCustomerId());
+	            repoInfo.setCustomerId(getCustomerId());
+	        }
+	        repoInfo.setReleaseRepoURL(getRepoURL());
+	        repoInfo.setRepoPassword(getRepoPassword());
+	        repoInfo.setRepoUserName(getRepoUserName());
+	        repoInfo.setRepoName(getRepoName());
+	        if (StringUtils.isNotEmpty(getSnapshotRepoUrl())){
+	            repoInfo.setSnapshotRepoURL(getSnapshotRepoUrl());
+	        }
+	        if (StringUtils.isNotEmpty(getGroupRepoUrl())){
+	            repoInfo.setGroupRepoURL(getGroupRepoUrl());
+	        }
+	        if (StringUtils.isNotEmpty(getBaseRepoUrl())){
+	            repoInfo.setBaseRepoURL(getBaseRepoUrl());
+	        }
+	        customer.setRepoInfo(repoInfo);
+	        List<String> appliesTo = getAppliesTo();
+	        customer.setApplicableTechnologies(appliesTo);
+	        Map<String, String> frameworkTheme = new HashMap<String, String>();
+	        frameworkTheme.put(BRANDING_COLOR , getBrandingColor());
+	        frameworkTheme.put(ACCORDION_BACKGROUND_COLOR, getAccordionBackGroundColor());
+	        frameworkTheme.put(BODYBACKGROUND_COLOR, getBodyBackGroundColor());
+	        frameworkTheme.put(BUTTON_COLOR, getButtonColor());
+	        frameworkTheme.put(PAGEHEADER_COLOR, getPageHeaderColor());
+	        frameworkTheme.put(COPYRIGHT_COLOR, getCopyRightColor());
+	        frameworkTheme.put(LABEL_COLOR, getLabelColor());
+	        frameworkTheme.put(MENU_FONT_COLOR, getMenufontColor());
+	        frameworkTheme.put(MENU_BACKGROUND_COLOR, getMenuBackGround());
+	        frameworkTheme.put(COPYRIGHT, getCopyRight());
+	        frameworkTheme.put(DISABLED_LABEL_COLOR, getDisabledLabelColor());
+	        customer.setFrameworkTheme(frameworkTheme);
+	    } catch (Exception e) {
+            throw new PhrescoException(e);
         }
-        repoInfo.setReleaseRepoURL(getRepoURL());
-        repoInfo.setRepoPassword(getRepoPassword());
-        repoInfo.setRepoUserName(getRepoUserName());
-        repoInfo.setRepoName(getRepoName());
-        if (StringUtils.isNotEmpty(getSnapshotRepoUrl())){
-        	repoInfo.setSnapshotRepoURL(getSnapshotRepoUrl());
-        }
-        if (StringUtils.isNotEmpty(getGroupRepoUrl())){
-        	repoInfo.setGroupRepoURL(getGroupRepoUrl());
-        }
-        if (StringUtils.isNotEmpty(getBaseRepoUrl())){
-        	repoInfo.setBaseRepoURL(getBaseRepoUrl());
-        }
-        customer.setRepoInfo(repoInfo);
-        List<String> appliesTo = getAppliesTo();
-        customer.setApplicableTechnologies(appliesTo);
-        Map<String, String> frameworkTheme = new HashMap<String, String>();
-        frameworkTheme.put(BRANDING_COLOR , getBrandingColor());
-        frameworkTheme.put(ACCORDION_BACKGROUND_COLOR, getAccordionBackGroundColor());
-        frameworkTheme.put(BODYBACKGROUND_COLOR, getBodyBackGroundColor());
-        frameworkTheme.put(BUTTON_COLOR, getButtonColor());
-        frameworkTheme.put(PAGEHEADER_COLOR, getPageHeaderColor());
-        frameworkTheme.put(COPYRIGHT_COLOR, getCopyRightColor());
-        frameworkTheme.put(LABEL_COLOR, getLabelColor());
-        frameworkTheme.put(MENU_FONT_COLOR, getMenufontColor());
-        frameworkTheme.put(MENU_BACKGROUND_COLOR, getMenuBackGround());
-        frameworkTheme.put(COPYRIGHT, getCopyRight());
-        frameworkTheme.put(DISABLED_LABEL_COLOR, getDisabledLabelColor());
-        customer.setFrameworkTheme(frameworkTheme);
        
         return customer;
     }
@@ -938,4 +951,12 @@ public class Customers extends ServiceBaseAction  {
 	public void setCopyRight(String copyRight) {
 		this.copyRight = copyRight;
 	}
+
+    public void setOptions(List<String> options) {
+        this.options = options;
+    }
+
+    public List<String> getOptions() {
+        return options;
+    }
 }
