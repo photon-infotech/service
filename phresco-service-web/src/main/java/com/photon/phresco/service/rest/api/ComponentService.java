@@ -53,7 +53,6 @@ import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactInfo;
-import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.DownloadInfo;
 import com.photon.phresco.commons.model.Element;
 import com.photon.phresco.commons.model.License;
@@ -2255,6 +2254,28 @@ public class ComponentService extends DbService {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, OPTIONS_COLLECTION_NAME);
 		}
 	}
+	
+	/**
+     * Returns the list of Technologyoptions
+     * @return
+     */
+    @GET
+    @Path (REST_API_OPTIONS_CUSTOMER)
+    @Produces (MediaType.APPLICATION_JSON)
+    public Response findCustomerOptions() {
+        if (isDebugEnabled) {
+            S_LOGGER.debug("Entered into ComponentService.findCustomerOptions()");
+        }
+        try {
+            List<TechnologyOptions> techOptions = mongoOperation.getCollection(CUSTOMER_OPTIONS_COLLECTION_NAME, TechnologyOptions.class);
+            if(CollectionUtils.isEmpty(techOptions)) {
+                return  Response.status(Response.Status.NO_CONTENT).build();
+            }
+            return  Response.status(Response.Status.OK).entity(techOptions).build();
+        } catch (Exception e) {
+            throw new PhrescoWebServiceException(e, EX_PHEX00005, CUSTOMER_OPTIONS_COLLECTION_NAME);
+        }
+    }
 	
 	/**
 	 * Returns the list of Licenses

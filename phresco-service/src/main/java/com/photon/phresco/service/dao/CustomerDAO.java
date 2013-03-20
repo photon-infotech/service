@@ -27,6 +27,7 @@ public class CustomerDAO extends BaseDAO {
 	private List<String> applicableTechnologies;
 	private List<ApplicationType> applicableAppTypes;
 	private Map<String, String> frameworkTheme;
+	private List<String> options;
 	
 	public String getEmailId() {
 		return emailId;
@@ -139,5 +140,13 @@ public class CustomerDAO extends BaseDAO {
 	public void setFrameworkTheme(Map<String, String> frameworkTheme) {
 		this.frameworkTheme = frameworkTheme;
 	}
+	
+	public void setOptions(List<String> options) {
+        this.options = options;
+    }
+
+    public List<String> getOptions() {
+        return options;
+    }
 	
 }

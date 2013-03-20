@@ -18,7 +18,6 @@
   ###
   --%>
 
-
 <%@ taglib uri="/struts-tags" prefix="s" %>
 
 <%@ page import="org.apache.commons.collections.MapUtils"%>
@@ -36,11 +35,13 @@
 <%@ page import="com.photon.phresco.commons.model.ApplicationType" %>
 <%@ page import="org.apache.commons.collections.CollectionUtils" %>
 <%@ page import="com.photon.phresco.commons.model.Technology" %>
+<%@ page import="com.photon.phresco.commons.model.TechnologyOptions"%>
 
 <%
 	Customer customer = (Customer) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER);
 	String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
 	List<Technology> technologies = (List<Technology>) request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
+	List<TechnologyOptions> options = (List<TechnologyOptions>) request.getAttribute(ServiceUIConstants.REQ_TECHNOLOGY_OPTION);
 	
 	String title = ServiceActionUtil.getTitle(ServiceUIConstants.CUSTOMERS, fromPage);
 	String buttonLbl = ServiceActionUtil.getButtonLabel(fromPage);
@@ -88,7 +89,7 @@
 	List<String> applicableTechnologies = new ArrayList();
 	List<ApplicationType> applicableAppTypes = null;
 	Map<String, String> frameworkTheme = null;
-	
+	List<String> selectedOptions = null;
 	if (customer != null) {
 	    if (StringUtils.isNotEmpty(customer.getId())) {
 			id = customer.getId();
@@ -152,7 +153,7 @@
 			disabled = "disabled";
 		}
 		frameworkTheme = customer.getFrameworkTheme();
-		
+		selectedOptions = customer.getOptions();
 		if (MapUtils.isNotEmpty(frameworkTheme)) {
 			brandingColor = frameworkTheme.get("brandingColor");
 			bodyBackGroundColor = frameworkTheme.get("bodyBackGroundColor");
@@ -672,6 +673,44 @@
 		<%  
 			}
 		%>
+		
+		<div class="control-group" id="optionsControl">
+			<label class="control-label labelbold">
+				<s:text name='lbl.hdr.comp.applicable'/>
+			</label>
+			<div class="controls">
+					<div class="typeFields" id="typefield">
+					<div class="multilist-scroller multiselct" id="optionsDiv">
+						<ul>
+							<li>
+								<input type="checkbox" value="" id="checkAllOptions" onclick="checkAllEvent(this,$('.optionsChk'), false);"
+									style="margin: 3px 8px 6px 0;"><s:text name='lbl.all'/>
+							</li>
+							<%
+								if (CollectionUtils.isNotEmpty(options)) {
+									String checkedStr = "";
+									for (TechnologyOptions option : options) {
+										if (CollectionUtils.isNotEmpty(selectedOptions)) {
+										    if (selectedOptions.contains(option.getId())) {
+												checkedStr = "checked";
+											} else {
+											    checkedStr = "";
+											}
+										}
+							%>
+										<li>
+											<input type="checkbox" id="optionsCheckbox" name="options" value="<%= option.getId() %>" class="check optionsChk"
+												onclick="checkboxEvent($('#checkAllOptions'), 'optionsChk')" <%= checkedStr %>><%= option.getOption() %> 
+										</li>
+							<%		}
+								}
+							%>
+						</ul>
+					</div>
+				</div>
+          		<span class="help-inline applyerror" id="optionsError"></span>
+			</div>
+		</div>
 	
 	<section class="lft_menus_container adminaddtheme">
                <span class="siteaccordion openreg">
@@ -844,6 +883,7 @@
 		setLicenseType();
 		createUploader();
 		checkboxEvent($('#checkAllAuto'),'applsChk');
+		checkboxEvent($('#checkAllOptions'), 'optionsChk');
 		 // for edit - to show selected country while page loads 
 		 $("#countryList option[value='<%= country %>']").attr('selected', 'selected'); 
 		 
