@@ -2,8 +2,11 @@ package com.photon.phresco.service.dao;
 
 import java.util.List;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
 import com.photon.phresco.commons.model.DownloadInfo.Category;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class DownloadsDAO extends CustomerBaseDAO {
 	
 	private static final long serialVersionUID = 1L;

@@ -4,10 +4,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.Customer.LicenseType;
 import com.photon.phresco.commons.model.RepoInfo;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CustomerDAO extends BaseDAO {
 
 	private static final long serialVersionUID = 1L;
