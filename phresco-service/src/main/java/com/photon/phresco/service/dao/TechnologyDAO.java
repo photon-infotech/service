@@ -22,6 +22,9 @@ package com.photon.phresco.service.dao;
 
 import java.util.List;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class TechnologyDAO extends CustomerBaseDAO {
 	
     private static final long serialVersionUID = 1L;

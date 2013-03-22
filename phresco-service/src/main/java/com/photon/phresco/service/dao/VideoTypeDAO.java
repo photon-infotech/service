@@ -1,6 +1,8 @@
 package com.photon.phresco.service.dao;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class VideoTypeDAO extends CustomerBaseDAO {
 
 	private static final long serialVersionUID = 1L;

@@ -22,7 +22,10 @@ package com.photon.phresco.service.dao;
 
 import java.util.List;
 
-public class ProjectInfoDAO extends BaseDAO {
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class ProjectInfoDAO extends CustomerBaseDAO {
 	
 	private String projectCode;
 	private List<String> applicationInfoIds;

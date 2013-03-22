@@ -28,6 +28,7 @@ public class ProjectInfoConverter implements Converter<ProjectInfoDAO, ProjectIn
 		if(CollectionUtils.isNotEmpty(applicationInfos)) {
 			projectInfo.setAppInfos(applicationInfos);
 		}
+		projectInfo.setCustomerIds(dao.getCustomerIds());
 		return projectInfo;
 	}
 
@@ -38,6 +39,7 @@ public class ProjectInfoConverter implements Converter<ProjectInfoDAO, ProjectIn
 		projectInfoDAO.setId(projectInfo.getId());
 		projectInfoDAO.setProjectCode(projectInfo.getProjectCode());
 		projectInfoDAO.setApplicationInfoIds(createAppInfoIds(projectInfo));
+		projectInfoDAO.setCustomerIds(projectInfo.getCustomerIds());
 		return projectInfoDAO;
 	}
 
