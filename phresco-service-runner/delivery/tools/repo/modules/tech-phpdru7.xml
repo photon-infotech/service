@@ -1,4 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+
+    Phresco Service Root
+
+    Copyright (C) 1999-2013 Photon Infotech Inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
 <modules xmlns="http://www.example.org/Phresco">
     <module required="true" core="true" version="7.0" name="Block" id="mod_block_7.0">
         <documents>
@@ -1245,7 +1264,7 @@ The module currently allows you to set the following attributes for each menu it
                 <content>Menu block provides configurable blocks of menu trees starting with any level of any menu.</content>
             </document>
             <document documentType="DESCRIPTION">
-                <content>Menu block provides configurable blocks of menu trees starting with any level of any menu.Using Menu block user can add and configure a “Main menu (levels 2+)” block. That block would appear once you were on one of the Main menu’s pages and would show the menu tree for the 2nd level (and deeper) of your Main menu and would expand as you traversed down the tree. You can also limit the depth of the menu’s tree (e.g. “Main menu (levels 2-3)”) and/or expand all the child sub-menus (e.g. “Main menu (expanded levels 2+)”).</content>
+                <content>Menu block provides configurable blocks of menu trees starting with any level of any menu.Using Menu block user can add and configure a “Main menu (levels 2+)�? block. That block would appear once you were on one of the Main menu’s pages and would show the menu tree for the 2nd level (and deeper) of your Main menu and would expand as you traversed down the tree. You can also limit the depth of the menu’s tree (e.g. “Main menu (levels 2-3)�?) and/or expand all the child sub-menus (e.g. “Main menu (expanded levels 2+)�?).</content>
             </document>
         </documents>
     </module>
