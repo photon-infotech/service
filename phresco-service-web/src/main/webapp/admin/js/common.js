@@ -1,4 +1,3 @@
- */
 function applyTheme() {
 	var theme = localStorage["color"];
 	if (theme != null) {

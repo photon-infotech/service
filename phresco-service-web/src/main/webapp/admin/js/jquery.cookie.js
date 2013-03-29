@@ -1,4 +1,3 @@
- */
 /**
  * Create a cookie with the given name and value and other optional parameters.
  *

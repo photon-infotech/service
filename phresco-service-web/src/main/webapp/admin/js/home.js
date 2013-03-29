@@ -1,4 +1,3 @@
- */
 // JavaScript Document
 var leftnav_top = $(".lefttopnav");
 var Leftnav_bot = $(".leftbotnav");

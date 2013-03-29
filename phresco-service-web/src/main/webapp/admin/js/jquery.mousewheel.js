@@ -1,4 +1,3 @@
- */
 (function($) {
 var types = ['DOMMouseScroll', 'mousewheel'];
 

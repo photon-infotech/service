@@ -1,4 +1,3 @@
- */
 (function( window, undefined ) {
 
 // Use the correct document accordingly with window argument (sandbox)

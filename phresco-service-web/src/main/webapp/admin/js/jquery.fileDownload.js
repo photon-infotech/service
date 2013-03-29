@@ -1,4 +1,3 @@
- */
 /*
 * jQuery File Download Plugin v1.3.3
 *

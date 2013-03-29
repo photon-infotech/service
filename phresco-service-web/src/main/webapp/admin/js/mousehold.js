@@ -1,4 +1,3 @@
- */
 /**
  * jQuery mousehold plugin - fires an event while the mouse is clicked down.
  * Additionally, the function, when executed, is passed a single

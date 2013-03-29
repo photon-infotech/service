@@ -1,4 +1,3 @@
- */
 (function( $, undefined ) {
 
 // jQuery 1.4+

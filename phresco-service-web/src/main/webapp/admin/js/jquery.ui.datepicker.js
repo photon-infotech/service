@@ -1,4 +1,3 @@
- */
 (function( $, undefined ) {
 
 $.extend($.ui, { datepicker: { version: "1.8.18" } });

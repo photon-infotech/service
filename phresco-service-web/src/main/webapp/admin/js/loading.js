@@ -1,4 +1,3 @@
- */
 var maxprogress = 100;   // total to reach
 var actualprogress = 0;  // current value
 var itv = 0;  // id for setinterval

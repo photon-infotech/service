@@ -1,4 +1,3 @@
- */
 // JavaScript Document
 $(window).resize(function() {
 	$(window).bind("resize", resizeWindow);

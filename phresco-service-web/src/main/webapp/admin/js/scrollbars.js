@@ -1,4 +1,3 @@
- */
 /*
 * A jQuery extension to provide scrollbars to a container
 * 

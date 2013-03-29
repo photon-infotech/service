@@ -1,4 +1,3 @@
- */
 (function( $, undefined ) {
 
 // prevent duplicate loading
