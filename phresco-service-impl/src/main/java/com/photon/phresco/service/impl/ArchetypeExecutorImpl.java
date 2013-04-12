@@ -80,17 +80,18 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 				}
 			}
 			createProjectFolders(projectInfo, applicationInfo.getAppDirName(), new File(tempFolderPath));
-			updateRepository(customerId, applicationInfo.getAppDirName(), new File(tempFolderPath));
+			updateRepository(customerId, applicationInfo, new File(tempFolderPath));
 		} catch (IOException e) {
 			throw new PhrescoException(e);
 		}
 	}
 
-    private void updateRepository(String customerId, String appDirName,	File tempFolderPath) throws PhrescoException {
+    private void updateRepository(String customerId, ApplicationInfo appInfo,	File tempFolderPath) throws PhrescoException {
 		RepoInfo repoInfo = dbManager.getRepoInfo(customerId);
-		File pomFile = new File(tempFolderPath, appDirName + "/pom.xml");
+		File pomFile = new File(tempFolderPath, appInfo.getAppDirName() + "/pom.xml");
 		try {
 			PomProcessor processor = new PomProcessor(pomFile);
+			processor.setName(appInfo.getName());
 			processor.addRepositories(customerId, repoInfo.getGroupRepoURL());
 			processor.save();
 		} catch (PhrescoPomException e) {
