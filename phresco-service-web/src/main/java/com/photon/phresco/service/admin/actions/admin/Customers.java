@@ -95,6 +95,7 @@ public class Customers extends ServiceBaseAction  {
 	private String bodyBackGroundColor = "";
 	private String accordionBackGroundColor = "";
 	private String menuBackGround = "";
+	private String subMenuBackGround = "";
 	private String menufontColor = "";
 	private String buttonColor = "";
 	private String pageHeaderColor = "";
@@ -335,6 +336,7 @@ public class Customers extends ServiceBaseAction  {
 	        frameworkTheme.put(LABEL_COLOR, getLabelColor());
 	        frameworkTheme.put(MENU_FONT_COLOR, getMenufontColor());
 	        frameworkTheme.put(MENU_BACKGROUND_COLOR, getMenuBackGround());
+	        frameworkTheme.put(SUB_MENU_BACKGROUND_COLOR, getSubMenuBackGround());
 	        frameworkTheme.put(COPYRIGHT, getCopyRight());
 	        frameworkTheme.put(DISABLED_LABEL_COLOR, getDisabledLabelColor());
 	        customer.setFrameworkTheme(frameworkTheme);
@@ -884,6 +886,14 @@ public class Customers extends ServiceBaseAction  {
 
 	public void setMenuBackGround(String menuBackGround) {
 		this.menuBackGround = menuBackGround;
+	}
+
+	public String getSubMenuBackGround() {
+		return subMenuBackGround;
+	}
+
+	public void setSubMenuBackGround(String subMenuBackGround) {
+		this.subMenuBackGround = subMenuBackGround;
 	}
 
 	public void setMenufontColor(String menufontColor) {

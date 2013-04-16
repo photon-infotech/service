@@ -474,6 +474,7 @@ public interface ServiceUIConstants {
     String LABEL_COLOR = "LabelColor";
     String MENU_FONT_COLOR = "MenufontColor"; 
     String MENU_BACKGROUND_COLOR = "MenuBackGround";
+    String SUB_MENU_BACKGROUND_COLOR = "SubMenuBackGround";
     String COPYRIGHT = "CopyRight";
     String DISABLED_LABEL_COLOR = "DisabledLabelColor";
     

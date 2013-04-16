@@ -77,6 +77,7 @@
 	String bodyBackGroundColor = "";
 	String accordionBackGroundColor = "";
 	String menuBackGround = "";
+	String subMenuBackGround = "";
 	String menufontColor = "";
 	String buttonColor = "";
 	String pageHeaderColor = "";
@@ -158,6 +159,7 @@
 			bodyBackGroundColor = frameworkTheme.get("bodyBackGroundColor");
 			accordionBackGroundColor = frameworkTheme.get("accordionBackGroundColor");
 			menuBackGround = frameworkTheme.get("MenuBackGround");
+			subMenuBackGround = frameworkTheme.get("SubMenuBackGround");
 			menufontColor = frameworkTheme.get("MenufontColor");
 			buttonColor = frameworkTheme.get("ButtonColor");
 			pageHeaderColor = frameworkTheme.get("PageHeaderColor");
@@ -807,6 +809,15 @@
 							</div>
 						</div>
 						
+						<div class="control-group">
+							<label class="control-label labelbold">
+								<s:text name='lbl.hdr.adm.cust.submenu.background'/>
+							</label>
+							<div class="controls">
+								<input id="labelcolor" placeholder="<s:text name='place.hldr.cust.add.submenu.backgroundcolor'/>" class="input-xlarge" type="text" name="SubMenuBackGround"
+								   value="<%= subMenuBackGround %>"  maxlength="50" title="50 Characters only">
+							</div>
+						</div>
 						
 						<div class="control-group">
 							<label class="control-label labelbold">
