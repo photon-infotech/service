@@ -49,6 +49,9 @@
 	String desc = "";
 	boolean isSystem = false;
 	boolean isCustProp = false;
+	boolean isFavourite = false;
+	boolean isEnvSpecific = false;
+	List<PropertyTemplate> properties = null;
 	if (settingsTemplate != null) {
 		id = settingsTemplate.getId();
 		name = settingsTemplate.getName();
@@ -56,7 +59,9 @@
 		desc = settingsTemplate.getDescription();
 		isSystem = settingsTemplate.isSystem();
 		isCustProp = settingsTemplate.isCustomProp();
-		List<PropertyTemplate> properties = settingsTemplate.getProperties();
+		isFavourite = settingsTemplate.isFavourite();
+		isEnvSpecific = settingsTemplate.isEnvSpecific();
+		properties = settingsTemplate.getProperties();
 		for (PropertyTemplate prop : properties) {
 			List<String> values = prop.getPossibleValues();
 		}
@@ -157,6 +162,39 @@
           		 <span class="help-inline applyerror" id="applyError"></span>
 			</div>
 		</div>
+		
+		<div class="control-group">
+			<label class="control-label labelbold">
+				<s:text name="lbl.hdr.comp.cnfigtmplt.favourite" />
+			</label>
+			<div class="controls">
+				<%
+					String checkedStr = "";
+					if (isFavourite) {
+					    checkedStr = "checked";
+					} else {
+						checkedStr = "";	
+					}
+				%>
+				<input type="checkbox" name="favourite" id="favourite" value="false" <%= checkedStr %>>
+			</div>
+		</div>
+		
+		<div class="control-group">
+			<label class="control-label labelbold">
+				<s:text name="lbl.hdr.comp.cnfigtmplt.env.specific" />
+			</label>
+			<div class="controls">
+				<%
+					if (isEnvSpecific) {
+					    checkedStr = "checked";
+					} else {
+						checkedStr = "";	
+					}
+				%>
+				<input type="checkbox" name="envSpecific" id="envSpecific" value="false" <%= checkedStr %> <%= disabledStr %>>
+			</div>
+		</div>
 
 		<div class="control-group">
 			<label class="control-label labelbold">
@@ -164,9 +202,10 @@
 			</label>
 			<div class="controls">
 				<%
-					String checkedStr = "";
 					if (isCustProp) {
 					    checkedStr = "checked";
+					} else {
+						checkedStr = "";	
 					}
 				%> 
 				<input type="checkbox" name="defaultCustProp" id="defaultCustProp" value="false" <%= checkedStr %> <%= disabledStr %>>
@@ -268,20 +307,9 @@
 		checkboxEvent($('#checkAllAuto'), 'applsChk');
 		tableHide();
 		
-		$('#defaultCustProp').click(function(){
-			changeChckBoxValue(this);
-		});
-		
 		<%
-			if (settingsTemplate != null) {
-				id = settingsTemplate.getId();
-				name = settingsTemplate.getName();
-				dispName = settingsTemplate.getDisplayName();
-				desc = settingsTemplate.getDescription();
-				isSystem = settingsTemplate.isSystem();
-				isCustProp = settingsTemplate.isCustomProp();
-				List<PropertyTemplate> properties = settingsTemplate.getProperties();
-				for(PropertyTemplate prop : properties) {
+			if (settingsTemplate != null && properties != null) {
+				for (PropertyTemplate prop : properties) {
  		%>	
 		 			var values = [];
 					var json = {};
@@ -289,6 +317,7 @@
 					json.key = '<%= prop.getKey() %>';
 					json.type = '<%= prop.getType() %>';
 					json.helpText =  '<%= StringUtils.isNotEmpty(prop.getHelpText()) ? prop.getHelpText() : "" %>';
+					json.defaultValue =  '<%= StringUtils.isNotEmpty(prop.getDefaultValue()) ? prop.getDefaultValue() : "" %>';
 			
 		<% 
 					List<String> possibleValues = null;
@@ -318,19 +347,19 @@
 	
 	//Add propTemp
 	function openConfigTempPopup() {
-		var Params = 'fromPage=';
-		Params = Params.concat("Add");
+		var params = 'fromPage=';
+		params = params.concat("Add");
 		if ((fromPage == 'add') || (fromPage == 'edit' && system == 'false')) {
-			yesnoPopup('showPropTempPopup', "Add Property Templates", 'saveTemplate', 'OK', '', Params);
+			yesnoPopup('showPropTempPopup', "Add Property Templates", 'saveTemplate', 'OK', '', params);
 		} else if (fromPage == 'edit' && system == 'true' && customer == 'photon') {
-			yesnoPopup('showPropTempPopup', "Add Property Templates", 'saveTemplate', 'OK', '', Params);
+			yesnoPopup('showPropTempPopup', "Add Property Templates", 'saveTemplate', 'OK', '', params);
 		}
 	}
 	
 	//edit propTemp
 	function editPopup(key) {
 		var params = "propTempKey=";
-		params=params.concat(key);
+		params = params.concat(key);
 		params = params.concat("&fromPage=");
 		params = params.concat("Edit");
 		if (fromPage == 'add' || (fromPage == 'edit'&& system == 'false')) {
@@ -374,18 +403,20 @@
 		$('input[name=propTemps]').each( function() {
 			propTemps.push(jQuery.parseJSON($(this).val()));
 		});
-		
 		var jsonObj = {};
 		jsonObj.dispName = $('#dispName').val();
 		jsonObj.name = $('#configname').val();
 		jsonObj.propTemps = propTemps;
 		jsonObj.appliesTo = techs;
 		jsonObj.description = $('#description').val();
-		jsonObj.defaultCustProp = $('#defaultCustProp').val();
+		jsonObj.envSpecific = $('#envSpecific').prop("checked");
+		jsonObj.favourite = $('#favourite').prop("checked");
+		jsonObj.defaultCustProp = $('#defaultCustProp').prop("checked");
 		jsonObj.customerId = "<%= customerId %>";
 		jsonObj.configId = "<%= id %>";
 		jsonObj.oldName = "<%= name %>";
 		jsonObj.fromPage = "<%= fromPage %>";
+		jsonObj.system = "<%= isSystem %>";
 		var jsonParam = JSON.stringify(jsonObj);
 		
 		var tableStat = tableHide();
@@ -536,8 +567,9 @@
 			});
 			var key = $('#key').val();
 			var name = $('#name').val();
-			var type = $('#type').val();
+			var type = $('.propType').val();
 			var helpText = $('#helpText').val();
+			var defaultValue = $('#defaultValue').val();
 			var multiple = "false";
 			if ($('#multiple').is(':checked')) {
 				multiple = "true"; 
@@ -545,7 +577,7 @@
 			var mandatory = "false";
 			if ($('#mandatory').is(':checked')) {
 				mandatory = "true";
-			} 
+			}
 			var value = {};
 			value.key = key;
 			value.name = name;
@@ -554,17 +586,18 @@
 			value.possibleValues = array;
 			value.multiple = multiple;
 			value.required = mandatory;
+			value.defaultValue = defaultValue;
 			hideError($("#propTempControl"), $("#propTempError"));
 			if (!duplicateFinder(key, name, oldkey, oldname)) {
 				$('#popupPage').modal('hide');
 				if (fromPage === 'Add') {
-						constructDiv(value);
+					constructDiv(value);
 				} else if (fromPage === "Edit") {
-						modifyDiv(value,fieldId);
+					modifyDiv(value,fieldId);
 				}
 			}
 			trimValues();
-		} 
+		}
 	}
 	
 	function findError(data) {
@@ -586,5 +619,4 @@
 			hideError($("#dispNameControl"), $("#dispNameError"));
 		}
 	}
-	
 </script>
