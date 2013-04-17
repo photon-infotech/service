@@ -101,6 +101,19 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
         	Converter<ProjectInfoDAO, ProjectInfo> projectConverter = 
         		(Converter<ProjectInfoDAO, ProjectInfo>) ConvertersFactory.getConverter(ProjectInfoDAO.class);
         	ProjectInfoDAO projectInfoDAO = projectConverter.convertObjectToDAO(projectInfo);
+        	
+        	ProjectInfoDAO pDAO = mongoOperation.findOne("projectInfo", 
+        			new Query(Criteria.whereId().is(projectInfo.getId())), ProjectInfoDAO.class);
+        	if (pDAO != null) {
+        		List<String> applicationInfoIdsFromDB = pDAO.getApplicationInfoIds();
+            	List<String> applicationInfoIdsNew = projectInfoDAO.getApplicationInfoIds();
+            	for (String string : applicationInfoIdsNew) {
+    				if(!applicationInfoIdsFromDB.contains(string)) {
+    					applicationInfoIdsFromDB.add(string);
+    				}
+    			}
+            	projectInfoDAO.setApplicationInfoIds(applicationInfoIdsFromDB);
+        	}
         	mongoOperation.save("projectInfo", projectInfoDAO);
         	List<ApplicationInfo> appInfos = projectInfo.getAppInfos();
         	Converter<ApplicationInfoDAO, ApplicationInfo> appConverter = 
