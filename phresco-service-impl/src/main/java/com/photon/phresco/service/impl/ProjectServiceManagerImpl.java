@@ -65,12 +65,6 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 	}
 
 	public void updateProject(ProjectInfo projectInfo, String tempFolderPath) throws PhrescoException {
-		System.out.println("In Update ...................");
-		System.out.println("Project Id is  " + projectInfo.getId());
-		List<ApplicationInfo> appInfos2 = projectInfo.getAppInfos();
-		for (ApplicationInfo applicationInfo : appInfos2) {
-			System.out.println("Appinfo is " + applicationInfo.getId() + "     " + applicationInfo.getName());
-		}
 		File projectPath = new File(tempFolderPath);
 		projectPath.mkdirs();
 		String customerId = projectInfo.getCustomerIds().get(0);
@@ -85,11 +79,9 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 		
 		findNewlyAddedProject(appInfoMap, appInfosInDB, appInfos, createdAppInfos);
 		ProjectInfo projectInfoClone = projectInfo.clone();
-		System.out.println("CReate Project Size Is   " + createdAppInfos.size());
 		if(CollectionUtils.isNotEmpty(createdAppInfos)) {
 			for (int i = 0; i < createdAppInfos.size(); i++) {
 				projectInfoClone.setAppInfos(Arrays.asList(createdAppInfos.get(i)));
-				System.out.println("Called CReate Project From Update.................");
 				createProject(projectInfoClone, tempFolderPath);
 			}
 		}
@@ -98,10 +90,8 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 			if(applicationInfo.getPilotInfo() != null) {
 				ApplicationInfo appInfo = dBManager.getApplicationInfo(applicationInfo.getId());
 				if(appInfo.getPilotInfo() == null) {
-					System.out.println("Called CReate Pilots From Update.................");
 					createPilots(applicationInfo, tempFolderPath, customerId);
 				} else if(!StringUtils.equals(appInfo.getPilotInfo().getId(), applicationInfo.getPilotInfo().getId())) {
-					System.out.println("Called CReate Pilots From Update.................");
 					createPilots(applicationInfo, tempFolderPath, customerId);
 				}
 			}
@@ -115,13 +105,6 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 
 	public void findNewlyAddedProject(Map<String, String> appInfoMap, List<ApplicationInfo> appInfosInDB,
 			List<ApplicationInfo> appInfos, List<ApplicationInfo> createdAppInfos) {
-		System.out.println("From Db App Size Is  " + appInfosInDB.size());
-		for (ApplicationInfo applicationInfo : appInfosInDB) {
-			System.out.println("From DB  " + applicationInfo.getId());
-		}
-		for (ApplicationInfo applicationInfo : appInfos) {
-			System.out.println("From App  " + applicationInfo.getId());
-		}
 		for (ApplicationInfo appInfoInDB : appInfosInDB) {
 			appInfoMap.put(appInfoInDB.getId(), appInfoInDB.getId());
 		}
