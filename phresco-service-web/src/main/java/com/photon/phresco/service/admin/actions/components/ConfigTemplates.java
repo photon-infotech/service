@@ -23,14 +23,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import com.photon.phresco.commons.model.DownloadInfo;
 import com.photon.phresco.commons.model.Element;
 import com.photon.phresco.commons.model.PropertyTemplate;
 import com.photon.phresco.commons.model.SettingsTemplate;
@@ -50,9 +47,13 @@ public class ConfigTemplates extends ServiceBaseAction {
 	private String dispName = "";
 	private String description = "";
 	private List<String> appliesTo = null;
-	private String defaultCustProp = "";
+	private boolean defaultCustProp;
+	private boolean favourite;
+	private boolean envSpecific;
+	private boolean system;
 	private List<PropertyTemplate> propTemps = null;
     private String propTempKey = null;
+    private String defaultValue = "";
 	
 	private String nameError = "";
 	private String dispError = "";
@@ -200,11 +201,10 @@ public class ConfigTemplates extends ServiceBaseAction {
 		SettingsTemplate settingTemplate = null;
 		try {
 			List<String> techIds = getAppliesTo();
-			if(!DEFAULT_CUSTOMER_NAME.equalsIgnoreCase(getCustomerId()) && EDIT.equalsIgnoreCase(fromPage)) {
+			if(isSystem() && !DEFAULT_CUSTOMER_NAME.equalsIgnoreCase(getCustomerId()) && EDIT.equalsIgnoreCase(fromPage)) {
 				settingTemplate = getServiceManager().getConfigTemplate(getConfigId());
 				settingTemplate.setCustomerIds(Arrays.asList(getCustomerId()));
-				boolean customProp = Boolean.parseBoolean(getDefaultCustProp());
-				settingTemplate.setCustomProp(customProp);
+				settingTemplate.setCustomProp(getDefaultCustProp());
 				List<Element> appliesTos = new ArrayList<Element>();
 				for (String techId : techIds) {
 					String techName = getServiceManager().getTechnology(techId).getName();
@@ -220,8 +220,9 @@ public class ConfigTemplates extends ServiceBaseAction {
 				settingTemplate.setName(getName());
 				settingTemplate.setDisplayName(StringUtils.isEmpty(getDispName()) ? getName() : getDispName());
 				settingTemplate.setDescription(getDescription());
-				boolean customProp = Boolean.parseBoolean(getDefaultCustProp());
-				settingTemplate.setCustomProp(customProp);
+				settingTemplate.setCustomProp(getDefaultCustProp());
+				settingTemplate.setFavourite(isFavourite());
+				settingTemplate.setEnvSpecific(isEnvSpecific());
 				settingTemplate.setCustomerIds(Arrays.asList(getCustomerId()));
 				if (StringUtils.isNotEmpty(getConfigId())) {
 					settingTemplate.setId(getConfigId());
@@ -424,11 +425,11 @@ public class ConfigTemplates extends ServiceBaseAction {
 		return oldName;
 	}
 
-	public String getDefaultCustProp() {
+	public boolean getDefaultCustProp() {
 		return defaultCustProp;
 	}
 
-	public void setDefaultCustProp(String defaultCustProp) {
+	public void setDefaultCustProp(boolean defaultCustProp) {
 		this.defaultCustProp = defaultCustProp;
 	}
 
@@ -462,5 +463,37 @@ public class ConfigTemplates extends ServiceBaseAction {
 
 	public String getPropTempKey() {
 		return propTempKey;
+	}
+
+	public void setFavourite(boolean favourite) {
+		this.favourite = favourite;
+	}
+
+	public boolean isFavourite() {
+		return favourite;
+	}
+
+	public void setSystem(boolean system) {
+		this.system = system;
+	}
+
+	public boolean isSystem() {
+		return system;
+	}
+
+	public void setEnvSpecific(boolean envSpecific) {
+		this.envSpecific = envSpecific;
+	}
+
+	public boolean isEnvSpecific() {
+		return envSpecific;
+	}
+
+	public void setDefaultValue(String defaultValue) {
+		this.defaultValue = defaultValue;
+	}
+
+	public String getDefaultValue() {
+		return defaultValue;
 	}
 }

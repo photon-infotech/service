@@ -63,7 +63,7 @@
 		</label>
 		
 		<div class="controls">
-			<select id="type" class = "input-medium" onchange="typeChange(this);">
+			<select id="type" class = "input-medium propType" onchange="typeChange(this);">
 				<option value="String"><s:text name='lbl.hdr.comp.cnfigtmplt.string'/></option>
 				<option value="Number"><s:text name='lbl.hdr.comp.cnfigtmplt.number'/></option>
 				<option value="Password"><s:text name='lbl.hdr.comp.cnfigtmplt.password'/></option>
@@ -120,13 +120,25 @@
 	</div>
 	
 	<div class="control-group" id="multipleControl">
-			<label class="control-label labelbold">
-				<s:text name='lbl.hdr.comp.cnfigtmplt.mltpl.title'/>
-			</label>
-			
-			<div class="controls">
-				<input type="checkbox" class="multiple_chkBox_config" id='multiple' value="false">
-			</div>
+		<label class="control-label labelbold">
+			<s:text name='lbl.hdr.comp.cnfigtmplt.mltpl.title'/>
+		</label>
+		
+		<div class="controls">
+			<input type="checkbox" class="multiple_chkBox_config" id='multiple' value="false">
+		</div>
+	</div>
+	
+	<div class="control-group" id="defaultValueControl">
+		<label class="control-label labelbold">
+			<s:text name='lbl.default.value'/>
+		</label>
+		
+		<div class="controls">
+			<input id="defaultValue" placeholder="<s:text name='place.hldr.configTemp.default.value'/>" class="input-medium" 
+				type="text" name="defaultValue"  value="">
+			<span class="help-inline" id="defaultValueError"></span>
+		</div>
 	</div>
 	
 	<div class="control-group" id="mandatoryControl">
@@ -145,11 +157,8 @@
 <script language="javascript">
 	var fieldId = '<%= propTempKey %>';
 	var value = $('#' + fieldId).val();
-	var oldKey="";
-	var oldName="";
-	var selectedType = $('#type').find('option:selected').val();
-	loadDiv(selectedType);
-	
+	var oldKey = "";
+	var oldName = "";
 	$(document).ready(function() {
 		$('#clipboard').hide();
 		var popupFromPage = '<%= fromPage %>';
@@ -161,8 +170,9 @@
 			if (jsonObj != null) {
 				$('#key').val(jsonObj.key);
 				$('#name').val(jsonObj.name);
-				$('#type').val(jsonObj.type);
+				$('.propType').val(jsonObj.type);
 				$('#helpText').val(jsonObj.helpText);
+				$('#defaultValue').val(jsonObj.defaultValue);
 				var psblValues = jsonObj.possibleValues;
 				for ( var i = 0; i < psblValues.length; i++) {
 					$('#posblVal').append($('<option>', {
@@ -180,9 +190,9 @@
 				} else {
 					$('#mandatory').prop('checked', false);
 				}
+				oldKey = jsonObj.key;
+				oldName = jsonObj.name;
 			}
-			oldKey = jsonObj.key;
-			oldName = jsonObj.name;
 		}
 	
 		//remove possible value entry
@@ -196,6 +206,7 @@
 				});
 			}	
 			showHideMultiple();
+			showHideDefaultValue();
 		});
 			
 		//To move up the values
@@ -255,8 +266,11 @@
 			$('#multiple').attr("checked", false);
 			showHideMultiple();
 		});
+		
 		$('#key').focus();
 		showHideMultiple();
+		var selectedType = $('#type').find('option:selected').val();
+		loadDiv(selectedType);
 	});
 		
 
@@ -268,14 +282,26 @@
 	
 	//show/hide multiple chkbox
 	function showHideMultiple() {
+		var type = $('#type').val();
 		var size = $('#posblVal option').size();
-		if(size > 1) {
+		if (size > 1) {
 			$('#multipleControl').show();
 		} else {
 			$('#multipleControl').hide();
 		}
 	}
-	
+
+	//show/hide default value textbox
+	function showHideDefaultValue() {
+		var size = $('#posblVal option').size();
+		if (size == 0) {
+			$('#defaultValueControl').show();
+		} else {
+			$('#defaultValue').val("");
+			$('#defaultValueControl').hide();
+		}
+	}
+
 	//load appropriate div
 	function loadDiv(type) {
 		if (type === 'String' || type === 'Number') {
@@ -314,9 +340,11 @@
 			$('#addPosblText').val("");
 			$('.errMsg').html("");
 		}
+
 		showHideMultiple();
+		showHideDefaultValue();
 	}
-	
+
 	//key and name validation @ ok
 	function validatePropTemplates() {
 		var key = $('#key').val();
@@ -324,13 +352,13 @@
 		if (val === "-" || val === "." || key === "") {
 			$('.errMsg').html('<s:text name='err.msg.key.invalid'/>');
 			return false;
-		} 
+		}
 		var name = $('#name').val();
-		if(name === "") {
+		if (name === "") {
 			$('.errMsg').html('<s:text name='err.msg.name.empty'/>');
 			return false;
 		}
-		
+
 		return true;
 	}
 </script>  
