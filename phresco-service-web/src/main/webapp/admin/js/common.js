@@ -96,7 +96,7 @@ function loadJsonContent(url, jsonParam, containerTag, progressText) {
 	});	
 }
 
-function loadContent(pageUrl, form, tag, additionalParams, callSuccessEvent) {
+function loadContent(pageUrl, form, tag, additionalParams, callSuccessEvent, callbackFunction) {
 	if (tag != undefined && tag != "" && !isBlank(tag)) {
 		showLoadingIcon();
 	}
@@ -115,7 +115,7 @@ function loadContent(pageUrl, form, tag, additionalParams, callSuccessEvent) {
 		data : params,
 		type : "POST",
 		success : function(data) {
-			loadData(data, tag, pageUrl, callSuccessEvent);
+			loadData(data, tag, pageUrl, callSuccessEvent, callbackFunction);
 		}
 	});
 }
@@ -162,14 +162,18 @@ function validate(pageUrl, form, tag, progressText, disabledDiv) {
 	});
 }
 
-function loadData(data, tag, pageUrl, callSuccessEvent) {
+function loadData(data, tag, pageUrl, callSuccessEvent, callbackFunction) {
 	//To load the login page if the user session is not available
 	if (data != undefined && data != "[object Object]" && data != "[object XMLDocument]" 
 		&& !isBlank(data) && data.indexOf("Remember me") >= 0) {
 		window.location.href = "logout.action";
 	} else {
 		if (callSuccessEvent != undefined && !isBlank(callSuccessEvent) && callSuccessEvent) {
-			successEvent(pageUrl, data);
+			if (callbackFunction != undefined && !isBlank(callbackFunction)) {
+				window[callbackFunction](data);
+			} else {
+				successEvent(pageUrl, data);
+			}
 		} else {
 			if (tag !== undefined && !isBlank(tag)) {
 				tag.empty();

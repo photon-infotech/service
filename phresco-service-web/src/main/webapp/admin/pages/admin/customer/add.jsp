@@ -824,8 +824,9 @@
 								<s:text name='lbl.hdr.adm.cust.copyright'/>
 							</label>
 							<div class="controls">
-								<input id="copyright" placeholder="<s:text name='place.hldr.cust.add.copyright'/>" class="input-xlarge" type="text" name="CopyRight"
-								   value="<%=copyRight%>"  maxlength="50" title="50 Characters only">
+								<%-- <input id="copyright" placeholder="<s:text name='place.hldr.cust.add.copyright'/>" class="input-xlarge" type="text" name="CopyRight"
+								   value="<%=copyRight%>"  maxlength="50" title="50 Characters only"> --%>
+								<textarea id="copyright" placeholder="<s:text name='place.hldr.cust.add.copyright'/>" class="input-xlarge" name="CopyRight"><%= copyRight %></textarea>
 							</div>
 						</div>
 						

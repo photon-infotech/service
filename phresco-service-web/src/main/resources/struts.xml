@@ -68,8 +68,12 @@
 		<action name="components" class="com.photon.phresco.service.admin.actions.components.ComponentMenu" method="getCompMenu">
             <result name="compMenu">/admin/pages/components/menu.jsp</result>
         </action>
+        
+        <action name="fetchLogoImgUrl" method="fetchLogoImgUrl" class="com.photon.phresco.service.admin.actions.Login">
+			<result type="json"/>
+        </action>
 		
-		 <action name="featuresMenu" class="com.photon.phresco.service.admin.actions.components.Features" method="menu">
+		<action name="featuresMenu" class="com.photon.phresco.service.admin.actions.components.Features" method="menu">
             <result name="featuresList">/admin/pages/components/feature/menu.jsp</result>
         </action>
 		
