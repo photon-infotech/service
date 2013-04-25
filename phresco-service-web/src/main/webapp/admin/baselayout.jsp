@@ -176,7 +176,7 @@
 		<header>
 			<div class="header">
 				<div class="Logo">
-					 <a href="#" id="goToHome"><img class="headerlogoimg" src="" alt="logo"></a>
+					 <a href="#" id="goToHome"><img class="headerlogoimg" id="logoImg" src="" alt="logo"></a>
 				</div>
 				<div class="headerInner">
 					<div class="nav_slider">

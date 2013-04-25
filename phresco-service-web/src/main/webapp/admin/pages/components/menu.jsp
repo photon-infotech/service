@@ -62,7 +62,18 @@
 		$('#customerId').val(selectedId);
 		localStorage["selectedCustomerId"] = selectedId;
 		var selectedMenu = $("a[name='compTab'][class='active']").prop("id");
+		loadContent("fetchLogoImgUrl", $('#formCustomerId'), '', '', true, 'changeLogo');
 		loadContent(selectedMenu, $('#formCustomerId'), $("#subcontainer"));	
+	}
+	
+	function changeLogo(data) {
+		$('#logoImg').attr("src",  "data:image/png;base64," + data.logoImgUrl);
+		var copyright = data.copyRight;
+		if (!isBlank(copyright)) {
+			$(".copyrit").html(copyright);
+		} else {
+			$(".copyrit").html("&copy; 2013.Photon Infotech Pvt Ltd. |<a href='http://www.photon.in'> www.photon.in</a>");
+		}
 	}
 </script>
 
