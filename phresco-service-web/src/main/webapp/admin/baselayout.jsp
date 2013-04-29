@@ -217,10 +217,10 @@
                             	<li id="themeContainer" class="theme_change"><a href="#">Themes</a>
                                 	<ul>
                                     	<li>Photon&nbsp;<a href="#" class="styles" href="#" rel="theme/photon/css/photon_theme.css"><img src="images/photon_theme.png"></a></li>
-                                        <li>Red-Blue&nbsp;
-                                            <a class="styles" href="#" rel="theme/red_blue/css/blue.css"><img src="images/blue_themer.jpg" class="skinImage"></a>
-											<a class="styles" href="#" rel="theme/red_blue/css/red.css"><img src="images/red_themer.jpg"></a>
-                                        </li>
+<!--                                         <li>Red-Blue&nbsp; -->
+<!--                                             <a class="styles" href="#" rel="theme/red_blue/css/blue.css"><img src="images/blue_themer.jpg" class="skinImage"></a> -->
+<!-- 											<a class="styles" href="#" rel="theme/red_blue/css/red.css"><img src="images/red_themer.jpg"></a> -->
+<!--                                         </li> -->
                                     </ul>
                                 </li>
                                 <li><a href="#" id="about" ><s:text name="lbl.usrset.abtservice"/></a></li>

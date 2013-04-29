@@ -3425,6 +3425,7 @@ a {
 }
 .list-wrapper .header-background:nth-child(1) {
 	background: #DE522F;
+	border-radius: inherit;
 }
 .list-comment .header-background {
 	background: #969696 !important;
@@ -5047,7 +5048,7 @@ input[class="chkBox_config"] {
 	background-color: rgb(238, 238, 238);
 	padding: 7px 8px;
 	border: solid 1px #dcdcdc;
-	left: 150px;
+	left: 200px;
 	height: 350px;
 	overflow-y: auto;
 	top: 21px;
@@ -5152,4 +5153,17 @@ input[class="chkBox_config"] {
 
 #loadingIconDiv > div {
 	margin-left: 0px !important;
+}
+
+.multiselect input[type="checkbox"] {
+	margin: 4px 4px;	
+}
+
+#tech_id .dd-select {
+	left: 200px !important;
+}
+
+.updateMsg { 
+	float: left;
+    width: auto;
 }

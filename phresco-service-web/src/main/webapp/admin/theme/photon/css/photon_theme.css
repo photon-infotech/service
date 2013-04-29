@@ -102,7 +102,7 @@ strong {
 }
 
 a:hover {
-  	color: #39BC67;
+  	color: #DE522F;
   	text-decoration: underline;
 }
 table tr a{
@@ -569,7 +569,7 @@ label {
 
 .modal-header {
     border: 1px solid #ffffff;
-    background:#39BC67;
+    background:#DE522F;
 }
 
 .modal-header .close {
@@ -880,13 +880,13 @@ label {
 }
 
 .progress .bar {
-	background-color: #EE5F5B;
-	background-image: -ms-linear-gradient(top, #EE5F5B, #EE5F5B);
-	background-image : -moz-linear-gradient(top,  #EE5F5B, #EE5F5B);
-	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#EE5F5B), to(#EE5F5B));
-	background-image: -webkit-linear-gradient(top, #EE5F5B, #EE5F5B);
-	background-image: -o-linear-gradient(top, #EE5F5B, #EE5F5B);
-	background-image: linear-gradient(top, #EE5F5B, #EE5F5B);
+	background-color: #DE522F;
+	background-image: -ms-linear-gradient(top, #DE522F, #DE522F);
+	background-image : -moz-linear-gradient(top,  #DE522F, #DE522F);
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#DE522F), to(#DE522F));
+	background-image: -webkit-linear-gradient(top, #DE522F, #DE522F);
+	background-image: -o-linear-gradient(top, #DE522F, #DE522F);
+	background-image: linear-gradient(top, #DE522F, #DE522F);
 }
 
 /* scrollbar starts */
@@ -913,7 +913,7 @@ label {
 }
 
 .featurelist_tech { 
-	color:#ffffff;
+	color:#323232;
 }
 
 .featurelist_type { 
