@@ -536,7 +536,7 @@
 			});
 			var key = $('#key').val();
 			var name = $('#name').val();
-			var type = $('#type').val();
+			var type = $('.propType').val();
 			var helpText = $('#helpText').val();
 			var multiple = "false";
 			if ($('#multiple').is(':checked')) {

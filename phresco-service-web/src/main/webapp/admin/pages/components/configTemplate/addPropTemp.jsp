@@ -63,7 +63,7 @@
 		</label>
 		
 		<div class="controls">
-			<select id="type" class = "input-medium" onchange="typeChange(this);">
+			<select id="type" class = "input-medium propType" onchange="typeChange(this);">
 				<option value="String"><s:text name='lbl.hdr.comp.cnfigtmplt.string'/></option>
 				<option value="Number"><s:text name='lbl.hdr.comp.cnfigtmplt.number'/></option>
 				<option value="Password"><s:text name='lbl.hdr.comp.cnfigtmplt.password'/></option>
@@ -161,7 +161,7 @@
 			if (jsonObj != null) {
 				$('#key').val(jsonObj.key);
 				$('#name').val(jsonObj.name);
-				$('#type').val(jsonObj.type);
+				$('.propType').val(jsonObj.type);
 				$('#helpText').val(jsonObj.helpText);
 				var psblValues = jsonObj.possibleValues;
 				for ( var i = 0; i < psblValues.length; i++) {

@@ -96,9 +96,12 @@ function loadJsonContent(url, jsonParam, containerTag, progressText) {
 	});	
 }
 
-function loadContent(pageUrl, form, tag, additionalParams, callSuccessEvent, callbackFunction) {
-	if (tag != undefined && tag != "" && !isBlank(tag)) {
+function loadContent(pageUrl, form, tag, additionalParams, callSuccessEvent, callbackFunction, progressText) {
+	if (tag != undefined && tag != "" && !isBlank(tag) && progressText == undefined  && isBlank(progressText)) {
 		showLoadingIcon();
+	}
+	if (progressText !== undefined && !isBlank(progressText)) {
+		showProgressBar(progressText);
 	}
 	var params = "";
 	if (form != undefined && form != "" && !isBlank(form.serialize())) {
@@ -115,6 +118,7 @@ function loadContent(pageUrl, form, tag, additionalParams, callSuccessEvent, cal
 		data : params,
 		type : "POST",
 		success : function(data) {
+			hideProgressBar();
 			loadData(data, tag, pageUrl, callSuccessEvent, callbackFunction);
 		}
 	});

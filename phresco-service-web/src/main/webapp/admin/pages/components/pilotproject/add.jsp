@@ -194,7 +194,7 @@
 	%>	
 		<input type="button" id="" class="btn <%= disabledClass %>" <%= disabled %> value='<%= buttonLbl %>'
 			onclick="validate('<%= pageUrl %>', $('#formPilotProAdd'), $('#subcontainer'), '<%= progressTxt %>',$('.content_adder: input'));"/>
-		<input type="button" id="pilotprojCancel" class="btn btn-primary" onclick="loadContent('pilotprojList', '', $('#subcontainer'));"
+		<input type="button" id="pilotprojCancel" class="btn btn-primary" onclick="loadContent('pilotprojList', $('#formPilotProAdd'), $('#subcontainer'));"
 			value="<s:text name='lbl.btn.cancel'/>"/>
 	</div>
 	
