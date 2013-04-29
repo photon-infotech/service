@@ -102,7 +102,7 @@ strong {
 }
 
 a:hover {
-  	color: #39BC67;
+  	color: #DE522F;
   	text-decoration: underline;
 }
 table tr a{
@@ -240,11 +240,11 @@ body {
 }
 
 .btn-primary {
-	background: #4F577C;
+	background: #de522f;
 }
 
 .btn-primary:hover {
-	background: #4F577C;
+	background: #de522f;
 }
 
 .tr_color {
@@ -255,7 +255,7 @@ table th, table td {
       color: #323232;
 }
 table tr {
-	border: 1px solid #323232;
+	border: 1px solid #969696;
 }
 a { 
     color: #fff;
@@ -514,12 +514,12 @@ li {
 
 .tabs > li > a, .pills > li > a {
     /* background: -moz-linear-gradient(center top , #E1E1E1 0%, #E0E0E0 100%) repeat scroll 0 0 transparent; */
-    background: #323232;
+    background: #969696;
 }
 
 .tabs li a.selected, .tabs > li > a:hover  {
     color: #FFFFFF;
-    background: #39bc67; /* Old browsers */
+    background: #DE522F; /* Old browsers */
 	border-bottom: 0px solid #ddd;
 }
 
@@ -553,7 +553,7 @@ label {
 
 /*** login starts ***/
 .lgnContainer {
-	background: #1DAE4B;
+	background: #969696;
 	line-height: 24px;
 }
 
@@ -569,7 +569,7 @@ label {
 
 .modal-header {
     border: 1px solid #ffffff;
-    background:#39BC67;
+    background:#DE522F;
 }
 
 .modal-header .close {
@@ -609,11 +609,11 @@ label {
 }
 
 .userInfo ul li a {
-    color:#38b865;
+    color:#de522f;
 }
 
 .userInfo ul li ul li a {
-    color:#313131;
+    color:#de522f;
 }
 
 .build_table_data_div {
@@ -672,8 +672,15 @@ label {
 }
 
 .closereg {
-     background: #39bc67;
-    color: #FFF;
+    background: #a7a7a7;
+	background: -moz-linear-gradient(top, #a7a7a7 0%, #7b7b7b 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#a7a7a7), color-stop(100%,#7b7b7b));
+	background: -webkit-linear-gradient(top, #a7a7a7 0%,#7b7b7b 100%);
+	background: -o-linear-gradient(top, #a7a7a7 0%,#7b7b7b 100%);
+	background: -ms-linear-gradient(top, #a7a7a7 0%,#7b7b7b 100%);
+	background: linear-gradient(to bottom, #a7a7a7 0%,#7b7b7b 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a7a7a7', endColorstr='#7b7b7b',GradientType=0 );
+	color: #FFF;
 	-webkit-border-radius: 6px;
 	border-radius: 6px; 
 	padding: 0px 0px 8px 0px;
@@ -712,7 +719,14 @@ label {
 
 .openreg {
     color: #FFFFFF;
-    background: none repeat scroll 0 0 #39BC67;
+    background: #a7a7a7;
+	background: -moz-linear-gradient(top, #a7a7a7 0%, #7b7b7b 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#a7a7a7), color-stop(100%,#7b7b7b));
+	background: -webkit-linear-gradient(top, #a7a7a7 0%,#7b7b7b 100%);
+	background: -o-linear-gradient(top, #a7a7a7 0%,#7b7b7b 100%);
+	background: -ms-linear-gradient(top, #a7a7a7 0%,#7b7b7b 100%);
+	background: linear-gradient(to bottom, #a7a7a7 0%,#7b7b7b 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a7a7a7', endColorstr='#7b7b7b',GradientType=0 );
     border-radius: 6px 6px 0px 0px;
 }
 /** Download ends **/
@@ -773,7 +787,7 @@ label {
 /** Tool tip ends **/
 
 .header-background {
-  	background: #323232;
+  	background: #DE522F;
     color: white !important;
 }
 
@@ -822,7 +836,7 @@ label {
 }
 
 .tabs li a.active  {
-	background: #39bc67;
+	background: #DE522F;
 }
 
 .popuplabel label {
@@ -866,13 +880,13 @@ label {
 }
 
 .progress .bar {
-	background-color: #EE5F5B;
-	background-image: -ms-linear-gradient(top, #EE5F5B, #EE5F5B);
-	background-image : -moz-linear-gradient(top,  #EE5F5B, #EE5F5B);
-	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#EE5F5B), to(#EE5F5B));
-	background-image: -webkit-linear-gradient(top, #EE5F5B, #EE5F5B);
-	background-image: -o-linear-gradient(top, #EE5F5B, #EE5F5B);
-	background-image: linear-gradient(top, #EE5F5B, #EE5F5B);
+	background-color: #DE522F;
+	background-image: -ms-linear-gradient(top, #DE522F, #DE522F);
+	background-image : -moz-linear-gradient(top,  #DE522F, #DE522F);
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#DE522F), to(#DE522F));
+	background-image: -webkit-linear-gradient(top, #DE522F, #DE522F);
+	background-image: -o-linear-gradient(top, #DE522F, #DE522F);
+	background-image: linear-gradient(top, #DE522F, #DE522F);
 }
 
 /* scrollbar starts */
@@ -899,7 +913,7 @@ label {
 }
 
 .featurelist_tech { 
-	color:#ffffff;
+	color:#323232;
 }
 
 .featurelist_type { 
