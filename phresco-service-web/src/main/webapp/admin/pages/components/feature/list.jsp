@@ -82,7 +82,7 @@
 		                 	      	<thead>
 		                 	      		<tr>
 		                 	      			<th></th>
-		                 	      		`	<th><s:text name='lbl.hdr.comp.name'/></th>
+		                 	      			<th><s:text name='lbl.hdr.comp.name'/></th>
 			                 	      		<th><s:text name='lbl.hdr.comp.ver'/></th>
 			                 	      		<th><s:text name='lbl.hdr.comp.versioning'/></th>
 		                 	      		</tr>
