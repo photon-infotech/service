@@ -170,8 +170,10 @@
 			disabled = "";
 			disabledClass = "btn-primary";
 		} else {
-			disabled = "disabled";
-			disabledClass = "btn-disabled";
+			if(isSystem) {
+				disabled = "disabled";
+				disabledClass = "btn-disabled";
+			}
 		}
 	}
 	//from page is not empty
