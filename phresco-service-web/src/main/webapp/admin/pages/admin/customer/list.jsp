@@ -150,6 +150,6 @@
 	// This method calling from confirm_dialog.jsp
 	function continueDeletion() {
     	hidePopup();
-    	loadContent('customerDelete', $('#formCustomerList'), $('#subcontainer'));
+    	loadContent('customerDelete', $('#formCustomerList'), $('#subcontainer'), "", "", "", "<s:text name='lbl.prog.txt.customer.delete'/>");
     }
 </script>

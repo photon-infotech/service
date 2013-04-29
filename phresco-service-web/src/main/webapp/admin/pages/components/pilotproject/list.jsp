@@ -150,11 +150,14 @@
 	});
 	
 	function versioningPilotPro(id) {
-		 var params = "projectId=";
-	      params = params.concat(id);
-	      params = params.concat("&versioning=")
-	      params = params.concat("versioning");
-	      loadContent("pilotprojEdit",'', $('#subcontainer'), params);
+		var customerId = $('input[name = customerId]').val();
+		var params = "projectId=";
+		params = params.concat(id);
+		params = params.concat("&customerId=");
+        params = params.concat(customerId);
+		params = params.concat("&versioning=")
+		params = params.concat("versioning");
+		loadContent("pilotprojEdit",'', $('#subcontainer'), params);
 	}
 	
     /** To edit the pilot project **/

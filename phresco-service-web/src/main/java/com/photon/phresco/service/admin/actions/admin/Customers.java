@@ -289,7 +289,6 @@ public class Customers extends ServiceBaseAction  {
 	private Customer createCustomer() throws PhrescoException {
 	    Customer customer = new Customer();
 	    try {
-	        System.out.println("getOptions() in createCustomer()::::" + getOptions());
 	        customer.setName(getName());
 	        customer.setDescription(getDescription());
 	        customer.setEmailId(getEmail());
