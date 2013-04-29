@@ -862,14 +862,13 @@
             </div>
 	</section>
 	
-	
-		<div class="bottom_button">
+	</div>
+	<div class="bottom_button">
 		
 		<input type="button" id="" class="btn <%= disabledClass %>" <%= disabled %> value="<%= buttonLbl %>" 
 			 onclick="validate('<%= pageUrl %>', $('#formCustomerAdd'), $('#subcontainer'), '<%= progressTxt %>', $('.content_adder :input'));" />
 		<input type="button" id="customerCancel" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>" 
             onclick="loadContent('customerList', $('#formCustomerAdd'), $('#subcontainer'));" />
-	</div>
 	</div>
 	<!-- Hidden Fields -->
 	<input type="hidden" name="fromPage" value="<%= StringUtils.isNotEmpty(fromPage) ? fromPage : "" %>"/>
