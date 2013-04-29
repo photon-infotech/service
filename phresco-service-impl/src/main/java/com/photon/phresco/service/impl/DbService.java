@@ -221,8 +221,11 @@ public class DbService implements ServiceConstants {
     }
     
     protected InputStream getFileFromDB(String id) throws PhrescoException {
-		GridFSDBFile imageForOutput = getGridFs().findOne(id);
-		InputStream inputStream = imageForOutput.getInputStream();
+    	GridFSDBFile imageForOutput = getGridFs().findOne(id);
+		InputStream inputStream = null;
+		if(imageForOutput != null) {
+			inputStream = imageForOutput.getInputStream();
+		}
 		return inputStream; 
     }
     

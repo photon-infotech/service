@@ -102,11 +102,13 @@ public class Login extends ServiceBaseAction {
     		String encodeImg = s_encodeImgMap.get(getCustomerId());
     		if (StringUtils.isEmpty(encodeImg)) {
     			fileInputStream = getServiceManager().getIcon(getCustomerId());
-    			byte[] imgByte = null;
-    			imgByte = IOUtils.toByteArray(fileInputStream);
-    			byte[] encodedImage = Base64.encodeBase64(imgByte);
-    			encodeImg = new String(encodedImage);
-    			s_encodeImgMap.put(getCustomerId(), encodeImg);
+    			if(fileInputStream != null) {
+    				byte[] imgByte = null;
+        			imgByte = IOUtils.toByteArray(fileInputStream);
+        			byte[] encodedImage = Base64.encodeBase64(imgByte);
+        			encodeImg = new String(encodedImage);
+        			s_encodeImgMap.put(getCustomerId(), encodeImg);
+    			}
     		}
             setLogoImgUrl(encodeImg);
             
