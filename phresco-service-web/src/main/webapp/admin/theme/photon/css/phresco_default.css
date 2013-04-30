@@ -101,10 +101,6 @@ footer {
 	margin-bottom: 4px;
 }
 
-div.lgnBtnLabel {
-	text-align: right;
-}
-
 .btn.lgnBtn {
 	margin-right: -20px !important;
 	display: block;
@@ -2614,10 +2610,6 @@ footer {
 
 .settings_text {
 	margin-bottom: 4px;
-}
-
-div.lgnBtnLabel {
-	text-align: right;
 }
 
 .lgnBtn:hover {
@@ -5166,4 +5158,35 @@ input[class="chkBox_config"] {
 .updateMsg { 
 	float: left;
     width: auto;
+}
+
+.lgnBg {
+   /* background-image: none;*/
+    background-image: #000000; 
+    /* filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ffffff',GradientType=0 ); COLOR: #000000  IE login page back ground color red */
+}
+
+div.lgnError{
+    margin-top: 2px;
+    /*width: 185px;*/
+}
+
+.clear {
+	clear: both;
+	line-height: 0;
+	height: 0;
+}
+
+.marginBottomZero {
+	margin-bottom: -1;
+	width:100%;
+}
+
+.marginBottomZero {
+    margin-bottom: 0px;
+}
+
+div.lgnBtnLabel {
+    margin-left: 0;
+	margin-top:-20px;
 }
