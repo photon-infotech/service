@@ -442,11 +442,26 @@
 	  	var mandatory = document.createElement('td');
 	  	mandatory.innerHTML = img;
 	  	tr.appendChild (mandatory);
-	  
-	  	var icon = document.createElement('td');
-	  	icon.innerHTML = "<img class = 'del imagealign' id='deleteIcon' src='images/minus_icon.png' onclick='removeRow(this);' value='"+JSON.stringify(jsonObj)+"'>";
-	  	tr.appendChild (icon);
-	  
+	  	
+	  	var customerId = $('input[name=customerId]').val();
+	  	if (fromPage == 'add' || (fromPage == 'edit'&& system == 'false')) {
+	  		var icon = document.createElement('td');
+		  	icon.innerHTML = "<img class = 'del imagealign' id='deleteIcon' src='images/minus_icon.png' onclick='removeRow(this);' value='"+JSON.stringify(jsonObj)+"'>";
+		  	tr.appendChild (icon);
+		} else if (fromPage == 'edit' && system == 'true' && customerId == 'photon') {
+			var icon = document.createElement('td');
+		  	icon.innerHTML = "<img class = 'del imagealign' id='deleteIcon' src='images/minus_icon.png' onclick='removeRow(this);' value='"+JSON.stringify(jsonObj)+"'>";
+		  	tr.appendChild (icon);
+		} else if (fromPage == 'edit' && system == 'false' && customerId != 'photon') {
+			var icon = document.createElement('td');
+		  	icon.innerHTML = "<img class = 'del imagealign' id='deleteIcon' src='images/minus_icon.png' onclick='removeRow(this);' value='"+JSON.stringify(jsonObj)+"'>";
+		  	tr.appendChild (icon);
+		} else {
+			var icon = document.createElement('td');
+		  	icon.innerHTML = "<img class = 'del imagealign' id='deleteIcon' src='images/minus_icon.png' value='"+JSON.stringify(jsonObj)+"'>";
+		  	tr.appendChild (icon);
+		}
+	  	
 	  	var hiddenField = document.createElement("input");
 	  	hiddenField.type = "hidden";
 	  	hiddenField.name = "propTemps";
