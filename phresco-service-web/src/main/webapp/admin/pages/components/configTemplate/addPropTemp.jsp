@@ -40,7 +40,7 @@
 		
 		<div class="controls">
 			<input id="key" placeholder="<s:text name='place.hldr.configTemp.add.key'/>" class="input-medium" 
-				type="text" name="key" value="" maxlength="30" title="30 Characters only" >
+				type="text" name="key" value="" >
 			<span class="help-inline" id="keyError"></span>
 		</div>
 	</div>
