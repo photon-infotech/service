@@ -350,7 +350,10 @@
 	function validatePropTemplates() {
 		var key = $('#key').val();
 		var val = key.charAt(0).replace(/[0-9]+/, '.');
-		if (val === "-" || val === "." || key === "") {
+		if (key === "") {
+			$('.errMsg').html('<s:text name='err.msg.key.missing'/>');
+			return false;
+		} else if (val === "-" || val === ".") {
 			$('.errMsg').html('<s:text name='err.msg.key.invalid'/>');
 			return false;
 		}
