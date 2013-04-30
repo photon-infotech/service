@@ -1,6 +1,6 @@
 <%--
 
-    Service Web Archive
+    Framework Web Archive
 
     Copyright (C) 1999-2013 Photon Infotech Inc.
 
@@ -17,142 +17,135 @@
     limitations under the License.
 
 --%>
-<!DOCTYPE html>
-<%@ taglib uri="/struts-tags" prefix="s"%>
-
+<!doctype html>
 <%@ page import="org.apache.commons.lang.StringUtils"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
-
 <html>
-	<head>
-		<title>Phresco Admin</title>
-		<link rel="icon" type="image/png" href="images/favicon.png">
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
-		<link rel="stylesheet" href="css/bootstrap.css">
-		<link type="text/css" rel="stylesheet" href="theme/photon/css/phresco_default.css" id="phresco">
-        <link type="text/css" rel="stylesheet" class="changeme" title="phresco" href="theme/photon/css/photon_theme.css">
-		<!-- media queries css -->
-		<link type="text/css" rel="stylesheet" href="theme/photon/css/media-queries.css" id="media-query">
-		
-		<!-- basic js -->
-		<script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
-		<script type="text/javascript" src="js/jquery-ui-1.8.18.custom.min.js"></script>
-		
-		<!-- right panel scroll bar -->
-		<script type="text/javascript" src="js/home.js"></script>
-		
-		<!-- commons.js -->
-		<script type="text/javascript" src="js/common.js"></script>
-	   
-		<!-- document resizer -->
-		<script type="text/javascript" src="js/windowResizer.js"></script>
-		
-		<!-- Scrollbar -->
-		<script type="text/javascript" src="js/scrollbars.js"></script>
-		<script type="text/javascript" src="js/main.js"></script>
-		<script type="text/javascript" src="js/jquery.event.drag-2.0.min.js"></script>
-		<script type="text/javascript" src="js/jquery.ba-resize.min.js"></script>
-		<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
-		<script type="text/javascript" src="js/mousehold.js"></script>
-		
+<head>
+	<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+	<meta content="width=device-width" name="viewport">
+	<title>Helios</title>
+	<link rel="icon" type="image/png" href="images/favicon.png">
 
-		<script type="text/javascript">
-			$(document).ready(function() {
-				var localstore = localStorage['color'];
-				if (localstore != null) {
-					applyTheme();
-				}
-			});
-			
-		</script>
-	</head>
+	<!-- basic js -->
+	<script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
 
-	<body class="lgnBg">
-		<header>
-			<div class="header">
-				<div class="Logo">
-					 <a href="#" id="goToHome"><img class="headerlogoimg" src="theme/photon/images/phresco_header_red.png" alt="logo"></a>
+	<!-- commons.js -->
+	<script type="text/javascript" src="js/common.js"></script>
+	<script type="text/javascript" src="js/jquery.activity-indicator-1.0.0.js"></script>
+
+	<link rel="stylesheet" href="css/bootstrap.css">
+	<link type="text/css" rel="stylesheet" href="theme/photon/css/phresco_default.css" id="phresco">
+	<link type="text/css" rel="stylesheet" class="changeme" title="phresco" href="theme/photon/css/photon_theme.css">
+	<!-- media queries css -->
+	<link type="text/css" rel="stylesheet" href="theme/photon/css/media-queries.css" id="media-query">
+
+<script type="text/javascript">
+$(document).ready(function() {
+	var localstore = localStorage['color'];
+	if (localstore != null) {
+		applyTheme();
+	}
+    
+    <%
+		String cmdLogin = (String) request.getAttribute("cmdLogin");
+		if (cmdLogin != null) {
+	%>
+		createBookmarkLink('Phresco', '<%= request.getScheme() %>://<%= request.getServerName() %>:<%= request.getServerPort() %><%= request.getContextPath() %>');
+	<% } %>
+});
+
+/* function createBookmarkLink(title, url) {
+	if (window.sidebar)  {							// firefox
+		window.sidebar.addPanel(title, url, "");
+	} else if(window.opera && window.print) { 		// opera
+		var elem = document.createElement('a');
+		elem.setAttribute('href',url);
+		elem.setAttribute('title',title);
+		elem.setAttribute('rel','sidebar');
+		elem.click();
+	} else if(document.all) {						// ie
+		window.external.AddFavorite(url, title);
+	} else if (window.chrome) {
+		chrome.bookmarks.create({'parentId': bookmarkBar.id,'title': 'Extension bookmarks'},
+			function(newFolder) {
+			console.log("added folder: " + newFolder.title);
+		});
+	}
+} */
+
+</script>
+</head>
+<body class="lgnBg">
+    <div class="logincontainer">
+		<div class="logindiv">
+			<div class="loginhead">
+				<span><img src="theme/photon/images/userlogin.png"></img></span>
+				<div class="alert alert-error">
+					<%
+			     		String loginError = (String)request.getAttribute(ServiceUIConstants.REQ_LOGIN_ERROR);
+					%>
+					<div id="logimErrMesg" class="lgnError"><%= StringUtils.isEmpty(loginError) ? "" : loginError %></div>
 				</div>
+				<div class="clear"></div>
 			</div>
-			
-			<div class="innoimg">
-			   <img class="phtaccinno" src="theme/photon/images/acc_inov_red.png" alt="" border="0" onclick="window.open('http://www.photon.in','_blank');">
-			</div>
-		</header>
-      
-		<div class="lgnintro_container lgnContainer">
-	        <div class="welcome" id="welcome">
-                  <img class="welcomeimg" src="theme/photon/images/welcome_photon_red.png">
-             </div> 
-			<div class="lgnintro_container_left">
-			<h1 class="l_align"><s:text name="lbl.login"/></h1><h1 class="lp_align"></h1>    
-			   
-				<form name="login" action="login" method="post" class="marginBottomZero">
-					<!--  UserName starts -->
-					<div class="clearfix">
-						 <label class="labellg"><s:text name="lbl.login.username"/></label>
+		<form name="login" action="login" method="post" class="marginBottomZero">
+			<img class="leftslideone" src="theme/photon/images/leftslide.png"></img>
+			<div class="loginuser">
+				<div class="loginimg">
+					<img src="theme/photon/images/user.png"></img>
+				</div>
+				<div class="logintext clearfix">	
+				     <label class="labellg" for="xlInput" class="lgnfieldLb1">Username:</label>
 						<%
 							String userName = (String)request.getAttribute(ServiceUIConstants.REQ_USER_NAME);
 						%>
-						 <input class="xlarge settings_text lgnField" id="xlInput" name="username" autofocus placeholder="<s:text name="place.hldr.login.name"/>" 
-						 		value="<%= StringUtils.isNotEmpty(userName) ? userName : "" %>" type="text">
-						</div>
-					<!--  UserName ends -->
-						  
-					<!--  Password starts -->
-					<div class="clearfix">
-						<label class="labellg"><s:text name="lbl.login.pwd"/></label>
-						<%
+				    <input class="xlarge settings_text lgnField" id="xlInput" id="username" name="username" type="text" 
+				     	autofocus maxlength="63" value="<%= StringUtils.isNotEmpty(userName) ? userName : "" %>" title="63 Characters only" placeholder="Enter the username" />
+				</div>
+				<div class="clear"></div>
+			</div>
+			<img class="rightslideone" src="theme/photon/images/rightslide.png"></img>
+			<img class="leftslidetwo" src="theme/photon/images/leftslide.png"></img>
+			<div class="loginpassword">
+				<div class="loginimg">
+					<img src="theme/photon/images/password.png"></img>
+				</div>
+				<div class="logintext clearfix">	
+	                <label class="labellg" for="xlInput" class="lgnFieldLbl">Password:</label>
+		                <%
 							String password = (String)request.getAttribute(ServiceUIConstants.REQ_PASSWORD);
 						%>
-						<input class="xlarge settings_text lgnField" id="xlInput" name="password" value="" 
-								type="password" placeholder="<s:text name="place.hldr.login.pwd"/>">
-						
-						<script type="text/javascript">
-							<% if (StringUtils.isNotEmpty(userName) && StringUtils.isEmpty(password)) { %>
-									$('input[name="password"]').focus();
-							<% } %>	
-						</script>
-					</div>
-					<!--  Password ends -->
-						  
-					<!-- Remember me check starts  -->
-					<div class="login_check">
-						  <input id="rememberme" name="rememberme" type="checkbox">
-						  <labelrem><s:text name="lbl.login.rembr.me"/></labelrem>
-						
-					</div>
-					<!-- Remember me check ends  -->
-				   
-					
-					<div class="clearfix">
-						<div class="input lgnBtnLabel">
-							<input type="hidden" name="loginFirst" value="false"> 
-							<input type="submit" value="Login" class="btn btn-primary lgnBtn">
-							<%
-	                        	String loginError = (String)request.getAttribute(ServiceUIConstants.REQ_LOGIN_ERROR);
-	                    	%>
-							&nbsp;&nbsp;&nbsp;<div class="lgnError"><%= StringUtils.isNotEmpty(loginError) ? loginError : "" %></div>
-						</div>
-					</div>
-				</form>
+	                <input class="xlarge settings_text lgnField" id="xlInput" id="password" name="password" type="password"
+	                	maxlength="63" title="63 Characters only" value ="" placeholder="Enter the password"/>
+	               	
+					<script type="text/javascript">
+						<% if (StringUtils.isNotEmpty(userName) && StringUtils.isEmpty(password)) { %>
+								$('input[name="password"]').focus();
+						<% } %>	
+					</script>
+				</div>
+				<div class="clear"></div>
 			</div>
-		</div>
-	
-		<div class="footer_div login">
-		   <footer>
-			  <div class="copyrit">
-				 &copy; 2013.Photon Infotech Pvt Ltd. |
-			   <a href="http://www.photon.in/"> www.photon.in</a>
-			 </div>
-		   </footer>
-		</div>
-	</body>
+			<img class="rightslidetwo" src="theme/photon/images/rightslide.png"></img>
+			<div class="loginfoot">
+				<label class="checkbox login_check">
+	                <input id="rememberMe" type="checkbox" name="rememberme">
+	                <labelrem>Remember me</labelrem>
+				</label>
+				<span class="clearfix ">
+	                <div class="input lgnBtnLabel">
+	                    <input type="submit" value="LOGIN" class="btn loginbutton" id="Login">
+	            	</div>
+	            </span>
+	            <input type="hidden" name="loginFirst" value="false"/>
+			</div>	
+		</form>
+		</div>	
+	</div>	
+</body>
 </html>
 <script type="text/javascript">
-//$(document).ready(function() {
-//});
 	ReadCookie();
 	function ReadCookie()
 	{
@@ -171,7 +164,7 @@
 	      }
 	      if (newName === "password" && !isBlank(value)) {
 	    	  $('input[name="password"]').prop("value", value);
-	    	  document.getElementById("rememberme").checked=true
+	    	  document.getElementById("rememberMe").checked=true
 	      }
 	   }
 	}
@@ -191,7 +184,7 @@
 	function eraseCookie() {
 		document.cookie = "username=";
 		document.cookie = "password=";
-		document.getElementById("rememberme").checked=false;
+		document.getElementById("rememberMe").checked=false;
 	}
 
 //}
