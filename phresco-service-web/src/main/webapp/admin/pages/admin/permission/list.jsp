@@ -31,8 +31,8 @@
 
 <form id="formPermissionList" class="form-horizontal customer_list">
 	<div class="operation" id="operation">
-		<input type="button" id="del" class="btn" disabled value="<s:text name='lbl.btn.del'/>"
-			onclick="showDeleteConfirmation('<s:text name='del.confirm.permission'/>');"/>
+		<%-- <input type="button" id="del" class="btn" disabled value="<s:text name='lbl.btn.del'/>"
+			onclick="showDeleteConfirmation('<s:text name='del.confirm.permission'/>');"/> --%>
 	</div>
 	
 	<div class="table_div">
@@ -43,23 +43,22 @@
 					<thead>
 						<tr>
 							<th class="first">
-								<div class="th-inner">
+								<div class="th-inner th-inner-permissions">
 									<input type="checkbox" id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this,$('.check'),false);">
 								</div>
 							</th>
 							<th class="second">
-								<div class="th-inner tablehead">
+								<div class="th-inner tablehead th-inner-permissions">
 								<s:label key="lbl.name" theme="simple"/></div>
 							</th>
 							<th class="third">
-								<div class="th-inner tablehead"><s:label key="lbl.hdr.adm.prmlst.prms" theme="simple"/></div>
+								<div class="th-inner tablehead th-inner-permissions"><s:label key="lbl.hdr.adm.prmlst.prms" theme="simple"/></div>
 							</th>
 							
 					</thead>
 		
 					<tbody>
 						<% 
-						 // TODO:Arunprasanna
 							if (CollectionUtils.isNotEmpty(permissions)) {
 								for ( Permission permission : permissions) {
 						%>
@@ -67,8 +66,8 @@
 									<td class="checkboxwidth">
 										<input type="checkbox" class="check" name="permissionId" value="<%= permission.getId() %>" onclick="checkboxEvent($('#checkAllAuto'),'check');">
 									</td>
-									<td class="namelabel-width"><%= permission.getName()  %></td>
-<%-- 								<td><%= permission.getPermission()  %></td> --%>
+									<td class="namelabel-width"><%= permission.getName() %></td>
+									<td><%= permission.getDescription() %></td>
 									<td></td>
 								</tr>
 						<%		
