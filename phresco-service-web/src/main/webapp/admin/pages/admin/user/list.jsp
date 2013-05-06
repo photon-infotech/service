@@ -81,58 +81,15 @@
 							<td class="emailalign"><%= StringUtils.isNotEmpty(user.getEmail()) ? user.getEmail() : "" %></td>
 							<td class="userwidth"><%= user.getStatus()!= null ? user.getStatus() : "" %></td>
 							<td  class = "tablealign">
-								<input type="button" class="btn btn-primary addiconAlign" value="Roles" onclick="showAssignRolesPopup('<%= user.getName() %>');">
+								<input type="button" class="btn btn-primary addiconAlign" value="Roles" onclick="showAssignRolesPopup('<%= user.getId() %>');">
 							</td>
 						</tr>
 					</tbody>
 					<%
-						}
 							}
+						}
 					%>
 				</table>
-				
-								
-				<div id="rolesPopup" class="modal hide fade">
-					<div class="modal-header">
-					  <a class="close" data-dismiss="modal" >&times;</a>
-					  <h3><s:label key="lbl.hdr.adm.usrlst.role.popup.title" theme="simple"/></h3>
-					</div>
-					<div class="modal-body">
-						<div class="popupbody">
-							<div class="popupusr"><s:label key="lbl.hdr.adm.usrname" cssClass="popuplabel" theme="simple"/></div>&nbsp;<div class="popupusr-name"> </div>
-						</div>
-						<div class="pouproles">
-							<div class="popuprls"><s:label key="lbl.hdr.adm.availrole" cssClass="popuplabel" theme="simple"/></div> 
-							<div class="popuprole-select"><s:label key="lbl.hdr.adm.selrole" cssClass="popuplabel" theme="simple"/></div>
-						</div>
-						<div class="popuplist">
-							<div class="popup-list">
-								<select names="rolesAvailable" class="sample" id="rolesAvailable" multiple="multiple">
-									<option value="Phresco">Phresco Admin</option>
-									<option value="Customer">Customer Admin</option>
-								</select> 
-							</div>
-							
-							<div class="popup-button">
-								<div class="btnalign"><input type="button" class="btn sample" value=">" onclick="moveOptions(this.form.rolesAvailable, this.form.rolesSelected);"/></div>
-								<div class="btnalign"><input type="button" class="btn sample" value=">>" onclick="moveAllOptions(this.form.rolesAvailable, this.form.rolesSelected);"/></div>
-								<div class="btnalign"><input type="button" class="btn sample" value="<" onclick="moveOptions(this.form.rolesSelected, this.form.rolesAvailable);"/></div>
-								<div class="btnalign"><input type="button" class="btn sample" value="<<" onclick="moveAllOptions(this.form.rolesSelected, this.form.rolesAvailable);"/></div>
-							</div>
- 
-							<div class="popupselect">
-								<select name="rolesSelected" class="sample" id="rolesSelected" multiple="multiple">
-								</select> 
-							</div>
-						</div>
-					</div>
-					
-					<div class="modal-footer">
-					  <a href="#" class="btn btn-primary" data-dismiss="modal"><s:label key="lbl.btn.cancel" theme="simple"/></a>
-					  <a href="#" class="btn btn-primary" data-dismiss="modal" ><s:label key="lbl.btn.ok" theme="simple"/></a>
-					  <div id="errMsg" class="errMsg"></div>
-					</div>
-				</div>
 			</div>
 		</div>
 	</div>
@@ -212,74 +169,9 @@
 	  	}
 	}
 
-	function moveOptions(theSelFrom, theSelTo) {
-		var selLength = theSelFrom.length;
-	  	var selectedText = new Array();
-	  	var selectedValues = new Array();
-	  	var selectedCount = 0;
-	  	var i;
-	  	
-	  		  	
-	  	// Find the selected Options in reverse order
-	  	// and delete them from the 'from' Select.
-	  	for (i=selLength-1; i>=0; i--) {
-	  		if (theSelFrom.options[i].selected) {
-				selectedText[selectedCount] = theSelFrom.options[i].text;
-	      		selectedValues[selectedCount] = theSelFrom.options[i].value;
-	      		deleteOption(theSelFrom, i);
-	      		selectedCount++;
-	    	}
-	  	}
-	  
-	  	if (selectedCount == 0) {
-	  		$('#errMsg').html("<s:text name='err.msg.slt.rle'/>");
-	  	}
-	  	
-	  	// Add the selected text/values in reverse order.
-	  	// This will add the Options to the 'to' Select
-	  	// in the same order as they were in the 'from' Select.
-	  	for (i=selectedCount-1; i>=0; i--) {
-	    	addOption(theSelTo, selectedText[i], selectedValues[i]);
-	    	$('#errMsg').empty();
-	  	}
-	  
-	  	if (NS4) {
-	  		history.go(0);
-	  	}
-	}
-
-	function moveAllOptions(theSelFrom, theSelTo) {
-		var selLength = theSelFrom.length;
-		var selectedText = new Array();
-		var selectedValues = new Array();
-		var selectedCount = 0;
-		var i;
-		  
-		// Find the selected Options in reverse order
-		// and delete them from the 'from' Select.
-		for (i = selLength-1; i >= 0; i--) {
-			if (theSelFrom.options[i]) {
-				selectedText[selectedCount] = theSelFrom.options[i].text;
-		      	selectedValues[selectedCount] = theSelFrom.options[i].value;
-		      	deleteOption(theSelFrom, i);
-		      	selectedCount++;
-			}
-		}
-		  
-		// Add the selected text/values in reverse order.
-		// This will add the Options to the 'to' Select
-		// in the same order as they were in the 'from' Select.
-		for (i=selectedCount-1; i>=0; i--) {
-			addOption(theSelTo, selectedText[i], selectedValues[i]);
-		}
-		  
-		if (NS4) {
-			history.go(0);
-		}
-	}
-	
-	function showAssignRolesPopup(userName) {
-		$('#rolesPopup').modal('show');
-		$('.popupusr-name').html(userName);
+	function showAssignRolesPopup(userId) {
+		var params = "userId=";
+		params = params.concat(userId);
+		yesnoPopup("showAssignRoles", '<s:label key="lbl.hdr.adm.usrlst.role.popup.title"/>', 'assignRoles' , '<s:text name="lbl.btn.ok"/>', '', params);
 	}
 </script>

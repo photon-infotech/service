@@ -5174,3 +5174,9 @@ div.lgnBtnLabel {
     margin-left: 0;
 	margin-top:-20px;
 }
+
+.assignRolesSuccMsg {
+	top: 66px !important;
+	margin-left: 22% !important;
+	text-align: center !important;
+}	

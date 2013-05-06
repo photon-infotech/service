@@ -22,7 +22,16 @@
 <form id="syncForm" class="form-horizontal customer_list">
 	<div class="operation" id="operation">
 		<input type="button" id="userSync" class="btn btn-primary" name="users_sync"  value="<s:text name='lbl.hdr.adm.usrlst'/>"/>
-		
+		<s:if test="hasActionMessages()">
+			<div class="alert alert-success alert-message assignRolesSuccMsg"  id="successmsg">
+				<s:actionmessage />
+			</div>
+		</s:if>
+		<s:if test="hasActionErrors()">
+			<div class="alert alert-error"  id="errormsg">
+				<s:actionerror />
+			</div>
+		</s:if>
 	    <div id="userListContainer" class="syncTable">
 	
 		</div>
