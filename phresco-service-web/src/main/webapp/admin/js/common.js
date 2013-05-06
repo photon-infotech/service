@@ -576,7 +576,7 @@ function yesnoPopup(url, title, okUrl, okLabel, form, additionalParams) {
 	$('.popupOk, #popupCancel').show(); // show ok & cancel button
 	$(".popupOk").attr('id', okUrl); // popup action mapped to id
 	if (okLabel !== undefined && !isBlank(okLabel)) {
-		$('#' + okUrl).val(okLabel); // label for the ok button
+		$('#' + okUrl).text(okLabel); // label for the ok button
 	}
 	
 	var params = "";
