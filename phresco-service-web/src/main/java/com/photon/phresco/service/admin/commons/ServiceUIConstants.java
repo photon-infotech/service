@@ -129,6 +129,7 @@ public interface ServiceUIConstants {
      * String REQ_USER_XXX
      *****************************/ 
     String REQ_USER_LIST = "userList";
+    String REQ_USER = "user";
     String REQ_USER_SYNCLIST = "userSyncList";
     
     
@@ -236,6 +237,7 @@ public interface ServiceUIConstants {
     String REQ_ROLE_ROLE = "role";
     String REQ_ROLE_LIST = "roleList";
     String REQ_ROLE_ID = "roleId";
+    String REQ_ROLES_MAP = "availableRolesMap";
     
     
     /*****************************
@@ -264,6 +266,7 @@ public interface ServiceUIConstants {
 	String EXCEPTION_ROLE_LIST = "excep.hdr.admin.role.list";
 	String EXCEPTION_ROLE_ASSIGN_PERMISSION_POPUP = "excep.hdr.admin.role.assign.permission.popup";
 	String EXCEPTION_ROLE_ASSIGN_PERMISSION = "excep.hdr.admin.role.assign.permission";
+	String EXCEPTION_ASSIGN_ROLE_TO_USER= "excep.hdr.admin.assign.role.to.user";
 	
 	String EXCEPTION_PERMISSION_LIST = "excep.hdr.admin.asgnprm.list";
 	String EXCEPTION_PERMISSION_DELETE = "excep.hdr.admin.asgnprm.delete";
@@ -450,6 +453,7 @@ public interface ServiceUIConstants {
     String ROLE_NOT_ADDED = "fail.role.add";
     String ROLE_DELETED = "succ.role.delete";
     String ROLE_NOT_DELETED = "fail.role.delete" ;
+    String ROLE_ADDED_TO_USER = "succ.role.add.to.user";
     String PERMISSION_ADDED_TO_ROLE = "succ.permission.add.to.role";
     
     String VIDEO_ADDED = "succ.vdeo.add";

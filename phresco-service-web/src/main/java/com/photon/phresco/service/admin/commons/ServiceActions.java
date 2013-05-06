@@ -87,6 +87,7 @@ public interface ServiceActions {
 	String ADMIN_CUSTOMER_CANCEL 	= "customerCancel";
 	
 	String ADMIN_USER_LIST  	 	= "userList";
+	String ADMIN_USER		  	 	= "user";
 	
 	String ADMIN_ROLE_LIST  	 	= "roleList";
 	String ADMIN_ROLE_ADD	  	 	= "roleAdd";
