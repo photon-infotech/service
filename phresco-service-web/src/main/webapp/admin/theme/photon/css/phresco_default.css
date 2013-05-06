@@ -5152,3 +5152,8 @@ input[class="chkBox_config"] {
 #loadingIconDiv > div {
 	margin-left: 0px !important;
 }
+.assignRolesSuccMsg {
+	top: 66px !important;
+	margin-left: 22% !important;
+	text-align: center !important;
+}

@@ -479,9 +479,18 @@
 		<action name="userList" class="com.photon.phresco.service.admin.actions.admin.Users" method="fetchUsersFromDB">
 			<result name="userList">/admin/pages/admin/user/sync.jsp</result>
         </action>
+
+		<action name="showAssignRoles" class="com.photon.phresco.service.admin.actions.admin.Users" method="showAssignRolesPopup">
+			<result name="user">/admin/pages/admin/user/assignRolesPopup.jsp</result>
+        </action>
         
-        <action name="syncUsers" class="com.photon.phresco.service.admin.actions.admin.Users" method="syncUsers">
+       <action name="syncUsers" class="com.photon.phresco.service.admin.actions.admin.Users" method="syncUsers">
 			<result name="userList">/admin/pages/admin/user/list.jsp</result>
+        </action>
+        
+        <action name="assignRoles" class="com.photon.phresco.service.admin.actions.admin.Users" method="assignRoles">
+			<!-- <result type="json" /> -->
+			<result name="userList">/admin/pages/admin/user/sync.jsp</result>
         </action>
         
         <action name="fetchUsersFromDB" class="com.photon.phresco.service.admin.actions.admin.Users" method="fetchUsersFromDB">
