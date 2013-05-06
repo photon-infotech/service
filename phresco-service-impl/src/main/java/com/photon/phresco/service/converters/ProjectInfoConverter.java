@@ -41,6 +41,8 @@ public class ProjectInfoConverter implements Converter<ProjectInfoDAO, ProjectIn
 		ProjectInfo projectInfo = new ProjectInfo();
 		projectInfo.setId(dao.getId());
 		projectInfo.setProjectCode(dao.getProjectCode());
+		projectInfo.setStartDate(dao.getStartDate());
+		projectInfo.setEndDate(dao.getEndDate());
 		List<ApplicationInfo> applicationInfos = getApplicationInfos(dao.getApplicationInfoIds(), mongoOperation);
 		if(CollectionUtils.isNotEmpty(applicationInfos)) {
 			projectInfo.setAppInfos(applicationInfos);
@@ -54,6 +56,8 @@ public class ProjectInfoConverter implements Converter<ProjectInfoDAO, ProjectIn
 			throws PhrescoException {
 		ProjectInfoDAO projectInfoDAO = new ProjectInfoDAO();
 		projectInfoDAO.setId(projectInfo.getId());
+		projectInfoDAO.setStartDate(projectInfo.getStartDate());
+		projectInfoDAO.setEndDate(projectInfo.getEndDate());
 		projectInfoDAO.setProjectCode(projectInfo.getProjectCode());
 		projectInfoDAO.setApplicationInfoIds(createAppInfoIds(projectInfo));
 		projectInfoDAO.setCustomerIds(projectInfo.getCustomerIds());

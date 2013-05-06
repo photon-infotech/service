@@ -17,6 +17,7 @@
  */
 package com.photon.phresco.service.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
@@ -26,6 +27,8 @@ public class ProjectInfoDAO extends CustomerBaseDAO {
 	
 	private String projectCode;
 	private List<String> applicationInfoIds;
+	private Date startDate;
+    private Date endDate;
 	
 	public ProjectInfoDAO() {
 		super();
@@ -45,6 +48,22 @@ public class ProjectInfoDAO extends CustomerBaseDAO {
 
 	public void setApplicationInfoIds(List<String> applicationInfoIds) {
 		this.applicationInfoIds = applicationInfoIds;
+	}
+	
+	public Date getStartDate() {
+		return startDate;
+	}
+
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
+	}
+
+	public Date getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
 	}
 	
 }
