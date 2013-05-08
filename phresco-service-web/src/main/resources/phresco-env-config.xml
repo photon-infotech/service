@@ -98,7 +98,7 @@
 		<port>27017</port>
 		<username></username>
 		<password/>
-		<dbname>database-dump</dbname>
+		<dbname>phresco-dev</dbname>
 		<type>mongodb</type>
 		<version>2.0.4</version>
 	</Database>
