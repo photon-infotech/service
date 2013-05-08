@@ -26,6 +26,7 @@ import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
 
 import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.FunctionalFramework;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.Converter;
@@ -81,6 +82,11 @@ public class TechnologyConverter implements Converter<TechnologyDAO, Technology>
         if(CollectionUtils.isNotEmpty(technologyDAO.getArchetypeFeatures())) {
         	technology.setArchetypeFeatures(technologyDAO.getArchetypeFeatures());
         }
+        if(CollectionUtils.isNotEmpty(technologyDAO.getFunctionalFrameworks())) {
+        	List<FunctionalFramework> functionalFrameworks = mongoOperation.find("functionalFrameworks", 
+        			new Query(Criteria.whereId().in(technologyDAO.getFunctionalFrameworks().toArray())), FunctionalFramework.class);
+        	technology.setFunctionalFrameworks(functionalFrameworks);
+        }
         return technology;
     }
 
@@ -106,9 +112,18 @@ public class TechnologyConverter implements Converter<TechnologyDAO, Technology>
         techDAO.setTechGroupId(technology.getTechGroupId());
         techDAO.setReports(technology.getReports());
         techDAO.setArchetypeFeatures(technology.getArchetypeFeatures());
+        techDAO.setFunctionalFrameworks(getFrameworkIds(technology.getFunctionalFrameworks()));
         return techDAO;
     }
-
+    
+    private List<String> getFrameworkIds(List<FunctionalFramework> functionalFrameworks) {
+    	List<String> ids = new ArrayList<String>();
+    	for (FunctionalFramework functionalFramework : functionalFrameworks) {
+			ids.add(functionalFramework.getId());
+		}
+    	return ids;
+    }
+    
 	private List<String> createPluginId(List<ArtifactGroup> plugins) {
 		List<String> ids = new ArrayList<String>();
 		for (ArtifactGroup artifactGroup : plugins) {

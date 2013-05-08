@@ -42,6 +42,7 @@ import org.apache.log4j.Logger;
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactInfo;
+import com.photon.phresco.commons.model.FunctionalFramework;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.commons.model.TechnologyGroup;
 import com.photon.phresco.commons.model.TechnologyOptions;
@@ -155,7 +156,8 @@ public class Archetypes extends ServiceBaseAction {
 			setReqAttribute(REQ_TECHNOLOGY_OPTION, options);
 			setReqAttribute(REQ_FROM_PAGE, ADD);
 			setReqAttribute(REQ_TECHNOLOGY_REPORTS, reports);
-			setReqAttribute(REQ_ARCHE_TYPES, getServiceManager().getTechnologyByCustomer(getCustomerId()));
+			setReqAttribute(REQ_ARCHE_TYPES, serviceManager.getTechnologyByCustomer(getCustomerId()));
+			setReqAttribute(REQ_FUNCTIONAL_FRAMEWORKS, serviceManager.getFunctionalTestFramework());
 		} catch (PhrescoException e) {
 		    return showErrorPopup(e, getText(EXCEPTION_ARCHETYPE_ADD));
 		}
@@ -172,6 +174,14 @@ public class Archetypes extends ServiceBaseAction {
 		    ServiceManager serviceManager = getServiceManager();
 		    versionFile = getVersioning();
 			Technology technology = serviceManager.getArcheType(getTechId(), getCustomerId());
+			List<FunctionalFramework> functionalFrameworks = technology.getFunctionalFrameworks();
+			if (CollectionUtils.isNotEmpty(functionalFrameworks)) {
+				List<String> selectedFrameworkIds = new ArrayList<String>();
+				for (FunctionalFramework functionalFramework : functionalFrameworks) {
+					selectedFrameworkIds.add(functionalFramework.getId());
+				}
+				setReqAttribute(REQ_SELECTED_FUNCTIONAL_FRAMEWORKS, selectedFrameworkIds);
+			}
             List<ApplicationType> appTypes = serviceManager.getApplicationTypes();
             List<TechnologyOptions> options = serviceManager.getOptions();
             setReqAttribute(REQ_ARCHE_TYPE,  technology);
@@ -182,6 +192,7 @@ public class Archetypes extends ServiceBaseAction {
 			setReqAttribute(REQ_TECHNOLOGY_REPORTS, reports);
             setReqAttribute(REQ_VERSIONING, getVersioning()); 
             setReqAttribute(REQ_ARCHE_TYPES, getServiceManager().getTechnologyByCustomer(getCustomerId()));
+            setReqAttribute(REQ_FUNCTIONAL_FRAMEWORKS, serviceManager.getFunctionalTestFramework());
 		} catch (PhrescoException e) {
 		    return showErrorPopup(e, getText(EXCEPTION_ARCHETYPE_EDIT));
 		}
