@@ -106,7 +106,8 @@ public interface ServiceUIConstants {
     String REQ_TECHNOLOGY_GROUPS = "TechnologyGroups";
     String REQ_TECH_GROUP = "techGroup";
     String REQ_ZIP_FILE = "zip";
-    
+    String REQ_FUNCTIONAL_FRAMEWORKS = "functionalFrameworks";
+    String REQ_SELECTED_FUNCTIONAL_FRAMEWORKS = "selectedFunctionalFrameworks";
     
     /*****************************
      * Archetype Constants
@@ -459,7 +460,6 @@ public interface ServiceUIConstants {
     String URL_NOT_DELETED = "fail.globurl.delete";
     String URL_UPDATED = "succ.url.update";
     
-    
     String DOWNLOAD_ADDED = "succ.download.add";
     String DOWNLOAD_UPDATED = "succ.download.update";
     String DOWNLOAD_DELETED = "succ.download.delete";
@@ -467,9 +467,7 @@ public interface ServiceUIConstants {
     //Email validation
     String INVALID_EMAIL = "err.msg.invalid.email";
     
-    
     // Framework Theme Color Keys
-    
     String BRANDING_COLOR =  "brandingColor";
     String ACCORDION_BACKGROUND_COLOR = "accordionBackGroundColor";
     String BODYBACKGROUND_COLOR = "bodyBackGroundColor";
@@ -482,7 +480,4 @@ public interface ServiceUIConstants {
     String SUB_MENU_BACKGROUND_COLOR = "SubMenuBackGround";
     String COPYRIGHT = "CopyRight";
     String DISABLED_LABEL_COLOR = "DisabledLabelColor";
-    
-    
-    
 }

@@ -34,6 +34,7 @@
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
 <%@ page import="com.photon.phresco.service.admin.actions.util.ServiceActionUtil"%>
 <%@ page import="com.photon.phresco.commons.model.TechnologyGroup"%>
+<%@ page import="com.photon.phresco.commons.model.FunctionalFramework"%>
 
 <%
 	Technology technology = (Technology) request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPE);
@@ -41,6 +42,7 @@
 	List<ApplicationType> appTypes = (List<ApplicationType>) request.getAttribute(ServiceUIConstants.REQ_APP_TYPES);
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
 	List<TechnologyOptions> options = (List<TechnologyOptions>) request.getAttribute(ServiceUIConstants.REQ_TECHNOLOGY_OPTION);
+	List<FunctionalFramework> functionalFrameworks = (List<FunctionalFramework>) request.getAttribute(ServiceUIConstants.REQ_FUNCTIONAL_FRAMEWORKS);
 	List<Reports> reports = (List<Reports>)request.getAttribute(ServiceUIConstants.REQ_TECHNOLOGY_REPORTS);
 	List<Technology> technologies = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
 	String title = ServiceActionUtil.getTitle(ServiceUIConstants.ARCHETYPES, fromPage);
@@ -68,6 +70,7 @@
 	String techVer = "";
 	String selectedTech= "";
 	List<String> selectedReports = null;
+	List<String> selectedFunctionalFrameworks = null;
 	if (technology != null) {
 		name = technology.getName();		
 		desc = technology.getDescription();
@@ -82,7 +85,7 @@
 		appTypeId = technology.getAppTypeId();
 		techId = technology.getTechGroupId();
 		selectedReports = technology.getReports();
-	
+		selectedFunctionalFrameworks = (List<String>) request.getAttribute(ServiceUIConstants.REQ_SELECTED_FUNCTIONAL_FRAMEWORKS);
 	}
 %>
 
@@ -284,8 +287,8 @@
 			<label class="control-label labelbold">
 				<s:text name='lbl.hdr.comp.reports'/>
 			</label>
-		<div class="controls">
-					<div class="typeFields" id="typefield">
+			<div class="controls">
+				<div class="typeFields" id="typefield">
 					<div class="multilist-scroller multiselct" id="applicableToDiv">
 						<ul>
 							<li>
@@ -307,19 +310,20 @@
 										<li> <input type="checkbox" id="reportsCheckbox" <%= disabledVer %> name="applicableReports" value="<%= report.getId() %>"  onclick="checkboxEvent($('#checkAllReports'), 'reportsChk')"
 											 class="check reportsChk" <%= checkedStr %>><%= report.getDisplayName() %> 
 										</li>
-							<%		}	
+							<%
+									}	
 								}
 							%>
 						</ul>
 					</div>
 				</div>
-          		 <span class="help-inline applyerror" id="applicableError"></span>
+				<span class="help-inline applyerror" id="applicableError"></span>
 			</div>
 		</div>
 		<%
 			if (CollectionUtils.isNotEmpty(technologies)) {
 		%>						
-		<div class="control-group" id="applyControl">
+			<div class="control-group" id="applyControl">
 				<label class="control-label labelbold">
 					<s:text name='lbl.comp.featr.archetypefeatures'/>
 				</label>
@@ -360,10 +364,50 @@
 					</div>
 				</div>
 			</div>
-		<%		}	
-		%>	
+		<%
+			}	
+		%>
+		
+		<div class="control-group" id="funcFrameworksControl">
+			<label class="control-label labelbold">
+				<%-- <span class="mandatory">*</span>&nbsp; --%><s:text name='lbl.hdr.comp.func.test.frameworks'/>
+			</label>
+			<div class="controls">
+				<div class="typeFields" id="typefield">
+					<div class="multilist-scroller multiselct" id="funcFrameworksDiv">
+						<ul>
+							<li>
+								<input type="checkbox" value="" id="checkAllFuncFrameworks" name="" onclick="checkAllEvent(this,$('.funcFrameworkChk'), false);"
+									style="margin: 3px 8px 6px 0;"><s:text name='lbl.all'/>
+							</li>
+							<%
+								if (CollectionUtils.isNotEmpty(functionalFrameworks)) {
+									String checkedStr = "";
+									for (FunctionalFramework functionalFramework : functionalFrameworks) {
+										if (CollectionUtils.isNotEmpty(selectedFunctionalFrameworks)) {
+											if (selectedFunctionalFrameworks.contains(functionalFramework.getId())) {
+												checkedStr = "checked";
+											} else {
+												checkedStr = "";
+											}
+										}
+							%>
+										<li>
+											<input type="checkbox" id="funcFrameworkCheckbox" name="functionalFrameworks" value="<%= functionalFramework.getName() %>" class="check funcFrameworkChk" 
+												<%= checkedStr %> onclick="checkboxEvent($('#checkAllFuncFrameworks'), 'funcFrameworkChk')"><%= functionalFramework.getDisplayName() %> 
+										</li>
+							<%
+									}	
+								}
+							%>
+						</ul>
+					</div>
+				</div>
+				<span class="help-inline applyerror" id="funcFrameworksError"></span>
+			</div>
+		</div>
 	</div>
-
+	
 	<div class="bottom_button">
 		<%
 			String disabledClass = "btn-primary";
@@ -373,9 +417,8 @@
 				disabled = "disabled";
 			}
 		%>
-		<input type="button" id="" class="btn <%= disabledClass %>" <%= disabled %>
-			onclick="validate('<%= pageUrl %>', $('#formArcheTypeAdd'), $('#subcontainer'), '<%= progressTxt %>', $('.content_adder :input'));"
-			value='<%= buttonLbl %>'/>
+		<input type="button" id="" class="btn <%= disabledClass %>" <%= disabled %> value='<%= buttonLbl %>'
+			onclick="validate('<%= pageUrl %>', $('#formArcheTypeAdd'), $('#subcontainer'), '<%= progressTxt %>', $('.content_adder :input'));" />
 		
 		<input type="button" id="archetypeCancel" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>" 
             onclick="loadContent('archetypesList', $('#formArcheTypeAdd'), $('#subcontainer'));"/>
@@ -389,7 +432,7 @@
 	<input type="hidden" name="versioning" value="<%= versioning %>">
 	<input type="hidden" name="uploadPlugin" value="uploadPlugin">
 	<input type="hidden" name="archArchetypeId" value="<%= technology != null ? archArchetypeId : "" %>"/> 
-    <input type="hidden" name="archGroupId" value="<%= technology != null ? archGroupId : "" %>"/> 
+    <input type="hidden" name="archGroupId" value="<%= technology != null ? archGroupId : "" %>"/>
     <input type="hidden" name="archVersions" value="<%= technology != null ? archVersions : "" %>"/>
 </form>
 
