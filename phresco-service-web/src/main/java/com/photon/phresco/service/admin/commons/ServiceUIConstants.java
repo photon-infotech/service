@@ -209,6 +209,7 @@ public interface ServiceUIConstants {
      *****************************/ 
     String REQ_PERMISSIONS_LIST = "permissions";
     String REQ_PERMISSIONS_ID = "permissionId";
+    String REQ_SELECTED_PERMISSION_IDS = "permissionIds";
     
     
     /*****************************
@@ -259,10 +260,13 @@ public interface ServiceUIConstants {
 	String EXCEPTION_USERS_LIST = "excep.hdr.admin.user.list";
     
 	String EXCEPTION_ROLE_DELETE = "excep.hdr.admin.role.delete";
+	String EXCEPTION_ROLE_VALIDATE = "excep.hdr.admin.role.validate";
 	String EXCEPTION_ROLE_UPDATE = "excep.hdr.admin.role.update";
 	String EXCEPTION_ROLE_SAVE = "excep.hdr.admin.role.save";
 	String EXCEPTION_ROLE_EDIT = "excep.hdr.admin.role.edit";
 	String EXCEPTION_ROLE_LIST = "excep.hdr.admin.role.list";
+	String EXCEPTION_ROLE_ASSIGN_PERMISSION_POPUP = "excep.hdr.admin.role.assign.permission.popup";
+	String EXCEPTION_ROLE_ASSIGN_PERMISSION = "excep.hdr.admin.role.assign.permission";
 	String EXCEPTION_ASSIGN_ROLE_TO_USER= "excep.hdr.admin.assign.role.to.user";
 	
 	String EXCEPTION_PERMISSION_LIST = "excep.hdr.admin.asgnprm.list";
@@ -446,10 +450,12 @@ public interface ServiceUIConstants {
     String PERMISSION_NOT_DELETED = "fail.permission.delete";
     
     String ROLE_ADDED = "succ.role.add";
+    String ROLE_UPDATED = "succ.role.update";
     String ROLE_NOT_ADDED = "fail.role.add";
     String ROLE_DELETED = "succ.role.delete";
     String ROLE_NOT_DELETED = "fail.role.delete" ;
-	String ROLE_ADDED_TO_USER = "succ.role.add.to.user";
+    String ROLE_ADDED_TO_USER = "succ.role.add.to.user";
+    String PERMISSION_ADDED_TO_ROLE = "succ.permission.add.to.role";
     
     String VIDEO_ADDED = "succ.vdeo.add";
     String VIDEO_DELETED = "succ.vdeo.delete";

@@ -25,7 +25,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Phresco</title>
+		<title>Helios</title>
 		<link REL="SHORTCUT ICON" HREF="images/favicon.ico">
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
@@ -79,7 +79,6 @@
 		
 			
 		<script type="text/javascript">
-			
 		    $(document).ready(function() {
 		    	enableScreen();
 		    	applyTheme();
@@ -144,7 +143,6 @@
 	    			$("#reportMsg").empty();
 		    	});
 			});
-		    
 		</script>
 	</head>
 	<body>
@@ -218,10 +216,7 @@
                             	<li id="themeContainer" class="theme_change"><a href="#">Themes</a>
                                 	<ul>
                                     	<li>Photon&nbsp;<a href="#" class="styles" href="#" rel="theme/photon/css/photon_theme.css"><img src="images/photon_theme.png"></a></li>
-                                        <li>Red-Blue&nbsp;
-                                            <a class="styles" href="#" rel="theme/red_blue/css/blue.css"><img src="images/blue_themer.jpg" class="skinImage"></a>
-											<a class="styles" href="#" rel="theme/red_blue/css/red.css"><img src="images/red_themer.jpg"></a>
-                                        </li>
+                                        
                                     </ul>
                                 </li>
                                 <li><a href="#" id="about" ><s:text name="lbl.usrset.abtservice"/></a></li>
@@ -332,7 +327,6 @@
 			<div class="modal-header">
 				<a class="close" data-dismiss="modal" >&times;</a>
 				<h3 id="popupTitle"><s:text name='lbl.progress'/></h3>
-				<img src="images/clipboard-copy.png" alt="clipboard" id="clipboard" class="close progressClipboard" title="Copy to clipboard"/>
 			</div>
 			<div class="modal-body" id="popupPage_modal-body">
 			</div>
@@ -340,7 +334,7 @@
 				<div class="errMsg" id="reportMsg"></div>
 				<div id="updateMsg" class="updateMsg"></div>
 				<a href="#" class="btn btn-primary" data-dismiss="modal" id="popupCancel"><s:text name='lbl.btn.cancel'/></a>
-				<input type="button" class="btn btn-primary popupOk" id="" onclick="popupOnOk(this);" value="<s:text name='lbl.btn.ok'/>">
+				<a href="#" class="btn btn-primary popupOk" id="" onclick="popupOnOk(this);"><s:text name='lbl.btn.ok'/></a>
 				<a href="#" class="btn btn-primary" data-dismiss="modal" id="popupClose"><s:text name='lbl.btn.close'/></a>
 			</div>
 		</div>

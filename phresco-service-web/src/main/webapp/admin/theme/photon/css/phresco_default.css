@@ -2478,16 +2478,6 @@ input[class="chkBox_config"] {
 	margin: 8px 18px;
 }
 
-#permissionList{
-	background:#727272;
-	cursor: default;
-}
-
-#lbl_hdr_adm_perms{
-	color :#000000;
-	cursor: default;
-}
-
 .padd{
 	color:#B94A48;
 	padding-left:76%;
@@ -2785,6 +2775,10 @@ td {
 	position: fixed;
 	text-align: left;
 	top: 155px;
+}
+
+.th-inner-permissions {
+	top: 121px;
 }
 
 input[type="checkbox"],input[type="radio"] {
@@ -4268,7 +4262,7 @@ h3 label {
 }
 
 select[class='sample'] {
-	height: 132px;
+	height: 255px;
 }
 
 .popup-button {
@@ -4969,16 +4963,6 @@ div[class *='syncTable'] {
 
 input[class="chkBox_config"] {
 	margin: 8px 18px;
-}
-
-#permissionList{
-	background:#727272;
-	cursor: default;
-}
-
-#lbl_hdr_adm_perms{
-	color :#000000;
-	cursor: default;
 }
 
 .padd{

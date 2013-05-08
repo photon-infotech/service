@@ -96,9 +96,12 @@ function loadJsonContent(url, jsonParam, containerTag, progressText) {
 	});	
 }
 
-function loadContent(pageUrl, form, tag, additionalParams, callSuccessEvent) {
-	if (tag != undefined && tag != "" && !isBlank(tag)) {
+function loadContent(pageUrl, form, tag, additionalParams, callSuccessEvent, callbackFunction, progressText) {
+	if (tag != undefined && tag != "" && !isBlank(tag) && progressText == undefined  && isBlank(progressText)) {
 		showLoadingIcon();
+	}
+	if (progressText !== undefined && !isBlank(progressText)) {
+		showProgressBar(progressText);
 	}
 	var params = "";
 	if (form != undefined && form != "" && !isBlank(form.serialize())) {
@@ -115,7 +118,8 @@ function loadContent(pageUrl, form, tag, additionalParams, callSuccessEvent) {
 		data : params,
 		type : "POST",
 		success : function(data) {
-			loadData(data, tag, pageUrl, callSuccessEvent);
+			hideProgressBar();
+			loadData(data, tag, pageUrl, callSuccessEvent, callbackFunction);
 		}
 	});
 }
@@ -167,14 +171,18 @@ function validate(pageUrl, form, tag, progressText, disabledDiv) {
 	});
 }
 
-function loadData(data, tag, pageUrl, callSuccessEvent) {
+function loadData(data, tag, pageUrl, callSuccessEvent, callbackFunction) {
 	//To load the login page if the user session is not available
 	if (data != undefined && data != "[object Object]" && data != "[object XMLDocument]" 
 		&& !isBlank(data) && data.indexOf("Remember me") >= 0) {
 		window.location.href = "logout.action";
 	} else {
 		if (callSuccessEvent != undefined && !isBlank(callSuccessEvent) && callSuccessEvent) {
-			successEvent(pageUrl, data);
+			if (callbackFunction != undefined && !isBlank(callbackFunction)) {
+				window[callbackFunction](data);
+			} else {
+				successEvent(pageUrl, data);
+			}
 		} else {
 			if (tag !== undefined && !isBlank(tag)) {
 				tag.empty();
@@ -573,7 +581,7 @@ function yesnoPopup(url, title, okUrl, okLabel, form, additionalParams) {
 	$('.popupOk, #popupCancel').show(); // show ok & cancel button
 	$(".popupOk").attr('id', okUrl); // popup action mapped to id
 	if (okLabel !== undefined && !isBlank(okLabel)) {
-		$('#' + okUrl).val(okLabel); // label for the ok button
+		$('#' + okUrl).text(okLabel); // label for the ok button
 	}
 	
 	var params = "";

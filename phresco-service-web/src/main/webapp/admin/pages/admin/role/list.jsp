@@ -33,10 +33,8 @@
 
 <form id="formRoleList"  class="form-horizontal customer_list">
 	<div class="operation" id="operation">
-		<%-- <input type="button" id="roleAdd" class="btn btn-primary" name="role_action" onclick="loadContent('roleAdd', '', $('#subcontainer'));" value="<s:text name='lbl.hdr.adm.rlelst.add'/>"/> --%>
-		<input type="button" id="roleAdd" class="btn btn-disabled" 
-	        name="role_action" disabled="disbaled" onclick="loadContent('roleAdd', $('#formRoleList'), $('#subcontainer'));" 
-            value="<s:text name='lbl.hdr.adm.rlelst.add'/>"/>
+		<input type="button" id="roleAdd" class="btn btn-primary" value="<s:text name='lbl.hdr.adm.rlelst.add'/>"
+	        name="role_action" onclick="loadContent('roleAdd', $('#formRoleList'), $('#subcontainer'));" />
 		
 		<input type="button" id="del" class="btn" disabled value="<s:text 
 	        name='lbl.btn.del'/>"  onclick="showDeleteConfirmation('<s:text name='del.confirm.roles'/>');"/>
@@ -82,77 +80,45 @@
 					</thead>
 		
 					<tbody>
-					    <% 
-					       if (CollectionUtils.isNotEmpty(roleLists)) { 
-					          for(Role roleList : roleLists) {
+					    <%
+							if (CollectionUtils.isNotEmpty(roleLists)) {
+								for (Role roleList : roleLists) {
 					    %>
-					 
-						<tr>
-							<td class="checkboxwidth">
-								<% if (roleList.isSystem()) { %>
-									<input type="checkbox" name="roleId" value="<%= roleList.getId() %>" disabled/>
-								<% } else { %>
-									<input type="checkbox" class="check roles" name="roleId"  value="<%= roleList.getId() %>" onclick="checkboxEvent($('#checkAllAuto'),'roles');">
-								<% } %>
-							</td>
-							<td  class="namelabel-width">
-								<%-- <a href="#" onclick="editRole('<%= roleList.getId() %>');"><%= StringUtils.isNotEmpty(roleList.getName()) ? roleList.getName() : "" %></a> --%>
-							    <%= StringUtils.isNotEmpty(roleList.getName()) ? roleList.getName() : "" %>  
-							</td>
-							<td class="namelabel-width"><%= StringUtils.isNotEmpty(roleList.getDescription()) ? roleList.getDescription() : "" %></td>
-							<td>
-								<a data-toggle="modal" href="#myModal"><input type="button" class="btn btn-disabled" value="Assign Permission"  disabled = "disabled"></a>
-							</td>
-						</tr>
-					<%
-						 	}
-						 }
-					%>
-				</tbody>
+								<tr>
+									<td class="checkboxwidth">
+										<% if (roleList.isSystem()) { %>
+											<input type="checkbox" name="roleId" value="<%= roleList.getId() %>" disabled/>
+										<% } else { %>
+											<input type="checkbox" class="check roles" name="roleId"  value="<%= roleList.getId() %>" onclick="checkboxEvent($('#checkAllAuto'),'roles');">
+										<% } %>
+									</td>
+									<td  class="namelabel-width">
+										<% if (roleList.isSystem()) { %>
+											<%= StringUtils.isNotEmpty(roleList.getName()) ? roleList.getName() : "" %>
+										<% } else { %>
+											<a href="#" onclick="editRole('<%= roleList.getId() %>');"><%= StringUtils.isNotEmpty(roleList.getName()) ? roleList.getName() : "" %></a>
+										<% } %>
+									</td>
+									<td class="namelabel-width"><%= StringUtils.isNotEmpty(roleList.getDescription()) ? roleList.getDescription() : "" %></td>
+									<td>
+										<%
+											String disabledStr = "";
+											String disabledClass = "btn-primary";
+											if (roleList.isSystem()) {
+												disabledStr = "disabled";
+												disabledClass = "btn-disabled";
+											}
+										%>
+										<input type="button" class="btn <%= disabledClass %>" value="Assign Permission" <%= disabledStr %> onclick="openAssignPerPopup('<%= roleList.getId() %>', '<%= roleList.getName() %>');">
+									</td>
+								</tr>
+						<%
+								}
+							}
+						%>
+					</tbody>
 			</table>
-				<div id="myModal" class="modal hide fade">
-					<div class="modal-header">
-					  <a class="close" data-dismiss="modal" >&times;</a>
-					  <h3><s:label key="lbl.hdr.adm.rlelst.asgnprm" theme="simple"/></h3>
-					</div>
-					<div class="modal-body">
-						<div class="popupbody">
-							<div class="popupusr"><s:label key="lbl.hdr.adm.rolename" cssClass="popuplabel" theme="simple"/></div> 
-							<div class="popupusr-name">Phresco Admin</div>
-						</div>
-						<div class="pouproles">
-							<div class="popuprls"><s:label key="lbl.hdr.adm.availperm" cssClass="popuplabel" theme="simple"/></div> 
-							<div class="popuprole-select"><s:label key="lbl.hdr.adm.selperm" cssClass="popuplabel" theme="simple"/></div>
-						</div>
-						<div class="popuplist">
-							<div class="popup-list">
-								<select names="permAvailable" class="sample" id="permAvailable" multiple="multiple">
-									<option value="Developer">View</option>
-									<option value="Testing">Update</option>
-									<option value="Macys">Create</option>
-								</select> 
-							</div>
-							
-							<div class="popup-button">
-								<div class="btnalign"><input type="button" class="btn sample" value=">" onclick="moveOptions(this.form.permAvailable, this.form.rolesSelected);"/></div>
-								<div class="btnalign"><input type="button" class="btn sample" value=">>" onclick="moveAllOptions(this.form.permAvailable, this.form.rolesSelected);"/></div>
-								<div class="btnalign"><input type="button" class="btn sample" value="<" onclick="moveOptions(this.form.rolesSelected, this.form.permAvailable);"/></div>
-								<div class="btnalign"><input type="button" class="btn sample" value="<<" onclick="moveAllOptions(this.form.rolesSelected, this.form.permAvailable);"/></div>
-							</div>
- 
-							<div  class="popupselect">
-								<select name="rolesSelected" class="sample" id="rolesSelected" multiple="multiple">
-								</select> 
-							</div>
-						</div>
-					</div>
-					<div class="modal-footer">
-					  <a href="#" class="btn btn-primary" data-dismiss="modal"><s:label key="lbl.btn.cancel" theme="simple"/></a>
-					  <a href="#" class="btn btn-primary" data-dismiss="modal" ><s:label key="lbl.btn.ok" theme="simple"/></a>
-					</div>
-				</div>
-				
-			</div>
+		</div>
 		</div>
 	</div>
 	<% } %>
@@ -257,4 +223,21 @@
     	hidePopup();
     	loadContent('roleDelete', $('#formRoleList'), $('#subcontainer'));
     }
+	
+	function openAssignPerPopup(roleId, roleName) {
+		var params = "roleId=";
+		params = params.concat(roleId);
+		params = params.concat("&name=");
+		params = params.concat(roleName);
+		yesnoPopup('showAssignPermPopup', "Assign Permission", 'assignPermission', 'OK', '', params);
+	}
+	
+	function popupOnOk(obj) {
+		var url = $(obj).attr("id");
+		if (url === "assignPermission") {
+			$('#selectedPermissions option').prop('selected', 'selected');
+			$('#popupPage').modal('hide');
+			loadContent('assignPermission', $('#formAssignPermission'), $('#subcontainer'));
+		}
+	}
 </script>

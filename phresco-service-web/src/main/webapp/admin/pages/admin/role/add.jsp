@@ -28,14 +28,14 @@
    String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
    
    //For edit
+   String id = "";
    String name = "";
    String description = "";
    String disabled = "";
    String disabledClass = "btn-primary";
    if (role != null) {
-	   if (StringUtils.isNotEmpty(role.getName())) {
-		   name = role.getName();
-	   }
+	   name = role.getName();
+	   id = role.getId();
 	   if (StringUtils.isNotEmpty(role.getDescription())) {
 		   description = role.getDescription();
 	   }
@@ -75,10 +75,10 @@
 	<div class="bottom_button">
 		<% if(StringUtils.isNotEmpty(fromPage)) { %>
 			<input type="button" id="roleUpdate" class="btn <%= disabledClass %>" <%= disabled %> value="<s:text name='lbl.btn.edit'/>"
-		 		onclick="validate('roleUpdate',$('#formRoleAdd'),$('#subcontainer'), '<s:text name='lbl.prog.role.update'/>');" />
+		 		onclick="validate('roleUpdate',$('#formRoleAdd'),$('#subcontainer'), '<s:text name='lbl.prog.txt.role.update'/>');" />
 		<% } else { %> 
 			<input type="button" id="roleSave" class="btn btn-primary" value="<s:text name='lbl.btn.add'/>"
-				onclick="validate('roleSave',$('#formRoleAdd'),$('#subcontainer'), '<s:text name='lbl.prog.role.save'/>');" />
+				onclick="validate('roleSave',$('#formRoleAdd'),$('#subcontainer'), '<s:text name='lbl.prog.txt.role.save'/>');" />
 		<% } %>
 		<input type="button" id="roleCancel" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>" 
 			onclick="loadContent('roleList', $('#formRoleAdd'), $('#subcontainer'));" />
@@ -86,8 +86,8 @@
 	
 	<!-- Hidden Fields -->
     <input type="hidden" name="fromPage" value="<%= StringUtils.isNotEmpty(fromPage) ? fromPage : "" %>"/>
-    <input type="hidden" name="roleId" value="<%= role != null ? role.getId() : "" %>"/>
-    <input type="hidden" name="oldName" value="<%= role != null ? role.getName() : "" %>"/>
+    <input type="hidden" name="roleId" value="<%= id %>"/>
+    <input type="hidden" name="oldName" value="<%= name %>"/>
 </form>
 
 <script type="text/javascript">

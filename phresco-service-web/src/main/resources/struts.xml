@@ -536,12 +536,12 @@
             <result type="json" />
         </action>
 		
-		<action name="assignPermission" class="com.photon.phresco.service.admin.actions.admin.Roles" method="assign">
+		<action name="showAssignPermPopup" class="com.photon.phresco.service.admin.actions.admin.Roles" method="showAssignPermPopup">
 			<result name="assignPermission">/admin/pages/admin/role/permission.jsp</result>
         </action>
 		
-		<action name="permissionSave" class="com.photon.phresco.service.admin.actions.admin.Roles" method="assignSave">
-			<result name="permissionSave">/admin/pages/admin/role/list.jsp</result>
+		<action name="assignPermission" class="com.photon.phresco.service.admin.actions.admin.Roles" method="assignPermission">
+			<result name="roleList">/admin/pages/admin/role/list.jsp</result>
         </action>
 		
 		<action name="permissionCancel" class="com.photon.phresco.service.admin.actions.admin.Roles" method="assignCancel">

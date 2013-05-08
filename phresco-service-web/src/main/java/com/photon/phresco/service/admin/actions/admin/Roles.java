@@ -21,14 +21,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.photon.phresco.commons.model.Permission;
 import com.photon.phresco.commons.model.Role;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
-import com.sun.jersey.api.client.ClientResponse;
+import com.photon.phresco.service.client.api.ServiceManager;
 
 public class Roles extends ServiceBaseAction { 
 	
@@ -48,6 +50,7 @@ public class Roles extends ServiceBaseAction {
 	private String fromPage = "";
 	
 	private String roleId = "";
+	private List<String> selectedPermissions = new ArrayList<String>();
 	
 	public String list() throws PhrescoException {
 		if (isDebugEnabled) {
@@ -92,23 +95,19 @@ public class Roles extends ServiceBaseAction {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Roles.save()");
 		}
-		
+
 		try  {
 			List<Role> roleList = new ArrayList<Role>();
 			Role role = new Role();
 			role.setName(getName());
 			role.setDescription(getDescription());
 			roleList.add(role);
-			ClientResponse clientResponse = getServiceManager().createRoles(roleList);
-			if (clientResponse.getStatus() != RES_CODE_200) {
-				addActionError(getText(ROLE_NOT_ADDED, Collections.singletonList(getName())));
-			} else {
-				addActionMessage(getText(ROLE_ADDED, Collections.singletonList(getName())));
-			}	
+			getServiceManager().createRoles(roleList);
+			addActionMessage(getText(ROLE_ADDED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
-		    return showErrorPopup(e, getText(EXCEPTION_ROLE_SAVE));
+			return showErrorPopup(e, getText(EXCEPTION_ROLE_SAVE));
 		}
-		
+
 		return  list();
 	}
 	
@@ -118,8 +117,12 @@ public class Roles extends ServiceBaseAction {
 	    }
  
 		try {
-			Role role = new Role(getRoleId(), getName(), getDescription());
+			Role role = new Role();
+			role.setId(getRoleId());
+			role.setName(getName());
+			role.setDescription(getDescription());
 			getServiceManager().updateRole(role, getRoleId());
+			addActionMessage(getText(ROLE_UPDATED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
 		    return showErrorPopup(e, getText(EXCEPTION_ROLE_UPDATE));
 		}
@@ -136,10 +139,7 @@ public class Roles extends ServiceBaseAction {
 			String[] roleIds = getHttpRequest().getParameterValues(REQ_ROLE_ID);
 			if (ArrayUtils.isNotEmpty(roleIds)) {
 				for (String roleid : roleIds) {
-					ClientResponse clientResponse = getServiceManager().deleteRole(roleid);
-					if (clientResponse.getStatus() != RES_CODE_200) {
-						addActionError(getText(ROLE_NOT_DELETED));
-					}
+					getServiceManager().deleteRole(roleid);
 				}
 				addActionMessage(getText(ROLE_DELETED));
 			}
@@ -152,38 +152,76 @@ public class Roles extends ServiceBaseAction {
 		
 	public String validateForm() {
 		if (isDebugEnabled) {
-            S_LOGGER.debug("Entering Method Roles.validateForm()");
-        }
-		
+			S_LOGGER.debug("Entering Method Roles.validateForm()");
+		}
+
 		boolean isError = false;
-		
-		//Empty validation for name
-		if (StringUtils.isEmpty(getName())) {
-			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY));
-			isError = true;
-		} 
-		
-		if (isError) {
-            setErrorFound(true);
-        }
+		try {
+			//Empty validation for name
+			if (StringUtils.isEmpty(getName())) {
+				setNameError(getText(KEY_I18N_ERR_NAME_EMPTY));
+				isError = true;
+			}
+			
+			//Duplicate validation for name
+			if (StringUtils.isNotEmpty(getName())) {
+				List<Role> roles = getServiceManager().getRoles();
+				if (CollectionUtils.isNotEmpty(roles)) {
+					for (Role role : roles) {
+						if (!getOldName().equalsIgnoreCase(getName()) && role.getName().equalsIgnoreCase(getName())) {
+							setNameError(getText(KEY_I18N_ERR_NAME_ALREADY_EXIST));
+							isError = true;
+							break;
+						}
+					}
+				}
+			}
+			if (isError) {
+				setErrorFound(true);
+			}
+		} catch (PhrescoException e) {
+			return showErrorPopup(e, getText(EXCEPTION_ROLE_VALIDATE));
+		}
 		
 		return SUCCESS;
 	}
 	
-	public String assign() {
+	public String showAssignPermPopup() {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method RolesList.assign()");
+			S_LOGGER.debug("Entering Method RolesList.showAssignPermPopup()");
+		}
+		
+		try {
+			setReqAttribute(REQ_ROLE_NAME, getName());
+			setReqAttribute(REQ_ROLE_ID, getRoleId());
+			ServiceManager serviceManager = getServiceManager();
+			Role role = serviceManager.getRole(getRoleId());
+			setReqAttribute(REQ_SELECTED_PERMISSION_IDS, role.getPermissionIds());
+			List<Permission> permissions = serviceManager.getPermissions();
+			setReqAttribute(REQ_PERMISSIONS_LIST, permissions);
+		} catch (PhrescoException e) {
+			return showErrorPopup(e, getText(EXCEPTION_ROLE_ASSIGN_PERMISSION_POPUP));
 		}
 		
 		return ADMIN_ROLE_ASSIGN;	
 	}
 	
-	public String assignSave() {
+	public String assignPermission() throws PhrescoException {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method RolesList.assignSave()");
+			S_LOGGER.debug("Entering Method RolesList.assignPermission()");
 		}
 		
-		return ADMIN_ROLE_ASSIGN_SAVE;	
+		try {
+			ServiceManager serviceManager = getServiceManager();
+			Role role = serviceManager.getRole(getRoleId());
+			role.setPermissionIds(getSelectedPermissions());
+			serviceManager.updateRole(role, getRoleId());
+			addActionMessage(getText(PERMISSION_ADDED_TO_ROLE, Collections.singletonList(role.getName())));
+		} catch (PhrescoException e) {
+			return showErrorPopup(e, getText(EXCEPTION_ROLE_ASSIGN_PERMISSION));
+		}
+		
+		return list();	
 	}
 	
 	public String assignCancel() {
@@ -248,5 +286,13 @@ public class Roles extends ServiceBaseAction {
 
 	public void setRoleId(String roleId) {
 		this.roleId = roleId;
+	}
+
+	public void setSelectedPermissions(List<String> selectedPermissions) {
+		this.selectedPermissions = selectedPermissions;
+	}
+
+	public List<String> getSelectedPermissions() {
+		return selectedPermissions;
 	}
 }
