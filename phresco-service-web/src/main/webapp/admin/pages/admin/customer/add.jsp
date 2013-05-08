@@ -573,7 +573,7 @@
 				<s:text name='lbl.hdr.adm.cust.Vlddatefrom'/>
 			</label>
 			<div class="controls">
-				<input id="fromdate" class="datealign" type="text" name="validFrom" 
+				<input id="fromdate" class="datealign" placeholder="<s:text name='place.hldr.cust.add.valid.date'/>" type="text" name="validFrom" 
 				   value="<%= validFrom != null ? validFrom : "" %>">
 			</div>
 		</div>
@@ -583,7 +583,7 @@
 					<s:text name='lbl.hdr.adm.cust.vlddateto'/>
 			</label>
 			<div class="controls">
-				<input id="todate" class="datealign" type="text" name="validUpTo" 
+				<input id="todate" class="datealign" placeholder="<s:text name='place.hldr.cust.add.valid.date'/>" type="text" name="validUpTo" 
 				    value="<%= validUpto != null ? validUpto : "" %>">
 			</div>
 		</div>
