@@ -218,7 +218,7 @@
 		   	 <div class="control-group" >
                 <label class="control-label labelbold"> <s:text name="lbl.hdr.download.download" /> </label>
 			       <div class="controls">
-						<a href="#" onclick="downloadFile();"><%= name %></a>
+						<a href="#" onclick="downloadFile();"><%= name %>-<%= downloadVersions %></a>
           		   </div>
 			 </div>
 		<% } %>	

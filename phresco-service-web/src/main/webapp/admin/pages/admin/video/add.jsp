@@ -40,11 +40,13 @@
 	String description = "";
 	String disabled = "";
 	String disabledClass = "btn-primary";
+	String version = "";
 	ArtifactGroup videoArtifact = null;
 	if (videoInfo != null) {
 		name = videoInfo.getName();
 		description = videoInfo.getDescription();
 		videoArtifact = videoInfo.getVideoList().get(0).getArtifactGroup();
+		version = videoInfo.getVideoList().get(0).getArtifactGroup().getVersions().get(0).getVersion();
        if (videoInfo.isSystem()) {
     	   disabledClass = "btn-disabled";
 		   disabled = "disabled";
@@ -99,7 +101,7 @@
 		   	 <div class="control-group" >
                <label class="control-label labelbold"> <s:text name="lbl.hdr.video.download" /> </label>
 			       <div class="controls">
-						<a href="#" onclick="downloadVideo();"><%= name %></a>
+						<a href="#" onclick="downloadVideo();"><%= name %>-<%= version %></a>
           		   </div>
         	 </div>
 		<% } %>	
@@ -135,6 +137,7 @@
 	<input type="hidden" name="fromPage" value="<%= StringUtils.isNotEmpty(fromPage) ? fromPage : "" %>"/>
 	<input type="hidden" name="videoId" value="<%=  videoInfo != null ?  videoInfo.getId() : "" %>"/>
 	<input type="hidden" name="videoArtiId" value="<%=  videoArtifact != null ?  videoArtifact.getId() : "" %>"/>
+	<input type="hidden" name="oldName" value="<%= name %>"/>
 </form>
 
 <script type="text/javascript">

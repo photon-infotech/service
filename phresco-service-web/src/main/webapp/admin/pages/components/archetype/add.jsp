@@ -226,7 +226,7 @@
 			<div class="control-group" >
 				<label class="control-label labelbold"> <s:text name="lbl.hdr.archetype.download" /> </label>
 		       	<div class="controls">
-					<a href="#" onclick="downloadFile();"><%= archArchetypeId %></a>
+					<a href="#" onclick="downloadFile();"><%= name %>-<%= archVersions %></a>
 				</div>
 			</div>
 		<% } %>	
