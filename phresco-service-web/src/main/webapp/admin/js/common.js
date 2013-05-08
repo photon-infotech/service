@@ -122,8 +122,9 @@ function loadContent(pageUrl, form, tag, additionalParams, callSuccessEvent) {
 
 function clickSave(pageUrl, params, tag, progressText) {
 	if (progressText !== undefined) {
+		hideLoadingIcon();
 		showProgressBar(progressText);
-	} 
+	}
 	$.ajax({
 		url : pageUrl,
 		data : params,
@@ -136,6 +137,9 @@ function clickSave(pageUrl, params, tag, progressText) {
 }
 
 function validate(pageUrl, form, tag, progressText, disabledDiv) {
+	if (pageUrl == 'downloadSave') {
+		showLoadingIcon();
+	}
 	if (disabledDiv != undefined && disabledDiv != "") {
 		enableDivCtrls(disabledDiv);
 	}
@@ -149,6 +153,7 @@ function validate(pageUrl, form, tag, progressText, disabledDiv) {
 		type : "POST",
 		success : function(data) {
 			if (data.errorFound != undefined && data.errorFound) {
+				hideLoadingIcon();
 				if (data.versioning == "versioning") {
 					disableCtrl(disabledDiv);
 					$(".upload").attr("disabled", false);

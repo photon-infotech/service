@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -62,6 +63,7 @@ public class Videos extends ServiceBaseAction {
 	private String fromPage = "";
 	private String extFileName="";	
 	private String videoUrl = "";
+	private String oldName = "";
 	private InputStream fileInputStream;
     private String contentType;
     private int contentLength;
@@ -305,7 +307,20 @@ public class Videos extends ServiceBaseAction {
 		if (StringUtils.isEmpty(getName())) {
 			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY ));
 			isError = true;
-		} 
+		} else if (StringUtils.isEmpty(getFromPage()) || (!getName().equals(getOldName()))) {
+			// to check duplication of name
+			List<VideoInfo> videoInfos = getServiceManager().getVideoInfos();
+			if (CollectionUtils.isNotEmpty(videoInfos)) {
+				for (VideoInfo videoInfo : videoInfos) {
+					if (videoInfo.getName().equalsIgnoreCase(getName())) {
+						setNameError(getText(KEY_I18N_ERR_NAME_ALREADY_EXIST));
+						isError = true;
+						break;
+					}
+				}
+			}
+		}
+		
 		//empty validation for fileupload
 		if (!EDIT.equals(getFromPage()) && videoByteArray == null) {
 			setVideoError(getText(KEY_I18N_ERR_VIDEO_EMPTY));
@@ -434,5 +449,13 @@ public class Videos extends ServiceBaseAction {
 
 	public void setContentLength(int contentLength) {
 		this.contentLength = contentLength;
+	}
+
+	public String getOldName() {
+		return oldName;
+	}
+
+	public void setOldName(String oldName) {
+		this.oldName = oldName;
 	}
 }

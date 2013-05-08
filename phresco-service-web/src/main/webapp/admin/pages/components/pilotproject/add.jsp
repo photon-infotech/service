@@ -52,6 +52,7 @@
     String artifactId = "";
     String pilotProjectName = "";
     String jarVersion = "";
+    String pilotProjectVersion = "";
     boolean isSystem = false;
     ArtifactGroup pilotContent = null;
     if (pilotProjectInfo != null) {
@@ -59,6 +60,7 @@
    		pilotProjectName = pilotProjectInfo.getName();
    		description = pilotProjectInfo.getDescription();
    		version = pilotProjectInfo.getVersion();
+   		pilotProjectVersion = pilotProjectInfo.getPilotContent().getVersions().get(0).getVersion();
     	isSystem = pilotProjectInfo.isSystem();
     	pilotContent = pilotProjectInfo.getPilotContent();
     }
@@ -176,7 +178,7 @@
 		   	 <div class="control-group" >
                 <label class="control-label labelbold"> <s:text name="lbl.hdr.pilotproject.download" /> </label>
 			      <div class="controls">
-						<a href="#" onclick="downloadFile();"><%= pilotProjectName %></a>
+						<a href="#" onclick="downloadFile();"><%= pilotProjectName %>-<%= pilotProjectVersion %></a>
           		   </div>
 			       
           		   </div>
