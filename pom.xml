@@ -33,7 +33,6 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
     </distributionManagement>
 
     <modules>
-		<module>phresco-ldap</module>
         <module>phresco-service</module>
         <module>phresco-service-impl</module>
         <module>phresco-service-web</module>
