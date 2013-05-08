@@ -392,7 +392,7 @@
 		   	 <div class="control-group" >
                <label class="control-label labelbold"> <s:text name="lbl.hdr.feature.download" /> </label>
 			       <div class="controls">
-						<a href="#" onclick="downloadFile();"><%= featureArtifactId %></a>
+						<a href="#" onclick="downloadFile();"><%= displayName %>-<%= featureVersions %></a>
           		   </div>
         	 </div>
 		<% } %>		
