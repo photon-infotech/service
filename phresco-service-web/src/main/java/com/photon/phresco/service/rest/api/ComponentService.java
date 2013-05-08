@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +53,8 @@ import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.DownloadInfo;
 import com.photon.phresco.commons.model.Element;
+import com.photon.phresco.commons.model.FunctionalFramework;
+import com.photon.phresco.commons.model.FunctionalFrameworkProperties;
 import com.photon.phresco.commons.model.License;
 import com.photon.phresco.commons.model.PlatformType;
 import com.photon.phresco.commons.model.Property;
@@ -2249,6 +2252,42 @@ public class ComponentService extends DbService {
 			return  Response.status(Response.Status.OK).entity(techOptions).build();
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, OPTIONS_COLLECTION_NAME);
+		}
+	}
+	
+	/**
+	 * Returns the list of Functional test frameworks
+	 * @return
+	 */
+	@GET
+	@Path (REST_API_OPTIONS_FUNCTIONAL)
+	@Produces (MediaType.APPLICATION_JSON)
+	public Response findFunctionalTestFrameworks(@QueryParam(REST_QUERY_TECHID) String techId, @QueryParam("name") String name) {
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Entered into ComponentService.findFunctionalTestFrameworks()");
+	    }
+		try {
+			if (StringUtils.isNotEmpty(techId) && StringUtils.isNotEmpty(name)) {
+				FunctionalFramework functionalFramework = mongoOperation.findOne(FUNCTIONAL_FRAMEWORK_COLLECTION_NAME, 
+						new Query(Criteria.where("name").is(name)), FunctionalFramework.class);
+				List<FunctionalFrameworkProperties> funcFrameworkProperties = functionalFramework.getFuncFrameworkProperties();
+				if (CollectionUtils.isNotEmpty(funcFrameworkProperties)) {
+					for (FunctionalFrameworkProperties functionalFrameworkProperties : funcFrameworkProperties) {
+						if (functionalFrameworkProperties.getTechId().equals(techId)) {
+							functionalFramework.setFuncFrameworkProperties(Collections.singletonList(functionalFrameworkProperties));
+							break;
+						}
+					}
+				}
+				return  Response.status(Response.Status.OK).entity(functionalFramework).build();
+			}
+			List<FunctionalFramework> options = mongoOperation.getCollection(FUNCTIONAL_FRAMEWORK_COLLECTION_NAME, FunctionalFramework.class);
+			if (CollectionUtils.isEmpty(options)) {
+				return  Response.status(Response.Status.NO_CONTENT).build();
+			}
+			return  Response.status(Response.Status.OK).entity(options).build();
+		} catch (Exception e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00005, FUNCTIONAL_FRAMEWORK_COLLECTION_NAME);
 		}
 	}
 	

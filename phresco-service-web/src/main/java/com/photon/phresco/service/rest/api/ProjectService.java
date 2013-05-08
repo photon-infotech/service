@@ -182,7 +182,7 @@ public class ProjectService {
 			} finally {
 				if (fis != null) {
 					fis.close();
-					FileUtils.deleteDirectory(path.getParentFile());
+//					FileUtils.deleteDirectory(path.getParentFile());
 				}
 			}
 		}
