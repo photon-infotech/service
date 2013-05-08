@@ -34,6 +34,7 @@ public class TechnologyDAO extends CustomerBaseDAO {
 	private String techGroupId;
 	private List<String> reports;
 	private List<String> archetypeFeatures; 
+	private List<String> functionalFrameworks;
 	
 	public TechnologyDAO() {
 		super();
@@ -111,4 +112,11 @@ public class TechnologyDAO extends CustomerBaseDAO {
 		return archetypeFeatures;
 	}
 
+	public void setFunctionalFrameworks(List<String> functionalFrameworks) {
+		this.functionalFrameworks = functionalFrameworks;
+	}
+
+	public List<String> getFunctionalFrameworks() {
+		return functionalFrameworks;
+	}
 }
