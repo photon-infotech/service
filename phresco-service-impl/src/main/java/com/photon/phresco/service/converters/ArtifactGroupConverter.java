@@ -27,6 +27,7 @@ import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Order;
 import org.springframework.data.document.mongodb.query.Query;
 
+import com.photon.phresco.commons.model.ArtifactElement;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.Customer;
@@ -48,17 +49,13 @@ public class ArtifactGroupConverter implements Converter<ArtifactGroupDAO, Artif
         artifactGroup.setArtifactId(artifactGroupDAO.getArtifactId());
         artifactGroup.setClassifier(artifactGroupDAO.getClassifier());
         artifactGroup.setCustomerIds(artifactGroupDAO.getCustomerIds());
-        artifactGroup.setDescription(artifactGroupDAO.getDescription());
         artifactGroup.setGroupId(artifactGroupDAO.getGroupId());
-        artifactGroup.setHelpText(artifactGroupDAO.getHelpText());
         artifactGroup.setId(artifactGroupDAO.getId());
         artifactGroup.setImageURL(artifactGroupDAO.getImageURL());
         artifactGroup.setName(artifactGroupDAO.getName());
         artifactGroup.setPackaging(artifactGroupDAO.getPackaging());
-        artifactGroup.setSystem(artifactGroupDAO.isSystem());
         artifactGroup.setType(artifactGroupDAO.getType());
         artifactGroup.setUsed(artifactGroupDAO.isUsed());
-        artifactGroup.setAppliesTo(artifactGroupDAO.getAppliesTo());
         artifactGroup.setDisplayName(artifactGroupDAO.getDisplayName());
         Query query = new Query(Criteria.where(DB_COLUMN_ARTIFACT_GROUP_ID).is(artifactGroupDAO.getId()));
         query.sort().on(DB_COLUMN_CREATIONDATE, Order.DESCENDING);
@@ -78,17 +75,17 @@ public class ArtifactGroupConverter implements Converter<ArtifactGroupDAO, Artif
         artifactGroupDAO.setArtifactId(artifactGroup.getArtifactId());
         artifactGroupDAO.setClassifier(artifactGroup.getClassifier());
         artifactGroupDAO.setCustomerIds(artifactGroup.getCustomerIds());
-        artifactGroupDAO.setDescription(artifactGroup.getDescription());
+//        artifactGroupDAO.setDescription(artifactGroup.getDescription());
         artifactGroupDAO.setGroupId(artifactGroup.getGroupId());
         artifactGroupDAO.setImageURL(artifactGroup.getImageURL());
         artifactGroupDAO.setName(artifactGroup.getName());
         artifactGroupDAO.setPackaging(artifactGroup.getPackaging());
-        artifactGroupDAO.setSystem(artifactGroup.isSystem());
+//        artifactGroupDAO.setSystem(artifactGroup.isSystem());
         artifactGroupDAO.setType(artifactGroup.getType());
         artifactGroupDAO.setUsed(artifactGroup.isUsed());
         artifactGroupDAO.setAppliesTo(artifactGroup.getAppliesTo());
-        artifactGroupDAO.setHelpText(artifactGroup.getHelpText());
-        artifactGroupDAO.setLicenseId(artifactGroup.getLicenseId());
+//        artifactGroupDAO.setHelpText(artifactGroup.getHelpText());
+//        artifactGroupDAO.setLicenseId(artifactGroup.getLicenseId());
         artifactGroupDAO.setDisplayName(artifactGroup.getDisplayName());
         return artifactGroupDAO;
     }

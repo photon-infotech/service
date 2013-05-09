@@ -49,6 +49,7 @@ import org.springframework.stereotype.Component;
 
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ApplicationType;
+import com.photon.phresco.commons.model.ArtifactElement;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.DownloadInfo;
@@ -914,10 +915,11 @@ public class ComponentService extends DbService {
 			}
 			List<ArtifactGroupDAO> artifactGroupDAOs = mongoOperation.find(ARTIFACT_GROUP_COLLECTION_NAME,
 					query, ArtifactGroupDAO.class);
-		    List<ArtifactGroup> modules = convertDAOToModule(artifactGroupDAOs);
-		    if(CollectionUtils.isEmpty(modules)) {
+			if(CollectionUtils.isEmpty(artifactGroupDAOs)) {
 		    	return Response.status(Response.Status.NO_CONTENT).build();
 		    }
+		    List<ArtifactGroup> modules = convertDAOToModule(artifactGroupDAOs);
+		    
 		    ResponseBuilder response = Response.status(Response.Status.OK);
 		    response.header(Constants.ARTIFACT_COUNT_RESULT, count(ARTIFACT_GROUP_COLLECTION_NAME, query));
 			return response.entity(modules).build();
@@ -928,12 +930,21 @@ public class ComponentService extends DbService {
 
 	}
 	
-	private List<ArtifactGroup> convertDAOToModule(List<ArtifactGroupDAO> moduleDAOs) throws PhrescoException {
+    private List<ArtifactGroup> convertDAOToModule(List<ArtifactGroupDAO> moduleDAOs) throws PhrescoException {
 		Converter<ArtifactGroupDAO, ArtifactGroup> artifactConverter = 
             (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
 	    List<ArtifactGroup> modules = new ArrayList<ArtifactGroup>();
 	    for (ArtifactGroupDAO artifactGroupDAO : moduleDAOs) {
 			ArtifactGroup artifactGroup = artifactConverter.convertDAOToObject(artifactGroupDAO, mongoOperation);
+			ArtifactElement artifactElement = mongoOperation.findOne(ARTIFACT_ELEMENT_COLLECTION_NAME, 
+					new Query(Criteria.whereId().is(artifactGroupDAO.getId())), ArtifactElement.class);
+		    if(artifactElement != null) {
+		    	artifactGroup.setDescription(artifactElement.getDescription());
+		    	artifactGroup.setHelpText(artifactElement.getHelpText());
+		    	artifactGroup.setSystem(artifactElement.isSystem());
+		    	artifactGroup.setLicenseId(artifactElement.getLicenseId());
+		    	artifactGroup.setCreationDate(artifactElement.getCreationDate());
+		    }
 			modules.add(artifactGroup);
 		}
         return modules;
@@ -1057,9 +1068,21 @@ public class ComponentService extends DbService {
                 mongoOperation.save(ARTIFACT_INFO_COLLECTION_NAME, newVersion);
         }
         moduleGroupDAO.setVersionIds(versionIds);
+        mongoOperation.save("artifactElement", createArtifactElement(moduleGroup));
         mongoOperation.save(ARTIFACT_GROUP_COLLECTION_NAME, moduleGroupDAO);
     }
-
+	
+	private ArtifactElement createArtifactElement(ArtifactGroup artifactGroup) {
+		ArtifactElement artifactElement = new ArtifactElement();
+		artifactElement.setId(artifactGroup.getId());
+		artifactElement.setArtifactGroupId(artifactGroup.getId());
+		artifactElement.setHelpText(artifactGroup.getHelpText());
+		artifactElement.setDescription(artifactGroup.getDescription());
+		artifactElement.setCreationDate(artifactGroup.getCreationDate());
+		artifactElement.setSystem(artifactGroup.isSystem());
+		return artifactElement;
+	}
+	
 	private String checkVersionAvailable(List<com.photon.phresco.commons.model.ArtifactInfo> info, String version) {
 		for (com.photon.phresco.commons.model.ArtifactInfo artifactInfo : info) {
 			if(artifactInfo.getVersion().equals(version)) {
@@ -1124,6 +1147,15 @@ public class ComponentService extends DbService {
 		        Converter<ArtifactGroupDAO, ArtifactGroup> converter = 
 		            (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
 		        ArtifactGroup moduleGroup = converter.convertDAOToObject(moduleDAO, mongoOperation);
+		        ArtifactElement artifactElement = mongoOperation.findOne("artifactElement", 
+						new Query(Criteria.whereId().is(moduleGroup.getId())), ArtifactElement.class);
+			    if(artifactElement != null) {
+			    	moduleGroup.setDescription(artifactElement.getDescription());
+			    	moduleGroup.setHelpText(artifactElement.getHelpText());
+			    	moduleGroup.setSystem(artifactElement.isSystem());
+			    	moduleGroup.setLicenseId(artifactElement.getLicenseId());
+			    	moduleGroup.setCreationDate(artifactElement.getCreationDate());
+			    }
 				return  Response.status(Response.Status.OK).entity(moduleGroup).build();
 			}
 		} catch (Exception e) {
