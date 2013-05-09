@@ -266,8 +266,8 @@ public class DbService implements ServiceConstants {
 					List<TechnologyGroup> technologyGroups = createTechnologyInfo(technologies);
 					Map<String, List<TechnologyGroup>> appTypeMap = new HashMap<String, List<TechnologyGroup>>();
 					createAppTypeMap(technologyGroups, appTypeMap);
-					List<ApplicationType> applicationTypes = createApplicationTypes(appTypeMap);
-					customer.setApplicableAppTypes(applicationTypes);
+//					List<ApplicationType> applicationTypes = createApplicationTypes(appTypeMap);
+//					customer.setApplicableAppTypes(applicationTypes);
 					customers.add(customer);
 				}
     			return customers;
@@ -278,6 +278,33 @@ public class DbService implements ServiceConstants {
 		return null;
 	}
 	
+	protected List<TechnologyGroup> getTechGroupByCustomer(String customerId, String appTypeId) throws PhrescoException {
+		List<String> applicableTechnologies = new ArrayList<String>();
+		CustomerDAO customer = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME, 
+				new Query(Criteria.whereId().is(customerId)), CustomerDAO.class);
+		List<String> customerApplicableTechnologies = customer.getApplicableTechnologies();
+		List<String> fromDB = getApplicableForomDB(customer.getId(), customerApplicableTechnologies);
+		if(CollectionUtils.isNotEmpty(customerApplicableTechnologies)) {
+			applicableTechnologies.addAll(customerApplicableTechnologies);
+		}
+		if(CollectionUtils.isNotEmpty(fromDB)) {
+			applicableTechnologies.addAll(fromDB);
+		}
+		List<Technology> technologies = createTechnology(applicableTechnologies);
+		List<TechnologyGroup> technologyGroups = createTechnologyInfo(technologies);
+		return createTechGroup(technologyGroups, appTypeId);
+	}
+	
+	private List<TechnologyGroup> createTechGroup(List<TechnologyGroup> technologyGroups, String appTypeId) {
+		List<TechnologyGroup> groups = new ArrayList<TechnologyGroup>();
+		for (TechnologyGroup technologyGroup : technologyGroups) {
+			if(technologyGroup.getAppTypeId().equals(appTypeId)) {
+				groups.add(technologyGroup);
+			}
+		}
+		return groups;
+	}
+
 	private List<String> getApplicableForomDB(String customerId, List<String> applicableTechnologies) {
 		List<String> techIds = new ArrayList<String>();
 		List<TechnologyDAO> techs = mongoOperation.find(TECHNOLOGIES_COLLECTION_NAME, 

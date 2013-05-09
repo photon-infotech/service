@@ -100,12 +100,26 @@ public class AdminService extends DbService {
     @GET
     @Path (REST_API_CUSTOMERS)
     @Produces (MediaType.APPLICATION_JSON)
-    public Response findCustomer() {
+    public Response findCustomer(@QueryParam("customerName") String customerName) {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.findCustomer()");
         }
-        List<Customer> customers = findCustomersFromDB();
-    	return Response.status(Response.Status.OK).entity(customers).build();
+        try {
+			if(StringUtils.isNotEmpty(customerName)) {
+				CustomerDAO customer = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME, 
+				        new Query(Criteria.where("name").is(customerName)), CustomerDAO.class);
+				if (customer != null) {
+					Converter<CustomerDAO, Customer> customerConverter = 
+						(Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
+					Customer customerInfo = customerConverter.convertDAOToObject(customer, mongoOperation);
+					return Response.status(Response.Status.OK).entity(customerInfo).build();
+				}
+			}
+			List<Customer> customers = findCustomersFromDB();
+			return Response.status(Response.Status.OK).entity(customers).build();
+		} catch (PhrescoException e) {
+			throw new PhrescoWebServiceException(e, EX_PHEX00005, CUSTOMERS_COLLECTION_NAME);
+		}
     }
     
     /**
