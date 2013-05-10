@@ -20,10 +20,7 @@ package com.photon.phresco.service.converters;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.document.mongodb.MongoOperations;
-import org.springframework.data.document.mongodb.query.Criteria;
-import org.springframework.data.document.mongodb.query.Query;
 
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.TechnologyGroup;
@@ -42,11 +39,11 @@ public class ApplicationTypeConverter implements Converter<ApplicationTypeDAO, A
 		applicationType.setName(applicationTypeDAO.getName());
 		applicationType.setSystem(applicationTypeDAO.isSystem());
 		applicationType.setDescription(applicationTypeDAO.getDescription());
-		if(CollectionUtils.isNotEmpty(applicationTypeDAO.getTechGroupIds())) {
-			List<TechnologyGroup> techGroups = mongoOperation.find(TECH_GROUP_COLLECTION_NAME, 
-					new Query(Criteria.whereId().in(applicationTypeDAO.getTechGroupIds().toArray())), TechnologyGroup.class);
-			applicationType.setTechGroups(techGroups);
-		}
+//		if(CollectionUtils.isNotEmpty(applicationTypeDAO.getTechGroupIds())) {
+//			List<TechnologyGroup> techGroups = mongoOperation.find(TECH_GROUP_COLLECTION_NAME, 
+//					new Query(Criteria.whereId().in(applicationTypeDAO.getTechGroupIds().toArray())), TechnologyGroup.class);
+//			applicationType.setTechGroups(techGroups);
+//		}
 		applicationType.setCustomerIds(applicationTypeDAO.getCustomerIds());
 		return applicationType;
 	}

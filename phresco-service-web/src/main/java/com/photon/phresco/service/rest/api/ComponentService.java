@@ -113,7 +113,7 @@ public class ComponentService extends DbService {
 	@GET
 	@Path (REST_API_APPTYPES)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findAppTypes() throws PhrescoException {
+	public Response findAppTypes(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) throws PhrescoException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.findAppTypes()");
 	    }
@@ -121,10 +121,16 @@ public class ComponentService extends DbService {
 			List<ApplicationType> applicationTypes = new ArrayList<ApplicationType>();
 //			Query query = createCustomerIdQuery(DEFAULT_CUSTOMER_NAME);
 			List<ApplicationTypeDAO> applicationTypeDAOs = mongoOperation.getCollection(APPTYPES_COLLECTION_NAME, ApplicationTypeDAO.class);
+			
 			Converter<ApplicationTypeDAO, ApplicationType> converter = (Converter<ApplicationTypeDAO, ApplicationType>) 
 				ConvertersFactory.getConverter(ApplicationTypeDAO.class);
 			for (ApplicationTypeDAO applicationTypeDAO : applicationTypeDAOs) {
-				applicationTypes.add(converter.convertDAOToObject(applicationTypeDAO, mongoOperation));
+				ApplicationType convertDAOToObject = converter.convertDAOToObject(applicationTypeDAO, mongoOperation);
+				if(StringUtils.isNotEmpty(customerId)) {
+					List<TechnologyGroup> techGroupByCustomer = getTechGroupByCustomer(customerId, applicationTypeDAO.getId());
+					convertDAOToObject.setTechGroups(techGroupByCustomer);
+					applicationTypes.add(convertDAOToObject);
+				}
 			}
 			if(CollectionUtils.isEmpty(applicationTypes)) {
 				return Response.status(Response.Status.NO_CONTENT).build();
