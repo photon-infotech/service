@@ -466,7 +466,7 @@
 	  	var status = jsonObj.required;
 	  	var img = "";
 	  	if (status == "true") {
-			img = "<img src='images/success.png' title='Failure'>"; 
+			img = "<img src='images/success.png' title='Success'>"; 
 	  	} else if (status == "false") {
  			img = "<img src='images/smalldelete.png' title='Failure'>";
 		}
