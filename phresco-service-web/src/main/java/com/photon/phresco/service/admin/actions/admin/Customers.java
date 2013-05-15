@@ -106,6 +106,8 @@ public class Customers extends ServiceBaseAction  {
 	private String snapshotRepoUrl = "";
 	private String groupRepoUrl = "";
 	private String baseRepoUrl = "";
+	private String loginlogo = "";
+	private String logopadding = "";
 	private List<String> appliesTo = new ArrayList<String>();
 	List<ApplicationType> applicableAppTypes = new ArrayList<ApplicationType>();
 	
@@ -337,8 +339,10 @@ public class Customers extends ServiceBaseAction  {
 	        frameworkTheme.put(MENU_FONT_COLOR, getMenufontColor());
 	        frameworkTheme.put(MENU_BACKGROUND_COLOR, getMenuBackGround());
 	        frameworkTheme.put(SUB_MENU_BACKGROUND_COLOR, getSubMenuBackGround());
-	        frameworkTheme.put(COPYRIGHT, getCopyRight());
 	        frameworkTheme.put(DISABLED_LABEL_COLOR, getDisabledLabelColor());
+	        frameworkTheme.put(COPYRIGHT, getCopyRight());
+	        frameworkTheme.put(LOGIN_LOGO, getLoginlogo());
+	        frameworkTheme.put(LOGO_PADDING, getLogopadding());
 	        customer.setFrameworkTheme(frameworkTheme);
 	    } catch (Exception e) {
             throw new PhrescoException(e);
@@ -563,7 +567,23 @@ public class Customers extends ServiceBaseAction  {
 	public String getNameError() {
 		return nameError;
 	}
-	
+
+	public String getLoginlogo() {
+		return loginlogo;
+	}
+
+	public void setLoginlogo(String loginlogo) {
+		this.loginlogo = loginlogo;
+	}
+
+	public String getLogopadding() {
+		return logopadding;
+	}
+
+	public void setLogopadding(String logopadding) {
+		this.logopadding = logopadding;
+	}
+
 	public void setNameError(String nameError) {
 		this.nameError = nameError;
 	}

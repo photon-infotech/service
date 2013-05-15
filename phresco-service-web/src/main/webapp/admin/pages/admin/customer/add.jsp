@@ -85,6 +85,8 @@
 	String disabledLabelColor = "";
 	String copyRightColor = "";
 	String copyRight = "";
+	String loginlogo = "";
+	String logopadding = "";
 	
 	List<String> applicableTechnologies = new ArrayList();
 	List<ApplicationType> applicableAppTypes = null;
@@ -167,6 +169,8 @@
 			disabledLabelColor = frameworkTheme.get("DisabledLabelColor");
 			copyRightColor = frameworkTheme.get("CopyRightColor");
 			copyRight = frameworkTheme.get("CopyRight");
+			loginlogo = frameworkTheme.get("loginlogo");
+			logopadding = frameworkTheme.get("logopadding");
 		}
 		
 		if (StringUtils.isNotEmpty(customer.getRepoInfo().getRepoName())) {
@@ -725,7 +729,7 @@
 									name='lbl.hdr.adm.cust.brandingcolor' /> </label>
 							<div class="controls">
 								<input id="brandcolor" placeholder="<s:text name='place.hldr.cust.add.brandingcolor'/>"class="input-xlarge" type="text" name="brandingColor"
-									value="<%= brandingColor %>" maxlength="50" title="50 Characters only">
+									value="<%= brandingColor %>" maxlength="50" title="Color Hashcode eg: #FFFFFF">
 							</div>
 						</div>
 						<div class="control-group">
@@ -734,7 +738,7 @@
 							</label>
 							<div class="controls">
 								<input id="backgroundcolor" placeholder="<s:text name='place.hldr.cust.add.backgroundcolor'/>" class="input-xlarge" type="text" name="bodyBackGroundColor"
-								   value="<%=bodyBackGroundColor%>"  maxlength="50" title="50 Characters only">
+								   value="<%=bodyBackGroundColor%>"  maxlength="50" title="Color Hashcode eg: #FFFFFF">
 							</div>
 						</div>
 						
@@ -744,7 +748,7 @@
 							</label>
 							<div class="controls">
 								<input id="accordionbackcolor" placeholder="<s:text name='place.hldr.cust.add.accordionbackgroundcolor'/>" class="input-xlarge" type="text" name="accordionBackGroundColor"
-								   value="<%=accordionBackGroundColor%>"  maxlength="50" title="50 Characters only">
+								   value="<%=accordionBackGroundColor%>"  maxlength="50" title="Color Hashcode eg: #FFFFFF">
 							</div>
 						</div>
 						
@@ -754,7 +758,7 @@
 							</label>
 							<div class="controls">
 								<input id="labelcolor" placeholder="<s:text name='place.hldr.cust.add.menubackgroundcolor'/>" class="input-xlarge" type="text" name="MenuBackGround"
-								   value="<%=menuBackGround%>"  maxlength="50" title="50 Characters only">
+								   value="<%=menuBackGround%>"  maxlength="50" title="Color Hashcode eg: #FFFFFF">
 							</div>
 						</div>
 						
@@ -765,7 +769,7 @@
 							</label>
 							<div class="controls">
 								<input id="menufontcolor" placeholder="<s:text name='place.hldr.cust.add.menufontcolor'/>" class="input-xlarge" type="text" name="MenufontColor"
-								   value="<%=menufontColor%>"  maxlength="50" title="50 Characters only">
+								   value="<%=menufontColor%>"  maxlength="50" title="Color Hashcode eg: #FFFFFF">
 							</div>
 						</div>
 						
@@ -775,7 +779,7 @@
 							</label>
 							<div class="controls">
 								<input id="buttoncolor" placeholder="<s:text name='place.hldr.cust.add.buttoncolor'/>" class="input-xlarge" type="text" name="ButtonColor"
-								   value="<%=buttonColor%>"  maxlength="50" title="50 Characters only">
+								   value="<%=buttonColor%>"  maxlength="50" title="Color Hashcode eg: #FFFFFF">
 							</div>
 						</div>
 						
@@ -785,7 +789,7 @@
 							</label>
 							<div class="controls">
 								<input id="pageheadercolor" placeholder="<s:text name='place.hldr.cust.add.pageHeadercolor'/>" class="input-xlarge" type="text" name="PageHeaderColor"
-								   value="<%= pageHeaderColor%>"  maxlength="50" title="50 Characters only">
+								   value="<%= pageHeaderColor%>"  maxlength="50" title="Color Hashcode eg: #FFFFFF">
 							</div>
 						</div>
 						
@@ -795,7 +799,7 @@
 							</label>
 							<div class="controls">
 								<input id="labelcolor" placeholder="<s:text name='place.hldr.cust.add.labelcolor'/>" class="input-xlarge" type="text" name="LabelColor"
-								   value="<%=labelColor%>"  maxlength="50" title="50 Characters only">
+								   value="<%=labelColor%>"  maxlength="50" title="Color Hashcode eg: #FFFFFF">
 							</div>
 						</div>
 						
@@ -805,7 +809,7 @@
 							</label>
 							<div class="controls">
 								<input id="labelcolor" placeholder="<s:text name='place.hldr.cust.add.disabledlabelcolor'/>" class="input-xlarge" type="text" name="DisabledLabelColor"
-								   value="<%=disabledLabelColor%>"  maxlength="50" title="50 Characters only">
+								   value="<%=disabledLabelColor%>"  maxlength="50" title="Color Hashcode eg: #FFFFFF">
 							</div>
 						</div>
 						
@@ -815,7 +819,7 @@
 							</label>
 							<div class="controls">
 								<input id="labelcolor" placeholder="<s:text name='place.hldr.cust.add.submenu.backgroundcolor'/>" class="input-xlarge" type="text" name="SubMenuBackGround"
-								   value="<%= subMenuBackGround %>"  maxlength="50" title="50 Characters only">
+								   value="<%= subMenuBackGround %>"  maxlength="50" title="Color Hashcode eg: #FFFFFF">
 							</div>
 						</div>
 						
@@ -825,7 +829,7 @@
 							</label>
 							<div class="controls">
 								<input id="copyrightcolor" placeholder="<s:text name='place.hldr.cust.add.copyrightcolor'/>" class="input-xlarge" type="text" name="CopyRightColor"
-								   value="<%=copyRightColor%>"  maxlength="50" title="50 Characters only">
+								   value="<%=copyRightColor%>"  maxlength="50" title="Color Hashcode eg: #FFFFFF">
 							</div>
 						</div>
 						
@@ -836,10 +840,29 @@
 							</label>
 							<div class="controls">
 								<input id="copyright" placeholder="<s:text name='place.hldr.cust.add.copyright'/>" class="input-xlarge" type="text" name="CopyRight"
-								   value="<%=copyRight%>"  maxlength="50" title="50 Characters only">
+								   value="<%=copyRight%>"  maxlength="50" title="Enter the copyright  ">
 							</div>
 						</div>
 						
+						<div class="control-group">
+							<label class="control-label labelbold">
+								<s:text name='lbl.hdr.adm.cust.margintop'/>
+							</label>
+							<div class="controls">
+								<input id="copyright" placeholder="<s:text name='place.hldr.cust.add.loginlogo'/>" class="input-xlarge" type="text" name="loginlogo"
+								   value="<%=loginlogo%>"  maxlength="50" title="In pixels eg: 10px">
+							</div>
+						</div>
+						
+						<div class="control-group">
+							<label class="control-label labelbold">
+								<s:text name='lbl.hdr.adm.cust.paddingtop'/>
+							</label>
+							<div class="controls">
+								<input id="copyright" placeholder="<s:text name='place.hldr.cust.add.logopadding'/>" class="input-xlarge" type="text" name="logopadding"
+								   value="<%=logopadding%>"  maxlength="50" title="In pixels eg: 10px">
+							</div>
+						</div>
 						
 						
 						<div class="control-group" id="iconControl">
