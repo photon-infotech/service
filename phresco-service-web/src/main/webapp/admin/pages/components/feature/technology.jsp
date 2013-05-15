@@ -76,7 +76,7 @@
 				</div>
 				
 				<div class="featurelist_tech">
-					<s:text name='lbl.comp.featr.technology'/>
+					<span><s:text name='lbl.comp.featr.technology'/></span>
 					<select name="" id="tech_id">
 						<%
 							if (CollectionUtils.isNotEmpty(technologies)) {
