@@ -17,6 +17,9 @@
  */
 package com.photon.phresco.service.rest.api;
 
+import java.util.Arrays;
+import java.util.Date;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -26,6 +29,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import com.photon.phresco.commons.model.User;
+import com.photon.phresco.commons.model.User.AuthType;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.exception.PhrescoWebServiceException;
 import com.photon.phresco.service.api.DbManager;
@@ -34,6 +38,7 @@ import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.impl.DbService;
 import com.photon.phresco.service.rest.util.AuthenticationUtil;
 import com.photon.phresco.service.util.ServerConstants;
+import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.Credentials;
 import com.photon.phresco.util.ServiceConstants;
 import com.sun.jersey.api.client.Client;
@@ -43,6 +48,9 @@ import com.sun.jersey.api.client.WebResource;
 
 @Path(ServiceConstants.REST_API_LOGIN)
 public class LoginService extends DbService {
+	
+	private final String SERVICE_VIEW_ROLE_ID = "4e8c0bed7-fb39-4erta-ae73-2d1286ae4ad0";
+	private final String FRAMEWORK_VIEW_ROLE_ID = "4e8c0bed7-fb39-4aea-ae73-2d1286ae4ad0";
 	
 	public LoginService() {
 		super();
@@ -102,6 +110,14 @@ public class LoginService extends DbService {
         user.setToken(createAuthToken(credentials.getUsername()));
         user.setPhrescoEnabled(true);
         user.setValidLogin(true);
+        user.setRoleIds(Arrays.asList(SERVICE_VIEW_ROLE_ID, FRAMEWORK_VIEW_ROLE_ID));
+        if(user != null) {
+        	user.setCreationDate(new Date());
+        	user.setPassword(ServerUtil.encodeUsingHash(credentials.getUsername(), 
+        			ServerUtil.decryptString(credentials.getPassword())));
+        	user.setAuthType(AuthType.LOCAL);
+        	mongoOperation.save(USERS_COLLECTION_NAME, user);
+        }
         user.setCustomers(findCustomersFromDB());
         return user;
 	}
