@@ -59,6 +59,14 @@
     		selectedTech = versionId.getAppliesTo();
    	 	}
     }
+	 
+	List<String> permissionIds = (List<String>) session.getAttribute(ServiceUIConstants.SESSION_PERMISSION_IDS);
+	String per_disabledStr = "";
+	String per_disabledClass = "btn-primary";
+	if (CollectionUtils.isNotEmpty(permissionIds) && !permissionIds.contains(ServiceUIConstants.PER_MANAGE_REUSABLE_COMPONENTS)) {
+		per_disabledStr = "disabled";
+		per_disabledClass = "btn-disabled";
+	}
   
   	//For edit
   	String moduleId = "";
@@ -170,8 +178,10 @@
 			disabled = "";
 			disabledClass = "btn-primary";
 		} else {
-			disabled = "disabled";
-			disabledClass = "btn-disabled";
+			if(isSystem) {
+				disabled = "disabled";
+				disabledClass = "btn-disabled";
+			}
 		}
 	}
 	//from page is not empty
@@ -400,7 +410,7 @@
 			</label>
 			<div class="controls">
 				<input type="button" class="btn <%= disabledClass %>" <%= disabled %> value="Select Dependency" onclick="getFeatures();" />
-				<span id="totalSize" style="color:white;"></span>
+				<span id="totalSize"></span>
 			</div>
 		</div>
 		
@@ -422,12 +432,11 @@
 	</div>
 	
 	<div class="bottom_button">
-     
-     		<input type="button" id="featuresUpdate" class="btn btn-primary" 
-						onclick="validate('<%= pageUrl %>', $('#formFeatureAdd'), $('#featureContainer'), '<%= progressTxt %>', $('.content_feature :input'));"
-						value="<%= buttonLbl %>"/>
-			<input type="button" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>"
-				onclick="loadContent('technologies', $('#formFeatureAdd'), $('#featureContainer'));" />
+   		<input type="button" id="featuresUpdate" class="btn <%= per_disabledClass %>" 
+			onclick="validate('<%= pageUrl %>', $('#formFeatureAdd'), $('#featureContainer'), '<%= progressTxt %>', $('.content_feature :input'));"
+			value="<%= buttonLbl %>" <%= per_disabledStr %>/>
+		<input type="button" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>"
+			onclick="loadTechnologies();" />
 	</div>
 	
 	<!-- Hidden Fields -->
@@ -527,6 +536,11 @@
 			}
 		});
 	});
+	
+	function loadTechnologies() {
+		showLoadingIcon();
+		loadContent('technologies', $('#formFeatureAdd'), $('#subcontainer'));
+	}
 
 	//To show the validation error
     function findError(data) {
@@ -652,12 +666,9 @@
 		jarError('', type);
 	}
 	
-	// to get the features to add the dependencies
+	//To get the features to add the dependencies
 	function getFeatures() {
-		$('#popup_div').empty();
-		$('#popup_div').show();
-		disableScreen();
-		loadContent('fetchFeaturesForDependency', $('#formFeatureAdd'), $('#popup_div'));
+		yesnoPopup("fetchFeaturesForDependency", '<s:text name="lbl.hdr.comp.featr.popup.title"/>', 'saveDependentFeatures', '<s:text name="lbl.btn.ok"/>', $('#formFeatureAdd'));
 	}
 	
 	function downloadFile() {

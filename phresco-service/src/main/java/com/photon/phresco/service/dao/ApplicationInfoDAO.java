@@ -45,7 +45,9 @@ public class ApplicationInfoDAO extends CustomerBaseDAO {
     private String artifactGroupId;
     private boolean phoneEnabled;
     private boolean tabletEnabled;
-    private boolean pilot;    
+    private boolean pilot;
+    private String functionalFramework;
+    
 	public String getCode() {
 		return code;
 	}
@@ -172,5 +174,13 @@ public class ApplicationInfoDAO extends CustomerBaseDAO {
 
 	public boolean getPilot() {
 		return pilot;
+	}
+	
+	public void setFunctionalFramework(String functionalFrameworkId) {
+		this.functionalFramework = functionalFrameworkId;
+	}
+
+	public String getFunctionalFramework() {
+		return functionalFramework;
 	}
 }

@@ -17,19 +17,28 @@
  */
 package com.photon.phresco.service.admin.actions;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.photon.phresco.commons.model.Customer;
+import com.photon.phresco.commons.model.Role;
 import com.photon.phresco.commons.model.User;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.exception.PhrescoWebServiceException;
+import com.photon.phresco.service.api.PhrescoServerFactory;
 
 public class Login extends ServiceBaseAction {
 
@@ -41,8 +50,16 @@ public class Login extends ServiceBaseAction {
 	private String username = null;
 	private String password = null;
 	private boolean loginFirst = true;
+	private String customerId = "";
 	
 	private String currentVersion = "";
+	
+	private String logoImgUrl = "";
+	private String copyRightColor = "";
+	private String copyRight = "";
+	
+	private static Map<String, String> s_encodeImgMap = new HashMap<String, String>();
+	private static Map<String, Map<String, String>> s_themeMap = new HashMap<String, Map<String, String>>();
 	
 	public String login() throws PhrescoException {
 	    if (isDebugEnabled) {
@@ -70,6 +87,7 @@ public class Login extends ServiceBaseAction {
 		}
 		
 		removeSessionAttribute(SESSION_USER_INFO);
+		removeSessionAttribute(SESSION_PERMISSION_IDS);
 		String errorTxt = (String) getSessionAttribute(REQ_LOGIN_ERROR);
 		if (StringUtils.isNotEmpty(errorTxt)) {
 			setReqAttribute(REQ_LOGIN_ERROR, getText(errorTxt));
@@ -79,6 +97,55 @@ public class Login extends ServiceBaseAction {
 		removeSessionAttribute(REQ_LOGIN_ERROR);
 		
         return SUCCESS;
+    }
+	
+	public String fetchLogoImgUrl() {
+    	InputStream fileInputStream = null;
+    	try {
+    		String encodeImg = s_encodeImgMap.get(getCustomerId());
+    		if (StringUtils.isEmpty(encodeImg)) {
+    			fileInputStream = getServiceManager().getIcon(getCustomerId());
+    			if(fileInputStream != null) {
+    				byte[] imgByte = null;
+        			imgByte = IOUtils.toByteArray(fileInputStream);
+        			byte[] encodedImage = Base64.encodeBase64(imgByte);
+        			encodeImg = new String(encodedImage);
+        			s_encodeImgMap.put(getCustomerId(), encodeImg);
+    			}
+    		}
+            setLogoImgUrl(encodeImg);
+            
+            Map<String, String> themeMap = s_themeMap.get(getCustomerId());
+            if (MapUtils.isEmpty(s_themeMap.get(getCustomerId()))) {
+            	User user = (User) getSessionAttribute(SESSION_USER_INFO);
+            	List<Customer> customers = user.getCustomers();
+            	for (Customer customer : customers) {
+            		if (customer.getId().equals(getCustomerId())) {
+            			themeMap = customer.getFrameworkTheme();
+            			s_themeMap.put(getCustomerId(), themeMap);
+            			break;
+            		}
+            	}
+            }
+            if (MapUtils.isNotEmpty(themeMap)) {
+            	setCopyRightColor(themeMap.get(COPYRIGHT_COLOR));
+            	setCopyRight(themeMap.get(COPYRIGHT));
+            }
+    	} catch (PhrescoException e) {
+    		
+    	} catch (IOException e) {
+    		
+		} finally {
+    		try {
+    			if (fileInputStream != null) {
+    				fileInputStream.close();
+    			}
+			} catch (IOException e) {
+				
+			}
+    	}
+    	
+    	return SUCCESS;
     }
 	
 	public String about() {
@@ -110,7 +177,7 @@ public class Login extends ServiceBaseAction {
 		
 		User user = null;
 		try {
-			user = doLogin(username, password);
+			user = doLogin(getUsername(), getPassword());
 			List<Customer> customers = user.getCustomers();
 			if (CollectionUtils.isNotEmpty(customers)) {
 				Collections.sort(customers, sortingCusNameInAlphaOrder());
@@ -127,14 +194,25 @@ public class Login extends ServiceBaseAction {
 				return LOGIN_FAILURE;
 			}
 			setSessionAttribute(SESSION_USER_INFO, user);
+			List<String> roleIds = user.getRoleIds();
+			if (CollectionUtils.isNotEmpty(roleIds)) {
+				List<String> permisionIds = new ArrayList<String>();
+				for (String roleId : roleIds) {
+					Role role = getServiceManager().getRole(roleId);
+					permisionIds.addAll(role.getPermissionIds());
+				}
+				setSessionAttribute(SESSION_PERMISSION_IDS, permisionIds);
+			}
 		} catch (PhrescoWebServiceException e) {
-			if(e.getResponse().getStatus() == 204) {
+			if (e.getResponse().getStatus() == 204) {
 				setReqAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_ERROR_LOGIN));
 				return LOGIN_FAILURE;
 			} else {
 				setReqAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_SERVER_DOWN));
 				return LOGIN_FAILURE;
 			}
+		} catch (PhrescoException e) {
+			// TODO Auto-generated catch block
 		} 
 			
 		return SUCCESS;
@@ -199,5 +277,37 @@ public class Login extends ServiceBaseAction {
 
 	public String getCurrentVersion() {
 		return currentVersion;
+	}
+	
+	public String getLogoImgUrl() {
+		return logoImgUrl;
+	}
+
+	public void setLogoImgUrl(String logoImgUrl) {
+		this.logoImgUrl = logoImgUrl;
+	}
+	
+	public String getCustomerId() {
+	    return customerId;
+	}
+
+	public void setCustomerId(String customerId) {
+	    this.customerId = customerId;
+	}
+
+	public void setCopyRightColor(String copyRightColor) {
+		this.copyRightColor = copyRightColor;
+	}
+
+	public String getCopyRightColor() {
+		return copyRightColor;
+	}
+
+	public void setCopyRight(String copyRight) {
+		this.copyRight = copyRight;
+	}
+
+	public String getCopyRight() {
+		return copyRight;
 	}
 }

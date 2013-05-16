@@ -30,23 +30,25 @@
 <%
 	List<SettingsTemplate> configTemplates = (List<SettingsTemplate>) request.getAttribute(ServiceUIConstants.REQ_CONFIG_TEMPLATES);
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
+	
+	List<String> permissionIds = (List<String>) session.getAttribute(ServiceUIConstants.SESSION_PERMISSION_IDS);
+	String per_disabledStr = "";
+	String per_disabledClass = "btn-primary";
+	if (CollectionUtils.isNotEmpty(permissionIds) && !permissionIds.contains(ServiceUIConstants.PER_MANAGE_CONFIG_TEMPLATES)) {
+		per_disabledStr = "disabled";
+		per_disabledClass = "btn-disabled";
+	}
 %>
 
 <form id="formConfigTempList" class="customer_list">
 	<div class="operation">
-		<input type="button" class="btn btn-primary" name="configTemplate_add" id="configtempAdd" 
-	         onclick="loadContent('configtempAdd', $('#formConfigTempList'), $('#subcontainer'));" 
-		         value="<s:text name='lbl.hdr.configtemp.add'/>"/>
+		<input type="button" class="btn <%= per_disabledClass %>" <%= per_disabledStr %> name="configTemplate_add" id="configtempAdd" 
+	         onclick="addConfigTemp();" value="<s:text name='lbl.hdr.configtemp.add'/>"/>
 		<input type="button" class="btn" id="del" disabled value="<s:text name='lbl.btn.del'/>"
 			onclick="showDeleteConfirmation('<s:text name='del.confirm.configurationTemplate'/>');"/>
 		<s:if test="hasActionMessages()">
 			<div class="alert alert-success alert-message" id="successmsg" >
 				<s:actionmessage />
-			</div>
-		</s:if>
-		<s:if test="hasActionErrors()">
-			<div class="alert alert-error"  id="errormsg">
-				<s:actionerror />
 			</div>
 		</s:if>
 	</div>
@@ -65,7 +67,7 @@
 								<tr>
 									<th class="first">
 										<div class="th-inner tablehead">
-											<input type="checkbox" value="" class=checkAll id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this,$('.configtempltes'), false);">
+											<input type="checkbox" value="" <%= per_disabledStr %> class=checkAll id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this,$('.configtempltes'), false);">
 										</div>
 									</th>
 									<th class="second">
@@ -97,10 +99,10 @@
 								 		<% 
 								 		if (configTemplate.isSystem()) { %>
 											<input type="checkbox" name="configId" value="<%= configTemplate.getId() %>" 
-											             onclick="checkboxEvent();" disabled/>
+												onclick="checkboxEvent();" disabled/>
 										<% } else { %>
-										<input type="checkbox" class="check configtempltes" name="configId" value="<%= configTemplate.getId() %>" 
-										                onclick="checkboxEvent($('#checkAllAuto'),'configtempltes');" />
+											<input type="checkbox" <%= per_disabledStr %> class="check configtempltes" name="configId" value="<%= configTemplate.getId() %>" 
+							                	onclick="checkboxEvent($('#checkAllAuto'),'configtempltes');" />
 										<% } %>
 										</td>
 										<td class="nameConfig">
@@ -147,7 +149,13 @@
 		
    	});
 	
+	function addConfigTemp() {
+		showLoadingIcon();
+		loadContent('configtempAdd', $('#formConfigTempList'), $('#subcontainer'));
+	}
+	
     function editConfigTemp(id) {
+    	showLoadingIcon();
 		var params = "configId=";
 		params = params.concat(id);
 		params = params.concat("&customerId=");

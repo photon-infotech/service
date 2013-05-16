@@ -19,32 +19,46 @@
 --%>
 <%@ taglib uri="/struts-tags" prefix="s" %>
 
+<%@ page import="java.util.List"%>
+
 <%@ page import="org.apache.commons.lang.StringUtils"%>
+<%@ page import="org.apache.commons.collections.CollectionUtils"%>
 
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
 <%@ page import="com.photon.phresco.commons.model.Role" %>
+
 <% 
-   Role role = (Role)request.getAttribute(ServiceUIConstants.REQ_ROLE_ROLE);  
-   String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
+   	Role role = (Role)request.getAttribute(ServiceUIConstants.REQ_ROLE_ROLE);  
+   	String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
+   	String appliesTo = (String) request.getAttribute(ServiceUIConstants.REQ_APPLIES_TO);
    
-   //For edit
-   String id = "";
-   String name = "";
-   String description = "";
-   String disabled = "";
-   String disabledClass = "btn-primary";
-   if (role != null) {
-	   name = role.getName();
-	   id = role.getId();
-	   if (StringUtils.isNotEmpty(role.getDescription())) {
-		   description = role.getDescription();
-	   }
-	   
-	   if(role.isSystem()) {
-		   disabledClass = "btn-disabled";
-		   disabled = "disabled";
-	   }
-   }
+   	List<String> permissionIds = (List<String>) session.getAttribute(ServiceUIConstants.SESSION_PERMISSION_IDS);
+	String per_disabledStr = "";
+	String per_disabledClass = "btn-primary";
+   
+	//For edit
+   	String id = "";
+   	String name = "";
+   	String description = "";
+   	String disabled = "";
+   	String disabledClass = "";
+   	if (role != null) {
+		name = role.getName();
+	   	id = role.getId();
+	   	if (StringUtils.isNotEmpty(role.getDescription())) {
+			description = role.getDescription();
+	   	}
+	   	if (CollectionUtils.isNotEmpty(permissionIds) && !permissionIds.contains(ServiceUIConstants.PER_MANAGE_ROLES)) {
+			per_disabledStr = "disabled";
+			per_disabledClass = "btn-disabled";
+		} else {
+			disabledClass = "btn-primary";
+		   	if (role.isSystem()) {
+				disabledClass = "btn-disabled";
+			   	disabled = "disabled";
+		   	}
+		}
+   	}
 %>
 
 <form id="formRoleAdd" class="form-horizontal customer_list">
@@ -74,26 +88,32 @@
 	
 	<div class="bottom_button">
 		<% if(StringUtils.isNotEmpty(fromPage)) { %>
-			<input type="button" id="roleUpdate" class="btn <%= disabledClass %>" <%= disabled %> value="<s:text name='lbl.btn.edit'/>"
-		 		onclick="validate('roleUpdate',$('#formRoleAdd'),$('#subcontainer'), '<s:text name='lbl.prog.txt.role.update'/>');" />
+			<input type="button" id="roleUpdate" class="btn <%= disabledClass %> <%= per_disabledClass %>" <%= disabled %> <%= per_disabledStr %> 
+				value="<s:text name='lbl.btn.edit'/>" onclick="validate('roleUpdate',$('#formRoleAdd'),$('#subcontainer'), '<s:text name='lbl.prog.txt.role.update'/>');" />
 		<% } else { %> 
-			<input type="button" id="roleSave" class="btn btn-primary" value="<s:text name='lbl.btn.add'/>"
+			<input type="button" id="roleSave" class="btn <%= per_disabledClass %>" <%= per_disabledStr %> value="<s:text name='lbl.btn.add'/>"
 				onclick="validate('roleSave',$('#formRoleAdd'),$('#subcontainer'), '<s:text name='lbl.prog.txt.role.save'/>');" />
 		<% } %>
 		<input type="button" id="roleCancel" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>" 
-			onclick="loadContent('roleList', $('#formRoleAdd'), $('#subcontainer'));" />
+			onclick="getRolesList();" />
 	</div>
 	
 	<!-- Hidden Fields -->
     <input type="hidden" name="fromPage" value="<%= StringUtils.isNotEmpty(fromPage) ? fromPage : "" %>"/>
     <input type="hidden" name="roleId" value="<%= id %>"/>
     <input type="hidden" name="oldName" value="<%= name %>"/>
+    <input type="hidden" name="appliesTo" value="<%= appliesTo %>"/>
 </form>
 
 <script type="text/javascript">
 	$(document).ready(function() {
 		hideLoadingIcon();
 	});
+	
+	function getRolesList() {
+		showLoadingIcon();
+		loadContent('roleList', $('#formRoleAdd'), $('#subcontainer'));
+	}
 
 	function findError(data) {
 	    if (data.nameError != undefined) {

@@ -32,13 +32,20 @@
 	List<Technology> technologies = (List<Technology>) request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
 	List<ApplicationType> appTypes = (List<ApplicationType>)request.getAttribute(ServiceUIConstants.REQ_APP_TYPES);
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
+	
+	List<String> permissionIds = (List<String>) session.getAttribute(ServiceUIConstants.SESSION_PERMISSION_IDS);
+	String per_disabledStr = "";
+	String per_disabledClass = "btn-primary";
+	if (CollectionUtils.isNotEmpty(permissionIds) && !permissionIds.contains(ServiceUIConstants.PER_MANAGE_ARCHETYPES)) {
+		per_disabledStr = "disabled";
+		per_disabledClass = "btn-disabled";
+	}
 %>
 
 <form id="formArchetypeList" class="customer_list" >
 	<div class="operation" id="operation">
-		<input type="button" id="archetypeAdd" class="btn btn-primary" name="archetype_add" 
-			onclick="loadContent('archetypeAdd', $('#formArchetypeList'), $('#subcontainer'));" 
-			value="<s:text name='lbl.hdr.archetype.add'/>"/>
+		<input type="button" id="archetypeAdd" class="btn <%= per_disabledClass %>" <%= per_disabledStr %> name="archetype_add" 
+			onclick="addArchetype();" value="<s:text name='lbl.hdr.archetype.add'/>"/>
 		<input type="button" id="del" class="btn" disabled value="<s:text name='lbl.btn.del'/>"
 		 	onclick="showDeleteConfirmation('<s:text name='del.confirm.archetype'/>');"/>
 		<input type="button" id="techGroup" class="btn btn-primary" name="tech_group" onclick="addTechGroup();" value="<s:text name='lbl.hdr.archetype.techgroup'/>"/> 	
@@ -68,7 +75,7 @@
 							<tr>
 								<th class="first">
 									<div class="th-inner">
-										<input type="checkbox" value="" class=checkAll id="checkAllFeature" name="checkAllAuto" onclick="checkAllEvent(this, $('.technolgies'), false);">
+										<input type="checkbox" value="" <%= per_disabledStr %> class=checkAll id="checkAllFeature" name="checkAllAuto" onclick="checkAllEvent(this, $('.technolgies'), false);">
 									</div>
 								</th>
 								<th class="second">
@@ -101,7 +108,7 @@
 									<% if (technology.isSystem()) { %>
 										<input type="checkbox" name="techId" value="<%= technology.getId() %>" disabled/>
 									<% } else { %>
-										<input type="checkbox" class="checkAll technolgies" name="techId" value="<%= technology.getId() %>" onclick="checkboxEvent($('#checkAllFeature'), 'technolgies');" />
+										<input type="checkbox" class="checkAll technolgies" name="techId" <%= per_disabledStr %> value="<%= technology.getId() %>" onclick="checkboxEvent($('#checkAllFeature'), 'technolgies');" />
 									<% } %>
 									</td>
 									
@@ -174,6 +181,11 @@
 	        return textTrim($(this));
 	    }); 
 	});
+	
+	function addArchetype() {
+		showLoadingIcon();
+		loadContent('archetypeAdd', $('#formArchetypeList'), $('#subcontainer'));
+	}
  
 	function versioningTech(id) {
 		var params = "techId=";
@@ -183,7 +195,8 @@
 		loadContent("archetypeEdit", $('#formArchetypeList'), $('#subcontainer'), params);
 	}
 	
-    function editTech(id) {   
+    function editTech(id) {
+    	showLoadingIcon();
     	var customerId = $('input[name=customerId]').val();
 		var params = "techId=";
 		params = params.concat(id);
@@ -199,14 +212,14 @@
     }
     
     function addTechGroup() {
-		yesnoPopup('openTechGroupPopup', 'Add Technology Group', '', 'Ok', $('#formArchetypeList'));
+		yesnoPopup('openTechGroupPopup', 'Technology Group', 'techGroupOk', 'Ok', $('#formArchetypeList'));
 	}
     
 	function popupOnOk(self) {
 		if ($(self).attr("id") == "techGroupOk") {
 			var customerId = $('input[name=customerId]').val();
 			var params = '{"techGroups" : [' + techGroupToAdd.join(',') + '], "customerId" : "' + customerId + '"}';
-			loadJsonContent('newTechGroup',params,$("#subcontainer"));
+			loadJsonContent('newTechGroup', params, $("#subcontainer"));
 		}
 	}
 </script>

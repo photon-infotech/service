@@ -26,7 +26,7 @@
 <%@ page import="com.photon.phresco.commons.model.Technology"%>
 <%@ page import="com.photon.phresco.commons.model.DownloadInfo" %>
 <%@ page import="com.photon.phresco.commons.model.DownloadInfo.Category"%>
-<%@page import="com.photon.phresco.commons.model.License"%>
+<%@ page import="com.photon.phresco.commons.model.License"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
 <%@ page import="com.photon.phresco.commons.model.PlatformType" %>
 <%@ page import="com.photon.phresco.commons.model.ArtifactGroup"%>
@@ -51,6 +51,14 @@
 	String disabledVer ="";
 	if(StringUtils.isNotEmpty(versionPro)) {
 		disabledVer = "disabled";
+	}
+	
+	List<String> permissionIds = (List<String>) session.getAttribute(ServiceUIConstants.SESSION_PERMISSION_IDS);
+	String per_disabledStr = "";
+	String per_disabledClass = "btn-primary";
+	if (CollectionUtils.isNotEmpty(permissionIds) && !permissionIds.contains(ServiceUIConstants.PER_MANAGE_DOWNLOADS)) {
+		per_disabledStr = "disabled";
+		per_disabledClass = "btn-disabled";
 	}
 	
     //For edit
@@ -336,10 +344,10 @@
 	</div>
 
 	<div class="bottom_button">
-		<input type="button" id="" class="btn btn-primary" value='<%= buttonLbl %>' 
+		<input type="button" id="" class="btn <%= per_disabledClass %>" <%= per_disabledStr %> value='<%= buttonLbl %>' 
 			onclick="validate('<%= pageUrl %>', $('#formDownloadAdd'), $('#subcontainer'), '<%= progressTxt %>', $('.content_adder :input'));" />	
 		<input type="button" id="downloadCancel" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>"
-			onclick="loadContent('downloadList', $('#formDownloadAdd'), $('#subcontainer'));"/>
+			onclick="getDownloads();"/>
 	</div>
 	
 	<!-- Hidden Fields -->
@@ -392,9 +400,13 @@
         });
         
         // for edit - to show selected group while page loads 
-       		 $("#category option[value='<%= downloadCat %>']").attr('selected', 'selected'); 
-      
+		$("#category option[value='<%= downloadCat %>']").attr('selected', 'selected'); 
 	});
+	
+	function getDownloads() {
+		showLoadingIcon();
+		loadContent('downloadList', $('#formDownloadAdd'), $('#subcontainer'));
+	}
 
 	function findError(data) {
 		if (!isBlank(data.nameError)) {

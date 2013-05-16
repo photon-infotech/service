@@ -59,10 +59,31 @@
 	});
 	
 	function customerChangeEvent(selectedId) {
+		showLoadingIcon();
 		$('#customerId').val(selectedId);
 		localStorage["selectedCustomerId"] = selectedId;
 		var selectedMenu = $("a[name='compTab'][class='active']").prop("id");
-		loadContent(selectedMenu, $('#formCustomerId'), $("#subcontainer"));	
+		loadContent("fetchLogoImgUrl", $('#formCustomerId'), '', '', true, 'changeLogo');
+		
+		//Handles the click event of the sub tabs
+		clickMenu($("a[name='featureTab']"), $("#subcontainer"), $('#formCustomerId'));
+		
+		//To load the page by default
+		loadContent("technologies", $('#formCustomerId'), $("#subcontainer"), "type=<%= Type.FEATURE.name() %>");
+		
+		//To activate the module menu by default
+		activateMenu($("#module"));
+	}
+	
+	function changeLogo(data) {
+		showLoadingIcon();
+		$('#logoImg').attr("src",  "data:image/png;base64," + data.logoImgUrl);
+		var copyright = data.copyRight;
+		if (!isBlank(copyright)) {
+			$(".copyrit").html(copyright);
+		} else {
+			$(".copyrit").html("&copy; 2013.Photon Infotech Pvt Ltd. |<a href='http://www.photon.in'> www.photon.in</a>");
+		}
 	}
 </script>
 
@@ -97,24 +118,23 @@
 	<ul class="tabs">
 		<li>
 			<a href="#" class="active" name="compTab" id="featuresMenu"><s:label key="lbl.hdr.comp.featrs" theme="simple"/></a>
-				<ul id="testmenu">
-					<li>
-						<a href="#" class="active" id="technologies" name="featureTab" additionalParam="type=<%= Type.FEATURE.name() %>">
-							<s:text name="lbl.hdr.comp.featrs.modules" />
-						</a>
-					</li>
-					<li>
-						<a href="#" class="inactive" id="technologies" name="featureTab" additionalParam="type=<%= Type.JAVASCRIPT.name() %>">
-							<s:text name="lbl.hdr.comp.featrs.jslib"/>
-						</a>
-					</li>
-					<li>
-						<a href="#" class="inactive" id="technologies" name="featureTab" additionalParam="type=<%= Type.COMPONENT.name() %>">
-							<s:text name="lbl.hdr.comp.component"/>
-						</a>
-					</li>
-					
-				</ul>
+			<ul class="submenu" id="testmenu">
+				<li>
+					<a href="#" class="active" id="technologies" name="featureTab" additionalParam="type=<%= Type.FEATURE.name() %>">
+						<s:text name="lbl.hdr.comp.featrs.modules" />
+					</a>
+				</li>
+				<li>
+					<a href="#" class="inactive" id="technologies" name="featureTab" additionalParam="type=<%= Type.JAVASCRIPT.name() %>">
+						<s:text name="lbl.hdr.comp.featrs.jslib"/>
+					</a>
+				</li>
+				<li>
+					<a href="#" class="inactive" id="technologies" name="featureTab" additionalParam="type=<%= Type.COMPONENT.name() %>">
+						<s:text name="lbl.hdr.comp.component"/>
+					</a>
+				</li>
+			</ul>
 		</li>
 		<li>
 			<a href="#" class="inactive" name="compTab" id="archetypesList"><s:label key="lbl.hdr.comp.arhtyp" theme="simple"/></a>

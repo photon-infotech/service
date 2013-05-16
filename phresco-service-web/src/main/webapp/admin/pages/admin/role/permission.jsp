@@ -31,6 +31,7 @@
 	String roleId = (String) request.getAttribute(ServiceUIConstants.REQ_ROLE_ID);
 	List<Permission> permissions = (List<Permission>) request.getAttribute(ServiceUIConstants.REQ_PERMISSIONS_LIST);
 	List<String> permissionIds = (List<String>) request.getAttribute(ServiceUIConstants.REQ_SELECTED_PERMISSION_IDS);
+	boolean isEditable = (Boolean) request.getAttribute(ServiceUIConstants.REQ_ROLE_EDITABLE);
 %>
 
 <form id="formAssignPermission">
@@ -66,10 +67,10 @@
 		</div>
 		
 		<div class="popup-button">
-			<div class="btnalign"><input type="button" class="btn sample" value=">" onclick="moveOptions(this.form.permAvailable, this.form.selectedPermissions);"/></div>
-			<div class="btnalign"><input type="button" class="btn sample" value=">>" onclick="moveAllOptions(this.form.permAvailable, this.form.selectedPermissions);"/></div>
-			<div class="btnalign"><input type="button" class="btn sample" value="<" onclick="moveOptions(this.form.selectedPermissions, this.form.permAvailable);"/></div>
-			<div class="btnalign"><input type="button" class="btn sample" value="<<" onclick="moveAllOptions(this.form.selectedPermissions, this.form.permAvailable);"/></div>
+			<div class="btnalign"><input type="button" class="btn btn-primary sample" value=">" onclick="moveOptions(this.form.permAvailable, this.form.selectedPermissions);"/></div>
+			<div class="btnalign"><input type="button" class="btn btn-primary sample" value=">>" onclick="moveAllOptions(this.form.permAvailable, this.form.selectedPermissions);"/></div>
+			<div class="btnalign"><input type="button" class="btn btn-primary sample" value="<" onclick="moveOptions(this.form.selectedPermissions, this.form.permAvailable);"/></div>
+			<div class="btnalign"><input type="button" class="btn btn-primary sample" value="<<" onclick="moveAllOptions(this.form.selectedPermissions, this.form.permAvailable);"/></div>
 		</div>
 	
 		<div  class="popupselect">
@@ -95,6 +96,11 @@
 
 <script type="text/javascript">
 	$(document).ready(function () {
-		
+		//To restrict the user in updating the systems roles
+		<% if (isEditable) { %>
+			$("#assignPermission").attr("disabled", true).removeClass("btn-primary").addClass("btn-disabled");
+		<% } else { %>
+			$("#assignPermission").attr("disabled", false).removeClass("btn-disabled").addClass("btn-primary");
+		<% } %>
 	});
 </script>

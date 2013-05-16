@@ -26,7 +26,7 @@
 <html>
 	<head>
 		<title>Helios</title>
-		<link REL="SHORTCUT ICON" HREF="images/favicon.ico">
+		<link rel="icon" type="image/png" href="images/favicon.png">
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
 		
@@ -174,7 +174,7 @@
 		<header>
 			<div class="header">
 				<div class="Logo">
-					 <a href="#" id="goToHome"><img class="headerlogoimg" src="" alt="logo"></a>
+					 <a href="#" id="goToHome"><img class="headerlogoimg" id="logoImg" src="" alt="logo"></a>
 				</div>
 				<div class="headerInner">
 					<div class="nav_slider">
@@ -333,9 +333,8 @@
 			<div class="modal-footer">
 				<div class="errMsg" id="reportMsg"></div>
 				<div id="updateMsg" class="updateMsg"></div>
-				<a href="#" class="btn btn-primary" data-dismiss="modal" id="popupCancel"><s:text name='lbl.btn.cancel'/></a>
-				<a href="#" class="btn btn-primary popupOk" id="" onclick="popupOnOk(this);"><s:text name='lbl.btn.ok'/></a>
-				<a href="#" class="btn btn-primary" data-dismiss="modal" id="popupClose"><s:text name='lbl.btn.close'/></a>
+				<input type="button" class="btn btn-primary" data-dismiss="modal" id="popupCancel" value="<s:text name='lbl.btn.cancel'/>"/>
+				<input type="button" class="btn btn-primary popupOk" onClick="popupOnOk(this);" value="<s:text name='lbl.btn.ok'/>"/>
 			</div>
 		</div>
 	    <!-- Popup Ends -->

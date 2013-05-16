@@ -17,33 +17,42 @@
     limitations under the License.
 
 --%>
-<%@page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
-<%@page import="com.photon.phresco.util.ServiceConstants"%>
 <%@ taglib uri="/struts-tags" prefix="s"%>
 
 <%@ page import="java.util.List"%>
 <%@ page import="java.util.ArrayList"%>
 <%@ page import="java.util.Collection"%>
 <%@ page import="java.util.Iterator"%>
+
 <%@ page import="com.google.gson.Gson"%>
+
 <%@ page import="org.apache.commons.lang.StringUtils"%>
 <%@ page import="org.apache.commons.collections.CollectionUtils"%>
 
 <%@ page import="com.photon.phresco.commons.model.TechnologyGroup"%>
 <%@ page import="com.photon.phresco.commons.model.ApplicationType"%>
 <%@ page import="com.photon.phresco.commons.model.Technology"%>
+<%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
+<%@ page import="com.photon.phresco.util.ServiceConstants"%>
 
 <%
 	List<ApplicationType> appTypes = (List<ApplicationType>)request.getAttribute(ServiceUIConstants.REQ_APP_TYPES);
     Gson gson = new Gson();
    
     String versioning = (String)request.getAttribute(ServiceUIConstants.REQ_VERSIONING);
-	String disabledVer ="";
+	String disabledVer = "";
 	if (StringUtils.isNotEmpty(versioning)) {
 		disabledVer = "disabled";
 	}
+	
+	List<String> permissionIds = (List<String>) session.getAttribute(ServiceUIConstants.SESSION_PERMISSION_IDS);
+	String per_disabledStr = "";
+	String per_disabledClass = "btn-primary";
+	if (CollectionUtils.isNotEmpty(permissionIds) && !permissionIds.contains(ServiceUIConstants.PER_MANAGE_ARCHETYPES)) {
+		per_disabledStr = "disabled";
+		per_disabledClass = "btn-disabled";
+	}
 %>
-
 
 <form id="formTechgroup" class="form-horizontal">
 	<div class="control-group">
@@ -84,7 +93,8 @@
 		<div class="controls">
 			<textarea name="techDesc" id="techGroDesc" class="input-xlarge" 
 				 maxlength="150" title="<s:text name='title.150.chars'/>" placeholder="<s:text name='place.hldr.techgroup.desc'/>"></textarea>
-			<input type="button" value="<s:text name='lbl.hdr.component.add'/>" tabindex=3 id="add" class="btn btn-primary addButton">
+			<input type="button" tabindex=3 id="add" class="btn <%= per_disabledClass %> addButton" <%= per_disabledStr %>
+				value="<s:text name='lbl.hdr.component.add'/>">
 		</div>
 	</div>
 
@@ -99,7 +109,8 @@
             </div>
 		</div>
 		<div class="deleteButton">
-			<input type="button" value="<s:text name='lbl.btn.del' />" tabindex=5 id="removeTechGroup" class="btn btn-primary">
+			<input type="button" tabindex=5 id="removeTechGroup" <%= per_disabledStr %> class="btn <%= per_disabledClass %>"
+				value="<s:text name='lbl.btn.del' />">
 		</div>
 	</fieldset>
 </form>
@@ -110,41 +121,18 @@
 	$(document).ready(function() {
 		getTechGroup();
 		$('#popup_div').hide();
-		$('#popupTitle').html("Technology Group"); 
-		$('#popupClose').hide();
-		$('.popupOk').attr("onclick","popupOnOk(this)");
-		$('#popupPage').css({"width":"590px","position":"relative","left":"49%"});
+		$('#popupPage').css({"width":"590px", "position":"relative", "left":"49%"});
 		$('.modal-body').css("height","270px");
-		$('#clipboard').hide();
-		$('.popupOk, #popupCancel').show(); // show ok & cancel button
 		$('.modal-body').html($("#formTechgroup"));
-		$('.popupOk').attr('id', "techGroupOk");
 		$('.borderBottom-none').attr('id', "tableAdd");
-		$('#reportMsg').html("");
 		//To disable ok button 
-		document.getElementById('techGroupOk').disabled = true;
+		$('#techGroupOk').attr("disabled", "disabled");
 		$("#techGroupOk").removeClass("btn-primary");
-		
-		$('#popupPage').modal({
-			show: true
-		}); 
-		
-		$('#techGroupOk').click(function() {
-			$('#popupPage').modal('hide');
-			$('#formTechgroup').hide();
-			$('#popup_div').hide();
-			hideLoadingIcon();
-		});
 		
 		$("#appTypeLayer").change(function() {
 			techGroupToAdd = [];
 			getTechGroup();
         });  
-		
-		$('#popupCancel').click(function() {
-			$('#popup_div').empty();
-			showParentPage();
-		});
 		
 		$('#add').click(function() {
 			$('#reportMsg').html("");
@@ -168,7 +156,7 @@
 						returnValue = false;
 						return false;
 					} 
-					document.getElementById('techGroupOk').disabled = false;
+					$('#techGroupOk').attr("disabled", false);
 					$("#techGroupOk").addClass("btn-primary");
 				});
 			}
@@ -192,7 +180,7 @@
 			loadContent('deleteTechGroup', $('#formTechgroup'), '', params, false);
 			$('#multiTechGroup ul li input[type=checkbox]:checked').parent().remove();
         });
-        document.getElementById('techGroupOk').disabled = false;
+        $('#techGroupOk').attr("disabled", false);
 		$("#techGroupOk").addClass("btn-primary");
     });
 	
@@ -225,7 +213,7 @@
 				var checkValue = '{"name": "' + name + '", "id": "' + id + '", "description": "' + description + '", "appTypeId": "' + appTypeId + '", "system": "' + system + '"}';
 				if (system) {
 					var checkbox = '<input type="checkbox" name="groupTech" class="techCheck" value=\'' + checkValue + '\' title="' + description + '"  disabled/>' + name;
-				}else {
+				} else {
 					var checkbox = '<input type="checkbox" name="groupTech" class="techCheck" value=\'' + checkValue + '\' title="' + description + '" />' + name;
 				}
 				$("#multiTechGroup ul").append('<li>' + checkbox + '</li>');
@@ -245,7 +233,6 @@
 			$("#multiTechGroup ul li:last").after('<li>' + checkbox + '</li>');
 		}
 		techGroupToAdd.push(checkValue);
-// 		$("#multiTechGroup ul li:last").after('<li>' + checkbox + '</li>');
 	}
 	 
 	function selectTech() {

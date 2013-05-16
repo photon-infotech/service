@@ -27,15 +27,23 @@
 
 <%
 	List<VideoInfo> videoInfos = (List<VideoInfo>) request.getAttribute(ServiceUIConstants.REQ_VIDEO_INFO);
+	
+	List<String> permissionIds = (List<String>) session.getAttribute(ServiceUIConstants.SESSION_PERMISSION_IDS);
+	String per_disabledStr = "";
+	String per_disabledClass = "btn-primary";
+	if (CollectionUtils.isNotEmpty(permissionIds) && !permissionIds.contains(ServiceUIConstants.PER_MANAGE_VIDEOS)) {
+		per_disabledStr = "disabled";
+		per_disabledClass = "btn-disabled";
+	}
 %>
 
 <form id="formVideoList" class="form-horizontal customer_list">
 	<div class="operation" id="operation">
-		<input type="button" id="videoAdd" class="btn btn-primary" name="video_add"
-			onclick="loadContent('videoAdd', $('#formVideoList'), $('#subcontainer'));" 
-					value="<s:text name='lbl.hdr.video.add'/>"/>
+		<input type="button" id="videoAdd" <%= per_disabledStr %> class="btn <%= per_disabledClass %>" name="video_add"
+			onclick="addVideo();" value="<s:text name='lbl.hdr.video.add'/>"/>
 		<input type="button" id="del" class="btn" disabled value="<s:text name='lbl.btn.del'/>" 
-				onclick="showDeleteConfirmation('<s:text name='del.confirm.videos'/>');"/>
+			onclick="showDeleteConfirmation('<s:text name='del.confirm.videos'/>');"/>
+			
 		<s:if test="hasActionMessages()">
 			<div class="alert alert-success alert-message"  id="successmsg">
 				<s:actionmessage />
@@ -63,7 +71,8 @@
 							<tr>
 								<th class="first">
 									<div class="th-inner">
-										<input type="checkbox" value="" id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this, $('.videoChk'), false);">
+										<input type="checkbox" <%= per_disabledStr %> value="" id="checkAllAuto" name="checkAllAuto" 
+											onclick="checkAllEvent(this, $('.videoChk'), false);">
 									</div>
 								</th>
 								<th class="second">
@@ -82,11 +91,11 @@
 						<% for (VideoInfo videoInfo : videoInfos) { %>
 							<tr>
 								<td class="checkboxwidth">
-								   <% if (videoInfo.isSystem()) { %>
-								      <input type="checkbox"  name="videoId" value="<%= videoInfo.getId() %>"  disabled /> 
-								   <% } else { %>
-									<input type="checkbox" class="check videoChk" name="videoId" value="<%= videoInfo.getId() %>" 
-									   onclick="checkboxEvent($('#checkAllAuto'),'videoChk');" />
+									<% if (videoInfo.isSystem()) { %>
+										<input type="checkbox" name="videoId" value="<%= videoInfo.getId() %>"  disabled /> 
+								   	<% } else { %>
+										<input type="checkbox" <%= per_disabledStr %> class="check videoChk" name="videoId" value="<%= videoInfo.getId() %>" 
+									   		onclick="checkboxEvent($('#checkAllAuto'),'videoChk');" />
 								    <% } %>	   
 								</td>
 								<td>
@@ -120,8 +129,14 @@
 		hideLoadingIcon();
 	});
 	
-	 /** To edit the pilot project **/
-    function editVideo(id) {    	
+	function addVideo() {
+		showLoadingIcon();
+		loadContent('videoAdd', $('#formVideoList'), $('#subcontainer'));
+	}
+	
+	/** To edit the pilot project **/
+    function editVideo(id) {
+    	showLoadingIcon();
         var params = "videoId=";
         params = params.concat(id);
         loadContent("videoEdit", '', $('#subcontainer'), params);

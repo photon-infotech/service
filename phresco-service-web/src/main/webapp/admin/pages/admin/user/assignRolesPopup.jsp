@@ -17,13 +17,13 @@
     limitations under the License.
 
 --%>
-<%@page import="org.apache.commons.collections.MapUtils"%>
 <%@ taglib uri="/struts-tags" prefix="s" %>
 
 <%@ page import="java.util.List"%>
 <%@ page import="java.util.Map"%>
 <%@ page import="java.util.Set"%>
 
+<%@ page import="org.apache.commons.collections.MapUtils"%>
 <%@ page import="org.apache.commons.collections.CollectionUtils"%>
 <%@ page import="org.apache.commons.lang.StringUtils"%>
 
@@ -32,81 +32,82 @@
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
 
 <%
-    User user = (User)request.getAttribute(ServiceUIConstants.REQ_USER);
+	User user = (User)request.getAttribute(ServiceUIConstants.REQ_USER);
 	List<Role> roles = (List<Role>)request.getAttribute(ServiceUIConstants.REQ_ROLE_LIST); 
 	Map<String, String> availableRoleMap = (Map<String, String>)request.getAttribute(ServiceUIConstants.REQ_ROLES_MAP); 
 	
 	String userName = "";	
 	String userId = "";
-	List<String> roleIds = null;
 	if (user != null) {
 		userName = user.getName();
 		userId = user.getId();
-		roleIds = user.getRoleIds();
 	}
 %>
 
-<form class="form-horizontal" id="userAssignRoleForm">
+<form id="userAssignRoleForm">
 	<div class="popupbody">
-		<div class="popupusr"><s:label key="lbl.hdr.adm.rolename" cssClass="popuplabel" theme="simple"/></div> 
+		<div class="popupusr"><s:label key="lbl.login.username" cssClass="popuplabel" theme="simple"/></div> 
 		<div class="popupusr-name"><%= userName %></div>
 	</div>
 	<div class="pouproles">
-		<div class="popuprls"><s:label key="lbl.hdr.adm.availperm" cssClass="popuplabel" theme="simple"/></div> 
-		<div class="popuprole-select"><s:label key="lbl.hdr.adm.selperm" cssClass="popuplabel" theme="simple"/></div>
+		<select id="appliesTo" class="input-large" style="margin-left: 3%;">
+			<option value="service"><s:text name="lbl.hdr.adm.rles.service"/></option>
+			<option value="framework"><s:text name="lbl.hdr.adm.rles.framework"/></option>
+		</select>
+		<div class="popuprls"><s:label key="lbl.hdr.adm.usrlst.role.popup.lbl.avail.roles" cssClass="popuplabel" theme="simple"/></div> 
+		<div class="popuprole-select"><s:label key="lbl.hdr.adm.usrlst.role.popup.lbl.select.roles" cssClass="popuplabel" theme="simple"/></div>
 	</div>
 	<div class="popuplist">
 		<div class="popup-list">
-			<select names="" class="sample" id="rolesAvailable" multiple="multiple">
-				<% if (CollectionUtils.isNotEmpty(roles)) { 
-						for (Role role : roles) {	
-							//adds all available roles to left select box except roles already assigned for user
-							if (CollectionUtils.isNotEmpty(roleIds) && !roleIds.contains(role.getId())) {
-				%>
-							<option value="<%= role.getId() %>"><%=  role.getName() %></option>
-							
-				<%			} else if (CollectionUtils.isEmpty(roleIds)) {
-							//adds all roles to left select box if user doesnot has no pre assigned roles
-				%>	
-								<option value="<%= role.getId() %>"><%=  role.getName() %></option>
-				<%			}
-						}	
-					} 
-				%>	
-				</select> 
+			<select name="" class="sample" id="rolesAvailable" multiple="multiple">
+				
+			</select> 
 		</div>
 		
-		<div class="popup-button">
-			<div class="btnalign"><input type="button" class="btn sample" value=">" onclick="moveOptions(this.form.rolesAvailable, this.form.rolesSelected, 'leftToRight');"/></div>
-				<div class="btnalign"><input type="button" class="btn sample" value=">>" onclick="moveAllOptions(this.form.rolesAvailable, this.form.rolesSelected, 'leftToRight');"/></div>
-				<div class="btnalign"><input type="button" class="btn sample" value="<" onclick="moveOptions(this.form.rolesSelected, this.form.rolesAvailable, 'rightToLeft');"/></div>
-				<div class="btnalign"><input type="button" class="btn sample" value="<<" onclick="moveAllOptions(this.form.rolesSelected, this.form.rolesAvailable, 'rightToLeft');"/></div>
+		<div class="popup-button" style="left: 5px;">
+			<div class="btnalign"><input type="button" class="btn btn-primary sample" value=">" onclick="moveOptions(this.form.rolesAvailable, this.form.rolesSelected, 'leftToRight');"/></div>
+			<div class="btnalign"><input type="button" class="btn btn-primary sample" value=">>" onclick="moveAllOptions(this.form.rolesAvailable, this.form.rolesSelected, 'leftToRight');"/></div>
+			<div class="btnalign"><input type="button" class="btn btn-primary sample" value="<" onclick="moveOptions(this.form.rolesSelected, this.form.rolesAvailable, 'rightToLeft');"/></div>
+			<div class="btnalign"><input type="button" class="btn btn-primary sample" value="<<" onclick="moveAllOptions(this.form.rolesSelected, this.form.rolesAvailable, 'rightToLeft');"/></div>
 		</div>
 	
 		<div  class="popupselect">
 			<select name="" class="sample" id="rolesSelected" multiple="multiple">
-				<% if (MapUtils.isNotEmpty(availableRoleMap)) { 
-					Set<String> keys = availableRoleMap.keySet();
-	    			for (String key : keys) {
+				<%
+					if (MapUtils.isNotEmpty(availableRoleMap)) { 
+						Set<String> keys = availableRoleMap.keySet();
+	    				for (String key : keys) {
 				%>
 							<option value="<%= key %>"><%=  availableRoleMap.get(key) %></option>
 				<% 		}
-					} 
+					}
 				%>	
-				</select> 
+			</select> 
 		</div>
 	</div>
 	
-	<!-- Hidden Filelds -->
+	<!-- Hidden Fields -->
 	<input type="hidden" name="userId" value="<%= userId %>"/>
 </form>
 
-
-	
 <script type="text/javascript">
+	getRoles("service");
+	
 	$(document).ready(function() {
 		$('.errMsg').empty();
+		
+		$("#appliesTo").change(function() {
+			getRoles($(this).val());
+		});
 	});
+	
+	function getRoles(appliesTo) {
+		var params = "appliesTo=";
+		params = params.concat(appliesTo);
+		params = params.concat("&userId=");
+		params = params.concat('<%= userId %>');
+		loadContent("roleListToAssign", "", $("#subcontainer"), params, true);
+	}
 	
 	function moveOptions(theSelFrom, theSelTo, direction) {
 		var selLength = theSelFrom.length;
@@ -140,14 +141,10 @@
 	    	}
 	  	}
 	  
-	  	/* if (selectedCount == 0) {
-	  		$('.errMsg').html("<s:text name='err.msg.slt.rle'/>");
-	  	} */
-	  	
 	  	// Add the selected text/values in reverse order.
 	  	// This will add the Options to the 'to' Select
 	  	// in the same order as they were in the 'from' Select.
-	  	for (i=selectedCount-1; i>=0; i--) {
+	  	for (i = selectedCount-1; i >= 0; i--) {
   			addOption(theSelTo, selectedText[i], selectedValues[i]);
 	    	$('.errMsg').empty();
 	  	}

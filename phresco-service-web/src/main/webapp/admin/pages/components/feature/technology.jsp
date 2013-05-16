@@ -46,6 +46,14 @@
 	if (ServiceUIConstants.REQ_FEATURES_TYPE_COMPONENT.equals(type)) {
 		component = true;
 	}
+	
+	List<String> permissionIds = (List<String>) session.getAttribute(ServiceUIConstants.SESSION_PERMISSION_IDS);
+	String per_disabledStr = "";
+	String per_disabledClass = "btn-primary";
+	if (CollectionUtils.isNotEmpty(permissionIds) && !permissionIds.contains(ServiceUIConstants.PER_MANAGE_REUSABLE_COMPONENTS)) {
+		per_disabledStr = "disabled";
+		per_disabledClass = "btn-disabled";
+	}
 %>
 
 <%
@@ -67,16 +75,15 @@
 			<div class="operation">
 				<div class="featurelist_add">
 				<% if (moduleGro || jslibs || component ) { %>	
-					<input type="button" class="btn btn-primary" name="features_add" 
-						onclick="loadContent('addFeatures', $('#formFeaturesList'), $('#featureContainer'));" 
-						value="<s:text name='lbl.hdr.comp.featrs.mod.add'/>"/>
+					<input type="button" class="btn <%= per_disabledClass %>" <%= per_disabledStr %> name="features_add" 
+						onclick="addFeatures();" value="<s:text name='lbl.hdr.comp.featrs.mod.add'/>"/>
 				<% } %>		
 					<input type="button" class="btn" id="del" disabled value="<s:text name='lbl.btn.del'/>" 
 						onclick="showDeleteConfirmation('<s:text name='del.confirm.feature'/>');"/>
 				</div>
 				
 				<div class="featurelist_tech">
-					<s:text name='lbl.comp.featr.technology'/>
+					<span><s:text name='lbl.comp.featr.technology'/></span>
 					<select name="" id="tech_id">
 						<%
 							if (CollectionUtils.isNotEmpty(technologies)) {
@@ -125,14 +132,20 @@
 		        });
 			});
 			
+			function addFeatures() {
+				showLoadingIcon();
+				loadContent('addFeatures', $('#formFeaturesList'), $('#subcontainer'));
+			}
+			
 			// This method calling from confirm_dialog.jsp
 		    function continueDeletion() {
-		    	confirmDialog('none', '');
-		    	loadContent('featuresDelete', $('#formFeaturesList'), $("#featureContainer"));
+		    	hidePopup();
+		    	loadContent('featuresDelete', $('#formFeaturesList'), $("#subcontainer"));
 		    }
 			
 			//To list the features based on the type
 		    function featurelist() {
+		    	showLoadingIcon();
 				loadContent('listFeatures', $('#formFeaturesList'), $('#feature_list'), '', '', true);
 		    }
 		</script>

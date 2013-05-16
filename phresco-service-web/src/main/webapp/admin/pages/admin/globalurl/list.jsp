@@ -29,13 +29,20 @@
 <% 
  	List<Property> globalUrls = (List<Property>) request.getAttribute(ServiceUIConstants.REQ_GLOBURL_URL);
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
+	
+	List<String> permissionIds = (List<String>) session.getAttribute(ServiceUIConstants.SESSION_PERMISSION_IDS);
+	String per_disabledStr = "";
+	String per_disabledClass = "btn-primary";
+	if (CollectionUtils.isNotEmpty(permissionIds) && !permissionIds.contains(ServiceUIConstants.PER_MANAGE_GLOBALURL)) {
+		per_disabledStr = "disabled";
+		per_disabledClass = "btn-disabled";
+	}
 %>
 
 <form id="formGlobalUrlList" class="customer_list">
 	<div class="operation" id="operation">
-		<input type="button" id="globalurlAdd" class="btn btn-primary" name="url_add" 
-            onclick="loadContent('globalurlAdd', $('#formGlobalUrlList'), $('#subcontainer'));" 
-            value="<s:text name='lbl.hdr.adm.urllst.title'/>"/>
+		<input type="button" id="globalurlAdd" class="btn <%= per_disabledClass %>" <%= per_disabledStr %> name="url_add" 
+            onclick="addGlobalUrl();" value="<s:text name='lbl.hdr.adm.urllst.title'/>"/>
 		<input type="button" class="btn" id="del" disabled value="<s:text name='lbl.btn.del'/>"
 			onclick="showDeleteConfirmation('<s:text name='del.confirm.globalURL'/>');"/>              
 		<s:if test="hasActionMessages()">
@@ -64,7 +71,8 @@
 						<tr>
 							<th class="first">
 								<div class="th-inner">
-									<input type="checkbox" value="" id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this,$('.check'),false);">
+									<input type="checkbox" value="" <%= per_disabledStr %> id="checkAllAuto" name="checkAllAuto" 
+										onclick="checkAllEvent(this,$('.check'),false);">
 								</div>
 							</th>
 							<th class="second">
@@ -131,7 +139,13 @@
 		toDisableCheckAll($('#checkAllAuto'),'check');
 	});
 	
-	function editGlobalUrl(id) {		
+	function addGlobalUrl() {
+		showLoadingIcon();
+		loadContent('globalurlAdd', $('#formGlobalUrlList'), $('#subcontainer'));
+	}
+	
+	function editGlobalUrl(id) {	
+		showLoadingIcon();
 		var params = "globalurlId=";
 		params = params.concat(id);
 		loadContent("globalurlEdit",'', $('#subcontainer'), params);

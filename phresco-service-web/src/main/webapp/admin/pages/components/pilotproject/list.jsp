@@ -33,12 +33,20 @@
 	List<ApplicationInfo> pilotProjectInfo = (List<ApplicationInfo>) request.getAttribute(ServiceUIConstants.REQ_PILOT_PROJECTS);
     List<Technology> technologies = (List<Technology>) request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
+	
+	List<String> permissionIds = (List<String>) session.getAttribute(ServiceUIConstants.SESSION_PERMISSION_IDS);
+	String per_disabledStr = "";
+	String per_disabledClass = "btn-primary";
+	if (CollectionUtils.isNotEmpty(permissionIds) && !permissionIds.contains(ServiceUIConstants.PER_MANAGE_PILOT_PROJECTS)) {
+		per_disabledStr = "disabled";
+		per_disabledClass = "btn-disabled";
+	}
 %>
 
 <form id="formPilotProjList" class="customer_list">
 	<div class="operation">
-		<input type="button" class="btn btn-primary" name="pilotproj_add" id="pilotprojAdd" 
-			onclick="loadContent('pilotprojAdd', $('#formPilotProjList'), $('#subcontainer'));" value="<s:text name='lbl.hdr.comp.pltprjt.add'/>" /> 
+		<input type="button" class="btn <%= per_disabledClass %>" name="pilotproj_add" id="pilotprojAdd" <%= per_disabledStr %> 
+			onclick="addPilotProject();" value="<s:text name='lbl.hdr.comp.pltprjt.add'/>" /> 
 		<input type="button" class="btn" id="del" disabled value="<s:text name='lbl.btn.del'/>" 
 			onclick="showDeleteConfirmation('<s:text name='del.confirm.pilotes'/>');"/>
 		<s:if test="hasActionMessages()">
@@ -66,7 +74,7 @@
 							<tr>
 								<th class="first">
 									<div class="th-inner">
-										<input type="checkbox" value="" class=checkAll id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this,$('.pilotprojt'), false);">
+										<input type="checkbox" value="" <%= per_disabledStr %> class=checkAll id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this,$('.pilotprojt'), false);">
 									</div>
 								</th>
 								<th class="second">
@@ -102,7 +110,7 @@
 			 					        <% if (proInfo.isSystem()) { %>
 											<input type="checkbox" name="projectId" value="<%=proInfo.getId() %>"  disabled/>	
 										<% } else { %>
-											<input type="checkbox" class="check pilotprojt" name="projectId" value="<%=proInfo.getId() %>" onclick="checkboxEvent($('#checkAllAuto'),'pilotprojt');" />
+											<input type="checkbox" <%= per_disabledStr %> class="check pilotprojt" name="projectId" value="<%=proInfo.getId() %>" onclick="checkboxEvent($('#checkAllAuto'),'pilotprojt');" />
 										<% } %>
 									</td>
 									<td>
@@ -149,16 +157,26 @@
 		hideLoadingIcon();
 	});
 	
+	function addPilotProject() {
+		showLoadingIcon();
+		loadContent('pilotprojAdd', $('#formPilotProjList'), $('#subcontainer'));
+	}
+	
 	function versioningPilotPro(id) {
-		 var params = "projectId=";
-	      params = params.concat(id);
-	      params = params.concat("&versioning=")
-	      params = params.concat("versioning");
-	      loadContent("pilotprojEdit",'', $('#subcontainer'), params);
+		showLoadingIcon();
+		var customerId = $('input[name = customerId]').val();
+		var params = "projectId=";
+		params = params.concat(id);
+		params = params.concat("&customerId=");
+        params = params.concat(customerId);
+		params = params.concat("&versioning=")
+		params = params.concat("versioning");
+		loadContent("pilotprojEdit",'', $('#subcontainer'), params);
 	}
 	
     /** To edit the pilot project **/
-    function editPilotProject(id) {  
+    function editPilotProject(id) {
+    	showLoadingIcon();
     	var customerId = $('input[name = customerId]').val();
     	var params = "projectId=";
         params = params.concat(id);

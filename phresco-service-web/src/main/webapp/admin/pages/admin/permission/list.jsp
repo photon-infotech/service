@@ -42,11 +42,6 @@
 				<table cellspacing="0" class="zebra-striped">
 					<thead>
 						<tr>
-							<th class="first">
-								<div class="th-inner th-inner-permissions">
-									<input type="checkbox" id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this,$('.check'),false);">
-								</div>
-							</th>
 							<th class="second">
 								<div class="th-inner tablehead th-inner-permissions">
 								<s:label key="lbl.name" theme="simple"/></div>
@@ -63,9 +58,6 @@
 								for ( Permission permission : permissions) {
 						%>
 								<tr>
-									<td class="checkboxwidth">
-										<input type="checkbox" class="check" name="permissionId" value="<%= permission.getId() %>" onclick="checkboxEvent($('#checkAllAuto'),'check');">
-									</td>
 									<td class="namelabel-width"><%= permission.getName() %></td>
 									<td><%= permission.getDescription() %></td>
 									<td></td>

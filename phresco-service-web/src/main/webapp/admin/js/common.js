@@ -53,7 +53,6 @@ function showWelcomeImage(localstore) {
 var jars = [];
 
 function clickMenu(menu, tag, form) {
-	
 	menu.click(function() {
 		showLoadingIcon();
 		inActivateAllMenu(menu);
@@ -89,7 +88,9 @@ function loadJsonContent(url, jsonParam, containerTag, progressText) {
 		contentType: "application/json; charset=utf-8",
 		success : function(data) {
 			if (containerTag != undefined) {
-				hideProgressBar();
+				if (progressText !== undefined && !isBlank(progressText)) {
+					hideProgressBar();
+				}
 				loadData(data, containerTag);
 			}
 		}
@@ -97,9 +98,6 @@ function loadJsonContent(url, jsonParam, containerTag, progressText) {
 }
 
 function loadContent(pageUrl, form, tag, additionalParams, callSuccessEvent, callbackFunction, progressText) {
-	if (tag != undefined && tag != "" && !isBlank(tag) && progressText == undefined  && isBlank(progressText)) {
-		showLoadingIcon();
-	}
 	if (progressText !== undefined && !isBlank(progressText)) {
 		showProgressBar(progressText);
 	}
@@ -118,7 +116,9 @@ function loadContent(pageUrl, form, tag, additionalParams, callSuccessEvent, cal
 		data : params,
 		type : "POST",
 		success : function(data) {
-			hideProgressBar();
+			if (progressText !== undefined && !isBlank(progressText)) {
+				hideProgressBar();
+			}
 			loadData(data, tag, pageUrl, callSuccessEvent, callbackFunction);
 		}
 	});
@@ -232,7 +232,7 @@ function buttonStatus(checkAll) {
 }
 
 function toDisableCheckAll(parentChkBoxObj, chldChkBoxCls) {
-	if ($('.' + chldChkBoxCls).length > 0 ) {
+	if ($('.' + chldChkBoxCls).length > 0 && $('.' + chldChkBoxCls + ':disabled').length == 0) {
 		parentChkBoxObj.prop('disabled', false);
 	} else {
 		parentChkBoxObj.prop('disabled', true);
@@ -329,13 +329,13 @@ function hidePopuploadingIcon() {
 
 function showProgressBar(progressText) {
 	$("#progressnum").html(progressText);
-	$(".modal-backdrop").show();
+	disableScreen();
 	$("#progressbar").show();
 	setInterval(prog, 100);
 }
 
 function hideProgressBar() {
-	$(".modal-backdrop").hide();
+	enableScreen();
 	$("#progressbar").hide();
 }
 
@@ -528,8 +528,7 @@ $(document).keydown(function(e) {
 
 //Shows the parent page
 function showParentPage() {
-	enableScreen();
-	$('#popup_div').hide();
+	$('#popupPage').modal("hide");
 }
 
 //To disable the given control
@@ -575,13 +574,11 @@ function validateJson(url, form, containerTag, jsonParam, progressText, disabled
 
 function yesnoPopup(url, title, okUrl, okLabel, form, additionalParams) {
 	$('#popupPage').modal('show');//To show the popup
-	$('#popupClose').hide();
 	$('#popupTitle').html(title); // Title for the popup
-	$('.popupClose').hide(); //no need close button since yesno popup
 	$('.popupOk, #popupCancel').show(); // show ok & cancel button
 	$(".popupOk").attr('id', okUrl); // popup action mapped to id
 	if (okLabel !== undefined && !isBlank(okLabel)) {
-		$('#' + okUrl).text(okLabel); // label for the ok button
+		$('#' + okUrl).val(okLabel); // label for the ok button
 	}
 	
 	var params = "";

@@ -68,8 +68,12 @@
 		<action name="components" class="com.photon.phresco.service.admin.actions.components.ComponentMenu" method="getCompMenu">
             <result name="compMenu">/admin/pages/components/menu.jsp</result>
         </action>
+        
+        <action name="fetchLogoImgUrl" method="fetchLogoImgUrl" class="com.photon.phresco.service.admin.actions.Login">
+			<result type="json"/>
+        </action>
 		
-		 <action name="featuresMenu" class="com.photon.phresco.service.admin.actions.components.Features" method="menu">
+		<action name="featuresMenu" class="com.photon.phresco.service.admin.actions.components.Features" method="menu">
             <result name="featuresList">/admin/pages/components/feature/menu.jsp</result>
         </action>
 		
@@ -488,8 +492,11 @@
 			<result name="userList">/admin/pages/admin/user/list.jsp</result>
         </action>
         
+        <action name="roleListToAssign" class="com.photon.phresco.service.admin.actions.admin.Roles" method="roleListToAssign">
+			<result type="json" />
+        </action>
+        
         <action name="assignRoles" class="com.photon.phresco.service.admin.actions.admin.Users" method="assignRoles">
-			<!-- <result type="json" /> -->
 			<result name="userList">/admin/pages/admin/user/sync.jsp</result>
         </action>
         

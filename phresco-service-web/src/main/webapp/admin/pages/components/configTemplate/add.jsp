@@ -42,6 +42,15 @@
 	String buttonLbl = ServiceActionUtil.getButtonLabel(fromPage);
 	String pageUrl = ServiceActionUtil.getPageUrl(ServiceUIConstants.CONFIG_TEMPLATES, fromPage);
 	String progressTxt = ServiceActionUtil.getProgressTxt(ServiceUIConstants.CONFIG_TEMPLATES, fromPage);
+	
+	List<String> permissionIds = (List<String>) session.getAttribute(ServiceUIConstants.SESSION_PERMISSION_IDS);
+	String per_disabledStr = "";
+	String per_disabledClass = "btn-primary";
+	if (CollectionUtils.isNotEmpty(permissionIds) && !permissionIds.contains(ServiceUIConstants.PER_MANAGE_CONFIG_TEMPLATES)) {
+		per_disabledStr = "disabled";
+		per_disabledClass = "btn-disabled";
+	}
+	
 	//For edit
 	String id = "";
 	String name = "";
@@ -281,11 +290,10 @@
 	</div>	
 	 
 	<div class="bottom_config">
-		<input type="button" id="" class="btn btn-primary" 
-			onclick="validatePropTempKey('<%= pageUrl %>', '<%= progressTxt %>');" 
-			value='<%= buttonLbl %>'/>
-		<input type="button" id="configtempCancel" class="btn btn-primary" 
-			onclick="loadContent('configtempList', $('#formCustomerId'), $('#subcontainer'));" value="<s:text name='lbl.btn.cancel'/>"/>
+		<input type="button" id="" class="btn <%= per_disabledClass %>" <%= per_disabledStr %> 
+			onclick="validatePropTempKey('<%= pageUrl %>', '<%= progressTxt %>');" value='<%= buttonLbl %>'/>
+		<input type="button" id="configtempCancel" class="btn btn-primary" onclick="getConfigTemplates()" 
+			value="<s:text name='lbl.btn.cancel'/>"/>
 	</div>
 	
 	<!-- Hidden Fields -->
@@ -344,6 +352,11 @@
 	var customer = $('input[name=customerId]').val();
 	var fromPage = '<%= fromPage %>';
 	var system = '<%= isSystem %>';
+	
+	function getConfigTemplates() {
+		showLoadingIcon();
+		loadContent('configtempList', $('#formCustomerId'), $('#subcontainer'));
+	}
 	
 	//Add propTemp
 	function openConfigTempPopup() {
@@ -466,18 +479,33 @@
 	  	var status = jsonObj.required;
 	  	var img = "";
 	  	if (status == "true") {
-			img = "<img src='images/success.png' title='Failure'>"; 
+			img = "<img src='images/success.png' title='Success'>"; 
 	  	} else if (status == "false") {
  			img = "<img src='images/smalldelete.png' title='Failure'>";
 		}
 	  	var mandatory = document.createElement('td');
 	  	mandatory.innerHTML = img;
 	  	tr.appendChild (mandatory);
-	  
-	  	var icon = document.createElement('td');
-	  	icon.innerHTML = "<img class = 'del imagealign' id='deleteIcon' src='images/minus_icon.png' onclick='removeRow(this);' value='"+JSON.stringify(jsonObj)+"'>";
-	  	tr.appendChild (icon);
-	  
+	  	
+	  	var customerId = $('input[name=customerId]').val();
+	  	if (fromPage == 'add' || (fromPage == 'edit'&& system == 'false')) {
+	  		var icon = document.createElement('td');
+		  	icon.innerHTML = "<img class = 'del imagealign' id='deleteIcon' src='images/minus_icon.png' onclick='removeRow(this);' value='"+JSON.stringify(jsonObj)+"'>";
+		  	tr.appendChild (icon);
+		} else if (fromPage == 'edit' && system == 'true' && customerId == 'photon') {
+			var icon = document.createElement('td');
+		  	icon.innerHTML = "<img class = 'del imagealign' id='deleteIcon' src='images/minus_icon.png' onclick='removeRow(this);' value='"+JSON.stringify(jsonObj)+"'>";
+		  	tr.appendChild (icon);
+		} else if (fromPage == 'edit' && system == 'false' && customerId != 'photon') {
+			var icon = document.createElement('td');
+		  	icon.innerHTML = "<img class = 'del imagealign' id='deleteIcon' src='images/minus_icon.png' onclick='removeRow(this);' value='"+JSON.stringify(jsonObj)+"'>";
+		  	tr.appendChild (icon);
+		} else {
+			var icon = document.createElement('td');
+		  	icon.innerHTML = "<img class = 'del imagealign' id='deleteIcon' src='images/minus_icon.png' value='"+JSON.stringify(jsonObj)+"'>";
+		  	tr.appendChild (icon);
+		}
+	  	
 	  	var hiddenField = document.createElement("input");
 	  	hiddenField.type = "hidden";
 	  	hiddenField.name = "propTemps";
@@ -619,4 +647,5 @@
 			hideError($("#dispNameControl"), $("#dispNameError"));
 		}
 	}
+	
 </script>
