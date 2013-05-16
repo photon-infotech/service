@@ -210,10 +210,11 @@ $.extend(Datepicker.prototype, {
 			input.focus(this._showDatepicker);
 		if (showOn == 'button' || showOn == 'both') { // pop-up date picker when button clicked
 			var buttonText = this._get(inst, 'buttonText');
+			var title =  this._get(inst, 'title');
 			var buttonImage = this._get(inst, 'buttonImage');
 			inst.trigger = $(this._get(inst, 'buttonImageOnly') ?
 				$('<img/>').addClass(this._triggerClass).
-					attr({ src: buttonImage, alt: buttonText, title: buttonText }) :
+					attr({ src: buttonImage, alt: buttonText, title: title }) :
 				$('<button type="button"></button>').addClass(this._triggerClass).
 					html(buttonImage == '' ? buttonText : $('<img/>').attr(
 					{ src:buttonImage, alt:buttonText, title:buttonText })));

@@ -965,12 +965,14 @@
 			$("#fromdate").datepicker({
 				showOn : "button",
 				buttonImage : "images/calendar.gif",
+				title : "select date",
 				buttonImageOnly : true
 			});
 			
 			$("#todate").datepicker({
 				showOn : "button",
 				buttonImage : "images/calendar.gif",
+				title : "select date",
 				buttonImageOnly : true
 			});
 		});
