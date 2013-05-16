@@ -31,12 +31,20 @@
 
 <%
 	List<Customer> customers = (List<Customer>) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMERS);
+
+	List<String> permissionIds = (List<String>) session.getAttribute(ServiceUIConstants.SESSION_PERMISSION_IDS);
+	String per_disabledStr = "";
+	String per_disabledClass = "btn-primary";
+	if (CollectionUtils.isNotEmpty(permissionIds) && !permissionIds.contains(ServiceUIConstants.PER_MANAGE_CUSTOMERS)) {
+		per_disabledStr = "disabled";
+		per_disabledClass = "btn-disabled";
+	}
 %>
 
 <form id="formCustomerList" class="customer_list">
 	<div class="operation" id="operation">
-		<input type="button" id="customerAdd" class="btn btn-primary" name="customer_add" value="<s:text name='lbl.hdr.adm.cust.add'/>" 
-		      onclick="loadContent('customerAdd', $('#formCustomerList'), $('#subcontainer'));"/>
+		<input type="button" id="customerAdd" class="btn <%= per_disabledClass %>" <%= per_disabledStr %> name="customer_add" 
+			value="<s:text name='lbl.hdr.adm.cust.add'/>" onclick="addCustomer();"/>
 		<input type="button"  id="del"  class="btn del" class="btn btn-primary" disabled value="<s:text name='lbl.btn.del'/>" 
 		      onclick="showDeleteConfirmation('<s:text name='del.confirm.customers'/>');"/>
 		<s:if test="hasActionMessages()">
@@ -65,7 +73,7 @@
 							<tr>
 								<th class="first">
 									<div class="th-inner">
-										<input type="checkbox" id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this, $('.customerChk'), false);">
+										<input <%= per_disabledStr %> type="checkbox" id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this, $('.customerChk'), false);">
 									</div>
 								</th>
 								<th class="second">
@@ -103,7 +111,7 @@
 								<% if (customer.isSystem()) { %>
 								    <input type="checkbox" name="customerId" value="<%= customer.getId() %>" disabled/>
 								<% } else { %>
-									<input type="checkbox" class="check customerChk" name="customerId" value="<%= customer.getId() %>" 
+									<input type="checkbox" <%= per_disabledStr %> class="check customerChk" name="customerId" value="<%= customer.getId() %>" 
 									   onclick="checkboxEvent($('#checkAllAuto'),'customerChk');" />
 							    <% } %>		   
 								</td>
@@ -140,8 +148,14 @@
 		hideLoadingIcon();
 	});
 	
+	function addCustomer() {
+		showLoadingIcon();
+		loadContent('customerAdd', $('#formCustomerList'), $('#subcontainer'));
+	}
+	
 	/** To edit the customer **/
 	function editCustomer(id) {
+		showLoadingIcon();
 		var params = "customerId=";
 		params = params.concat(id);
 		loadContent("customerEdit", '', $('#subcontainer'), params);

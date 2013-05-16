@@ -17,6 +17,7 @@
     limitations under the License.
 
 --%>
+
 <%@ taglib uri="/struts-tags" prefix="s" %>
 
 <%@ page import="java.util.List" %>
@@ -32,6 +33,12 @@
 <% 
 	List<ArtifactGroup> moduleGroups = (List<ArtifactGroup>)request.getAttribute(ServiceUIConstants.REQ_FEATURES_MOD_GRP);
 	String type = (String) request.getAttribute(ServiceUIConstants.REQ_FEATURES_TYPE);
+	
+	List<String> permissionIds = (List<String>) session.getAttribute(ServiceUIConstants.SESSION_PERMISSION_IDS);
+	String per_disabledStr = "";
+	if (CollectionUtils.isNotEmpty(permissionIds) && !permissionIds.contains(ServiceUIConstants.PER_MANAGE_REUSABLE_COMPONENTS)) {
+		per_disabledStr = "disabled";
+	}
 %>
     
 	<div class="featuresScrollDiv">
@@ -47,8 +54,8 @@
 				<tbody>
 					<tr>
 						<td>
-							<input type="checkbox" class=checkAll id="checkAllAuto" name="moduleGroup" 
-								onclick="checkAllArchEvent(this, $('.technology'), false); checkAllArchEvent($('.technology'), $('.subtechnology'), false);" value="Call2Functions">
+							<input type="checkbox" class=checkAll id="checkAllAuto" name="moduleGroup" value="Call2Functions"
+								onclick="checkAllArchEvent(this, $('.technology'), false); checkAllArchEvent($('.technology'), $('.subtechnology'), false);">
 						</td>
 						<td class="labelbold"><s:text name='lbl.hdr.comp.name'/></td>
 					</tr>
@@ -69,7 +76,7 @@
 									<input type="checkbox" name="moduleGroup" value="<%= moduleGroup.getId() %>" disabled/>
 									&nbsp;&nbsp;<%= moduleGroup.getName() %>&nbsp;&nbsp;
 								<% } else { %> 
-			                		<input type="checkbox" class="check technology" name="moduleGroup" value="<%= moduleGroup.getId()%>" 
+			                		<input type="checkbox" <%= per_disabledStr %> class="check technology" name="moduleGroup" value="<%= moduleGroup.getId()%>" 
 			                			id="<%= moduleGroup.getId()%>checkBox" onclick="checkAllArchEvent(this, $('.<%= moduleGroup.getName()%>'), false); checkboxArchEvent();" value="Call2Functions" >
 			                		&nbsp;&nbsp;<%= moduleGroup.getName() %>&nbsp;&nbsp;
 								<% } %> 
@@ -99,7 +106,7 @@
 													}
 													
 													String helpTextContent = "";
-													if (module.getHelpText() != null) { 
+													if (module.getHelpText() != null) {
 													  	helpTextContent = module.getHelpText();
 													}
 										%>
@@ -108,7 +115,8 @@
 												<% if (moduleGroup.isSystem()) { %>
 													<input type="checkbox"  class ="child_chkBox" name="selectedModuleId" value="<%= module.getId() %> %>" disabled/>
 												<% } else { %> 
-													<input type="checkbox" class ="child_chkBox <%= moduleGroup.getName() %> subtechnology" id="<%= moduleGroup.getName() %>"  name="selectedModuleId" value="<%= module.getId() %>"  onclick="checkOneArchEvent( $('.<%=moduleGroup.getName()%>'), $('#<%=moduleGroup.getId()%>checkBox')); checkboxArchEvent();" value="Call2Functions">
+													<input type="checkbox" class ="child_chkBox <%= moduleGroup.getName() %> subtechnology" <%= per_disabledStr %> id="<%= moduleGroup.getName() %>"  name="selectedModuleId"  
+														value="<%= module.getId() %>" onclick="checkOneArchEvent( $('.<%=moduleGroup.getName()%>'), $('#<%=moduleGroup.getId()%>checkBox')); checkboxArchEvent();">
 												<% } %> 
 												</td>
 												<td class="zero_padding">
@@ -148,7 +156,7 @@
 	}
 	
 	$(document).ready(function() {
-		toDisableCheckAll($('#checkAllAuto'),'technology');
+		toDisableCheckAll($('#checkAllAuto'), 'technology');
 		hideLoadingIcon();//To hide the loading icon
 	});
 	
@@ -171,7 +179,8 @@
 	}
 	
 	function loadCont(params) {
-		loadContent("featurseEdit", $('#formFeaturesList'), $('#featureContainer'), params);
+		showLoadingIcon();
+		loadContent("featurseEdit", $('#formFeaturesList'), $('#subcontainer'), params);
     }
 	
 	function checkAllArchEvent(currentCheckbox, childCheckBox, disable) {

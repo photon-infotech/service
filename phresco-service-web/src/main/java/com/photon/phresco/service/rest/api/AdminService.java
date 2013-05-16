@@ -36,6 +36,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
@@ -75,8 +76,6 @@ import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.MultiPart;
 import com.sun.jersey.multipart.MultiPartMediaTypes;
-
-import fr.opensagres.xdocreport.utils.StringUtils;
 
 @Component
 @Path(ServiceConstants.REST_API_ADMIN)
@@ -813,15 +812,19 @@ public class AdminService extends DbService {
 	@GET
 	@Path (REST_API_ROLES)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findRoles() {
+	public Response findRoles(@QueryParam(REST_QUERY_APPLIESTO) String applyTo) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.findRoles()");
 	    }
-		
+		List<Role> roles = new ArrayList<Role>();
 		try {
-			List<Role> roleList = mongoOperation.getCollection(ROLES_COLLECTION_NAME , Role.class);
-			if (roleList != null) {
-				return Response.status(Response.Status.OK).entity(roleList).build();
+			if(StringUtils.isNotEmpty(applyTo)) {
+				roles = mongoOperation.find(ROLES_COLLECTION_NAME, new Query(Criteria.where("appliesTo").is(applyTo)), Role.class);
+				return Response.status(Response.Status.OK).entity(roles).build();
+			}
+			roles = mongoOperation.getCollection(ROLES_COLLECTION_NAME , Role.class);
+			if (roles != null) {
+				return Response.status(Response.Status.OK).entity(roles).build();
 			} 
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, ROLES_COLLECTION_NAME);
@@ -983,15 +986,19 @@ public class AdminService extends DbService {
 	@GET
 	@Path (REST_API_PERMISSIONS)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findPermissions() {
+	public Response findPermissions(@QueryParam(REST_QUERY_APPLIESTO) String applyTo) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.findPermissions()");
 	    }
-		
+		List<Permission> permissions = new ArrayList<Permission>();
 		try {
-			List<Permission> permissionList = mongoOperation.getCollection(PERMISSION_COLLECTION_NAME , Permission.class);
-			if (permissionList != null) {
-				return Response.status(Response.Status.OK).entity(permissionList).build();
+			if(StringUtils.isNotBlank(applyTo)) {
+				permissions = mongoOperation.find(PERMISSION_COLLECTION_NAME, new Query(Criteria.where("appliesTo").is(applyTo)), Permission.class);
+				return Response.status(Response.Status.OK).entity(permissions).build();
+			}
+			permissions = mongoOperation.getCollection(PERMISSION_COLLECTION_NAME , Permission.class);
+			if (permissions != null) {
+				return Response.status(Response.Status.OK).entity(permissions).build();
 			} 
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, PERMISSION_COLLECTION_NAME);

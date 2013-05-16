@@ -32,9 +32,11 @@ public interface ServiceUIConstants {
     String SQUARE_OPEN = "[";
     String ADD = "add";
     String REQ_FROM_PAGE = "fromPage";
+    String REQ_APPLIES_TO = "appliesTo";
     String EDIT = "edit";
     String REQ_USER_INFO = "userInfo";
     String SESSION_USER_INFO = "userInfo";
+    String SESSION_PERMISSION_IDS = "sessionPermissionIds";
     String SUCCESS_FALSE = "{\"success\": false}";
 	String SUCCESS_TRUE = "{\"success\": true}";
 	String MAVEN_JAR_FALSE = "{\"mavenJar\": false,\"success\": true}";
@@ -238,6 +240,7 @@ public interface ServiceUIConstants {
     String REQ_ROLE_ROLE = "role";
     String REQ_ROLE_LIST = "roleList";
     String REQ_ROLE_ID = "roleId";
+    String REQ_ROLE_EDITABLE = "editable";
     String REQ_ROLES_MAP = "availableRolesMap";
     
     
@@ -486,4 +489,33 @@ public interface ServiceUIConstants {
     String SUB_MENU_BACKGROUND_COLOR = "SubMenuBackGround";
     String COPYRIGHT = "CopyRight";
     String DISABLED_LABEL_COLOR = "DisabledLabelColor";
+    
+    /*****************************
+     * Permission Constants
+     * String PER_XXX
+     *****************************/
+    String PER_MANAGE_REUSABLE_COMPONENTS = "manage_reusable_components";
+    String PER_VIEW_REUSABLE_COMPONENTS = "view_reusable_components";
+    String PER_MANAGE_ARCHETYPES = "manage_archetypes";
+    String PER_VIEW_ARCHETYPES = "view_archetypes";
+    String PER_MANAGE_CONFIG_TEMPLATES = "manage_configTemplates";
+    String PER_VIEW_CONFIG_TEMPLATES = "view_configTemplates";
+    String PER_MANAGE_PILOT_PROJECTS = "manage_pilotProjects";
+    String PER_VIEW_PILOT_PROJECTS = "view_pilotProjects";
+    String PER_MANAGE_DOWNLOADS = "manage_downloads";
+    String PER_VIEW_DOWNLOADS = "view_downloads";
+    String PER_MANAGE_CUSTOMERS = "manage_customers";
+    String PER_VIEW_CUSTOMERS = "view_customers";
+    String PER_MANAGE_USERS = "manage_users";
+    String PER_VIEW_USERS = "view_users";
+    String PER_MANAGE_ROLES = "manage_roles";
+    String PER_VIEW_ROLES = "view_roles";
+    String PER_MANAGE_PERMISSIONS = "manage_permissions";
+    String PER_VIEW_PERMISSIONS = "view_permissions";
+    String PER_MANAGE_LDAP = "manage_ldap";
+    String PER_VIEW_LDAP = "view_ldap";
+    String PER_MANAGE_VIDEOS = "manage_videos";
+    String PER_VIEW_VIDEOS = "view_videos";
+    String PER_MANAGE_GLOBALURL = "manage_globalurl";
+    String PER_VIEW_GLOBALURL = "view_globalurl";
 }

@@ -20,6 +20,7 @@
 <%@ taglib uri="/struts-tags" prefix="s" %>
   
 <%@ page import="java.util.List"%>
+
 <%@ page import="org.apache.commons.collections.CollectionUtils"%>
 <%@ page import="org.apache.commons.lang.StringUtils"%>
 
@@ -27,7 +28,18 @@
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
 
 <%
-   List<User> userList = (List<User>)request.getAttribute(ServiceUIConstants.REQ_USER_LIST);
+   	List<User> userList = (List<User>)request.getAttribute(ServiceUIConstants.REQ_USER_LIST);
+   	
+   	List<String> permissionIds = (List<String>) session.getAttribute(ServiceUIConstants.SESSION_PERMISSION_IDS);
+	String per_disabledStr = "";
+	String per_disabledClass = "btn-primary";
+	if (CollectionUtils.isNotEmpty(permissionIds)) {
+		if (permissionIds.contains(ServiceUIConstants.PER_VIEW_USERS) && 
+				!permissionIds.contains(ServiceUIConstants.PER_MANAGE_USERS)) {
+			per_disabledStr = "disabled";
+			per_disabledClass = "btn-disabled";
+		}
+	}
 %>
 
 <form class="form-horizontal customer_list" id="userListForm">
@@ -47,22 +59,17 @@
 				<table cellspacing="0" class="zebra-striped">
 						<thead>
 							<tr>
-								<th class="first">
-									<div class="th-inner">
-										<input type="checkbox" value="" id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this,$('.check'),false);">
-									</div>
-								</th>
 								<th class="second">
-									<div class="th-inner tablehead"><s:label key="lbl.name" theme="simple"/></div>
+									<div class="th-inner tablehead" style="top: 121px;"><s:label key="lbl.name" theme="simple"/></div>
 								</th>
 								<th class="third">
-									<div class="th-inner tablehead"><s:label key="lbl.hdr.adm.usrlst.mail" theme="simple"/></div>
+									<div class="th-inner tablehead" style="top: 121px;"><s:label key="lbl.hdr.adm.usrlst.mail" theme="simple"/></div>
 								</th>
 								<th class="third">
-									<div class="th-inner tablehead"><s:label key="lbl.hdr.adm.usrlst.status" theme="simple"/></div>
+									<div class="th-inner tablehead" style="top: 121px;"><s:label key="lbl.hdr.adm.usrlst.status" theme="simple"/></div>
 								</th>
 								<th class="third">
-									<div class="th-inner tablehead"><s:label key="lbl.hdr.adm.usrlst.asignrole" theme="simple"/></div>
+									<div class="th-inner tablehead" style="top: 121px;"><s:label key="lbl.hdr.adm.usrlst.asignrole" theme="simple"/></div>
 								</th>
 							</tr>
 						</thead>
@@ -72,16 +79,13 @@
 			            %>
 						<tbody>
 						<tr>
-							<td class="checkboxwidth">
-								<input type="checkbox" class="check" name="check"  onclick="checkboxEvent($('#checkAllAuto'),'check');">
-							</td>
 							<td>
-								<%= StringUtils.isNotEmpty(user.getName()) ? user.getName() :"" %>
+								<%= StringUtils.isNotEmpty(user.getDisplayName()) ? user.getDisplayName() :"" %>
 							</td>
 							<td class="emailalign"><%= StringUtils.isNotEmpty(user.getEmail()) ? user.getEmail() : "" %></td>
 							<td class="userwidth"><%= user.getStatus()!= null ? user.getStatus() : "" %></td>
 							<td  class = "tablealign">
-								<input type="button" class="btn btn-primary addiconAlign" value="Roles" onclick="showAssignRolesPopup('<%= user.getId() %>');">
+								<input type="button" class="btn <%= per_disabledClass %> addiconAlign" <%= per_disabledStr %> value="Roles" onclick="showAssignRolesPopup('<%= user.getId() %>');">
 							</td>
 						</tr>
 					</tbody>
@@ -172,6 +176,41 @@
 	function showAssignRolesPopup(userId) {
 		var params = "userId=";
 		params = params.concat(userId);
-		yesnoPopup("showAssignRoles", '<s:label key="lbl.hdr.adm.usrlst.role.popup.title"/>', 'assignRoles' , '<s:text name="lbl.btn.ok"/>', '', params);
+		yesnoPopup("showAssignRoles", '<s:text name="lbl.hdr.adm.usrlst.role.popup.title"/>', 'assignRoles' , '<s:text name="lbl.btn.ok"/>', '', params);
+	}
+	
+	function successEvent(pageUrl, data) {
+		if (pageUrl === "roleListToAssign") {
+// 			$("#rolesSelected").empty()
+			$("#rolesAvailable").empty()
+			if (data != undefined && !isBlank(data)) {
+				/* if (data.availableRoles != undefined && !isBlank(data.availableRoles)) {
+					for (i in data.availableRoles) {
+						var role = data.availableRoles[i];
+						var id = role.id;
+						var name = role.name;
+						if ($.inArray(id.toString(), selectedRoleIds) == -1) {
+							var option = "<option value='"+ id +"'>"+ name +"</option>";
+							$("#rolesSelected").append(option);
+						}
+					}
+				} */
+				
+				var selectedRoleIds = [];
+				$("#rolesSelected option").each(function() {
+					selectedRoleIds.push($(this).val());
+				});
+				
+				for (i in data.roles) {
+					var role = data.roles[i];
+					var id = role.id;
+					var name = role.name;
+					if ($.inArray(id.toString(), selectedRoleIds) == -1) {
+						var option = "<option value='"+ id +"'>"+ name +"</option>";
+						$("#rolesAvailable").append(option);
+					}
+				}
+			}
+		}
 	}
 </script>

@@ -30,12 +30,20 @@
 <% 
 	List<DownloadInfo> downloadInfos = (List<DownloadInfo>)request.getAttribute(ServiceUIConstants.REQ_DOWNLOAD_INFO); 
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
+	
+	List<String> permissionIds = (List<String>) session.getAttribute(ServiceUIConstants.SESSION_PERMISSION_IDS);
+	String per_disabledStr = "";
+	String per_disabledClass = "btn-primary";
+	if (CollectionUtils.isNotEmpty(permissionIds) && !permissionIds.contains(ServiceUIConstants.PER_MANAGE_DOWNLOADS)) {
+		per_disabledStr = "disabled";
+		per_disabledClass = "btn-disabled";
+	}
 %>
 
 <form id="formDownloadList" class="customer_list">
 	<div class="operation" id="operation">
-		<input type="button" id="downloadAdd" class="btn btn-primary" name="download_add" 
-			onclick="loadContent('downloadAdd', $('#formDownloadList'), $('#subcontainer'));" value="<s:text name='lbl.hdr.download.add'/>"/>
+		<input type="button" id="downloadAdd" class="btn <%= per_disabledClass %>" <%= per_disabledStr %> name="download_add" 
+			onclick="addDownload();" value="<s:text name='lbl.hdr.download.add'/>"/>
 		<input type="button" id="del" class="btn" disabled value="<s:text name='lbl.btn.del'/>"
 			onclick="showDeleteConfirmation('<s:text name='del.confirm.download'/>');"/>
 		<s:if test="hasActionMessages()">
@@ -64,7 +72,7 @@
 							<tr>
 								<th class="first">
 									<div class="th-inner">
-										<input type="checkbox" value="" class=checkAll id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this,$('.dwnloadInfo'), false);">
+										<input type="checkbox" value="" class="checkAll" <%= per_disabledStr %> id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this,$('.dwnloadInfo'), false);">
 									</div>
 								</th>
 								<th class="second">
@@ -97,7 +105,8 @@
 									<% if (download.isSystem()) { %>
 										<input type="checkbox"  name="downloadId" value="<%= download.getId() %>" disabled >
 									<% } else { %>
-									  	<input type="checkbox" class="check dwnloadInfo" name="downloadId" value="<%= download.getId() %>" onclick="checkboxEvent($('#checkAllAuto'),'dwnloadInfo');" >
+									  	<input type="checkbox" <%= per_disabledStr %> class="check dwnloadInfo" name="downloadId" value="<%= download.getId() %>" 
+									  		onclick="checkboxEvent($('#checkAllAuto'),'dwnloadInfo');" >
 									<% } %>								
 									</td>
 									<td class="namelabel-width">
@@ -144,17 +153,24 @@
 		toDisableCheckAll($('#checkAllAuto'),'dwnloadInfo'); 
 		hideLoadingIcon();
 	});
+	
+	function addDownload() {
+		showLoadingIcon();
+		loadContent('downloadAdd', $('#formDownloadList'), $('#subcontainer'));
+	}
      
 	function versioningDownload(id) {
-		 var params = "downloadId=";
-	     params = params.concat(id);
-	     params = params.concat("&versioning=")
-	     params = params.concat("versioning");
-	     loadContent("downloadEdit", $('#formDownloadList'), $('#subcontainer'), params);
+		showLoadingIcon();
+		var params = "downloadId=";
+	    params = params.concat(id);
+	    params = params.concat("&versioning=")
+	    params = params.concat("versioning");
+	    loadContent("downloadEdit", $('#formDownloadList'), $('#subcontainer'), params);
 	}
 	
     /** To edit the download **/
     function editDownload(id) {
+    	showLoadingIcon();
 		var customerId = $('input[name=customerId]').val();
         var params = "downloadId=";
         params = params.concat(id);

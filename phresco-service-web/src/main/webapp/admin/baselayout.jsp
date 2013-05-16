@@ -333,9 +333,8 @@
 			<div class="modal-footer">
 				<div class="errMsg" id="reportMsg"></div>
 				<div id="updateMsg" class="updateMsg"></div>
-				<a href="#" class="btn btn-primary" data-dismiss="modal" id="popupCancel"><s:text name='lbl.btn.cancel'/></a>
-				<a href="#" class="btn btn-primary popupOk" id="" onclick="popupOnOk(this);"><s:text name='lbl.btn.ok'/></a>
-				<a href="#" class="btn btn-primary" data-dismiss="modal" id="popupClose"><s:text name='lbl.btn.close'/></a>
+				<input type="button" class="btn btn-primary" data-dismiss="modal" id="popupCancel" value="<s:text name='lbl.btn.cancel'/>"/>
+				<input type="button" class="btn btn-primary popupOk" onClick="popupOnOk(this);" value="<s:text name='lbl.btn.ok'/>"/>
 			</div>
 		</div>
 	    <!-- Popup Ends -->

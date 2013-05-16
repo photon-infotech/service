@@ -17,11 +17,13 @@
     limitations under the License.
 
 --%>
+
 <%@ taglib uri="/struts-tags" prefix="s"%>
 
 <%@ page import="java.util.List"%>
 
 <%@ page import="org.apache.commons.lang.StringUtils"%>
+<%@ page import="org.apache.commons.collections.CollectionUtils"%>
 
 <%@ page import="com.photon.phresco.commons.model.Property"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
@@ -35,6 +37,14 @@
 	String buttonLbl = ServiceActionUtil.getButtonLabel(fromPage);
 	String pageUrl = ServiceActionUtil.getPageUrl(ServiceUIConstants.GLOBALURLS, fromPage);
 	String progressTxt = ServiceActionUtil.getProgressTxt(ServiceUIConstants.GLOBALURLS, fromPage);
+	
+	List<String> permissionIds = (List<String>) session.getAttribute(ServiceUIConstants.SESSION_PERMISSION_IDS);
+	String per_disabledStr = "";
+	String per_disabledClass = "btn-primary";
+	if (CollectionUtils.isNotEmpty(permissionIds) && !permissionIds.contains(ServiceUIConstants.PER_MANAGE_GLOBALURL)) {
+		per_disabledStr = "disabled";
+		per_disabledClass = "btn-disabled";
+	}
 	
     String id = "";
     String name = "";
@@ -96,11 +106,11 @@
 	</div>
 	
 	<div class="bottom_button">
-			<input type="button" id="" class="btn <%= disabledClass %>" <%= disabled %>  value="<%= buttonLbl %>"
-				onclick="validate('<%= pageUrl %>', $('#formGlobalUrlAdd'), $('#subcontainer'), '<%= progressTxt %>');" />
+		<input type="button" id="" class="btn <%= disabledClass %> <%= per_disabledClass %>" <%= per_disabledStr %> <%= disabled %>  value="<%= buttonLbl %>"
+			onclick="validate('<%= pageUrl %>', $('#formGlobalUrlAdd'), $('#subcontainer'), '<%= progressTxt %>');" />
     
-			<input type="button" id="globalurlCancel" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>"
-				onclick="loadContent('globalurlList', $('#formGlobalUrlAdd'), $('#subcontainer'));" />
+		<input type="button" id="globalurlCancel" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>"
+			onclick="getGlobalUrlList();" />
 	</div>
 	
 	<!-- Hidden Fields -->
@@ -125,6 +135,11 @@
             $(this).val(name);        
 		});
 	});
+	
+	function getGlobalUrlList() {
+		showLoadingIcon();
+		loadContent('globalurlList', $('#formGlobalUrlAdd'), $('#subcontainer'));
+	}
 	
 	function findError(data) {
 		if (!isBlank(data.nameError)) {

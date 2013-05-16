@@ -42,6 +42,15 @@
 	String buttonLbl = ServiceActionUtil.getButtonLabel(fromPage);
 	String pageUrl = ServiceActionUtil.getPageUrl(ServiceUIConstants.CONFIG_TEMPLATES, fromPage);
 	String progressTxt = ServiceActionUtil.getProgressTxt(ServiceUIConstants.CONFIG_TEMPLATES, fromPage);
+	
+	List<String> permissionIds = (List<String>) session.getAttribute(ServiceUIConstants.SESSION_PERMISSION_IDS);
+	String per_disabledStr = "";
+	String per_disabledClass = "btn-primary";
+	if (CollectionUtils.isNotEmpty(permissionIds) && !permissionIds.contains(ServiceUIConstants.PER_MANAGE_CONFIG_TEMPLATES)) {
+		per_disabledStr = "disabled";
+		per_disabledClass = "btn-disabled";
+	}
+	
 	//For edit
 	String id = "";
 	String name = "";
@@ -281,11 +290,10 @@
 	</div>	
 	 
 	<div class="bottom_config">
-		<input type="button" id="" class="btn btn-primary" 
-			onclick="validatePropTempKey('<%= pageUrl %>', '<%= progressTxt %>');" 
-			value='<%= buttonLbl %>'/>
-		<input type="button" id="configtempCancel" class="btn btn-primary" 
-			onclick="loadContent('configtempList', $('#formCustomerId'), $('#subcontainer'));" value="<s:text name='lbl.btn.cancel'/>"/>
+		<input type="button" id="" class="btn <%= per_disabledClass %>" <%= per_disabledStr %> 
+			onclick="validatePropTempKey('<%= pageUrl %>', '<%= progressTxt %>');" value='<%= buttonLbl %>'/>
+		<input type="button" id="configtempCancel" class="btn btn-primary" onclick="getConfigTemplates()" 
+			value="<s:text name='lbl.btn.cancel'/>"/>
 	</div>
 	
 	<!-- Hidden Fields -->
@@ -344,6 +352,11 @@
 	var customer = $('input[name=customerId]').val();
 	var fromPage = '<%= fromPage %>';
 	var system = '<%= isSystem %>';
+	
+	function getConfigTemplates() {
+		showLoadingIcon();
+		loadContent('configtempList', $('#formCustomerId'), $('#subcontainer'));
+	}
 	
 	//Add propTemp
 	function openConfigTempPopup() {
@@ -634,4 +647,5 @@
 			hideError($("#dispNameControl"), $("#dispNameError"));
 		}
 	}
+	
 </script>

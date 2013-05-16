@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 
 import com.photon.phresco.commons.model.Permission;
 import com.photon.phresco.commons.model.Role;
+import com.photon.phresco.commons.model.User;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.client.api.ServiceManager;
@@ -47,9 +48,15 @@ public class Roles extends ServiceBaseAction {
 	
 	private String oldName = "";
 	
+	private boolean editable = false;
 	private String fromPage = "";
 	
 	private String roleId = "";
+	private String appliesTo = "";
+	private String userId = "";
+	private List<Role> availableRoles = new ArrayList<Role>();
+	private List<Role> roles = new ArrayList<Role>();
+	
 	private List<String> selectedPermissions = new ArrayList<String>();
 	
 	public String list() throws PhrescoException {
@@ -58,8 +65,9 @@ public class Roles extends ServiceBaseAction {
 		}
 		
 		try {
-			List<Role> roleList = getServiceManager().getRoles();
+			List<Role> roleList = getServiceManager().getRoles(getAppliesTo());
 			setReqAttribute(REQ_ROLE_LIST, roleList);
+			setReqAttribute(REQ_APPLIES_TO, getAppliesTo());
 		} catch (PhrescoException e) {
 		    return showErrorPopup(e, getText(EXCEPTION_ROLE_LIST));
 		}
@@ -71,6 +79,8 @@ public class Roles extends ServiceBaseAction {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Roles.add()");
 		}
+		
+		setReqAttribute(REQ_APPLIES_TO, getAppliesTo());
 		
 		return ADMIN_ROLE_ADD;	
 	}
@@ -84,6 +94,7 @@ public class Roles extends ServiceBaseAction {
 		    Role role = getServiceManager().getRole(getRoleId());
 			setReqAttribute(REQ_ROLE_ROLE , role);
 			setReqAttribute(REQ_FROM_PAGE, EDIT);
+			setReqAttribute(REQ_APPLIES_TO, getAppliesTo());
 		} catch (PhrescoException e) {
 		    return showErrorPopup(e, getText(EXCEPTION_ROLE_EDIT));
 		}
@@ -97,12 +108,9 @@ public class Roles extends ServiceBaseAction {
 		}
 
 		try  {
-			List<Role> roleList = new ArrayList<Role>();
-			Role role = new Role();
-			role.setName(getName());
-			role.setDescription(getDescription());
-			roleList.add(role);
-			getServiceManager().createRoles(roleList);
+			List<Role> roles = new ArrayList<Role>();
+			roles.add(createRole());
+			getServiceManager().createRoles(roles);
 			addActionMessage(getText(ROLE_ADDED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
 			return showErrorPopup(e, getText(EXCEPTION_ROLE_SAVE));
@@ -117,17 +125,52 @@ public class Roles extends ServiceBaseAction {
 	    }
  
 		try {
-			Role role = new Role();
-			role.setId(getRoleId());
-			role.setName(getName());
-			role.setDescription(getDescription());
-			getServiceManager().updateRole(role, getRoleId());
+			getServiceManager().updateRole(createRole(), getRoleId());
 			addActionMessage(getText(ROLE_UPDATED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
 		    return showErrorPopup(e, getText(EXCEPTION_ROLE_UPDATE));
 		}
 
 		return list();
+	}
+	
+	public String roleListToAssign() {
+		if (isDebugEnabled) {
+	        S_LOGGER.debug("Entering Method Roles.roleListToAssign()");
+	    }
+		
+		try {
+			ServiceManager serviceManager = getServiceManager();
+			setRoles(serviceManager.getRoles(getAppliesTo()));
+			User user = serviceManager.getUserInfo(getUserId());
+			List<String> roleIds = user.getRoleIds();
+			if (CollectionUtils.isNotEmpty(roleIds)) {
+				for (String roleId : roleIds) {
+					Role role = getServiceManager().getRole(roleId);
+					if (role.getAppliesTo().equalsIgnoreCase(getAppliesTo())) {
+						availableRoles.add(role);
+					}
+				}
+			}
+				
+		} catch (PhrescoException e) {
+			
+		}
+		
+		return SUCCESS;
+	}
+	
+	private Role createRole() {
+		Role role = new Role();
+		if (StringUtils.isNotEmpty(getRoleId())) {
+			role.setId(getRoleId());
+		}
+		role.setName(getName());
+		role.setDescription(getDescription());
+		role.setAppliesTo(getAppliesTo());
+		role.setAppliesTo(getAppliesTo());
+		
+		return role;
 	}
 	
 	public String delete() throws PhrescoException {
@@ -197,8 +240,9 @@ public class Roles extends ServiceBaseAction {
 			ServiceManager serviceManager = getServiceManager();
 			Role role = serviceManager.getRole(getRoleId());
 			setReqAttribute(REQ_SELECTED_PERMISSION_IDS, role.getPermissionIds());
-			List<Permission> permissions = serviceManager.getPermissions();
+			List<Permission> permissions = serviceManager.getPermissions(getAppliesTo());
 			setReqAttribute(REQ_PERMISSIONS_LIST, permissions);
+			setReqAttribute(REQ_ROLE_EDITABLE, isEditable());
 		} catch (PhrescoException e) {
 			return showErrorPopup(e, getText(EXCEPTION_ROLE_ASSIGN_PERMISSION_POPUP));
 		}
@@ -294,5 +338,45 @@ public class Roles extends ServiceBaseAction {
 
 	public List<String> getSelectedPermissions() {
 		return selectedPermissions;
+	}
+
+	public void setAppliesTo(String appliesTo) {
+		this.appliesTo = appliesTo;
+	}
+
+	public String getAppliesTo() {
+		return appliesTo;
+	}
+
+	public void setRoles(List<Role> roles) {
+		this.roles = roles;
+	}
+
+	public List<Role> getRoles() {
+		return roles;
+	}
+
+	public void setEditable(boolean editable) {
+		this.editable = editable;
+	}
+
+	public boolean isEditable() {
+		return editable;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setAvailableRoles(List<Role> availableRoles) {
+		this.availableRoles = availableRoles;
+	}
+
+	public List<Role> getAvailableRoles() {
+		return availableRoles;
 	}
 }

@@ -20,7 +20,9 @@
 <%@ taglib uri="/struts-tags" prefix="s" %>
 
 <%@ page import="java.util.List"%>
+
 <%@ page import="org.apache.commons.lang.StringUtils"%>
+<%@ page import="org.apache.commons.collections.CollectionUtils"%>
 
 <%@ page import="com.photon.phresco.commons.model.VideoInfo"%>
 <%@ page import="com.photon.phresco.commons.model.ArtifactGroup"%>
@@ -35,6 +37,14 @@
 	String buttonLbl = ServiceActionUtil.getButtonLabel(fromPage);
 	String pageUrl = ServiceActionUtil.getPageUrl(ServiceUIConstants.VIDEOS, fromPage);
 	String progressTxt = ServiceActionUtil.getProgressTxt(ServiceUIConstants.VIDEOS, fromPage);
+	
+	List<String> permissionIds = (List<String>) session.getAttribute(ServiceUIConstants.SESSION_PERMISSION_IDS);
+	String per_disabledStr = "";
+	String per_disabledClass = "btn-primary";
+	if (CollectionUtils.isNotEmpty(permissionIds) && !permissionIds.contains(ServiceUIConstants.PER_MANAGE_VIDEOS)) {
+		per_disabledStr = "disabled";
+		per_disabledClass = "btn-disabled";
+	}
 
 	String name = "";
 	String description = "";
@@ -126,11 +136,11 @@
 	
 	
 	<div class="bottom_button">
-       	<input type="button" id="" class="btn <%= disabledClass %>" <%= disabled %>  value='<%= buttonLbl %>'
+       	<input type="button" id="" class="btn <%= disabledClass %> <%= per_disabledClass %>" <%= per_disabledStr %> <%= disabled %>  value='<%= buttonLbl %>'
            onclick="validate('<%= pageUrl %>', $('#formVideoAdd'), $('#subcontainer'), '<%= progressTxt %>');" />
   
 		<input type="button" id="videoCancel" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>" 
-            onclick="loadContent('videoList', $('#formVideoAdd'), $('#subcontainer'));" />
+            onclick="getVideos();" />
     </div>
 	
 	<!-- Hidden Fields -->
@@ -159,6 +169,11 @@
 	    	$(this).val(name);
 		});	
 	});
+	
+	function getVideos() {
+		showLoadingIcon();
+		loadContent('videoList', $('#formVideoAdd'), $('#subcontainer'));
+	}
 	
 	function findError(data) {
 		if (!isBlank(data.nameError)) {

@@ -19,20 +19,21 @@
 --%>
 <%@ taglib uri="/struts-tags" prefix="s" %>
 
-<%@ page import="org.apache.commons.collections.MapUtils"%>
-<%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="java.text.SimpleDateFormat"%>
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.List"%>
 <%@ page import="java.util.Map"%>
 <%@ page import="java.util.ArrayList"%>
 
+<%@ page import="org.apache.commons.collections.MapUtils"%>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="org.apache.commons.collections.CollectionUtils" %>
+
 <%@ page import="com.photon.phresco.commons.model.Customer" %>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
 <%@ page import="com.photon.phresco.service.admin.actions.util.ServiceActionUtil" %>
 <%@ page import="com.photon.phresco.commons.model.Customer.LicenseType" %>
 <%@ page import="com.photon.phresco.commons.model.ApplicationType" %>
-<%@ page import="org.apache.commons.collections.CollectionUtils" %>
 <%@ page import="com.photon.phresco.commons.model.Technology" %>
 <%@ page import="com.photon.phresco.commons.model.TechnologyOptions"%>
 
@@ -46,6 +47,10 @@
 	String buttonLbl = ServiceActionUtil.getButtonLabel(fromPage);
 	String pageUrl = ServiceActionUtil.getPageUrl(ServiceUIConstants.CUSTOMERS, fromPage);
 	String progressTxt = ServiceActionUtil.getProgressTxt(ServiceUIConstants.CUSTOMERS, fromPage);
+	
+	List<String> permissionIds = (List<String>) session.getAttribute(ServiceUIConstants.SESSION_PERMISSION_IDS);
+	String per_disabledStr = "";
+	String per_disabledClass = "btn-primary";
 	
 	//For edit
 	String id = "";
@@ -68,7 +73,7 @@
 	String baseRepoUrl = "";
 	String country = "";
 	String disabled = "";
-	String disabledClass = "btn-primary";
+	String disabledClass = "";
 	LicenseType licenseType = null;
 	String validFrom = null;
 	String validUpto = null;
@@ -148,9 +153,15 @@
 		if (customer.getType() != null) {
 			licenseType = customer.getType();
 		}
-		if(customer.isSystem()){
-			disabledClass = "btn-disabled";
-			disabled = "disabled";
+		if (CollectionUtils.isNotEmpty(permissionIds) && !permissionIds.contains(ServiceUIConstants.PER_MANAGE_CUSTOMERS)) {
+			per_disabledStr = "disabled";
+			per_disabledClass = "btn-disabled";
+		} else {
+			disabledClass = "btn-primary";
+			if (customer.isSystem()) {
+				disabledClass = "btn-disabled";
+				disabled = "disabled";
+			}
 		}
 		frameworkTheme = customer.getFrameworkTheme();
 		selectedOptions = customer.getOptions();
@@ -864,11 +875,9 @@
 	
 	</div>
 	<div class="bottom_button">
-		
-		<input type="button" id="" class="btn <%= disabledClass %>" <%= disabled %> value="<%= buttonLbl %>" 
+		<input type="button" id="" class="btn <%= disabledClass %> <%= per_disabledClass %>" <%= per_disabledStr %> <%= disabled %> value="<%= buttonLbl %>" 
 			 onclick="validate('<%= pageUrl %>', $('#formCustomerAdd'), $('#subcontainer'), '<%= progressTxt %>', $('.content_adder :input'));" />
-		<input type="button" id="customerCancel" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>" 
-            onclick="loadContent('customerList', $('#formCustomerAdd'), $('#subcontainer'));" />
+		<input type="button" id="customerCancel" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>" onclick="getCustomersList();" />
 	</div>
 	<!-- Hidden Fields -->
 	<input type="hidden" name="fromPage" value="<%= StringUtils.isNotEmpty(fromPage) ? fromPage : "" %>"/>
@@ -894,8 +903,9 @@
 		createUploader();
 		checkboxEvent($('#checkAllAuto'),'applsChk');
 		checkboxEvent($('#checkAllOptions'), 'optionsChk');
-		 // for edit - to show selected country while page loads 
-		 $("#countryList option[value='<%= country %>']").attr('selected', 'selected'); 
+		
+		// for edit - to show selected country while page loads 
+		$("#countryList option[value='<%= country %>']").attr('selected', 'selected'); 
 		 
 		// To check for the special character in name
         $('#custmname').bind('input propertychange', function (e) {
@@ -951,22 +961,6 @@
 				document.getElementById('todate').value = '';
 		<% } %>
 		
-		
-		function createUploader() {
-			var imgUploader = new qq.FileUploader ({
-	            element: document.getElementById('image-file-uploader'),
-	            action: 'uploadCustomerIcon',
-	            multiple: false,
-	            allowedExtensions : ["png"],
-	            uploadId: 'customerUploadId',
-	            type: 'customerImageFile',
-	            buttonLabel: '<s:label key="lbl.hdr.adm.upload.logo" />',
-	            typeError : '<s:text name="err.invalid.img.file" />',
-	            params: {type: 'customerImageFile'}, 
-	            debug: true
-	        });
-		}
-		
 		$(function() {
 			$("#fromdate").datepicker({
 				showOn : "button",
@@ -981,6 +975,26 @@
 			});
 		});
 	});
+	
+	function getCustomersList() {
+		showLoadingIcon();
+		loadContent('customerList', $('#formCustomerAdd'), $('#subcontainer'));
+	}
+	
+	function createUploader() {
+		var imgUploader = new qq.FileUploader ({
+            element: document.getElementById('image-file-uploader'),
+            action: 'uploadCustomerIcon',
+            multiple: false,
+            allowedExtensions : ["png"],
+            uploadId: 'customerUploadId',
+            type: 'customerImageFile',
+            buttonLabel: '<s:label key="lbl.hdr.adm.upload.logo" />',
+            typeError : '<s:text name="err.invalid.img.file" />',
+            params: {type: 'customerImageFile'}, 
+            debug: true
+        });
+	}
 	
 	function removeUploadedJar(obj, btnId) {
 		$(obj).parent().remove();
@@ -1020,7 +1034,7 @@
 		}
 	});
 	
-	 $('#reponame').bind('input propertychange', function (e) {
+	$('#reponame').bind('input propertychange', function (e) {
 		var reponame = $(this).val();
 		reponame = allowAlphaNum(reponame);
 		$(this).val(reponame.trim());

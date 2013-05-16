@@ -4226,7 +4226,7 @@ h3 label {
 
 .popupusr  label {
 	padding-left: 3%;
-	width: 15%;
+	width: 17%;
 	float: left;
 	font-weight: bold;
 }
@@ -4276,7 +4276,7 @@ select[class='sample'] {
 }
 
 input[class *='sample'] {
-	height: 23px;
+	height: 30px;
 	width: 5px;
 	margin-top: 6px;
 }
@@ -4993,27 +4993,27 @@ input[class="chkBox_config"] {
 .dwnldError{
 	color:#B94A48;
 }
-#testmenu {
+.submenu {
 	margin: 0px !important;
 	padding: 0;
 	list-style: none;
 }
 
-#testmenu li:last-child {
+.submenu li:last-child {
 	border-bottom: none;
 }
 
-#testmenu li:first-child {
+.submenu li:first-child {
 	border-top : 1px solid #656565;
 }
 
-#testmenu li a.active, #testmenu li a:hover {
+.submenu li a.active, .submenu li a:hover {
 	background: #DE522F;
 	color: white;
 	font-weight: bold;
 }
 
-#testmenu li a {
+.submenu li a {
 	text-decoration: none;
 	background: #545454;
 	display: block;

@@ -55,6 +55,14 @@
 		disabledVer = "disabled";
 	}
 	
+	List<String> permissionIds = (List<String>) session.getAttribute(ServiceUIConstants.SESSION_PERMISSION_IDS);
+	String per_disabledStr = "";
+	String per_disabledClass = "btn-primary";
+	if (CollectionUtils.isNotEmpty(permissionIds) && !permissionIds.contains(ServiceUIConstants.PER_MANAGE_ARCHETYPES)) {
+		per_disabledStr = "disabled";
+		per_disabledClass = "btn-disabled";
+	}
+	
 	//For edit
 	String name = "";
 	String desc = "";
@@ -417,11 +425,11 @@
 				disabled = "disabled";
 			}
 		%>
-		<input type="button" id="" class="btn <%= disabledClass %>" <%= disabled %> value='<%= buttonLbl %>'
+		<input type="button" id="" class="btn <%= disabledClass %> <%= per_disabledClass %>" <%= disabled %> <%= per_disabledStr %> value='<%= buttonLbl %>'
 			onclick="validate('<%= pageUrl %>', $('#formArcheTypeAdd'), $('#subcontainer'), '<%= progressTxt %>', $('.content_adder :input'));" />
 		
 		<input type="button" id="archetypeCancel" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>" 
-            onclick="loadContent('archetypesList', $('#formArcheTypeAdd'), $('#subcontainer'));"/>
+            onclick="getArchetypes();"/>
 	</div>
 	
 	<!-- Hidden Fields -->
@@ -483,7 +491,12 @@
     	if (e.keyCode == 27) {    		  
     		$("#progressBar").hide();
     	} 
-    }); 
+    });
+	
+	function getArchetypes() {
+		showLoadingIcon();
+		loadContent('archetypesList', $('#formArcheTypeAdd'), $('#subcontainer'));
+	}
 	   
 	function getTechGroup() {
 		loadContent('getTechGroup', $('#formArcheTypeAdd'), '', '', true);

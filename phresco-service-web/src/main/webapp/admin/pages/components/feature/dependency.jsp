@@ -33,94 +33,80 @@
 %>
 
 <form id="formDependency">
-<div class="modal">
-	<div class="modal-header">
-		<a class="close" id="close">&times;</a>
-	  	<h3><s:label key="lbl.hdr.comp.featr.popup.title" theme="simple"/></h3>
-	</div>
-	
-	<div class="modal-body feat_modal-body">
-		<% if (CollectionUtils.isEmpty(moduleGroups)) { %>
-			<div class="alert alert-block">
-				<s:text name='alert.msg.feature.not.available'/>
-			</div>
-    	<% } else { %>
-			<div class="theme_accordion_container jsLib_accordion_container">
-			    <section class="accordion_panel_wid">
-			        <div class="accordion_panel_inner">
-			            <section class="lft_menus_container">
-			            <%
-							for (ArtifactGroup moduleGroup : moduleGroups) {
-						%>
-			                <span class="siteaccordion closereg">
-			                	<span class="dependencySpan">
-			                		<input type="checkbox" name="dependentModGroupId" value="<%= moduleGroup.getId()%>" 
-			                			id="<%= moduleGroup.getId()%>checkBox" class="floatLeft">
-			                		&nbsp;&nbsp;<%= moduleGroup.getName() %>&nbsp;&nbsp;
-			                		<p id="<%= moduleGroup.getId()%>version" class="version floatRight"></p>
-			                	</span>
-			                </span>
-			                <div class="mfbox siteinnertooltiptxt hideContent">
-			                    <div class="scrollpanel">
-			                        <section class="scrollpanel_inner">
-			                        	<table class="download_tbl">
-				                            <tbody>
-				                            <% 
-				                            	List<ArtifactInfo> versions = moduleGroup.getVersions();
-										    	if (CollectionUtils.isNotEmpty(versions)) {
-													for (ArtifactInfo module : versions) {
-													    String descContent = "";
-														if (StringUtils.isNotEmpty(module.getDescription())) {
-														  	descContent = module.getDescription();
-														}
-														
-														String helpTextContent = "";
-														if (StringUtils.isNotEmpty(module.getHelpText())) { 
-														  	helpTextContent = module.getHelpText();
-														}
-														
-														//To check the already selected dependent modules
-														String checkedStr = "";
-														if (CollectionUtils.isNotEmpty(dependentModuleIds)) {
-													        if (dependentModuleIds.contains(module.getId())) {
-													            checkedStr = "checked";
-													        } else {
-													            checkedStr = "";
-													        }
-														}
-											%>
-												<tr>
-													<td class="editFeatures_td1">
-														<input type="radio" class="module" name="<%= moduleGroup.getId() %>" value="<%= module.getId() %>"
-															<%= checkedStr %> version="<%= module.getVersion() %>" onchange="selectCheckBox('<%= moduleGroup.getId()%>', this);">
-													</td>
-													<td class="fontColor"><%= moduleGroup.getName() %></td>
-													<td class="fontColor"><%= module.getVersion() %></td>
-												</tr>
-											<%	
+	<% if (CollectionUtils.isEmpty(moduleGroups)) { %>
+		<div class="alert alert-block">
+			<s:text name='alert.msg.feature.not.available'/>
+		</div>
+   	<% } else { %>
+		<div class="theme_accordion_container jsLib_accordion_container">
+		    <section class="accordion_panel_wid">
+		        <div class="accordion_panel_inner">
+		            <section class="lft_menus_container">
+		            <%
+						for (ArtifactGroup moduleGroup : moduleGroups) {
+					%>
+		                <span class="siteaccordion closereg">
+		                	<span class="dependencySpan">
+		                		<input type="checkbox" name="dependentModGroupId" value="<%= moduleGroup.getId()%>" 
+		                			id="<%= moduleGroup.getId()%>checkBox" class="floatLeft">
+		                		&nbsp;&nbsp;<%= moduleGroup.getName() %>&nbsp;&nbsp;
+		                		<p id="<%= moduleGroup.getId()%>version" class="version floatRight"></p>
+		                	</span>
+		                </span>
+		                <div class="mfbox siteinnertooltiptxt hideContent">
+		                    <div class="scrollpanel">
+		                        <section class="scrollpanel_inner">
+		                        	<table class="download_tbl">
+			                            <tbody>
+			                            <% 
+			                            	List<ArtifactInfo> versions = moduleGroup.getVersions();
+									    	if (CollectionUtils.isNotEmpty(versions)) {
+												for (ArtifactInfo module : versions) {
+												    String descContent = "";
+													if (StringUtils.isNotEmpty(module.getDescription())) {
+													  	descContent = module.getDescription();
 													}
-									    		}
-											%>
-				                            </tbody>
-			                        	</table>
-			                        </section>
-			                    </div>
-			                </div>
-			                <% 		
-								}
-							%>	
-			            </section>  
-			        </div>
-			    </section>
-			</div>	
-		<% } %>
-	</div>
-	
-	<div class="modal-footer">
-		<a href="#" class="btn btn-primary" id="cancel"><s:label key="lbl.btn.cancel"/></a>
-	  	<a href="#" class="btn btn-primary" id="saveDependency"><s:label key="lbl.btn.ok"/></a>
-	</div>
-</div>
+													
+													String helpTextContent = "";
+													if (StringUtils.isNotEmpty(module.getHelpText())) { 
+													  	helpTextContent = module.getHelpText();
+													}
+													
+													//To check the already selected dependent modules
+													String checkedStr = "";
+													if (CollectionUtils.isNotEmpty(dependentModuleIds)) {
+												        if (dependentModuleIds.contains(module.getId())) {
+												            checkedStr = "checked";
+												        } else {
+												            checkedStr = "";
+												        }
+													}
+										%>
+											<tr>
+												<td class="editFeatures_td1">
+													<input type="radio" class="module" name="<%= moduleGroup.getId() %>" value="<%= module.getId() %>"
+														<%= checkedStr %> version="<%= module.getVersion() %>" onchange="selectCheckBox('<%= moduleGroup.getId()%>', this);">
+												</td>
+												<td class="fontColor"><%= moduleGroup.getName() %></td>
+												<td class="fontColor"><%= module.getVersion() %></td>
+											</tr>
+										<%	
+												}
+								    		}
+										%>
+			                            </tbody>
+		                        	</table>
+		                        </section>
+		                    </div>
+		                </div>
+		                <% 		
+							}
+						%>	
+		            </section>  
+		        </div>
+		    </section>
+		</div>	
+	<% } %>
 </form>
 
 <script language="JavaScript" type="text/javascript">
@@ -130,13 +116,6 @@
 	}
 	
 	$(document).ready(function() {
-		
-		//To close the popup
-		$('#cancel, #close').click(function() {
-			showParentPage();
-			hideLoadingIcon();
-		});
-		
 		//Check box click function to check the first radio button and show the selected version
 		$('input[name="dependentModGroupId"]').change(function() {
 			var modGrpId = $(this).val();
@@ -151,20 +130,6 @@
 			}
 		});
 		
-		//To save the selected dependency module ids
-		$('#saveDependency').click(function() {
-			$('#popupPage').modal('hide');
-			showParentPage();
-			var size = $('input[name="dependentModGroupId"]:checked').size();
-			if(size > 0) {
-				$('#totalSize').html(size+" Dependencies Added");
-			} else {
-				$('#totalSize').empty();
-			}
-			loadContent('saveDependentFeatures', $('#formDependency'), $('#popup_div'), '', true);
-			hideLoadingIcon();
-		});
-		
 		//To check the selected modules group checkbox and show the selected version
 		$("input[type=radio]:checked").each(function() {
 			var version = $(this).attr('version');
@@ -173,6 +138,17 @@
 			$("#" + moduleGroupId + "checkBox").prop("checked", true);
 		});
 	});
+	
+	//To save the selected dependency module ids
+	function popupOnOk(self) {
+		var size = $('input[name="dependentModGroupId"]:checked').size();
+		if(size > 0) {
+			$('#totalSize').html(size+" Dependencies Added");
+		} else {
+			$('#totalSize').empty();
+		}
+		loadContent('saveDependentFeatures', $('#formDependency'), '', '', true);
+	}
 	
 	//Radio button click function to check the checkbox and show the selected version
 	function selectCheckBox(moduleId, currentElement) {
@@ -184,6 +160,5 @@
 	//To enable the page because the page will not be refreshed
 	function successEvent(url, data) {
 		showParentPage();
-		hideLoadingIcon();
 	}
 </script>

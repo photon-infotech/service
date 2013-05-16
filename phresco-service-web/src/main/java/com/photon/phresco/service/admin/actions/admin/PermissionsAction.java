@@ -32,6 +32,9 @@ public class PermissionsAction extends ServiceBaseAction {
 	private static final Logger S_LOGGER = Logger.getLogger(PermissionsAction.class);
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
+	private String fromPage = "";
+	private String appliesTo = "";
+	
 	//To get the all the permissions 
 	public String list() throws PhrescoException {
 		if (isDebugEnabled) {
@@ -39,7 +42,7 @@ public class PermissionsAction extends ServiceBaseAction {
 		}
 		
 		try {
-			List<Permission> permissions = getServiceManager().getPermissions();
+			List<Permission> permissions = getServiceManager().getPermissions(getAppliesTo());
 			setReqAttribute(REQ_PERMISSIONS_LIST, permissions);
 		} catch (PhrescoException e) {
 			return showErrorPopup(e, getText(EXCEPTION_PERMISSION_LIST));
@@ -47,5 +50,20 @@ public class PermissionsAction extends ServiceBaseAction {
 
 		return ADMIN_PERMISSION_LIST;	
 	}
+
+	public String getFromPage() {
+		return fromPage;
+	}
+
+	public void setFromPage(String fromPage) {
+		this.fromPage = fromPage;
+	}
 	
+	public void setAppliesTo(String appliesTo) {
+		this.appliesTo = appliesTo;
+	}
+
+	public String getAppliesTo() {
+		return appliesTo;
+	}
 }

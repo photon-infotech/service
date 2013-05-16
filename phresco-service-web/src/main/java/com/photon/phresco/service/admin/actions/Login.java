@@ -19,6 +19,7 @@ package com.photon.phresco.service.admin.actions;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -33,10 +34,11 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.photon.phresco.commons.model.Customer;
+import com.photon.phresco.commons.model.Role;
 import com.photon.phresco.commons.model.User;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.exception.PhrescoWebServiceException;
+import com.photon.phresco.service.api.PhrescoServerFactory;
 
 public class Login extends ServiceBaseAction {
 
@@ -85,6 +87,7 @@ public class Login extends ServiceBaseAction {
 		}
 		
 		removeSessionAttribute(SESSION_USER_INFO);
+		removeSessionAttribute(SESSION_PERMISSION_IDS);
 		String errorTxt = (String) getSessionAttribute(REQ_LOGIN_ERROR);
 		if (StringUtils.isNotEmpty(errorTxt)) {
 			setReqAttribute(REQ_LOGIN_ERROR, getText(errorTxt));
@@ -174,7 +177,7 @@ public class Login extends ServiceBaseAction {
 		
 		User user = null;
 		try {
-			user = doLogin(username, password);
+			user = doLogin(getUsername(), getPassword());
 			List<Customer> customers = user.getCustomers();
 			if (CollectionUtils.isNotEmpty(customers)) {
 				Collections.sort(customers, sortingCusNameInAlphaOrder());
@@ -191,14 +194,25 @@ public class Login extends ServiceBaseAction {
 				return LOGIN_FAILURE;
 			}
 			setSessionAttribute(SESSION_USER_INFO, user);
+			List<String> roleIds = user.getRoleIds();
+			if (CollectionUtils.isNotEmpty(roleIds)) {
+				List<String> permisionIds = new ArrayList<String>();
+				for (String roleId : roleIds) {
+					Role role = getServiceManager().getRole(roleId);
+					permisionIds.addAll(role.getPermissionIds());
+				}
+				setSessionAttribute(SESSION_PERMISSION_IDS, permisionIds);
+			}
 		} catch (PhrescoWebServiceException e) {
-			if(e.getResponse().getStatus() == 204) {
+			if (e.getResponse().getStatus() == 204) {
 				setReqAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_ERROR_LOGIN));
 				return LOGIN_FAILURE;
 			} else {
 				setReqAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_SERVER_DOWN));
 				return LOGIN_FAILURE;
 			}
+		} catch (PhrescoException e) {
+			// TODO Auto-generated catch block
 		} 
 			
 		return SUCCESS;
