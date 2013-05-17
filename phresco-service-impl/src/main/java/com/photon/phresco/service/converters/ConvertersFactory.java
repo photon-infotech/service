@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.photon.phresco.commons.model.Element;
+import com.photon.phresco.framework.converters.FrameworkArtifactGroupConverter;
+import com.photon.phresco.framework.converters.FrameworkCustomerConverter;
 import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.dao.ApplicationInfoDAO;
 import com.photon.phresco.service.dao.ApplicationTypeDAO;
@@ -42,8 +44,12 @@ public class ConvertersFactory {
 	public static final Map<Class<? extends BaseDAO>, Converter<? extends BaseDAO, ? extends Element>> CONVERTERS_MAP = 
 		new HashMap<Class<? extends BaseDAO>, Converter<? extends BaseDAO, ? extends Element>>(32);  
 	
+	public static final Map<Class<? extends BaseDAO>, Converter<? extends BaseDAO, ? extends Element>> FRAMEWORK_CONVERTERS_MAP = 
+		new HashMap<Class<? extends BaseDAO>, Converter<? extends BaseDAO, ? extends Element>>(32);
+	
 	static {
 		initConverters();
+		initFrameworkConverters();
 	}
 
 	private static void initConverters() {
@@ -57,9 +63,18 @@ public class ConvertersFactory {
 		CONVERTERS_MAP.put(ApplicationTypeDAO.class, new ApplicationTypeConverter());
 		CONVERTERS_MAP.put(CustomerDAO.class, new CustomerConverter());
 	}
+	
+	private static void initFrameworkConverters() {
+		FRAMEWORK_CONVERTERS_MAP.put(CustomerDAO.class, new FrameworkCustomerConverter());
+		FRAMEWORK_CONVERTERS_MAP.put(ArtifactGroupDAO.class, new FrameworkArtifactGroupConverter());
+	}
 
 	public static final Converter<? extends BaseDAO, ? extends Element> getConverter(Class<? extends BaseDAO> clazz) {
 		return CONVERTERS_MAP.get(clazz);
 	}
-
+	
+	public static final Converter<? extends BaseDAO, ? extends Element> getFrameworkConverter(Class<? extends BaseDAO> clazz) {
+		return FRAMEWORK_CONVERTERS_MAP.get(clazz);
+	}
+	
 }

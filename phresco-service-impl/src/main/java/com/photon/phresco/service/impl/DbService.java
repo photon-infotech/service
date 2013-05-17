@@ -76,12 +76,14 @@ public class DbService implements ServiceConstants {
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
 	private static final String MONGO_TEMPLATE = "mongoTemplate";
-	protected MongoOperations mongoOperation;
-	private ServerConfiguration serverConfig = null;
+	protected static MongoOperations mongoOperation;
+	private static ServerConfiguration serverConfig = null;
 	protected DbService() {
-		ApplicationContext ctx = new AnnotationConfigApplicationContext(MongoConfig.class);
-    	mongoOperation = (MongoOperations)ctx.getBean(MONGO_TEMPLATE);
-    	serverConfig = PhrescoServerFactory.getServerConfig();
+		if(mongoOperation == null) {
+			ApplicationContext ctx = new AnnotationConfigApplicationContext(MongoConfig.class);
+	    	mongoOperation = (MongoOperations)ctx.getBean(MONGO_TEMPLATE);
+	    	serverConfig = PhrescoServerFactory.getServerConfig();
+		}
 	}
 
 	protected Query createCustomerIdQuery(String customerId) {
@@ -120,7 +122,7 @@ public class DbService implements ServiceConstants {
 	
 	protected ArtifactGroup convertArtifactDAO(ArtifactGroupDAO artifactGroupDAO) throws PhrescoException {
 		Converter<ArtifactGroupDAO, ArtifactGroup> converter = 
-			(Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
+			(Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getFrameworkConverter(ArtifactGroupDAO.class);
 		return converter.convertDAOToObject(artifactGroupDAO, mongoOperation);
 	}
 	
@@ -243,39 +245,17 @@ public class DbService implements ServiceConstants {
 	
 	protected List<Customer> findCustomersFromDB() {
     	try {
-    		List<Customer> customers = new ArrayList<Customer>();
     		List<CustomerDAO> customersDAOs = mongoOperation.getCollection(CUSTOMERDAO_COLLECTION_NAME, CustomerDAO.class);
     		List<Customer> customersInDb = new ArrayList<Customer>();
     		Converter<CustomerDAO, Customer> customerConverter = 
-    			(Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
+    			(Converter<CustomerDAO, Customer>) ConvertersFactory.getFrameworkConverter(CustomerDAO.class);
     		for (CustomerDAO customerDAO : customersDAOs) {
 				customersInDb.add(customerConverter.convertDAOToObject(customerDAO, mongoOperation));
 			}
-    		if (CollectionUtils.isNotEmpty(customersInDb)) {
-    			for (Customer customer : customersInDb) {
-    				List<String> applicableTechnologies = new ArrayList<String>();
-    				List<String> customerApplicableTechnologies = customer.getApplicableTechnologies();
-					List<String> fromDB = getApplicableForomDB(customer.getId(), customerApplicableTechnologies);
-					if(CollectionUtils.isNotEmpty(customerApplicableTechnologies)) {
-						applicableTechnologies.addAll(customerApplicableTechnologies);
-					}
-					if(CollectionUtils.isNotEmpty(fromDB)) {
-						applicableTechnologies.addAll(fromDB);
-					}
-					List<Technology> technologies = createTechnology(applicableTechnologies);
-					List<TechnologyGroup> technologyGroups = createTechnologyInfo(technologies);
-					Map<String, List<TechnologyGroup>> appTypeMap = new HashMap<String, List<TechnologyGroup>>();
-					createAppTypeMap(technologyGroups, appTypeMap);
-//					List<ApplicationType> applicationTypes = createApplicationTypes(appTypeMap);
-//					customer.setApplicableAppTypes(applicationTypes);
-					customers.add(customer);
-				}
-    			return customers;
-    		}
+    		return customersInDb;
     	} catch (Exception e) {
     		throw new PhrescoWebServiceException(e, EX_PHEX00005, CUSTOMERS_COLLECTION_NAME);
 		}
-		return null;
 	}
 	
 	protected List<TechnologyGroup> getTechGroupByCustomer(String customerId, String appTypeId) throws PhrescoException {

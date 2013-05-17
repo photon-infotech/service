@@ -42,7 +42,7 @@ public class CustomerDAO extends BaseDAO {
 	private Date validFrom;
 	private Date validUpto;
 	private LicenseType type;
-	private RepoInfo repoInfo;
+	private String repoInfoId;
 	private String icon;
 	private List<String> applicableTechnologies;
 	private List<ApplicationType> applicableAppTypes;
@@ -129,14 +129,6 @@ public class CustomerDAO extends BaseDAO {
 		this.type = type;
 	}
 	
-	public RepoInfo getRepoInfo() {
-		return repoInfo;
-	}
-	
-	public void setRepoInfo(RepoInfo repoInfo) {
-		this.repoInfo = repoInfo;
-	}
-	
 	public String getIcon() {
 		return icon;
 	}
@@ -168,5 +160,13 @@ public class CustomerDAO extends BaseDAO {
     public List<String> getOptions() {
         return options;
     }
+
+	public void setRepoInfoId(String repoInfoId) {
+		this.repoInfoId = repoInfoId;
+	}
+
+	public String getRepoInfoId() {
+		return repoInfoId;
+	}
 	
 }

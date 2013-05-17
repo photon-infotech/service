@@ -91,7 +91,8 @@ public class LoginService extends DbService {
             user.setCustomers(findCustomersFromDB());
         	return user;
         }
-		return loginUsingAuth(credentials);
+        user = loginUsingAuth(credentials);
+		return user;
     }
 	
 	private User loginUsingAuth(Credentials credentials) throws PhrescoException {

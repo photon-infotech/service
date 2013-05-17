@@ -119,7 +119,6 @@ public class ComponentService extends DbService {
 	    }
 		try {
 			List<ApplicationType> applicationTypes = new ArrayList<ApplicationType>();
-//			Query query = createCustomerIdQuery(DEFAULT_CUSTOMER_NAME);
 			List<ApplicationTypeDAO> applicationTypeDAOs = mongoOperation.getCollection(APPTYPES_COLLECTION_NAME, ApplicationTypeDAO.class);
 			
 			Converter<ApplicationTypeDAO, ApplicationType> converter = (Converter<ApplicationTypeDAO, ApplicationType>) 
@@ -925,7 +924,7 @@ public class ComponentService extends DbService {
 		    	return Response.status(Response.Status.NO_CONTENT).build();
 		    }
 		    List<ArtifactGroup> modules = convertDAOToModule(artifactGroupDAOs);
-		    
+		 
 		    ResponseBuilder response = Response.status(Response.Status.OK);
 		    response.header(Constants.ARTIFACT_COUNT_RESULT, count(ARTIFACT_GROUP_COLLECTION_NAME, query));
 			return response.entity(modules).build();
@@ -1704,6 +1703,9 @@ public class ComponentService extends DbService {
 				query.addCriteria(customerCri);
         	}
         	List<DownloadsDAO> downloadList = mongoOperation.find(DOWNLOAD_COLLECTION_NAME, query, DownloadsDAO.class);
+        	if(CollectionUtils.isEmpty(downloadList)) {
+            	return  Response.status(Response.Status.NO_CONTENT).build();
+            }
             if (downloadList != null) {
             	Converter<DownloadsDAO, DownloadInfo> downloadConverter = 
             		(Converter<DownloadsDAO, DownloadInfo>) ConvertersFactory.getConverter(DownloadsDAO.class);
@@ -1712,9 +1714,6 @@ public class ComponentService extends DbService {
 					downloads.add(downloadInfo);
 				}
             } 
-            if(CollectionUtils.isEmpty(downloads)) {
-            	return  Response.status(Response.Status.NO_CONTENT).build();
-            }
         } catch (Exception e) {
         	e.printStackTrace();
             throw new PhrescoWebServiceException(e, EX_PHEX00006, DOWNLOAD_COLLECTION_NAME);

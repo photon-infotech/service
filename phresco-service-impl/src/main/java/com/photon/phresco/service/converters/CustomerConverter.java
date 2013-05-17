@@ -18,11 +18,15 @@
 package com.photon.phresco.service.converters;
 
 import org.springframework.data.document.mongodb.MongoOperations;
+import org.springframework.data.document.mongodb.query.Criteria;
+import org.springframework.data.document.mongodb.query.Query;
 
 import com.photon.phresco.commons.model.Customer;
+import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.dao.CustomerDAO;
+import com.photon.phresco.util.ServiceConstants;
 
 public class CustomerConverter implements Converter<CustomerDAO, Customer> {
 
@@ -41,7 +45,9 @@ public class CustomerConverter implements Converter<CustomerDAO, Customer> {
 		customer.setHelpText(dao.getHelpText());
 		customer.setId(dao.getId());
 		customer.setName(dao.getName());
-		customer.setRepoInfo(dao.getRepoInfo());
+		RepoInfo repoInfo = mongoOperation.findOne(ServiceConstants.REPOINFO_COLLECTION_NAME, 
+				new Query(Criteria.whereId().is(dao.getRepoInfoId())), RepoInfo.class);
+		customer.setRepoInfo(repoInfo);
 		customer.setState(dao.getState());
 		customer.setStatus(dao.getStatus());
 		customer.setType(dao.getType());
@@ -53,7 +59,7 @@ public class CustomerConverter implements Converter<CustomerDAO, Customer> {
 		customer.setOptions(dao.getOptions());
 		return customer;
 	}
-
+	
 	@Override
 	public CustomerDAO convertObjectToDAO(Customer customer)
 			throws PhrescoException {
@@ -69,7 +75,7 @@ public class CustomerConverter implements Converter<CustomerDAO, Customer> {
 		customerDAO.setHelpText(customer.getHelpText());
 		customerDAO.setId(customer.getId());
 		customerDAO.setName(customer.getName());
-		customerDAO.setRepoInfo(customer.getRepoInfo());
+		customerDAO.setRepoInfoId(customer.getRepoInfo().getId());
 		customerDAO.setState(customer.getState());
 		customerDAO.setStatus(customer.getStatus());
 		customerDAO.setType(customer.getType());

@@ -87,7 +87,6 @@ public class FrameworkComponentService extends DbService{
 		    	return Response.status(Response.Status.NO_CONTENT).build();
 		    }
 		    List<ArtifactGroup> modules = convertDAOToModule(artifactGroupDAOs);
-		    
 		    ResponseBuilder response = Response.status(Response.Status.OK);
 			return response.entity(modules).build();
 		} catch(Exception e) {
@@ -97,7 +96,7 @@ public class FrameworkComponentService extends DbService{
 	
 	private List<ArtifactGroup> convertDAOToModule(List<ArtifactGroupDAO> moduleDAOs) throws PhrescoException {
 		Converter<ArtifactGroupDAO, ArtifactGroup> artifactConverter = 
-            (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
+            (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getFrameworkConverter(ArtifactGroupDAO.class);
 	    List<ArtifactGroup> modules = new ArrayList<ArtifactGroup>();
 	    for (ArtifactGroupDAO artifactGroupDAO : moduleDAOs) {
 			ArtifactGroup artifactGroup = artifactConverter.convertDAOToObject(artifactGroupDAO, mongoOperation);
