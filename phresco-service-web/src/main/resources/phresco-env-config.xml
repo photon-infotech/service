@@ -56,7 +56,7 @@
             <port>8080</port>
             <password/>
             <context>auth-2.0</context>
-            <host>172.16.18.174</host>
+            <host>172.16.8.250</host>
             <protocol>http</protocol>
             <username/>
         </WebService>	
@@ -89,7 +89,7 @@
             <port>8080</port>
             <password/>
             <context>auth-2.0</context>
-            <host>172.16.18.174</host>
+            <host>172.16.8.250</host>
             <protocol>http</protocol>
             <username/>
         </WebService>	
