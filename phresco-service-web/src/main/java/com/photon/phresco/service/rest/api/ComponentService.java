@@ -2368,12 +2368,18 @@ public class ComponentService extends DbService {
 	@GET
 	@Path (REST_API_TECHGROUPS)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findTechnologyGroups() {
+	public Response findTechnologyGroups(@QueryParam(REST_QUERY_APPTYPEID) String appTypeId) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.findTechnologyGroups()");
 	    }
+	    List<TechnologyGroup> technologyGroups = new ArrayList<TechnologyGroup>();
 		try {
-			List<TechnologyGroup> technologyGroups = mongoOperation.getCollection(TECH_GROUP_COLLECTION_NAME, TechnologyGroup.class);
+			if(StringUtils.isNotEmpty(appTypeId)) {
+				technologyGroups = mongoOperation.find(TECH_GROUP_COLLECTION_NAME, 
+						new Query(Criteria.where(REST_QUERY_APPTYPEID).is(appTypeId)), TechnologyGroup.class);
+			} else {
+				technologyGroups = mongoOperation.getCollection(TECH_GROUP_COLLECTION_NAME, TechnologyGroup.class);
+			}
 			if(CollectionUtils.isEmpty(technologyGroups)) {
 				return  Response.status(Response.Status.NO_CONTENT).build();
 			}

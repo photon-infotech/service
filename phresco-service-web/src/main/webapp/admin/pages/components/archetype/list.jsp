@@ -217,6 +217,7 @@
     
 	function popupOnOk(self) {
 		if ($(self).attr("id") == "techGroupOk") {
+			showParentPage();
 			var customerId = $('input[name=customerId]').val();
 			var params = '{"techGroups" : [' + techGroupToAdd.join(',') + '], "customerId" : "' + customerId + '"}';
 			loadJsonContent('newTechGroup', params, $("#subcontainer"));
