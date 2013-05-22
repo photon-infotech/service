@@ -649,7 +649,7 @@ public class ComponentService extends DbService {
 	@GET
 	@Path (REST_API_SETTINGS)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findSettings(@QueryParam(REST_QUERY_CUSTOMERID) String customerId, @QueryParam(REST_QUERY_TECHID) String techId) {
+	public Response findSettings(@QueryParam(REST_QUERY_CUSTOMERID) String customerId, @QueryParam(REST_QUERY_TECHID) String techId, @QueryParam(REST_QUERY_TYPE) String type) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into ComponentService.findSettings()" + customerId);
 	    }
@@ -676,6 +676,12 @@ public class ComponentService extends DbService {
 			} else {
 				Criteria customerCri = Criteria.where(DB_COLUMN_CUSTOMERIDS).in(Arrays.asList(DEFAULT_CUSTOMER_NAME, customerId).toArray());
 				query.addCriteria(customerCri);
+			}
+			if(StringUtils.isNotEmpty(type)) {
+				query.addCriteria(Criteria.where(REST_API_NAME).is(type));
+				SettingsTemplate setting = mongoOperation.findOne(SETTINGS_COLLECTION_NAME, 
+						query, SettingsTemplate.class);
+				return Response.status(Response.Status.OK).entity(setting).build();
 			}
 			List<SettingsTemplate> settingsList = mongoOperation.find(SETTINGS_COLLECTION_NAME, query, SettingsTemplate.class);
 			for (SettingsTemplate settingsTemplate : settingsList) {
