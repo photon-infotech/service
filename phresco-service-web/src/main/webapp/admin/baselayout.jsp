@@ -312,7 +312,7 @@
 		
 		<!-- Footer Starts Here -->
 		<footer>
-			<address class="copyrit">&copy; 2013.Photon Infotech Pvt Ltd. |<a href="http://www.photon.in"> www.photon.in</a></address>
+			<address class="copyrit">&copy; 2013 Photon Infotech Pvt Ltd. |<a onclick="open_win();"> www.photon.in</a></address>
 		</footer>
 		<!-- Footer Ends Here -->
 		

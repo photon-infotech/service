@@ -513,15 +513,8 @@ public class Archetypes extends ServiceBaseAction {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.getTechnologyGroup()");
 		}
-
-		List<ApplicationType> appTypes = getServiceManager().getApplicationTypes();
-		for (ApplicationType appType : appTypes) {
-			if (appType.getId().equals(getApptype())) {
-				setAppTypeTechGroups(appType.getTechGroups());
-				return SUCCESS;
-			}
-		}
-
+		List<TechnologyGroup> technologyGroups = getServiceManager().getTechnologyGroups(getApptype());
+		setAppTypeTechGroups(technologyGroups);
 		return SUCCESS;
 	}
 	

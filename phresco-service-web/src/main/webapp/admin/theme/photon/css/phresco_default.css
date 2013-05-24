@@ -167,6 +167,10 @@ footer {
 	margin: 0;
 }
 
+.customer_list#formFeaturesList .operation {
+	margin-bottom: 15px;
+}
+
 .form-horizontal .control-group {
 	margin-bottom: 5px;
 }
@@ -4562,16 +4566,12 @@ input[class *='sample'] {
 .featurelist_tech {
 	margin-right: 7px;
 	font-weight: bold;
-}
-
-.featurelist_tech span:first-child {
-	margin-top: 5px;
 	float: left;
 }
 
-.featurelist_tech .dd-container {
-	padding-top: 20px;
-	margin-bottom: -15px;
+.featurelist_tech span:first-child {
+	margin-top: 6px;
+	float: left;
 }
 
 .featurelist_type {
@@ -5034,7 +5034,7 @@ input[class="chkBox_config"] {
 	background-color: rgb(238, 238, 238);
 	padding: 7px 8px;
 	border: solid 1px #dcdcdc;
-	left: 200px;
+	left: 80px;
 	height: 350px;
 	overflow-y: auto;
 	top: 36px;
@@ -5146,7 +5146,9 @@ input[class="chkBox_config"] {
 }
 
 #tech_id .dd-select {
-	left: 200px !important;
+	left: 80px !important;
+	top: -2px !important;
+	position: absolute;
 }
 
 .updateMsg { 

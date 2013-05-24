@@ -29,17 +29,11 @@
 
 <%
    	List<User> userList = (List<User>)request.getAttribute(ServiceUIConstants.REQ_USER_LIST);
+    User userInfo = (User) session.getAttribute(ServiceUIConstants.SESSION_USER_INFO);
    	
    	List<String> permissionIds = (List<String>) session.getAttribute(ServiceUIConstants.SESSION_PERMISSION_IDS);
 	String per_disabledStr = "";
-	String per_disabledClass = "btn-primary";
-	if (CollectionUtils.isNotEmpty(permissionIds)) {
-		if (permissionIds.contains(ServiceUIConstants.PER_VIEW_USERS) && 
-				!permissionIds.contains(ServiceUIConstants.PER_MANAGE_USERS)) {
-			per_disabledStr = "disabled";
-			per_disabledClass = "btn-disabled";
-		}
-	}
+	String per_disabledClass = "";
 %>
 
 <form class="form-horizontal customer_list" id="userListForm">
@@ -76,6 +70,15 @@
 			            <%
 			            	if (CollectionUtils.isNotEmpty(userList)) {
 			            		for (User user : userList) {
+			            			if (CollectionUtils.isNotEmpty(permissionIds)) {
+				            			if (!permissionIds.contains(ServiceUIConstants.PER_MANAGE_USERS) && !user.getId().equals(userInfo.getId())) {
+				            				per_disabledStr = "disabled";
+											per_disabledClass = "btn-disabled";
+										} else {
+											per_disabledStr = "";
+											per_disabledClass = "btn-primary";
+										}
+			            			}
 			            %>
 						<tbody>
 						<tr>
