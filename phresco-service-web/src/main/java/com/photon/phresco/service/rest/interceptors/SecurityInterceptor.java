@@ -39,7 +39,7 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 			LOGGER.debug(absolutePath);
 		}
 		String path = request.getPath();
-		if((ServiceConstants.LOGIN).equals(path) || (ServiceConstants.ADMIN_CUSTOMER).equals(path) || (ServiceConstants.CUSTOMER_IMAGE).equals(path)) {
+		if((ServiceConstants.LOGIN).equals(path) || (ServiceConstants.ADMIN_CUSTOMER).equals(path) || (ServiceConstants.CUSTOMER_PROPERTIES).equals(path)) {
 			return request;
 		}
 		

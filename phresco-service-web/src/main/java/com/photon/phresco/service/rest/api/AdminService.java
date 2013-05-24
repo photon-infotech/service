@@ -17,6 +17,7 @@
  */
 package com.photon.phresco.service.rest.api;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -136,6 +137,77 @@ public class AdminService extends DbService {
         InputStream inputStream = getFileFromDB(id);
     	return Response.status(Response.Status.OK).entity(inputStream).build();
     }
+    
+    /**
+     * Returns the customer theme and icon for a particular customer
+     * @return
+     * @throws PhrescoException 
+     */
+    @GET
+    @Path(REST_CUSTOMER_PROPERTIES)
+    @Produces (MultiPartMediaTypes.MULTIPART_MIXED)
+    public Response getCustomerProperties(@QueryParam("context") String context) throws PhrescoException {
+    	
+    	Customer customerInfo=null;
+    	InputStream inputStream=null;
+    	
+    	 if (isDebugEnabled) {
+             S_LOGGER.debug("Entered into AdminService.getCustomerProperties()");
+         }
+         try {
+			if(StringUtils.isNotEmpty(context)) {
+				
+				CustomerDAO customer = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME, 
+				        new Query(Criteria.where("context").is(context)), CustomerDAO.class);
+				
+				if (customer != null) {
+					
+					Converter<CustomerDAO, Customer> customerConverter = 
+						(Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
+					customerInfo = customerConverter.convertDAOToObject(customer, mongoOperation);
+					
+					inputStream = getFileFromDB(customerInfo.getId());
+					
+					if(inputStream != null) {
+	
+		 			MultiPart multiPart = new MultiPart().
+	 		    	      bodyPart(new BodyPart(customerInfo, MediaType.APPLICATION_JSON_TYPE)).
+	 		    	      bodyPart(new BodyPart(inputStream, MediaType.MULTIPART_FORM_DATA_TYPE));
+		 			
+		 			return Response.ok(multiPart, MultiPartMediaTypes.MULTIPART_MIXED_TYPE).header("status", Response.Status.OK).build();
+		 			
+					}
+					else {
+						return Response.ok(getErrorResponse(), MultiPartMediaTypes.MULTIPART_MIXED_TYPE).header("status", Response.Status.NO_CONTENT).build();
+					}
+				}
+				else {
+					return Response.ok(getErrorResponse(), MultiPartMediaTypes.MULTIPART_MIXED_TYPE).header("status", Response.Status.NOT_FOUND).build();
+				}
+			}
+			else {
+				
+				return Response.ok(getErrorResponse(), MultiPartMediaTypes.MULTIPART_MIXED_TYPE).header("status", Response.Status.PRECONDITION_FAILED).build();
+			}
+ 			
+ 		} catch (PhrescoException e) {
+ 			throw new PhrescoWebServiceException(e, EX_PHEX00005, CUSTOMERS_COLLECTION_NAME);
+ 		}
+         
+ 			
+    }
+    
+    private MultiPart getErrorResponse()
+    {
+    	String str = "null";
+		InputStream is = new ByteArrayInputStream(str.getBytes());
+		MultiPart multiPart = new MultiPart().
+		    	      bodyPart(new BodyPart("", MediaType.APPLICATION_JSON_TYPE)).
+		    	      bodyPart(new BodyPart(is, MediaType.MULTIPART_FORM_DATA_TYPE));
+		return multiPart;
+    }
+    
+    
     
     /**
      * Creates the list of customers
