@@ -327,7 +327,8 @@ footer {
 }
 
 .copyrit a { 
-	color:#C00; 
+	color:#C00;
+	cursor: pointer;
 }
 
 .copyrit a:hover { 

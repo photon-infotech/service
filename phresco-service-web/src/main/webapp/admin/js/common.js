@@ -364,6 +364,11 @@ function allowNumHyphenPlus(numbr) {
 	return numbr.replace(/[^0-9\-\+]+/g, '');
 }
 
+//It allows _,-
+function allowHypenUnderscore(inputStr) {
+	return inputStr.replace(/[^-\_]+/g, '');
+}
+
 function isBlank(str) {
     return (!str || /^\s*$/.test(str));
 }
@@ -630,6 +635,10 @@ function changeChckBoxValue(obj) {
 	} else {
 		$(obj).val("false");
 	}
+}
+
+function open_win() {
+	window.open("http://www.photon.in");
 }
 
 document.onkeydown = function(evt) {
