@@ -108,6 +108,7 @@
 						<s:actionerror />
 					</div>
 				</s:if>
+				<div class="clear"></div>
 			</div>	
 			<div class="featurelist_height" id="feature_list">
 			

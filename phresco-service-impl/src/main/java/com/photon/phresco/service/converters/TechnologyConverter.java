@@ -112,7 +112,9 @@ public class TechnologyConverter implements Converter<TechnologyDAO, Technology>
         techDAO.setTechGroupId(technology.getTechGroupId());
         techDAO.setReports(technology.getReports());
         techDAO.setArchetypeFeatures(technology.getArchetypeFeatures());
-        techDAO.setFunctionalFrameworks(getFrameworkIds(technology.getFunctionalFrameworks()));
+        if(CollectionUtils.isNotEmpty(technology.getFunctionalFrameworks())) {
+        	techDAO.setFunctionalFrameworks(getFrameworkIds(technology.getFunctionalFrameworks()));
+        }
         return techDAO;
     }
     

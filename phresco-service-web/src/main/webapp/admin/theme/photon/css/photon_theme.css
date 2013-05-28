@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+ */
 h4 {
 	color:#fff;
 }
@@ -101,7 +102,7 @@ strong {
 }
 
 a:hover {
-  	color: #39BC67;
+  	color: #DE522F;
   	text-decoration: underline;
 }
 table tr a{
@@ -239,11 +240,11 @@ body {
 }
 
 .btn-primary {
-	background: #4F577C;
+	background: #de522f;
 }
 
 .btn-primary:hover {
-	background: #4F577C;
+	background: #de522f;
 }
 
 .tr_color {
@@ -254,7 +255,7 @@ table th, table td {
       color: #323232;
 }
 table tr {
-	border: 1px solid #323232;
+	border: 1px solid #969696;
 }
 a { 
     color: #fff;
@@ -326,7 +327,8 @@ footer {
 }
 
 .copyrit a { 
-	color:#C00; 
+	color:#C00;
+	cursor: pointer;
 }
 
 .copyrit a:hover { 
@@ -436,22 +438,16 @@ div.logoimg {
 	float : left;
     margin-right:60px;
     margin-top:9px;
-	}
+}
 div.welcome {
-     position:relative;
-     top:15px;
-   }
+	position:relative;
+	top:15px;
+}
  	
-div.login_check {
-    color: #FFFFFF;
-    font-family: Arial,Helvetica,sans-serif;
-    font-size: 11px;
-	float: left;
-   }
 img.phtaccinno {
     cursor: pointer;
     padding: 0 24% 0 0;
-   }
+}
 
 html, body {
   	color: #000000;
@@ -513,12 +509,12 @@ li {
 
 .tabs > li > a, .pills > li > a {
     /* background: -moz-linear-gradient(center top , #E1E1E1 0%, #E0E0E0 100%) repeat scroll 0 0 transparent; */
-    background: #323232;
+    background: #969696;
 }
 
 .tabs li a.selected, .tabs > li > a:hover  {
     color: #FFFFFF;
-    background: #39bc67; /* Old browsers */
+    background: #DE522F; /* Old browsers */
 	border-bottom: 0px solid #ddd;
 }
 
@@ -552,7 +548,7 @@ label {
 
 /*** login starts ***/
 .lgnContainer {
-	background: #1DAE4B;
+	background: #969696;
 	line-height: 24px;
 }
 
@@ -568,7 +564,7 @@ label {
 
 .modal-header {
     border: 1px solid #ffffff;
-    background:#39BC67;
+    background:#DE522F;
 }
 
 .modal-header .close {
@@ -608,11 +604,11 @@ label {
 }
 
 .userInfo ul li a {
-    color:#38b865;
+    color:#de522f;
 }
 
 .userInfo ul li ul li a {
-    color:#313131;
+    color:#de522f;
 }
 
 .build_table_data_div {
@@ -671,8 +667,15 @@ label {
 }
 
 .closereg {
-     background: #39bc67;
-    color: #FFF;
+    background: #a7a7a7;
+	background: -moz-linear-gradient(top, #a7a7a7 0%, #7b7b7b 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#a7a7a7), color-stop(100%,#7b7b7b));
+	background: -webkit-linear-gradient(top, #a7a7a7 0%,#7b7b7b 100%);
+	background: -o-linear-gradient(top, #a7a7a7 0%,#7b7b7b 100%);
+	background: -ms-linear-gradient(top, #a7a7a7 0%,#7b7b7b 100%);
+	background: linear-gradient(to bottom, #a7a7a7 0%,#7b7b7b 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a7a7a7', endColorstr='#7b7b7b',GradientType=0 );
+	color: #FFF;
 	-webkit-border-radius: 6px;
 	border-radius: 6px; 
 	padding: 0px 0px 8px 0px;
@@ -711,7 +714,14 @@ label {
 
 .openreg {
     color: #FFFFFF;
-    background: none repeat scroll 0 0 #39BC67;
+    background: #a7a7a7;
+	background: -moz-linear-gradient(top, #a7a7a7 0%, #7b7b7b 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#a7a7a7), color-stop(100%,#7b7b7b));
+	background: -webkit-linear-gradient(top, #a7a7a7 0%,#7b7b7b 100%);
+	background: -o-linear-gradient(top, #a7a7a7 0%,#7b7b7b 100%);
+	background: -ms-linear-gradient(top, #a7a7a7 0%,#7b7b7b 100%);
+	background: linear-gradient(to bottom, #a7a7a7 0%,#7b7b7b 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a7a7a7', endColorstr='#7b7b7b',GradientType=0 );
     border-radius: 6px 6px 0px 0px;
 }
 /** Download ends **/
@@ -772,7 +782,7 @@ label {
 /** Tool tip ends **/
 
 .header-background {
-  	background: #323232;
+  	background: #DE522F;
     color: white !important;
 }
 
@@ -821,7 +831,7 @@ label {
 }
 
 .tabs li a.active  {
-	background: #39bc67;
+	background: #DE522F;
 }
 
 .popuplabel label {
@@ -865,13 +875,13 @@ label {
 }
 
 .progress .bar {
-	background-color: #EE5F5B;
-	background-image: -ms-linear-gradient(top, #EE5F5B, #EE5F5B);
-	background-image : -moz-linear-gradient(top,  #EE5F5B, #EE5F5B);
-	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#EE5F5B), to(#EE5F5B));
-	background-image: -webkit-linear-gradient(top, #EE5F5B, #EE5F5B);
-	background-image: -o-linear-gradient(top, #EE5F5B, #EE5F5B);
-	background-image: linear-gradient(top, #EE5F5B, #EE5F5B);
+	background-color: #DE522F;
+	background-image: -ms-linear-gradient(top, #DE522F, #DE522F);
+	background-image : -moz-linear-gradient(top,  #DE522F, #DE522F);
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#DE522F), to(#DE522F));
+	background-image: -webkit-linear-gradient(top, #DE522F, #DE522F);
+	background-image: -o-linear-gradient(top, #DE522F, #DE522F);
+	background-image: linear-gradient(top, #DE522F, #DE522F);
 }
 
 /* scrollbar starts */
@@ -898,7 +908,7 @@ label {
 }
 
 .featurelist_tech { 
-	color:#ffffff;
+	color:#323232;
 }
 
 .featurelist_type { 
@@ -929,13 +939,201 @@ label {
 /*** loading image starts ***/
 #indicator {
 /* 	background-image:url("../images/pggreen.png"); */
-	background-color: #39bc67;
+	background-color: #DE522F;
 	color: #FFFFFF;
 }
 
 #progressbar {
-  	border:1px solid #2e9d55;
+  	border:1px solid #DE522F;
   	color: #ffffff;
 }
 /*** loading image ends ***/
 
+.lgnBg {
+    /*font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;*/
+    background: #f6f6f6; /* Old browsers */
+    background-attachment: fixed;
+}
+
+.logincontainer {
+  position: absolute;
+  top: 46%;
+  left: 0px;
+  width: 100%;
+  height: 1px;
+  overflow: visible;
+}
+
+.logindiv {
+  width: 460px;
+  height: 220px;
+  margin-left: -200px;  /***  width / 2   ***/
+  position: absolute;
+  top: -100px;          /***  height / 2   ***/
+  left: 50%;
+  -webkit-box-shadow: 0px 0px 10px 5px #e1e1e1;
+  box-shadow: 0px 0px 10px 5px #e1e1e1; 
+  background: #ffffff;
+}
+
+.loginhead {
+    height: 57px;
+}
+
+.loginhead img {
+    float: left;
+    margin: 15px 0 15px 10px;
+}
+
+.loginhead .alert {
+    float: right;
+    color: #ff0808;
+    font-weight: bold;
+    font-size: 12px;
+    margin: 17px 10px 14px 0;
+    padding: 0 6px;
+    border-radius: 6px;
+	border: 0;
+}
+
+.loginhead .alert .close {
+    top: 0px;
+    right: -8px;
+    color: #ff0808;
+    opacity: 1;
+}
+
+#logimErrMesg {
+	color: #FF0000;
+    float: left;
+    font-weight: bold;
+	margin: -21px -250px 0 -209px;
+}
+
+div.lgnError {
+    color: #FFFFFF;
+    /*margin-left: 70px;*/
+    /*margin-top: -20px;*/
+}
+
+.leftslideone {
+    position: absolute;
+    top: 93px;
+    left: -10px;
+}
+
+.loginuser {
+    width: 480px;
+    height: 35px;
+    margin-left: -11px;
+    margin-bottom: 30px;
+    border: 1px solid #e3e3e3;
+    background: #ffffff;
+}
+
+.loginimg {
+    width: 55px;
+    height: 31px;
+    background: #ededed;
+    float: left;
+    margin: 2px;
+}
+
+.loginimg img {
+    margin: 9px 18px;
+}
+
+.logintext {
+    width: 420px;
+    height: 40px;
+    float: right;
+}
+
+.logintext input:-webkit-autofill {
+    background-color: #ffffff;
+}
+
+.logintext input {
+    width: 400px !important;
+    padding: 0px 10px !important;
+    height: 35px;
+    border: 0px !important;
+    border-radius: 0px;
+    box-shadow: none;
+    margin-top: -24px;
+}
+
+label.labellg {
+     font-size: 13px;
+     font-weight: normal;
+     color:#ffffff;
+     padding-top: 0px;
+     text-align: left;
+     width: 100%;
+	 clear:both;
+	 margin-top:7px;
+}
+
+.rightslideone {
+    position: absolute;
+    top: 93px;
+    right: -10px;
+}
+
+.leftslidetwo {
+    position: absolute;
+    top: 160px;
+    left: -10px;
+}
+
+.loginpassword {
+    width: 480px;
+    height: 35px;
+    margin-left: -11px;
+    margin-bottom: 15px;
+    border: 1px solid #e3e3e3;
+    background: #ffffff;
+}
+
+.lgnFieldLbl {
+	color: #6A0A0B;
+}
+
+.rightslidetwo {
+    position: absolute;
+    top: 160px;
+    right: -10px;
+}
+
+.loginfoot label{
+    float: left;
+    margin-left: 20px;
+    width: 100px;
+    font-size: 12px;
+}
+
+.loginfoot span {
+    float: right;
+    margin-right: 20px;
+}
+
+.loginbutton, .loginbutton:hover {
+    background: #777777; /* Old browsers */
+    background: -moz-linear-gradient(top, #777777 0%, #3a3a3a 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#777777), color-stop(100%,#3a3a3a)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, #777777 0%,#3a3a3a 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, #777777 0%,#3a3a3a 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, #777777 0%,#3a3a3a 100%); /* IE10+ */
+    background: linear-gradient(to bottom, #777777 0%,#3a3a3a 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#777777', endColorstr='#3a3a3a',GradientType=0 ); /* IE6-9 */
+    color: #fff;
+    border: 1px solid #383838;
+    font-size: 12px;
+    font-weight: bold;
+    text-shadow: none !important;
+    margin-top: 20px;
+}
+
+.loginfoot label {
+    color: #333333 !important;
+}

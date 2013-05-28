@@ -29,7 +29,7 @@
 					</aside>
 					<div id="list-header-toggle1"></div>
 					<aside class="right-list-header">
-						<img id="replaceimg1" src="images/minus_icon.png" alt="open" />
+						<img id="replaceimg1" src="images/r_arrowopen.png" alt="open" />
 					</aside>
 				</div>
 			</div>
@@ -99,7 +99,7 @@
 					<aside class="left-list-header tabletitle"><s:label key="lbl.hdr.dash.featrs"  theme="simple"/></aside>
 					<div id="list-header-toggle2"> </div>
 					<aside class="right-list-header">
-						<img id="replaceimg2" src="images/minus_icon.png" alt="open" />
+						<img id="replaceimg2" src="images/r_arrowopen.png" alt="open" />
 					</aside>
 				</div>
 			</div>
@@ -167,7 +167,7 @@
 					<aside class="left-list-header tabletitle"><s:label key="lbl.hdr.dash.pltprjt"  theme="simple"/></aside>
 					<div id="list-header-toggle3"> </div>
 					<aside class="right-list-header">
-						<img id="replaceimg3" src="images/minus_icon.png" alt="open" />
+						<img id="replaceimg3" src="images/r_arrowopen.png" alt="open" />
 					</aside>
 				</div>
 			</div>
@@ -235,11 +235,11 @@
 		$('#replaceimg1').click(function() {
 			$('.list-slide1').slideToggle();
 			if ($("#list-header-toggle1").is(":hidden")) {
-				$("#replaceimg1").attr('src', 'images/add_icon.png');
+				$("#replaceimg1").attr('src', 'images/r_arrowclose.png');
 				$("#list-header-toggle1").show();
 				$("#dashboard-panel1").css("height", "auto");
 			} else {
-				$("#replaceimg1").attr('src', 'images/minus_icon.png');
+				$("#replaceimg1").attr('src', 'images/r_arrowopen.png');
 				$("#list-header-toggle1").hide();
 				$("#dashboard-panel1").css("height", "97%");
 			}
@@ -248,12 +248,12 @@
 		$('#replaceimg2').click(function() {
 			$('.list-slide2').slideToggle();
 			if ($('#list-header-toggle2').is(":hidden")) {
-				$("#replaceimg2").attr('src', 'images/add_icon.png');
+				$("#replaceimg2").attr('src', 'images/r_arrowclose.png');
 				$("#list-header-toggle2").show();
 				$("#dashboard-panel2").css("height", "auto");
 			} else {
 
-				$("#replaceimg2").attr('src', 'images/minus_icon.png');
+				$("#replaceimg2").attr('src', 'images/r_arrowopen.png');
 				$("#list-header-toggle2").hide();
 				$("#dashboard-panel2").css("height", "97%");
 			}
@@ -262,11 +262,11 @@
 		$('#replaceimg3').click(function() {
 			$('.list-slide3').slideToggle();
 			if ($('#list-header-toggle3').is(":hidden")) {
-				$('#replaceimg3').attr('src', 'images/add_icon.png');
+				$('#replaceimg3').attr('src', 'images/r_arrowclose.png');
 				$('#list-header-toggle3').show();
 				$("#dashboard-panel3").css("height", "auto");
 			} else {
-				$('#replaceimg3').attr('src', 'images/minus_icon.png');
+				$('#replaceimg3').attr('src', 'images/r_arrowopen.png');
 				$("#list-header-toggle3").hide();
 				$("#dashboard-panel3").css("height", "97%");
 			}

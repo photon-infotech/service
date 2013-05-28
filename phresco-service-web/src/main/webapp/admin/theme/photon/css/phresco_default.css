@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+ */
 html,body {
 	margin: 0;
 	border: 0 none;
@@ -100,10 +101,6 @@ footer {
 	margin-bottom: 4px;
 }
 
-div.lgnBtnLabel {
-	text-align: right;
-}
-
 .btn.lgnBtn {
 	margin-right: -20px !important;
 	display: block;
@@ -168,6 +165,10 @@ div.lgnBtnLabel {
 .customer_list {
 	height: 98%;
 	margin: 0;
+}
+
+.customer_list#formFeaturesList .operation {
+	margin-bottom: 15px;
 }
 
 .form-horizontal .control-group {
@@ -922,10 +923,10 @@ a {
 	width: 98%;
 }
 .list-wrapper .header-background:nth-child(1) {
-	background: #39BC67;
+	background: #DE522F;
 }
 .list-comment .header-background {
-	background: #323232 !important;
+	background: #969696 !important;
 }
 .list-comment {
 	overflow-x: hidden;
@@ -2605,10 +2606,6 @@ footer {
 	margin-bottom: 4px;
 }
 
-div.lgnBtnLabel {
-	text-align: right;
-}
-
 .lgnBtn:hover {
 	background: #323232 !important;
 }
@@ -3241,7 +3238,7 @@ a {
 	text-decoration: none;
 	font-weight: bold;
 	text-transform: uppercase;
-	color:#37b764;
+	color:#DE522F;
 }
 
 .headerInnerTop li a.active {	
@@ -3254,7 +3251,7 @@ a {
 }
 
 .headerInnerTop li a.active label {
-	color:#37b764 !important;
+	color:#DE522F !important;
 }
 
 
@@ -3417,10 +3414,11 @@ a {
 	width: 98%;
 }
 .list-wrapper .header-background:nth-child(1) {
-	background: #39BC67;
+	background: #DE522F;
+	border-radius: inherit;
 }
 .list-comment .header-background {
-	background: #323232 !important;
+	background: #969696 !important;
 }
 .list-comment {
 	overflow-x: hidden;
@@ -3531,7 +3529,7 @@ legend {
 }
 
 .customer_name {
-	background: black;
+	background: #969696;
 	height: 30px;
 	margin: 2px;
 }
@@ -4568,6 +4566,12 @@ input[class *='sample'] {
 .featurelist_tech {
 	margin-right: 7px;
 	font-weight: bold;
+	float: left;
+}
+
+.featurelist_tech span:first-child {
+	margin-top: 6px;
+	float: left;
 }
 
 .featurelist_type {
@@ -5022,7 +5026,7 @@ input[class="chkBox_config"] {
 	padding: 8px 8px;
 	border: solid 1px #dcdcdc;
 	border-radius: 0px !important;
-	top: -17px;
+	top: -22px;
 	left: 150px;
 }
 .dd-options {
@@ -5030,10 +5034,10 @@ input[class="chkBox_config"] {
 	background-color: rgb(238, 238, 238);
 	padding: 7px 8px;
 	border: solid 1px #dcdcdc;
-	left: 150px;
+	left: 80px;
 	height: 350px;
 	overflow-y: auto;
-	top: 21px;
+	top: 36px;
 }
 .dd-option:hover, .dd-option-selected {
 	background-color: rgb(238, 238, 238)!important;
@@ -5077,7 +5081,7 @@ input[class="chkBox_config"] {
 
 .download_feature_tbl thead tr th {
 	height : 30px !important;
-	background: #3c3c3c;
+	background: #DE522F;
 	color: #ffffff !important;
 }
 
@@ -5136,8 +5140,55 @@ input[class="chkBox_config"] {
 #loadingIconDiv > div {
 	margin-left: 0px !important;
 }
+
+.multiselect input[type="checkbox"] {
+	margin: 4px 4px;	
+}
+
+#tech_id .dd-select {
+	left: 80px !important;
+	top: -2px !important;
+	position: absolute;
+}
+
+.updateMsg { 
+	float: left;
+    width: auto;
+}
+
+.lgnBg {
+   /* background-image: none;*/
+    background-image: #000000; 
+    /* filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ffffff',GradientType=0 ); COLOR: #000000  IE login page back ground color red */
+}
+
+div.lgnError{
+    margin-top: 2px;
+    /*width: 185px;*/
+}
+
+.clear {
+	clear: both;
+	line-height: 0;
+	height: 0;
+}
+
+.marginBottomZero {
+	margin-bottom: -1;
+	width:100%;
+}
+
+.marginBottomZero {
+    margin-bottom: 0px;
+}
+
+div.lgnBtnLabel {
+    margin-left: 0;
+	margin-top:-20px;
+}
+
 .assignRolesSuccMsg {
 	top: 66px !important;
 	margin-left: 22% !important;
 	text-align: center !important;
-}
+}	

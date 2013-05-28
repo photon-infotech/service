@@ -25,7 +25,7 @@
 	</div>	
 
 	<div class="abt_content">
-		Phresco is a next-generation development framework of frameworks.It is a platform for creating next generation web,mobile and multi channel presences leveraging existing investments combined with accepted industry best practices		
+		HeliOS is a platform for creating next generation web, mobile, and multi channel presences leveraging your existing investments combined with accepted industry best practices.		
 	</div>
 </div>
 
@@ -46,7 +46,7 @@
 	function successEvent(pageUrl, data) {
 		if (pageUrl == "versionInfo") {
 			$('#CurrentVersion').html(data.currentVersion);
-  		 	$("#popupTitle").html("Phresco Service " + data.currentVersion);
+  		 	$("#popupTitle").html("Helios Service " + data.currentVersion);
 		}
 	}
 	

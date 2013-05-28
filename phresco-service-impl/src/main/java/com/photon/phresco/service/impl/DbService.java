@@ -245,6 +245,7 @@ public class DbService implements ServiceConstants {
 	
 	protected List<Customer> findCustomersFromDB() {
     	try {
+    		List<Customer> customers = new ArrayList<Customer>();
     		List<CustomerDAO> customersDAOs = mongoOperation.getCollection(CUSTOMERDAO_COLLECTION_NAME, CustomerDAO.class);
     		List<Customer> customersInDb = new ArrayList<Customer>();
     		Converter<CustomerDAO, Customer> customerConverter = 

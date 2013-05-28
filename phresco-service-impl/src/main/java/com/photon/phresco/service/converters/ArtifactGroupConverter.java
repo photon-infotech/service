@@ -74,17 +74,17 @@ public class ArtifactGroupConverter implements Converter<ArtifactGroupDAO, Artif
         artifactGroupDAO.setArtifactId(artifactGroup.getArtifactId());
         artifactGroupDAO.setClassifier(artifactGroup.getClassifier());
         artifactGroupDAO.setCustomerIds(artifactGroup.getCustomerIds());
-//        artifactGroupDAO.setDescription(artifactGroup.getDescription());
+        artifactGroupDAO.setDescription(artifactGroup.getDescription());
         artifactGroupDAO.setGroupId(artifactGroup.getGroupId());
         artifactGroupDAO.setImageURL(artifactGroup.getImageURL());
         artifactGroupDAO.setName(artifactGroup.getName());
         artifactGroupDAO.setPackaging(artifactGroup.getPackaging());
-//        artifactGroupDAO.setSystem(artifactGroup.isSystem());
+        artifactGroupDAO.setSystem(artifactGroup.isSystem());
         artifactGroupDAO.setType(artifactGroup.getType());
         artifactGroupDAO.setUsed(artifactGroup.isUsed());
         artifactGroupDAO.setAppliesTo(artifactGroup.getAppliesTo());
-//        artifactGroupDAO.setHelpText(artifactGroup.getHelpText());
-//        artifactGroupDAO.setLicenseId(artifactGroup.getLicenseId());
+        artifactGroupDAO.setHelpText(artifactGroup.getHelpText());
+        artifactGroupDAO.setLicenseId(artifactGroup.getLicenseId());
         artifactGroupDAO.setDisplayName(artifactGroup.getDisplayName());
         return artifactGroupDAO;
     }

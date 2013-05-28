@@ -43,7 +43,6 @@ public class FrameworkArtifactGroupConverter implements Converter<ArtifactGroupD
 	@Override
     public ArtifactGroup convertDAOToObject(ArtifactGroupDAO artifactGroupDAO,
             MongoOperations mongoOperation) throws PhrescoException {
-		System.out.println("***********************************  Enterd 888888");
 		this.mongoOperation = mongoOperation;
         ArtifactGroup artifactGroup = new ArtifactGroup();
         artifactGroup.setArtifactId(artifactGroupDAO.getArtifactId());

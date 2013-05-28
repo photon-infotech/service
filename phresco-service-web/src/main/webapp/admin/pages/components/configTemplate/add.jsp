@@ -479,9 +479,9 @@
 	  	var status = jsonObj.required;
 	  	var img = "";
 	  	if (status == "true") {
-			img = "<img src='images/success.png' title='Success'>"; 
+			img = "<img src='images/success.png' title='Applicable'>"; 
 	  	} else if (status == "false") {
- 			img = "<img src='images/smalldelete.png' title='Failure'>";
+ 			img = "<img src='images/smalldelete.png' title='NotApplicable'>";
 		}
 	  	var mandatory = document.createElement('td');
 	  	mandatory.innerHTML = img;
@@ -532,9 +532,9 @@
 		var status = jsonObj.required;
 		var img = "";
 		if (status == "true") {
-			img = "<img src='images/success.png' title='Failure'>"; 
+			img = "<img src='images/success.png' title='Applicable'>"; 
 	  	} else if (status == "false") {
-			img = "<img src='images/smalldelete.png' title='Failure'>";
+			img = "<img src='images/smalldelete.png' title='NotApplicable'>";
 	  	}
 		$('#'+trId).append("<td>"+img+"</td>");
 		$('#'+trId).append("<td><img class = 'del imagealign' id='deleteIcon' src='images/minus_icon.png' onclick='removeRow(this);' value="+JSON.stringify(jsonObj)+"></td>");

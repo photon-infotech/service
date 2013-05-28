@@ -35,6 +35,7 @@
 	User user = (User)request.getAttribute(ServiceUIConstants.REQ_USER);
 	List<Role> roles = (List<Role>)request.getAttribute(ServiceUIConstants.REQ_ROLE_LIST); 
 	Map<String, String> availableRoleMap = (Map<String, String>)request.getAttribute(ServiceUIConstants.REQ_ROLES_MAP); 
+	List<String> permissionIds = (List<String>) session.getAttribute(ServiceUIConstants.SESSION_PERMISSION_IDS);
 	
 	String userName = "";	
 	String userId = "";
@@ -99,6 +100,14 @@
 		$("#appliesTo").change(function() {
 			getRoles($(this).val());
 		});
+		
+		<% if (CollectionUtils.isNotEmpty(permissionIds) && !permissionIds.contains(ServiceUIConstants.PER_MANAGE_USERS)) { %>
+			$("#assignRoles").attr("disabled", true).removeClass("btn-primary").addClass("btn-disabled");
+		<% } else { %>
+			$("#assignRoles").attr("disabled", false).removeClass("btn-disabled").addClass("btn-primary");
+		<% } %>
+		
+		
 	});
 	
 	function getRoles(appliesTo) {

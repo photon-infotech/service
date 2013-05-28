@@ -82,9 +82,13 @@
 		if (!isBlank(copyright)) {
 			$(".copyrit").html(copyright);
 		} else {
-			$(".copyrit").html("&copy; 2013.Photon Infotech Pvt Ltd. |<a href='http://www.photon.in'> www.photon.in</a>");
+			$(".copyrit").html("&copy; 2013 Photon Infotech Pvt Ltd. |<a onclick='open_win();'> www.photon.in</a>");
 		}
 	}
+	
+	function open_win() {
+		window.open("http://www.photon.in");
+    }
 </script>
 
 <%

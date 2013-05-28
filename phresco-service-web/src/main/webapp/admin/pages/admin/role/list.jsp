@@ -31,7 +31,6 @@
    	List<Role> roleLists = (List<Role>)request.getAttribute(ServiceUIConstants.REQ_ROLE_LIST); 
    	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID); 
    	String appliesTo = (String) request.getAttribute(ServiceUIConstants.REQ_APPLIES_TO);
-   
    	List<String> permissionIds = (List<String>) session.getAttribute(ServiceUIConstants.SESSION_PERMISSION_IDS);
 	String per_disabledStr = "";
 	String per_disabledClass = "btn-primary";
@@ -256,7 +255,9 @@
 		if (url === "assignPermission") {
 			$('#selectedPermissions option').prop('selected', 'selected');
 			$('#popupPage').modal('hide');
-			loadContent('assignPermission', $('#formAssignPermission'), $('#subcontainer'));
+			var params = "appliesTo=";
+		    params = params.concat('<%= appliesTo %>');
+			loadContent('assignPermission', $('#formAssignPermission'), $('#subcontainer'), params);
 		}
 	}
 </script>

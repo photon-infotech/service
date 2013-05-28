@@ -2421,7 +2421,6 @@ public class ComponentService extends DbService {
 				technologyGroups = getTechGroupByCustomer(customerId, appTypeId);
 				return  Response.status(Response.Status.OK).entity(technologyGroups).build();
 			}
-			technologyGroups = mongoOperation.getCollection(TECH_GROUP_COLLECTION_NAME, TechnologyGroup.class);
 			if(CollectionUtils.isEmpty(technologyGroups)) {
 				return  Response.status(Response.Status.NO_CONTENT).build();
 			}

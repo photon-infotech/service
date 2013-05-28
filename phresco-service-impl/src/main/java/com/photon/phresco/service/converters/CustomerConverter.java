@@ -59,7 +59,7 @@ public class CustomerConverter implements Converter<CustomerDAO, Customer> {
 		customer.setOptions(dao.getOptions());
 		return customer;
 	}
-	
+
 	@Override
 	public CustomerDAO convertObjectToDAO(Customer customer)
 			throws PhrescoException {

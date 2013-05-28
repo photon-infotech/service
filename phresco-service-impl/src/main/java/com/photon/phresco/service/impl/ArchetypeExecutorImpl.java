@@ -88,7 +88,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 
     private void updateRepository(String customerId, ApplicationInfo appInfo,	File tempFolderPath) throws PhrescoException {
 		RepoInfo repoInfo = dbManager.getRepoInfo(customerId);
-		File pomFile = new File(tempFolderPath, appInfo.getAppDirName() + "/pom.xml");
+		File pomFile = new File(tempFolderPath, appInfo.getAppDirName() + File.separatorChar + Utility.getPomFileName(appInfo));
 		try {
 			PomProcessor processor = new PomProcessor(pomFile);
 			processor.setName(appInfo.getName());

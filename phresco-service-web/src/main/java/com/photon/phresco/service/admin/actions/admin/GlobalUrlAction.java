@@ -220,8 +220,8 @@ public class GlobalUrlAction extends ServiceBaseAction {
 		if (StringUtils.isEmpty(getUrl())) {
 			setUrlError(getText(KEY_I18N_ERR_URL_EMPTY));
 			errorUrl= true;
-		} else if (StringUtils.isNotEmpty(getUrl())){			
-			String urlPattern = "^http(s{0,1})://[a-zA-Z0-9_/\\-\\.]+\\.([A-Za-z/]{2,5})[a-zA-Z0-9_/\\&\\?\\=\\-\\.\\~\\%]*";
+		} else if (StringUtils.isNotEmpty(getUrl())) {			
+			String urlPattern = "^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
 			Pattern pattern = Pattern.compile(urlPattern);
 			Matcher matcher = pattern.matcher(getUrl());
 			boolean matchFound = matcher.matches();
@@ -229,7 +229,7 @@ public class GlobalUrlAction extends ServiceBaseAction {
 				setUrlError(getText(KEY_I18N_ERR_URL_NOT_VALID));
 				errorUrl=true;
 			}
-		 }
+		}
 		return errorUrl;
 	}
 
