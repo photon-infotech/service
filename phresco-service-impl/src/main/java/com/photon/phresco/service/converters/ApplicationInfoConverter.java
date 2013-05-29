@@ -67,7 +67,7 @@ public class ApplicationInfoConverter implements Converter<ApplicationInfoDAO, A
 			throws PhrescoException {
 		ApplicationInfoDAO applicationInfoDAO = new ApplicationInfoDAO();
 		applicationInfoDAO.setId(applicationInfo.getId());
-		applicationInfoDAO.setCode(applicationInfo.getId());
+		applicationInfoDAO.setCode(applicationInfo.getCode());
 		applicationInfoDAO.setDescription(applicationInfo.getDescription());
 		applicationInfoDAO.setEmailSupported(applicationInfo.isEmailSupported());
 		applicationInfoDAO.setName(applicationInfo.getName());

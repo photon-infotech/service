@@ -56,6 +56,7 @@ public class ArtifactGroupConverter implements Converter<ArtifactGroupDAO, Artif
         artifactGroup.setType(artifactGroupDAO.getType());
         artifactGroup.setUsed(artifactGroupDAO.isUsed());
         artifactGroup.setDisplayName(artifactGroupDAO.getDisplayName());
+        artifactGroup.setAppliesTo(artifactGroupDAO.getAppliesTo());
         Query query = new Query(Criteria.where(DB_COLUMN_ARTIFACT_GROUP_ID).is(artifactGroupDAO.getId()));
         query.limit(7).sort().on(DB_COLUMN_CREATIONDATE, Order.DESCENDING);
         List<ArtifactInfo> versions = mongoOperation.find(ARTIFACT_INFO_COLLECTION_NAME, 
@@ -86,6 +87,7 @@ public class ArtifactGroupConverter implements Converter<ArtifactGroupDAO, Artif
         artifactGroupDAO.setHelpText(artifactGroup.getHelpText());
         artifactGroupDAO.setLicenseId(artifactGroup.getLicenseId());
         artifactGroupDAO.setDisplayName(artifactGroup.getDisplayName());
+        artifactGroupDAO.setAppliesTo(artifactGroup.getAppliesTo());
         return artifactGroupDAO;
     }
     
