@@ -378,7 +378,7 @@
 		
 		<div class="control-group" id="funcFrameworksControl">
 			<label class="control-label labelbold">
-				<%-- <span class="mandatory">*</span>&nbsp; --%><s:text name='lbl.hdr.comp.func.test.frameworks'/>
+				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.func.test.frameworks'/>
 			</label>
 			<div class="controls">
 				<div class="typeFields" id="typefield">
@@ -401,7 +401,7 @@
 										}
 							%>
 										<li>
-											<input type="checkbox" id="funcFrameworkCheckbox" name="functionalFrameworks" value="<%= functionalFramework.getName() %>" class="check funcFrameworkChk" 
+											<input type="checkbox" id="funcFrameworkCheckbox" name="functionalFramework" value="<%= functionalFramework.getName() %>" class="check funcFrameworkChk" 
 												<%= checkedStr %> onclick="checkboxEvent($('#checkAllFuncFrameworks'), 'funcFrameworkChk')"><%= functionalFramework.getDisplayName() %> 
 										</li>
 							<%
@@ -457,6 +457,11 @@
         getTechGroup();
         checkboxEvent($('#checkAllFeatures'), 'applsChk');
         checkboxEvent($('#checkAllReports'), 'reportsChk');
+        $("#funcFrameworksControl").hide();
+    	var functionalStatus = $("input[value='Functional_Test']").attr("checked");
+    	if (functionalStatus === "checked") {
+    		 $("#funcFrameworksControl").show();
+    	}
         // To focus the name textbox by default
         $('#archename').focus();
         
@@ -482,6 +487,15 @@
 			getTechGroup();
         });  
         
+       	$("input[value='Functional_Test']").change(function() {
+        	 var name = $(this).val();
+        	var status = $(this).attr("checked");
+        	if (status === "checked") {
+        		$("#funcFrameworksControl").show();
+        	} else {
+        		$("#funcFrameworksControl").hide();
+        	}
+        });
         if ( '<%= versioning %>' != "versioning" ){
 			$("#versionComment").hide();
 		}
@@ -556,6 +570,12 @@
 			showError($("#applicableControl"), $("#applicableError"), data.applicableErr);
 		} else {
 			hideError($("#applicableControl"), $("#applicableError"));
+		}
+		
+		if (!isBlank(data.funcFrameworksError)) {
+			showError($("#funcFrameworksControl"), $("#funcFrameworksError"), data.funcFrameworksError);
+		} else {
+			hideError($("#funcFrameworksControl"), $("#funcFrameworksError"));
 		}
 	}
 

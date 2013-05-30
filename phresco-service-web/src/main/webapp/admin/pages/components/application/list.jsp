@@ -131,6 +131,6 @@
 	// This method calling from confirm_dialog.jsp
 	function continueDeletion() {
     	hidePopup();
-    	loadContent('applicationDelete', $('#formAppTypeList'), $('#subcontainer'));
+    	loadContent('applicationDelete', $('#formAppTypeList'), $('#subcontainer'), "", "", "", "<s:text name='lbl.prog.apptype.delete'/>");
     }
 </script>

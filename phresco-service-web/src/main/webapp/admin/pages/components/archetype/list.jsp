@@ -208,7 +208,7 @@
     // This method calling from confirm_dialog.jsp
     function continueDeletion() {
     	hidePopup();
-    	loadContent('archetypeDelete', $('#formArchetypeList'), $('#subcontainer'));
+    	loadContent('archetypeDelete', $('#formArchetypeList'), $('#subcontainer'), "", "", "", "<s:text name='lbl.prog.txt.archetype.delete'/>");
     }
     
     function addTechGroup() {

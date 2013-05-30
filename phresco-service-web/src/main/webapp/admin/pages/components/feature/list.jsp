@@ -158,6 +158,7 @@
 	$(document).ready(function() {
 		toDisableCheckAll($('#checkAllAuto'), 'technology');
 		hideLoadingIcon();//To hide the loading icon
+		hideProgressBar();
 	});
 	
 	function versioningFeatu(moduleGroupId, moduleId) {

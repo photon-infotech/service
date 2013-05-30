@@ -166,6 +166,6 @@
  	// This method calling from confirm_dialog.jsp
     function continueDeletion() {
     	hidePopup();
-    	loadContent('configtempDelete', $('#formConfigTempList'), $('#subcontainer'));
+    	loadContent('configtempDelete', $('#formConfigTempList'), $('#subcontainer'), "", "", "", "<s:text name='lbl.prog.txt.configtemp.delete'/>");
     }
 </script>

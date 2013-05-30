@@ -141,7 +141,7 @@
 			// This method calling from confirm_dialog.jsp
 		    function continueDeletion() {
 		    	hidePopup();
-		    	loadContent('featuresDelete', $('#formFeaturesList'), $("#subcontainer"));
+		    	loadContent('featuresDelete', $('#formFeaturesList'), $("#subcontainer"), "", "", "", "<s:text name='lbl.prog.txt.features.delete'/>");
 		    }
 			
 			//To list the features based on the type
