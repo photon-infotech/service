@@ -48,6 +48,7 @@ public class CustomerDAO extends BaseDAO {
 	private List<ApplicationType> applicableAppTypes;
 	private Map<String, String> frameworkTheme;
 	private List<String> options;
+	private String context;
 	
 	public String getEmailId() {
 		return emailId;
@@ -167,6 +168,14 @@ public class CustomerDAO extends BaseDAO {
 
 	public String getRepoInfoId() {
 		return repoInfoId;
+	}
+
+	public void setContext(String context) {
+		this.context = context;
+	}
+
+	public String getContext() {
+		return context;
 	}
 	
 }

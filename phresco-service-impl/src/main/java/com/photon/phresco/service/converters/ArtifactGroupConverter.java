@@ -34,6 +34,7 @@ import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
+import com.photon.phresco.service.dao.CustomerDAO;
 import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.ServiceConstants;
 
@@ -110,9 +111,10 @@ public class ArtifactGroupConverter implements Converter<ArtifactGroupDAO, Artif
     
 	private String createDownloadURL(String groupId, String artifactId, String packaging, String version, String customerId, long fileSize) {		
 		if(StringUtils.isNotEmpty(groupId) && StringUtils.isNotEmpty(artifactId) && StringUtils.isNotEmpty(version)) {
-			Customer customer = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME, new Query(Criteria.whereId().is(customerId)), Customer.class);			
+			CustomerDAO customer = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME, new Query(Criteria.whereId().is(customerId)), CustomerDAO.class);			
 			if(customer != null) {
-				RepoInfo repoInfo = customer.getRepoInfo();				
+				RepoInfo repoInfo = mongoOperation.findOne(REPOINFO_COLLECTION_NAME, 
+						new Query(Criteria.whereId().is(customer.getRepoInfoId())), RepoInfo.class);				
 				if(StringUtils.isNotEmpty(repoInfo.getGroupRepoURL())) {
 					return repoInfo.getGroupRepoURL() + "/" + ServerUtil.createContentURL(groupId, artifactId, version, packaging);
 				}

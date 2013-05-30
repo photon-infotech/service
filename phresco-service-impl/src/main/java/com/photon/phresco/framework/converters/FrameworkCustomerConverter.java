@@ -36,6 +36,7 @@ public class FrameworkCustomerConverter implements Converter<CustomerDAO, Custom
 		customer.setType(dao.getType());
 		customer.setFrameworkTheme(dao.getFrameworkTheme());
 		customer.setOptions(dao.getOptions());
+		customer.setContext(dao.getContext());
 		return customer;
 	}
 
