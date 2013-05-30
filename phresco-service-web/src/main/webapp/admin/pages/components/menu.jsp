@@ -72,7 +72,11 @@
 		loadContent("technologies", $('#formCustomerId'), $("#subcontainer"), "type=<%= Type.FEATURE.name() %>");
 		
 		//To activate the module menu by default
-		activateMenu($("#module"));
+		
+		$(".tabs li a").removeClass("active").addClass("inactive");
+		$(".tabs li:first-child .submenu ").show();
+		$(".tabs li:first-child .submenu li:first-child a").addClass("active");
+		activateMenu($("#featuresMenu"));
 	}
 	
 	function changeLogo(data) {
