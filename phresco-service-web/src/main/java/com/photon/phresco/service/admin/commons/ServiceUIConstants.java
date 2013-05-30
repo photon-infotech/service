@@ -362,6 +362,7 @@ public interface ServiceUIConstants {
     String KEY_I18N_ERR_DISPLAYNAME_ALREADY_EXIST = "err.msg.displayname.exists";
     String KEY_I18N_ERR_NAME_ALREADY_EXIST_TECH = "err.msg.name.tech.exists";
     String KEY_I18N_ERR_NAME_ALREADY_EXIST_APPTYPE = "err.msg.name.apptype.exists";
+    String KEY_18N_ERR_CONTEXT_ALREADY_EXIST = "err.msg.context.exists";
     String KEY_I18N_ERR_DESC_EMPTY = "err.msg.desc.empty";
     String KEY_I18N_ERR_VER_EMPTY = "err.msg.ver.empty";
     String KEY_I18N_ERR_TECHVER_EMPTY = "err.msg.techver.empty";
@@ -372,6 +373,7 @@ public interface ServiceUIConstants {
     String KEY_I18N_MULTI_TECH_EMPTY = "err.msg.multitech.empty";
     String KEY_I18N_NAME_CHANGE_NOT_APPLICABLE = "err.msg.name.chnge.not.appl";
 	String KEY_I18N_SINGLE_TECH_EMPTY = "err.msg.singletech.empty";
+	String KEY_I18N_ERR_CONTEXT_EMPTY = "err.msg.context.empty";
     
     String KEY_I18N_ERR_APPTYPE_EMPTY = "err.msg.apptye.empty";
     String KEY_I18N_ERR_APPLIES_EMPTY = "err.msg.applies.empty";

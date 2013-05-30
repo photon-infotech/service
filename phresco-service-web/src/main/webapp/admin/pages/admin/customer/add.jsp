@@ -90,6 +90,7 @@
 	String disabledLabelColor = "";
 	String copyRightColor = "";
 	String copyRight = "";
+	String context = "";
 	
 	List<String> applicableTechnologies = new ArrayList();
 	List<ApplicationType> applicableAppTypes = null;
@@ -152,6 +153,9 @@
 		}
 		if (customer.getType() != null) {
 			licenseType = customer.getType();
+		}
+		if (customer.getContext() != null) {
+			context = customer.getContext();
 		}
 		if (CollectionUtils.isNotEmpty(permissionIds) && !permissionIds.contains(ServiceUIConstants.PER_MANAGE_CUSTOMERS)) {
 			per_disabledStr = "disabled";
@@ -642,6 +646,16 @@
 					<span class="help-inline" id="repoPasswordError"></span>
 			</div>
 		</div>
+		<div class="control-group" id="contextControl">
+			<label class="control-label labelbold">
+				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.adm.cust.context'/>
+			</label>
+			<div class="controls">
+				<input id="context" placeholder="<s:text name='place.hldr.cust.add.context'/>" class="input-xlarge" type="text" name="context"
+				    value="<%= context %>" maxlength="50" title="50 Characters only">
+				    <span class="help-inline" id="contextError"></span>
+			</div>
+		</div>
 		
 		<%
 			if(CollectionUtils.isNotEmpty(technologies)) {
@@ -886,6 +900,7 @@
 	<input type="hidden" name="snapshotRepoUrl" value="<%= snapShotRepoUrl %>">
 	<input type="hidden" name="groupRepoUrl" value="<%= groupRepoUrl %>">
 	<input type="hidden" name="baseRepoUrl" value="<%= baseRepoUrl %>">
+	<input type="hidden" name="oldContext" value="<%= context %>"/>
 </form>
 
 <script type="text/javascript">
@@ -912,6 +927,13 @@
             var name = $(this).val();
             name = checkForSplChr(name);
             $(this).val(name);        
+		});
+		
+		// To check allow only underscore and hypen in context
+		$('#context').bind('input propertychange', function (e) {
+			var context = $(this).val();
+			context = allowHypenUnderscore(context);
+			$(this).val(context);
 		});
 		
     	// To check for the special character in state
@@ -1121,6 +1143,12 @@
 			showError($("#repoURLControl"), $("#repoURLError"), data.repoURLError);
 		} else {
 			hideError($("#repoURLControl"), $("#repoURLError"));
+		}
+		
+		if (!isBlank(data.contextError)) {
+			showError($("#contextControl"), $("#contextError"), data.contextError);
+		} else {
+			hideError($("#contextControl"), $("#contextError"));
 		}
 	}
 </script>

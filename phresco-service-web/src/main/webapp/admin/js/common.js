@@ -366,7 +366,7 @@ function allowNumHyphenPlus(numbr) {
 
 //It allows _,-
 function allowHypenUnderscore(inputStr) {
-	return inputStr.replace(/[^-\_]+/g, '');
+	return inputStr.replace(/[^a-zA-Z\-\_]+/g, '');
 }
 
 function isBlank(str) {

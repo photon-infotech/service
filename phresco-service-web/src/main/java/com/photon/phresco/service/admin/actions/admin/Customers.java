@@ -86,6 +86,7 @@ public class Customers extends ServiceBaseAction  {
 	private String repoUserNameError = "";
 	private String repoPasswordError = "";
 	private String repoURLError = "";
+	private String contextError = "";
 	private boolean errorFound = false;
 	private boolean tempError = false;
 	private static String uploadIconName = "";
@@ -108,11 +109,12 @@ public class Customers extends ServiceBaseAction  {
 	private String baseRepoUrl = "";
 	private List<String> appliesTo = new ArrayList<String>();
 	List<ApplicationType> applicableAppTypes = new ArrayList<ApplicationType>();
-	
+	private String context = "";
 	
 	private String fromPage = "";
 	
 	private String oldName = "";
+	private String oldContext = "";
 
     /**
      * To get the all the customers from the DB
@@ -339,6 +341,7 @@ public class Customers extends ServiceBaseAction  {
 	        frameworkTheme.put(COPYRIGHT, getCopyRight());
 	        frameworkTheme.put(DISABLED_LABEL_COLOR, getDisabledLabelColor());
 	        customer.setFrameworkTheme(frameworkTheme);
+	        customer.setContext(context);
 	    } catch (Exception e) {
             throw new PhrescoException(e);
         }
@@ -417,6 +420,9 @@ public class Customers extends ServiceBaseAction  {
     		
     		isError = repoUrlValidation(isError);
     		
+    		//Empty vaildation for context
+    		isError = contextValidation();
+    		
     		if (StringUtils.isNotEmpty(getRepoURL())) {
     			//Empty validation for repo username
         		if (StringUtils.isEmpty(getRepoUserName())) {
@@ -439,7 +445,7 @@ public class Customers extends ServiceBaseAction  {
 		
 		return SUCCESS;
 	}
-
+	
 	public boolean repoUrlValidation(boolean isError) {
 		if (StringUtils.isNotEmpty(getRepoURL())) {
 			String urlPattern = "^(http|https|ftp)://.*$";
@@ -534,14 +540,33 @@ public class Customers extends ServiceBaseAction  {
 	public boolean nameValidation(boolean isError) throws PhrescoException {
 		if (StringUtils.isEmpty(getName())) { 
 			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY));
-			isError = true;
-		} else if (StringUtils.isEmpty(getFromPage()) || (!getName().equals(getOldName()))) {
+			tempError = true;
+		} else if (ADD.equals(getFromPage()) || (!getName().equals(getOldName()))) {
 			// to check duplication of name
 			List<Customer> customers = getServiceManager().getCustomers();
 			if (CollectionUtils.isNotEmpty(customers)) {
 				for (Customer customer : customers) {
 					if (customer.getName().equalsIgnoreCase(getName())) {
 						setNameError(getText(KEY_I18N_ERR_NAME_ALREADY_EXIST));
+						tempError = true;
+						break;
+					}
+				}
+			}
+		}
+		return tempError;
+	}
+	
+	private boolean contextValidation() throws PhrescoException {
+		if (StringUtils.isEmpty(getContext())) {
+			setContextError(getText(KEY_I18N_ERR_CONTEXT_EMPTY));
+			tempError = true;
+		} else if (ADD.equals(getFromPage()) || (!getContext().equals(getOldContext()))) {
+			List<Customer> customers = getServiceManager().getCustomers();
+			if (CollectionUtils.isNotEmpty(customers)) {
+				for (Customer customer : customers) {
+					if (customer.getContext().equalsIgnoreCase(getContext())) {
+						setContextError(getText(KEY_18N_ERR_CONTEXT_ALREADY_EXIST));
 						tempError = true;
 						break;
 					}
@@ -966,4 +991,28 @@ public class Customers extends ServiceBaseAction  {
     public List<String> getOptions() {
         return options;
     }
+
+	public void setContext(String context) {
+		this.context = context;
+	}
+
+	public String getContext() {
+		return context;
+	}
+
+	public void setContextError(String contextError) {
+		this.contextError = contextError;
+	}
+
+	public String getContextError() {
+		return contextError;
+	}
+
+	public void setOldContext(String oldContext) {
+		this.oldContext = oldContext;
+	}
+
+	public String getOldContext() {
+		return oldContext;
+	}
 }

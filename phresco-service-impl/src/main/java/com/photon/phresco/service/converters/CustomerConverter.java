@@ -51,6 +51,7 @@ public class CustomerConverter implements Converter<CustomerDAO, Customer> {
 		customer.setFrameworkTheme(dao.getFrameworkTheme());
 		customer.setSystem(dao.isSystem());
 		customer.setOptions(dao.getOptions());
+		customer.setContext(dao.getContext());
 		return customer;
 	}
 
@@ -79,6 +80,7 @@ public class CustomerConverter implements Converter<CustomerDAO, Customer> {
 		customerDAO.setFrameworkTheme(customer.getFrameworkTheme());
 		customerDAO.setSystem(customer.isSystem());
 		customerDAO.setOptions(customer.getOptions());
+		customerDAO.setContext(customer.getContext());
 		return customerDAO;
 	}
 
