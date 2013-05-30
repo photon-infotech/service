@@ -168,7 +168,6 @@ public class Roles extends ServiceBaseAction {
 		role.setName(getName());
 		role.setDescription(getDescription());
 		role.setAppliesTo(getAppliesTo());
-		role.setAppliesTo(getAppliesTo());
 		
 		return role;
 	}

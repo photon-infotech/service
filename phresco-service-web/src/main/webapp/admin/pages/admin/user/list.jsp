@@ -81,21 +81,21 @@
 			            			}
 			            %>
 						<tbody>
-						<tr>
-							<td>
-								<%= StringUtils.isNotEmpty(user.getDisplayName()) ? user.getDisplayName() :"" %>
-							</td>
-							<td class="emailalign"><%= StringUtils.isNotEmpty(user.getEmail()) ? user.getEmail() : "" %></td>
-							<td class="userwidth"><%= user.getStatus()!= null ? user.getStatus() : "" %></td>
-							<td  class = "tablealign">
-								<input type="button" class="btn <%= per_disabledClass %> addiconAlign" <%= per_disabledStr %> value="Roles" onclick="showAssignRolesPopup('<%= user.getId() %>');">
-							</td>
-						</tr>
-					</tbody>
-					<%
+							<tr>
+								<td>
+									<%= StringUtils.isNotEmpty(user.getDisplayName()) ? user.getDisplayName() :"" %>
+								</td>
+								<td class="emailalign"><%= StringUtils.isNotEmpty(user.getEmail()) ? user.getEmail() : "" %></td>
+								<td class="userwidth"><%= user.getStatus()!= null ? user.getStatus() : "" %></td>
+								<td  class = "tablealign">
+									<input type="button" class="btn <%= per_disabledClass %> addiconAlign" <%= per_disabledStr %> value="Roles" onclick="showAssignRolesPopup('<%= user.getId() %>');">
+								</td>
+							</tr>
+						</tbody>
+						<%
+								}
 							}
-						}
-					%>
+						%>
 				</table>
 			</div>
 		</div>
