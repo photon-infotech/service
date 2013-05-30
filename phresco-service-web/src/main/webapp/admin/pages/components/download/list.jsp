@@ -182,6 +182,6 @@
     // This method calling from confirm_dialog.jsp
     function continueDeletion() {
     	hidePopup();
-    	loadContent('downloadDelete', $('#formDownloadList'), $('#subcontainer'));
+    	loadContent('downloadDelete', $('#formDownloadList'), $('#subcontainer'), "", "", "", "<s:text name='lbl.prog.txt.download.delete'/>");
     }
 </script>

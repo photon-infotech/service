@@ -82,6 +82,7 @@ public class Archetypes extends ServiceBaseAction {
 	private String appError = "";
 	private String fileError = "";
 	private String applicableErr = "";
+	private String funcFrameworksError = "";
 	private boolean errorFound = false;
 	private String oldName = "";
 
@@ -102,6 +103,7 @@ public class Archetypes extends ServiceBaseAction {
 	private String archGroupId = "";
 	private String archVersions = "";
 	private List<String> applicable = null;
+	private List<String> functionalFramework = null;
 	private List<String> applicableReports = null;
 	private List<String> applicableAtchetypeFeatures = null;
 	private boolean archType = false;
@@ -279,7 +281,7 @@ public class Archetypes extends ServiceBaseAction {
     	if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method Archetypes.getTechnology()");
 		}
-    	
+    	ServiceManager serviceManager = getServiceManager();
     	String artifactId = getArtifactId();
     	String groupId = getGroupId();
     	String version = getVersion();
@@ -298,6 +300,20 @@ public class Archetypes extends ServiceBaseAction {
         	options.add(selectedOption);
 		}
         technology.setOptions(options);
+       
+        List<FunctionalFramework> functionalFrameworks = new ArrayList<FunctionalFramework>();
+        List<FunctionalFramework> functionalTestFramework = serviceManager.getFunctionalTestFramework();
+        for (String funcFramework : getFunctionalFramework()) {
+        	for (FunctionalFramework functionalFramework : functionalTestFramework) {
+				if(functionalFramework.getName().equals(funcFramework)) {
+					FunctionalFramework e = new FunctionalFramework();
+		        	e.setId(functionalFramework.getId());
+		        	functionalFrameworks.add(e);
+				}
+			}
+		}
+		technology.setFunctionalFrameworks(functionalFrameworks);
+        
         //To create the ArtifactGroup with groupId, artifactId and version for archetype jar
         if ((StringUtils.isEmpty(artifactId) && StringUtils.isEmpty(groupId) && StringUtils.isEmpty(version))) {
         	artifactId = getArchArchetypeId();
@@ -502,6 +518,8 @@ public class Archetypes extends ServiceBaseAction {
 		//Empty validation for applicable features
 		isError = featureValidation(isError);
 		
+		isError = functioanlFrameworkValidation(isError);
+		
 		if (isError) {
             setErrorFound(true);
         }
@@ -573,6 +591,15 @@ public class Archetypes extends ServiceBaseAction {
 	private boolean featureValidation(boolean isError) {
 		if (CollectionUtils.isEmpty(getApplicable())) {
 			setApplicableErr(getText(KEY_I18N_ERR_APPLICABLE_EMPTY ));
+			tempError = true;
+		}
+		
+		return tempError;
+	}
+
+	private boolean functioanlFrameworkValidation(boolean isError) {
+		if (CollectionUtils.isNotEmpty(getApplicable()) && getApplicable().contains("Functional_Test") && CollectionUtils.isEmpty(getFunctionalFramework())) {
+			setFuncFrameworksError(getText(KEY_I18N_ERR_FUNCTIONAL_FRAMEWORK_EMPTY));
 			tempError = true;
 		}
 		
@@ -931,5 +958,21 @@ public class Archetypes extends ServiceBaseAction {
 
 	public List<String> getApplicableAtchetypeFeatures() {
 		return applicableAtchetypeFeatures;
+	}
+
+	public List<String> getFunctionalFramework() {
+		return functionalFramework;
+	}
+
+	public void setFunctionalFramework(List<String> functionalFramework) {
+		this.functionalFramework = functionalFramework;
+	}
+
+	public String getFuncFrameworksError() {
+		return funcFrameworksError;
+	}
+
+	public void setFuncFrameworksError(String funcFrameworksError) {
+		this.funcFrameworksError = funcFrameworksError;
 	}
 }

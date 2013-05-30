@@ -188,6 +188,6 @@
  	// This method calling from confirm_dialog.jsp
     function continueDeletion() {
     	hidePopup();
-    	loadContent('pilotprojDelete', $('#formPilotProjList'), $('#subcontainer'));
+    	loadContent('pilotprojDelete', $('#formPilotProjList'), $('#subcontainer'), "", "", "", "<s:text name='lbl.prog.txt.pilot.delete'/>");
     }
 </script>
