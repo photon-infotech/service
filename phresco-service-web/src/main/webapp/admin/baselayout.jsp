@@ -142,6 +142,9 @@
 	    			$("#updateMsg").empty();
 	    			$("#reportMsg").empty();
 		    	});
+		    	
+		    	var logoImgUrl = '<%= request.getAttribute("enCodedLogo") %>';
+				$('#logoImg').attr("src",  "data:image/png;base64," + logoImgUrl);
 			});
 		</script>
 	</head>

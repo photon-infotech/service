@@ -17,6 +17,9 @@
  */
 package com.photon.phresco.service.admin.actions;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -32,6 +35,9 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.Role;
@@ -39,6 +45,7 @@ import com.photon.phresco.commons.model.User;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.exception.PhrescoWebServiceException;
 import com.photon.phresco.service.api.PhrescoServerFactory;
+import com.photon.phresco.util.Utility;
 
 public class Login extends ServiceBaseAction {
 
@@ -61,7 +68,7 @@ public class Login extends ServiceBaseAction {
 	private static Map<String, String> s_encodeImgMap = new HashMap<String, String>();
 	private static Map<String, Map<String, String>> s_themeMap = new HashMap<String, Map<String, String>>();
 	
-	public String login() throws PhrescoException {
+	public String login() throws PhrescoException, IOException, ParseException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method  Login.login()");
 	    }
@@ -95,6 +102,8 @@ public class Login extends ServiceBaseAction {
 			setReqAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_SUCCESS_LOGOUT));
 		}
 		removeSessionAttribute(REQ_LOGIN_ERROR);
+		s_encodeImgMap.clear();
+		s_themeMap.clear();
 		
         return SUCCESS;
     }
@@ -102,18 +111,7 @@ public class Login extends ServiceBaseAction {
 	public String fetchLogoImgUrl() {
     	InputStream fileInputStream = null;
     	try {
-    		String encodeImg = s_encodeImgMap.get(getCustomerId());
-    		if (StringUtils.isEmpty(encodeImg)) {
-    			fileInputStream = getServiceManager().getIcon(getCustomerId());
-    			if(fileInputStream != null) {
-    				byte[] imgByte = null;
-        			imgByte = IOUtils.toByteArray(fileInputStream);
-        			byte[] encodedImage = Base64.encodeBase64(imgByte);
-        			encodeImg = new String(encodedImage);
-        			s_encodeImgMap.put(getCustomerId(), encodeImg);
-    			}
-    		}
-            setLogoImgUrl(encodeImg);
+            setLogoImgUrl(getEncodedLogo(getCustomerId()));
             
             Map<String, String> themeMap = s_themeMap.get(getCustomerId());
             if (MapUtils.isEmpty(s_themeMap.get(getCustomerId()))) {
@@ -131,19 +129,9 @@ public class Login extends ServiceBaseAction {
             	setCopyRightColor(themeMap.get(COPYRIGHT_COLOR));
             	setCopyRight(themeMap.get(COPYRIGHT));
             }
-    	} catch (PhrescoException e) {
-    		
     	} catch (IOException e) {
     		
-		} finally {
-    		try {
-    			if (fileInputStream != null) {
-    				fileInputStream.close();
-    			}
-			} catch (IOException e) {
-				
-			}
-    	}
+		}
     	
     	return SUCCESS;
     }
@@ -170,7 +158,7 @@ public class Login extends ServiceBaseAction {
 		return SUCCESS;
 	}
 	
-	private String authenticate() {
+	private String authenticate() throws IOException, ParseException  {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entering Method  Login.authenticate()");
 	    }
@@ -193,7 +181,41 @@ public class Login extends ServiceBaseAction {
 				setReqAttribute(REQ_LOGIN_ERROR, getText(KEY_I18N_ERROR_LOGIN_ACCESS_DENIED));
 				return LOGIN_FAILURE;
 			}
+			
 			setSessionAttribute(SESSION_USER_INFO, user);
+			
+			File tempPath = new File(Utility.getSystemTemp() + File.separator + USER_JSON);
+        	String userId = user.getId();
+        	JSONObject userjson = new JSONObject();
+        	JSONParser parser = new JSONParser();
+        	String customerId = PHOTON;
+        	if (tempPath.exists()) {
+        		FileReader reader = new FileReader(tempPath);
+        		userjson = (JSONObject)parser.parse(reader);
+        		if (userjson.get(userId) != null) {
+        			customerId = (String) userjson.get(userId);
+        		}
+        		reader.close();
+        	} 
+        	
+        	userjson.put(userId, customerId);
+        	
+        	List<String> customerList = new ArrayList<String>();
+        	for (Customer c : customers) {
+				customerList.add(c.getId());
+			}
+        	//If photon is present in customer list , then ui should load with photon customer
+        	if ((StringUtils.isEmpty(customerId) || PHOTON.equals(customerId)) && customerList.contains(PHOTON)) {
+        		customerId = PHOTON;
+        	}
+			setSessionAttribute(REQ_CUST_CUSTOMER_ID, customerId);
+			String enCodedLogo = getEncodedLogo(customerId);
+			setReqAttribute("enCodedLogo", enCodedLogo);
+
+			FileWriter  writer = new FileWriter(tempPath);
+        	writer.write(userjson.toString());
+        	writer.close();
+			
 			List<String> roleIds = user.getRoleIds();
 			if (CollectionUtils.isNotEmpty(roleIds)) {
 				List<String> permisionIds = new ArrayList<String>();
@@ -217,6 +239,69 @@ public class Login extends ServiceBaseAction {
 			
 		return SUCCESS;
 	}
+	
+	private String getEncodedLogo(String customerId) throws IOException {
+		InputStream fileInputStream = null;
+		String encodeImg = s_encodeImgMap.get(customerId);
+    	try {
+    		if (StringUtils.isEmpty(encodeImg)) {
+    			fileInputStream = getServiceManager().getIcon(customerId);
+    			if(fileInputStream != null) {
+    				byte[] imgByte = null;
+        			imgByte = IOUtils.toByteArray(fileInputStream);
+        			byte[] encodedImage = Base64.encodeBase64(imgByte);
+        			encodeImg = new String(encodedImage);
+        			s_encodeImgMap.put(customerId, encodeImg);
+    			}
+    		}
+    	} catch (Exception e) {
+			// TODO: handle exception
+		} finally {
+    		try {
+    			if (fileInputStream != null) {
+    				fileInputStream.close();
+    			}
+			} catch (IOException e) {
+				
+			}
+    	}
+    	
+    	return encodeImg;
+	}
+	
+	 @SuppressWarnings("unchecked")
+		public String fetchCustomerId() {
+	    	try {
+	    		User user = (User) getSessionAttribute(SESSION_USER_INFO);
+	    		String userId = user.getId();
+	    		String customerId = (String) getSessionAttribute("customerId");
+	    		if (!customerId.equals(getCustomerId())) {
+	    			File tempPath = new File(Utility.getSystemTemp() + File.separator + USER_JSON);
+	    			JSONObject userjson = null;
+	    			JSONParser parser = new JSONParser();
+	    			customerId = getCustomerId();
+	    			if (tempPath.exists()) {
+	    				FileReader reader = new FileReader(tempPath);
+	    				userjson = (JSONObject)parser.parse(reader);
+	    				reader.close();
+	    			} else {
+	    				userjson = new JSONObject();
+	    			}
+
+	    			userjson.put(userId, customerId);
+	    			FileWriter  writer = new FileWriter(tempPath);
+	    			writer.write(userjson.toString());
+	    			writer.close();
+	    		}
+	    		setSessionAttribute(SESSION_USER_INFO, user);
+	    		setSessionAttribute("customerId", customerId);
+			} catch (IOException e) {
+				return showErrorPopup(new PhrescoException(e), getText(EXCEPTION_FRAMEWORKSTREAM));
+			} catch (ParseException e) {
+				return showErrorPopup(new PhrescoException(e), getText(EXCEPTION_FRAMEWORKSTREAM));
+			}
+	    	return SUCCESS;
+	    }
 	
 	private Comparator sortingCusNameInAlphaOrder() {
 		return new Comparator(){

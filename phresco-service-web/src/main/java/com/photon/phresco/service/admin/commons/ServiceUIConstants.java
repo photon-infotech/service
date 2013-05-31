@@ -64,6 +64,8 @@ public interface ServiceUIConstants {
 	String TEMP_FOLDER = "newtemp";
 	String TECHGROUP_LIST = "techGrpList";
 	String ABOUT = "about";
+	String USER_JSON = "user.json";
+	String PHOTON = "photon";
     
 	/*****************************
      * Login Request Constants
@@ -303,6 +305,7 @@ public interface ServiceUIConstants {
 	String EXCEPTION_COMPONENT_LIST = "excep.hdr.comp.compon.list";
 	String EXCEPTION_COMPONENT_LIST_DEPENDENCY = "excep.hdr.comp.compon.dependency";
 	String EXCEPTION_COMPONENT_UPLOAD_FILE = "excep.hdr.comp.compon.uploadfile";
+	String EXCEPTION_FRAMEWORKSTREAM = "changecustomer.exception.message.stream";
 	
 	String EXCEPTION_ARCHETYPE_DELETE = "excep.hdr.comp.archetype.delete";
 	String EXCEPTION_ARCHETYPE_UPDATE = "excep.hdr.comp.archetype.update";

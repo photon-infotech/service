@@ -101,6 +101,7 @@ public class Features extends ServiceBaseAction {
     private String fromPage = "";
 
 	private String nameError = "";
+	private String dispNameError = "";
 	private String artifactIdError = "";
     private String groupIdError = "";
 	private String fileError = "";
@@ -584,6 +585,9 @@ public class Features extends ServiceBaseAction {
         //Empty validation for name
         isError = nameValidation(isError);
         
+        //Display Name Validation
+        isError = dispNameValidation(isError);
+        
         //Empty Multiple Technology selection
         isError = techValidation(isError);
         
@@ -667,6 +671,27 @@ public class Features extends ServiceBaseAction {
 						for (ArtifactGroup moduleGroup : moduleGroups) {
 							if (moduleGroup.getName().equalsIgnoreCase(getName())) {
 								setNameError(getText(KEY_I18N_ERR_NAME_ALREADY_EXIST_APPTYPE));
+								tempError = true;
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		return tempError;
+	}
+	
+	private boolean dispNameValidation(boolean isError) throws PhrescoException {
+		if (ADD.equals(getFromPage()) || (!getName().equals(getOldName()))) {
+			if (CollectionUtils.isNotEmpty(getMultiTechnology())) {	 
+				for(String technologyList : getMultiTechnology()){
+					List<ArtifactGroup>  moduleGroups = getServiceManager().getFeatures(getCustomerId(), technologyList, Type.valueOf(getType()).name());
+					if (CollectionUtils.isNotEmpty(moduleGroups)) {
+						for (ArtifactGroup moduleGroup : moduleGroups) {
+							if (moduleGroup.getDisplayName().equalsIgnoreCase(getDisplayName())) {
+								setDispNameError(getText(KEY_I18N_ERR_DISPLAYNAME_ALREADY_EXIST));
 								tempError = true;
 								break;
 							}
@@ -997,5 +1022,13 @@ public class Features extends ServiceBaseAction {
 
 	public String getPackaging() {
 		return packaging;
+	}
+
+	public String getDispNameError() {
+		return dispNameError;
+	}
+
+	public void setDispNameError(String dispNameError) {
+		this.dispNameError = dispNameError;
 	}
 }

@@ -29,6 +29,9 @@
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
 <%@ page import="com.photon.phresco.util.ServiceConstants"%>
 
+<% 
+    String customerId = (String)session.getAttribute("customerId"); 
+%>
 
 <script type="text/javascript">
 	var customerId = "";
