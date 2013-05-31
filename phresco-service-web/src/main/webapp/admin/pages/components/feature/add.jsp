@@ -549,6 +549,12 @@
         } else {
             hideError($("#nameControl"), $("#nameError"));
         }
+
+        if (!isBlank(data.dispNameError)) {
+            showError($("#dispNameControl"), $("#dispNameError"), data.dispNameError);
+        } else {
+            hideError($("#dispNameControl"), $("#dispNameError"));
+        }
         
         if (!isBlank(data.licenseError)) {
             showError($("#licenseControl"), $("#licenseError"), data.licenseError);
