@@ -259,7 +259,37 @@ public class Login extends ServiceBaseAction {
 			
 		return SUCCESS;
 	}
-@SuppressWarnings("unchecked")
+	
+	private String getEncodedLogo(String customerId) throws IOException {
+		InputStream fileInputStream = null;
+		String encodeImg = s_encodeImgMap.get(customerId);
+    	try {
+    		if (StringUtils.isEmpty(encodeImg)) {
+    			fileInputStream = getServiceManager().getIcon(customerId);
+    			if(fileInputStream != null) {
+    				byte[] imgByte = null;
+        			imgByte = IOUtils.toByteArray(fileInputStream);
+        			byte[] encodedImage = Base64.encodeBase64(imgByte);
+        			encodeImg = new String(encodedImage);
+        			s_encodeImgMap.put(customerId, encodeImg);
+    			}
+    		}
+    	} catch (Exception e) {
+			// TODO: handle exception
+		} finally {
+    		try {
+    			if (fileInputStream != null) {
+    				fileInputStream.close();
+    			}
+			} catch (IOException e) {
+				
+			}
+    	}
+    	
+    	return encodeImg;
+	}
+	
+	 @SuppressWarnings("unchecked")
 		public String fetchCustomerId() {
 	    	try {
 	    		User user = (User) getSessionAttribute(SESSION_USER_INFO);
