@@ -37,8 +37,8 @@ import org.apache.log4j.Logger;
 
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactInfo;
+import com.photon.phresco.commons.model.Category;
 import com.photon.phresco.commons.model.DownloadInfo;
-import com.photon.phresco.commons.model.DownloadInfo.Category;
 import com.photon.phresco.commons.model.PlatformType;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;

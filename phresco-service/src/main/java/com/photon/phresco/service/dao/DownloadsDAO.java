@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
-import com.photon.phresco.commons.model.DownloadInfo.Category;
+import com.photon.phresco.commons.model.Category;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DownloadsDAO extends CustomerBaseDAO {
