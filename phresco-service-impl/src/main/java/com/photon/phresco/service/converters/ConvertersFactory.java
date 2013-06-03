@@ -41,10 +41,16 @@ import com.photon.phresco.service.dao.VideoTypeDAO;
  */
 public class ConvertersFactory {
 	
-	public static final Map<Class<? extends BaseDAO>, Converter<? extends BaseDAO, ? extends Element>> CONVERTERS_MAP = 
+	/**
+	 * 
+	 */
+	private static final Map<Class<? extends BaseDAO>, Converter<? extends BaseDAO, ? extends Element>> CONVERTERS_MAP = 
 		new HashMap<Class<? extends BaseDAO>, Converter<? extends BaseDAO, ? extends Element>>(32);  
 	
-	public static final Map<Class<? extends BaseDAO>, Converter<? extends BaseDAO, ? extends Element>> FRAMEWORK_CONVERTERS_MAP = 
+	/**
+	 * 
+	 */
+	private static final Map<Class<? extends BaseDAO>, Converter<? extends BaseDAO, ? extends Element>> FRAMEWORK_CONVERTERS_MAP = 
 		new HashMap<Class<? extends BaseDAO>, Converter<? extends BaseDAO, ? extends Element>>(32);
 	
 	static {
@@ -52,6 +58,9 @@ public class ConvertersFactory {
 		initFrameworkConverters();
 	}
 
+	/**
+	 * 
+	 */
 	private static void initConverters() {
 		CONVERTERS_MAP.put(ArtifactGroupDAO.class, new ArtifactGroupConverter());
 		CONVERTERS_MAP.put(TechnologyDAO.class, new TechnologyConverter());
@@ -64,15 +73,26 @@ public class ConvertersFactory {
 		CONVERTERS_MAP.put(CustomerDAO.class, new CustomerConverter());
 	}
 	
+	/**
+	 * 
+	 */
 	private static void initFrameworkConverters() {
 		FRAMEWORK_CONVERTERS_MAP.put(CustomerDAO.class, new FrameworkCustomerConverter());
 		FRAMEWORK_CONVERTERS_MAP.put(ArtifactGroupDAO.class, new FrameworkArtifactGroupConverter());
 	}
 
+	/**
+	 * @param clazz
+	 * @return
+	 */
 	public static final Converter<? extends BaseDAO, ? extends Element> getConverter(Class<? extends BaseDAO> clazz) {
 		return CONVERTERS_MAP.get(clazz);
 	}
 	
+	/**
+	 * @param clazz
+	 * @return
+	 */
 	public static final Converter<? extends BaseDAO, ? extends Element> getFrameworkConverter(Class<? extends BaseDAO> clazz) {
 		return FRAMEWORK_CONVERTERS_MAP.get(clazz);
 	}

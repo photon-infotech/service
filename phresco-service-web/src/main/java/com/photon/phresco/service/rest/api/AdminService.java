@@ -175,20 +175,13 @@ public class AdminService extends DbService {
 	 		    	      bodyPart(new BodyPart(inputStream, MediaType.MULTIPART_FORM_DATA_TYPE));
 		 			
 		 			return Response.ok(multiPart, MultiPartMediaTypes.MULTIPART_MIXED_TYPE).header("status", Response.Status.OK).build();
-		 			
+
 					}
-					else {
-						return Response.ok(getErrorResponse(), MultiPartMediaTypes.MULTIPART_MIXED_TYPE).header("status", Response.Status.NO_CONTENT).build();
-					}
+					return Response.ok(getErrorResponse(), MultiPartMediaTypes.MULTIPART_MIXED_TYPE).header("status", Response.Status.NO_CONTENT).build();
 				}
-				else {
-					return Response.ok(getErrorResponse(), MultiPartMediaTypes.MULTIPART_MIXED_TYPE).header("status", Response.Status.NOT_FOUND).build();
-				}
+				return Response.ok(getErrorResponse(), MultiPartMediaTypes.MULTIPART_MIXED_TYPE).header("status", Response.Status.NOT_FOUND).build();
 			}
-			else {
-				
-				return Response.ok(getErrorResponse(), MultiPartMediaTypes.MULTIPART_MIXED_TYPE).header("status", Response.Status.PRECONDITION_FAILED).build();
-			}
+			return Response.ok(getErrorResponse(), MultiPartMediaTypes.MULTIPART_MIXED_TYPE).header("status", Response.Status.PRECONDITION_FAILED).build();
  			
  		} catch (PhrescoException e) {
  			throw new PhrescoWebServiceException(e, EX_PHEX00005, CUSTOMERS_COLLECTION_NAME);
@@ -389,8 +382,7 @@ public class AdminService extends DbService {
 		try {
 			List<VideoInfoDAO> videoList = mongoOperation.getCollection(VIDEODAO_COLLECTION_NAME , VideoInfoDAO.class);
 			if (videoList != null) {
-				Converter<VideoInfoDAO, VideoInfo> videoInfoConverter = 
-						(Converter<VideoInfoDAO, VideoInfo>) ConvertersFactory.getConverter(VideoInfoDAO.class);
+				Converter<VideoInfoDAO, VideoInfo> videoInfoConverter =  (Converter<VideoInfoDAO, VideoInfo>) ConvertersFactory.getConverter(VideoInfoDAO.class);
 				for (VideoInfoDAO videoInfoDAO : videoList) {
 					VideoInfo videoInfo = videoInfoConverter.convertDAOToObject(videoInfoDAO, mongoOperation);
 					videoInfos.add(videoInfo);
