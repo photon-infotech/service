@@ -120,7 +120,7 @@ public class CustomerDAO extends BaseDAO {
 	 * @return the emailId
 	 */
 	public String getEmailId() {
-		return emailId;
+		return this.emailId;
 	}
 
 	/**
@@ -134,7 +134,7 @@ public class CustomerDAO extends BaseDAO {
 	 * @return the address
 	 */
 	public String getAddress() {
-		return address;
+		return this.address;
 	}
 
 	/**
@@ -148,7 +148,7 @@ public class CustomerDAO extends BaseDAO {
 	 * @return the country
 	 */
 	public String getCountry() {
-		return country;
+		return this.country;
 	}
 
 	/**
@@ -162,7 +162,7 @@ public class CustomerDAO extends BaseDAO {
 	 * @return the state
 	 */
 	public String getState() {
-		return state;
+		return this.state;
 	}
 
 	/**
@@ -176,7 +176,7 @@ public class CustomerDAO extends BaseDAO {
 	 * @return the zipcode
 	 */
 	public String getZipcode() {
-		return zipcode;
+		return this.zipcode;
 	}
 
 	/**
@@ -190,7 +190,7 @@ public class CustomerDAO extends BaseDAO {
 	 * @return the contactNumber
 	 */
 	public String getContactNumber() {
-		return contactNumber;
+		return this.contactNumber;
 	}
 
 	/**
@@ -204,7 +204,7 @@ public class CustomerDAO extends BaseDAO {
 	 * @return the fax
 	 */
 	public String getFax() {
-		return fax;
+		return this.fax;
 	}
 
 	/**
@@ -218,7 +218,7 @@ public class CustomerDAO extends BaseDAO {
 	 * @return the validFrom
 	 */
 	public Date getValidFrom() {
-		return validFrom;
+		return this.validFrom;
 	}
 
 	/**
@@ -232,7 +232,7 @@ public class CustomerDAO extends BaseDAO {
 	 * @return the validUpto
 	 */
 	public Date getValidUpto() {
-		return validUpto;
+		return this.validUpto;
 	}
 
 	/**
@@ -246,7 +246,7 @@ public class CustomerDAO extends BaseDAO {
 	 * @return the type
 	 */
 	public LicenseType getType() {
-		return type;
+		return this.type;
 	}
 
 	/**
@@ -260,7 +260,7 @@ public class CustomerDAO extends BaseDAO {
 	 * @return the repoInfoId
 	 */
 	public String getRepoInfoId() {
-		return repoInfoId;
+		return this.repoInfoId;
 	}
 
 	/**
@@ -274,7 +274,7 @@ public class CustomerDAO extends BaseDAO {
 	 * @return the icon
 	 */
 	public String getIcon() {
-		return icon;
+		return this.icon;
 	}
 
 	/**
@@ -288,7 +288,7 @@ public class CustomerDAO extends BaseDAO {
 	 * @return the applicableTechnologies
 	 */
 	public List<String> getApplicableTechnologies() {
-		return applicableTechnologies;
+		return this.applicableTechnologies;
 	}
 
 	/**
@@ -302,7 +302,7 @@ public class CustomerDAO extends BaseDAO {
 	 * @return the applicableAppTypes
 	 */
 	public List<ApplicationType> getApplicableAppTypes() {
-		return applicableAppTypes;
+		return this.applicableAppTypes;
 	}
 
 	/**
@@ -316,7 +316,7 @@ public class CustomerDAO extends BaseDAO {
 	 * @return the frameworkTheme
 	 */
 	public Map<String, String> getFrameworkTheme() {
-		return frameworkTheme;
+		return this.frameworkTheme;
 	}
 
 	/**
@@ -330,7 +330,7 @@ public class CustomerDAO extends BaseDAO {
 	 * @return the options
 	 */
 	public List<String> getOptions() {
-		return options;
+		return this.options;
 	}
 
 	/**
@@ -344,7 +344,7 @@ public class CustomerDAO extends BaseDAO {
 	 * @return the context
 	 */
 	public String getContext() {
-		return context;
+		return this.context;
 	}
 
 	/**

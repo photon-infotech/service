@@ -26,15 +26,27 @@ public class ApplicationTypeDAO extends CustomerBaseDAO {
 	
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * 
+	 */
 	private List<String> techGroupIds;
 	
+	/**
+	 * 
+	 */
 	public ApplicationTypeDAO() {
     }
 	
+	/**
+	 * @return
+	 */
 	public List<String> getTechGroupIds() {
-		return techGroupIds;
+		return this.techGroupIds;
 	}
 
+	/**
+	 * @param techGroupIds
+	 */
 	public void setTechGroupIds(List<String> techGroupIds) {
 		this.techGroupIds = techGroupIds;
 	}

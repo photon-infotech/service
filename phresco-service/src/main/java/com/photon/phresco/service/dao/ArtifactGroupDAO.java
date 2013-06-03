@@ -28,85 +28,177 @@ import com.photon.phresco.commons.model.CoreOption;
 public class ArtifactGroupDAO extends CustomerBaseDAO {
     
     private static final long serialVersionUID = 1L;
+   
+    /**
+     * 
+     */
     private String groupId;
+    
+    /**
+     * 
+     */
     private String artifactId;
+    
+    /**
+     * 
+     */
     private String packaging;
+    
+    /**
+     * 
+     */
     private String classifier;
+    
+    /**
+     * 
+     */
     private ArtifactGroup.Type type;
+    
+    /**
+     * 
+     */
     private String imageURL;
+    
+    /**
+     * 
+     */
     private List<String> versionIds;
+    
+    /**
+     * 
+     */
     private List<CoreOption> appliesTo;
+    
+    /**
+     * 
+     */
     private String licenseId;
-    
-    public String getGroupId() {
-        return groupId;
-    }
-    
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
-    }
-    
-    public String getArtifactId() {
-        return artifactId;
-    }
-    
-    public void setArtifactId(String artifactId) {
-        this.artifactId = artifactId;
-    }
-    
-    public String getPackaging() {
-        return packaging;
-    }
-    
-    public void setPackaging(String packaging) {
-        this.packaging = packaging;
-    }
-    
-    public String getClassifier() {
-        return classifier;
-    }
-    
-    public void setClassifier(String classifier) {
-        this.classifier = classifier;
-    }
-    
-    public ArtifactGroup.Type getType() {
-        return type;
-    }
-    
-    public void setType(ArtifactGroup.Type type) {
-        this.type = type;
-    }
-    
-    public String getImageURL() {
-        return imageURL;
-    }
-    
-    public void setImageURL(String imageURL) {
-        this.imageURL = imageURL;
-    }
-    
-    public List<CoreOption> getAppliesTo() {
-        return appliesTo;
-    }
-    
-    public void setAppliesTo(List<CoreOption> appliesTo) {
-        this.appliesTo = appliesTo;
-    }
 
-    public List<String> getVersionIds() {
-        return versionIds;
-    }
+	/**
+	 * @return the groupId
+	 */
+	public String getGroupId() {
+		return this.groupId;
+	}
 
-    public void setVersionIds(List<String> versionIds) {
-        this.versionIds = versionIds;
-    }
+	/**
+	 * @param groupId the groupId to set
+	 */
+	public void setGroupId(String groupId) {
+		this.groupId = groupId;
+	}
 
+	/**
+	 * @return the artifactId
+	 */
+	public String getArtifactId() {
+		return this.artifactId;
+	}
+
+	/**
+	 * @param artifactId the artifactId to set
+	 */
+	public void setArtifactId(String artifactId) {
+		this.artifactId = artifactId;
+	}
+
+	/**
+	 * @return the packaging
+	 */
+	public String getPackaging() {
+		return this.packaging;
+	}
+
+	/**
+	 * @param packaging the packaging to set
+	 */
+	public void setPackaging(String packaging) {
+		this.packaging = packaging;
+	}
+
+	/**
+	 * @return the classifier
+	 */
+	public String getClassifier() {
+		return this.classifier;
+	}
+
+	/**
+	 * @param classifier the classifier to set
+	 */
+	public void setClassifier(String classifier) {
+		this.classifier = classifier;
+	}
+
+	/**
+	 * @return the type
+	 */
+	public ArtifactGroup.Type getType() {
+		return this.type;
+	}
+
+	/**
+	 * @param type the type to set
+	 */
+	public void setType(ArtifactGroup.Type type) {
+		this.type = type;
+	}
+
+	/**
+	 * @return the imageURL
+	 */
+	public String getImageURL() {
+		return this.imageURL;
+	}
+
+	/**
+	 * @param imageURL the imageURL to set
+	 */
+	public void setImageURL(String imageURL) {
+		this.imageURL = imageURL;
+	}
+
+	/**
+	 * @return the versionIds
+	 */
+	public List<String> getVersionIds() {
+		return this.versionIds;
+	}
+
+	/**
+	 * @param versionIds the versionIds to set
+	 */
+	public void setVersionIds(List<String> versionIds) {
+		this.versionIds = versionIds;
+	}
+
+	/**
+	 * @return the appliesTo
+	 */
+	public List<CoreOption> getAppliesTo() {
+		return this.appliesTo;
+	}
+
+	/**
+	 * @param appliesTo the appliesTo to set
+	 */
+	public void setAppliesTo(List<CoreOption> appliesTo) {
+		this.appliesTo = appliesTo;
+	}
+
+	/**
+	 * @return the licenseId
+	 */
+	public String getLicenseId() {
+		return this.licenseId;
+	}
+
+	/**
+	 * @param licenseId the licenseId to set
+	 */
 	public void setLicenseId(String licenseId) {
 		this.licenseId = licenseId;
 	}
-
-	public String getLicenseId() {
-		return licenseId;
-	}
+    
+    
 }

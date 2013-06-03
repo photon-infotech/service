@@ -30,157 +30,328 @@ import com.photon.phresco.commons.model.TechnologyInfo;
 public class ApplicationInfoDAO extends CustomerBaseDAO {
 	
 	private static final long serialVersionUID = 1L;
+	/**
+	 * 
+	 */
 	private String code;
-    private String version;
-    private TechnologyInfo techInfo;
-    private Element pilotInfo;
-    private List<String> selectedModules;
-    private List<String> selectedJSLibs;
-    private List<ArtifactGroup> selectedFrameworks;
-    private List<String> selectedComponents;
-    private List<ArtifactGroupInfo> selectedServers;
-    private List<ArtifactGroupInfo> selectedDatabases;
-    private List<String> selectedWebservices;
-    private boolean emailSupported;
-    private String artifactGroupId;
-    private boolean phoneEnabled;
-    private boolean tabletEnabled;
-    private boolean pilot;
-    private String functionalFramework;
     
+	/**
+     * 
+     */
+    private String version;
+    
+    /**
+     * 
+     */
+    private TechnologyInfo techInfo;
+    
+    /**
+     * 
+     */
+    private Element pilotInfo;
+    
+    /**
+     * 
+     */
+    private List<String> selectedModules;
+    
+    /**
+     * 
+     */
+    private List<String> selectedJSLibs;
+    
+    /**
+     * 
+     */
+    private List<ArtifactGroup> selectedFrameworks;
+    
+    /**
+     * 
+     */
+    private List<String> selectedComponents;
+    
+    /**
+     * 
+     */
+    private List<ArtifactGroupInfo> selectedServers;
+    
+    /**
+     * 
+     */
+    private List<ArtifactGroupInfo> selectedDatabases;
+    
+    /**
+     * 
+     */
+    private List<String> selectedWebservices;
+    
+    /**
+     * 
+     */
+    private boolean emailSupported;
+    
+    /**
+     * 
+     */
+    private String artifactGroupId;
+    
+    /**
+     * 
+     */
+    private boolean phoneEnabled;
+    
+    /**
+     * 
+     */
+    private boolean tabletEnabled;
+    
+    /**
+     * 
+     */
+    private boolean pilot;
+    
+    /**
+     * 
+     */
+    private String functionalFramework;
+
+	/**
+	 * @return the code
+	 */
 	public String getCode() {
-		return code;
+		return this.code;
 	}
-	
+
+	/**
+	 * @param code the code to set
+	 */
 	public void setCode(String code) {
 		this.code = code;
 	}
-	
+
+	/**
+	 * @return the version
+	 */
 	public String getVersion() {
-		return version;
+		return this.version;
 	}
-	
+
+	/**
+	 * @param version the version to set
+	 */
 	public void setVersion(String version) {
 		this.version = version;
 	}
-	
+
+	/**
+	 * @return the techInfo
+	 */
 	public TechnologyInfo getTechInfo() {
-		return techInfo;
+		return this.techInfo;
 	}
-	
+
+	/**
+	 * @param techInfo the techInfo to set
+	 */
 	public void setTechInfo(TechnologyInfo techInfo) {
 		this.techInfo = techInfo;
 	}
-	
+
+	/**
+	 * @return the pilotInfo
+	 */
 	public Element getPilotInfo() {
-		return pilotInfo;
+		return this.pilotInfo;
 	}
-	
+
+	/**
+	 * @param pilotInfo the pilotInfo to set
+	 */
 	public void setPilotInfo(Element pilotInfo) {
 		this.pilotInfo = pilotInfo;
 	}
-	
+
+	/**
+	 * @return the selectedModules
+	 */
 	public List<String> getSelectedModules() {
-		return selectedModules;
+		return this.selectedModules;
 	}
-	
+
+	/**
+	 * @param selectedModules the selectedModules to set
+	 */
 	public void setSelectedModules(List<String> selectedModules) {
 		this.selectedModules = selectedModules;
 	}
-	
+
+	/**
+	 * @return the selectedJSLibs
+	 */
 	public List<String> getSelectedJSLibs() {
-		return selectedJSLibs;
+		return this.selectedJSLibs;
 	}
-	
+
+	/**
+	 * @param selectedJSLibs the selectedJSLibs to set
+	 */
 	public void setSelectedJSLibs(List<String> selectedJSLibs) {
 		this.selectedJSLibs = selectedJSLibs;
 	}
-	
+
+	/**
+	 * @return the selectedFrameworks
+	 */
 	public List<ArtifactGroup> getSelectedFrameworks() {
-		return selectedFrameworks;
+		return this.selectedFrameworks;
 	}
-	
+
+	/**
+	 * @param selectedFrameworks the selectedFrameworks to set
+	 */
 	public void setSelectedFrameworks(List<ArtifactGroup> selectedFrameworks) {
 		this.selectedFrameworks = selectedFrameworks;
 	}
-	
+
+	/**
+	 * @return the selectedComponents
+	 */
 	public List<String> getSelectedComponents() {
-		return selectedComponents;
+		return this.selectedComponents;
 	}
-	
+
+	/**
+	 * @param selectedComponents the selectedComponents to set
+	 */
 	public void setSelectedComponents(List<String> selectedComponents) {
 		this.selectedComponents = selectedComponents;
 	}
-	
+
+	/**
+	 * @return the selectedServers
+	 */
 	public List<ArtifactGroupInfo> getSelectedServers() {
-		return selectedServers;
+		return this.selectedServers;
 	}
-	
+
+	/**
+	 * @param selectedServers the selectedServers to set
+	 */
 	public void setSelectedServers(List<ArtifactGroupInfo> selectedServers) {
 		this.selectedServers = selectedServers;
 	}
-	
+
+	/**
+	 * @return the selectedDatabases
+	 */
 	public List<ArtifactGroupInfo> getSelectedDatabases() {
-		return selectedDatabases;
+		return this.selectedDatabases;
 	}
-	
+
+	/**
+	 * @param selectedDatabases the selectedDatabases to set
+	 */
 	public void setSelectedDatabases(List<ArtifactGroupInfo> selectedDatabases) {
 		this.selectedDatabases = selectedDatabases;
 	}
-	
+
+	/**
+	 * @return the selectedWebservices
+	 */
 	public List<String> getSelectedWebservices() {
-		return selectedWebservices;
+		return this.selectedWebservices;
 	}
-	
+
+	/**
+	 * @param selectedWebservices the selectedWebservices to set
+	 */
 	public void setSelectedWebservices(List<String> selectedWebservices) {
 		this.selectedWebservices = selectedWebservices;
 	}
-	
+
+	/**
+	 * @return the emailSupported
+	 */
 	public boolean isEmailSupported() {
-		return emailSupported;
+		return this.emailSupported;
 	}
-	
+
+	/**
+	 * @param emailSupported the emailSupported to set
+	 */
 	public void setEmailSupported(boolean emailSupported) {
 		this.emailSupported = emailSupported;
 	}
-	
+
+	/**
+	 * @return the artifactGroupId
+	 */
 	public String getArtifactGroupId() {
-		return artifactGroupId;
+		return this.artifactGroupId;
 	}
-	
+
+	/**
+	 * @param artifactGroupId the artifactGroupId to set
+	 */
 	public void setArtifactGroupId(String artifactGroupId) {
 		this.artifactGroupId = artifactGroupId;
 	}
 
-    public boolean isPhoneEnabled() {
-        return phoneEnabled;
-    }
+	/**
+	 * @return the phoneEnabled
+	 */
+	public boolean isPhoneEnabled() {
+		return this.phoneEnabled;
+	}
 
-    public void setPhoneEnabled(boolean phoneEnabled) {
-        this.phoneEnabled = phoneEnabled;
-    }
+	/**
+	 * @param phoneEnabled the phoneEnabled to set
+	 */
+	public void setPhoneEnabled(boolean phoneEnabled) {
+		this.phoneEnabled = phoneEnabled;
+	}
 
-    public boolean isTabletEnabled() {
-        return tabletEnabled;
-    }
+	/**
+	 * @return the tabletEnabled
+	 */
+	public boolean isTabletEnabled() {
+		return this.tabletEnabled;
+	}
 
-    public void setTabletEnabled(boolean tabletEnabled) {
-        this.tabletEnabled = tabletEnabled;
-    }
+	/**
+	 * @param tabletEnabled the tabletEnabled to set
+	 */
+	public void setTabletEnabled(boolean tabletEnabled) {
+		this.tabletEnabled = tabletEnabled;
+	}
 
+	/**
+	 * @return the pilot
+	 */
+	public boolean isPilot() {
+		return this.pilot;
+	}
+
+	/**
+	 * @param pilot the pilot to set
+	 */
 	public void setPilot(boolean pilot) {
 		this.pilot = pilot;
 	}
 
-	public boolean getPilot() {
-		return pilot;
-	}
-	
-	public void setFunctionalFramework(String functionalFrameworkId) {
-		this.functionalFramework = functionalFrameworkId;
+	/**
+	 * @return the functionalFramework
+	 */
+	public String getFunctionalFramework() {
+		return this.functionalFramework;
 	}
 
-	public String getFunctionalFramework() {
-		return functionalFramework;
+	/**
+	 * @param functionalFramework the functionalFramework to set
+	 */
+	public void setFunctionalFramework(String functionalFramework) {
+		this.functionalFramework = functionalFramework;
 	}
+    
+	
 }
