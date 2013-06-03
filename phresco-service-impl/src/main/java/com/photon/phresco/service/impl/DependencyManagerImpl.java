@@ -33,13 +33,14 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactGroupInfo;
 import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.DownloadInfo;
-import com.photon.phresco.commons.model.Element;
+//import com.photon.phresco.commons.model.Element;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.DependencyManager;
@@ -97,7 +98,7 @@ public class DependencyManagerImpl implements DependencyManager {
 			updatePOMWithArtifacts(projectPath, selectedFeatures, type);
 		}
 		
-		Element pilotInfo = applicationInfo.getPilotInfo();
+		com.photon.phresco.commons.model.Element pilotInfo = applicationInfo.getPilotInfo();
 		String pilotId = pilotInfo.getId();
 		ApplicationInfo projectInfo = dbManager.getApplicationInfo(pilotId);
 		if(projectInfo != null) {
@@ -154,7 +155,7 @@ public class DependencyManagerImpl implements DependencyManager {
 				return;
 			}
 			
-			List<org.w3c.dom.Element> configList = new ArrayList<org.w3c.dom.Element>();
+			List<Element> configList = new ArrayList<Element>();
 			File pomFile = new File(path, "pom.xml");
 			if (pomFile.exists()) {
 				PomProcessor processor = new PomProcessor(pomFile);
@@ -180,20 +181,20 @@ public class DependencyManagerImpl implements DependencyManager {
 		}
 	}
 
-	private List<org.w3c.dom.Element> configList(File pomFile, String moduleGroupId, String moduleArtifactId, 
+	private List<Element> configList(File pomFile, String moduleGroupId, String moduleArtifactId, 
 			String moduleVersion, Document doc) throws PhrescoException {
-		List<org.w3c.dom.Element> configList = new ArrayList<org.w3c.dom.Element>();
-		org.w3c.dom.Element groupId = doc.createElement("groupId");
+		List<Element> configList = new ArrayList<Element>();
+		Element groupId = doc.createElement("groupId");
 		groupId.setTextContent(moduleGroupId);
-		org.w3c.dom.Element artifactId = doc.createElement("artifactId");
+		Element artifactId = doc.createElement("artifactId");
 		artifactId.setTextContent(moduleArtifactId);
-		org.w3c.dom.Element version = doc.createElement("version");
+		Element version = doc.createElement("version");
 		version.setTextContent(moduleVersion);
-		org.w3c.dom.Element eleType = doc.createElement("type");
+		Element eleType = doc.createElement("type");
 		eleType.setTextContent("zip");
-		org.w3c.dom.Element overWrite = doc.createElement("overWrite");
+		Element overWrite = doc.createElement("overWrite");
 		overWrite.setTextContent("false");
-		org.w3c.dom.Element outputDirectory = doc.createElement("outputDirectory");
+		Element outputDirectory = doc.createElement("outputDirectory");
 		outputDirectory.setTextContent(artifactTypeMap.get(artifactType));	
 		configList.add(groupId);
 		configList.add(artifactId);
