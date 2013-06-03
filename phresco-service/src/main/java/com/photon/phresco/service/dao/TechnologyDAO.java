@@ -25,6 +25,7 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 public class TechnologyDAO extends CustomerBaseDAO {
 	
     private static final long serialVersionUID = 1L;
+    
     private String appTypeId;
     private List<String> techVersions;
 	private String archetypeGroupDAOId;
@@ -41,7 +42,7 @@ public class TechnologyDAO extends CustomerBaseDAO {
 	}
 
     public String getArchetypeGroupDAOId() {
-        return archetypeGroupDAOId;
+        return this.archetypeGroupDAOId;
     }
 
     public void setArchetypeGroupDAOId(String archetypeGroupDAOId) {
@@ -49,11 +50,11 @@ public class TechnologyDAO extends CustomerBaseDAO {
     }
 
     public List<String> getDependencyIds() {
-        return dependencyIds;
+        return this.dependencyIds;
     }
 
     public String getAppTypeId() {
-        return appTypeId;
+        return this.appTypeId;
     }
 
     public void setAppTypeId(String appTypeId) {
@@ -61,7 +62,7 @@ public class TechnologyDAO extends CustomerBaseDAO {
     }
 
     public List<String> getTechVersions() {
-        return techVersions;
+        return this.techVersions;
     }
 
     public void setTechVersions(List<String> techVersions) {
@@ -73,7 +74,7 @@ public class TechnologyDAO extends CustomerBaseDAO {
     }
 
 	public List<String> getPluginIds() {
-		return pluginIds;
+		return this.pluginIds;
 	}
 
 	public void setPluginIds(List<String> pluginIds) {
@@ -81,7 +82,7 @@ public class TechnologyDAO extends CustomerBaseDAO {
 	}
 
 	public List<String> getOptions() {
-		return options;
+		return this.options;
 	}
 
 	public void setOptions(List<String> options) {
@@ -89,7 +90,7 @@ public class TechnologyDAO extends CustomerBaseDAO {
 	}
 
 	public String getTechGroupId() {
-		return techGroupId;
+		return this.techGroupId;
 	}
 
 	public void setTechGroupId(String techGroupId) {
@@ -101,7 +102,7 @@ public class TechnologyDAO extends CustomerBaseDAO {
 	}
 
 	public List<String> getReports() {
-		return reports;
+		return this.reports;
 	}
 
 	public void setArchetypeFeatures(List<String> archetypeFeatures) {
@@ -109,7 +110,7 @@ public class TechnologyDAO extends CustomerBaseDAO {
 	}
 
 	public List<String> getArchetypeFeatures() {
-		return archetypeFeatures;
+		return this.archetypeFeatures;
 	}
 
 	public void setFunctionalFrameworks(List<String> functionalFrameworks) {
@@ -117,6 +118,6 @@ public class TechnologyDAO extends CustomerBaseDAO {
 	}
 
 	public List<String> getFunctionalFrameworks() {
-		return functionalFrameworks;
+		return this.functionalFrameworks;
 	}
 }

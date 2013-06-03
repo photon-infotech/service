@@ -37,7 +37,7 @@ public class DownloadsDAO extends CustomerBaseDAO {
 	}
 	
 	public List<String> getAppliesToTechIds() {
-		return appliesToTechIds;
+		return this.appliesToTechIds;
 	}
 	
 	public void setAppliesToTechIds(List<String> appliesToTechIds) {
@@ -45,7 +45,7 @@ public class DownloadsDAO extends CustomerBaseDAO {
 	}
 	
 	public List<String> getPlatformTypeIds() {
-		return platformTypeIds;
+		return this.platformTypeIds;
 	}
 	
 	public void setPlatform(List<String> platformTypeIds) {
@@ -53,7 +53,7 @@ public class DownloadsDAO extends CustomerBaseDAO {
 	}
 	
 	public Category getCategory() {
-		return category;
+		return this.category;
 	}
 	
 	public void setCategory(Category category) {
@@ -61,7 +61,7 @@ public class DownloadsDAO extends CustomerBaseDAO {
 	}
 	
 	public String getArtifactGroupId() {
-		return artifactGroupId;
+		return this.artifactGroupId;
 	}
 	
 	public void setArtifactGroupId(String artifactGroupId) {

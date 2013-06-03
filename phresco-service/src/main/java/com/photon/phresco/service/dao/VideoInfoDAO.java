@@ -24,23 +24,47 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class VideoInfoDAO extends CustomerBaseDAO {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3242224325656048944L;
+	
+	/**
+	 * 
+	 */
 	private String imageurl;
+	
+	/**
+	 * 
+	 */
 	private List<String> videoListId;
-	
+
+	/**
+	 * @return the imageurl
+	 */
 	public String getImageurl() {
-		return imageurl;
+		return this.imageurl;
 	}
-	
+
+	/**
+	 * @param imageurl the imageurl to set
+	 */
 	public void setImageurl(String imageurl) {
 		this.imageurl = imageurl;
 	}
-	
+
+	/**
+	 * @return the videoListId
+	 */
 	public List<String> getVideoListId() {
-		return videoListId;
+		return this.videoListId;
 	}
-	
+
+	/**
+	 * @param videoListId the videoListId to set
+	 */
 	public void setVideoListId(List<String> videoListId) {
 		this.videoListId = videoListId;
 	}
-
+	
 }

@@ -41,7 +41,7 @@ public class CustomerBaseDAO extends BaseDAO {
 	}
 
     public List<String> getCustomerIds() {
-        return customerIds;
+        return this.customerIds;
     }
 
     public void setCustomerIds(List<String> customerIds) {
@@ -49,7 +49,7 @@ public class CustomerBaseDAO extends BaseDAO {
     }
     
     public boolean isUsed() {
-        return used;
+        return this.used;
     }
 
     public void setUsed(boolean used) {

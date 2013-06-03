@@ -25,43 +25,90 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ProjectInfoDAO extends CustomerBaseDAO {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1573457137995213967L;
+	
+	/**
+	 * 
+	 */
 	private String projectCode;
+	
+	/**
+	 * 
+	 */
 	private List<String> applicationInfoIds;
+	
+	/**
+	 * 
+	 */
 	private Date startDate;
+    
+	/**
+     * 
+     */
     private Date endDate;
 	
+	/**
+	 * 
+	 */
 	public ProjectInfoDAO() {
 		super();
 	}
-	
+
+	/**
+	 * @return the projectCode
+	 */
 	public String getProjectCode() {
-		return projectCode;
+		return this.projectCode;
 	}
 
+	/**
+	 * @param projectCode the projectCode to set
+	 */
 	public void setProjectCode(String projectCode) {
 		this.projectCode = projectCode;
 	}
 
+	/**
+	 * @return the applicationInfoIds
+	 */
 	public List<String> getApplicationInfoIds() {
-		return applicationInfoIds;
+		return this.applicationInfoIds;
 	}
 
+	/**
+	 * @param applicationInfoIds the applicationInfoIds to set
+	 */
 	public void setApplicationInfoIds(List<String> applicationInfoIds) {
 		this.applicationInfoIds = applicationInfoIds;
 	}
-	
+
+	/**
+	 * @return the startDate
+	 */
 	public Date getStartDate() {
-		return startDate;
+		return this.startDate;
 	}
 
+	/**
+	 * @param startDate the startDate to set
+	 */
 	public void setStartDate(Date startDate) {
 		this.startDate = startDate;
 	}
 
+	/**
+	 * @return the endDate
+	 */
 	public Date getEndDate() {
-		return endDate;
+		return this.endDate;
 	}
 
+	/**
+	 * @param endDate the endDate to set
+	 */
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
 	}

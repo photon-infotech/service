@@ -21,6 +21,11 @@ import com.photon.phresco.commons.model.Element;
 
 public class BaseDAO extends Element {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2286678551222391872L;
+
 	public BaseDAO() {
 		//do not call super
 	}
