@@ -45,6 +45,7 @@ import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.converters.ConvertersFactory;
 import com.photon.phresco.service.dao.ApplicationInfoDAO;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
+import com.photon.phresco.service.dao.CustomerDAO;
 import com.photon.phresco.service.dao.DownloadsDAO;
 import com.photon.phresco.service.dao.ProjectInfoDAO;
 import com.photon.phresco.service.dao.TechnologyDAO;
@@ -88,9 +89,10 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
 
     @Override
     public RepoInfo getRepoInfo(String customerId) throws PhrescoException {
-    	Customer customer = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME, new Query(Criteria.whereId().is(customerId)), Customer.class);
+    	CustomerDAO customer = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME, new Query(Criteria.whereId().is(customerId)), CustomerDAO.class);
     	if(customer != null) {
-    		return customer.getRepoInfo();
+    		return mongoOperation.findOne(ServiceConstants.REPOINFO_COLLECTION_NAME, 
+    				new Query(Criteria.whereId().is(customer.getRepoInfoId())), RepoInfo.class);
     	}
         return null;
     }
