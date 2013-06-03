@@ -352,6 +352,13 @@ public class ApplicationInfoDAO extends CustomerBaseDAO {
 	public void setFunctionalFramework(String functionalFramework) {
 		this.functionalFramework = functionalFramework;
 	}
+
+	/**
+	 * @return
+	 */
+	public boolean getPilot() {
+		return this.pilot;
+	}
     
 	
 }
