@@ -25,7 +25,7 @@
 
 <%@ page import="com.photon.phresco.commons.model.Technology"%>
 <%@ page import="com.photon.phresco.commons.model.DownloadInfo" %>
-<%@ page import="com.photon.phresco.commons.model.DownloadInfo.Category"%>
+<%@ page import="com.photon.phresco.commons.model.Category"%>
 <%@ page import="com.photon.phresco.commons.model.License"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
 <%@ page import="com.photon.phresco.commons.model.PlatformType" %>
