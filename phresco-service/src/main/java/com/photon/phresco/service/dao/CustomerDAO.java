@@ -25,157 +25,332 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.Customer.LicenseType;
-import com.photon.phresco.commons.model.RepoInfo;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CustomerDAO extends BaseDAO {
 
 	private static final long serialVersionUID = 1L;
 	
+	/**
+	 * 
+	 */
 	private String emailId;
+    
+	/**
+     * 
+     */
     private String address;
+    
+    /**
+     * 
+     */
     private String country;
+    
+    /**
+     * 
+     */
     private String state;
+    
+    /**
+     * 
+     */
     private String zipcode;
+    
+    /**
+     * 
+     */
     private String contactNumber;
+    
+    /**
+     * 
+     */
     private String fax;
-	private Date validFrom;
-	private Date validUpto;
-	private LicenseType type;
-	private String repoInfoId;
-	private String icon;
-	private List<String> applicableTechnologies;
-	private List<ApplicationType> applicableAppTypes;
-	private Map<String, String> frameworkTheme;
-	private List<String> options;
-	private String context;
 	
+    /**
+	 * 
+	 */
+	private Date validFrom;
+	
+	/**
+	 * 
+	 */
+	private Date validUpto;
+	
+	/**
+	 * 
+	 */
+	private LicenseType type;
+	
+	/**
+	 * 
+	 */
+	private String repoInfoId;
+	
+	/**
+	 * 
+	 */
+	private String icon;
+	
+	/**
+	 * 
+	 */
+	private List<String> applicableTechnologies;
+	
+	/**
+	 * 
+	 */
+	private List<ApplicationType> applicableAppTypes;
+	
+	/**
+	 * 
+	 */
+	private Map<String, String> frameworkTheme;
+	
+	/**
+	 * 
+	 */
+	private List<String> options;
+	
+	/**
+	 * 
+	 */
+	private String context;
+
+	/**
+	 * @return the emailId
+	 */
 	public String getEmailId() {
 		return emailId;
 	}
-	
+
+	/**
+	 * @param emailId the emailId to set
+	 */
 	public void setEmailId(String emailId) {
 		this.emailId = emailId;
 	}
-	
+
+	/**
+	 * @return the address
+	 */
 	public String getAddress() {
 		return address;
 	}
-	
+
+	/**
+	 * @param address the address to set
+	 */
 	public void setAddress(String address) {
 		this.address = address;
 	}
-	
+
+	/**
+	 * @return the country
+	 */
 	public String getCountry() {
 		return country;
 	}
-	
+
+	/**
+	 * @param country the country to set
+	 */
 	public void setCountry(String country) {
 		this.country = country;
 	}
-	
+
+	/**
+	 * @return the state
+	 */
 	public String getState() {
 		return state;
 	}
-	
+
+	/**
+	 * @param state the state to set
+	 */
 	public void setState(String state) {
 		this.state = state;
 	}
-	
+
+	/**
+	 * @return the zipcode
+	 */
 	public String getZipcode() {
 		return zipcode;
 	}
-	
+
+	/**
+	 * @param zipcode the zipcode to set
+	 */
 	public void setZipcode(String zipcode) {
 		this.zipcode = zipcode;
 	}
-	
+
+	/**
+	 * @return the contactNumber
+	 */
 	public String getContactNumber() {
 		return contactNumber;
 	}
-	
+
+	/**
+	 * @param contactNumber the contactNumber to set
+	 */
 	public void setContactNumber(String contactNumber) {
 		this.contactNumber = contactNumber;
 	}
-	
+
+	/**
+	 * @return the fax
+	 */
 	public String getFax() {
 		return fax;
 	}
-	
+
+	/**
+	 * @param fax the fax to set
+	 */
 	public void setFax(String fax) {
 		this.fax = fax;
 	}
-	
+
+	/**
+	 * @return the validFrom
+	 */
 	public Date getValidFrom() {
 		return validFrom;
 	}
-	
+
+	/**
+	 * @param validFrom the validFrom to set
+	 */
 	public void setValidFrom(Date validFrom) {
 		this.validFrom = validFrom;
 	}
-	
+
+	/**
+	 * @return the validUpto
+	 */
 	public Date getValidUpto() {
 		return validUpto;
 	}
-	
+
+	/**
+	 * @param validUpto the validUpto to set
+	 */
 	public void setValidUpto(Date validUpto) {
 		this.validUpto = validUpto;
 	}
-	
+
+	/**
+	 * @return the type
+	 */
 	public LicenseType getType() {
 		return type;
 	}
-	
+
+	/**
+	 * @param type the type to set
+	 */
 	public void setType(LicenseType type) {
 		this.type = type;
 	}
-	
-	public String getIcon() {
-		return icon;
-	}
-	
-	public void setIcon(String icon) {
-		this.icon = icon;
-	}
-	
-	public List<String> getApplicableTechnologies() {
-		return applicableTechnologies;
-	}
-	
-	public void setApplicableTechnologies(List<String> applicableTechnologies) {
-		this.applicableTechnologies = applicableTechnologies;
-	}
-			
-	public Map<String, String> getFrameworkTheme() {
-		return frameworkTheme;
-	}
-	
-	public void setFrameworkTheme(Map<String, String> frameworkTheme) {
-		this.frameworkTheme = frameworkTheme;
-	}
-	
-	public void setOptions(List<String> options) {
-        this.options = options;
-    }
 
-    public List<String> getOptions() {
-        return options;
-    }
-
-	public void setRepoInfoId(String repoInfoId) {
-		this.repoInfoId = repoInfoId;
-	}
-
+	/**
+	 * @return the repoInfoId
+	 */
 	public String getRepoInfoId() {
 		return repoInfoId;
 	}
 
-	public void setContext(String context) {
-		this.context = context;
+	/**
+	 * @param repoInfoId the repoInfoId to set
+	 */
+	public void setRepoInfoId(String repoInfoId) {
+		this.repoInfoId = repoInfoId;
 	}
 
+	/**
+	 * @return the icon
+	 */
+	public String getIcon() {
+		return icon;
+	}
+
+	/**
+	 * @param icon the icon to set
+	 */
+	public void setIcon(String icon) {
+		this.icon = icon;
+	}
+
+	/**
+	 * @return the applicableTechnologies
+	 */
+	public List<String> getApplicableTechnologies() {
+		return applicableTechnologies;
+	}
+
+	/**
+	 * @param applicableTechnologies the applicableTechnologies to set
+	 */
+	public void setApplicableTechnologies(List<String> applicableTechnologies) {
+		this.applicableTechnologies = applicableTechnologies;
+	}
+
+	/**
+	 * @return the applicableAppTypes
+	 */
+	public List<ApplicationType> getApplicableAppTypes() {
+		return applicableAppTypes;
+	}
+
+	/**
+	 * @param applicableAppTypes the applicableAppTypes to set
+	 */
+	public void setApplicableAppTypes(List<ApplicationType> applicableAppTypes) {
+		this.applicableAppTypes = applicableAppTypes;
+	}
+
+	/**
+	 * @return the frameworkTheme
+	 */
+	public Map<String, String> getFrameworkTheme() {
+		return frameworkTheme;
+	}
+
+	/**
+	 * @param frameworkTheme the frameworkTheme to set
+	 */
+	public void setFrameworkTheme(Map<String, String> frameworkTheme) {
+		this.frameworkTheme = frameworkTheme;
+	}
+
+	/**
+	 * @return the options
+	 */
+	public List<String> getOptions() {
+		return options;
+	}
+
+	/**
+	 * @param options the options to set
+	 */
+	public void setOptions(List<String> options) {
+		this.options = options;
+	}
+
+	/**
+	 * @return the context
+	 */
 	public String getContext() {
 		return context;
 	}
-	
+
+	/**
+	 * @param context the context to set
+	 */
+	public void setContext(String context) {
+		this.context = context;
+	}
 }
