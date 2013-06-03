@@ -22,27 +22,65 @@ import java.util.Properties;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.util.ServerConstants;
 
+/**
+ * LDAP configuration
+ */
 public class LDAPConfiguration implements ServerConstants {
+	
+	/**
+	 * 
+	 */
 	private Properties ldapProps;
+	
+	/**
+	 * 
+	 */
 	private String ldapContextFactory;
+	
+	/**
+	 * 
+	 */
 	private String ldapUrl;
+	
+	/**
+	 * 
+	 */
 	private String ldapBaseDn;
+	
+	/**
+	 * 
+	 */
 	private String ldapLoginAttribute;
+	
+	/**
+	 * 
+	 */
 	private String displayNameAttribute;
+	
+	/**
+	 * 
+	 */
 	private String mailIdAttribute;
+	
+	/**
+	 * 
+	 */
 	private String phrescoEnabledAttribute;
+	
+	/**
+	 * 
+	 */
 	private String customerNameAttribute;
 
-	
+	/**
+	 * @param serverProps
+	 * @throws PhrescoException
+	 */
 	public LDAPConfiguration(Properties serverProps) throws PhrescoException {
-		this.ldapProps = serverProps;
-		init();
-	}
-
-	private void init() throws PhrescoException {
-		if (ldapProps == null) {
+		if (serverProps == null) {
 			throw new PhrescoException("LDAP Properties cannot be null");
 		}
+		this.ldapProps = serverProps;
 		ldapContextFactory = (String) ldapProps.get(LDAP_CONTEXT_FACTORY);
 		ldapUrl = (String) ldapProps.get(LDAP_URL);
 		ldapBaseDn = (String) ldapProps.get(LDAP_BASEDN);
@@ -51,7 +89,7 @@ public class LDAPConfiguration implements ServerConstants {
 		mailIdAttribute = (String) ldapProps.get(LDAP_MAIL_ATTRIBUTE);
 		phrescoEnabledAttribute=(String) ldapProps.get(LDAP_PHRESCO_ENABLED);
 		customerNameAttribute=(String) ldapProps.get(LDAP_CUSTOMER_NAME);
-		
+
 	}
 
 	/**
@@ -95,6 +133,7 @@ public class LDAPConfiguration implements ServerConstants {
 	public String getMailIdAttribute() {
 		return mailIdAttribute;
 	}
+	
 	/**
 	 * 
 	 * @return the customerName
@@ -102,6 +141,7 @@ public class LDAPConfiguration implements ServerConstants {
 	public String getCustomerNameAttribute(){
 		return customerNameAttribute;
 	}
+
 	/**
 	 * 
 	 * @return the phrescoEnabled true or false
@@ -109,6 +149,4 @@ public class LDAPConfiguration implements ServerConstants {
 	public String getPhrescoEnabledAttribute(){
 		return phrescoEnabledAttribute;
 	}
-
-	
 }
