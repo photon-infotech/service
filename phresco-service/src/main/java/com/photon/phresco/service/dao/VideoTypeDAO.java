@@ -53,7 +53,7 @@ public class VideoTypeDAO extends CustomerBaseDAO {
 	 * @return the videoInfoId
 	 */
 	public String getVideoInfoId() {
-		return videoInfoId;
+		return this.videoInfoId;
 	}
 
 	/**
@@ -67,7 +67,7 @@ public class VideoTypeDAO extends CustomerBaseDAO {
 	 * @return the url
 	 */
 	public String getUrl() {
-		return url;
+		return this.url;
 	}
 
 	/**
@@ -81,7 +81,7 @@ public class VideoTypeDAO extends CustomerBaseDAO {
 	 * @return the artifactGroupId
 	 */
 	public String getArtifactGroupId() {
-		return artifactGroupId;
+		return this.artifactGroupId;
 	}
 
 	/**
@@ -95,7 +95,7 @@ public class VideoTypeDAO extends CustomerBaseDAO {
 	 * @return the type
 	 */
 	public String getType() {
-		return type;
+		return this.type;
 	}
 
 	/**
@@ -109,7 +109,7 @@ public class VideoTypeDAO extends CustomerBaseDAO {
 	 * @return the codec
 	 */
 	public String getCodec() {
-		return codec;
+		return this.codec;
 	}
 
 	/**

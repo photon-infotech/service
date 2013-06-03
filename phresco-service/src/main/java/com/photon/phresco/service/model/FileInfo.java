@@ -19,9 +19,7 @@ package com.photon.phresco.service.model;
 
 public class FileInfo {
 
-	private static final long serialVersionUID = 1L;
-    
-    private boolean mavenJar;
+	private boolean mavenJar;
 
 	private boolean success;
 	private String groupId;
