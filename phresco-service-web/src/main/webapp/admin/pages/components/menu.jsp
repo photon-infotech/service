@@ -80,6 +80,8 @@
 		$(".tabs li:first-child .submenu ").show();
 		$(".tabs li:first-child .submenu li:first-child a").addClass("active");
 		activateMenu($("#featuresMenu"));
+		
+		loadContent("fetchCustomerId", $('#formCustomerId'), '', '', false, true, '');
 	}
 	
 	function changeLogo(data) {
