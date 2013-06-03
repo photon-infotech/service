@@ -21,3 +21,25 @@ phresco-service/.classpath
 logs/phresco-engine.log.13-09-2012
 
 phresco-service-tools/.classpath
+
+phresco-ldap/.settings/org.eclipse.wst.common.component
+
+phresco-ldap/.settings/org.eclipse.wst.common.project.facet.core.xml
+
+phresco-service-impl/.settings/org.eclipse.wst.common.component
+
+phresco-service-impl/.settings/org.eclipse.wst.common.project.facet.core.xml
+
+phresco-service-web/.settings/.jsdtscope
+
+phresco-service-web/.settings/org.eclipse.wst.common.component
+
+phresco-service-web/.settings/org.eclipse.wst.jsdt.ui.superType.container
+
+phresco-service-web/.settings/org.eclipse.wst.common.project.facet.core.xml
+
+phresco-service-web/.settings/org.eclipse.wst.jsdt.ui.superType.name
+
+phresco-service/.settings/org.eclipse.wst.common.component
+
+phresco-service/.settings/org.eclipse.wst.common.project.facet.core.xml
