@@ -33,7 +33,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactInfo;
@@ -42,6 +41,7 @@ import com.photon.phresco.commons.model.DownloadInfo;
 import com.photon.phresco.commons.model.PlatformType;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.client.api.ServiceManager;
 import com.photon.phresco.service.util.ServerUtil;
@@ -50,7 +50,7 @@ public class Downloads extends ServiceBaseAction {
 
 	private static final long serialVersionUID = 6801037145464060759L;
 	
-	private static final Logger S_LOGGER = Logger.getLogger(Downloads.class);
+	private static final SplunkLogger S_LOGGER = SplunkLogger.getSplunkLogger(Downloads.class.getName());
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 
 	private String downloadId = "";
@@ -98,12 +98,19 @@ public class Downloads extends ServiceBaseAction {
 	private static String downloadZipFileName = "";
 	private static long size;
 	
-	public String list() throws PhrescoException {
+	public String list() {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method Downloads.list()");
-		}
+	        S_LOGGER.debug("Downloads.list : Entry");
+	    }
 		
 		try {
+			if (isDebugEnabled) {
+				if (StringUtils.isEmpty(getCustomerId())) {
+					S_LOGGER.warn("Downloads.list", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+					return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_DOWNLOADS_LIST));
+				}
+				S_LOGGER.info("Downloads.list", "customerId=" + "\"" + getCustomerId() + "\"");
+			}
 			List<DownloadInfo> downloadInfo = getServiceManager().getDownloads(getCustomerId());
 			if (CollectionUtils.isNotEmpty(downloadInfo)) {
 				Collections.sort(downloadInfo, sortByName());
@@ -111,6 +118,9 @@ public class Downloads extends ServiceBaseAction {
 			setReqAttribute(REQ_DOWNLOAD_INFO, downloadInfo);
 			setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		} catch (PhrescoException e) {
+			if (isDebugEnabled) {
+		        S_LOGGER.error("Downloads.list", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
 			return showErrorPopup(e, getText(EXCEPTION_DOWNLOADS_LIST));
 		}
 
@@ -118,6 +128,9 @@ public class Downloads extends ServiceBaseAction {
 		inputStreamMap.clear();
 		downloadByteArray = null;
 		imgByteArray = null;
+		if (isDebugEnabled) {
+	        S_LOGGER.debug("Downloads.list : Exit");
+	    }
 		
 		return COMP_DOWNLOAD_LIST;	
 	}
@@ -132,55 +145,92 @@ public class Downloads extends ServiceBaseAction {
 		};
 	}
 	
-	public String add() throws PhrescoException {
-		if (isDebugEnabled) {	
-			S_LOGGER.debug("Entering Method Downloads.add()");
-		}
+	public String add() {
+		if (isDebugEnabled) {
+	        S_LOGGER.debug("Downloads.add : Entry");
+	    }
 		
 		try {
 		    ServiceManager serviceManager = getServiceManager();
 		    List<PlatformType> platforms = serviceManager.getPlatforms();
 		    setReqAttribute(REQ_DOWNLOAD_PLATFORMS, platforms);
+		    if (isDebugEnabled) {
+				if (StringUtils.isEmpty(getCustomerId())) {
+					S_LOGGER.warn("Downloads.add", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+					return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_DOWNLOADS_ADD));
+				}
+				S_LOGGER.info("Downloads.add", "customerId=" + "\"" + getCustomerId() + "\"");
+			}
 			List<Technology> technologies = serviceManager.getArcheTypes(getCustomerId());
 			setReqAttribute(REQ_ARCHE_TYPES, technologies);
 			setReqAttribute(REQ_FROM_PAGE, ADD);
 			setReqAttribute(REQ_FEATURES_LICENSE, getServiceManager().getLicenses());
 		} catch (PhrescoException e) {
+			if (isDebugEnabled) {
+		        S_LOGGER.error("Downloads.add", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
 			return showErrorPopup(e, getText(EXCEPTION_DOWNLOADS_ADD));
 		}
+		if (isDebugEnabled) {
+	        S_LOGGER.debug("Downloads.add : Exit");
+	    }
 		
 		return COMP_DOWNLOAD_ADD;
 	}
 	
-	public String edit() throws PhrescoException {
+	public String edit() {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method Downloads.edit()");
+			S_LOGGER.debug("Downloads.edit : Entry");
 		}
 
 		try {
+			if (isDebugEnabled) {
+				if (StringUtils.isEmpty(getCustomerId())) {
+					S_LOGGER.warn("Downloads.edit", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+					return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_DOWNLOADS_EDIT));
+				}
+				if (StringUtils.isEmpty(getDownloadId())) {
+					S_LOGGER.warn("Downloads.edit", "status=\"Bad Request\"", "message=\"Download Id is empty\"");
+					return showErrorPopup(new PhrescoException("Download Id is empty"), getText(EXCEPTION_DOWNLOADS_EDIT));
+				}
+				S_LOGGER.info("Downloads.edit", "customerId=" + "\"" + getCustomerId() + "\"", "downloadId=" + "\"" + getDownloadId() + "\"");
+			}
 			ServiceManager serviceManager = getServiceManager();
-            DownloadInfo downloadInfo = serviceManager.getDownload(getDownloadId(), getCustomerId());
-            setReqAttribute(REQ_DOWNLOAD_INFO, downloadInfo);
-            List<Technology> technologies = serviceManager.getArcheTypes(getCustomerId());
-            setReqAttribute(REQ_ARCHE_TYPES, technologies);
-            List<PlatformType> platforms = serviceManager.getPlatforms();
-            setReqAttribute(REQ_DOWNLOAD_PLATFORMS, platforms);
+			DownloadInfo downloadInfo = serviceManager.getDownload(getDownloadId(), getCustomerId());
+			setReqAttribute(REQ_DOWNLOAD_INFO, downloadInfo);
+			List<Technology> technologies = serviceManager.getArcheTypes(getCustomerId());
+			setReqAttribute(REQ_ARCHE_TYPES, technologies);
+			List<PlatformType> platforms = serviceManager.getPlatforms();
+			setReqAttribute(REQ_DOWNLOAD_PLATFORMS, platforms);
 			setReqAttribute(REQ_FROM_PAGE, EDIT);
 			setReqAttribute(REQ_FEATURES_LICENSE, getServiceManager().getLicenses());
 			setReqAttribute(REQ_VERSIONING, getVersioning());	
-	  } catch (PhrescoException e) {
+		} catch (PhrescoException e) {
+			if (isDebugEnabled) {
+		        S_LOGGER.error("Downloads.edit", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
 			return showErrorPopup(e, getText(EXCEPTION_DOWNLOADS_EDIT));
+		}
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Downloads.edit : Exit");
 		}
 
 		return COMP_DOWNLOAD_ADD;
 	}
 	
-	public String save() throws PhrescoException {
+	public String save() {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method Downloads.save()");
+			S_LOGGER.debug("Downloads.save : Entry");
 		}
 		
 		try {
+			if (isDebugEnabled) {
+				if (StringUtils.isEmpty(getCustomerId())) {
+					S_LOGGER.warn("Downloads.save", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+					return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_DOWNLOADS_SAVE));
+				}
+				S_LOGGER.info("Downloads.save", "customerId=" + "\"" + getCustomerId() + "\"");
+			}
 			DownloadInfo downloadInfo = getDownloadInfo();
 			if(downloadByteArray != null){
 				inputStreamMap.put(downloadInfo.getName(),  new ByteArrayInputStream(downloadByteArray));
@@ -192,18 +242,35 @@ public class Downloads extends ServiceBaseAction {
 			getServiceManager().createDownloads(getDownloadInfo(), inputStreamMap, getCustomerId());
 			addActionMessage(getText(DOWNLOAD_ADDED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
+			if (isDebugEnabled) {
+		        S_LOGGER.error("Downloads.save", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
 			return showErrorPopup(e, getText(EXCEPTION_DOWNLOADS_SAVE));
+		}
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Downloads.save : Exit");
 		}
 		
 		return list();
 	}
 
-	public String update() throws PhrescoException {
+	public String update() {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method  Downloads.update()");
+			S_LOGGER.debug("Downloads.update : Entry");
 		}
 
 		try {
+			if (isDebugEnabled) {
+				if (StringUtils.isEmpty(getCustomerId())) {
+					S_LOGGER.warn("Downloads.update", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+					return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_DOWNLOADS_UPDATE));
+				}
+				if (StringUtils.isEmpty(getDownloadId())) {
+					S_LOGGER.warn("Downloads.update", "status=\"Bad Request\"", "message=\"Download Id is empty\"");
+					return showErrorPopup(new PhrescoException("Download Id is empty"), getText(EXCEPTION_DOWNLOADS_UPDATE));
+				}
+				S_LOGGER.info("Downloads.update", "customerId=" + "\"" + getCustomerId() + "\"", "downloadId=" + "\"" + getDownloadId() + "\"");
+			}
 			DownloadInfo downloadInfo = getDownloadInfo();
 			if(downloadByteArray != null){
 				inputStreamMap.put(downloadInfo.getName(),  new ByteArrayInputStream(downloadByteArray));
@@ -214,98 +281,128 @@ public class Downloads extends ServiceBaseAction {
 			getServiceManager().updateDownload(getDownloadInfo(), inputStreamMap, getCustomerId());
 			addActionMessage(getText(DOWNLOAD_UPDATED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
+			if (isDebugEnabled) {
+		        S_LOGGER.error("Downloads.update", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
 			return showErrorPopup(e, getText(EXCEPTION_DOWNLOADS_UPDATE));
+		}
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Downloads.update : Exit");
 		}
 
 		return list();
 	}
 	
-	 private DownloadInfo getDownloadInfo() throws PhrescoException {
-        DownloadInfo downloadInfo = new DownloadInfo();
-        
-        String artifactId = getArtifactId();
-    	String groupId = getGroupId();
-    	//String version = getVersion();
-    	 if ((StringUtils.isEmpty(artifactId) && StringUtils.isEmpty(groupId))) {
-         	artifactId = getDownloadAtrifactId();
-         	groupId = getDownloadGroupId();
-         	//version = getDownloadVersions();
-         }
-        //To set the id for update
-        if (StringUtils.isNotEmpty(getDownloadId())) {
-            downloadInfo.setId(getDownloadId());
-        }
-        downloadInfo.setName(getName());
-        downloadInfo.setDescription(getDescription());
-        downloadInfo.setCustomerIds(Arrays.asList(getCustomerId()));
-        downloadInfo.setAppliesToTechIds(getTechnology()); //To set applies to technology
-        
-        //To set applies to platform types
-        List<String> platformTypeIds = new ArrayList<String>(getPlatform().size());
-        if (CollectionUtils.isNotEmpty(getPlatform())) {
-            for (String platformType : getPlatform()) {
-                platformTypeIds.add(platformType);
-            }
-        }
-        downloadInfo.setPlatformTypeIds(platformTypeIds);
-        Category category = Category.valueOf(getCategory());
-        downloadInfo.setCategory(category); //To set category
-
-        //To set the versions of the download items
-        List<ArtifactInfo> downloadVersions = new ArrayList<ArtifactInfo>();
-        ArtifactInfo downloadVersion = new ArtifactInfo();
-        if (StringUtils.isNotEmpty(version)) {
-        	downloadVersion.setVersion(version);
-        } 
-        downloadVersion.setFileSize(size);
-        downloadVersions.add(downloadVersion);
-        ArtifactGroup artifactGroup = new ArtifactGroup();
-        artifactGroup.setId(downloadInfo.getId());
-        List<String> customerIds = new ArrayList<String>();
-        customerIds.add(getCustomerId());
-        artifactGroup.setName(getName());
-        artifactGroup.setCustomerIds(customerIds);
-        artifactGroup.setVersions(downloadVersions);
-        artifactGroup.setLicenseId(getLicense());
-        if (StringUtils.isNotEmpty(artifactId) && StringUtils.isNotEmpty(groupId)) {
-	        artifactGroup.setGroupId(groupId);
-	        artifactGroup.setArtifactId(artifactId);
-        } 
-        artifactGroup.setPackaging(ServerUtil.getFileExtension(downloadZipFileName));
-        downloadInfo.setArtifactGroup(artifactGroup);
-      
-        return downloadInfo;
-    }
-
-	public String delete() throws PhrescoException {
+	private DownloadInfo getDownloadInfo() throws PhrescoException {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method Downloads.delete()");
+			S_LOGGER.debug("Downloads.getDownloadInfo : Entry");
+		}
+		
+		DownloadInfo downloadInfo = new DownloadInfo();
+
+		String artifactId = getArtifactId();
+		String groupId = getGroupId();
+		//String version = getVersion();
+		if ((StringUtils.isEmpty(artifactId) && StringUtils.isEmpty(groupId))) {
+			artifactId = getDownloadAtrifactId();
+			groupId = getDownloadGroupId();
+			//version = getDownloadVersions();
+		}
+		//To set the id for update
+		if (StringUtils.isNotEmpty(getDownloadId())) {
+			downloadInfo.setId(getDownloadId());
+		}
+		downloadInfo.setName(getName());
+		downloadInfo.setDescription(getDescription());
+		downloadInfo.setCustomerIds(Arrays.asList(getCustomerId()));
+		downloadInfo.setAppliesToTechIds(getTechnology()); //To set applies to technology
+
+		//To set applies to platform types
+		List<String> platformTypeIds = new ArrayList<String>(getPlatform().size());
+		if (CollectionUtils.isNotEmpty(getPlatform())) {
+			for (String platformType : getPlatform()) {
+				platformTypeIds.add(platformType);
+			}
+		}
+		downloadInfo.setPlatformTypeIds(platformTypeIds);
+		Category category = Category.valueOf(getCategory());
+		downloadInfo.setCategory(category); //To set category
+
+		//To set the versions of the download items
+		List<ArtifactInfo> downloadVersions = new ArrayList<ArtifactInfo>();
+		ArtifactInfo downloadVersion = new ArtifactInfo();
+		if (StringUtils.isNotEmpty(version)) {
+			downloadVersion.setVersion(version);
+		} 
+		downloadVersion.setFileSize(size);
+		downloadVersions.add(downloadVersion);
+		ArtifactGroup artifactGroup = new ArtifactGroup();
+		artifactGroup.setId(downloadInfo.getId());
+		List<String> customerIds = new ArrayList<String>();
+		customerIds.add(getCustomerId());
+		artifactGroup.setName(getName());
+		artifactGroup.setCustomerIds(customerIds);
+		artifactGroup.setVersions(downloadVersions);
+		artifactGroup.setLicenseId(getLicense());
+		if (StringUtils.isNotEmpty(artifactId) && StringUtils.isNotEmpty(groupId)) {
+			artifactGroup.setGroupId(groupId);
+			artifactGroup.setArtifactId(artifactId);
+		} 
+		artifactGroup.setPackaging(ServerUtil.getFileExtension(downloadZipFileName));
+		downloadInfo.setArtifactGroup(artifactGroup);
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Downloads.getDownloadInfo : Exit");
+		}
+
+		return downloadInfo;
+	}
+
+	public String delete() {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Downloads.delete : Entry");
 		}
 
 		try {
+			if (isDebugEnabled) {
+				if (StringUtils.isEmpty(getCustomerId())) {
+					S_LOGGER.warn("Downloads.update", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+					return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_DOWNLOADS_DELETE));
+				}
+				S_LOGGER.info("Downloads.update", "customerId=" + "\"" + getCustomerId() + "\"");
+			}
 			String[] downloadIds = getHttpRequest().getParameterValues(REQ_DOWNLOAD_ID);
 			if (ArrayUtils.isNotEmpty(downloadIds)) {
+				if (isDebugEnabled) {
+					if (isDebugEnabled) {
+						S_LOGGER.info("Downloads.delete", "downloadIds=" + "\"" + downloadIds.toString() + "\"");
+					}
+				}
 				for (String downloadid : downloadIds) {
 					getServiceManager().deleteDownloadInfo(downloadid, getCustomerId());
 				}
 				addActionMessage(getText(DOWNLOAD_DELETED));
 			}
 		} catch (PhrescoException e) {
+			if (isDebugEnabled) {
+		        S_LOGGER.error("Downloads.delete", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
 			return showErrorPopup(e, getText(EXCEPTION_DOWNLOADS_DELETE));
+		}
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Downloads.delete : Exit");
 		}
 
 		return list();
 	}
 
-	public String uploadFile() throws PhrescoException {
+	public String uploadFile() {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method  Downloads.uploadFile()");
+			S_LOGGER.debug("Downloads.uploadFile : Entry");
 		}
 		
 		PrintWriter writer = null;
 		try {
             writer = getHttpResponse().getWriter();
-	       
 	        downloadByteArray = getByteArray();
 	        downloadZipFileName = getFileName();
 	        size = getFileSize();
@@ -316,6 +413,13 @@ public class Downloads extends ServiceBaseAction {
 		} catch (Exception e) {
 			getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
             writer.print(SUCCESS_FALSE);
+            if (isDebugEnabled) {
+		        S_LOGGER.error("Downloads.uploadFile", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
+            return showErrorPopup(new PhrescoException(e), getText(EXCEPTION_UPLOAD_FILE));
+		}
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Downloads.uploadFile : Exit");
 		}
 		
 		return SUCCESS;
@@ -323,10 +427,21 @@ public class Downloads extends ServiceBaseAction {
 
 	public String downloadArchive() {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method  Downloads.downloadArchive()");
+			S_LOGGER.debug("Downloads.downloadArchive : Entry");
 		}
 
 		try {
+			if (isDebugEnabled) {
+				if (StringUtils.isEmpty(getCustomerId())) {
+					S_LOGGER.warn("Downloads.downloadArchive", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+					return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(DOWNLOAD_FAILED));
+				}
+				if (StringUtils.isEmpty(getDownloadId())) {
+					S_LOGGER.warn("Downloads.downloadArchive", "status=\"Bad Request\"", "message=\"Download Id is empty\"");
+					return showErrorPopup(new PhrescoException("Download Id is empty"), getText(DOWNLOAD_FAILED));
+				}
+				S_LOGGER.info("Downloads.downloadArchive", "customerId=" + "\"" + getCustomerId() + "\"", "downloadId=" + "\"" + getDownloadId() + "\"");
+			}
 			DownloadInfo downloadInfo = getServiceManager().getDownload(getDownloadId(), getCustomerId());
 			String archiveUrl = downloadInfo.getArtifactGroup().getVersions().get(0).getDownloadURL();
 
@@ -337,16 +452,22 @@ public class Downloads extends ServiceBaseAction {
 			contentType = url.openConnection().getContentType();
 			contentLength = url.openConnection().getContentLength();
 		} catch (Exception e) {
+			if (isDebugEnabled) {
+		        S_LOGGER.error("Downloads.downloadArchive", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
 			return showErrorPopup(new PhrescoException(e), getText(DOWNLOAD_FAILED));
+		}
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Downloads.downloadArchive : Exit");
 		}
 		
 		return SUCCESS;
 	}
 	
-	public String uploadImage() throws PhrescoException {
-	    if (isDebugEnabled) {
-            S_LOGGER.debug("Entering Method  Downloads.uploadImage()");
-        }
+	public String uploadImage() {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Downloads.uploadImage : Entry");
+		}
 	    
 		PrintWriter writer = null;
 		try {
@@ -360,7 +481,13 @@ public class Downloads extends ServiceBaseAction {
 		} catch (Exception e) {
 			getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
             writer.print(SUCCESS_FALSE);
-			throw new PhrescoException(e);
+            if (isDebugEnabled) {
+		        S_LOGGER.error("Downloads.uploadImage", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
+            return showErrorPopup(new PhrescoException(e), getText(EXCEPTION_UPLOAD_FILE));
+		}
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Downloads.uploadImage : Exit");
 		}
 		
 		return SUCCESS;
@@ -368,7 +495,7 @@ public class Downloads extends ServiceBaseAction {
 	
 	public void removeUploadedFile() {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method  Downloads.removeUploadedFile()");
+			S_LOGGER.debug("Downloads.removeUploadedFile : Entry");
 		}
 		
 		if (REQ_DOWNLOAD_UPLOAD_FILE.equals(getType())) {
@@ -376,14 +503,17 @@ public class Downloads extends ServiceBaseAction {
 		} else {
 			imgByteArray = null;
 		}
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Downloads.removeUploadedFile : Exit");
+		}
 	}
 
 	public String validateForm() throws PhrescoException {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method Downloads.validateForm()");
+			S_LOGGER.debug("Downloads.validateForm : Entry");
 		}
-		boolean isError = false;
 		
+		boolean isError = false;
 		if (!Boolean.parseBoolean(getSystem())) {
 			//Empty validation for name
 			isError = nameValidation();
@@ -435,6 +565,9 @@ public class Downloads extends ServiceBaseAction {
 		
 		if (isError) {
 			setErrorFound(true);
+		}
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Downloads.validateForm : Exit");
 		}
 
 		return SUCCESS;

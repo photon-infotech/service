@@ -32,15 +32,14 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactInfo;
-import com.photon.phresco.commons.model.SettingsTemplate;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.commons.model.TechnologyInfo;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.client.api.Content;
 import com.photon.phresco.service.client.api.ServiceManager;
@@ -49,8 +48,9 @@ public class PilotProjects extends ServiceBaseAction {
 	
 	private static final long serialVersionUID = 6801037145464060759L;
 	
-	private static final Logger S_LOGGER = Logger.getLogger(PilotProjects.class);
+	private static final SplunkLogger S_LOGGER = SplunkLogger.getSplunkLogger(PilotProjects.class.getName());
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
+		
 	private static Map<String, InputStream> inputStreamMap = new HashMap<String, InputStream>();
 	
 	private String name = "";
@@ -93,14 +93,20 @@ public class PilotProjects extends ServiceBaseAction {
 	 /**
      * To get all Pilot Projects form DB
      * @return List of Pilot Projects
-     * @throws PhrescoException
      */
-	public String list() throws PhrescoException {
-        if (isDebugEnabled) {
-            S_LOGGER.debug("Entering Method PilotProjects.list()");
-        }
+	public String list() {
+		if (isDebugEnabled) {
+	        S_LOGGER.debug("PilotProjects.list : Entry");
+	    }
 
 		try {
+			if (isDebugEnabled) {
+				if (StringUtils.isEmpty(getCustomerId())) {
+					S_LOGGER.warn("PilotProjects.list", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+					return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_PILOT_PROJECTS_LIST));
+				}
+				S_LOGGER.info("Features.setTechnologiesInRequest", "customerId=" + "\"" + getCustomerId() + "\"");
+			}
 			List<ApplicationInfo> pilotProjects = getServiceManager().getPilotProjects(getCustomerId());
 			List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
 			if (CollectionUtils.isNotEmpty(pilotProjects)) {
@@ -110,12 +116,18 @@ public class PilotProjects extends ServiceBaseAction {
 			setReqAttribute(REQ_ARCHE_TYPES, technologies);
 			setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		} catch (PhrescoException e) {
+			if (isDebugEnabled) {
+		        S_LOGGER.error("PilotProjects.list", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
 			return showErrorPopup(e, getText(EXCEPTION_PILOT_PROJECTS_LIST));
 		}
 		
 		//to clear file input stream and byte array
 		inputStreamMap.clear();
 		pilotProByteArray = null;
+		if (isDebugEnabled) {
+	        S_LOGGER.debug("PilotProjects.list : Exit");
+	    }
 		
 		return COMP_PILOTPROJ_LIST;
 	}
@@ -133,14 +145,20 @@ public class PilotProjects extends ServiceBaseAction {
 	 /**
      * To return to the page to add Pilot projects
      * @return 
-     * @throws PhrescoException
      */
-    public String add() throws PhrescoException {
-    	if (isDebugEnabled) {	
-    		S_LOGGER.debug("Entering Method PilotProjects.add()");
-    	}
+    public String add() {
+    	if (isDebugEnabled) {
+	        S_LOGGER.debug("PilotProjects.add : Entry");
+	    }
     	
     	try {
+    		if (isDebugEnabled) {
+				if (StringUtils.isEmpty(getCustomerId())) {
+					S_LOGGER.warn("PilotProjects.add", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+					return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_PILOT_PROJECTS_ADD));
+				}
+				S_LOGGER.info("PilotProjects.add", "customerId=" + "\"" + getCustomerId() + "\"");
+			}
     		List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
     		if (CollectionUtils.isNotEmpty(technologies)) {
     			Collections.sort(technologies, TECHNAME_COMPARATOR);
@@ -148,8 +166,14 @@ public class PilotProjects extends ServiceBaseAction {
     		setReqAttribute(REQ_ARCHE_TYPES, technologies);
     		setReqAttribute(REQ_FROM_PAGE, ADD);
     	} catch (PhrescoException e) {
+    		if (isDebugEnabled) {
+		        S_LOGGER.error("PilotProjects.add", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
     		return showErrorPopup(e, getText(EXCEPTION_PILOT_PROJECTS_ADD));
 		}
+    	if (isDebugEnabled) {
+	        S_LOGGER.debug("PilotProjects.add : Exit");
+	    }
     	
     	return COMP_PILOTPROJ_ADD;
     }
@@ -157,13 +181,23 @@ public class PilotProjects extends ServiceBaseAction {
     /**
 	 * To return the edit page with the details of the selected Pilot Projects
 	 * @return
-	 * @throws PhrescoException
 	 */
-    public String edit() throws PhrescoException {
+    public String edit() {
     	if (isDebugEnabled) {
-    		S_LOGGER.debug("Entering Method PilotProjects.edit()");
-    	}
+	        S_LOGGER.debug("PilotProjects.edit : Entry");
+	    }
     	try {
+    		if (isDebugEnabled) {
+				if (StringUtils.isEmpty(getCustomerId())) {
+					S_LOGGER.warn("PilotProjects.edit", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+					return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_PILOT_PROJECTS_EDIT));
+				}
+				if (StringUtils.isEmpty(getProjectId())) {
+					S_LOGGER.warn("PilotProjects.edit", "status=\"Bad Request\"", "message=\"Pilot project Id is empty\"");
+					return showErrorPopup(new PhrescoException("Pilot project Id is empty"), getText(EXCEPTION_PILOT_PROJECTS_EDIT));
+				}
+				S_LOGGER.info("PilotProjects.edit", "customerId=" + "\"" + getCustomerId() + "\"", "pilotProjectId=" + "\"" + getProjectId() + "\"");
+			}
     		versionFile = getVersioning();
     		ServiceManager serviceManager = getServiceManager();
 			ApplicationInfo applicationInfo = serviceManager.getPilotProject(getProjectId(), getCustomerId());
@@ -173,23 +207,35 @@ public class PilotProjects extends ServiceBaseAction {
     		setReqAttribute(REQ_FROM_PAGE, EDIT);
     		setReqAttribute(REQ_VERSIONING, getVersioning());
     	} catch (PhrescoException e) {
+    		if (isDebugEnabled) {
+		        S_LOGGER.error("PilotProjects.edit", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
     		return showErrorPopup(e, getText(EXCEPTION_PILOT_PROJECTS_EDIT));
 		}
+    	if (isDebugEnabled) {
+	        S_LOGGER.debug("PilotProjects.edit : Exit");
+	    }
 
     	return COMP_PILOTPROJ_ADD;
     }
     
     /**
-	 * To create a pilot projects with the provided details
-	 * @return List of pilot projects
-	 * @throws PhrescoException
-	 */
-    public String save() throws PhrescoException {
+     * To create a pilot projects with the provided details
+     * @return
+     */
+    public String save() {
     	if (isDebugEnabled) {
-    		S_LOGGER.debug("Entering Method PilotProjects.save()");
-    	}
+	        S_LOGGER.debug("PilotProjects.save : Entry");
+	    }
     	
     	try {
+    		if (isDebugEnabled) {
+				if (StringUtils.isEmpty(getCustomerId())) {
+					S_LOGGER.warn("PilotProjects.save", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+					return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_PILOT_PROJECTS_SAVE));
+				}
+				S_LOGGER.info("PilotProjects.save", "customerId=" + "\"" + getCustomerId() + "\"");
+			}
             ApplicationInfo pilotProInfo = createPilotProj();     		
     		//save pilot project jar files
 			if(pilotProByteArray != null){
@@ -199,8 +245,14 @@ public class PilotProjects extends ServiceBaseAction {
     		getServiceManager().createPilotProjects(createPilotProj(), inputStreamMap, getCustomerId());
 			addActionMessage(getText(PLTPROJ_ADDED, Collections.singletonList(getName())));
     	} catch (PhrescoException e) {
+    		if (isDebugEnabled) {
+		        S_LOGGER.error("PilotProjects.save", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
     		return showErrorPopup(e, getText(EXCEPTION_PILOT_PROJECTS_SAVE));
 		}
+    	if (isDebugEnabled) {
+	        S_LOGGER.debug("PilotProjects.save : Entry");
+	    }
 
     	return list();
     }
@@ -208,24 +260,41 @@ public class PilotProjects extends ServiceBaseAction {
     /**
 	 * To update the pilot projects with the provided details
 	 * @return List of pilot projects
-	 * @throws PhrescoException
 	 */
-    public String update() throws PhrescoException {
+    public String update() {
     	if (isDebugEnabled) {
-    		S_LOGGER.debug("Entering Method  PilotProjects.update()");
-    	}
+	        S_LOGGER.debug("PilotProjects.update : Entry");
+	    }
+    	
     	try {
+    		if (isDebugEnabled) {
+				if (StringUtils.isEmpty(getCustomerId())) {
+					S_LOGGER.warn("PilotProjects.update", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+					return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_PILOT_PROJECTS_UPDATE));
+				}
+				if (StringUtils.isEmpty(getProjectId())) {
+					S_LOGGER.warn("PilotProjects.update", "status=\"Bad Request\"", "message=\"Pilot project Id is empty\"");
+					return showErrorPopup(new PhrescoException("Pilot project Id is empty"), getText(EXCEPTION_PILOT_PROJECTS_UPDATE));
+				}
+				S_LOGGER.info("PilotProjects.update", "customerId=" + "\"" + getCustomerId() + "\"", "pilotProjectId=" + "\"" + getProjectId() + "\"");
+			}
     		ApplicationInfo pilotProInfo = createPilotProj();
     		//update pilot project jar files
-    		if(pilotProByteArray != null){
+    		if (pilotProByteArray != null) {
     			inputStreamMap.put(pilotProInfo.getName(),  new ByteArrayInputStream(pilotProByteArray));
     		} 
     		getServiceManager().updatePilotProject(createPilotProj(), inputStreamMap, getProjectId(), getCustomerId());
     		addActionMessage(getText(PLTPROJ_UPDATED, Collections.singletonList(getName())));
     	} catch (PhrescoException e) {
+    		if (isDebugEnabled) {
+		        S_LOGGER.error("PilotProjects.update", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
     		return showErrorPopup(e, getText(EXCEPTION_PILOT_PROJECTS_UPDATE));
 		}
-
+    	if (isDebugEnabled) {
+	        S_LOGGER.debug("PilotProjects.update : Exit");
+	    }
+    	
     	return list();
     }
     
@@ -285,33 +354,51 @@ public class PilotProjects extends ServiceBaseAction {
 	 */
     public String delete() throws PhrescoException {
     	if (isDebugEnabled) {
-    		S_LOGGER.debug("Entering Method PilotProjects.delete()");
-    	}
+	        S_LOGGER.debug("PilotProjects.delete : Entry");
+	    }
     	
     	try {
-    		String[] projectIds = getHttpRequest().getParameterValues(REQ_PILOT_PROJ_ID);
+    		if (isDebugEnabled) {
+				if (StringUtils.isEmpty(getCustomerId())) {
+					S_LOGGER.warn("PilotProjects.delete", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+					return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_PILOT_PROJECTS_DELETE));
+				}
+				S_LOGGER.info("PilotProjects.delete", "customerId=" + "\"" + getCustomerId() + "\"");
+			}
+    		String[] projectIds = getReqParameterValues(REQ_PILOT_PROJ_ID);
+    		if (isDebugEnabled) {
+    			if (ArrayUtils.isEmpty(projectIds)) {
+					S_LOGGER.warn("PilotProjects.delete", "status=\"Bad Request\"", "message=\"No pilot project to delete\"");
+					return showErrorPopup(new PhrescoException("No pilot project to delete"), getText(EXCEPTION_PILOT_PROJECTS_DELETE));
+				}
+    		}
     		if (ArrayUtils.isNotEmpty(projectIds)) {
     			for (String projectid : projectIds) {
     				getServiceManager().deletePilotProject(projectid, getCustomerId());
     			}
     			addActionMessage(getText(PLTPROJ_DELETED));
     		}
-    	}catch (PhrescoException e) {
+    	} catch (PhrescoException e) {
+    		if (isDebugEnabled) {
+		        S_LOGGER.error("PilotProjects.delete", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
     		return showErrorPopup(e, getText(EXCEPTION_PILOT_PROJECTS_DELETE));
 		}
-
+    	if (isDebugEnabled) {
+	        S_LOGGER.debug("PilotProjects.delete : Exit");
+	    }
+    	
     	return list();
     }
     
     /**
 	 * To upload file
 	 * @return
-	 * @throws PhrescoException
 	 */
-    public String uploadFile() throws PhrescoException {
+    public String uploadFile() {
     	if (isDebugEnabled) {
-    	S_LOGGER.debug("Entering Method PilotProjects.uploadFile()");
-    	}
+	        S_LOGGER.debug("PilotProjects.uploadFile : Entry");
+	    }
 
     	PrintWriter writer = null;
     	try {
@@ -325,18 +412,35 @@ public class PilotProjects extends ServiceBaseAction {
     	} catch (Exception e) {
     		getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
     		writer.print(SUCCESS_FALSE);
-    		throw new PhrescoException(e);
+    		if (isDebugEnabled) {
+		        S_LOGGER.error("PilotProjects.uploadFile", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
+    		return showErrorPopup(new PhrescoException(e), getText(EXCEPTION_UPLOAD_FILE));
     	}
+    	if (isDebugEnabled) {
+	        S_LOGGER.debug("PilotProjects.uploadFile : Exit");
+	    }
 
     	return SUCCESS;
     }
     
-    public String downloadPilotProjects() throws PhrescoException {
+    public String downloadPilotProjects() {
     	if (isDebugEnabled) {
-    		S_LOGGER.debug("Entering Method  PilotProjects.downloadPilotProjects()");
-    	}
+	        S_LOGGER.debug("PilotProjects.downloadPilotProjects : Entry");
+	    }
 
     	try {
+    		if (isDebugEnabled) {
+				if (StringUtils.isEmpty(getCustomerId())) {
+					S_LOGGER.warn("PilotProjects.downloadPilotProjects", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+					return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(DOWNLOAD_FAILED));
+				}
+				if (StringUtils.isEmpty(getProjectId())) {
+					S_LOGGER.warn("PilotProjects.downloadPilotProjects", "status=\"Bad Request\"", "message=\"Pilot project Id is empty\"");
+					return showErrorPopup(new PhrescoException("Pilot project Id is empty"), getText(DOWNLOAD_FAILED));
+				}
+				S_LOGGER.info("PilotProjects.downloadPilotProjects", "customerId=" + "\"" + getCustomerId() + "\"", "pilotProjectId=" + "\"" + getProjectId() + "\"");
+			}
     		ApplicationInfo pilotProjInfo = getServiceManager().getPilotProject(getProjectId(), getCustomerId());
     		pilotURL = pilotProjInfo.getPilotContent().getVersions().get(0).getDownloadURL();
 
@@ -347,8 +451,14 @@ public class PilotProjects extends ServiceBaseAction {
     		contentType = url.openConnection().getContentType();
     		contentLength = url.openConnection().getContentLength();
     	} catch(Exception e) {
+    		if (isDebugEnabled) {
+		        S_LOGGER.error("PilotProjects.downloadPilotProjects", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
     		return showErrorPopup(new PhrescoException(e), getText(DOWNLOAD_FAILED));
     	}
+    	if (isDebugEnabled) {
+	        S_LOGGER.debug("PilotProjects.downloadPilotProjects : Exit");
+	    }
 		
 		return SUCCESS;
 	}
@@ -368,8 +478,8 @@ public class PilotProjects extends ServiceBaseAction {
 	
     public String validateForm() throws PhrescoException {
     	if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method  PilotProjects.validateForm()");
-		}
+	        S_LOGGER.debug("PilotProjects.validateForm : Entry");
+	    }
     	boolean isError = false;
     	//Empty validation for name
     	isError = nameValidation(isError);
@@ -388,7 +498,10 @@ public class PilotProjects extends ServiceBaseAction {
     	if (isError) {
     		setErrorFound(true);
     	}
-		
+    	if (isDebugEnabled) {
+	        S_LOGGER.debug("PilotProjects.validateForm : Exit");
+	    }
+    	
     	return SUCCESS;
     }
 

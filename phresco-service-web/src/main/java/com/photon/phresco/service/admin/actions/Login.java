@@ -77,10 +77,6 @@ public class Login extends ServiceBaseAction {
 		}
 
 		User user = (User) getSessionAttribute(SESSION_USER_INFO);
-		if (isDebugEnabled) {
-			LOGGER.info("Login.login", "userId=" + "\"" + user.getId(), "userName=" + "\"" + user.getName());
-		}
-
 		if (user != null) {
 			return SUCCESS;
 		}
@@ -91,7 +87,6 @@ public class Login extends ServiceBaseAction {
 		if (validateLogin()) {
 			return authenticate();
 		}
-
 		if (isDebugEnabled) {
 			LOGGER.debug("Login.login : Exit");
 		}
@@ -230,6 +225,9 @@ public class Login extends ServiceBaseAction {
 				return LOGIN_FAILURE;
 			}
 			setSessionAttribute(SESSION_USER_INFO, user);
+			if (isDebugEnabled) {
+				LOGGER.info("Login.login", "userId=" + "\"" + user.getId(), "userName=" + "\"" + user.getName());
+			}
 
 			File tempPath = new File(Utility.getSystemTemp() + File.separator + USER_JSON);
 			String userId = user.getId();

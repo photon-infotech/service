@@ -26,13 +26,13 @@ import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 
 import com.photon.phresco.commons.model.Element;
 import com.photon.phresco.commons.model.PropertyTemplate;
 import com.photon.phresco.commons.model.SettingsTemplate;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.client.api.ServiceManager;
 
@@ -40,7 +40,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 	
 	private static final long serialVersionUID = 6801037145464060759L;
 	
-	private static final Logger S_LOGGER = Logger.getLogger(ConfigTemplates.class);
+	private static final SplunkLogger S_LOGGER = SplunkLogger.getSplunkLogger(ConfigTemplates.class.getName());
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
 	private String name = "";
@@ -72,12 +72,19 @@ public class ConfigTemplates extends ServiceBaseAction {
      * @return List of config templates
      * @throws PhrescoException
      */
-	public String list() throws PhrescoException {
+	public String list() {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method ConfigTemplates.list()");
-		}
+	    	S_LOGGER.debug("ConfigTemplates.list : Entry");
+	    }
 		
 		try {
+			if (isDebugEnabled) {
+				if (StringUtils.isEmpty(getCustomerId())) {
+					S_LOGGER.warn("ConfigTemplates.list", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+					return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_APPTYPES_UPDATE));
+				}
+				S_LOGGER.info("ConfigTemplates.list", "customerId=" + "\"" + getCustomerId() + "\"");
+			}
 			List<SettingsTemplate> configTemplates = getServiceManager().getConfigTemplates(getCustomerId());
 			if (CollectionUtils.isNotEmpty(configTemplates)) {
 				Collections.sort(configTemplates, sortTemplateInAlphaOrder());
@@ -85,8 +92,14 @@ public class ConfigTemplates extends ServiceBaseAction {
 			setReqAttribute(REQ_CONFIG_TEMPLATES, configTemplates);
 			setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		} catch (PhrescoException e) {
+			if (isDebugEnabled) {
+		        S_LOGGER.error("ConfigTemplates.list", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
 			return showErrorPopup(e, getText(EXCEPTION_CONFIG_TEMP_LIST));
 		}
+		if (isDebugEnabled) {
+	    	S_LOGGER.debug("ConfigTemplates.list : Exit");
+	    }
 		
 		return COMP_CONFIGTEMPLATE_LIST;
 	}
@@ -106,18 +119,31 @@ public class ConfigTemplates extends ServiceBaseAction {
 	 * @return 
 	 * @throws PhrescoException
 	 */
-	public String add() throws PhrescoException {
+	public String add() {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method ConfigTemplates.add()");
-		}
+	    	S_LOGGER.debug("ConfigTemplates.add : Entry");
+	    }
 		
 		try {
+			if (isDebugEnabled) {
+				if (StringUtils.isEmpty(getCustomerId())) {
+					S_LOGGER.warn("ConfigTemplates.add", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+					return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_CONFIG_TEMP_ADD));
+				}
+				S_LOGGER.info("ConfigTemplates.add", "customerId=" + "\"" + getCustomerId() + "\"");
+			}
 			List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
 			setReqAttribute(REQ_ARCHE_TYPES, technologies);
 			setReqAttribute(REQ_FROM_PAGE, ADD);
 		} catch (PhrescoException e) {
+			if (isDebugEnabled) {
+		        S_LOGGER.error("ConfigTemplates.add", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
 		    return showErrorPopup(e, getText(EXCEPTION_CONFIG_TEMP_ADD));
 		}
+		if (isDebugEnabled) {
+	    	S_LOGGER.debug("ConfigTemplates.add : Exit");
+	    }
 		
 		return COMP_CONFIGTEMPLATE_ADD;
 	}
@@ -127,12 +153,23 @@ public class ConfigTemplates extends ServiceBaseAction {
 	 * @return
 	 * @throws PhrescoException
 	 */
-	public String edit() throws PhrescoException {
+	public String edit() {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method ConfigTemplates.edit()");
-		}
+	    	S_LOGGER.debug("ConfigTemplates.edit : Entry");
+	    }
 		
 		try {
+			if (isDebugEnabled) {
+				if (StringUtils.isEmpty(getCustomerId())) {
+					S_LOGGER.warn("ConfigTemplates.edit", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+					return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_CONFIG_TEMP_EDIT));
+				}
+				if (StringUtils.isEmpty(getConfigId())) {
+					S_LOGGER.warn("ConfigTemplates.edit", "status=\"Bad Request\"", "message=\"Configuration template Id is empty\"");
+					return showErrorPopup(new PhrescoException("Configuration template Id is empty"), getText(EXCEPTION_CONFIG_TEMP_EDIT));
+				}
+				S_LOGGER.info("ConfigTemplates.edit", "customerId=" + "\"" + getCustomerId() + "\"", "configId=" + "\"" + getConfigId() + "\"");
+			}
 		    ServiceManager serviceManager = getServiceManager();
 			SettingsTemplate configTemp = serviceManager.getConfigTemplate(getConfigId(), getCustomerId());
 			List<Technology> technologies = serviceManager.getArcheTypes(getCustomerId());
@@ -141,8 +178,14 @@ public class ConfigTemplates extends ServiceBaseAction {
 			setReqAttribute(REQ_ARCHE_TYPES, technologies);
 			setReqAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (PhrescoException e) {
+			if (isDebugEnabled) {
+		        S_LOGGER.error("ConfigTemplates.edit", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
 		    return showErrorPopup(e, getText(EXCEPTION_CONFIG_TEMP_EDIT));
 		}
+		if (isDebugEnabled) {
+	    	S_LOGGER.debug("ConfigTemplates.edit : Exit");
+	    }
 		
 		return COMP_CONFIGTEMPLATE_ADD;
 	}
@@ -152,19 +195,32 @@ public class ConfigTemplates extends ServiceBaseAction {
 	 * @return List of Config templates
 	 * @throws PhrescoException
 	 */
-	public String save() throws PhrescoException {
+	public String save() {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method ConfigTemplates.save()");
-		}
+	    	S_LOGGER.debug("ConfigTemplates.save : Entry");
+	    }
 
 		try  {
+			if (isDebugEnabled) {
+				if (StringUtils.isEmpty(getCustomerId())) {
+					S_LOGGER.warn("ConfigTemplates.save", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+					return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_CONFIG_TEMP_SAVE));
+				}
+				S_LOGGER.info("ConfigTemplates.save", "customerId=" + "\"" + getCustomerId() + "\"");
+			}
 			List<SettingsTemplate> settingsTemplates = new ArrayList<SettingsTemplate>();
             settingsTemplates.add(createSettingsTemplateInstance());
             getServiceManager().createConfigTemplates(settingsTemplates, getCustomerId());
         	addActionMessage(getText(CONFIGTEMPLATE_ADDED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
+			if (isDebugEnabled) {
+		        S_LOGGER.error("ConfigTemplates.save", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
 		    return showErrorPopup(e, getText(EXCEPTION_CONFIG_TEMP_SAVE));
 		}
+		if (isDebugEnabled) {
+	    	S_LOGGER.debug("ConfigTemplates.save : Exit");
+	    }
 		
 		return  list();
 	}
@@ -174,18 +230,35 @@ public class ConfigTemplates extends ServiceBaseAction {
 	 * @return
 	 * @throws PhrescoException
 	 */
-	public String update() throws PhrescoException {
-    	if (isDebugEnabled) {
-    		S_LOGGER.debug("Entering Method  ConfigTemplates.update()");
-    	}
+	public String update() {
+		if (isDebugEnabled) {
+	    	S_LOGGER.debug("ConfigTemplates.update : Entry");
+	    }
     	
     	try {
+    		if (isDebugEnabled) {
+				if (StringUtils.isEmpty(getCustomerId())) {
+					S_LOGGER.warn("ConfigTemplates.update", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+					return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_CONFIG_TEMP_SAVE));
+				}
+				if (StringUtils.isEmpty(getCustomerId())) {
+					S_LOGGER.warn("ConfigTemplates.update", "status=\"Bad Request\"", "message=\"Config template Id is empty\"");
+					return showErrorPopup(new PhrescoException("Config template Id is empty"), getText(EXCEPTION_CONFIG_TEMP_SAVE));
+				}
+				S_LOGGER.info("ConfigTemplates.update", "customerId=" + "\"" + getCustomerId() + "\"", "configId=" + "\"" + getConfigId() + "\"");
+			}
     		getServiceManager().updateConfigTemp(createSettingsTemplateInstance(), getConfigId(), getCustomerId());
     		addActionMessage(getText(CONFIGTEMPLATE_UPDATED, Collections.singletonList(getName())));
     	} catch (PhrescoException e) {
+    		if (isDebugEnabled) {
+		        S_LOGGER.error("ConfigTemplates.update", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
     	    return showErrorPopup(e, getText(EXCEPTION_CONFIG_TEMP_UPDATE));
 		}
-
+    	if (isDebugEnabled) {
+	    	S_LOGGER.debug("ConfigTemplates.update : Exit");
+	    }
+    	
     	return list();
     }
 	
@@ -196,8 +269,9 @@ public class ConfigTemplates extends ServiceBaseAction {
 	 */
 	private SettingsTemplate createSettingsTemplateInstance() throws PhrescoException {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method ConfigTemplates.createPropertyTemplates()");
-		}
+	    	S_LOGGER.debug("ConfigTemplates.createSettingsTemplateInstance : Entry");
+	    }
+		
 		SettingsTemplate settingTemplate = null;
 		try {
 			List<String> techIds = getAppliesTo();
@@ -241,15 +315,27 @@ public class ConfigTemplates extends ServiceBaseAction {
 			}
 			
 		} catch (Exception e) {
+			if (isDebugEnabled) {
+		        S_LOGGER.error("ConfigTemplates.createSettingsTemplateInstance", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
 			throw new PhrescoException(e);
 		}
+		if (isDebugEnabled) {
+	    	S_LOGGER.debug("ConfigTemplates.createSettingsTemplateInstance : Exit");
+	    }
 		
 		return settingTemplate;
 	}
 	
 	public String showPropTempPopup() {
+		if (isDebugEnabled) {
+	    	S_LOGGER.debug("ConfigTemplates.showPropTempPopup : Entry");
+	    }
 		setReqAttribute("propTempKey", getPropTempKey());
 		setReqAttribute(REQ_FROM_PAGE, fromPage);
+		if (isDebugEnabled) {
+	    	S_LOGGER.debug("ConfigTemplates.showPropTempPopup : Exit");
+	    }
 		return SUCCESS;
 	}
 
@@ -259,21 +345,34 @@ public class ConfigTemplates extends ServiceBaseAction {
 	 * @throws PhrescoException
 	 */
 	public String delete() throws PhrescoException {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entering Method ConfigTemplates.delete()");
+		if (isDebugEnabled) {
+	    	S_LOGGER.debug("ConfigTemplates.delete : Entry");
 	    }
 
 		try {
+			if (isDebugEnabled) {
+				if (StringUtils.isEmpty(getCustomerId())) {
+					S_LOGGER.warn("ConfigTemplates.delete", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+					return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_CONFIG_TEMP_DELETE));
+				}
+				S_LOGGER.info("ConfigTemplates.delete", "customerId=" + "\"" + getCustomerId() + "\"");
+			}
 			String[] configIds = getHttpRequest().getParameterValues(REQ_CONFIG_ID);
 			if (ArrayUtils.isNotEmpty(configIds)) {
+				if (isDebugEnabled) {
+					S_LOGGER.info("ConfigTemplates.delete", "configIds=" + "\"" + configIds.toString() + "\"");
+				}
 				for (String configid : configIds) {
 					getServiceManager().deleteConfigTemp(configid, getCustomerId());
 				}
-			addActionMessage(getText(CONFIGTEMPLATE_DELETED));
+				addActionMessage(getText(CONFIGTEMPLATE_DELETED));
 			}
 		} catch (PhrescoException e) {
 		    return showErrorPopup(e, getText(EXCEPTION_CONFIG_TEMP_DELETE));
 		}
+		if (isDebugEnabled) {
+	    	S_LOGGER.debug("ConfigTemplates.delete : Exit");
+	    }
 
 		return list();
 	}
@@ -285,10 +384,10 @@ public class ConfigTemplates extends ServiceBaseAction {
 	 */
 	public String validateForm() throws PhrescoException {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method ConfigTemplates.validateForm()");
-		}
-		boolean isError = false;
+	    	S_LOGGER.debug("ConfigTemplates.validateForm : Entry");
+	    }
 		
+		boolean isError = false;
 		if (!DEFAULT_CUSTOMER_NAME.equalsIgnoreCase(customerId) && EDIT.equalsIgnoreCase(fromPage)) {
 			//Empty validation for applies to technology
 			if (CollectionUtils.isEmpty(getAppliesTo())) {
@@ -341,6 +440,10 @@ public class ConfigTemplates extends ServiceBaseAction {
 		if (isError) {
             setErrorFound(true);
         }
+		
+		if (isDebugEnabled) {
+	    	S_LOGGER.debug("ConfigTemplates.validateForm : Exit");
+	    }
 
 		return SUCCESS;
 	}

@@ -319,6 +319,8 @@ public interface ServiceUIConstants {
 	String EXCEPTION_APPTYPES_SAVE = "excep.hdr.comp.appln.save";
 	String EXCEPTION_APPTYPES_UPDATE = "excep.hdr.comp.appln.update";
 	String EXCEPTION_APPTYPES_DELETE = "excep.hdr.comp.appln.delete";
+	String EXCEPTION_APPTYPES_TECH_GROUP = "excep.hdr.comp.appln.tech.group";
+	String EXCEPTION_APPTYPES_TECH_GROUP_CREATE = "excep.hdr.comp.appln.tech.group.create";
 	
 	String EXCEPTION_CONFIG_TEMP_DELETE = "excep.hdr.comp.configtemp.delete";
 	String EXCEPTION_CONFIG_TEMP_UPDATE = "excep.hdr.comp.configtemp.update";
@@ -341,6 +343,7 @@ public interface ServiceUIConstants {
 	String EXCEPTION_DOWNLOADS_ADD = "excep.hdr.comp.download.add";
 	String EXCEPTION_DOWNLOADS_LIST = "excep.hdr.comp.download.list";
 	String EXCEPTION_ARTIFACTINFO_MISSING = "excep.hdr.comp.comp.artifactInfos.missing";
+	String EXCEPTION_UPLOAD_FILE = "excep.hdr.comp.upload.file";
 	
 	/*****************************
      * I18N Keys Constants

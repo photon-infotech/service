@@ -35,7 +35,6 @@ import java.util.Map;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactGroup.Type;
@@ -45,6 +44,7 @@ import com.photon.phresco.commons.model.License;
 import com.photon.phresco.commons.model.RequiredOption;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.client.api.Content;
 import com.photon.phresco.service.client.api.ServiceManager;
@@ -59,7 +59,7 @@ public class Features extends ServiceBaseAction {
 
     private static final long serialVersionUID = 6801037145464060759L;
     
-	private static final Logger S_LOGGER = Logger.getLogger(Features.class);
+    private static final SplunkLogger S_LOGGER = SplunkLogger.getSplunkLogger(Features.class.getName());
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
 	private static Map<String, InputStream> inputStreamMap = new HashMap<String, InputStream>();
@@ -118,20 +118,23 @@ public class Features extends ServiceBaseAction {
     
 	public String menu() {
 		if (isDebugEnabled) {
-    		S_LOGGER.debug("Entering Method  Features.menu()");
-    	}
+	        S_LOGGER.debug("Features.menu : Entry");
+	    }
 
 		setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		inputStreamMap.clear();
 		featureByteArray = null;
+		if (isDebugEnabled) {
+	        S_LOGGER.debug("Features.menu : Exit");
+	    }
 		
     	return COMP_FEATURES_LIST;
     }
 	
 	public String technologies() {
-	    if (isDebugEnabled) {
-            S_LOGGER.debug("Entering Method  Features.modulesList()");
-        }
+		if (isDebugEnabled) {
+	        S_LOGGER.debug("Features.technologies : Entry");
+	    }
 	    
 	    try {
             setReqAttribute(REQ_FEATURES_TYPE, getType()); //for handle in feature sub menu
@@ -140,7 +143,13 @@ public class Features extends ServiceBaseAction {
     	    //To remove the selected dependent moduleIds from the session
     	    removeSessionAttribute(SESSION_FEATURES_DEPENDENT_MOD_IDS);
 	    } catch (PhrescoException e) {
+	    	if (isDebugEnabled) {
+		        S_LOGGER.error("Features.technologies", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
 	        return showErrorPopup(e, getText(EXCEPTION_FEATURE_LIST));
+	    }
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("Features.technologies : Exit");
 	    }
 	    
 	    return COMP_FEATURES_LIST;
@@ -148,10 +157,17 @@ public class Features extends ServiceBaseAction {
 	
     private void setTechnologiesInRequest() throws PhrescoException {
     	if (isDebugEnabled) {
-    		S_LOGGER.debug("Entering Method  Features.list()");
-    	}
+	        S_LOGGER.debug("Features.setTechnologiesInRequest : Entry");
+	    }
     	
     	try {
+    		if (isDebugEnabled) {
+				if (StringUtils.isEmpty(getCustomerId())) {
+					S_LOGGER.warn("Features.setTechnologiesInRequest", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+					throw new PhrescoException("Customer Id is empty");
+				}
+				S_LOGGER.info("Features.setTechnologiesInRequest", "customerId=" + "\"" + getCustomerId() + "\"");
+			}
     		List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
     		if (CollectionUtils.isNotEmpty(technologies)) {
     			Collections.sort(technologies, TECHNAME_COMPARATOR);
@@ -159,41 +175,79 @@ public class Features extends ServiceBaseAction {
     		setReqAttribute(REQ_ARCHE_TYPES, technologies);
     		featureByteArray = null;
     	} catch (PhrescoException e) {
-    	    throw new PhrescoException(e);
+    	    throw e;
     	}
+    	if (isDebugEnabled) {
+	        S_LOGGER.debug("Features.setTechnologiesInRequest : Exit");
+	    }
     }
     
-    public String listFeatures() throws PhrescoException {
+    public String listFeatures() {
     	if (isDebugEnabled) {
-    		S_LOGGER.debug("Entering Method  Features.featurelist()");
+    		S_LOGGER.debug("Features.listFeatures : Entry");
     	}
-    	inputStreamMap.clear();
-    	featureByteArray = null;
-		List<ArtifactGroup> moduleGroups = getServiceManager().getFeatures(getCustomerId(), getTechnology(), Type.valueOf(getType()).name());
-		if (CollectionUtils.isNotEmpty(moduleGroups)) {
-			Collections.sort(moduleGroups, ARTIFACTGROUP_COMPARATOR_ASCEND);
+    	try {
+    		inputStreamMap.clear();
+    		featureByteArray = null;
+    		if (isDebugEnabled) {
+    			if (StringUtils.isEmpty(getCustomerId())) {
+    				S_LOGGER.warn("Features.listFeatures", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+    				return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_FEATURE_LIST));
+    			}
+    			if (StringUtils.isEmpty(getTechnology())) {
+    				S_LOGGER.warn("Features.listFeatures", "status=\"Bad Request\"", "message=\"Technology Id is empty\"");
+    				return showErrorPopup(new PhrescoException("Technology Id is empty"), getText(EXCEPTION_FEATURE_LIST));
+    			}
+    			if (StringUtils.isEmpty(getType())) {
+    				S_LOGGER.warn("Features.listFeatures", "status=\"Bad Request\"", "message=\"Features type is empty\"");
+    				return showErrorPopup(new PhrescoException("Features type is empty"), getText(EXCEPTION_FEATURE_LIST));
+    			}
+    			S_LOGGER.info("Features.listFeatures", "customerId=" + "\"" + getCustomerId() + "\"", "techIdId=" + "\"" 
+    					+ getTechnology() + "\"", "type=" + "\"" + Type.valueOf(getType()).name() + "\"");
+    		}
+    		List<ArtifactGroup> moduleGroups = getServiceManager().getFeatures(getCustomerId(), getTechnology(), Type.valueOf(getType()).name());
+    		if (CollectionUtils.isNotEmpty(moduleGroups)) {
+    			Collections.sort(moduleGroups, ARTIFACTGROUP_COMPARATOR_ASCEND);
+    		}
+    		setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroups);
+    		setReqAttribute(REQ_FEATURES_TYPE, getType());
+    		setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
+    	} catch (PhrescoException e) {
+    		if (isDebugEnabled) {
+		        S_LOGGER.error("Features.listFeatures", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
+		    return showErrorPopup(e, getText(EXCEPTION_FEATURE_LIST));
+    	}
+    	if (isDebugEnabled) {
+			S_LOGGER.debug("Features.listFeatures : Exit");
 		}
-		setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroups);
-		setReqAttribute(REQ_FEATURES_TYPE, getType());
-		setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
-		
-		return COMP_FEATURES_LIST;
+
+    	return COMP_FEATURES_LIST;
     }
     
     public String addFeatures() {
-        if (isDebugEnabled) {
-            S_LOGGER.debug("Entering Method  Features.addModules()");
-        }
+    	if (isDebugEnabled) {
+			S_LOGGER.debug("Features.addFeatures : Entry");
+		}
       
-        try {        	
+        try {
+        	if (isDebugEnabled) {
+        		S_LOGGER.info("Features.addFeatures", "customerId=" + "\"" + getCustomerId() + "\"", "type=" + "\"" + Type.valueOf(getType()).name() + "\"");
+        	}
             setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
             setReqAttribute(REQ_FEATURES_TYPE, getType());
             setReqAttribute(REQ_FROM_PAGE, ADD);
             setTechnologiesInRequest();
             setReqAttribute(REQ_FEATURES_LICENSE, getLicences());
         } catch (PhrescoException e) {
+        	if (isDebugEnabled) {
+		        S_LOGGER.error("Features.addFeatures", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
             return showErrorPopup(e, getText(EXCEPTION_FEATURE_ADD));            
         }
+        if (isDebugEnabled) {
+			S_LOGGER.debug("Features.addFeatures : Exit");
+		}
       
         return COMP_FEATURES_ADD;
     }
@@ -202,29 +256,57 @@ public class Features extends ServiceBaseAction {
     	return getServiceManager().getLicenses();
 	}
 
-	public String fetchFeaturesForDependency() {
-      if (isDebugEnabled) {
-          S_LOGGER.debug("Entering Method  Features.featurelist()");
-      }
-      
-      try {
-    	  if(CollectionUtils.isNotEmpty(getMultiTechnology())) {
-    		  for(String technologyList : getMultiTechnology()){
-    			  List<ArtifactGroup>  moduleGroups = getServiceManager().getFeatures(getCustomerId(), technologyList, Type.valueOf(getType()).name());
-    			  setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroups); 
-    		  }
-    	  }
-      } catch (PhrescoException e) {
-          return showErrorPopup(e, getText(EXCEPTION_FEATURE_LIST));
-      }
-      
-      return COMP_FEATURES_LIST;
-  }
+    public String fetchFeaturesForDependency() {
+    	if (isDebugEnabled) {
+    		S_LOGGER.debug("Features.fetchFeaturesForDependency : Entry");
+    	}
+
+    	try {
+    		if (isDebugEnabled) {
+    			if (StringUtils.isEmpty(getCustomerId())) {
+    				S_LOGGER.warn("Features.fetchFeaturesForDependency", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+    				return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_FEATURE_LIST));
+    			}
+    			if (CollectionUtils.isEmpty(getMultiTechnology())) {
+    				S_LOGGER.warn("Features.fetchFeaturesForDependency", "status=\"Bad Request\"", "message=\"Technology Id is empty\"");
+    				return showErrorPopup(new PhrescoException("Technology Id is empty"), getText(EXCEPTION_FEATURE_LIST));
+    			}
+    			if (StringUtils.isEmpty(getType())) {
+    				S_LOGGER.warn("Features.fetchFeaturesForDependency", "status=\"Bad Request\"", "message=\"Features type is empty\"");
+    				return showErrorPopup(new PhrescoException("Features type is empty"), getText(EXCEPTION_FEATURE_LIST));
+    			}
+    			S_LOGGER.info("Features.fetchFeaturesForDependency", "customerId=" + "\"" + getCustomerId() + "\"", "type=" + "\"" + Type.valueOf(getType()).name() + "\"");
+    		}
+    		if (CollectionUtils.isNotEmpty(getMultiTechnology())) {
+    			if (isDebugEnabled) {
+    				S_LOGGER.info("Features.fetchFeaturesForDependency", "getMultiTechnology()=" + "\"" + getMultiTechnology() + "\"");
+    			}
+    			for (String technologyList : getMultiTechnology()) {
+    				List<ArtifactGroup>  moduleGroups = getServiceManager().getFeatures(getCustomerId(), technologyList, Type.valueOf(getType()).name());
+    				setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroups); 
+    			}
+    		}
+    	} catch (PhrescoException e) {
+    		if (isDebugEnabled) {
+		        S_LOGGER.error("Features.fetchFeaturesForDependency", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
+    		return showErrorPopup(e, getText(EXCEPTION_FEATURE_LIST));
+    	}
+    	if (isDebugEnabled) {
+    		S_LOGGER.debug("Features.fetchFeaturesForDependency : Exit");
+    	}
+    	
+    	return COMP_FEATURES_LIST;
+    }
     
-    public void saveDependentFeatures() {
-        if (isDebugEnabled) {
-            S_LOGGER.debug("Entering Method  Features.saveDependentFeatures()");
-        }
+    public String saveDependentFeatures() {
+    	if (isDebugEnabled) {
+    		S_LOGGER.debug("Features.saveDependentFeatures : Entry");
+    		if (CollectionUtils.isEmpty(dependentModGroupId)) {
+    			S_LOGGER.warn("Features.saveDependentFeatures", "status=\"Bad Request\"", "message=\"Technology Id is empty\"");
+    			return showErrorPopup(new PhrescoException("Technology Id is empty"), getText(EXCEPTION_FEATURE_LIST));
+    		}
+    	}
         List<String> dependentModuleIds = new ArrayList<String>();
         if (CollectionUtils.isNotEmpty(dependentModGroupId)) {
             for (String dependentModGroup : dependentModGroupId) {
@@ -232,10 +314,30 @@ public class Features extends ServiceBaseAction {
             }
         }
         setSessionAttribute(SESSION_FEATURES_DEPENDENT_MOD_IDS, dependentModuleIds);
+        if (isDebugEnabled) {
+    		S_LOGGER.debug("Features.saveDependentFeatures : Entry");
+    	}
+        
+        return null;
     }
     
-    public String save() throws PhrescoException, IOException {
+    public String save() {
+    	if (isDebugEnabled) {
+    		S_LOGGER.debug("Features.save : Entry");
+    	}
+    	
         try {
+        	if (isDebugEnabled) {
+        		if (StringUtils.isEmpty(getCustomerId())) {
+    				S_LOGGER.warn("Features.save", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+    				return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_FEATURE_SAVE));
+    			}
+        		if (StringUtils.isEmpty(getType())) {
+        			S_LOGGER.warn("Features.save", "status=\"Bad Request\"", "message=\"Feature type is empty\"");
+        			return showErrorPopup(new PhrescoException("Feature type is empty"), getText(EXCEPTION_FEATURE_SAVE));
+        		}
+    			S_LOGGER.info("Features.save", "customerId=" + "\"" + getCustomerId() + "\"", "type=" + "\"" + Type.valueOf(getType()).name() + "\"");
+        	}
             ArtifactGroup moduleGroup = createModuleGroup(Type.valueOf(getType()));
             
             /*if(featureByteArray != null){
@@ -246,18 +348,49 @@ public class Features extends ServiceBaseAction {
             setTechnologiesInRequest();
             addActionMessage(getText(FEATURE_ADDED, Collections.singletonList(getName())));
         } catch (PhrescoException e) {
+        	if (isDebugEnabled) {
+		        S_LOGGER.error("Features.save", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
             return showErrorPopup(e, getText(EXCEPTION_FEATURE_SAVE));
-        }
+        } catch (IOException e) {
+        	if (isDebugEnabled) {
+		        S_LOGGER.error("Features.save", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
+            return showErrorPopup(new PhrescoException(e), getText(EXCEPTION_FEATURE_SAVE));
+		}
+        if (isDebugEnabled) {
+    		S_LOGGER.debug("Features.save : Exit");
+    	}
         
         return listFeatures();
     }
 	
 	public String edit() {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method  Features.edit()");
+			S_LOGGER.debug("Features.edit : Entry");
 		}
 		
 		try {
+			if (isDebugEnabled) {
+				if (StringUtils.isEmpty(getCustomerId())) {
+    				S_LOGGER.warn("Features.edit", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+    				return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_FEATURE_SAVE));
+    			}
+        		if (StringUtils.isEmpty(getType())) {
+        			S_LOGGER.warn("Features.edit", "status=\"Bad Request\"", "message=\"Feature type is empty\"");
+        			return showErrorPopup(new PhrescoException("Feature type is empty"), getText(EXCEPTION_FEATURE_SAVE));
+        		}
+        		if (StringUtils.isEmpty(getModuleGroupId())) {
+        			S_LOGGER.warn("Features.edit", "status=\"Bad Request\"", "message=\"Module Group Id is empty\"");
+        			return showErrorPopup(new PhrescoException("Module Group is empty"), getText(EXCEPTION_FEATURE_SAVE));
+        		}
+        		if (StringUtils.isEmpty(getTechnology())) {
+        			S_LOGGER.warn("Features.edit", "status=\"Bad Request\"", "message=\"Technology Id is empty\"");
+        			return showErrorPopup(new PhrescoException("Technology Id is empty"), getText(EXCEPTION_FEATURE_SAVE));
+        		}
+    			S_LOGGER.info("Features.edit", "customerId=" + "\"" + getCustomerId() + "\"", "type=" + "\"" + Type.valueOf(getType()).name() + "\"", 
+    					"technology=" + "\"" + getTechnology() + "\"", "moduleGroupIdId=" + "\"" + getModuleGroupId() + "\"");
+        	}
 		    setTechnologiesInRequest();
 		    versionFile = getVersioning();
 		    ArtifactGroup moduleGroup = getServiceManager().getFeature(getModuleGroupId(), getCustomerId(), technology, Type.valueOf(getType()).name());
@@ -270,18 +403,40 @@ public class Features extends ServiceBaseAction {
 	        setReqAttribute(REQ_FEATURES_LICENSE, getLicences());
 	        setReqAttribute(REQ_VERSIONING, getVersioning());
 		} catch (PhrescoException e) {
+			if (isDebugEnabled) {
+		        S_LOGGER.error("Features.edit", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
 			showErrorPopup(e, getText(EXCEPTION_FEATURE_EDIT));
 		}
-
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Features.edit : Entry");
+		}
+		
 		return COMP_FEATURES_ADD;
 	}
 	
     public String update() throws PhrescoException, IOException {
-        if (isDebugEnabled) {
-            S_LOGGER.debug("Entering Method Features.update()");
-        }
+    	if (isDebugEnabled) {
+			S_LOGGER.debug("Features.update : Entry");
+		}
         
         try {
+        	if (isDebugEnabled) {
+				if (StringUtils.isEmpty(getCustomerId())) {
+    				S_LOGGER.warn("Features.update", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+    				return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_FEATURE_UPDATE));
+    			}
+        		if (StringUtils.isEmpty(getType())) {
+        			S_LOGGER.warn("Features.update", "status=\"Bad Request\"", "message=\"Feature type is empty\"");
+        			return showErrorPopup(new PhrescoException("Feature type is empty"), getText(EXCEPTION_FEATURE_UPDATE));
+        		}
+        		if (StringUtils.isEmpty(getModuleGroupId())) {
+        			S_LOGGER.warn("Features.update", "status=\"Bad Request\"", "message=\"Module Group Id is empty\"");
+        			return showErrorPopup(new PhrescoException("Module Group is empty"), getText(EXCEPTION_FEATURE_UPDATE));
+        		}
+        		S_LOGGER.info("Features.update", "customerId=" + "\"" + getCustomerId() + "\"", "type=" + "\"" + Type.valueOf(getType()).name() + "\"", 
+    					"technology=" + "\"" + getTechnology() + "\"", "moduleGroupIdId=" + "\"" + getModuleGroupId() + "\"");
+        	}
             ArtifactGroup moduleGroup = createModuleGroup(Type.valueOf(getType()));
             /*if(featureByteArray != null){
 				inputStreamMap.put(moduleGroup.getName(),  new ByteArrayInputStream(featureByteArray));
@@ -290,16 +445,22 @@ public class Features extends ServiceBaseAction {
             addActionMessage(getText(FEATURE_UPDATED, Collections.singletonList(getName())));
             setTechnologiesInRequest();
         } catch (PhrescoException e) {
-            showErrorPopup(e, getText(EXCEPTION_FEATURE_SAVE));
+        	if (isDebugEnabled) {
+		        S_LOGGER.error("Features.update", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
+            showErrorPopup(e, getText(EXCEPTION_FEATURE_UPDATE));
         }
+        if (isDebugEnabled) {
+			S_LOGGER.debug("Features.update : Exit");
+		}
         
         return listFeatures();
     }
 	
 	private ArtifactGroup createModuleGroup(Type type) throws PhrescoException {
-	    if (isDebugEnabled) {
-            S_LOGGER.debug("Entering Method  Features.createModuleGroup(Type type)");
-        }
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Features.createModuleGroup : Entry");
+		}
         
         try {
         	if(!DEFAULT_CUSTOMER_NAME.equalsIgnoreCase(getCustomerId()) && "edit".equalsIgnoreCase(fromPage)) {
@@ -373,26 +534,32 @@ public class Features extends ServiceBaseAction {
             artifactInfo.setDependencyIds((List<String>) getSessionAttribute(SESSION_FEATURES_DEPENDENT_MOD_IDS));
             
             artifactGroup.setVersions(Arrays.asList(artifactInfo));
-            
+            if (isDebugEnabled) {
+    			S_LOGGER.debug("Features.createModuleGroup : Exit");
+    		}
             return artifactGroup;
         } catch (Exception e) {
+        	if (isDebugEnabled) {
+		        S_LOGGER.error("Features.createModuleGroup", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
             throw new PhrescoException(e);
         }
     }
+	
     private List<CoreOption> getAppliesTo() {
     	List<CoreOption> appliesTo = new ArrayList<CoreOption>();
         CoreOption moduleCoreOption = null;
-        for (String multiTech : getMultiTechnology()){
+        for (String multiTech : getMultiTechnology()) {
         	moduleCoreOption = new CoreOption(multiTech, Boolean.parseBoolean(getModuleType()));
         	appliesTo.add(moduleCoreOption);
         }
         return appliesTo;
     }
     
-    public String delete() throws PhrescoException {
-        if (isDebugEnabled) {
-            S_LOGGER.debug("Entering Method  Features.deleteJSLibs()");
-        }
+    public String delete() {
+    	if (isDebugEnabled) {
+			S_LOGGER.debug("Features.delete : Entry");
+		}
         
         try {
             String[] moduleGroupIds = getReqParameterValues(REQ_FEATURES_MOD_GRP);
@@ -420,15 +587,21 @@ public class Features extends ServiceBaseAction {
             addActionMessage(getText(FEATURE_DELETED));
             setTechnologiesInRequest();
         } catch (PhrescoException e) {
+        	if (isDebugEnabled) {
+		        S_LOGGER.error("Features.delete", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
             showErrorPopup(e, getText(EXCEPTION_FEATURE_DELETE));
         }
+        if (isDebugEnabled) {
+			S_LOGGER.debug("Features.delete : Exit");
+		}
         
         return listFeatures();
     }
 	
 	public String uploadFile() throws PhrescoException {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method  Features.uploadFile()");
+			S_LOGGER.debug("Features.uploadFile : Entry");
 		}
 		
 		PrintWriter writer = null;
@@ -458,6 +631,13 @@ public class Features extends ServiceBaseAction {
 			//If upload fails it will be shown in UI, so need not to throw error popup
 			getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
             writer.print(SUCCESS_FALSE);
+            if (isDebugEnabled) {
+		        S_LOGGER.error("Features.uploadFile", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
+            showErrorPopup(new PhrescoException(e), getText(EXCEPTION_UPLOAD_FILE));
+		}
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Features.uploadFile : Exit");
 		}
 		
 		return SUCCESS;
@@ -508,7 +688,6 @@ public class Features extends ServiceBaseAction {
 	}
 
 	private void uploadFeature(PrintWriter writer, byte[] tempFeaByteArray) throws PhrescoException {
-		
 		try {
 			if (tempFeaByteArray == null) {
 				Features.newtempFeaByteArray = new byte[0];
@@ -532,10 +711,30 @@ public class Features extends ServiceBaseAction {
 
 	public String downloadFeature() {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method  Features.downloadFeature()");
+			S_LOGGER.debug("Features.downloadFeature : Entry");
 		}
 		
 		try {
+			if (isDebugEnabled) {
+				if (StringUtils.isEmpty(getCustomerId())) {
+    				S_LOGGER.warn("Features.downloadFeature", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+    				return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_FEATURE_SAVE));
+    			}
+        		if (StringUtils.isEmpty(getType())) {
+        			S_LOGGER.warn("Features.downloadFeature", "status=\"Bad Request\"", "message=\"Feature type is empty\"");
+        			return showErrorPopup(new PhrescoException("Feature type is empty"), getText(EXCEPTION_FEATURE_SAVE));
+        		}
+        		if (StringUtils.isEmpty(getModuleGroupId())) {
+        			S_LOGGER.warn("Features.downloadFeature", "status=\"Bad Request\"", "message=\"Module Group Id is empty\"");
+        			return showErrorPopup(new PhrescoException("Module Group is empty"), getText(EXCEPTION_FEATURE_SAVE));
+        		}
+        		if (StringUtils.isEmpty(getTechnology())) {
+        			S_LOGGER.warn("Features.downloadFeature", "status=\"Bad Request\"", "message=\"Technology Id is empty\"");
+        			return showErrorPopup(new PhrescoException("Technology Id is empty"), getText(EXCEPTION_FEATURE_SAVE));
+        		}
+    			S_LOGGER.info("Features.downloadFeature", "customerId=" + "\"" + getCustomerId() + "\"", "type=" + "\"" + Type.valueOf(getType()).name() + "\"", 
+    					"technology=" + "\"" + getTechnology() + "\"", "moduleGroupIdId=" + "\"" + getModuleGroupId() + "\"");
+        	}
 			setTechnologiesInRequest();
 			ArtifactGroup artiGroup = getServiceManager().getFeature(getModuleGroupId(), getCustomerId(), technology, Type.valueOf(getType()).name());						
 			featureUrl = artiGroup.getVersions().get(0).getDownloadURL();			
@@ -547,11 +746,23 @@ public class Features extends ServiceBaseAction {
 			contentType = url.openConnection().getContentType();
 			contentLength = url.openConnection().getContentLength();
 		} catch(PhrescoException e) {
-			return showErrorPopup(new PhrescoException(e), getText(DOWNLOAD_FAILED));
+			if (isDebugEnabled) {
+		        S_LOGGER.error("Features.downloadFeature", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
+			return showErrorPopup(e, getText(DOWNLOAD_FAILED));
 		} catch (MalformedURLException e) {
+			if (isDebugEnabled) {
+		        S_LOGGER.error("Features.downloadFeature", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
 			return showErrorPopup(new PhrescoException(e), getText(DOWNLOAD_FAILED));
 		} catch (IOException e) {
+			if (isDebugEnabled) {
+		        S_LOGGER.error("Features.downloadFeature", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
 			return showErrorPopup(new PhrescoException(e), getText(DOWNLOAD_FAILED));
+		}
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Features.downloadFeature : Exit");
 		}
 		
 		return SUCCESS;
@@ -559,20 +770,23 @@ public class Features extends ServiceBaseAction {
 	
 	public void removeUploadedFile() {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method  Features.removeUploadedFile()");
+			S_LOGGER.debug("Features.removeUploadedFile : Entry");
 		}
-		 if (REQ_FEATURES_UPLOADTYPE.equals(getFileType())) {
-			 featureByteArray = null;
-			 featureJarFileName = "";
-		 } else {
-			inputStreamMap.remove(Content.Type.ICON.name());
-		 }
 		
+		if (REQ_FEATURES_UPLOADTYPE.equals(getFileType())) {
+			featureByteArray = null;
+			featureJarFileName = "";
+		} else {
+			inputStreamMap.remove(Content.Type.ICON.name());
+		}
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Features.removeUploadedFile : Exit");
+		}
 	}
 
 	public String validateForm() throws PhrescoException {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method  Features.validateForm()");
+			S_LOGGER.debug("Features.validateForm : Entry");
 		}
 		
 		boolean isError = false;
@@ -606,6 +820,9 @@ public class Features extends ServiceBaseAction {
         if (isError) {
             setErrorFound(true);
         }
+        if (isDebugEnabled) {
+			S_LOGGER.debug("Features.validateForm : Exit");
+		}
         
         return SUCCESS;
 	}	

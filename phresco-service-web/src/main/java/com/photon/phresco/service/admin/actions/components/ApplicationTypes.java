@@ -22,19 +22,20 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 
 public class ApplicationTypes extends ServiceBaseAction { 
 
 	private static final long serialVersionUID = 6801037145464060759L;
 	
-	private static final Logger S_LOGGER = Logger.getLogger(ApplicationTypes.class);
+	private static final SplunkLogger S_LOGGER = SplunkLogger.getSplunkLogger(ApplicationTypes.class.getName());
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 
 	private String customerId = "";
@@ -52,7 +53,7 @@ public class ApplicationTypes extends ServiceBaseAction {
 
     public String list() {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entering Method ApplicationTypes.list()");
+	        S_LOGGER.debug("ApplicationTypes.list : Entry");
 	    }
 
 		try {
@@ -60,72 +61,134 @@ public class ApplicationTypes extends ServiceBaseAction {
 		    setReqAttribute(REQ_APP_TYPES, applicationTypes);
 		    setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		} catch (PhrescoException e) {
+			if (isDebugEnabled) {
+		        S_LOGGER.error("ApplicationTypes.list", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
 		    return showErrorPopup(e, getText(EXCEPTION_APPTYPES_LIST));
 		}
-
+		if (isDebugEnabled) {
+	        S_LOGGER.debug("ApplicationTypes.list : Exit");
+	    }
 		return COMP_APPTYPE_LIST;
 	}
 
 	public String add() {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entering Method ApplicationTypes.add()");
+	        S_LOGGER.debug("ApplicationTypes.add : Entry");
 	    }
 	    
 	    setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
+	    if (isDebugEnabled) {
+	        S_LOGGER.debug("ApplicationTypes.add : Exit");
+	    } 
 	    
 		return COMP_APPTYPE_ADD;
 	}
 
 	public String edit() {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entering Method ApplicationTypes.edit()");
+		if (isDebugEnabled) {
+	        S_LOGGER.debug("ApplicationTypes.edit : Entry");
 	    }
 		
 		try {
+			if (isDebugEnabled) {
+				if (StringUtils.isEmpty(getAppTypeId())) {
+					S_LOGGER.warn("ApplicationTypes.edit", "status=\"Bad Request\"", "message=\"Application type Id is empty\"");
+					return showErrorPopup(new PhrescoException("Application type Id is empty"), getText(EXCEPTION_APPTYPES_EDIT));
+				}
+				if (StringUtils.isEmpty(getCustomerId())) {
+					S_LOGGER.warn("ApplicationTypes.edit", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+					return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_APPTYPES_EDIT));
+				}
+				S_LOGGER.info("ApplicationTypes.edit", "customerId=" + "\"" + getCustomerId() + "\"", "appTypeId=" + "\"" + getAppTypeId() + "\"");
+			}
 		    ApplicationType appType = getServiceManager().getApplicationType(getAppTypeId(), getCustomerId());
 		    setReqAttribute(REQ_APP_TYPE, appType);
 		    setReqAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (PhrescoException e) {
+			if (isDebugEnabled) {
+		        S_LOGGER.error("ApplicationTypes.edit", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
 		    return showErrorPopup(e, getText(EXCEPTION_APPTYPES_EDIT));
 		}
+		if (isDebugEnabled) {
+	        S_LOGGER.debug("ApplicationTypes.edit : Exit");
+	    }
 		
 		return COMP_APPTYPE_ADD;
 	}
 
 	public String save() {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entering Method ApplicationTypes.save()");
+		if (isDebugEnabled) {
+	        S_LOGGER.debug("ApplicationTypes.save : Entry");
 	    }
 		
 		try {
 		    List<ApplicationType> appTypes = new ArrayList<ApplicationType>();
 			appTypes.add(createAppType());
+			if (isDebugEnabled) {
+				if (StringUtils.isEmpty(getCustomerId())) {
+					S_LOGGER.warn("ApplicationTypes.save", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+					return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_APPTYPES_SAVE));
+				}
+				if (CollectionUtils.isEmpty(appTypes)) {
+					S_LOGGER.warn("ApplicationTypes.save", "status=\"Bad Request\"", "message=\"Applcation Type is empty\"");
+					return showErrorPopup(new PhrescoException("Application type is empty"), getText(EXCEPTION_APPTYPES_SAVE));
+				}
+				S_LOGGER.info("ApplicationTypes.save", "customerId=" + "\"" + getCustomerId() + "\"");
+			}
 			getServiceManager().createApplicationTypes(appTypes, getCustomerId());
 			addActionMessage(getText(APPTYPES_ADDED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
+			if (isDebugEnabled) {
+		        S_LOGGER.error("ApplicationTypes.save", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
             return showErrorPopup(e, getText(EXCEPTION_APPTYPES_SAVE));
         }
+		if (isDebugEnabled) {
+	        S_LOGGER.debug("ApplicationTypes.save : Exit");
+	    }
 		
 		return list();
 	}
 
 	public String update() {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entering Method Apptypes.update()");
+	    	S_LOGGER.debug("ApplicationTypes.update : Entry");
 	    }
 
 		try {
+			if (isDebugEnabled) {
+				if (StringUtils.isEmpty(getAppTypeId())) {
+					S_LOGGER.warn("ApplicationTypes.update", "status=\"Bad Request\"", "message=\"Application type Id is empty\"");
+					return showErrorPopup(new PhrescoException("Application type Id is empty"), getText(EXCEPTION_APPTYPES_UPDATE));
+				}
+				if (StringUtils.isEmpty(getCustomerId())) {
+					S_LOGGER.warn("ApplicationTypes.update", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+					return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_APPTYPES_UPDATE));
+				}
+				S_LOGGER.info("ApplicationTypes.update", "customerId=" + "\"" + getCustomerId() + "\"");
+			}
 			ApplicationType appType = createAppType();
 			getServiceManager().updateApplicationType(appType, getAppTypeId(), getCustomerId());
 			addActionMessage(getText(APPTYPES_UPDATED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
+			if (isDebugEnabled) {
+		        S_LOGGER.error("ApplicationTypes.update", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
             return showErrorPopup(e, getText(EXCEPTION_APPTYPES_UPDATE));
         }
+		if (isDebugEnabled) {
+	    	S_LOGGER.debug("ApplicationTypes.update : Exit");
+	    }
 
 		return list();
 	}
 
     private ApplicationType createAppType() throws PhrescoException {
+    	if (isDebugEnabled) {
+	    	S_LOGGER.debug("ApplicationTypes.createAppType : Entry");
+	    }
         ApplicationType appType = new ApplicationType();
         if(StringUtils.isNotEmpty(getAppTypeId())) {
         	appType.setId(getAppTypeId());
@@ -133,34 +196,52 @@ public class ApplicationTypes extends ServiceBaseAction {
         appType.setName(getName());
         appType.setDescription(getDescription());
         appType.setCustomerIds(Arrays.asList(getCustomerId()));
+        if (isDebugEnabled) {
+	    	S_LOGGER.debug("ApplicationTypes.createAppType : Exit");
+	    }
         
         return appType;
     }
 
 	public String delete() throws PhrescoException {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entering Method AppType.delete()");
+		if (isDebugEnabled) {
+	    	S_LOGGER.debug("ApplicationTypes.delete : Entry");
 	    }
 
 		try {
 			String[] appTypeIds = getHttpRequest().getParameterValues(REQ_APP_TYPEID);
+			if (isDebugEnabled) {
+				if (ArrayUtils.isEmpty(appTypeIds)) {
+					S_LOGGER.warn("ApplicationTypes.delete", "status=\"Bad Request\"", "message=\"No Application Type Ids found to delete\"");
+					return showErrorPopup(new PhrescoException("No Applicaation Type Ids found to delete"), getText(EXCEPTION_APPTYPES_DELETE));
+				}
+			}
 			if (ArrayUtils.isNotEmpty(appTypeIds)) {
+				if (isDebugEnabled) {
+					S_LOGGER.info("ApplicationTypes.delete", "appTypeIds=" + "\"" + appTypeIds.toString() + "\"");
+				}
 				for (String appTypeid : appTypeIds) {
 					getServiceManager().deleteApplicationType(appTypeid, getCustomerId());
 				}
 				addActionMessage(getText(APPTYPES_DELETED));
 			}
 		} catch (PhrescoException e) {
+			if (isDebugEnabled) {
+		        S_LOGGER.error("ApplicationTypes.delete", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
 		    return showErrorPopup(e, getText(EXCEPTION_APPTYPES_DELETE));
 		}
+		if (isDebugEnabled) {
+	    	S_LOGGER.debug("ApplicationTypes.delete : Exit");
+	    }
 
 		return list();
 	}
 
 	public String validateForm() {
-	    if (isDebugEnabled) {
-            S_LOGGER.debug("Entering Method AppType.validateForm()");
-        }
+		if (isDebugEnabled) {
+	    	S_LOGGER.debug("ApplicationTypes.validateForm : Entry");
+	    }
 
 	    boolean isError = false;
 	    //Empty validation for name
@@ -172,6 +253,9 @@ public class ApplicationTypes extends ServiceBaseAction {
 		if (isError) {
             setErrorFound(true);
         }
+		if (isDebugEnabled) {
+	    	S_LOGGER.debug("ApplicationTypes.validateForm : Exit");
+	    }
 		
 		return SUCCESS;
 	}

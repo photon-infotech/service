@@ -37,7 +37,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
@@ -47,6 +46,7 @@ import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.commons.model.TechnologyGroup;
 import com.photon.phresco.commons.model.TechnologyOptions;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.client.api.ServiceManager;
 import com.photon.phresco.service.util.ServerUtil;
@@ -58,7 +58,7 @@ public class Archetypes extends ServiceBaseAction {
 
 	private static final long serialVersionUID = 6801037145464060759L;
 	
-	private static final Logger S_LOGGER = Logger.getLogger(Archetypes.class);
+	private static final SplunkLogger S_LOGGER = SplunkLogger.getSplunkLogger(Archetypes.class.getName());
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
 	/* plugin and archetype jar InputStream Map*/
@@ -122,16 +122,26 @@ public class Archetypes extends ServiceBaseAction {
 	
 	public String list() throws PhrescoException {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method Archetypes.list()");
-		}
+	        S_LOGGER.debug("Archetypes.list : Entry");
+	    }
 
 		try {
+			if (isDebugEnabled) {
+				if (StringUtils.isEmpty(getCustomerId())) {
+					S_LOGGER.warn("Archetypes.list", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+					return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_ARCHETYPE_LIST));
+				}
+				S_LOGGER.info("Archetypes.list", "customerId=" + "\"" + getCustomerId() + "\"");
+			}
 			List<Technology> technologies = getServiceManager().getArcheTypes(getCustomerId());
 			List<ApplicationType> appTypes = getServiceManager().getApplicationTypes();
 			setReqAttribute(REQ_APP_TYPES, appTypes);
 			setReqAttribute(REQ_ARCHE_TYPES, technologies);
 			setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		} catch (PhrescoException e) {
+			if (isDebugEnabled) {
+		        S_LOGGER.error("Archetypes.list", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
 			return showErrorPopup(e, getText(EXCEPTION_ARCHETYPE_LIST));
 		}
 		
@@ -140,13 +150,16 @@ public class Archetypes extends ServiceBaseAction {
 		pluginArtfactInfoMap.clear();
 		archetypeJarByteArray = null;
 		pluginInfos.clear();
+		if (isDebugEnabled) {
+	        S_LOGGER.debug("Archetypes.list : Exit");
+	    }
 
 		return COMP_ARCHETYPE_LIST;
 	}
 
 	public String add() throws PhrescoException {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entering Method Archetypes.add()");
+		if (isDebugEnabled) {
+	        S_LOGGER.debug("Archetypes.add : Entry");
 	    }
 
 		try {
@@ -161,20 +174,37 @@ public class Archetypes extends ServiceBaseAction {
 			setReqAttribute(REQ_ARCHE_TYPES, serviceManager.getTechnologyByCustomer(getCustomerId()));
 			setReqAttribute(REQ_FUNCTIONAL_FRAMEWORKS, serviceManager.getFunctionalTestFramework());
 		} catch (PhrescoException e) {
+			if (isDebugEnabled) {
+		        S_LOGGER.error("Archetypes.add", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
 		    return showErrorPopup(e, getText(EXCEPTION_ARCHETYPE_ADD));
 		}
+		if (isDebugEnabled) {
+	        S_LOGGER.debug("Archetypes.add : Exit");
+	    }
 
 		return COMP_ARCHETYPE_ADD;
 	}
 	
 	public String edit() throws PhrescoException {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method Archetypes.edit()");
-		}
+	        S_LOGGER.debug("Archetypes.edit : Entry");
+	    }
 
 		try {
 		    ServiceManager serviceManager = getServiceManager();
 		    versionFile = getVersioning();
+		    if (isDebugEnabled) {
+				if (StringUtils.isEmpty(getTechId())) {
+					S_LOGGER.warn("Archetypes.edit", "status=\"Bad Request\"", "message=\"Technology Id is empty\"");
+					return showErrorPopup(new PhrescoException("Technology Id is empty"), getText(EXCEPTION_ARCHETYPE_EDIT));
+				}
+				if (StringUtils.isEmpty(getCustomerId())) {
+					S_LOGGER.warn("Archetypes.list", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+					return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_ARCHETYPE_EDIT));
+				}
+				S_LOGGER.info("Archetypes.edit", "customerId=" + "\"" + getCustomerId() + "\"", "techId=" + "\"" + getTechId() + "\"");
+			}
 			Technology technology = serviceManager.getArcheType(getTechId(), getCustomerId());
 			List<FunctionalFramework> functionalFrameworks = technology.getFunctionalFrameworks();
 			if (CollectionUtils.isNotEmpty(functionalFrameworks)) {
@@ -196,18 +226,31 @@ public class Archetypes extends ServiceBaseAction {
             setReqAttribute(REQ_ARCHE_TYPES, getServiceManager().getTechnologyByCustomer(getCustomerId()));
             setReqAttribute(REQ_FUNCTIONAL_FRAMEWORKS, serviceManager.getFunctionalTestFramework());
 		} catch (PhrescoException e) {
+			if (isDebugEnabled) {
+		        S_LOGGER.error("Archetypes.edit", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
 		    return showErrorPopup(e, getText(EXCEPTION_ARCHETYPE_EDIT));
 		}
+		if (isDebugEnabled) {
+	        S_LOGGER.debug("Archetypes.edit : Exit");
+	    }
 
 		return COMP_ARCHETYPE_ADD;
 	}
 	
 	public String save() throws PhrescoException {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method Archetypes.save()");
-		}
+	        S_LOGGER.debug("Archetypes.save : Entry");
+	    }
 
 		try {
+			if (isDebugEnabled) {
+				if (StringUtils.isEmpty(getCustomerId())) {
+					S_LOGGER.warn("Archetypes.save", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+					return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_ARCHETYPE_SAVE));
+				}
+				S_LOGGER.info("Archetypes.save", "customerId=" + "\"" + getCustomerId() + "\"");
+			}
 			Technology technology = createTechnology();
 			//save application jar files
 			if(archetypeJarByteArray != null){
@@ -216,49 +259,82 @@ public class Archetypes extends ServiceBaseAction {
 			getServiceManager().createArcheTypes(technology, inputStreamMap, getCustomerId());
 			addActionMessage(getText(ARCHETYPE_ADDED, Collections.singletonList(name)));
 		} catch (PhrescoException e) {
+			if (isDebugEnabled) {
+		        S_LOGGER.error("Archetypes.save", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
 			return showErrorPopup(e, getText(EXCEPTION_ARCHETYPE_SAVE));
-		} 
+		}
+		if (isDebugEnabled) {
+	        S_LOGGER.debug("Archetypes.save : Exit");
+	    }
+		
 		return list();
 	}
 	
-	public void createPluginInfo() {
-		pluginInfos.clear();
-		String key = "";
-		if (MapUtils.isNotEmpty(inputStreamMap)) {
-			Iterator iter = inputStreamMap.keySet().iterator();
-			while (iter.hasNext()) {
-				key = (String) iter.next();
-				artifactId = getReqParameter(key + "_artifactId");
-				groupId = getReqParameter(key + "_groupId");
-				version = getReqParameter(key + "_version");
-				ArtifactGroup pluginInfo = new ArtifactGroup();
-				pluginInfo.setArtifactId(getArtifactId());
-				pluginInfo.setGroupId(getGroupId());
+	public String createPluginInfo() {
+		if (isDebugEnabled) {
+	        S_LOGGER.debug("Archetypes.createPluginInfo : Entry");
+	    }
+		try {
+			pluginInfos.clear();
+			String key = "";
+			if (MapUtils.isNotEmpty(inputStreamMap)) {
+				Iterator iter = inputStreamMap.keySet().iterator();
+				while (iter.hasNext()) {
+					key = (String) iter.next();
+					artifactId = getReqParameter(key + "_artifactId");
+					groupId = getReqParameter(key + "_groupId");
+					version = getReqParameter(key + "_version");
+					ArtifactGroup pluginInfo = new ArtifactGroup();
+					pluginInfo.setArtifactId(getArtifactId());
+					pluginInfo.setGroupId(getGroupId());
 
-				List<ArtifactInfo> artifactVersions = new ArrayList<ArtifactInfo>();
-				ArtifactInfo artifactVersion = new ArtifactInfo();
-				artifactVersion.setVersion(getVersion());
-				artifactVersions.add(artifactVersion);
-				pluginInfo.setVersions(artifactVersions);
-				List<String> customerIds = new ArrayList<String>();
-				customerIds.add(getCustomerId());
-				pluginInfo.setCustomerIds(customerIds);
-				pluginInfo.setName(key);
-				int pos = name.lastIndexOf('.');
-				String ext = key.substring(pos+1);
-				pluginInfo.setPackaging(ext);
-				//pluginInfos.add(pluginInfo);
-				pluginArtfactInfoMap.put(key, pluginInfo);
+					List<ArtifactInfo> artifactVersions = new ArrayList<ArtifactInfo>();
+					ArtifactInfo artifactVersion = new ArtifactInfo();
+					artifactVersion.setVersion(getVersion());
+					artifactVersions.add(artifactVersion);
+					pluginInfo.setVersions(artifactVersions);
+					List<String> customerIds = new ArrayList<String>();
+					customerIds.add(getCustomerId());
+					pluginInfo.setCustomerIds(customerIds);
+					pluginInfo.setName(key);
+					int pos = name.lastIndexOf('.');
+					String ext = key.substring(pos+1);
+					pluginInfo.setPackaging(ext);
+					//pluginInfos.add(pluginInfo);
+					pluginArtfactInfoMap.put(key, pluginInfo);
+				}
 			}
+		} catch (Exception e) {
+			if (isDebugEnabled) {
+		        S_LOGGER.error("Archetypes.createPluginInfo", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
+			return showErrorPopup(new PhrescoException(e), getText(EXCEPTION_ARCHETYPE_SAVE));
 		}
+		if (isDebugEnabled) {
+	        S_LOGGER.debug("Archetypes.createPluginInfo : Exit");
+	    }
+		
+		return null;
 	}
 
 	public String update() throws PhrescoException {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method Archetypes.update()");
-		}
+	        S_LOGGER.debug("Archetypes.update : Entry");
+	    }
 		
 		try {
+			if (isDebugEnabled) {
+				if (StringUtils.isEmpty(getCustomerId())) {
+					S_LOGGER.warn("Archetypes.update", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+					return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_ARCHETYPE_UPDATE));
+				}
+				if (StringUtils.isEmpty(getTechId())) {
+					S_LOGGER.warn("Archetypes.update", "status=\"Bad Request\"", "message=\"Technology Id is empty\"");
+					return showErrorPopup(new PhrescoException("Technology Id is empty"), getText(EXCEPTION_ARCHETYPE_UPDATE));
+				}
+				S_LOGGER.info("Archetypes.save", "customerId=" + "\"" + getCustomerId() + "\"", "techId=" + "\"" + getTechId() + "\"");
+			}
 			Technology technology = createTechnology();
 			//update application jar files
 			if (archetypeJarByteArray != null) {
@@ -267,8 +343,14 @@ public class Archetypes extends ServiceBaseAction {
 			getServiceManager().updateArcheType(technology, inputStreamMap, getCustomerId());
 			addActionMessage(getText(ARCHETYPE_UPDATED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
+			if (isDebugEnabled) {
+		        S_LOGGER.error("Archetypes.update", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
 			return showErrorPopup(e, getText(EXCEPTION_ARCHETYPE_UPDATE));
 		}
+		if (isDebugEnabled) {
+	        S_LOGGER.debug("Archetypes.update : Exit");
+	    }
 
 		return list();
 	}
@@ -277,79 +359,89 @@ public class Archetypes extends ServiceBaseAction {
      * @return
      * @throws PhrescoException
      */
-    private Technology createTechnology() throws PhrescoException {
-    	if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method Archetypes.getTechnology()");
+	private Technology createTechnology() throws PhrescoException {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Archetypes.createTechnology : Entry");
 		}
-    	ServiceManager serviceManager = getServiceManager();
-    	String artifactId = getArtifactId();
-    	String groupId = getGroupId();
-    	String version = getVersion();
-        Technology technology = new Technology();
-        if (StringUtils.isNotEmpty(getTechId())) {
-        	technology.setId(getTechId());
-        }
-        technology.setName(getName());
-        technology.setDescription(getDescription());
-        technology.setAppTypeId(getApptype());
-        technology.setTechGroupId(getTechGroup());
-        
-        //To set the applicable features
-        List<String> options = new ArrayList<String>();
-        for (String selectedOption : getApplicable()) {
-        	options.add(selectedOption);
-		}
-        technology.setOptions(options);
-       
-        List<FunctionalFramework> functionalFrameworks = new ArrayList<FunctionalFramework>();
-        List<FunctionalFramework> functionalTestFramework = serviceManager.getFunctionalTestFramework();
-        for (String funcFramework : getFunctionalFramework()) {
-        	for (FunctionalFramework functionalFramework : functionalTestFramework) {
-				if(functionalFramework.getName().equals(funcFramework)) {
-					FunctionalFramework e = new FunctionalFramework();
-		        	e.setId(functionalFramework.getId());
-		        	functionalFrameworks.add(e);
+		Technology technology = new Technology();
+		try {
+			ServiceManager serviceManager = getServiceManager();
+			String artifactId = getArtifactId();
+			String groupId = getGroupId();
+			String version = getVersion();
+			if (StringUtils.isNotEmpty(getTechId())) {
+				technology.setId(getTechId());
+			}
+			technology.setName(getName());
+			technology.setDescription(getDescription());
+			technology.setAppTypeId(getApptype());
+			technology.setTechGroupId(getTechGroup());
+
+			//To set the applicable features
+			List<String> options = new ArrayList<String>();
+			for (String selectedOption : getApplicable()) {
+				options.add(selectedOption);
+			}
+			technology.setOptions(options);
+
+			List<FunctionalFramework> functionalFrameworks = new ArrayList<FunctionalFramework>();
+			List<FunctionalFramework> functionalTestFramework = serviceManager.getFunctionalTestFramework();
+			for (String funcFramework : getFunctionalFramework()) {
+				for (FunctionalFramework functionalFramework : functionalTestFramework) {
+					if(functionalFramework.getName().equals(funcFramework)) {
+						FunctionalFramework e = new FunctionalFramework();
+						e.setId(functionalFramework.getId());
+						functionalFrameworks.add(e);
+					}
 				}
 			}
+			technology.setFunctionalFrameworks(functionalFrameworks);
+
+			//To create the ArtifactGroup with groupId, artifactId and version for archetype jar
+			if ((StringUtils.isEmpty(artifactId) && StringUtils.isEmpty(groupId) && StringUtils.isEmpty(version))) {
+				artifactId = getArchArchetypeId();
+				groupId = getArchGroupId();
+				version = getArchVersions();
+			}
+			if (StringUtils.isNotEmpty(artifactId) && StringUtils.isNotEmpty(groupId) && StringUtils.isNotEmpty(version)) {
+				ArtifactGroup archetypeArtfGroup = getArtifactGroupInfo(getName(), artifactId, groupId, REQ_JAR_FILE, version, getCustomerId());
+				technology.setArchetypeInfo(archetypeArtfGroup);
+			} else {
+				throw new PhrescoException(getText(EXCEPTION_ARTIFACTINFO_MISSING));
+			}
+			technology.setCustomerIds(Arrays.asList(getCustomerId()));
+
+			String[] techVersions = getTechVersion().split(",");
+			List<String> listTechVersion = Arrays.asList(techVersions);
+			technology.setTechVersions(listTechVersion);
+			technology.setReports(getApplicableReports());
+			Set<String> keySet = pluginArtfactInfoMap.keySet();
+			for (String key : keySet) {
+				ArtifactGroup artifactGroup = pluginArtfactInfoMap.get(key);
+				pluginInfos.add(artifactGroup);
+			}
+			technology.setPlugins(pluginInfos);
+			technology.setArchetypeFeatures(getApplicableAtchetypeFeatures());
+		} catch (PhrescoException e) {
+			if (isDebugEnabled) {
+		        S_LOGGER.error("Archetypes.createTechnology", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
+			throw e;
 		}
-		technology.setFunctionalFrameworks(functionalFrameworks);
-        
-        //To create the ArtifactGroup with groupId, artifactId and version for archetype jar
-        if ((StringUtils.isEmpty(artifactId) && StringUtils.isEmpty(groupId) && StringUtils.isEmpty(version))) {
-        	artifactId = getArchArchetypeId();
-        	groupId = getArchGroupId();
-        	version = getArchVersions();
-        }
-        if (StringUtils.isNotEmpty(artifactId) && StringUtils.isNotEmpty(groupId) && StringUtils.isNotEmpty(version)) {
-	        ArtifactGroup archetypeArtfGroup = getArtifactGroupInfo(getName(), artifactId, groupId, REQ_JAR_FILE, version, getCustomerId());
-	        technology.setArchetypeInfo(archetypeArtfGroup);
-        } else {
-        	throw new PhrescoException(getText(EXCEPTION_ARTIFACTINFO_MISSING));
-        }
-        technology.setCustomerIds(Arrays.asList(getCustomerId()));
-        
-        String[] techVersions = getTechVersion().split(",");
-        List<String> listTechVersion = Arrays.asList(techVersions);
-        technology.setTechVersions(listTechVersion);
-        technology.setReports(getApplicableReports());
-        Set<String> keySet = pluginArtfactInfoMap.keySet();
-        for (String key : keySet) {
-        	ArtifactGroup artifactGroup = pluginArtfactInfoMap.get(key);
-        	pluginInfos.add(artifactGroup);
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Archetypes.createTechnology : Exit");
 		}
-        technology.setPlugins(pluginInfos);
-        technology.setArchetypeFeatures(getApplicableAtchetypeFeatures());
-        
-        return technology;
-    }
+		
+		return technology;
+	}
 
     /**
 	 * @param artifactGroupInfo 
 	 * @return
 	 */
-	public void createPluginInfos(ArtifactGroup artifactGroupInfo, String jarName) {
+	/*public void createPluginInfos(ArtifactGroup artifactGroupInfo, String jarName) {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method Archetypes.createPluginInfos(ArtifactGroup artifactGroupInfo, String jarName)");
+			S_LOGGER.debug("Archetypes.createTechnology : Entry");
 		}
 		
 		if (inputStreamMap != null) {
@@ -361,16 +453,25 @@ public class Archetypes extends ServiceBaseAction {
 		    pluginInfo.setCustomerIds(Arrays.asList(getCustomerId()));
 		    pluginArtfactInfoMap.put(jarName, pluginInfo);
 		}
-	}
+	}*/
 
 	public String delete() throws PhrescoException {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method Archetypes.delete()");
+			S_LOGGER.debug("Archetypes.delete : Entry");
 		}
 
 		try {
 			String[] techTypeIds = getReqParameterValues(REQ_ARCHE_TECHID);
+			if (isDebugEnabled) {
+				if (ArrayUtils.isEmpty(techTypeIds)) {
+					S_LOGGER.warn("Archetypes.delete", "status=\"Bad Request\"", "message=\"No Archetype Ids found to delete\"");
+					return showErrorPopup(new PhrescoException("No Applicaation Type Ids found to delete"), getText(EXCEPTION_ARCHETYPE_DELETE));
+				}
+			}
 			if (ArrayUtils.isNotEmpty(techTypeIds)) {
+				if (isDebugEnabled) {
+					S_LOGGER.info("Archetypes.delete", "techTypeIds=" + "\"" + techTypeIds.toString() + "\"");
+				}
                 ServiceManager serviceManager = getServiceManager();
 				for (String techid : techTypeIds) {
                     serviceManager.deleteArcheType(techid, getCustomerId());
@@ -378,7 +479,13 @@ public class Archetypes extends ServiceBaseAction {
 				addActionMessage(getText(ARCHETYPE_DELETED));
 			}
 		} catch (PhrescoException e) {
+			if (isDebugEnabled) {
+		        S_LOGGER.error("Archetypes.delete", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
 		    return showErrorPopup(e, getText(EXCEPTION_ARCHETYPE_DELETE));
+		}
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Archetypes.delete : Exit");
 		}
 
 		return list();
@@ -386,7 +493,7 @@ public class Archetypes extends ServiceBaseAction {
 	
 	public String uploadJar() throws PhrescoException {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method Archetypes.uploadAppJar()");
+			S_LOGGER.debug("Archetypes.uploadJar : Entry");
 		}
 		
 		PrintWriter writer = null;
@@ -404,6 +511,12 @@ public class Archetypes extends ServiceBaseAction {
 		} catch (Exception e) { //If upload fails it will be shown in UI, so need not to throw error popup
 			getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
             writer.print(SUCCESS_FALSE);
+            if (isDebugEnabled) {
+		        S_LOGGER.error("Archetypes.uploadJar", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
+		}
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Archetypes.uploadJar : Exit");
 		}
 		
 		return SUCCESS;
@@ -417,6 +530,9 @@ public class Archetypes extends ServiceBaseAction {
 	 * @throws IOException
 	 */
 	private void uploadPluginJar(PrintWriter writer, byte[] tempApplnByteArray) throws PhrescoException {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Archetypes.uploadPluginJar : Entry");
+		}
 		try {
 			String pluginJarName = getFileName();
 			byte[] byteArray = tempApplnByteArray;
@@ -428,6 +544,9 @@ public class Archetypes extends ServiceBaseAction {
 		} catch (PhrescoException e) {
 			throw new PhrescoException(e);
 		}
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Archetypes.uploadPluginJar : Exit");
+		}
 	}
 
 	/**
@@ -438,6 +557,9 @@ public class Archetypes extends ServiceBaseAction {
 	 * @throws IOException
 	 */
 	private void uploadArchetypeJar(PrintWriter writer, byte[] tempApplnByteArray) throws PhrescoException {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Archetypes.uploadArchetypeJar : Entry");
+		}
 		if (tempApplnByteArray == null) {
 			this.newtempApplnByteArray = new byte[0];
 		} else {
@@ -451,11 +573,14 @@ public class Archetypes extends ServiceBaseAction {
 			archetypeJarByteArray = null;
 			writer.print(INVALID_ARCHETYPE_JAR);
 		}
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Archetypes.uploadArchetypeJar : Exit");
+		}
 	}
 	
 	public String downloadArchetype() throws PhrescoException {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method  Archetypes.downloadArchetype()");
+			S_LOGGER.debug("Archetypes.downloadArchetype : Entry");
 		}
 
 		try {
@@ -470,7 +595,13 @@ public class Archetypes extends ServiceBaseAction {
 			contentType = url.openConnection().getContentType();
 			contentLength = url.openConnection().getContentLength();
 		} catch (Exception e) {
+			if (isDebugEnabled) {
+				S_LOGGER.error("Archetypes.downloadArchetype", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
 			return showErrorPopup(new PhrescoException(e), getText(DOWNLOAD_FAILED));
+		}
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Archetypes.downloadArchetype : Exit");
 		}
 
 		return SUCCESS;
@@ -478,18 +609,21 @@ public class Archetypes extends ServiceBaseAction {
 
 	public String showPluginJarPopup() {
 		if (isDebugEnabled) {
-	        S_LOGGER.debug("Entering Method Archetypes.showPluginJarPopup()");
-	    }
+			S_LOGGER.debug("Archetypes.showPluginJarPopup : Entry");
+		}
 		setReqAttribute(REQ_PLUGIN_INFO, pluginArtfactInfoMap);
 		setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Archetypes.showPluginJarPopup : Exit");
+		}
 		
 		return uploadPlugin;
 	}
 	
 	public void removeUploadedJar() {
 		if (isDebugEnabled) {
-	        S_LOGGER.debug("Entering Method Archetypes.removeUploadedJar()");
-	    }
+			S_LOGGER.debug("Archetypes.removeUploadedJar : Entry");
+		}
 		
 		String type = getReqParameter(REQ_JAR_TYPE);
 		if (REQ_PLUGIN_JAR.equals(type)) {
@@ -499,11 +633,14 @@ public class Archetypes extends ServiceBaseAction {
 		} else {
 			archetypeJarByteArray = null;
 		}
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Archetypes.removeUploadedJar : Exit");
+		}
 	}
 	
 	public String validateForm() throws PhrescoException {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method Archetypes.validateForm()");
+			S_LOGGER.debug("Archetypes.validateForm : Entry");
 		}
 		
 		boolean isError = false;
@@ -523,15 +660,24 @@ public class Archetypes extends ServiceBaseAction {
 		if (isError) {
             setErrorFound(true);
         }
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Archetypes.validateForm : Exit");
+		}
 		
 		return SUCCESS;
 	}
 	
 	public String getTechnologyGroup() throws PhrescoException {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method Archetypes.getTechnologyGroup()");
+			S_LOGGER.debug("Archetypes.getTechnologyGroup : Entry");
 		}
-
+		
+		if (isDebugEnabled) {
+			if (StringUtils.isEmpty(getApptype())) {
+				S_LOGGER.warn("Archetypes.getTechnologyGroup", "status=\"Bad Request\"", "message=\"Application type is empty\"");
+				return showErrorPopup(new PhrescoException("Application type is empty"), getText(EXCEPTION_APPTYPES_TECH_GROUP));
+			}
+		}
 		List<ApplicationType> appTypes = getServiceManager().getApplicationTypes();
 		for (ApplicationType appType : appTypes) {
 			if (appType.getId().equals(getApptype())) {
@@ -539,24 +685,30 @@ public class Archetypes extends ServiceBaseAction {
 				return SUCCESS;
 			}
 		}
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Archetypes.getTechnologyGroup : Exit");
+		}
 
 		return SUCCESS;
 	}
 	
 	public String showTechGroupPopup() throws PhrescoException {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method Archetypes.openTechGroup()");
+			S_LOGGER.debug("Archetypes.showTechGroupPopup : Entry");
 		}
 		
 		List<ApplicationType> appTypes = getServiceManager().getApplicationTypes();
 		setReqAttribute(REQ_APP_TYPES, appTypes);
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Archetypes.showTechGroupPopup : Exit");
+		}
 		
 		return REQ_TECH_GROUP;
 	}
 	
 	public String createTechGroup() throws PhrescoException {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method Archetypes.createTechGroup()");
+			S_LOGGER.debug("Archetypes.createTechGroup : Entry");
 		}
 		
 		try {
@@ -568,8 +720,14 @@ public class Archetypes extends ServiceBaseAction {
 			}
 			getServiceManager().createTechnologyGroups(technologyGroups, getCustomerId());
 			addActionMessage(getText(TECH_GROUP_UPDATED));
-		} catch (Exception e) {			
-			throw new PhrescoException(e);
+		} catch (Exception e) {
+			if (isDebugEnabled) {
+				S_LOGGER.error("Archetypes.createTechGroup", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
+			return showErrorPopup(new PhrescoException(e), getText(EXCEPTION_APPTYPES_TECH_GROUP_CREATE));
+		}
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Archetypes.createTechGroup : Exit");
 		}
 
 		return list();
@@ -577,13 +735,19 @@ public class Archetypes extends ServiceBaseAction {
 	
 	public String deleteTechnologyGroup() throws PhrescoException {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method Archetypes.deleteTechGroup()");
-		} 
-		if(StringUtils.isNotEmpty(getRemoveTechGroup())) {		
-			getServiceManager().deleteTechnologyGroups(getRemoveTechGroup(), getCustomerId());			
+			S_LOGGER.debug("Archetypes.deleteTechnologyGroup : Entry");
 		}
-		
-		
+		if (isDebugEnabled) {
+			if (StringUtils.isEmpty(getRemoveTechGroup())) {
+				S_LOGGER.warn("Archetypes.deleteTechnologyGroup", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+				return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_ARCHETYPE_UPDATE));
+			}
+			S_LOGGER.info("Archetypes.createTechGroup", "customerId=" + "\"" + getCustomerId() + "\"");
+		}
+		getServiceManager().deleteTechnologyGroups(getRemoveTechGroup(), getCustomerId());			
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Archetypes.deleteTechnologyGroup : Exit");
+		}
 		
 		return TECHGROUP_LIST;
 	}
