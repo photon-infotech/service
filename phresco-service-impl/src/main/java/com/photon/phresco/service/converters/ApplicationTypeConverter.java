@@ -25,15 +25,22 @@ import org.springframework.data.document.mongodb.MongoOperations;
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.TechnologyGroup;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.dao.ApplicationTypeDAO;
 import com.photon.phresco.util.ServiceConstants;
 
 public class ApplicationTypeConverter implements Converter<ApplicationTypeDAO, ApplicationType>, ServiceConstants {
 
+	private static final SplunkLogger LOGGER = SplunkLogger.getSplunkLogger(ApplicationTypeConverter.class.getName());
+	private static Boolean isDebugEnabled = LOGGER.isDebugEnabled();
+	
 	@Override
 	public ApplicationType convertDAOToObject(ApplicationTypeDAO applicationTypeDAO,
 			MongoOperations mongoOperation) throws PhrescoException {
+		if (isDebugEnabled) {
+			LOGGER.debug("ApplicationTypeConverter.convertDAOToObject:Entry");
+		}
 		ApplicationType applicationType = new ApplicationType();
 		applicationType.setId(applicationTypeDAO.getId());
 		applicationType.setName(applicationTypeDAO.getName());
@@ -45,12 +52,18 @@ public class ApplicationTypeConverter implements Converter<ApplicationTypeDAO, A
 //			applicationType.setTechGroups(techGroups);
 //		}
 		applicationType.setCustomerIds(applicationTypeDAO.getCustomerIds());
+		if (isDebugEnabled) {
+			LOGGER.debug("ApplicationTypeConverter.convertDAOToObject:Exit");
+		}
 		return applicationType;
 	}
 
 	@Override
 	public ApplicationTypeDAO convertObjectToDAO(ApplicationType applicationType)
 			throws PhrescoException {
+		if (isDebugEnabled) {
+			LOGGER.debug("ApplicationTypeConverter.convertObjectToDAO:Entry");
+		}
 		ApplicationTypeDAO applicationTypeDAO = new ApplicationTypeDAO();
 		applicationTypeDAO.setId(applicationType.getId());
 		applicationTypeDAO.setName(applicationType.getName());
@@ -63,6 +76,9 @@ public class ApplicationTypeConverter implements Converter<ApplicationTypeDAO, A
 		applicationTypeDAO.setSystem(applicationType.isSystem());
 		applicationTypeDAO.setCustomerIds(applicationType.getCustomerIds());
 		applicationTypeDAO.setDescription(applicationType.getDescription());
+		if (isDebugEnabled) {
+			LOGGER.debug("ApplicationTypeConverter.convertObjectToDAO:Exit");
+		}
 		return applicationTypeDAO;
 	}
 

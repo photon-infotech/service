@@ -21,14 +21,21 @@ import org.springframework.data.document.mongodb.MongoOperations;
 
 import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.dao.CustomerDAO;
 
 public class FrameworkCustomerConverter implements Converter<CustomerDAO, Customer> {
 
+	private static final SplunkLogger LOGGER = SplunkLogger.getSplunkLogger(FrameworkCustomerConverter.class.getName());
+	private static Boolean isDebugEnabled = LOGGER.isDebugEnabled();
+	
 	@Override
 	public Customer convertDAOToObject(CustomerDAO dao,
 			MongoOperations mongoOperation) throws PhrescoException {
+		if (isDebugEnabled) {
+			LOGGER.debug("FrameworkCustomerConverter.convertDAOToObject:Entry");
+		}
 		Customer customer = new Customer();
 		customer.setDescription(dao.getDescription());
 		customer.setId(dao.getId());
@@ -37,12 +44,18 @@ public class FrameworkCustomerConverter implements Converter<CustomerDAO, Custom
 		customer.setFrameworkTheme(dao.getFrameworkTheme());
 		customer.setOptions(dao.getOptions());
 		customer.setContext(dao.getContext());
+		if (isDebugEnabled) {
+			LOGGER.debug("FrameworkCustomerConverter.convertDAOToObject:Exit");
+		}
 		return customer;
 	}
 
 	@Override
 	public CustomerDAO convertObjectToDAO(Customer customer)
 			throws PhrescoException {
+		if (isDebugEnabled) {
+			LOGGER.debug("FrameworkCustomerConverter.convertObjectToDAO:Entry");
+		}
 		CustomerDAO customerDAO = new CustomerDAO();
 		customerDAO.setDescription(customer.getDescription());
 		customerDAO.setId(customer.getId());
@@ -50,6 +63,9 @@ public class FrameworkCustomerConverter implements Converter<CustomerDAO, Custom
 		customerDAO.setType(customer.getType());
 		customerDAO.setFrameworkTheme(customer.getFrameworkTheme());
 		customerDAO.setOptions(customer.getOptions());
+		if (isDebugEnabled) {
+			LOGGER.debug("FrameworkCustomerConverter.convertObjectToDAO:Exit");
+		}
 		return customerDAO;
 	}
 

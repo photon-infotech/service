@@ -42,6 +42,7 @@ import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.DownloadInfo;
 //import com.photon.phresco.commons.model.Element;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.DependencyManager;
 import com.photon.phresco.service.api.PhrescoServerFactory;
@@ -57,6 +58,8 @@ public class DependencyManagerImpl implements DependencyManager {
 	private static Map<String, String> artifactTypeMap = new HashMap<String, String>();
 	private static Map<String, String> testPomFiles = new HashMap<String, String>();
 	private String artifactType = null;
+	private static final SplunkLogger LOGGER = SplunkLogger.getSplunkLogger(DependencyManagerImpl.class.getName());
+	private static Boolean isDebugEnabled = LOGGER.isDebugEnabled();
 	
 	static {
 		artifactTypeMap.put("FEATURE", "${feature.directory}");
@@ -79,10 +82,18 @@ public class DependencyManagerImpl implements DependencyManager {
 	
 	@Override
 	public void configureProject(ApplicationInfo applicationInfo, File projectPath) throws PhrescoException {
+		if(isDebugEnabled) {
+			LOGGER.debug("DependencyManagerImpl.configureProject:Entry");
+			if(applicationInfo == null) {
+				LOGGER.warn("DependencyManagerImpl.configureProject","status=\"Bad Request\"", "message=\"applicationInfo is empty\"");
+				throw new PhrescoException("applicationInfo is empty");
+			}
+			LOGGER.info("DependencyManagerImpl.configureProject", "projectPath=\"" + projectPath.getPath() + "\"");
+		}
 		String customerId = null;
 		customerId = applicationInfo.getCustomerIds().get(0);
-		
 		if(StringUtils.isEmpty(customerId)) {
+			LOGGER.warn("DependencyManagerImpl.configureProject","status=\"Bad Request\"", "message=\"customerId is empty\"");
 			throw new PhrescoException("CustomerId Should Not Be Null");
 		}
 		
@@ -113,6 +124,9 @@ public class DependencyManagerImpl implements DependencyManager {
 		}
 		
 		updateTestPom(projectPath);
+		if(isDebugEnabled) {
+			LOGGER.debug("DependencyManagerImpl.configureProject:Exit");
+		}
 	}
 	
 	public void setDbManager(DbManager dbManager) {
@@ -124,8 +138,15 @@ public class DependencyManagerImpl implements DependencyManager {
 	}
 
 	private void updatePOMWithArtifacts(File path, List<ArtifactGroup> modules, String type) throws PhrescoException {
+		if(isDebugEnabled) {
+			LOGGER.debug("DependencyManagerImpl.updatePOMWithArtifacts:Entry");
+			LOGGER.info("DependencyManagerImpl.updatePOMWithArtifacts", "path=\""+ path.getPath() +"\"", "type=\""+ type +"\"");
+		}
 		this.artifactType = type;
 		if(CollectionUtils.isEmpty(modules)) {
+			if(isDebugEnabled) {
+				LOGGER.warn("DependencyManagerImpl.configureProject","status=\"Bad Request\"", "message=\"Modules is empty\"");
+			}
 			return;
 		}
 		
@@ -144,14 +165,27 @@ public class DependencyManagerImpl implements DependencyManager {
 				processor.save();
 			}
 			updatePOMWithPluginArtifact(path, modules);
+			if(isDebugEnabled) {
+				LOGGER.debug("DependencyManagerImpl.updatePOMWithArtifacts:Exit");
+			}
 		} catch (PhrescoPomException e) {
+			if(isDebugEnabled) {
+				LOGGER.error("DependencyManagerImpl.updatePOMWithArtifacts", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
 			throw new PhrescoException(e);
 		}
 	}
 	
 	private void updatePOMWithPluginArtifact(File path, List<ArtifactGroup> modules) throws PhrescoException {
+		if(isDebugEnabled) {
+			LOGGER.debug("DependencyManagerImpl.updatePOMWithPluginArtifact:Entry");
+			LOGGER.info("DependencyManagerImpl.updatePOMWithPluginArtifact", "path=\""+ path.getPath() +"\"");
+		}
 		try {
 			if(CollectionUtils.isEmpty(modules)) {
+				if(isDebugEnabled) {
+					LOGGER.warn("DependencyManagerImpl.updatePOMWithPluginArtifact","status=\"Bad Request\"", "message=\"Modules is empty\"");
+				}
 				return;
 			}
 			
@@ -174,15 +208,25 @@ public class DependencyManagerImpl implements DependencyManager {
 				}
 				processor.save();
 			}
+			if(isDebugEnabled) {
+				LOGGER.debug("DependencyManagerImpl.updatePOMWithPluginArtifact:Exit");
+			}
 		} catch (PhrescoPomException e) {
+			LOGGER.error("DependencyManagerImpl.updatePOMWithPluginArtifact", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
 			throw new PhrescoException(e);
 		} catch (ParserConfigurationException e) {
+			LOGGER.error("DependencyManagerImpl.updatePOMWithPluginArtifact", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
 			throw new PhrescoException(e);
 		}
 	}
 
 	private List<Element> configList(File pomFile, String moduleGroupId, String moduleArtifactId, 
 			String moduleVersion, Document doc) throws PhrescoException {
+		if(isDebugEnabled) {
+			LOGGER.debug("DependencyManagerImpl.configList:Entry");
+			LOGGER.info("DependencyManagerImpl.configList", "path=\""+ pomFile.getPath() +"\"", "moduleGroupId=\""+ moduleGroupId +"\"",
+					"moduleArtifactId=\""+ moduleArtifactId +"\"", "moduleVersion=\""+ moduleVersion +"\"");
+		}
 		List<Element> configList = new ArrayList<Element>();
 		Element groupId = doc.createElement("groupId");
 		groupId.setTextContent(moduleGroupId);
@@ -202,22 +246,39 @@ public class DependencyManagerImpl implements DependencyManager {
 		configList.add(eleType);
 		configList.add(overWrite);
 		configList.add(outputDirectory);
+		if(isDebugEnabled) {
+			LOGGER.debug("DependencyManagerImpl.configList:Exit");
+		}
 		return configList;
 	}
 	
 	private void extractPilots(ApplicationInfo projectInfo, File projectPath, String customerId) throws PhrescoException {
+		if(isDebugEnabled) {
+			LOGGER.debug("DependencyManagerImpl.extractPilots:Entry");
+			LOGGER.info("DependencyManagerImpl.extractPilots","projectPath=\""+ projectPath +"\"", "customerId=\""+ customerId +"\"");
+		}
 		ArtifactGroup pilotContent = projectInfo.getPilotContent();
         String contentURL = ServerUtil.createContentURL(pilotContent.getGroupId(), pilotContent.getArtifactId(),
         		pilotContent.getVersions().get(0).getVersion(), pilotContent.getPackaging());
         if(contentURL != null) {
             DependencyUtils.extractFiles(contentURL, projectPath, customerId);
         }
+        if(isDebugEnabled) {
+        	LOGGER.debug("DependencyManagerImpl.extractPilots:Exit");
+        }
 	}
 	
 	private static void updateTestPom(File path) throws PhrescoException {
+		if(isDebugEnabled) {
+			LOGGER.debug("DependencyManagerImpl.updateTestPom:Entry");
+			LOGGER.info("DependencyManagerImpl.updateTestPom","path=\""+ path.getPath() +"\"");
+		}
 		try {
 			File sourcePom = new File(path + "/pom.xml");
 			if (!sourcePom.exists()) {
+				if(isDebugEnabled) {
+					LOGGER.warn("DependencyManagerImpl.updateTestPom","status=\"Bad Request\"", "message=\"pom path not exist\"");
+				}
 				return;
 			}
 			
@@ -241,13 +302,20 @@ public class DependencyManagerImpl implements DependencyManager {
                   processor.save();
               }
             }
-			
+			if(isDebugEnabled) {
+				LOGGER.debug("DependencyManagerImpl.updateTestPom:Exit");
+			}
 		} catch (Exception e) {
+			LOGGER.error("DependencyManagerImpl.updateTestPom", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
 			throw new PhrescoException(e);
 		}
 	}
 	
 	private void createSqlFolder(List<DownloadInfo> selectedDbs, File path) throws PhrescoException {
+		if(isDebugEnabled) {
+			LOGGER.debug("DependencyManagerImpl.createSqlFolder:Entry");
+			LOGGER.info("DependencyManagerImpl.createSqlFolder", "path=\""+ path.getPath() +"\"");
+		}
 		String databaseType = "";
 		try {
 			File mysqlFolder = new File(path, artifactTypeMap.get("database") + Constants.DB_MYSQL);
@@ -269,15 +337,26 @@ public class DependencyManagerImpl implements DependencyManager {
 					}
 				}
 			}
+			if(isDebugEnabled) {
+				LOGGER.debug("DependencyManagerImpl.createSqlFolder:Exit");
+			}
 		} catch (IOException e) {
+			LOGGER.error("DependencyManagerImpl.createSqlFolder", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
 			throw new PhrescoException(e);
 		}
 	}
 	
 	private File getMysqlVersionFolder(File mysqlFolder) {
+		if(isDebugEnabled) {
+			LOGGER.debug("DependencyManagerImpl.getMysqlVersionFolder:Entry");
+			LOGGER.info("DependencyManagerImpl.getMysqlVersionFolder","path=\""+ mysqlFolder.getPath() +"\"");
+		}
 		File[] mysqlFolderFiles = mysqlFolder.listFiles();
 		if (mysqlFolderFiles != null && mysqlFolderFiles.length > 0) {
 			return mysqlFolderFiles[0];
+		}
+		if(isDebugEnabled) {
+			LOGGER.debug("DependencyManagerImpl.getMysqlVersionFolder:Exit");
 		}
 		return null;
 	}

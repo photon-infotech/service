@@ -29,9 +29,9 @@ import org.springframework.data.document.mongodb.query.Query;
 
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactInfo;
-import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
 import com.photon.phresco.service.dao.CustomerDAO;
@@ -41,9 +41,15 @@ import com.photon.phresco.util.ServiceConstants;
 public class ArtifactGroupConverter implements Converter<ArtifactGroupDAO, ArtifactGroup>, ServiceConstants {
 	
 	private MongoOperations mongoOperation  = null;
+	private static final SplunkLogger LOGGER = SplunkLogger.getSplunkLogger(ArtifactGroupConverter.class.getName());
+	private static Boolean isDebugEnabled = LOGGER.isDebugEnabled();
+	
 	@Override
     public ArtifactGroup convertDAOToObject(ArtifactGroupDAO artifactGroupDAO,
             MongoOperations mongoOperation) throws PhrescoException {
+		if (isDebugEnabled) {
+			LOGGER.debug("ArtifactGroupConverter.convertDAOToObject:Entry");
+		}
 		this.mongoOperation = mongoOperation;
         ArtifactGroup artifactGroup = new ArtifactGroup();
         artifactGroup.setArtifactId(artifactGroupDAO.getArtifactId());
@@ -65,12 +71,18 @@ public class ArtifactGroupConverter implements Converter<ArtifactGroupDAO, Artif
         artifactGroup.setVersions(versions);
         artifactGroup.setLicenseId(artifactGroupDAO.getLicenseId());
         createArticatGroupURL(artifactGroup);
+        if (isDebugEnabled) {
+			LOGGER.debug("ArtifactGroupConverter.convertDAOToObject:Exit");
+		}
         return artifactGroup;
     }
 
     @Override
     public ArtifactGroupDAO convertObjectToDAO(ArtifactGroup artifactGroup)
             throws PhrescoException {
+    	if (isDebugEnabled) {
+			LOGGER.debug("ArtifactGroupConverter.convertObjectToDAO:Entry");
+		}
         ArtifactGroupDAO artifactGroupDAO = new ArtifactGroupDAO();
         artifactGroupDAO.setId(artifactGroup.getId());
         artifactGroupDAO.setArtifactId(artifactGroup.getArtifactId());
@@ -89,12 +101,19 @@ public class ArtifactGroupConverter implements Converter<ArtifactGroupDAO, Artif
         artifactGroupDAO.setLicenseId(artifactGroup.getLicenseId());
         artifactGroupDAO.setDisplayName(artifactGroup.getDisplayName());
         artifactGroupDAO.setAppliesTo(artifactGroup.getAppliesTo());
+        if (isDebugEnabled) {
+			LOGGER.debug("ArtifactGroupConverter.convertObjectToDAO:Exit");
+		}
         return artifactGroupDAO;
     }
     
     private ArtifactGroup createArticatGroupURL(ArtifactGroup artifactGroup) {
+    	if (isDebugEnabled) {
+			LOGGER.debug("ArtifactGroupConverter.createArticatGroupURL:Entry");
+		}
 		List<ArtifactInfo> newVersions = new ArrayList<ArtifactInfo>();
 		if(CollectionUtils.isEmpty(artifactGroup.getVersions())) {
+			LOGGER.warn("ArtifactGroupConverter.createArticatGroupURL", "versions="+artifactGroup.getVersions());
 			return artifactGroup;
 		}
 		List<ArtifactInfo> actualVersions = artifactGroup.getVersions();
@@ -106,10 +125,16 @@ public class ArtifactGroupConverter implements Converter<ArtifactGroupDAO, Artif
 			newVersions.add(artifactInfo);
 		}
 		artifactGroup.setVersions(newVersions);
+		if (isDebugEnabled) {
+			LOGGER.debug("ArtifactGroupConverter.createArticatGroupURL:Exit");
+		}
 		return artifactGroup;
 	}
     
 	private String createDownloadURL(String groupId, String artifactId, String packaging, String version, String customerId, long fileSize) {		
+		if (isDebugEnabled) {
+			LOGGER.debug("ArtifactGroupConverter.createDownloadURL:Entry");
+		}
 		if(StringUtils.isNotEmpty(groupId) && StringUtils.isNotEmpty(artifactId) && StringUtils.isNotEmpty(version)) {
 			CustomerDAO customer = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME, new Query(Criteria.whereId().is(customerId)), CustomerDAO.class);			
 			if(customer != null) {
@@ -117,6 +142,9 @@ public class ArtifactGroupConverter implements Converter<ArtifactGroupDAO, Artif
 						new Query(Criteria.whereId().is(customer.getRepoInfoId())), RepoInfo.class);				
 				if(StringUtils.isNotEmpty(repoInfo.getGroupRepoURL())) {
 					return repoInfo.getGroupRepoURL() + "/" + ServerUtil.createContentURL(groupId, artifactId, version, packaging);
+				}
+				if (isDebugEnabled) {
+					LOGGER.debug("ArtifactGroupConverter.createDownloadURL:Exit");
 				}
 			}
 		}

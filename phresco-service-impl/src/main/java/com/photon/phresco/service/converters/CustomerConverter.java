@@ -24,15 +24,22 @@ import org.springframework.data.document.mongodb.query.Query;
 import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.dao.CustomerDAO;
 import com.photon.phresco.util.ServiceConstants;
 
 public class CustomerConverter implements Converter<CustomerDAO, Customer> {
 
+	private static final SplunkLogger LOGGER = SplunkLogger.getSplunkLogger(CustomerConverter.class.getName());
+	private static Boolean isDebugEnabled = LOGGER.isDebugEnabled();
+	
 	@Override
 	public Customer convertDAOToObject(CustomerDAO dao,
 			MongoOperations mongoOperation) throws PhrescoException {
+		if (isDebugEnabled) {
+			LOGGER.debug("ArtifactGroupConverter.convertDAOToObject:Entry");
+		}
 		Customer customer = new Customer();
 		customer.setAddress(dao.getAddress());
 		customer.setApplicableTechnologies(dao.getApplicableTechnologies());
@@ -58,12 +65,18 @@ public class CustomerConverter implements Converter<CustomerDAO, Customer> {
 		customer.setSystem(dao.isSystem());
 		customer.setOptions(dao.getOptions());
 		customer.setContext(dao.getContext());
+		if (isDebugEnabled) {
+			LOGGER.debug("ArtifactGroupConverter.convertDAOToObject:Exit");
+		}
 		return customer;
 	}
 
 	@Override
 	public CustomerDAO convertObjectToDAO(Customer customer)
 			throws PhrescoException {
+		if (isDebugEnabled) {
+			LOGGER.debug("ArtifactGroupConverter.convertObjectToDAO:Entry");
+		}
 		CustomerDAO customerDAO = new CustomerDAO();
 		customerDAO.setAddress(customer.getAddress());
 		customerDAO.setApplicableTechnologies(customer.getApplicableTechnologies());
@@ -87,6 +100,9 @@ public class CustomerConverter implements Converter<CustomerDAO, Customer> {
 		customerDAO.setSystem(customer.isSystem());
 		customerDAO.setOptions(customer.getOptions());
 		customerDAO.setContext(customer.getContext());
+		if (isDebugEnabled) {
+			LOGGER.debug("ArtifactGroupConverter.convertObjectToDAO:Exit");
+		}
 		return customerDAO;
 	}
 

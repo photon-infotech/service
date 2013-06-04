@@ -32,6 +32,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.util.ArchiveUtil;
 import com.photon.phresco.util.ArchiveUtil.ArchiveType;
@@ -42,8 +43,8 @@ import com.photon.phresco.util.Utility;
  *
  */
 public final class DependencyUtils {
-	private static final Logger S_LOGGER = Logger.getLogger(DependencyUtils.class);
-	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
+	private static final SplunkLogger LOGGER = SplunkLogger.getSplunkLogger(DependencyUtils.class.getName());
+	private static Boolean isDebugEnabled = LOGGER.isDebugEnabled();
 
 	private DependencyUtils(){
 		//restrict instantiation 
@@ -57,13 +58,17 @@ public final class DependencyUtils {
 	 */
 	public static ArchiveType getArchiveType(String extension) {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method DependencyUtils.getArchiveType(String extension)");
+			LOGGER.debug("DependencyUtils.getArchiveType:Entry");
+			LOGGER.info("DependencyUtils.getArchiveType","extension=\""+ extension +"\"");
 		}
 		ArchiveType archiveType = ArchiveType.ZIP;
 		if(extension.equals(".tar.gz")) {
 			archiveType = ArchiveType.TARGZ;
 		} else if (extension.endsWith(".tar")){
 			archiveType = ArchiveType.TAR;
+		}
+		if (isDebugEnabled) {
+			LOGGER.debug("DependencyUtils.getArchiveType:Exit");
 		}
 		return archiveType;
 	}
@@ -77,13 +82,17 @@ public final class DependencyUtils {
 	 */
 	public static String getExtension(String contentURL) {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method DependencyUtils.getExtension(String contentURL)");
+			LOGGER.debug("DependencyUtils.getExtension:Entry");
+			LOGGER.info("DependencyUtils.getExtension","contentURL=\""+ contentURL +"\"");
 		}
 		String extension = ".zip";
 		if(contentURL.endsWith("tar.gz")){
 			extension = ".tar.gz";
 		} else if(contentURL.endsWith("tar")){
 			extension = ".tar";
+		}
+		if (isDebugEnabled) {
+			LOGGER.debug("DependencyUtils.getExtension:Exit");
 		}
 		return extension;
 	}
@@ -98,10 +107,16 @@ public final class DependencyUtils {
 	 */
 	public static void extractFiles(String contentURL, File path, String customerId) throws PhrescoException {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method DependencyUtils.extractFiles(String contentURL, File path)");
-			S_LOGGER.debug("extractFiles() Filepath="+path.getPath());
+			LOGGER.debug("DependencyUtils.extractFiles:Entry");
+			if(StringUtils.isEmpty(customerId)) {
+				LOGGER.warn("DependencyUtils.extractFiles","status=\"Bad Request\"", "message=\"customerId is empty\"");
+			}
+			LOGGER.info("DependencyUtils.extractFiles","contentURL=\""+ contentURL +"\"", "path=\""+ path.getPath()+"\"", "customerId=\""+ customerId +"\"");
 		}
 		extractFiles(contentURL, null, path, customerId);
+		if(isDebugEnabled) {
+			LOGGER.debug("DependencyUtils.extractFiles:Exit");
+		}
 	}
 	
 	/**
@@ -114,7 +129,9 @@ public final class DependencyUtils {
 	 */
 	public static void extractFiles(String contentURL, String folderName, File path, String customerId) throws PhrescoException {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method DependencyUtils.extractFiles(String contentURL, String folderName, File path)");
+			LOGGER.debug("DependencyUtils.extractFiles:Entry");
+			LOGGER.info("DependencyUtils.extractFiles","contentURL=\""+ contentURL +"\"","folderName=\""+ folderName +"\""
+					,"path=\""+ path.getName() +"\"","customerId=\""+ customerId +"\"");
 		}
 		assert !StringUtils.isEmpty(contentURL);
 		
@@ -135,18 +152,24 @@ public final class DependencyUtils {
 			fos.close();
 			ArchiveType archiveType = getArchiveType(extension);	
 			if (isDebugEnabled) {
-				S_LOGGER.debug("extractFiles() path="+path.getPath());
+				LOGGER.debug("extractFiles() path="+path.getPath());
 			}
 			ArchiveUtil.extractArchive(archive.toString(), path.getAbsolutePath(), folderName, archiveType);
 			archive.delete();
+			if(isDebugEnabled) {
+				LOGGER.debug("DependencyUtils.extractFiles:Exit");
+			}
 		} 
 		catch (FileNotFoundException e) {
+			LOGGER.error("DependencyUtils.extractFiles", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
 			return;
 		}
 		
 		catch (IOException e) {
+			LOGGER.error("DependencyUtils.extractFiles", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
 			throw new PhrescoException(e);
 		} catch (PhrescoException pe ){
+			LOGGER.error("DependencyUtils.extractFiles", "status=\"Failure\"", "message=\"" + pe.getLocalizedMessage() + "\"");
 			if(pe.getCause() instanceof FileNotFoundException) {
 				return;
 			}
@@ -159,8 +182,8 @@ public final class DependencyUtils {
 	
 	public static void copyFilesTo(File[] files, File destPath) throws IOException {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method DependencyUtils.copyFilesTo(File[] files, File destPath)");
-			S_LOGGER.error(" copyFilesTo() Destination Filepath =" + destPath.getPath());
+			LOGGER.debug("DependencyUtils.copyFilesTo:Entry");
+			LOGGER.info("DependencyUtils.copyFilesTo","destPath=\""+ destPath +"\"");
 		}
 		if(files == null || destPath == null) {
 			return; //nothing to copy
@@ -171,6 +194,9 @@ public final class DependencyUtils {
 			} else {
 				FileUtils.copyFileToDirectory(file, destPath);
 			}
+		}
+		if(isDebugEnabled) {
+			LOGGER.debug("DependencyUtils.copyFilesTo:Exit");
 		}
 
 	}

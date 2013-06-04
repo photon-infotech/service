@@ -29,6 +29,7 @@ import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.FunctionalFramework;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
 import com.photon.phresco.service.dao.TechnologyDAO;
@@ -36,9 +37,15 @@ import com.photon.phresco.util.ServiceConstants;
 
 public class TechnologyConverter implements Converter<TechnologyDAO, Technology>, ServiceConstants {
 
+	private static final SplunkLogger LOGGER = SplunkLogger.getSplunkLogger(TechnologyConverter.class.getName());
+	private static Boolean isDebugEnabled = LOGGER.isDebugEnabled();
+	
     @Override
     public Technology convertDAOToObject(TechnologyDAO technologyDAO, MongoOperations mongoOperation) throws PhrescoException {
-        Technology technology = new Technology(technologyDAO.getId());
+    	if (isDebugEnabled) {
+			LOGGER.debug("ArtifactGroupConverter.convertDAOToObject:Entry");
+		}
+    	Technology technology = new Technology(technologyDAO.getId());
         technology.setAppTypeId(technologyDAO.getAppTypeId());
         technology.setCreationDate(technologyDAO.getCreationDate());
         technology.setCustomerIds(technologyDAO.getCustomerIds());
@@ -87,11 +94,17 @@ public class TechnologyConverter implements Converter<TechnologyDAO, Technology>
         			new Query(Criteria.whereId().in(technologyDAO.getFunctionalFrameworks().toArray())), FunctionalFramework.class);
         	technology.setFunctionalFrameworks(functionalFrameworks);
         }
+        if (isDebugEnabled) {
+			LOGGER.debug("ArtifactGroupConverter.convertDAOToObject:Exit");
+		}
         return technology;
     }
 
     @Override
     public TechnologyDAO convertObjectToDAO(Technology technology) throws PhrescoException {
+    	if (isDebugEnabled) {
+			LOGGER.debug("ArtifactGroupConverter.convertObjectToDAO:Entry");
+		}
         TechnologyDAO techDAO = new TechnologyDAO();
         techDAO.setId(technology.getId());
         techDAO.setAppTypeId(technology.getAppTypeId());
@@ -115,13 +128,22 @@ public class TechnologyConverter implements Converter<TechnologyDAO, Technology>
         if(CollectionUtils.isNotEmpty(technology.getFunctionalFrameworks())) {
         	techDAO.setFunctionalFrameworks(getFrameworkIds(technology.getFunctionalFrameworks()));
         }
+        if (isDebugEnabled) {
+			LOGGER.debug("ArtifactGroupConverter.convertObjectToDAO:Exit");
+		}
         return techDAO;
     }
     
     private List<String> getFrameworkIds(List<FunctionalFramework> functionalFrameworks) {
+    	if (isDebugEnabled) {
+			LOGGER.debug("ArtifactGroupConverter.getFrameworkIds:Entry");
+		}
     	List<String> ids = new ArrayList<String>();
     	for (FunctionalFramework functionalFramework : functionalFrameworks) {
 			ids.add(functionalFramework.getId());
+		}
+    	if (isDebugEnabled) {
+			LOGGER.debug("ArtifactGroupConverter.getFrameworkIds:Exit");
 		}
     	return ids;
     }

@@ -24,6 +24,7 @@ import org.springframework.data.document.mongodb.query.Query;
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.dao.ApplicationInfoDAO;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
@@ -31,9 +32,15 @@ import com.photon.phresco.util.ServiceConstants;
 
 public class ApplicationInfoConverter implements Converter<ApplicationInfoDAO, ApplicationInfo>, ServiceConstants{
 
+	private static final SplunkLogger LOGGER = SplunkLogger.getSplunkLogger(ApplicationInfoConverter.class.getName());
+	private static Boolean isDebugEnabled = LOGGER.isDebugEnabled();
+	
 	@Override
 	public ApplicationInfo convertDAOToObject(ApplicationInfoDAO dao,
 			MongoOperations mongoOperation) throws PhrescoException {
+		if (isDebugEnabled) {
+			LOGGER.debug("ApplicationInfoConverter.convertDAOToObject:Entry");
+		}
 		ApplicationInfo applicationInfo = new ApplicationInfo();
 		applicationInfo.setCode(dao.getCode());
 		applicationInfo.setVersion(dao.getVersion());
@@ -53,18 +60,26 @@ public class ApplicationInfoConverter implements Converter<ApplicationInfoDAO, A
 		applicationInfo.setTechInfo(dao.getTechInfo());
 		if(dao.getArtifactGroupId() != null) {
 			applicationInfo.setPilotContent(createPilotContent(dao.getArtifactGroupId(), mongoOperation));
+		} else {
+			LOGGER.warn("ApplicationInfoConverter.convertDAOToObject", "ArtifactGroupId=" + dao.getArtifactGroupId());
 		}
 		applicationInfo.setPhoneEnabled(dao.isPhoneEnabled());
 		applicationInfo.setTabletEnabled(dao.isTabletEnabled());
 		applicationInfo.setPilot(dao.getPilot());
 		applicationInfo.setSystem(dao.isSystem());
 		applicationInfo.setFunctionalFramework(dao.getFunctionalFramework());
+		if (isDebugEnabled) {
+			LOGGER.debug("ApplicationInfoConverter.convertDAOToObject:Exit");
+		}
 		return applicationInfo;
 	}
 
 	@Override
 	public ApplicationInfoDAO convertObjectToDAO(ApplicationInfo applicationInfo)
 			throws PhrescoException {
+		if (isDebugEnabled) {
+			LOGGER.debug("ApplicationInfoConverter.convertObjectToDAO:Entry");
+		}
 		ApplicationInfoDAO applicationInfoDAO = new ApplicationInfoDAO();
 		applicationInfoDAO.setId(applicationInfo.getId());
 		applicationInfoDAO.setCode(applicationInfo.getCode());
@@ -90,14 +105,23 @@ public class ApplicationInfoConverter implements Converter<ApplicationInfoDAO, A
 		applicationInfoDAO.setTabletEnabled(applicationInfo.isTabletEnabled());
 		applicationInfoDAO.setPilot(applicationInfo.isPilot());
 		applicationInfoDAO.setFunctionalFramework(applicationInfo.getFunctionalFramework());
+		if (isDebugEnabled) {
+			LOGGER.debug("ApplicationInfoConverter.convertObjectToDAO:Exit");
+		}
 		return applicationInfoDAO;
 	}
 	
 	private ArtifactGroup createPilotContent(String artifactGroupId, MongoOperations mongoOperation) throws PhrescoException {
+		if (isDebugEnabled) {
+			LOGGER.debug("ApplicationInfoConverter.createPilotContent:Entry");
+		}
 		ArtifactGroupDAO artifactGroupDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
 				new Query(Criteria.whereId().is(artifactGroupId)), ArtifactGroupDAO.class);
 		Converter<ArtifactGroupDAO, ArtifactGroup> converter = 
 			(Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
+		if (isDebugEnabled) {
+			LOGGER.debug("ApplicationInfoConverter.createPilotContent:Exit");
+		}
 		return converter.convertDAOToObject(artifactGroupDAO, mongoOperation);
 	}
 

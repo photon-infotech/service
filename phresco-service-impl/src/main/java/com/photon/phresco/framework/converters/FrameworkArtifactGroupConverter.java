@@ -32,6 +32,7 @@ import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
 import com.photon.phresco.service.util.ServerUtil;
@@ -40,9 +41,16 @@ import com.photon.phresco.util.ServiceConstants;
 public class FrameworkArtifactGroupConverter implements Converter<ArtifactGroupDAO, ArtifactGroup>, ServiceConstants {
 	
 	private MongoOperations mongoOperation  = null;
+	
+	private static final SplunkLogger LOGGER = SplunkLogger.getSplunkLogger(FrameworkArtifactGroupConverter.class.getName());
+	private static Boolean isDebugEnabled = LOGGER.isDebugEnabled();
+	
 	@Override
     public ArtifactGroup convertDAOToObject(ArtifactGroupDAO artifactGroupDAO,
             MongoOperations mongoOperation) throws PhrescoException {
+		if (isDebugEnabled) {
+			LOGGER.debug("FrameworkArtifactGroupConverter.convertDAOToObject:Entry");
+		}
 		this.mongoOperation = mongoOperation;
         ArtifactGroup artifactGroup = new ArtifactGroup();
         artifactGroup.setArtifactId(artifactGroupDAO.getArtifactId());
@@ -61,12 +69,18 @@ public class FrameworkArtifactGroupConverter implements Converter<ArtifactGroupD
         List<ArtifactInfo> versions = mongoOperation.find(ARTIFACT_INFO_COLLECTION_NAME, 
         		query , ArtifactInfo.class);
         artifactGroup.setVersions(versions);
+        if (isDebugEnabled) {
+			LOGGER.debug("FrameworkArtifactGroupConverter.convertDAOToObject:Exit");
+		}
         return artifactGroup;
     }
 
     @Override
     public ArtifactGroupDAO convertObjectToDAO(ArtifactGroup artifactGroup)
             throws PhrescoException {
+    	if (isDebugEnabled) {
+			LOGGER.debug("FrameworkArtifactGroupConverter.convertObjectToDAO:Entry");
+		}
         ArtifactGroupDAO artifactGroupDAO = new ArtifactGroupDAO();
         artifactGroupDAO.setId(artifactGroup.getId());
         artifactGroupDAO.setArtifactId(artifactGroup.getArtifactId());
@@ -84,6 +98,9 @@ public class FrameworkArtifactGroupConverter implements Converter<ArtifactGroupD
 //        artifactGroupDAO.setHelpText(artifactGroup.getHelpText());
 //        artifactGroupDAO.setLicenseId(artifactGroup.getLicenseId());
         artifactGroupDAO.setDisplayName(artifactGroup.getDisplayName());
+        if (isDebugEnabled) {
+			LOGGER.debug("FrameworkArtifactGroupConverter.convertObjectToDAO:Exit");
+		}
         return artifactGroupDAO;
     }
     

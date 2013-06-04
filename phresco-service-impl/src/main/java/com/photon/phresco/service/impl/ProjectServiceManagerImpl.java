@@ -34,6 +34,7 @@ import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.Element;
 import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.ProjectServiceManager;
@@ -44,8 +45,8 @@ import com.photon.phresco.util.Utility;
 
 public class ProjectServiceManagerImpl implements ProjectServiceManager, Constants {
 	
-	private static final Logger S_LOGGER = Logger.getLogger(ProjectServiceManagerImpl.class);
-	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
+	private static final SplunkLogger LOGGER = SplunkLogger.getSplunkLogger(ProjectServiceManagerImpl.class.getName());
+	private static Boolean isDebugEnabled = LOGGER.isDebugEnabled();
 	private DbManager dbManager;
 	
 	public ProjectServiceManagerImpl() throws PhrescoException {
@@ -56,15 +57,31 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 	public synchronized void createProject(ProjectInfo projectInfo, String tempFolderPath) throws PhrescoException {
 		// TODO:This code should be moved into server initialization
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method DefaultProjectService.createProject(ProjectInfo projectInfo)");
-			S_LOGGER.debug("createProject() ProjectInfo =" + projectInfo.getProjectCode());
+			LOGGER.debug("ProjectServiceManagerImpl.createProject:Entry");
+			if(projectInfo == null) {
+				LOGGER.warn("ProjectServiceManagerImpl.createProject","status=\"Bad Request\"", "message=\"ProjectInfo is empty\"");
+				throw new PhrescoException("ProjectInfo is empty");
+			}
+			LOGGER.info("ProjectServiceManagerImpl.createProject", "customerId=\"" + projectInfo.getCustomerIds().get(0) + "\"", "creationDate=\"" + projectInfo.getCreationDate() + "\"",
+					"projectCode=\"" + projectInfo.getProjectCode() + "\"");
 		}
-
 		PhrescoServerFactory.initialize();
 		PhrescoServerFactory.getArchetypeExecutor().execute(projectInfo, tempFolderPath);
+		if(isDebugEnabled) {
+			LOGGER.debug("ProjectServiceManagerImpl.createProject:Exit");
+		}
 	}
 
 	public void updateProject(ProjectInfo projectInfo, String tempFolderPath) throws PhrescoException {
+		if (isDebugEnabled) {
+			LOGGER.debug("ProjectServiceManagerImpl.updateProject:Entry");
+			if(projectInfo == null) {
+				LOGGER.warn("ProjectServiceManagerImpl.updateProject","status=\"Bad Request\"", "message=\"ProjectInfo is empty\"");
+				throw new PhrescoException("ProjectInfo is empty");
+			}
+			LOGGER.info("ProjectServiceManagerImpl.updateProject", "customerId=\"" + projectInfo.getCustomerIds().get(0) + "\"", "creationDate=\"" + projectInfo.getCreationDate() + "\"",
+					"projectCode=\"" + projectInfo.getProjectCode() + "\"", "tempFolderPath=\""+ tempFolderPath +"\"");
+		}
 		File projectPath = new File(tempFolderPath);
 		projectPath.mkdirs();
 		String customerId = projectInfo.getCustomerIds().get(0);
@@ -99,12 +116,15 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 		
 		dBManager.storeCreatedProjects(projectInfo);
 		if (isDebugEnabled) {
-			S_LOGGER.info("successfully updated application :" + projectInfo.getName());
+			LOGGER.debug("ProjectServiceManagerImpl.updateProject:Exit");
 		}
 	}
 
 	public void findNewlyAddedProject(Map<String, String> appInfoMap, List<ApplicationInfo> appInfosInDB,
 			List<ApplicationInfo> appInfos, List<ApplicationInfo> createdAppInfos) {
+		if(isDebugEnabled) {
+			LOGGER.debug("ProjectServiceManagerImpl.findNewlyAddedProject:Entry");
+		}
 		for (ApplicationInfo appInfoInDB : appInfosInDB) {
 			appInfoMap.put(appInfoInDB.getId(), appInfoInDB.getId());
 		}
@@ -114,9 +134,19 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 				createdAppInfos.add(appInfo);
 			}
 		}
+		if(isDebugEnabled) {
+			LOGGER.debug("ProjectServiceManagerImpl.findNewlyAddedProject:Exit");
+		}
 	}
 
 	private void createPilots(ApplicationInfo applicationInfo, String tempFolderPath, String customerId) throws PhrescoException {
+		if(isDebugEnabled) {
+			LOGGER.debug("ProjectServiceManagerImpl.createPilots:Entry");
+			if(StringUtils.isEmpty(customerId)) {
+				LOGGER.warn("ProjectServiceManagerImpl.createPilots","status=\"Bad Request\"", "message=\"customerId is empty\"");
+			}
+			LOGGER.info("ProjectServiceManagerImpl.createPilots", "customerId=\""+ customerId +"\"");
+		}
 		Element pilotElement = applicationInfo.getPilotInfo();
 		ApplicationInfo pilotInfo = dbManager.getApplicationInfo(pilotElement.getId());
 		ArtifactGroup pilotContent = pilotInfo.getPilotContent();
@@ -124,14 +154,26 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 		String contentURL = ServerUtil.createContentURL(pilotContent.getGroupId(), pilotContent.getArtifactId(), 
 				version, pilotContent.getPackaging());
 		DependencyUtils.extractFiles(contentURL, new File(tempFolderPath, applicationInfo.getAppDirName()), customerId);
+		if(isDebugEnabled) {
+			LOGGER.debug("ProjectServiceManagerImpl.createPilots:Exit");
+		}
 	}
 
 	public File updateDocumentProject(ApplicationInfo projectInfo) throws PhrescoException {
+		if(isDebugEnabled) {
+			LOGGER.debug("ProjectServiceManagerImpl.updateDocumentProject:Entry");
+		}
 		File tempPath = new File(Utility.getPhrescoTemp(), UUID.randomUUID().toString() + File.separator + projectInfo.getCode());
 		try {
 //			PhrescoServerFactory.getDocumentGenerator().generate(projectInfo, tempPath);
 		} catch (Exception e) {
+			if(isDebugEnabled) {
+				LOGGER.error("ProjectServiceManagerImpl.updateDocumentProject", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
 			throw new PhrescoException(e);
+		}
+		if(isDebugEnabled) {
+			LOGGER.debug("ProjectServiceManagerImpl.updateDocumentProject:Exit");
 		}
 		return tempPath;
 	}

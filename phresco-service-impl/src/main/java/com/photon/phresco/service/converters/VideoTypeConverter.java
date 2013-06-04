@@ -24,6 +24,7 @@ import org.springframework.data.document.mongodb.query.Query;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.VideoType;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
 import com.photon.phresco.service.dao.VideoTypeDAO;
@@ -31,9 +32,15 @@ import com.photon.phresco.util.ServiceConstants;
 
 public class VideoTypeConverter implements Converter<VideoTypeDAO, VideoType>, ServiceConstants {
 	
+	private static final SplunkLogger LOGGER = SplunkLogger.getSplunkLogger(VideoTypeConverter.class.getName());
+	private static Boolean isDebugEnabled = LOGGER.isDebugEnabled();
+	
 	@Override
 	public VideoType convertDAOToObject(VideoTypeDAO dao,
 			MongoOperations mongoOperation) throws PhrescoException {
+		if (isDebugEnabled) {
+			LOGGER.debug("ArtifactGroupConverter.convertDAOToObject:Entry");
+		}
 		VideoType videoType = new VideoType();
 		videoType.setId(dao.getId());
 		videoType.setUrl(dao.getUrl());
@@ -46,12 +53,18 @@ public class VideoTypeConverter implements Converter<VideoTypeDAO, VideoType>, S
 		videoType.setSystem(dao.isSystem());
 		videoType.setType(dao.getType());
 		videoType.setCodec(dao.getCodec());
+		if (isDebugEnabled) {
+			LOGGER.debug("ArtifactGroupConverter.convertDAOToObject:Exit");
+		}
 		return videoType;
 	}
 
 	@Override
 	public VideoTypeDAO convertObjectToDAO(VideoType videoType)
 			throws PhrescoException {
+		if (isDebugEnabled) {
+			LOGGER.debug("ArtifactGroupConverter.convertObjectToDAO:Entry");
+		}
 		VideoTypeDAO videoDAO = new VideoTypeDAO();
 		videoDAO.setId(videoType.getId());
 		videoDAO.setVideoInfoId(videoType.getVideoInfoId());
@@ -64,14 +77,23 @@ public class VideoTypeConverter implements Converter<VideoTypeDAO, VideoType>, S
 		videoDAO.setSystem(videoType.isSystem());
 		videoDAO.setType(videoType.getType());
 		videoDAO.setCodec(videoType.getCodec());
+		if (isDebugEnabled) {
+			LOGGER.debug("ArtifactGroupConverter.convertObjectToDAO:Exit");
+		}
 		return videoDAO;
 	}
 	
 	private ArtifactGroup createArtifactGroup(String artifactGroupId,MongoOperations mongoOperation) throws PhrescoException {
+		if (isDebugEnabled) {
+			LOGGER.debug("ArtifactGroupConverter.createArtifactGroup:Entry");
+		}
 		ArtifactGroupDAO artifactGroupDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
 				new Query(Criteria.whereId().is(artifactGroupId)), ArtifactGroupDAO.class);
 		Converter<ArtifactGroupDAO, ArtifactGroup> artifactConverter = 
 			(Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
+		if (isDebugEnabled) {
+			LOGGER.debug("ArtifactGroupConverter.createArtifactGroup:Exit");
+		}
 		return artifactConverter.convertDAOToObject(artifactGroupDAO, mongoOperation);
 	}
 
