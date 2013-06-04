@@ -31,13 +31,13 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactGroup.Type;
 import com.photon.phresco.commons.model.VideoInfo;
 import com.photon.phresco.commons.model.VideoType;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.client.api.ServiceManager;
 import com.photon.phresco.service.util.ServerUtil;
@@ -45,14 +45,15 @@ public class Videos extends ServiceBaseAction {
 
 	private static final long serialVersionUID = -3065717999492844302L;
 
-	private static final Logger S_LOGGER = Logger.getLogger(Videos.class);
-	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
+	//	private static final Logger S_LOGGER = Logger.getLogger(Videos.class);
+	private static final SplunkLogger LOGGER = SplunkLogger.getSplunkLogger(Videos.class.getName());
+	private static Boolean s_isDebugEnabled = LOGGER.isDebugEnabled();
 	private static Map<String, InputStream> inputStreamMap = new HashMap<String, InputStream>();
 
 	private static byte[] videoByteArray = null;
 	private static byte[] imgByteArray = null;
 	private static String videoName;
-	
+
 	private String name = "";
 	private String description = "";
 	private String videoId = "";
@@ -65,65 +66,82 @@ public class Videos extends ServiceBaseAction {
 	private String videoUrl = "";
 	private String oldName = "";
 	private InputStream fileInputStream;
-    private String contentType;
-    private int contentLength;
+	private String contentType;
+	private int contentLength;
 	private Boolean errorFound = false;
 
 	public String list() throws PhrescoException {
 		if (s_isDebugEnabled) {
-			S_LOGGER.debug("Entering Method Videos.list()");
+			LOGGER.debug("Videos.list : Entry");
 		}
-		
 		try {
 			List<VideoInfo> videoInfos = getServiceManager().getVideoInfos();
 			setReqAttribute(REQ_VIDEO_INFO, videoInfos);
 		} catch (PhrescoException e) {
 			if(s_isDebugEnabled) {
-				S_LOGGER.debug("Entered into the catch block of Videos.list()" + e.getStackError());
+				LOGGER.error("Videos.list", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
 			}
 			return showErrorPopup(e, getText(EXCEPTION_VIDEO_LIST));
 		}
-        
+
 		inputStreamMap.clear();
 		videoByteArray = null;
 		imgByteArray = null;
 
+		if (s_isDebugEnabled) {
+			LOGGER.debug("Videos.list : Exit");
+		}
 		return ADMIN_VIDEO_LIST;	
 	}
 
 	public String add() {
 		if (s_isDebugEnabled) {
-			S_LOGGER.debug("Entering Method Videos.list()");
+			LOGGER.debug("Videos.add : Entry");
 		}
 		setReqAttribute(REQ_FROM_PAGE, ADD);
-		
+
+		if (s_isDebugEnabled) {
+			LOGGER.debug("Videos.add : Exit");
+		}
+
 		return ADMIN_VIDEO_ADD;
 	}
 
 	public String edit() throws PhrescoException {
 		if (s_isDebugEnabled) {
-			S_LOGGER.debug("Entering Method PilotProjects.edit()");
+			LOGGER.debug("Videos.edit : Entry");
 		}
-		
+
 		try {
+			if(s_isDebugEnabled) {
+				if (StringUtils.isEmpty(getVideoId())) {
+					LOGGER.warn("Videos.edit", "status=\"Bad Request\"", "message=\"Video Info is empty\"");
+					return showErrorPopup(new PhrescoException("videoInfo is Empty"), getText(EXCEPTION_VIDEO_EDIT));
+				}
+				LOGGER.info("Videos.edit", "videoId=" + "\"" + getVideoId());
+			}
 			ServiceManager serviceManager = getServiceManager();
 			VideoInfo videoInfo = serviceManager.getVideo(getVideoId());
 			setReqAttribute(REQ_VIDEO_INFO, videoInfo);
 			setReqAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (PhrescoException e) {
 			if(s_isDebugEnabled) {
-				S_LOGGER.debug("Entered into the catch block of Videos.edit()" + e.getStackError());
+				LOGGER.error("Videos.edit", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
 			}
 			return showErrorPopup(e, getText(EXCEPTION_VIDEO_EDIT));
+		}
+
+		if (s_isDebugEnabled) {
+			LOGGER.debug("Videos.edit : Exit");
 		}
 
 		return ADMIN_VIDEO_ADD;
 	}
 	public String save() throws PhrescoException {
 		if (s_isDebugEnabled) {
-			S_LOGGER.debug("Entering Method Videos.save()");
+			LOGGER.debug("Videos.save : Entry");
 		}
-		
+
 		try {
 			VideoInfo videoInfo = createVideoInstance();
 			if(videoByteArray != null){
@@ -132,25 +150,36 @@ public class Videos extends ServiceBaseAction {
 			if(imgByteArray != null){
 				inputStreamMap.put(Type.ICON.name(),  new ByteArrayInputStream(imgByteArray));
 			} 
-			
+
 			getServiceManager().createVideos(createVideoInstance(), inputStreamMap);
 			addActionMessage(getText(VIDEO_ADDED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
 			if(s_isDebugEnabled) {
-				S_LOGGER.debug("Entered into the catch block of Videos.save()" + e.getStackError());
+				LOGGER.error("Videos.save", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
 			}
 			return showErrorPopup(e, getText(EXCEPTION_VIDEO_SAVE));
 		}
 
+		if (s_isDebugEnabled) {
+			LOGGER.debug("Videos.save : Exit");
+		}
+
 		return list();
 	}
-	
+
 	public String update() throws PhrescoException {
 		if (s_isDebugEnabled) {
-			S_LOGGER.debug("Entering Method  PilotProjects.update()");
+			LOGGER.debug("Videos.update : Entry");
 		}
-		
+
 		try {
+			if (s_isDebugEnabled) {
+				if (StringUtils.isEmpty(getVideoId())) {
+					LOGGER.warn("Videos.update", "status=\"Bad Request\"", "message=\"Video Id is empty\"");
+					return showErrorPopup(new PhrescoException("Video Id is empty"), getText(EXCEPTION_VIDEO_UPDATE));
+				}
+				LOGGER.info("Videos.update", "videoId=" + "\"" + getVideoId());
+			}
 			VideoInfo videoInfo = createVideoInstance();
 			if(videoByteArray != null){
 				inputStreamMap.put(videoInfo.getName(),  new ByteArrayInputStream(videoByteArray));
@@ -162,9 +191,13 @@ public class Videos extends ServiceBaseAction {
 			addActionMessage(getText(PLTPROJ_UPDATED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
 			if(s_isDebugEnabled) {
-				S_LOGGER.debug("Entered into the catch block of Videos.update()" + e.getStackError());
+				LOGGER.error("Videos.update", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
 			}
 			return showErrorPopup(e, getText(EXCEPTION_VIDEO_UPDATE));
+		}
+
+		if (s_isDebugEnabled) {
+			LOGGER.debug("Videos.update : Exit");
 		}
 
 		return list();
@@ -192,11 +225,18 @@ public class Videos extends ServiceBaseAction {
 
 	public String delete() throws PhrescoException {
 		if (s_isDebugEnabled) {
-			S_LOGGER.debug("Entering Method PilotProjects.delete()");
+			LOGGER.debug("Videos.delete : Entry");
 		}
-		
+
 		try {
 			String[] videoIds = getHttpRequest().getParameterValues("videoId");
+			if (s_isDebugEnabled) {
+				if (videoIds == null) {
+					LOGGER.warn("Videos.delete", "status=\"Bad Request\"", "message=\"VideoIds is empty\"");
+					return showErrorPopup(new PhrescoException("VideoIds is empty"), getText(VIDEO_DELETED));
+				}
+				LOGGER.info("Videos.delete", "videoIds=" + "\"" + videoIds);
+			}
 			if (ArrayUtils.isNotEmpty(videoIds)) {
 				for (String videoid : videoIds) {
 					getServiceManager().deleteVideo(videoid);
@@ -205,37 +245,47 @@ public class Videos extends ServiceBaseAction {
 			}
 		}catch (PhrescoException e) {
 			if(s_isDebugEnabled) {
-				S_LOGGER.debug("Entered into the catch block of Videos.delete()" + e.getStackError());
+				LOGGER.error("Videos.delete", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
 			}
 			return showErrorPopup(e, getText(EXCEPTION_VIDEO_DELETE));
 		}
 
+		if (s_isDebugEnabled) {
+			LOGGER.debug("Videos.delete : Exit");
+		}
 		return list();
 	} 
 
 	public String uploadFile() throws PhrescoException {
 		if (s_isDebugEnabled) {
-			S_LOGGER.debug("Entering Method Videos.uploadFile()");
+			LOGGER.debug("Videos.uploadFile : Entry");
 		}
-		
+
 		PrintWriter writer = null;
 		try {
-            writer = getHttpResponse().getWriter();
+			writer = getHttpResponse().getWriter();
 			String type = getReqParameter(REQ_VIDEO_FILE_TYPE);
 			if (REQ_VIDEO_UPLOAD.equals(type)) {
 				videoByteArray = getByteArray();
 				videoName = getFileName();
-			     
+
 			} else {
 				imgByteArray = getFileByteArray();
 			}
 			writer.print(MAVEN_JAR_FALSE);
-        	getHttpResponse().setStatus(getHttpResponse().SC_OK);
-	        writer.flush();
-	        writer.close();
+			getHttpResponse().setStatus(getHttpResponse().SC_OK);
+			writer.flush();
+			writer.close();
 		} catch (Exception e) {
+			if(s_isDebugEnabled) {
+				LOGGER.error("Videos.uploadFile", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
 			getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
-            writer.print(SUCCESS_FALSE);
+			writer.print(SUCCESS_FALSE);
+		}
+
+		if (s_isDebugEnabled) {
+			LOGGER.debug("Videos.uploadFile : Exit");
 		}
 
 		return SUCCESS;
@@ -263,7 +313,7 @@ public class Videos extends ServiceBaseAction {
 
 	public void removeUploadedFile() {
 		if (s_isDebugEnabled) {
-			S_LOGGER.debug("Entering Method Archetypes.removeUploadedJar()");
+			LOGGER.debug("Videos.removeUploadedFile : Entry");
 		}
 
 		String type = getHttpRequest().getParameter(REQ_VIDEO_FILE_TYPE);
@@ -272,14 +322,24 @@ public class Videos extends ServiceBaseAction {
 		} else {
 			imgByteArray = null;
 		}
+		if (s_isDebugEnabled) {
+			LOGGER.debug("Videos.removeUploadedFile : Exit");
+		}
 	}
-	
+
 	public String downloadVideo() throws PhrescoException {
 		if (s_isDebugEnabled) {
-			S_LOGGER.debug("Entering Method  Features.downloadVideo()");
+			LOGGER.debug("Videos.downloadVideo : Entry");
 		}
-		
+
 		try {
+			if (s_isDebugEnabled) {
+				if (StringUtils.isEmpty(videoId)) {
+					LOGGER.warn("Videos.downloadVideo", "status=\"Bad Request\"", "message=\"videoId is empty\"");
+					return showErrorPopup(new PhrescoException("videoId is empty"), getText(DOWNLOAD_FAILED));
+				}
+				LOGGER.info("Videos.downloadVideo", "videoId=" + "\"" + videoId);
+			}
 			VideoInfo videoInfo = getServiceManager().getVideo(videoId);
 			ArtifactGroup artifactGroup = videoInfo.getVideoList().get(0).getArtifactGroup();
 			videoUrl = artifactGroup.getVersions().get(0).getDownloadURL();
@@ -291,17 +351,24 @@ public class Videos extends ServiceBaseAction {
 			contentType = url.openConnection().getContentType();
 			contentLength = url.openConnection().getContentLength();
 		} catch(Exception e) {
+			if(s_isDebugEnabled) {
+				LOGGER.error("Videos.downloadVideo", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
 			return showErrorPopup(new PhrescoException(e), getText(DOWNLOAD_FAILED));
 		}
-		
+
+		if (s_isDebugEnabled) {
+			LOGGER.debug("Videos.downloadVideo : Exit");
+		}
+
 		return SUCCESS;
 	}
 
 	public String validateForm() throws PhrescoException {
 		if (s_isDebugEnabled) {
-			S_LOGGER.debug("Entering Method  PilotProjects.validateForm()");
+			LOGGER.debug("Videos.validateForm : Entry");
 		}
-		
+
 		boolean isError = false;
 		//Empty validation for name
 		if (StringUtils.isEmpty(getName())) {
@@ -320,7 +387,7 @@ public class Videos extends ServiceBaseAction {
 				}
 			}
 		}
-		
+
 		//empty validation for fileupload
 		if (!EDIT.equals(getFromPage()) && videoByteArray == null) {
 			setVideoError(getText(KEY_I18N_ERR_VIDEO_EMPTY));
@@ -334,6 +401,10 @@ public class Videos extends ServiceBaseAction {
 
 		if (isError) {
 			setErrorFound(true);
+		}
+
+		if (s_isDebugEnabled) {
+			LOGGER.debug("Videos.validateForm : Exit");
 		}
 
 		return SUCCESS;

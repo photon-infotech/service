@@ -33,7 +33,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.Customer;
@@ -42,38 +41,40 @@ import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.commons.model.TechnologyOptions;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.util.ServiceConstants;
 
 public class Customers extends ServiceBaseAction  { 
-	
+
 	private static final long serialVersionUID = 6801037145464060759L;
-	
-	private static final Logger S_LOGGER = Logger.getLogger(Customers.class);
-	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
+
+	private static final SplunkLogger LOGGER = SplunkLogger.getSplunkLogger(Customers.class.getName());
+	//private static final Logger S_LOGGER = Logger.getLogger(Customers.class);
+	private static Boolean isDebugEnabled = LOGGER.isDebugEnabled();
 	private static Map<String, InputStream> inputStreamMap = new HashMap<String, InputStream>();
-	
+
 	private String customerId = "";
-	
+
 	private String name = "";
 	private String description = "";
 	private String email = "";
 	private String address = "";
 	private String country = "";
-    private String state = "";
-    private String zipcode = "";
-    private String number = "";
-    private String fax = "";
+	private String state = "";
+	private String zipcode = "";
+	private String number = "";
+	private String fax = "";
 	private String helpText = "";
-    private String licence = "";
-    private Date validFrom = null;
-    private Date validUpTo = null;
-    private String repoName = "";
+	private String licence = "";
+	private Date validFrom = null;
+	private Date validUpTo = null;
+	private String repoName = "";
 	private String repoUserName = "";
 	private String repoPassword = "";
 	private String repoURL = "";
 	private List<String> options = null;
-	
+
 	private String nameError = "";
 	private String mailError = "";
 	private String addressError = "";
@@ -112,64 +113,69 @@ public class Customers extends ServiceBaseAction  {
 	private List<String> appliesTo = new ArrayList<String>();
 	List<ApplicationType> applicableAppTypes = new ArrayList<ApplicationType>();
 	private String context = "";
-	
+
 	private String fromPage = "";
-	
+
 	private String oldName = "";
 	private String oldContext = "";
 
-    /**
-     * To get the all the customers from the DB
-     * @return List of Customer
-     * @throws PhrescoException
-     */
-    public String list() throws PhrescoException {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entering Method Customers.list()");
-	    }
-		
+	/**
+	 * To get the all the customers from the DB
+	 * @return List of Customer
+	 * @throws PhrescoException
+	 */
+	public String list() throws PhrescoException {
+		if (isDebugEnabled) {
+			LOGGER.debug("Customers.list : Entry");
+		}
 		try {
-            List<Customer> customers = getServiceManager().getCustomers();
-            if (CollectionUtils.isNotEmpty(customers)) {
-            	Collections.sort(customers, sortCustomerInAlphaOrder());
-            }
+			List<Customer> customers = getServiceManager().getCustomers();            
+			if (CollectionUtils.isNotEmpty(customers)) {
+				Collections.sort(customers, sortCustomerInAlphaOrder());
+			}
 			setReqAttribute(REQ_CUST_CUSTOMERS, customers);
 		} catch (PhrescoException e) {
+			if(isDebugEnabled) {
+				LOGGER.error("Customers.list", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
 			return showErrorPopup(e, getText(EXCEPTION_CUSTOMERS_LIST));
 		}
-		
+		if (isDebugEnabled) {
+			LOGGER.debug("Customers.list : Exit");
+		}
 		return ADMIN_CUSTOMER_LIST;	
 	}
-    
-    private Comparator sortCustomerInAlphaOrder() {
+
+	private Comparator sortCustomerInAlphaOrder() {
 		return new Comparator() {
-		    public int compare(Object firstObject, Object secondObject) {
-		    	Customer cus1 = (Customer) firstObject;
-		    	Customer cus2 = (Customer) secondObject;
-		       return cus1.getName().compareToIgnoreCase(cus2.getName());
-		    }
+			public int compare(Object firstObject, Object secondObject) {
+				Customer cus1 = (Customer) firstObject;
+				Customer cus2 = (Customer) secondObject;
+				return cus1.getName().compareToIgnoreCase(cus2.getName());
+			}
 		};
 	}
-	
+
 	/**
 	 * To return the page to add customer 
 	 * @return
 	 * @throws PhrescoException
 	 */
 	public String add() throws PhrescoException {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entering Method Customers.add()");
-	    }
-	    
-	    List<TechnologyOptions> options = getServiceManager().getCustomerOptions();
-	    List<Technology> technologies = getServiceManager().getArcheTypes(ServiceConstants.DEFAULT_CUSTOMER_NAME);
-	    setReqAttribute(REQ_TECHNOLOGY_OPTION, options);
-	    setReqAttribute(REQ_ARCHE_TYPES, technologies);
-	    setReqAttribute(REQ_FROM_PAGE, ADD);
-	    
-	    return ADMIN_CUSTOMER_ADD;
+		if (isDebugEnabled) {
+			LOGGER.debug("Customers.add : Entry");
+		}
+		List<TechnologyOptions> options = getServiceManager().getCustomerOptions();
+		List<Technology> technologies = getServiceManager().getArcheTypes(ServiceConstants.DEFAULT_CUSTOMER_NAME);
+		setReqAttribute(REQ_TECHNOLOGY_OPTION, options);
+		setReqAttribute(REQ_ARCHE_TYPES, technologies);
+		setReqAttribute(REQ_FROM_PAGE, ADD);
+		if (isDebugEnabled) {
+			LOGGER.debug("Customers.add : Exit");
+		}
+		return ADMIN_CUSTOMER_ADD;
 	}
-	
+
 	/**
 	 * To return the edit page with the details of the selected customer
 	 * @param customerId
@@ -178,34 +184,44 @@ public class Customers extends ServiceBaseAction  {
 	 */
 	public String edit() throws PhrescoException {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method Customers.edit()");
+			LOGGER.debug("Customers.edit : Entry");
 		}
-		
 		try {
+			if(isDebugEnabled) {
+				if (StringUtils.isEmpty(getCustomerId())) {
+					LOGGER.warn("Customers.add", "status=\"Bad Request\"", "message=\"CustomerId is empty\"");
+					return showErrorPopup(new PhrescoException("CustomerId is empty"), getText(EXCEPTION_CUSTOMERS_ADD));
+				}
+				LOGGER.info("Customers.add", "customerId=" + "\"" + getCustomerId()  + "\"");
+			}
 			Customer customer = getServiceManager().getCustomer(getCustomerId());
 			List<TechnologyOptions> options = getServiceManager().getCustomerOptions();
-	        setReqAttribute(REQ_TECHNOLOGY_OPTION, options);
+			setReqAttribute(REQ_TECHNOLOGY_OPTION, options);
 			List<Technology> technologies = getServiceManager().getArcheTypes(ServiceConstants.DEFAULT_CUSTOMER_NAME);
-		    setReqAttribute(REQ_ARCHE_TYPES, technologies);
+			setReqAttribute(REQ_ARCHE_TYPES, technologies);
 			setReqAttribute(REQ_CUST_CUSTOMER, customer);
 			setReqAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (PhrescoException e) {
-		    return showErrorPopup(e, getText(EXCEPTION_CUSTOMERS_ADD));
+			if(isDebugEnabled) {
+				LOGGER.error("Customers.edit", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
+			return showErrorPopup(e, getText(EXCEPTION_CUSTOMERS_ADD));
 		}
-		
+		if (isDebugEnabled) {
+			LOGGER.debug("Customers.edit : Exit");
+		}
 		return ADMIN_CUSTOMER_ADD;
 	}
-	
+
 	/**
 	 * To create a customer with the provided details
 	 * @return List of customers
 	 * @throws PhrescoException
 	 */
 	public String save() throws PhrescoException {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entering Method Customers.save()");
-	    }
-	    
+		if (isDebugEnabled) {
+			LOGGER.debug("Customers.save : Entry");
+		}
 		try {
 			Customer customer = createCustomer();
 			if (iconByteArray != null) {
@@ -214,9 +230,14 @@ public class Customers extends ServiceBaseAction  {
 			getServiceManager().createCustomers(customer, inputStreamMap);
 			addActionMessage(getText(CUSTOMER_ADDED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
-		    return showErrorPopup(e, getText(EXCEPTION_CUSTOMERS_SAVE));
+			if(isDebugEnabled) {
+				LOGGER.error("Customers.save", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
+			return showErrorPopup(e, getText(EXCEPTION_CUSTOMERS_SAVE));
 		}
-		
+		if (isDebugEnabled) {
+			LOGGER.debug("Customers.save : Exit");
+		}
 		return list();
 	}
 
@@ -226,39 +247,50 @@ public class Customers extends ServiceBaseAction  {
 	 * @throws PhrescoException
 	 */
 	public String uploadImage() throws PhrescoException {
-	    if (isDebugEnabled) {
-	    	S_LOGGER.debug("Entering Method Customers.uploadImage()");
-	    }
-	    PrintWriter writer = null;
-	    try {
-	    	writer = getHttpResponse().getWriter();
-	    	iconByteArray = getByteArray();
-	    	writer.print(SUCCESS_TRUE);
-	    	writer.flush();
-	    	writer.close();
-	    } catch (Exception e) { //If upload fails it will be shown in UI, so need not to throw error popup
-	    	getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
-	    	writer.print(SUCCESS_FALSE);
-	    }
-
-	    return SUCCESS;
+		if (isDebugEnabled) {
+			LOGGER.debug("Customers.uploadImage : Entry");
+		}
+		PrintWriter writer = null;
+		try {
+			writer = getHttpResponse().getWriter();
+			iconByteArray = getByteArray();
+			writer.print(SUCCESS_TRUE);
+			writer.flush();
+			writer.close();
+		} catch (Exception e) {
+			//If upload fails it will be shown in UI, so need not to throw error popup
+			if(isDebugEnabled) {
+				LOGGER.error("Customers.uploadImage", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
+			getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
+			writer.print(SUCCESS_FALSE);
+		}
+		if (isDebugEnabled) {
+			LOGGER.debug("Customers.uploadImage : Exit");
+		}
+		return SUCCESS;
 	}
-	
-	
+
+
 	/**
 	 * remove the icon image from byteArray and Map 
 	 * @return
 	 * @throws PhrescoException
 	 */
 	public String removeImage() throws PhrescoException {
-	    if (isDebugEnabled) {
-	    	S_LOGGER.debug("Entering Method Customers.removeImage()");
-	    }
-	    inputStreamMap.clear();
-	    iconByteArray = null;
-	    return SUCCESS;
+		if (isDebugEnabled) {
+			LOGGER.debug("Customers.removeImage : Entry");
+		}
+		inputStreamMap.clear();
+		iconByteArray = null;
+
+		if (isDebugEnabled) {
+			LOGGER.debug("Customers.removeImage : Exit");
+		}
+
+		return SUCCESS;
 	}
-	
+
 
 	/**
 	 * To update the details of the selected customer
@@ -267,9 +299,9 @@ public class Customers extends ServiceBaseAction  {
 	 * @throws PhrescoException
 	 */
 	public String update() throws PhrescoException {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entering Method Customers.update()");
-	    }
+		if (isDebugEnabled) {
+			LOGGER.debug("Customers.update : Entry");
+		}
 		try {
 			Customer customer = createCustomer();
 			if (iconByteArray != null) {
@@ -278,81 +310,88 @@ public class Customers extends ServiceBaseAction  {
 			getServiceManager().updateCustomer(customer, inputStreamMap);
 			addActionMessage(getText(CUSTOMER_UPDATED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
-		    return showErrorPopup(e, getText(EXCEPTION_CUSTOMERS_UPDATE));
+			if(isDebugEnabled) {
+				LOGGER.error("Customers.update", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
+			return showErrorPopup(e, getText(EXCEPTION_CUSTOMERS_UPDATE));
 		}
-		
+
+		if (isDebugEnabled) {
+			LOGGER.debug("Customers.update : Exit");
+		}
+
 		return list();
 	}
-	
-	
+
+
 	/**
 	 * To the customer object with the given details
 	 * @return customer object
 	 * @throws PhrescoException 
 	 */
 	private Customer createCustomer() throws PhrescoException {
-	    Customer customer = new Customer();
-	    try {
-	        customer.setName(getName());
-	        customer.setDescription(getDescription());
-	        customer.setEmailId(getEmail());
-	        customer.setAddress(getAddress());
-	        customer.setCountry(getCountry());
-	        customer.setState(getState());
-	        customer.setZipcode(getZipcode());
-	        customer.setContactNumber(getNumber());
-	        customer.setFax(getFax());
-	        customer.setHelpText(getHelpText());
-	        LicenseType licenceType = LicenseType.valueOf(getLicence());
-	        customer.setType(licenceType);
-	        customer.setValidFrom(getValidFrom());
-	        customer.setValidUpto(getValidUpTo());
-	        customer.setOptions(getOptions());
-	        RepoInfo repoInfo = new RepoInfo();
-	        if (StringUtils.isNotEmpty(getCustomerId())) {
-	            customer.setId(getCustomerId());
-	            repoInfo.setCustomerId(getCustomerId());
-	        }
-	        repoInfo.setReleaseRepoURL(getRepoURL());
-	        repoInfo.setRepoPassword(getRepoPassword());
-	        repoInfo.setRepoUserName(getRepoUserName());
-	        repoInfo.setRepoName(getRepoName());
-	        if (StringUtils.isNotEmpty(getSnapshotRepoUrl())){
-	            repoInfo.setSnapshotRepoURL(getSnapshotRepoUrl());
-	        }
-	        if (StringUtils.isNotEmpty(getGroupRepoUrl())){
-	            repoInfo.setGroupRepoURL(getGroupRepoUrl());
-	        }
-	        if (StringUtils.isNotEmpty(getBaseRepoUrl())){
-	            repoInfo.setBaseRepoURL(getBaseRepoUrl());
-	        }
-	        customer.setRepoInfo(repoInfo);
-	        List<String> appliesTo = getAppliesTo();
-	        customer.setApplicableTechnologies(appliesTo);
-	        Map<String, String> frameworkTheme = new HashMap<String, String>();
-	        frameworkTheme.put(BRANDING_COLOR , getBrandingColor());
-	        frameworkTheme.put(ACCORDION_BACKGROUND_COLOR, getAccordionBackGroundColor());
-	        frameworkTheme.put(BODYBACKGROUND_COLOR, getBodyBackGroundColor());
-	        frameworkTheme.put(BUTTON_COLOR, getButtonColor());
-	        frameworkTheme.put(PAGEHEADER_COLOR, getPageHeaderColor());
-	        frameworkTheme.put(COPYRIGHT_COLOR, getCopyRightColor());
-	        frameworkTheme.put(LABEL_COLOR, getLabelColor());
-	        frameworkTheme.put(MENU_FONT_COLOR, getMenufontColor());
-	        frameworkTheme.put(MENU_BACKGROUND_COLOR, getMenuBackGround());
-	        frameworkTheme.put(SUB_MENU_BACKGROUND_COLOR, getSubMenuBackGround());
-	        frameworkTheme.put(DISABLED_LABEL_COLOR, getDisabledLabelColor());
-	        frameworkTheme.put(COPYRIGHT, getCopyRight());
-	        frameworkTheme.put(LOGIN_LOGO, getLoginlogo());
-	        frameworkTheme.put(LOGO_PADDING, getLogopadding());
-	        customer.setFrameworkTheme(frameworkTheme);
-	        customer.setContext(context);
-	    } catch (Exception e) {
-            throw new PhrescoException(e);
-        }
-       
-        return customer;
-    }
-	
+		Customer customer = new Customer();
+		try {
+			customer.setName(getName());
+			customer.setDescription(getDescription());
+			customer.setEmailId(getEmail());
+			customer.setAddress(getAddress());
+			customer.setCountry(getCountry());
+			customer.setState(getState());
+			customer.setZipcode(getZipcode());
+			customer.setContactNumber(getNumber());
+			customer.setFax(getFax());
+			customer.setHelpText(getHelpText());
+			LicenseType licenceType = LicenseType.valueOf(getLicence());
+			customer.setType(licenceType);
+			customer.setValidFrom(getValidFrom());
+			customer.setValidUpto(getValidUpTo());
+			customer.setOptions(getOptions());
+			RepoInfo repoInfo = new RepoInfo();
+			if (StringUtils.isNotEmpty(getCustomerId())) {
+				customer.setId(getCustomerId());
+				repoInfo.setCustomerId(getCustomerId());
+			}
+			repoInfo.setReleaseRepoURL(getRepoURL());
+			repoInfo.setRepoPassword(getRepoPassword());
+			repoInfo.setRepoUserName(getRepoUserName());
+			repoInfo.setRepoName(getRepoName());
+			if (StringUtils.isNotEmpty(getSnapshotRepoUrl())){
+				repoInfo.setSnapshotRepoURL(getSnapshotRepoUrl());
+			}
+			if (StringUtils.isNotEmpty(getGroupRepoUrl())){
+				repoInfo.setGroupRepoURL(getGroupRepoUrl());
+			}
+			if (StringUtils.isNotEmpty(getBaseRepoUrl())){
+				repoInfo.setBaseRepoURL(getBaseRepoUrl());
+			}
+			customer.setRepoInfo(repoInfo);
+			List<String> appliesTo = getAppliesTo();
+			customer.setApplicableTechnologies(appliesTo);
+			Map<String, String> frameworkTheme = new HashMap<String, String>();
+			frameworkTheme.put(BRANDING_COLOR , getBrandingColor());
+			frameworkTheme.put(ACCORDION_BACKGROUND_COLOR, getAccordionBackGroundColor());
+			frameworkTheme.put(BODYBACKGROUND_COLOR, getBodyBackGroundColor());
+			frameworkTheme.put(BUTTON_COLOR, getButtonColor());
+			frameworkTheme.put(PAGEHEADER_COLOR, getPageHeaderColor());
+			frameworkTheme.put(COPYRIGHT_COLOR, getCopyRightColor());
+			frameworkTheme.put(LABEL_COLOR, getLabelColor());
+			frameworkTheme.put(MENU_FONT_COLOR, getMenufontColor());
+			frameworkTheme.put(MENU_BACKGROUND_COLOR, getMenuBackGround());
+			frameworkTheme.put(SUB_MENU_BACKGROUND_COLOR, getSubMenuBackGround());
+			frameworkTheme.put(DISABLED_LABEL_COLOR, getDisabledLabelColor());
+			frameworkTheme.put(COPYRIGHT, getCopyRight());
+			frameworkTheme.put(LOGIN_LOGO, getLoginlogo());
+			frameworkTheme.put(LOGO_PADDING, getLogopadding());
+			customer.setFrameworkTheme(frameworkTheme);
+			customer.setContext(context);
+		} catch (Exception e) {
+			throw new PhrescoException(e);
+		}
+
+		return customer;
+	}
+
 	/**
 	 * To delete the selected customers
 	 * @param List of customerIds
@@ -360,96 +399,111 @@ public class Customers extends ServiceBaseAction  {
 	 * @throws PhrescoException
 	 */
 	public String delete() throws PhrescoException {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entering Method Customers.delete()");
-	    }
-		
+		if (isDebugEnabled) {
+			LOGGER.debug("Customers.delete : Entry");
+		}
 		try {
 			String[] customerIds = getHttpRequest().getParameterValues(REQ_CUST_CUSTOMER_ID);
+			if(isDebugEnabled) {
+				if (customerIds == null) {
+					LOGGER.warn("Customers.delete", "status=\"Bad Request\"", "message=\"CustomerIds is empty\"");
+					return showErrorPopup(new PhrescoException("CustomerIds is empty"), getText(CUSTOMER_DELETED));
+				}
+				LOGGER.info("Customers.delete", "customerIds=" + "\"" + customerIds);
+			}
 			if (ArrayUtils.isNotEmpty(customerIds)) {
 				for (String customerid : customerIds) {
-			    	getServiceManager().deleteCustomer(customerid);
+					getServiceManager().deleteCustomer(customerid);
 				}
 				addActionMessage(getText(CUSTOMER_DELETED));
 			}
 		} catch (PhrescoException e) {
-		    return showErrorPopup(e, getText(EXCEPTION_CUSTOMERS_DELETE));
+			if(isDebugEnabled) {
+				LOGGER.error("Customers.delete", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
+			return showErrorPopup(e, getText(EXCEPTION_CUSTOMERS_DELETE));
 		}
-		
+		if (isDebugEnabled) {
+			LOGGER.debug("Customers.delete : Exit");
+		}
 		return list();
 	}
-	
+
 	/**
 	 * To validate the form values passed from the jsp
 	 * @return vaidation true/false
 	 * @throws PhrescoException
 	 */
 	public String validateForm() throws PhrescoException {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entering Method Customers.validateForm()");
-        }
-	    
-	    try {
-    		boolean isError = false;
-    		
-    		//Empty validation for name
-    		isError = nameValidation(isError);
-    		
-    		//Empty validation for email
-    		isError = emailValidation(isError); 
-    		
-    		//EmailId format validation
-    		isError = emailIdFormatValidation(isError);
-    		
-    		//Empty validation for address
-    		isError = addressValidation(isError); 
-    		
-    		//Empty validation for zip code
-    		isError = zipCodeValidation(isError); 
-    		
-    		//Empty validation for contact number
-    		isError = contactNumberValidation(isError); 
-    		
-    		//Empty validation for fax
-    		isError = faxValidation(isError); 
-    		
-    		//Empty validation for country
-    		isError = countryValidation(isError); 
-    		
-    		//Empty validation for license type
-    		isError = licenseTypeValidation(isError);
-    		
-    		//Empty validation for repo name
-    		isError = repoNameValidation(isError);
-    		
-    		isError = repoUrlValidation(isError);
-    		
-    		//Empty vaildation for context
-    		isError = contextValidation();
-    		
-    		if (StringUtils.isNotEmpty(getRepoURL())) {
-    			//Empty validation for repo username
-        		if (StringUtils.isEmpty(getRepoUserName())) {
-        			setRepoUserNameError(getText(KEY_I18N_ERR_REPO_USERNAME_EMPTY));
-        			isError = true;
-        		}
-        		//Empty validation for repo password
-        		if (StringUtils.isEmpty(getRepoPassword())) {
-        			setRepoPasswordError(getText(KEY_I18N_ERR_REPO_PASSWORD_EMPTY));
-        			isError = true;
-        		}
-    		}
-    		
-    		if (isError) {
-                setErrorFound(true);
-            }
-	    } catch (PhrescoException e) {
-	        return showErrorPopup(e, getText(EXCEPTION_CUSTOMERS_VALIDATE));
-	    }
-		
+		if (isDebugEnabled) {
+			LOGGER.debug("Customers.validateForm : Entry");
+		}
+		try {
+			boolean isError = false;
+
+			//Empty validation for name
+			isError = nameValidation(isError);
+
+			//Empty validation for email
+			isError = emailValidation(isError); 
+
+			//EmailId format validation
+			isError = emailIdFormatValidation(isError);
+
+			//Empty validation for address
+			isError = addressValidation(isError); 
+
+			//Empty validation for zip code
+			isError = zipCodeValidation(isError); 
+
+			//Empty validation for contact number
+			isError = contactNumberValidation(isError); 
+
+			//Empty validation for fax
+			isError = faxValidation(isError); 
+
+			//Empty validation for country
+			isError = countryValidation(isError); 
+
+			//Empty validation for license type
+			isError = licenseTypeValidation(isError);
+
+			//Empty validation for repo name
+			isError = repoNameValidation(isError);
+
+			isError = repoUrlValidation(isError);
+
+			//Empty vaildation for context
+			isError = contextValidation();
+
+			if (StringUtils.isNotEmpty(getRepoURL())) {
+				//Empty validation for repo username
+				if (StringUtils.isEmpty(getRepoUserName())) {
+					setRepoUserNameError(getText(KEY_I18N_ERR_REPO_USERNAME_EMPTY));
+					isError = true;
+				}
+				//Empty validation for repo password
+				if (StringUtils.isEmpty(getRepoPassword())) {
+					setRepoPasswordError(getText(KEY_I18N_ERR_REPO_PASSWORD_EMPTY));
+					isError = true;
+				}
+			}
+
+			if (isError) {
+				setErrorFound(true);
+			}
+		} catch (PhrescoException e) {
+			if(isDebugEnabled) {
+				LOGGER.error("Customers.validateForm", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
+			return showErrorPopup(e, getText(EXCEPTION_CUSTOMERS_VALIDATE));
+		}
+		if (isDebugEnabled) {
+			LOGGER.debug("Customers.validateForm : Exit");
+		}
 		return SUCCESS;
 	}
-	
+
 	public boolean repoUrlValidation(boolean isError) {
 		if (StringUtils.isNotEmpty(getRepoURL())) {
 			String urlPattern = "^(http|https|ftp)://.*$";
@@ -560,7 +614,7 @@ public class Customers extends ServiceBaseAction  {
 		}
 		return tempError;
 	}
-	
+
 	private boolean contextValidation() throws PhrescoException {
 		if (StringUtils.isEmpty(getContext())) {
 			setContextError(getText(KEY_I18N_ERR_CONTEXT_EMPTY));
@@ -579,15 +633,15 @@ public class Customers extends ServiceBaseAction  {
 		}
 		return tempError;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
-	
+
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	public String getNameError() {
 		return nameError;
 	}
@@ -611,7 +665,7 @@ public class Customers extends ServiceBaseAction  {
 	public void setNameError(String nameError) {
 		this.nameError = nameError;
 	}
-	
+
 	public String getEmail() {
 		return email;
 	}
@@ -643,7 +697,7 @@ public class Customers extends ServiceBaseAction  {
 	public void setAddressError(String addressError) {
 		this.addressError = addressError;
 	}
-	
+
 	public String getZipcode() {
 		return zipcode;
 	}
@@ -691,7 +745,7 @@ public class Customers extends ServiceBaseAction  {
 	public void setFaxError(String faxError) {
 		this.faxError = faxError;
 	}
-	
+
 	public String getCountry() {
 		return country;
 	}
@@ -723,11 +777,11 @@ public class Customers extends ServiceBaseAction  {
 	public void setLicenError(String licenError) {
 		this.licenError = licenError;
 	}
-	
+
 	public boolean isErrorFound() {
 		return errorFound;
 	}
-	
+
 	public void setErrorFound(boolean errorFound) {
 		this.errorFound = errorFound;
 	}
@@ -739,7 +793,7 @@ public class Customers extends ServiceBaseAction  {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	
+
 	public Date getValidFrom() {
 		return validFrom;
 	}
@@ -755,7 +809,7 @@ public class Customers extends ServiceBaseAction  {
 	public void setValidUpTo(Date validUpTo) {
 		this.validUpTo = validUpTo;
 	}
-	
+
 	public String getFromPage() {
 		return fromPage;
 	}
@@ -771,7 +825,7 @@ public class Customers extends ServiceBaseAction  {
 	public void setCustomerId(String customerId) {
 		this.customerId = customerId;
 	}
-	
+
 	public String getOldName() {
 		return oldName;
 	}
@@ -779,22 +833,22 @@ public class Customers extends ServiceBaseAction  {
 	public void setOldName(String oldName) {
 		this.oldName = oldName;
 	}
-	
+
 	public String getState() {
-        return state;
-    }
+		return state;
+	}
 
-    public void setState(String state) {
-        this.state = state;
-    }
-    
-    public String getHelpText() {
-        return helpText;
-    }
+	public void setState(String state) {
+		this.state = state;
+	}
 
-    public void setHelpText(String helpText) {
-        this.helpText = helpText;
-    }
+	public String getHelpText() {
+		return helpText;
+	}
+
+	public void setHelpText(String helpText) {
+		this.helpText = helpText;
+	}
 
 	public void setRepoURL(String repoURL) {
 		this.repoURL = repoURL;
@@ -827,7 +881,7 @@ public class Customers extends ServiceBaseAction  {
 	public String getRepoName() {
 		return repoName;
 	}
-	
+
 	public String getRepoNameError() {
 		return repoNameError;
 	}
@@ -867,7 +921,7 @@ public class Customers extends ServiceBaseAction  {
 	public String getBrandingColor() {
 		return brandingColor;
 	}
-	
+
 	public List<ApplicationType> getApplicableAppTypes() {
 		return applicableAppTypes;
 	}
@@ -911,7 +965,7 @@ public class Customers extends ServiceBaseAction  {
 	public String getButtonColor() {
 		return buttonColor;
 	}
-	
+
 	public String getLabelColor() {
 		return labelColor;
 	}
@@ -987,7 +1041,7 @@ public class Customers extends ServiceBaseAction  {
 	public void setBaseRepoUrl(String baseRepoUrl) {
 		this.baseRepoUrl = baseRepoUrl;
 	}
-	
+
 	public String getDisabledLabelColor() {
 		return disabledLabelColor;
 	}
@@ -1004,13 +1058,13 @@ public class Customers extends ServiceBaseAction  {
 		this.copyRight = copyRight;
 	}
 
-    public void setOptions(List<String> options) {
-        this.options = options;
-    }
+	public void setOptions(List<String> options) {
+		this.options = options;
+	}
 
-    public List<String> getOptions() {
-        return options;
-    }
+	public List<String> getOptions() {
+		return options;
+	}
 
 	public void setContext(String context) {
 		this.context = context;

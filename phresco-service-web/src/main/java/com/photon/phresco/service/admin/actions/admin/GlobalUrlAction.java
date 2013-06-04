@@ -29,106 +29,134 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import com.photon.phresco.commons.model.Property;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 
 public class GlobalUrlAction extends ServiceBaseAction { 
-	
+
 	private static final long serialVersionUID = 6801037145464060759L;
-	
-	private static final Logger S_LOGGER = Logger.getLogger(GlobalUrlAction.class);
-	private static Boolean s_isDebugEnabled = S_LOGGER.isDebugEnabled();
-	
+
+	//	private static final Logger S_LOGGER = Logger.getLogger(GlobalUrlAction.class);
+	private static final SplunkLogger LOGGER = SplunkLogger.getSplunkLogger(GlobalUrlAction.class.getName());
+	private static Boolean s_isDebugEnabled = LOGGER.isDebugEnabled();
+
 	private String name = "";
 	private String description = "";
 	private String url = "";
-	
+
 	private String nameError = "";
 	private String urlError = "";
 	private boolean errorFound = false;
 	private boolean errorUrl = false;
-	
+
 	private String globalurlId = "";
-	
+
 	private String fromPage = "";
 	private String oldName = "";
-			
+
 	//To get the all the globalURLs from the DB
 	public String list() throws PhrescoException {
 		if (s_isDebugEnabled) {
-			S_LOGGER.debug("Entering Method GlobalUrlAction.list()");
+			LOGGER.debug("GlobalUrlAction.list : Entry");
 		}
-		
 		try {
 			List<Property> globalUrls = getServiceManager().getGlobalUrls();
 			setReqAttribute(REQ_GLOBURL_URL, globalUrls);
 		} catch (PhrescoException e) {
-			if (s_isDebugEnabled) {
-				 S_LOGGER.error("Entered into catch block of GlobalUrlAction.list()" + e.getStackError());
-            }
-            return showErrorPopup(e, getText(EXCEPTION_GLOBAL_URL_LIST));
+			if(s_isDebugEnabled) {
+				LOGGER.error("GlobalUrlAction.list", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
+			return showErrorPopup(e, getText(EXCEPTION_GLOBAL_URL_LIST));
 		}
-		
+
+		if (s_isDebugEnabled) {
+			LOGGER.debug("GlobalUrlAction.list : Exit");
+		}
+
 		return ADMIN_GLOBALURL_LIST;	
 	}
-	
+
 	//To return the page to add GlobalURL
 	public String add() {
 		if (s_isDebugEnabled) {
-		     S_LOGGER.debug("Entering Method GlobalUrlAction.add()");
+			LOGGER.debug("GlobalUrlAction.add : Entry");
 		}
-		
 		setReqAttribute(REQ_FROM_PAGE, ADD);
+
+		if (s_isDebugEnabled) {
+			LOGGER.debug("GlobalUrlAction.add : Exit");
+		}
 
 		return ADMIN_GLOBALURL_ADD;
 	}
-	
+
 	//To return the edit page with the details of the selected GlobalURL
 	public String edit() {
 		if (s_isDebugEnabled) {
-			S_LOGGER.debug("Entering Method GlobalUrlAction.edit()");
+			LOGGER.debug("GlobalUrlAction.edit : Entry");
 		}
-		
 		try {
-			  Property globalUrl = getServiceManager().getGlobalUrl(getGlobalurlId());
-			  setReqAttribute(REQ_GLOBURL_URL , globalUrl);
-			  setReqAttribute(REQ_FROM_PAGE, EDIT);
+			if(s_isDebugEnabled) {
+				if (StringUtils.isEmpty(getGlobalurlId())) {
+					LOGGER.warn("GlobalUrlAction.edit", "status=\"Bad Request\"", "message=\"Globalurl id is empty\"");
+					return showErrorPopup(new PhrescoException("Globalurl id is empty"), getText(EXCEPTION_GLOBAL_URL_EDIT));
+				}
+				LOGGER.info("GlobalUrlAction.edit", "globalUrlId=" + "\"" + getGlobalurlId());
+			}
+			Property globalUrl = getServiceManager().getGlobalUrl(getGlobalurlId());
+			setReqAttribute(REQ_GLOBURL_URL , globalUrl);
+			setReqAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (PhrescoException e) {
-			if (s_isDebugEnabled) {
-				 S_LOGGER.error("Entered into catch block of GlobalUrlAction.edit()" + e.getStackError());
+			if(s_isDebugEnabled) {
+				LOGGER.error("GlobalUrlAction.edit", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
 			}
 			return showErrorPopup(e, getText(EXCEPTION_GLOBAL_URL_EDIT));
 		}
-		
+
+		if (s_isDebugEnabled) {
+			LOGGER.debug("GlobalUrlAction.edit : Exit");
+		}
+
 		return ADMIN_GLOBALURL_ADD;
 	}
-	
+
 	//To create a GlobalURL with the provided details
 	public String save() throws PhrescoException {
 		if (s_isDebugEnabled) {
-			S_LOGGER.debug("Entering Method GlobalUrlAction.save()");
+			LOGGER.debug("GlobalUrlAction.save : Entry");
 		}
-
 		try  {
+			if(s_isDebugEnabled) {
+				if (createGlobalURL() == null) {
+					LOGGER.warn("GlobalUrlAction.save", "status=\"Bad Request\"", "message=\"Globalurl is empty\"");
+					return showErrorPopup(new PhrescoException("Globalurl is empty"), getText(EXCEPTION_GLOBAL_URL_SAVE));
+				}
+				LOGGER.info("GlobalUrlAction.edit", "globalUrl=" + "\"" + createGlobalURL());
+			}
 			List<Property> globalURLs = new ArrayList<Property>();
 			globalURLs.add(createGlobalURL());
 			getServiceManager().createGlobalUrl(globalURLs);
 			addActionMessage(getText(URL_ADDED, Collections.singletonList(getName())));
 		}  catch (PhrescoException e) {
 			if(s_isDebugEnabled) {
-				S_LOGGER.debug("Entered into the catch block of GlobalUrlAction.save()" + e.getStackError());
+				LOGGER.error("GlobalUrlAction.save", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
 			}
 			return showErrorPopup(e, getText(EXCEPTION_GLOBAL_URL_SAVE));
 		}
 
+		if (s_isDebugEnabled) {
+			LOGGER.debug("GlobalUrlAction.save : Exit");
+		}
+
 		return list();
 	}
-	
+
 	private Property createGlobalURL() {
 		Property globalUrl = new Property();
 		if (StringUtils.isNotEmpty(getGlobalurlId())) {
 			globalUrl.setId(getGlobalurlId());
 		}
-		
+
 		globalUrl.setName(getName());
 		globalUrl.setDescription(getDescription());
 		globalUrl.setKey(globalUrl.getId());
@@ -139,28 +167,53 @@ public class GlobalUrlAction extends ServiceBaseAction {
 	//To update the details of the selected GlobalURL
 	public String update() throws PhrescoException { 
 		if (s_isDebugEnabled) {
-			S_LOGGER.debug("Entering Method GlobalUrlAction.update()");
+			LOGGER.debug("GlobalUrlAction.update : Entry");
 		}
 		try {
+			if(s_isDebugEnabled) {
+				if (createGlobalURL() == null) {
+					LOGGER.warn("GlobalUrlAction.update", "status=\"Bad Request\"", "message=\"Globalurl is empty\"");
+					return showErrorPopup(new PhrescoException("Globalurl is empty"), getText(EXCEPTION_GLOBAL_URL_UPDATE));
+				}
+				LOGGER.info("GlobalUrlAction.update", "globalUrl=" + "\"" + createGlobalURL());
+			}
+			if(s_isDebugEnabled) {
+				if (StringUtils.isEmpty(getGlobalurlId())) {
+					LOGGER.warn("GlobalUrlAction.update", "status=\"Bad Request\"", "message=\"Globalurl id is empty\"");
+					return showErrorPopup(new PhrescoException("Globalurl id is empty"), getText(EXCEPTION_GLOBAL_URL_UPDATE));
+				}
+				LOGGER.info("GlobalUrlAction.update", "globalUrlId=" + "\"" + getGlobalurlId());
+			}
 			getServiceManager().updateGlobalUrl(createGlobalURL(), getGlobalurlId());
 			addActionMessage(getText(URL_UPDATED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
 			if(s_isDebugEnabled) {
-				S_LOGGER.error("Entered into catch block of GlobalUrlAction.update()" + e.getStackError());
+				LOGGER.error("GlobalUrlAction.update", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
 			}
 			return showErrorPopup(e, getText(EXCEPTION_GLOBAL_URL_UPDATE));
 		}
+
+		if (s_isDebugEnabled) {
+			LOGGER.debug("GlobalUrlAction.update : Exit");
+		}
+
 		return list();
 	}
-	
+
 	//To delete the selected GlobalURLs
 	public String delete() throws PhrescoException {
-	    if (s_isDebugEnabled) {
-	        S_LOGGER.debug("Entering Method GlobalUrlAction.delete()");
-	    }
-
+		if (s_isDebugEnabled) {
+			LOGGER.debug("GlobalUrlAction.delete : Entry");
+		}
 		try {
 			String[] globalUrlIds = getHttpRequest().getParameterValues(REQ_GLOBURL_ID);
+			if(s_isDebugEnabled) {
+				if (globalUrlIds == null) {
+					LOGGER.warn("GlobalUrlAction.delete", "status=\"Bad Request\"", "message=\"Globalurl ids is empty\"");
+					return showErrorPopup(new PhrescoException("Globalurl ids is empty"), getText(EXCEPTION_GLOBAL_URL_UPDATE));
+				}
+				LOGGER.info("GlobalUrlAction.delete", "globalUrlIds=" + "\"" + globalUrlIds);
+			}
 			if (ArrayUtils.isNotEmpty(globalUrlIds)) {
 				for (String globalUrlId : globalUrlIds) {
 					getServiceManager().deleteGlobalUrl(globalUrlId);
@@ -169,18 +222,22 @@ public class GlobalUrlAction extends ServiceBaseAction {
 			}
 		} catch (PhrescoException e) {
 			if(s_isDebugEnabled) {
-				S_LOGGER.error("Entered into catch block of GlobalUrlAction.delete()" + e.getStackError());
+				LOGGER.error("GlobalUrlAction.delete", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
 			}
 			return showErrorPopup(e, getText(EXCEPTION_GLOBAL_URL_DELETE));
 		}
 
+		if (s_isDebugEnabled) {
+			LOGGER.debug("GlobalUrlAction.delete : Exit");
+		}
+
 		return list();
 	}
-	
+
 	//To validate the form values passed from the jsp
 	public String validateForm() throws PhrescoException {
 		if (s_isDebugEnabled) {
-			S_LOGGER.debug("Entering Method GlobalUrlAction.validateForm()");
+			LOGGER.debug("GlobalUrlAction.validateForm : Entry");
 		}
 
 		boolean isError = false;
@@ -193,10 +250,12 @@ public class GlobalUrlAction extends ServiceBaseAction {
 		if (isError) {
 			setErrorFound(true);
 		}
-
+		if (s_isDebugEnabled) {
+			LOGGER.debug("GlobalUrlAction.validateForm : Exit");
+		}
 		return SUCCESS;
 	}
-	
+
 	public boolean nameValidation() throws PhrescoException {
 		if (StringUtils.isEmpty(getName())) {
 			setNameError(getText(KEY_I18N_ERR_NAME_EMPTY));
@@ -235,12 +294,15 @@ public class GlobalUrlAction extends ServiceBaseAction {
 
 	public String cancel() {
 		if (s_isDebugEnabled) {
-			S_LOGGER.debug("Entering Method GlobalUrlAction.list()");
+			LOGGER.debug("GlobalUrlAction.list : Entry");
 		}
 
+		if (s_isDebugEnabled) {
+			LOGGER.debug("GlobalUrlAction.list : Exit");
+		}
 		return ADMIN_GLOBALURL_CANCEL;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -260,7 +322,7 @@ public class GlobalUrlAction extends ServiceBaseAction {
 	public boolean isErrorFound() {
 		return errorFound;
 	}
-	
+
 	public String getUrl() {
 		return url;
 	}
@@ -312,6 +374,6 @@ public class GlobalUrlAction extends ServiceBaseAction {
 	public void setOldName(String oldName) {
 		this.oldName = oldName;
 	}
-	
-	
+
+
 }

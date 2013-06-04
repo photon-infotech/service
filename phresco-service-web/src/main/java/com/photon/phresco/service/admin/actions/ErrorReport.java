@@ -20,18 +20,21 @@ package com.photon.phresco.service.admin.actions;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.lang.StringUtils;
 
 import com.photon.phresco.commons.model.LogInfo;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.logger.SplunkLogger;
+import com.photon.phresco.service.admin.actions.admin.Videos;
 
 
 
 public class ErrorReport extends ServiceBaseAction {
 	private static final long serialVersionUID = 1L;
 	
-	private static final Logger S_LOGGER = Logger.getLogger(ErrorReport.class);
-	private static Boolean debugEnabled  = S_LOGGER.isDebugEnabled();
+//	private static final Logger S_LOGGER = Logger.getLogger(ErrorReport.class);
+	private static final SplunkLogger LOGGER = SplunkLogger.getSplunkLogger(Videos.class.getName());
+	private static Boolean debugEnabled  = LOGGER.isDebugEnabled();
 	
 	private String message = null;
 	private String action = null;
@@ -41,19 +44,41 @@ public class ErrorReport extends ServiceBaseAction {
 	
 	public String sendReport() throws PhrescoException {
 		if (debugEnabled) {
-			S_LOGGER.debug("Entering Method  ErrorReport.sendReport() message" + message + " action" + action + " userid" + userid );
+			LOGGER.debug("ErrorReport.sendReport : Entry");
 		}
         try {
+        	if (debugEnabled) {
+				if (StringUtils.isEmpty(userid)) {
+				LOGGER.warn("ErrorReport.sendReport", "status=\"Bad Request\"", "message=\"userId is empty\"");
+				}
+				LOGGER.info("ErrorReport.sendReport", "userId=" + "\"" + userid);
+			}
+        	if (debugEnabled) {
+				if (StringUtils.isEmpty(message)) {
+				LOGGER.warn("ErrorReport.sendReport", "status=\"Bad Request\"", "message=\"message is empty\"");
+				}
+				LOGGER.info("ErrorReport.sendReport", "message=" + "\"" + message);
+			}
+        	if (debugEnabled) {
+				if (StringUtils.isEmpty(action)) {
+				LOGGER.warn("ErrorReport.sendReport", "status=\"Bad Request\"", "message=\"action is empty\"");
+				}
+				LOGGER.info("ErrorReport.sendReport", "action=" + "\"" + action);
+			}
         	LogInfo loginfo = new LogInfo(message, trace, action, userid);
         	List<LogInfo> infos = new ArrayList<LogInfo>();
         	infos.add(loginfo);
-        	if (debugEnabled) {
-        		S_LOGGER.debug("Going to send error report to service ");
-    		}
-//        	ClientResponse response = getServiceManager().sendErrorReport(infos);
+ //        	ClientResponse response = getServiceManager().sendErrorReport(infos);
         } catch (Exception e) {
+        	if(debugEnabled) {
+				LOGGER.error("ErrorReport.sendReport", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
         	throw new PhrescoException(e);
         }
+        
+        if (debugEnabled) {
+			LOGGER.debug("ErrorReport.sendReport() : Exit");
+		}
         return "success";
 	}
 	

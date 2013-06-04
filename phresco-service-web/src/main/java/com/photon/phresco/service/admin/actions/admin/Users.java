@@ -17,95 +17,140 @@
  */
 package com.photon.phresco.service.admin.actions.admin;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 
 import com.photon.phresco.commons.model.Role;
 import com.photon.phresco.commons.model.User;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 
 public class Users extends ServiceBaseAction { 
 
-    private static final long serialVersionUID = 1L;
-    
-    private static final Logger S_LOGGER = Logger.getLogger(Customers.class);
-    private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
-    
-    private String userId = "";
-    private String userName = "";
-    private String selectedRoles = "";
-    
-    public String fetchUsersFromDB() throws PhrescoException {
-    	if (isDebugEnabled) {
-    		S_LOGGER.debug("Entering Method Users.getUsersFromDB()");
-    	}
+	private static final long serialVersionUID = 1L;
 
-    	try {
-    		List<User> userList = getServiceManager().getUsersFromDB();
-    		setReqAttribute(REQ_USER_LIST, userList);
-    	} catch (PhrescoException e){
-    		return showErrorPopup(e, getText(EXCEPTION_USERS_LIST));
-    	}
+	//    private static final Logger S_LOGGER = Logger.getLogger(Customers.class);
+	private static final SplunkLogger LOGGER = SplunkLogger.getSplunkLogger(Users.class.getName());
+	private static Boolean isDebugEnabled = LOGGER.isDebugEnabled();
 
-    	return ADMIN_USER_LIST;
-    }
-	
-    public String syncUsers() throws PhrescoException {
-    	if (isDebugEnabled) {
-    		S_LOGGER.debug("Entering Method Users.getSyncUsers()");
-    	}
+	private String userId = "";
+	private String userName = "";
+	private String selectedRoles = "";
 
-    	try {
-    		List<User> userList = getServiceManager().getSyncUsers();
-    		setReqAttribute(REQ_USER_LIST, userList);
-    	} catch (PhrescoException e){
-    		return showErrorPopup(e, getText(EXCEPTION_USERS_LIST));
-    	}
+	public String fetchUsersFromDB() throws PhrescoException {
+		if (isDebugEnabled) {
+			LOGGER.debug("Users.getUsersFromDB : Entry");
+		}
 
-    	return ADMIN_USER_LIST;
-    }
-    
-    public String showAssignRolesPopup() throws PhrescoException {
-    	if (isDebugEnabled) {
-    		S_LOGGER.debug("Entering Method Users.showAssignRolesPopup()");
-    	}
+		try {
+			List<User> userList = getServiceManager().getUsersFromDB();
+			setReqAttribute(REQ_USER_LIST, userList);
+		} catch (PhrescoException e){
+			if(isDebugEnabled) {
+				LOGGER.error("Users.fetchUsersFromDB", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
+			return showErrorPopup(e, getText(EXCEPTION_USERS_LIST));
+		}
 
-    	try {
-    		if (StringUtils.isNotEmpty(getUserId())) {
-    			User user = getServiceManager().getUserInfo(getUserId());
-    			setReqAttribute(REQ_USER, user);
-    			List<Role> allRoles = getServiceManager().getRoles();
-    			setReqAttribute(REQ_ROLE_LIST, allRoles);
-    			Map<String, String> availableRoleMap = new HashMap<String, String>();
-    			if (CollectionUtils.isNotEmpty(user.getRoleIds())) {
-    				for (String availableUserRoleId : user.getRoleIds()) {
-    					Role role = getServiceManager().getRole(availableUserRoleId);
-    					availableRoleMap.put(availableUserRoleId, role.getName());
+		if (isDebugEnabled) {
+			LOGGER.debug("Users.getUsersFromDB : Exit");
+		}
+
+		return ADMIN_USER_LIST;
+	}
+
+	public String syncUsers() throws PhrescoException {
+		if (isDebugEnabled) {
+			LOGGER.debug("Users.getSyncUsers : Entry");
+		}
+
+		try {
+			List<User> userList = getServiceManager().getSyncUsers();
+			setReqAttribute(REQ_USER_LIST, userList);
+		} catch (PhrescoException e){
+			if(isDebugEnabled) {
+				LOGGER.error("Users.syncUsers", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
+			return showErrorPopup(e, getText(EXCEPTION_USERS_LIST));
+		}
+
+		if (isDebugEnabled) {
+			LOGGER.debug("Users.getSyncUsers : Exit");
+		}
+
+		return ADMIN_USER_LIST;
+	}
+
+	public String showAssignRolesPopup() throws PhrescoException {
+		if (isDebugEnabled) {
+			LOGGER.debug("Users.showAssignRolesPopup : Entry");
+		}
+
+		try {
+			if(isDebugEnabled) {
+				if (StringUtils.isEmpty(getUserId())) {
+					LOGGER.warn("Users.showAssignRolesPopup", "status=\"Bad Request\"", "message=\"UserId is empty\"");
+					return showErrorPopup(new PhrescoException("UserId is empty"), getText(EXCEPTION_ASSIGN_ROLE_TO_USER));
+				}
+				LOGGER.info("Users.showAssignRolesPopup", "userId=" + "\"" + getUserId());
+			}
+
+			if (StringUtils.isNotEmpty(getUserId())) {
+				User user = getServiceManager().getUserInfo(getUserId());
+				setReqAttribute(REQ_USER, user);
+				List<Role> allRoles = getServiceManager().getRoles();
+				setReqAttribute(REQ_ROLE_LIST, allRoles);
+				Map<String, String> availableRoleMap = new HashMap<String, String>();
+				if (CollectionUtils.isNotEmpty(user.getRoleIds())) {
+					for (String availableUserRoleId : user.getRoleIds()) {
+						Role role = getServiceManager().getRole(availableUserRoleId);
+						availableRoleMap.put(availableUserRoleId, role.getName());
 					}
-    			}
-    			setReqAttribute(REQ_ROLES_MAP, availableRoleMap);
-    		}
-    	} catch (PhrescoException e){
-    		return showErrorPopup(e, getText(EXCEPTION_USERS_LIST));
-    	}
+				}
+				setReqAttribute(REQ_ROLES_MAP, availableRoleMap);
+			}
+		} catch (PhrescoException e){
+			if(isDebugEnabled) {
+				LOGGER.error("Users.showAssignRolesPopup", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
+			return showErrorPopup(e, getText(EXCEPTION_ASSIGN_ROLE_TO_USER));
+		}
 
-    	return ADMIN_USER;
-    }
-    
-    public String assignRoles() throws PhrescoException {
-    	try {
+		if (isDebugEnabled) {
+			LOGGER.debug("Users.showAssignRolesPopup : Exit");
+		}
+
+		return ADMIN_USER;
+	}
+
+	public String assignRoles() throws PhrescoException {
+		if (isDebugEnabled) {
+			LOGGER.debug("Users.assignRoles : Entry");
+		}
+
+		try {
+			if(isDebugEnabled) {
+				if (StringUtils.isEmpty(getUserId())) {
+					LOGGER.warn("Users.assignRoles", "status=\"Bad Request\"", "message=\"UserId is empty\"");
+					return showErrorPopup(new PhrescoException("UserId is empty"), getText(EXCEPTION_ASSIGN_ROLE_TO_USER));
+				}
+				LOGGER.info("Users.assignRoles", "userId=" + "\"" + getUserId());
+			}
+			if(isDebugEnabled) {
+				if (StringUtils.isEmpty(getSelectedRoles())) {
+					LOGGER.warn("Users.assignRoles", "status=\"Bad Request\"", "message=\"Selected Roles is empty\"");
+					return showErrorPopup(new PhrescoException("Selected Roles is empty"), getText(EXCEPTION_ASSIGN_ROLE_TO_USER));
+				}
+				LOGGER.info("Users.assignRoles", "selectedRoles=" + "\"" + getSelectedRoles());
+			}
 			User user = getServiceManager().getUserInfo(getUserId());
-
 			if (user != null && StringUtils.isNotEmpty(getSelectedRoles())) {
 				List<String> rolesIds = Arrays.asList(getSelectedRoles().split(COMMA));
 				user.setRoleIds(rolesIds);
@@ -114,11 +159,18 @@ public class Users extends ServiceBaseAction {
 				addActionMessage(getText(ROLE_ADDED_TO_USER, Collections.singletonList(user.getName())));
 			}
 		} catch (PhrescoException e) {
+			if(isDebugEnabled) {
+				LOGGER.error("Users.assignRoles", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
 			return showErrorPopup(e, getText(EXCEPTION_ASSIGN_ROLE_TO_USER));
 		}
-    	
-    	return fetchUsersFromDB();
-    }
+
+		if (isDebugEnabled) {
+			LOGGER.debug("Users.assignRoles : Exit");
+		}
+
+		return fetchUsersFromDB();
+	}
 	public void setUserId(String userId) {
 		this.userId = userId;
 	}
