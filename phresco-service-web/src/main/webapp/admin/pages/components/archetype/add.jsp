@@ -488,14 +488,14 @@
         });  
         
        	$("input[value='Functional_Test']").change(function() {
-        	 var name = $(this).val();
         	var status = $(this).attr("checked");
-        	if (status === "checked") {
-        		$("#funcFrameworksControl").show();
-        	} else {
-        		$("#funcFrameworksControl").hide();
-        	}
+        	showOrHideFunctionalFramework(status);
         });
+       	
+       	$("input[name='applicableFeatures']").change(function() {
+       		var status = $(this).attr("checked");
+       		showOrHideFunctionalFramework(status);
+       	});
         if ( '<%= versioning %>' != "versioning" ){
 			$("#versionComment").hide();
 		}
@@ -507,6 +507,13 @@
     	} 
     });
 	
+	function showOrHideFunctionalFramework(status){
+		if (status === "checked") {
+    		$("#funcFrameworksControl").show();
+    	} else {
+    		$("#funcFrameworksControl").hide();
+    	}
+	}
 	function getArchetypes() {
 		showLoadingIcon();
 		loadContent('archetypesList', $('#formArcheTypeAdd'), $('#subcontainer'));
