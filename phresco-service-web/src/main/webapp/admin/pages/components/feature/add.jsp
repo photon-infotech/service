@@ -433,7 +433,7 @@
 	
 	<div class="bottom_button">
    		<input type="button" id="featuresUpdate" class="btn <%= per_disabledClass %>" 
-			onclick="validate('<%= pageUrl %>', $('#formFeatureAdd'), $('#featureContainer'), '<%= progressTxt %>', $('.content_feature :input'));"
+			onclick="validate('<%= pageUrl %>', $('#formFeatureAdd'), $('#subcontainer'), '<%= progressTxt %>', $('.content_feature :input'));"
 			value="<%= buttonLbl %>" <%= per_disabledStr %>/>
 		<input type="button" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>"
 			onclick="loadTechnologies();" />
