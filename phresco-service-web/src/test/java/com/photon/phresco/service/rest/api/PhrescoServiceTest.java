@@ -33,7 +33,7 @@ public class PhrescoServiceTest {
 	@Test
 	public void testCreateProject() throws PhrescoException, IOException {
 		ProjectService service = new ProjectService();
-		service.createProject(createApplicationInfo());
+//		service.createProject(createApplicationInfo());
 	}
 	
 	private ProjectInfo createApplicationInfo() {
