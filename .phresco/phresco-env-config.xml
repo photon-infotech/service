@@ -1,6 +1,6 @@
 <!--
 
-    Phresco Service Root
+    Service Web Archive
 
     Copyright (C) 1999-2013 Photon Infotech Inc.
 
@@ -18,75 +18,102 @@
 
 -->
 <environments>
-    <environment default="true" name="Production">
-	 <Server appliesTo="tech-html5-widget" desc="" name="server">
-            <protocol>http</protocol>
-            <host>localhost</host>
-            <port>3030</port>
-            <admin_username/>
-            <admin_password/>
-            <remoteDeployment>false</remoteDeployment>
-            <certificate/>
-            <type>Apache</type>
-            <version>2.3</version>
-            <deploy_dir>D:\work\apache-tomcat-7.0.14\webapps</deploy_dir>
-            <context>service</context>
-            <additional_context>/</additional_context>
-        </Server>
-		
-        <WebService desc="" name="webservice">
-            <protocol>http</protocol>
-            <host>172.16.18.174</host>
-            <port>7070</port>
-            <username/>
+    <environment default="false" name="Production">
+        <WebService name="webservice">
+            <port>8080</port>
             <password/>
             <context>auth-2.0</context>
+            <host>115.111.233.107</host>
+            <protocol>http</protocol>
+            <username/>
         </WebService>	
-		
-		<Database  desc="" name="database">
-			<host>172.16.17.227</host>
-			<port>27017</port>
-			<username></username>
-			<password/>
-			<dbname>Test</dbname>
-			<type>mongodb</type>
-			<version>2.0.4</version>
-		</Database>
+	<Database  desc="" name="database">
+		<host>localhost</host>
+		<port>27017</port>
+		<username></username>
+		<password/>
+		<dbname>database-dump</dbname>
+		<type>mongodb</type>
+		<version>2.0.4</version>
+	</Database>
+	<Server appliesTo="" desc="" name="server">
+            <protocol>http</protocol>
+            <host>172.16.17.226</host>
+            <port>8080</port>
+            <admin_username>admin</admin_username>
+            <admin_password>ZGV2cmVwbzI=</admin_password>
+            <remoteDeployment>No</remoteDeployment>
+            <type>Apache Tomcat</type>
+            <version>7.0.x</version>
+            <deploy_dir>c:/</deploy_dir>
+            <context>repository</context>
+            <additional_context>/</additional_context>
+        </Server>
+	</environment>
+    
+	<environment default="false" name="Development">
+        <WebService name="webservice">
+            <port>8080</port>
+            <password/>
+            <context>auth-2.0</context>
+            <host>172.16.8.250</host>
+            <protocol>http</protocol>
+            <username/>
+        </WebService>	
+	<Database  desc="" name="database">
+		<host>localhost</host>
+		<port>27017</port>
+		<username></username>
+		<password/>
+		<dbname>database-dump</dbname>
+		<type>mongodb</type>
+		<version>2.0.4</version>
+	</Database>
+	<Server appliesTo="" desc="" name="server">
+            <protocol>http</protocol>
+            <host>172.16.17.226</host>
+            <port>8080</port>
+            <admin_username>admin</admin_username>
+            <admin_password>ZGV2cmVwbzI=</admin_password>
+            <remoteDeployment>No</remoteDeployment>
+            <type>Apache Tomcat</type>
+            <version>7.0.x</version>
+            <deploy_dir>c:/</deploy_dir>
+            <context>repository</context>
+            <additional_context>/</additional_context>
+        </Server>
 	</environment>
 	
-	<environment default="false" name="Development">
-	 <Server appliesTo="tech-html5-widget" desc="" name="server">
-            <protocol>http</protocol>
-            <host>localhost</host>
-            <port>3030</port>
-            <admin_username/>
-            <admin_password/>
-            <remoteDeployment>false</remoteDeployment>
-            <certificate/>
-            <type>Apache</type>
-            <version>2.3</version>
-            <deploy_dir>D:\work\apache-tomcat-7.0.14\webapps</deploy_dir>
-            <context>service</context>
-            <additional_context>/</additional_context>
-        </Server>
-		
-        <WebService desc="" name="webservice">
-            <protocol>http</protocol>
-            <host>localhost</host>
-            <port>7070</port>
-            <username/>
+    <environment default="true" name="Testing">
+        <WebService name="webservice">
+            <port>8080</port>
             <password/>
             <context>auth-2.0</context>
+            <host>172.16.8.250</host>
+            <protocol>http</protocol>
+            <username/>
         </WebService>	
-		
-		<Database  desc="" name="database">
-			<host>localhost</host>
-			<port>27017</port>
-			<username></username>
-			<password/>
-			<dbname>Test</dbname>
-			<type>mongodb</type>
-			<version>2.0.4</version>
-		</Database>
+	<Database  desc="" name="database">
+		<host>172.16.17.227</host>
+		<port>27017</port>
+		<username></username>
+		<password/>
+		<dbname>phresco-dev3-0</dbname>
+		<type>mongodb</type>
+		<version>2.0.4</version>
+	</Database>
+	<Server appliesTo="" desc="" name="server">
+            <protocol>http</protocol>
+            <host>172.16.17.226</host>
+            <port>8080</port>
+            <admin_username>admin</admin_username>
+            <admin_password>ZGV2cmVwbzI=</admin_password>
+            <remoteDeployment>No</remoteDeployment>
+            <type>Apache Tomcat</type>
+            <version>7.0.x</version>
+            <deploy_dir>D:\phresco\Tomcat\Tomcat-7.0.14\webapps</deploy_dir>
+            <context>repository</context>
+            <additional_context>/</additional_context>
+        </Server>
 	</environment>
 </environments>

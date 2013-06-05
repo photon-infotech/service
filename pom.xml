@@ -1,199 +1,188 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
-   <!--  <parent>
-        <groupId>com.photon.phresco</groupId>
-        <artifactId>phresco-parent</artifactId>
-        <version>3.0.0.12001-SNAPSHOT</version>
-        <relativePath>../</relativePath>
-    </parent> -->
-
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.photon.phresco.service</groupId>
-    <artifactId>phresco-service-root</artifactId>
-	<version>3.0.0.12001-SNAPSHOT</version>
+    <artifactId>service-html5multichanneljquerywidget</artifactId>
     <packaging>pom</packaging>
-    <name>Phresco Service Root</name>
-	<url>http://www.phresco.org</url>
-
+    <name>service-html5multichanneljquerywidget</name>
+    <version>3.0.0.12001-SNAPSHOT</version>
+    <url>http://www.phresco.org</url>
+    <build>
+        <finalName>repository</finalName>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                            <pluginExecutions>
+<pluginExecution>
+    <pluginExecutionFilter>
+        <groupId>
+	 										org.apache.geronimo.genesis.plugins
+	 									</groupId>
+        <artifactId>
+	 										tools-maven-plugin
+	 									</artifactId>
+        <versionRange>
+	 										[1.1,)
+	 									</versionRange>
+        <goals>
+            <goal>
+	 											copy-legal-files
+	 										</goal>
+	 									</goals>
+	 								</pluginExecutionFilter>
+    <action>
+        <ignore/>
+	 								</action>
+	 							</pluginExecution>
+<pluginExecution>
+    <pluginExecutionFilter>
+        <groupId>
+	 										org.codehaus.mojo
+	 									</groupId>
+        <artifactId>
+	 										jspc-maven-plugin
+	 									</artifactId>
+        <versionRange>
+	 										[1.4.6,)
+	 									</versionRange>
+        <goals>
+            <goal>compile</goal>
+	 									</goals>
+	 								</pluginExecutionFilter>
+    <action>
+        <ignore/>
+	 								</action>
+	 							</pluginExecution>
+	 						</pluginExecutions>
+	 					</lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>com.photon.phresco.plugins</groupId>
+                    <artifactId>phresco-maven-plugin</artifactId>
+                    <version>2.2.1.1000</version>
+                    <extensions>true</extensions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+    <profiles>
+        <profile>
+            <id>js</id>
+            <properties>
+                <sonar.branch xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">js</sonar.branch>
+                <sonar.language xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">js</sonar.language>
+                <phresco.source.directory xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">src/main/webapp</phresco.source.directory>
+                <sonar.exclusions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">**/lib/**</sonar.exclusions>
+            </properties>
+        </profile>
+        <profile>
+            <id>java</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <sonar.branch xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">java</sonar.branch>
+                <sonar.language xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">java</sonar.language>
+                <phresco.source.directory xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">src/main/java</phresco.source.directory>
+            </properties>
+        </profile>
+        <profile>
+            <id>web</id>
+            <properties>
+                <sonar.branch xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">web</sonar.branch>
+                <sonar.language xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">web</sonar.language>
+                <sonar.dynamicAnalysis xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">false</sonar.dynamicAnalysis>
+                <phresco.source.directory xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">src/main/webapp</phresco.source.directory>
+            </properties>
+        </profile>
+    </profiles>
+    <modules>
+        <module>phresco-service</module>
+        <module>phresco-service-impl</module>
+        <module>phresco-service-web</module>
+    </modules>
     <distributionManagement>
-            <repository>
-                <id>${releases.repo.id}</id>
-                <url>${releases.repo.url}</url>
-            </repository>
-            <snapshotRepository>
-                <id>${snapshots.repo.id}</id>
-                <url>${snapshots.repo.url}</url>
-            </snapshotRepository>
-         <site>
+        <repository>
+            <id>${releases.repo.id}</id>
+            <url>${releases.repo.url}</url>
+        </repository>
+        <snapshotRepository>
+            <id>${snapshots.repo.id}</id>
+            <url>${snapshots.repo.url}</url>
+        </snapshotRepository>
+        <site>
             <id>phresco.service.root</id>
             <name>Phresco Service Root</name>
             <url>scp://phresco.org/home/projects/service/</url>
         </site>
     </distributionManagement>
-
-    <modules>
-		<module>phresco-ldap</module>
-        <module>phresco-service</module>
-        <module>phresco-service-impl</module>
-        <module>phresco-service-web</module>
-        <!-- <module>phresco-service-tools</module>-->
-    </modules>
-	
-	<profiles>
-		<profile>   
-			<id>js</id>			
-			<properties>
-				<sonar.branch>js</sonar.branch>
-				<sonar.language>js</sonar.language>
-				<phresco.source.directory>src/main/webapp</phresco.source.directory>
-				<sonar.exclusions>**/lib/**</sonar.exclusions>
-			 </properties> 
-		</profile>
-		
-		<profile>   
-			<id>java</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			 </activation>
-			<properties>
-				<sonar.branch>java</sonar.branch>
-				<sonar.language>java</sonar.language>
-				<phresco.source.directory>src/main/java</phresco.source.directory>
-				</properties> 
-		</profile>
-		
-		<profile>   
-			<id>web</id>
-			<properties>
-				<sonar.branch>web</sonar.branch>
-				<sonar.language>web</sonar.language>
-				<sonar.dynamicAnalysis>false</sonar.dynamicAnalysis>
-				<phresco.source.directory>src/main/webapp</phresco.source.directory>
-				</properties> 
-		</profile>
-	</profiles>
-	
-	
-	 <properties>
-		<phresco.server.dependency.config.file>config/dependency/2.0.0.6000/dependency-2.0.0.6000.properties</phresco.server.dependency.config.file> 
-		<tools-maven-plugin.version>1.1</tools-maven-plugin.version>
-		<jersey-client.version>1.8</jersey-client.version>
-		<mongo-java-driver.version>2.5.2</mongo-java-driver.version>
-		<spring-data-mongodb.version>1.0.0.M2</spring-data-mongodb.version>
-		<cglib.version>2.2</cglib.version>
-		<maven-jar-plugin.version>2.3.2</maven-jar-plugin.version>
-		<gson.version>1.7.1</gson.version>
-		<commons-lang.version>2.2</commons-lang.version>
-		<commons-collections.version>3.2.1</commons-collections.version>
-		<plexus-utils.version>3.0</plexus-utils.version>
-		<spring-oxm.version>1.5.9</spring-oxm.version>
-		<spring-ws-core.version>1.5.9</spring-ws-core.version>
-		<spring-hibernate3.version>2.0.8</spring-hibernate3.version>
-		<asm.version>3.3</asm.version>
-		<slf4j-simple.version>1.6.4</slf4j-simple.version>
-		<hibernate-annotations.version>3.5.6-Final</hibernate-annotations.version>
-		<hibernate-core.version>3.3.1.GA</hibernate-core.version>
-		<hibernate-validator.version>3.1.0.GA</hibernate-validator.version>
-		<mysql-connector-java.version>5.1.18</mysql-connector-java.version>
-		<javassist.version>3.12.1.GA</javassist.version>
-		<jettison.version>1.3</jettison.version>
-		<cglib.version>2.2.2</cglib.version>
-		<junit.version>4.9</junit.version>
-		<log4j.version>1.2.16</log4j.version>
-		<itextpdf.version>5.1.2</itextpdf.version>
-		<itext-xtra.version>5.1.2</itext-xtra.version>
-		<core-renderer.version>R8</core-renderer.version>
-		<classmate.version>0.5.4</classmate.version>
-		<itext.version>2.0.8</itext.version>
-		<fr.opensagres.xdocreport.converter.docx.xwpf.version>0.9.0</fr.opensagres.xdocreport.converter.docx.xwpf.version>
-		<jxl.version>2.6.12</jxl.version>
-		<poi.version>3.7</poi.version>
-		<aether-api.version>1.13</aether-api.version>
-		<aether-spi.version>1.13</aether-spi.version>
-		<aether-util.version>1.13</aether-util.version>
-		<aether-impl.version>1.13</aether-impl.version>
-		<aether-connector-file.version>1.13</aether-connector-file.version>
-		<aether-connector-wagon.version>1.13</aether-connector-wagon.version>
-		<wagon-http-lightweight.version>2.0</wagon-http-lightweight.version>
-		<maven-aether-provider.version>3.0.3</maven-aether-provider.version>
-		<jdom.version>1.1.2</jdom.version>
-		<maven-assembly-plugin.version>2.2-beta-5</maven-assembly-plugin.version>
-		<ehcache.version>1.6.1</ehcache.version>
-		<guava.version>13.0-rc1</guava.version>
-		<jersey-server.version>1.8</jersey-server.version>
-		<jersey-json.version>1.8</jersey-json.version>
-		<spring-core.version>3.0.5.RELEASE</spring-core.version>
-		<spring-context.version>3.0.5.RELEASE</spring-context.version>
-		<spring-web.version>3.0.5.RELEASE</spring-web.version>
-		<jersey-spring.version>1.8</jersey-spring.version>
-		<commons-io.version>2.0.1</commons-io.version>
-		<web-all.version>10.0-build-20080430</web-all.version>
-		<gf-embedded-api.version>1.0-alpha-4</gf-embedded-api.version>
-		<plexus-cipher.version>1.7</plexus-cipher.version>
-		<servlet-api.version>2.5</servlet-api.version>
-		<struts2-core.version>2.2.3.1</struts2-core.version>
-		<struts.version>1.2.9</struts.version>
-		<struts2-json-plugin.version>2.2.3.1</struts2-json-plugin.version>
-		<jersey-multipart.version>1.8</jersey-multipart.version>
-		<tomcat-maven-plugin.version>1.1</tomcat-maven-plugin.version>
-	</properties>
-	 <build>
-	 	<pluginManagement>
-	 		<plugins>
-	 			<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-	 			<plugin>
-	 				<groupId>org.eclipse.m2e</groupId>
-	 				<artifactId>lifecycle-mapping</artifactId>
-	 				<version>1.0.0</version>
-	 				<configuration>
-	 					<lifecycleMappingMetadata>
-	 						<pluginExecutions>
-	 							<pluginExecution>
-	 								<pluginExecutionFilter>
-	 									<groupId>
-	 										org.apache.geronimo.genesis.plugins
-	 									</groupId>
-	 									<artifactId>
-	 										tools-maven-plugin
-	 									</artifactId>
-	 									<versionRange>
-	 										[1.1,)
-	 									</versionRange>
-	 									<goals>
-	 										<goal>
-	 											copy-legal-files
-	 										</goal>
-	 									</goals>
-	 								</pluginExecutionFilter>
-	 								<action>
-	 									<ignore></ignore>
-	 								</action>
-	 							</pluginExecution>
-	 							<pluginExecution>
-	 								<pluginExecutionFilter>
-	 									<groupId>
-	 										org.codehaus.mojo
-	 									</groupId>
-	 									<artifactId>
-	 										jspc-maven-plugin
-	 									</artifactId>
-	 									<versionRange>
-	 										[1.4.6,)
-	 									</versionRange>
-	 									<goals>
-	 										<goal>compile</goal>
-	 									</goals>
-	 								</pluginExecutionFilter>
-	 								<action>
-	 									<ignore></ignore>
-	 								</action>
-	 							</pluginExecution>
-	 						</pluginExecutions>
-	 					</lifecycleMappingMetadata>
-	 				</configuration>
-	 			</plugin>
-	 		</plugins>
-	 	</pluginManagement>
-	 </build>
+    <properties>
+        <phresco.server.dependency.config.file xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">config/dependency/2.0.0.6000/dependency-2.0.0.6000.properties</phresco.server.dependency.config.file>
+        <tools-maven-plugin.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">1.1</tools-maven-plugin.version>
+        <jersey-client.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">1.8</jersey-client.version>
+        <mongo-java-driver.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">2.5.2</mongo-java-driver.version>
+        <spring-data-mongodb.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">1.0.0.M2</spring-data-mongodb.version>
+        <cglib.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">2.2</cglib.version>
+        <maven-jar-plugin.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">2.3.2</maven-jar-plugin.version>
+        <gson.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">1.7.1</gson.version>
+        <commons-lang.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">2.2</commons-lang.version>
+        <commons-collections.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">3.2.1</commons-collections.version>
+        <plexus-utils.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">3.0</plexus-utils.version>
+        <spring-oxm.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">1.5.9</spring-oxm.version>
+        <spring-ws-core.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">1.5.9</spring-ws-core.version>
+        <spring-hibernate3.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">2.0.8</spring-hibernate3.version>
+        <asm.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">3.3</asm.version>
+        <slf4j-simple.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">1.6.4</slf4j-simple.version>
+        <hibernate-annotations.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">3.5.6-Final</hibernate-annotations.version>
+        <hibernate-core.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">3.3.1.GA</hibernate-core.version>
+        <hibernate-validator.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">3.1.0.GA</hibernate-validator.version>
+        <mysql-connector-java.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">5.1.18</mysql-connector-java.version>
+        <javassist.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">3.12.1.GA</javassist.version>
+        <jettison.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">1.3</jettison.version>
+        <cglib.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">2.2.2</cglib.version>
+        <junit.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">4.9</junit.version>
+        <log4j.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">1.2.16</log4j.version>
+        <itextpdf.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">5.1.2</itextpdf.version>
+        <itext-xtra.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">5.1.2</itext-xtra.version>
+        <core-renderer.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">R8</core-renderer.version>
+        <classmate.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">0.5.4</classmate.version>
+        <itext.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">2.0.8</itext.version>
+        <fr.opensagres.xdocreport.converter.docx.xwpf.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">0.9.0</fr.opensagres.xdocreport.converter.docx.xwpf.version>
+        <jxl.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">2.6.12</jxl.version>
+        <poi.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">3.7</poi.version>
+        <aether-api.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">1.13</aether-api.version>
+        <aether-spi.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">1.13</aether-spi.version>
+        <aether-util.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">1.13</aether-util.version>
+        <aether-impl.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">1.13</aether-impl.version>
+        <aether-connector-file.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">1.13</aether-connector-file.version>
+        <aether-connector-wagon.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">1.13</aether-connector-wagon.version>
+        <wagon-http-lightweight.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">2.0</wagon-http-lightweight.version>
+        <maven-aether-provider.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">3.0.3</maven-aether-provider.version>
+        <jdom.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">1.1.2</jdom.version>
+        <maven-assembly-plugin.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">2.2-beta-5</maven-assembly-plugin.version>
+        <ehcache.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">1.6.1</ehcache.version>
+        <guava.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">13.0-rc1</guava.version>
+        <jersey-server.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">1.8</jersey-server.version>
+        <jersey-json.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">1.8</jersey-json.version>
+        <spring-core.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">3.0.5.RELEASE</spring-core.version>
+        <spring-context.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">3.0.5.RELEASE</spring-context.version>
+        <spring-web.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">3.0.5.RELEASE</spring-web.version>
+        <jersey-spring.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">1.8</jersey-spring.version>
+        <commons-io.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">2.0.1</commons-io.version>
+        <web-all.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">10.0-build-20080430</web-all.version>
+        <gf-embedded-api.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">1.0-alpha-4</gf-embedded-api.version>
+        <plexus-cipher.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">1.7</plexus-cipher.version>
+        <servlet-api.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">2.5</servlet-api.version>
+        <struts2-core.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">2.2.3.1</struts2-core.version>
+        <struts.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">1.2.9</struts.version>
+        <struts2-json-plugin.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">2.2.3.1</struts2-json-plugin.version>
+        <jersey-multipart.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">1.8</jersey-multipart.version>
+        <tomcat-maven-plugin.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">1.1</tomcat-maven-plugin.version>
+    </properties>
 </project>
