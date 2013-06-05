@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.photon.phresco.service</groupId>
-    <artifactId>service-html5multichanneljquerywidget</artifactId>
+    <artifactId>phresco-service-root</artifactId>
     <packaging>pom</packaging>
     <name>service-html5multichanneljquerywidget</name>
     <version>3.0.0.12001-SNAPSHOT</version>
