@@ -47,6 +47,8 @@ import com.mongodb.gridfs.GridFSInputFile;
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.ArtifactGroupInfo;
+import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.DownloadInfo;
 import com.photon.phresco.commons.model.Technology;
@@ -79,6 +81,8 @@ public class DbService implements ServiceConstants {
 	private static final String MONGO_TEMPLATE = "mongoTemplate";
 	protected static MongoOperations mongoOperation;
 	private static ServerConfiguration serverConfig = null;
+	private static Map<String, String> customerMap = new HashMap<String, String>();
+	
 	protected DbService() {
 		if(mongoOperation == null) {
 			ApplicationContext ctx = new AnnotationConfigApplicationContext(MongoConfig.class);
@@ -603,4 +607,47 @@ public class DbService implements ServiceConstants {
     			TechnologyGroup.class);
 	}
 	
+	protected String getCustomerNameById(String id) {
+		if(customerMap.get(id) != null) {
+			return customerMap.get(id);
+		}
+		Customer cstomer = mongoOperation.findOne(CUSTOMERDAO_COLLECTION_NAME, new Query(Criteria.whereId().is(id)), Customer.class);
+		if(cstomer != null) {
+			customerMap.put(id, cstomer.getName());
+			return cstomer.getName();
+		}
+		return "";
+	}
+	
+	protected String getSelectedFeatureString(List<String> selectedFeatures) {
+		if(CollectionUtils.isEmpty(selectedFeatures)) {
+			return "";
+		}
+		StringBuffer buffer = new StringBuffer();
+		List<ArtifactInfo> infos = mongoOperation.find(ARTIFACT_INFO_COLLECTION_NAME, 
+				new Query(Criteria.whereId().in(selectedFeatures.toArray())), ArtifactInfo.class);
+		for (ArtifactInfo artifactInfo : infos) {
+			ArtifactGroupDAO group = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
+					new Query(Criteria.whereId().is(artifactInfo.getArtifactGroupId())), ArtifactGroupDAO.class);
+			buffer.append(group.getName() + "-" + artifactInfo.getVersion() + ",");
+		}
+		return buffer.toString();
+	}
+	
+	protected String getSelectedDownloadString(List<ArtifactGroupInfo> selected) {
+		if(CollectionUtils.isNotEmpty(selected)) {
+			return "";
+		}
+		StringBuffer buffer = new StringBuffer();
+		for (ArtifactGroupInfo artifactGroupInfo : selected) {
+			buffer.append(artifactGroupInfo.getName() + "-");
+			List<ArtifactInfo> infos = mongoOperation.find(ARTIFACT_INFO_COLLECTION_NAME, 
+					new Query(Criteria.whereId().in(artifactGroupInfo.getArtifactInfoIds().toArray())), ArtifactInfo.class);
+			for (ArtifactInfo artifactInfo : infos) {
+				buffer.append(artifactInfo.getVersion() + ",");
+			}
+			buffer.append(",");
+		}
+		return buffer.toString();
+	}
 }

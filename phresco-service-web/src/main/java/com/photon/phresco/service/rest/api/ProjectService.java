@@ -24,23 +24,26 @@ import java.io.OutputStream;
 import java.util.Collections;
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
 
-import org.apache.log4j.Logger;
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.ProjectServiceManager;
+import com.photon.phresco.service.impl.DbService;
 import com.photon.phresco.service.util.MAGICNUMBER;
 import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.ArchiveUtil;
@@ -53,10 +56,10 @@ import com.photon.phresco.util.Utility;
  */
 
 @Path(ServiceConstants.REST_API_PROJECT)
-public class ProjectService {
+public class ProjectService extends DbService {
 	private static final String ZIP = ".zip";
-    private static final Logger S_LOGGER = Logger.getLogger(ProjectService.class);
-	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
+	private static final SplunkLogger LOGGER = SplunkLogger.getSplunkLogger(ProjectService.class.getName());
+	private static Boolean isDebugEnabled = LOGGER.isDebugEnabled();
 	private DbManager dbManager;
 	
 	public ProjectService() throws PhrescoException {
@@ -68,21 +71,25 @@ public class ProjectService {
 	@Path(ServiceConstants.REST_API_PROJECT_CREATE)
 	@Produces(ServiceConstants.MEDIATYPE_ZIP)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public StreamingOutput createProject(ProjectInfo projectInfo) throws PhrescoException, IOException {
-		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method PhrescoService.createProject(ProjectInfo projectInfo)");
+	public StreamingOutput createProject(@Context HttpServletRequest request, ProjectInfo projectInfo) throws PhrescoException, IOException {
+		LOGGER.debug("ProjectService.createProject : Entry");
+		if(projectInfo == null) {
+			LOGGER.warn("ProjectService.createProject" , "status=\"Bad Request\"" , "remoteAddress=" + request.getRemoteAddr(),
+					"user=" + request.getParameter("userId"));
+			return null;
 		}
 		String tempFolderPath = "";
 		try {
 			tempFolderPath = ServerUtil.getTempFolderPath();
 			
-			if (isDebugEnabled) {
-				S_LOGGER.debug("createProject() ProjectInfo=" + projectInfo.getId());
-				S_LOGGER.debug("Project Path = " + tempFolderPath);
-			}
-			
 			ProjectServiceManager projectService = PhrescoServerFactory.getProjectService();
 			for (int i=0; i < projectInfo.getNoOfApps(); i++) {
+				if (isDebugEnabled) {
+					LOGGER.debug("ProjectService.createProject", "remoteAddress=" + request.getRemoteAddr() , "technology=" + 
+							projectInfo.getAppInfos().get(0).getTechInfo().getName(), "user=" + request.getParameter("userId"),
+							"authType=" + request.getParameter("authType"),"customer=" + getCustomerNameById(projectInfo.getCustomerIds().get(0)),
+							"action=" + "CREATE", "endpoint=" + request.getRequestURI(),  "method=" + request.getMethod(), "projectCode=" + projectInfo.getProjectCode());
+				}
 				projectService.createProject(cloneProjectInfo(projectInfo, i), tempFolderPath);
 			}
 			
@@ -90,9 +97,11 @@ public class ProjectService {
 			ServiceOutput serviceOutput = new ServiceOutput(tempFolderPath);
 			dbManager.storeCreatedProjects(projectInfo);
 			dbManager.updateUsedObjects(projectInfo);
+			LOGGER.debug("ProjectService.createProject() : Exit");
 			return serviceOutput;
 		} catch (Exception pe) {
-			S_LOGGER.error("Error During createProject(projectInfo)", pe);
+			LOGGER.error("ProjectService.createProject", "remoteAddress=" + request.getRemoteAddr(),
+					"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + pe.getLocalizedMessage() + "\"");
 			throw new PhrescoException(pe);
 		}
 	}
@@ -108,10 +117,16 @@ public class ProjectService {
 	@Path(ServiceConstants.REST_API_PROJECT_UPDATE)
 	@Produces(ServiceConstants.MEDIATYPE_ZIP)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public StreamingOutput updateProject(ProjectInfo projectInfo) throws PhrescoException {
-		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method PhrescoService.updateProject(ProjectInfo projectInfo)");
-			S_LOGGER.debug("updateProject() ProjectInfo=" + projectInfo.getProjectCode());
+	public StreamingOutput updateProject(@Context HttpServletRequest request, ProjectInfo projectInfo) throws PhrescoException {
+    	if (isDebugEnabled) {
+			LOGGER.debug("ProjectService.updateProject() : Entry");
+		}
+    	if(projectInfo == null) {
+			if (isDebugEnabled) {
+				LOGGER.warn("ProjectService.createProject" , "status=\"Bad Request\"" , "remoteAddress=" + request.getRemoteAddr(),
+						"user=" + request.getParameter("userId"));
+			}
+			return null;
 		}
 		String projectPathStr = Utility.getPhrescoTemp() + UUID.randomUUID().toString();
 		try {
@@ -119,14 +134,24 @@ public class ProjectService {
 			projectService.updateProject(projectInfo, projectPathStr);
 			
 			if (isDebugEnabled) {
-				S_LOGGER.debug("updateProject() ProjectPath=" + projectPathStr);
+				LOGGER.debug("ProjectService.createProject", "remoteAddress=" + request.getRemoteAddr() , "technology=" + 
+						projectInfo.getAppInfos().get(0).getTechInfo().getName(), "user=" + request.getParameter("userId"),
+						"authType=" + request.getParameter("authType"),"customer=" + getCustomerNameById(projectInfo.getCustomerIds().get(0)),
+						"action=" + "UPDATE", "endpoint=" + request.getRequestURI(),  "method=" + request.getMethod(),
+						"projectCode=" + projectInfo.getProjectCode(), "features=" + getSelectedFeatureString(projectInfo.getAppInfos().get(0).getSelectedModules()) ,
+						"jslibraries=" + getSelectedFeatureString(projectInfo.getAppInfos().get(0).getSelectedJSLibs()), "components=" + 
+						getSelectedFeatureString(projectInfo.getAppInfos().get(0).getSelectedComponents()), 
+						"servers=" + getSelectedDownloadString(projectInfo.getAppInfos().get(0).getSelectedServers()),
+						"databases=" + getSelectedDownloadString(projectInfo.getAppInfos().get(0).getSelectedDatabases()));
 			}
 			ArchiveUtil.createArchive(projectPathStr, projectPathStr + ZIP, ArchiveType.ZIP);
 		} catch (Exception pe) {
-			S_LOGGER.error("Error During updateProject(projectInfo)" + pe);
+			LOGGER.error("ProjectService.createProject", "remoteAddress=" + request.getRemoteAddr(),
+					"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + pe.getLocalizedMessage() + "\"");
 			throw new PhrescoException(pe);
-			// //TODO: Need to design a proper way to throw the error response
-			// to client
+		}
+		if (isDebugEnabled) {
+			LOGGER.debug("ProjectService.updateProject : Exit");
 		}
 		return new ServiceOutput(projectPathStr);
 	}
@@ -137,8 +162,8 @@ public class ProjectService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public StreamingOutput updateDoc(ApplicationInfo appInfo) throws PhrescoException {
 		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method PhrescoService.updateDoc(ProjectInfo projectInfo)");
-			S_LOGGER.debug("updateProject() ProjectInfo=" + appInfo.getCode());
+			LOGGER.debug("Entering Method PhrescoService.updateDoc(ProjectInfo projectInfo)");
+			LOGGER.debug("updateProject() ProjectInfo=" + appInfo.getCode());
 		}
 		String projectPathStr = "";
 		try {
@@ -147,7 +172,7 @@ public class ProjectService {
 			projectPathStr = projectPath.getPath();
 			ArchiveUtil.createArchive(projectPathStr, projectPathStr + ZIP, ArchiveType.ZIP);
 		} catch (Exception pe) {
-			S_LOGGER.error("Error During updateProject(projectInfo)" + pe);
+			LOGGER.error("Error During updateProject(projectInfo)" + pe);
 			throw new PhrescoException(pe);
 		}
 		return new ServiceOutput(projectPathStr);
@@ -162,13 +187,10 @@ public class ProjectService {
 
 		public void write(OutputStream output) throws IOException{
 			if (isDebugEnabled) {
-				S_LOGGER.debug("Entering Method PhrescoService.write(OutputStream output)");
+				LOGGER.debug("ServiceOutput.write : Entry");
 			}
 			FileInputStream fis = null;
 			File path = new File(projectPath);
-			if (isDebugEnabled) {
-				S_LOGGER.debug("PhrescoService.write() FILe PATH = " + path.getPath());
-			}
 			try {
 				fis = new FileInputStream(projectPath + ZIP);
 				byte[] buf = new byte[MAGICNUMBER.BYTESMALLSIZE];
@@ -177,12 +199,12 @@ public class ProjectService {
 					output.write(buf, 0, i);
 				}
 			} catch (Exception e) {
-				S_LOGGER.error("Error During Stream write()", e);
+				LOGGER.error("ServiceOutput.write " , "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"" );
 				throw new WebApplicationException(e);
 			} finally {
 				if (fis != null) {
 					fis.close();
-//					FileUtils.deleteDirectory(path.getParentFile());
+					FileUtils.deleteDirectory(path.getParentFile());
 				}
 			}
 		}

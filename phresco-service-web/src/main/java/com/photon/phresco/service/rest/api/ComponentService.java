@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -36,13 +37,13 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
 import org.springframework.stereotype.Component;
@@ -67,6 +68,7 @@ import com.photon.phresco.commons.model.TechnologyOptions;
 import com.photon.phresco.commons.model.WebService;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.exception.PhrescoWebServiceException;
+import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
@@ -93,8 +95,8 @@ import com.sun.jersey.multipart.MultiPartMediaTypes;
 @Path(ServiceConstants.REST_API_COMPONENT)
 public class ComponentService extends DbService {
 	
-	private static final Logger S_LOGGER= Logger.getLogger(ComponentService.class);
-	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
+	private static final SplunkLogger LOGGER = SplunkLogger.getSplunkLogger(LoginService.class.getName());
+	private static Boolean isDebugEnabled = LOGGER.isDebugEnabled();
 	private static RepositoryManager repositoryManager;
 	
 	private static String exceptionString ="PhrescoException Is";
@@ -113,9 +115,12 @@ public class ComponentService extends DbService {
 	@GET
 	@Path (REST_API_APPTYPES)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findAppTypes(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) throws PhrescoException {
+	public Response findAppTypes(@Context HttpServletRequest request, @QueryParam(REST_QUERY_CUSTOMERID) String customerId) 
+		throws PhrescoException {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.findAppTypes()");
+	        LOGGER.debug("ComponentService.findAppTypes : Entry");
+	        LOGGER.debug("ComponentService.findAppTypes ", "remoteAddress=" + request.getRemoteAddr() , "customer" + getCustomerNameById(customerId),
+	        		"endpoint=" + request.getRequestURI() , "user=" + request.getParameter("userId"));
 	    }
 		try {
 			List<ApplicationType> applicationTypes = new ArrayList<ApplicationType>();
@@ -132,10 +137,20 @@ public class ComponentService extends DbService {
 				}
 			}
 			if(CollectionUtils.isEmpty(applicationTypes)) {
+				if (isDebugEnabled) {
+			        LOGGER.debug("ComponentService.findAppTypes", "status=\"Not Found\"", "remoteAddress=" + request.getRemoteAddr() , 
+			        		"customer" + getCustomerNameById(customerId), "endpoint=" + request.getRequestURI() , "user=" + request.getParameter("userId"));
+			    }
 				return Response.status(Response.Status.NO_CONTENT).build();
 			}
+			if (isDebugEnabled) {
+		        LOGGER.debug("ComponentService.findAppTypes : Exit");
+		    }
 	        return Response.status(Response.Status.OK).entity(applicationTypes).build();
 		} catch (Exception e) {
+			if (isDebugEnabled) {
+		        LOGGER.error("ComponentService.findAppTypes", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, APPTYPES_COLLECTION_NAME);
 		}
 	}
@@ -149,9 +164,11 @@ public class ComponentService extends DbService {
 	@POST
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Path (REST_API_APPTYPES)
-	public Response createAppTypes(List<ApplicationType> appTypes) throws PhrescoException {
+	public Response createAppTypes(@Context HttpServletRequest request, List<ApplicationType> appTypes) throws PhrescoException {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.createAppTypes(List<ApplicationType> appTypes)");
+	        LOGGER.debug("ComponentService.createAppTypes : Entry");
+	        LOGGER.debug("ComponentService.createAppTypes" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() + 
+	        		"user=" + request.getParameter("userId") , "appType=" + appTypes.get(0).getId());
         }
 		try {
 			for (ApplicationType applicationType : appTypes) {
@@ -160,9 +177,15 @@ public class ComponentService extends DbService {
 				}
 			}
 		} catch (Exception e) {
+			if (isDebugEnabled) {
+		        LOGGER.error("ComponentService.createAppTypes" , "status=\"Failure\"", "remoteAddress=" + request.getRemoteAddr() , 
+		        		"endpoint=" + request.getRequestURI(), "user=" + request.getParameter("userId"), "message=\"" + e.getLocalizedMessage() + "\"");
+	        }
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
 		}
-		
+		if (isDebugEnabled) {
+	        LOGGER.debug("ComponentService.createAppTypes : Exit");
+        }
 		return Response.status(Response.Status.CREATED).build();
 	}
 	
@@ -175,9 +198,11 @@ public class ComponentService extends DbService {
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_APPTYPES)
-	public Response updateAppTypes(List<ApplicationType> appTypes) {
+	public Response updateAppTypes(@Context HttpServletRequest request, List<ApplicationType> appTypes) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.updateAppTypes(List<ApplicationType> appTypes)");
+	        LOGGER.debug("ComponentService.updateAppTypes : Entry");
+	        LOGGER.debug("ComponentService.updateAppTypes" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId") , "appType=" + appTypes.get(0).getId());
 	    }
 		
 	    try {
@@ -185,9 +210,13 @@ public class ComponentService extends DbService {
 	            mongoOperation.save(APPTYPES_COLLECTION_NAME , applicationType);
             }
         } catch (Exception e) {
+        	LOGGER.error("ComponentService.createAppTypes" , "status=\"Failure\"", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"), "message=\"" + e.getLocalizedMessage() + "\"");
             throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
         }
-		
+        if (isDebugEnabled) {
+	        LOGGER.debug("ComponentService.updateAppTypes : Exit");
+	    }
 		return Response.status(Response.Status.OK).entity(appTypes).build();
 	}
 	
@@ -199,13 +228,15 @@ public class ComponentService extends DbService {
 	@DELETE
 	@Path (REST_API_APPTYPES)
 	@Produces (MediaType.TEXT_PLAIN)
-	public void deleteAppTypes(List<ApplicationType> appTypes) throws PhrescoException {
+	public void deleteAppTypes(@Context HttpServletRequest request, List<ApplicationType> appTypes) throws PhrescoException {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.deleteAppTypes(List<ApplicationType> appTypes)");
+	        LOGGER.debug("ComponentService.deleteAppTypes : Entry");
+	        LOGGER.debug("ComponentService.deleteAppTypes" , "remoteAddress=" + request.getRemoteAddr() ,"endpoint=" + request.getRequestURI() , 
+    		"user=" + request.getParameter("userId"));
         }
 		
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-		S_LOGGER.error(exceptionString + phrescoException.getErrorMessage());
+		LOGGER.error("ComponentService.deleteAppTypes" , "status=\"Failure\"", "message=\"" + phrescoException.getLocalizedMessage() + "\"");
 		throw phrescoException;
 	}
 	
@@ -217,21 +248,33 @@ public class ComponentService extends DbService {
 	@GET
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_APPTYPES + REST_API_PATH_ID)
-	public Response getApptype(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	public Response getApptype(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.getApptype(String id)" + id);
+	        LOGGER.debug("ComponentService.getApptype : Entry");
+	        LOGGER.debug("ComponentService.getApptype", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"), "id=" + id);
 	    }
-		
 		try {
 			ApplicationType appType = mongoOperation.findOne(APPTYPES_COLLECTION_NAME, 
 			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ApplicationType.class);
 			if(appType != null) {
 				return Response.status(Response.Status.OK).entity(appType).build();
-			} 
+			} else {
+				if (isDebugEnabled) {
+			        LOGGER.warn("ComponentService.getApptype", "status=\"Bad Request\"" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+			        		"user=" + request.getParameter("userId"), "id=" + id);
+			    }
+			}
 		} catch (Exception e) {
+			if (isDebugEnabled) {
+				LOGGER.error("ComponentService.getApptype" , "status=\"Failure\"", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+		        		"user=" + request.getParameter("userId"), "message=\"" + e.getLocalizedMessage() + "\"");
+			}
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, APPTYPES_COLLECTION_NAME);
 		}
-		
+		if (isDebugEnabled) {
+	        LOGGER.debug("ComponentService.getApptype : Exit");
+	    }
 		return Response.status(Response.Status.NO_CONTENT).build();
 	}
 	
@@ -244,17 +287,24 @@ public class ComponentService extends DbService {
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_APPTYPES + REST_API_PATH_ID)
-	public Response updateAppType(@PathParam(REST_API_PATH_PARAM_ID) String id , ApplicationType appType) throws PhrescoException {
+	public Response updateAppType(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id , ApplicationType appType) throws PhrescoException {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.updateAppType(String id , ApplicationType appType)" + id);
+	        LOGGER.debug("ComponentService.updateAppType : Entry");
+	        LOGGER.debug("ComponentService.updateAppType" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"), "id=" + id);
 	    }
-	    //TODO:Need to check if it is used.
 		try {
 	        mongoOperation.save(APPTYPES_COLLECTION_NAME, appType);
 		} catch (Exception e) {
+			if (isDebugEnabled) {
+				LOGGER.error("ComponentService.updateAppType" , "status=\"Failure\"", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+		        		"user=" + request.getParameter("userId"), "message=\"" + e.getLocalizedMessage() + "\"");
+			}
             throw new PhrescoWebServiceException(e, EX_PHEX00005, APPTYPES_COLLECTION_NAME);
         }
-		
+		if (isDebugEnabled) {
+	        LOGGER.debug("ComponentService.updateAppType : Exit");
+	    }
 		return Response.status(Response.Status.OK).entity(appType).build();
 	}
 	
@@ -265,9 +315,11 @@ public class ComponentService extends DbService {
 	 */
 	@DELETE
 	@Path (REST_API_APPTYPES + REST_API_PATH_ID)
-	public Response deleteAppType(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	public Response deleteAppType(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.deleteAppType(String id)" + id);
+	        LOGGER.debug("ComponentService.deleteAppType : Entry");
+	        LOGGER.debug("ComponentService.deleteAppType", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId") , "id=" + id);
 	    }
 		try {
 			ApplicationTypeDAO appType = mongoOperation.findOne(APPTYPES_COLLECTION_NAME, 
@@ -281,11 +333,22 @@ public class ComponentService extends DbService {
 				}
 				mongoOperation.remove(APPTYPES_COLLECTION_NAME, 
 				        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ApplicationTypeDAO.class);
+			} else {
+				if (isDebugEnabled) {
+			        LOGGER.warn("ComponentService.deleteAppType", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+			        		"user=" + request.getParameter("userId"), "status=\"Bad Request\"", "id=" + id);
+			    }
 			}
 		} catch (Exception e) {
+			if (isDebugEnabled) {
+				LOGGER.error("ComponentService.updateAppType" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+		        		"user=" + request.getParameter("userId") ,"status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
 		}
-		
+		if (isDebugEnabled) {
+	        LOGGER.debug("ComponentService.deleteAppType : Exit");
+	    }
 		return Response.status(Response.Status.OK).build();
 	}
 	
@@ -302,6 +365,10 @@ public class ComponentService extends DbService {
 	private void deleteTechnologyObject(String id) {
 		Query query = new Query(Criteria.whereId().is(id));
 		TechnologyDAO technologyDAO = mongoOperation.findOne(TECHNOLOGIES_COLLECTION_NAME, query, TechnologyDAO.class);
+		if(isDebugEnabled) {
+			LOGGER.warn("ComponentService.deleteTechnologyObject", "id=" + id , "status=\"Bad Request\"", 
+					"message=" + "Technology Not Found");
+		}
 		if(technologyDAO != null) {
 			String archetypeGroupDAOId = technologyDAO.getArchetypeGroupDAOId();
 			deleteAttifact(archetypeGroupDAOId);
@@ -322,9 +389,12 @@ public class ComponentService extends DbService {
 	@GET
 	@Path (REST_API_TECHNOLOGIES)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findTechnologies(@QueryParam(REST_QUERY_CUSTOMERID) String customerId, @QueryParam(REST_QUERY_APPTYPEID) String appTypeId) {
+	public Response findTechnologies(@Context HttpServletRequest request, @QueryParam(REST_QUERY_CUSTOMERID) String customerId, 
+			@QueryParam(REST_QUERY_APPTYPEID) String appTypeId) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.findTechnologies() " + customerId);
+	        LOGGER.debug("ComponentService.findTechnologies : Entry");
+	        LOGGER.debug("ComponentService.findTechnologies", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"), "customer" + getCustomerNameById(customerId), "appTypeId=" + appTypeId);
 	    }
 	    List<TechnologyDAO> techDAOList = new ArrayList<TechnologyDAO>();
 	    try {
@@ -354,16 +424,30 @@ public class ComponentService extends DbService {
 				Technology technology = technologyConverter.convertDAOToObject(technologyDAO, mongoOperation);
 				techList.add(technology);
 			}
-			
+			if (isDebugEnabled) {
+		        LOGGER.debug("ComponentService.findTechnologies", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+		        		"user=" + request.getParameter("userId"), "query=" + query.getQueryObject().toString());
+		    }
 			if (CollectionUtils.isEmpty(techList)) {
+				if (isDebugEnabled) {
+			        LOGGER.warn("ComponentService.findTechnologies", "remoteAddress=" + request.getRemoteAddr() , 
+			        		"endpoint=" + request.getRequestURI() , "user=" + request.getParameter("userId"), "status=\"Not Found\"");
+			    }
 				return Response.status(Response.Status.NO_CONTENT).build();	
 			}
 			
 			ResponseBuilder response = Response.status(Response.Status.OK);
 			
 			response.header(Constants.ARTIFACT_COUNT_RESULT, count(TECHNOLOGIES_COLLECTION_NAME, query));
+			if (isDebugEnabled) {
+		        LOGGER.debug("ComponentService.findTechnologies : Exit");
+		    }
 			return response.entity(techList).build();
 		} catch (Exception e) {
+			if (isDebugEnabled) {
+		        LOGGER.debug("ComponentService.findTechnologies ", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+		        		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, TECHNOLOGIES_COLLECTION_NAME);
 		}
     	 
@@ -378,9 +462,11 @@ public class ComponentService extends DbService {
 	@POST
 	@Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
 	@Path (REST_API_TECHNOLOGIES)
-	public Response createTechnologies(MultiPart multiPart) throws PhrescoException, IOException {
+	public Response createTechnologies(@Context HttpServletRequest request, MultiPart multiPart) throws PhrescoException, IOException {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.createTechnologies(List<Technology> technologies)");
+	        LOGGER.debug("ComponentService.createTechnologies");
+	        LOGGER.debug("ComponentService.createTechnologies" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"));
 	    }
 	   return saveOrUpdateTechnology(multiPart);
 	}
@@ -402,9 +488,15 @@ public class ComponentService extends DbService {
 		}
 
 		if (technology == null) {
-			throw new PhrescoException("Technology Is Null");
+			if(isDebugEnabled) {
+				LOGGER.debug("ComponentService.saveOrUpdateTechnology", "status=\"Bad Request\"" ,"message=" + "Technology Is Null");
+			}
+			return null;
 		}
-
+		if(isDebugEnabled) {
+			LOGGER.debug("ComponentService.saveOrUpdateTechnology", "customer" + getCustomerNameById(technology.getCustomerIds().get(0)), 
+					"techId=" + technology.getId());
+		}
 		for (BodyPart bodyPart : entities) {
 			if (bodyPart.getContentDisposition().getFileName()
 					.equals(technology.getName())) {
@@ -430,6 +522,9 @@ public class ComponentService extends DbService {
 			createArtifacts(artifactGroup, pluginMap.get(artifactGroup));
 		}
 		saveTechnology(technology);
+		if(isDebugEnabled) {
+			LOGGER.debug("ComponentService.saveOrUpdateTechnology : Exit");
+		} 
 	   return Response.status(Response.Status.OK).entity(technology).build();
 	}
 
@@ -437,6 +532,12 @@ public class ComponentService extends DbService {
 		BodyPartEntity bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
 		File artifactFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null, 
 				artifactGroup.getPackaging(), artifactGroup.getName());
+		if(!artifactFile.exists()) {
+			if(isDebugEnabled) {
+				LOGGER.info("ComponentService.createArtifacts", "customer" + getCustomerNameById(artifactGroup.getCustomerIds().get(0)), 
+						"artifactId=" + artifactGroup.getId() + "message=" + "Artifact File Not Found");
+			}
+		}
 		uploadBinary(artifactGroup, artifactFile);
 	}
 
@@ -551,11 +652,12 @@ public class ComponentService extends DbService {
 	@Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_TECHNOLOGIES)
-	public Response updateTechnologies(MultiPart multipart) throws PhrescoException {
+	public Response updateTechnologies(@Context HttpServletRequest request, MultiPart multipart) throws PhrescoException {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.updateTechnologies(List<Technology> technologies)");
+	        LOGGER.debug("ComponentService.updateTechnologies : Entry");
+	        LOGGER.debug("ComponentService.createTechnologies" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"));
 	    }
-		
 		return saveOrUpdateTechnology(multipart);
 	}
 	
@@ -566,13 +668,14 @@ public class ComponentService extends DbService {
 	 */
 	@DELETE
 	@Path (REST_API_TECHNOLOGIES)
-	public void deleteTechnologies(List<Technology> technologies) throws PhrescoException {
+	public void deleteTechnologies(@Context HttpServletRequest request, List<Technology> technologies) throws PhrescoException {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.deleteTechnologies(List<WebService> technologies)");
+	        LOGGER.debug("ComponentService.deleteTechnologies : Entry");
+	        LOGGER.debug("ComponentService.deleteTechnologies", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"));
 	    }
-		
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-		S_LOGGER.error(exceptionString + phrescoException.getErrorMessage());
+		LOGGER.error("ComponentService.deleteTechnologies", "status=\"Failure\"", "message=\"" + phrescoException.getLocalizedMessage() + "\"");
 		throw phrescoException;
 	}
 	
@@ -586,11 +689,20 @@ public class ComponentService extends DbService {
 	@GET
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_TECHNOLOGIES + REST_API_PATH_ID)
-	public Response getTechnology(@PathParam(REST_API_PATH_PARAM_ID) String id) throws PhrescoException {
+	public Response getTechnology(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id) throws PhrescoException {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.getTechnology(String id)" + id);
+	    	LOGGER.debug("ComponentService.getTechnology : Entry");
+	    	LOGGER.debug("ComponentService.deleteTechnologies", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"), "id=" + id);
 	    }
 		Technology technology = getTechnologyById(id);
+		if(technology == null) {
+			LOGGER.warn("ComponentService.deleteTechnologies", "remoteAddress=" + request.getRemoteAddr() , 
+	        		"user=" + request.getParameter("userId"), "id=" + id , "status=\"Not Found\"");
+		}
+		if (isDebugEnabled) {
+	    	LOGGER.debug("ComponentService.getTechnology : Exit");
+	    }
 		return Response.status(Response.Status.OK).entity(technology).build();
 	}
 	
@@ -604,20 +716,27 @@ public class ComponentService extends DbService {
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_TECHNOLOGIES + REST_API_PATH_ID)
-	public Response updateTechnology(@PathParam(REST_API_PATH_PARAM_ID) String id , Technology technology) {
+	public Response updateTechnology(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id , Technology technology) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.getTechnology(String id, Technology technology)" + id);
+	        LOGGER.debug("ComponentService.updateTechnology");
+	        LOGGER.debug("ComponentService.updateTechnology" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"), "techId=" + technology.getId());
 	    }
-		
 		try {
 			if (id.equals(technology.getId())) {
 				mongoOperation.save(TECHNOLOGIES_COLLECTION_NAME, technology);
 				return Response.status(Response.Status.OK).entity(technology).build();
 			} 
 		} catch (Exception e) {
+			if (isDebugEnabled) {
+		        LOGGER.error("ComponentService.updateTechnology" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+		        		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
 		}
-		
+		if (isDebugEnabled) {
+	        LOGGER.debug("ComponentService.updateTechnology : Exit");
+	    }
 		return Response.status(Response.Status.BAD_REQUEST).entity(ERROR_MSG_ID_NOT_EQUAL).build();
 	}
 	
@@ -628,9 +747,11 @@ public class ComponentService extends DbService {
 	 */
 	@DELETE
 	@Path (REST_API_TECHNOLOGIES + REST_API_PATH_ID)
-	public Response deleteTechnology(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	public Response deleteTechnology(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.deleteTechnology(String id)" + id);
+	        LOGGER.debug("ComponentService.deleteTechnology : Entry");
+	        LOGGER.debug("ComponentService.deleteTechnology" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"), "id=" + id);
 	    }
 		
 		try {
@@ -638,7 +759,7 @@ public class ComponentService extends DbService {
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
 		}
-		
+		LOGGER.debug("ComponentService.deleteTechnology : Exit");
 		return Response.status(Response.Status.OK).build();
 	}
     
@@ -649,9 +770,11 @@ public class ComponentService extends DbService {
 	@GET
 	@Path (REST_API_SETTINGS)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findSettings(@QueryParam(REST_QUERY_CUSTOMERID) String customerId, @QueryParam(REST_QUERY_TECHID) String techId, @QueryParam(REST_QUERY_TYPE) String type) {
+	public Response findSettings(@Context HttpServletRequest request, @QueryParam(REST_QUERY_CUSTOMERID) String customerId, @QueryParam(REST_QUERY_TECHID) String techId, @QueryParam(REST_QUERY_TYPE) String type) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.findSettings()" + customerId);
+	        LOGGER.debug("ComponentService.findSettings : Entry");
+	        LOGGER.debug("ComponentService.findSettings" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"), "customer" + getCustomerNameById(customerId) , "techId=" + techId, "type=" + type);
 	    }
 	    List<SettingsTemplate> settings = new ArrayList<SettingsTemplate>();
 		try {
@@ -690,10 +813,23 @@ public class ComponentService extends DbService {
 				settings.add(settingsTemplate);
 			}
 			if(CollectionUtils.isEmpty(settings)) {
+				if(isDebugEnabled) {
+					LOGGER.debug("ComponentService.findSettings", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"), "status=\"Not Found\"", "message=\"" + "Settings Not Found" + "\"");
+				}
 				return Response.status(Response.Status.NO_CONTENT).build();
+			}
+			if(isDebugEnabled) {
+				LOGGER.debug("ComponentService.findSettings", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+        		"user=" + request.getParameter("userId"), "query=" + query.getQueryObject().toString());
+				LOGGER.debug("ComponentService.findSettings : Exit");
 			}
 			return Response.status(Response.Status.OK).entity(settings).build();
 		} catch (Exception e) {
+			if(isDebugEnabled) {
+				LOGGER.error("ComponentService.findSettings", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+        		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, SETTINGS_COLLECTION_NAME);
 		}
 	}
@@ -721,11 +857,12 @@ public class ComponentService extends DbService {
 	@POST
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Path (REST_API_SETTINGS)
-	public Response createSettings(List<SettingsTemplate> settings) {
+	public Response createSettings(@Context HttpServletRequest request, List<SettingsTemplate> settings) {
 		if (isDebugEnabled) {
-		    S_LOGGER.debug("Entered into ComponentService.createSettings(List<SettingsTemplate> settings)");
+		    LOGGER.debug("ComponentService.createSettings : Entry");
+		    LOGGER.debug("ComponentService.createSettings" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"), "customer" + getCustomerNameById(settings.get(0).getCustomerIds().get(0)));
 		}
-		
 		try {
 			for (SettingsTemplate settingsTemplate : settings) {
 				if(validate(settingsTemplate)) {
@@ -733,9 +870,15 @@ public class ComponentService extends DbService {
 				}
 			}
 		} catch (Exception e) {
+			if(isDebugEnabled) {
+				LOGGER.error("ComponentService.createSettings", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+        		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
 		}
-		
+		if (isDebugEnabled) {
+		    LOGGER.debug("ComponentService.createSettings : Exit");
+		}
 		return Response.status(Response.Status.CREATED).build();
 	}
 	
@@ -748,9 +891,11 @@ public class ComponentService extends DbService {
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_SETTINGS)
-	public Response updateSettings(List<SettingsTemplate> settings) {
+	public Response updateSettings(@Context HttpServletRequest request, List<SettingsTemplate> settings) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.updateSettings(List<SettingsTemplate> settings)");
+	        LOGGER.debug("ComponentService.updateSettings : Entry");
+	        LOGGER.debug("ComponentService.updateSettings" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"), "customer" + getCustomerNameById(settings.get(0).getCustomerIds().get(0)));
 	    }
 		
 		try {
@@ -762,9 +907,15 @@ public class ComponentService extends DbService {
 				}
 			}
 		} catch (Exception e) {
+			if(isDebugEnabled) {
+				LOGGER.error("ComponentService.createSettings", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+        		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
 		}
-		
+		if (isDebugEnabled) {
+		    LOGGER.debug("ComponentService.updateSettings : Exit");
+		}
 		return Response.status(Response.Status.OK).entity(settings).build();
 	}
 	
@@ -777,11 +928,13 @@ public class ComponentService extends DbService {
 	@Path (REST_API_SETTINGS)
 	public void deleteSettings(List<SettingsTemplate> settings) throws PhrescoException {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.updateSettings(List<SettingsTemplate> settings)");
+	        LOGGER.debug("ComponentService.deleteSettings : Entry");
 	    }
 		
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-		S_LOGGER.error(exceptionString + phrescoException.getErrorMessage());
+		if(isDebugEnabled) {
+			LOGGER.error("ComponentService.deleteSettings", "status=\"Failure\"", "message=\"" + phrescoException.getLocalizedMessage() + "\"");
+		}
 		throw phrescoException;
 		
 	}
@@ -794,11 +947,12 @@ public class ComponentService extends DbService {
 	@GET
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_SETTINGS + REST_API_PATH_ID)
-	public Response getSettingsTemplate(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	public Response getSettingsTemplate(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.getSettingsTemplate(String id)" + id);
+	        LOGGER.debug("ComponentService.getSettingsTemplate : Entry");
+	        LOGGER.debug("ComponentService.getSettingsTemplate" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"), "id=" + id);
 	    }
-		
 		try {
 			SettingsTemplate settingTemplate = mongoOperation.findOne(SETTINGS_COLLECTION_NAME, 
 			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), SettingsTemplate.class); 
@@ -806,9 +960,15 @@ public class ComponentService extends DbService {
 				return Response.status(Response.Status.OK).entity(settingTemplate).build();
 			}
 		} catch (Exception e) {
+			if(isDebugEnabled) {
+				LOGGER.error("ComponentService.getSettingsTemplate", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+        		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, SETTINGS_COLLECTION_NAME);
 		}
-		
+		if (isDebugEnabled) {
+	        LOGGER.debug("ComponentService.getSettingsTemplate : Exit");
+	    }
 		return Response.status(Response.Status.OK).build();
 	}
 	
@@ -821,9 +981,12 @@ public class ComponentService extends DbService {
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_SETTINGS + REST_API_PATH_ID)
-	public Response updateSetting(@PathParam(REST_API_PATH_PARAM_ID) String id , SettingsTemplate settingsTemplate) {
+	public Response updateSetting(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id , 
+			SettingsTemplate settingsTemplate) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.updateAppType(String id , SettingsTemplate settingsTemplate)" + id);
+	        LOGGER.debug("ComponentService.updateAppType : Entry");
+	        LOGGER.debug("ComponentService.getSettingsTemplate" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"), "id=" + id , "customer" + getCustomerNameById(settingsTemplate.getCustomerIds().get(0)));
 	    }
 		try {
 			SettingsTemplate fromDb = mongoOperation.findOne(SETTINGS_COLLECTION_NAME, 
@@ -842,8 +1005,15 @@ public class ComponentService extends DbService {
 			settingsTemplate.setAppliesToTechs(appliesToTechs);
 			settingsTemplate.setCustomerIds(customerIds);
 			mongoOperation.save(SETTINGS_COLLECTION_NAME, settingsTemplate);
+			if (isDebugEnabled) {
+		        LOGGER.debug("ComponentService.updateAppType : Exit");
+		    }
 			return Response.status(Response.Status.OK).entity(settingsTemplate).build();
 		} catch (Exception e) {
+			if(isDebugEnabled) {
+				LOGGER.error("ComponentService.updateAppType", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+        		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
 		}
 	}
@@ -864,18 +1034,25 @@ public class ComponentService extends DbService {
 	 */
 	@DELETE
 	@Path (REST_API_SETTINGS + REST_API_PATH_ID)
-	public Response deleteSettingsTemplate(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	public Response deleteSettingsTemplate(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.deleteSettingsTemplate(String id)" + id);
+	        LOGGER.debug("ComponentService.deleteSettingsTemplate : Entry");
+	        LOGGER.debug("ComponentService.deleteSettingsTemplate" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"), "id=" + id);
 	    }
-		
 		try {
 			mongoOperation.remove(SETTINGS_COLLECTION_NAME, 
 			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), SettingsTemplate.class);
 		} catch (Exception e) {
+			if(isDebugEnabled) {
+				LOGGER.error("ComponentService.deleteSettingsTemplate", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+        		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
 		}
-		
+		if (isDebugEnabled) {
+	        LOGGER.debug("ComponentService.deleteSettingsTemplate : Exit");
+	    }
 		return Response.status(Response.Status.OK).build();
 	}
 	
@@ -886,11 +1063,13 @@ public class ComponentService extends DbService {
 	@GET
 	@Path (REST_API_MODULES)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findModules(@QueryParam(REST_QUERY_TYPE) String type, @QueryParam(REST_QUERY_CUSTOMERID) String customerId,
+	public Response findModules(@Context HttpServletRequest request, @QueryParam(REST_QUERY_TYPE) String type, @QueryParam(REST_QUERY_CUSTOMERID) String customerId,
 			@QueryParam(REST_QUERY_TECHID) String techId, @QueryParam(REST_LIMIT_VALUE) String count,
 			@QueryParam(REST_SKIP_VALUE) String start) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.findModules()" + type);
+	        LOGGER.debug("ComponentService.findModules : Entry");
+	        LOGGER.debug("ComponentService.findModules" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"), "customer" + getCustomerNameById(customerId), "techId=" + techId);
 	    }
 		try {
 			Query query = new Query();
@@ -927,15 +1106,30 @@ public class ComponentService extends DbService {
 			List<ArtifactGroupDAO> artifactGroupDAOs = mongoOperation.find(ARTIFACT_GROUP_COLLECTION_NAME,
 					query, ArtifactGroupDAO.class);
 			if(CollectionUtils.isEmpty(artifactGroupDAOs)) {
+				if(isDebugEnabled) {
+					LOGGER.warn("ComponentService.findModules" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+			        		"user=" + request.getParameter("userId"), "status=\"Not Found\"", "message=" + "Not Found");
+				}
 		    	return Response.status(Response.Status.NO_CONTENT).build();
 		    }
+			if(isDebugEnabled) {
+				LOGGER.info("ComponentService.findModules" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+		        		"user=" + request.getParameter("userId"), "query=" + query.getQueryObject().toString());
+			}
 		    List<ArtifactGroup> modules = convertDAOToModule(artifactGroupDAOs);
 		 
 		    ResponseBuilder response = Response.status(Response.Status.OK);
 		    response.header(Constants.ARTIFACT_COUNT_RESULT, count(ARTIFACT_GROUP_COLLECTION_NAME, query));
+		    if (isDebugEnabled) {
+		        LOGGER.debug("ComponentService.findModules : Exit");
+		    }
 			return response.entity(modules).build();
 		    
 		} catch(Exception e) {
+			if(isDebugEnabled) {
+				LOGGER.error("ComponentService.deleteSettingsTemplate", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+        		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, ARTIFACT_GROUP_COLLECTION_NAME);
 		}
 
@@ -971,9 +1165,11 @@ public class ComponentService extends DbService {
     @Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
     @Produces (MediaType.APPLICATION_JSON)
     @Path (REST_API_MODULES)
-    public Response createModules(MultiPart moduleInfo) throws PhrescoException {
+    public Response createModules(@Context HttpServletRequest request, MultiPart moduleInfo) throws PhrescoException {
         if (isDebugEnabled) {
-            S_LOGGER.debug("Entered into ComponentService.createModules(List<ModuleGroup> modules)");
+        	LOGGER.debug("ComponentService.createModules : Entry");
+        	LOGGER.debug("ComponentService.findModules" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"));
         }
         return createOrUpdateFeatures(moduleInfo);
     }
@@ -985,6 +1181,10 @@ public class ComponentService extends DbService {
         List<BodyPart> bodyParts = moduleInfo.getBodyParts();
         Map<String, BodyPartEntity> bodyPartEntityMap = new HashMap<String, BodyPartEntity>();
         moduleGroup = createBodyPart(moduleGroup, bodyParts, bodyPartEntityMap);
+        if (isDebugEnabled) {
+        	LOGGER.debug("ComponentService.createOrUpdateFeatures " , "customer" + getCustomerNameById(moduleGroup.getCustomerIds().get(0)), 
+        			"id" + moduleGroup.getId());
+        }
         if(bodyPartEntityMap.isEmpty()) {
         	saveModuleGroup(moduleGroup);
         }
@@ -1015,6 +1215,9 @@ public class ComponentService extends DbService {
         	}
         }
         bodyPartEntityMap.clear();
+        if (isDebugEnabled) {
+        	LOGGER.debug("ComponentService.createOrUpdateFeatures : Exit");
+        }
         return Response.status(Response.Status.CREATED).entity(moduleGroup).build();
 	}
 
@@ -1113,9 +1316,11 @@ public class ComponentService extends DbService {
 	@Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_MODULES)
-	public Response updateModules(MultiPart multiPart) throws PhrescoException {
+	public Response updateModules(@Context HttpServletRequest request, MultiPart multiPart) throws PhrescoException {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.updateModules(List<ModuleGroup> modules)");
+	        LOGGER.debug("ComponentService.updateModules :  Entry");
+	        LOGGER.debug("ComponentService.findModules" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"));
 	    }
 		return createOrUpdateFeatures(multiPart);
 	}
@@ -1129,11 +1334,13 @@ public class ComponentService extends DbService {
 	@Path (REST_API_MODULES)
 	public void deleteModules(List<ArtifactGroup> modules) throws PhrescoException {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.deleteModules(List<ModuleGroup> modules)");
+	        LOGGER.debug("ComponentService.deleteModules : Entry");
 	    }
 		
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-		S_LOGGER.error(exceptionString + phrescoException.getErrorMessage());
+		if (isDebugEnabled) {
+	        LOGGER.debug("ComponentService.deleteModules" ,"status=\"Failure\"", "message=\"" + phrescoException.getLocalizedMessage() + "\"");
+	    }
 		throw phrescoException;
 	}
 	
@@ -1145,11 +1352,12 @@ public class ComponentService extends DbService {
 	@GET
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_MODULES + REST_API_PATH_ID)
-	public Response getModule(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	public Response getModule(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.getModule(String id)" + id);
+	        LOGGER.debug("ComponentService.getModule : Entry");
+	        LOGGER.debug("ComponentService.getModule" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId") , "id=" + id);
 	    }
-		
 		try {
 			ArtifactGroupDAO moduleDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
 			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ArtifactGroupDAO.class);
@@ -1166,14 +1374,23 @@ public class ComponentService extends DbService {
 			    	moduleGroup.setSystem(artifactElement.isSystem());
 			    	moduleGroup.setLicenseId(artifactElement.getLicenseId());
 			    	moduleGroup.setCreationDate(artifactElement.getCreationDate());
+			    	return  Response.status(Response.Status.OK).entity(moduleGroup).build();
+			    } else {
+			    	if(isDebugEnabled) {
+						LOGGER.info("ComponentService.getModule", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+		        		"user=" + request.getParameter("userId"), "status=\"NotFound\"");
+					}
+			    	return Response.status(Response.Status.NO_CONTENT).build();
 			    }
-				return  Response.status(Response.Status.OK).entity(moduleGroup).build();
 			}
 		} catch (Exception e) {
+			if(isDebugEnabled) {
+				LOGGER.error("ComponentService.getModule", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+        		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, ARTIFACT_GROUP_COLLECTION_NAME);
 		}
-		
-		return Response.status(Response.Status.NO_CONTENT).build();
+		return null;
 	}
 	
 	/**
@@ -1186,17 +1403,25 @@ public class ComponentService extends DbService {
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_MODULES + REST_API_PATH_ID)
-	public Response updatemodule(@PathParam(REST_API_PATH_PARAM_ID) String id, ArtifactGroup module) {
+	public Response updatemodule(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id, ArtifactGroup module) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.updatemodule(String id , ModuleGroup module)" + id);
+	        LOGGER.debug("ComponentService.updatemodule : Entry");
+	        LOGGER.debug("ComponentService.updatemodule" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId") , "id=" + id , "customer" + getCustomerNameById(module.getCustomerIds().get(0)));
 	    }
-		
 		try {
 			if (id.equals(module.getId())) {
 				saveModuleGroup(module);
+				if (isDebugEnabled) {
+			        LOGGER.debug("ComponentService.updatemodule : Exit");
+			    }
 				return  Response.status(Response.Status.OK).entity(module).build();
 			}
 		} catch (Exception e) {
+			if(isDebugEnabled) {
+				LOGGER.error("ComponentService.updatemodule", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+        		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
 		}
 		
@@ -1210,9 +1435,11 @@ public class ComponentService extends DbService {
 	 */
 	@DELETE
 	@Path (REST_API_MODULES + REST_API_PATH_ID)
-	public Response deleteModules(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	public Response deleteModules(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.deleteModules(String id)" + id);
+	        LOGGER.debug("ComponentService.deleteModules : Entry");
+	        LOGGER.debug("ComponentService.deleteModules" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId") , "id=" + id);
 	    }
 		return deleteAttifact(id);
 	}
@@ -1239,11 +1466,18 @@ public class ComponentService extends DbService {
 					mongoOperation.remove(ARTIFACT_INFO_COLLECTION_NAME, query, ArtifactInfo.class);
 				}
 			}
-			
+			if (isDebugEnabled) {
+		        LOGGER.debug("ComponentService.deleteAttifact " , "query=" + query.getQueryObject().toString());
+		    }
 		} catch (Exception e) {
+			if(isDebugEnabled) {
+				LOGGER.error("ComponentService.deleteAttifact", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
 		}
-		
+		if (isDebugEnabled) {
+	        LOGGER.debug("ComponentService.deleteModules : Exit");
+	    }
 		return Response.status(Response.Status.OK).build();
 	}
 	
@@ -1254,15 +1488,24 @@ public class ComponentService extends DbService {
 	@GET
 	@Path (REST_API_ARTIFACTINFO)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response getArtifactInfo(@QueryParam(REST_QUERY_ID) String id) {
+	public Response getArtifactInfo(@Context HttpServletRequest request, @QueryParam(REST_QUERY_ID) String id) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.getArtifactInfo()" + id);
+	        LOGGER.debug("ComponentService.getArtifactInfo : Entry");
+	        LOGGER.debug("ComponentService.getArtifactInfo" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId") , "id=" + id);
 	    }
 		try {
 			Query query = new Query(Criteria.whereId().is(id));
 			ArtifactInfo info = mongoOperation.findOne(ARTIFACT_INFO_COLLECTION_NAME, query, ArtifactInfo.class);
+			if (isDebugEnabled) {
+		        LOGGER.debug("ComponentService.getArtifactInfo : Exit");
+			}
 			return  Response.status(Response.Status.OK).entity(info).build();
 		} catch (Exception e) {
+			if(isDebugEnabled) {
+				LOGGER.error("ComponentService.getArtifactInfo", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+        		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, ARTIFACT_INFO_COLLECTION_NAME);
 		}
 	}
@@ -1274,9 +1517,11 @@ public class ComponentService extends DbService {
 	@GET
 	@Path (REST_API_PILOTS)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findPilots(@QueryParam(REST_QUERY_CUSTOMERID) String customerId, @QueryParam(REST_QUERY_TECHID) String techId) {
+	public Response findPilots(@Context HttpServletRequest request, @QueryParam(REST_QUERY_CUSTOMERID) String customerId, @QueryParam(REST_QUERY_TECHID) String techId) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.findPilots()" + customerId);
+	        LOGGER.debug("ComponentService.findPilots : Entry");
+	        LOGGER.debug("ComponentService.findPilots" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId") , "customer" + getCustomerNameById(customerId) , "techId=" + techId);
 	    }
 	    List<ApplicationInfo> applicationInfos = new ArrayList<ApplicationInfo>();
 		try {
@@ -1310,12 +1555,26 @@ public class ComponentService extends DbService {
 			}
             
 			if(CollectionUtils.isEmpty(applicationInfos)) {
+				if (isDebugEnabled) {
+			        LOGGER.info("ComponentService.findPilots" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+			        		"user=" + request.getParameter("userId") , "status=\"Not Found\"");
+			    }
 				return Response.status(Response.Status.NO_CONTENT).build();
 			}
+			if (isDebugEnabled) {
+		        LOGGER.info("ComponentService.findPilots" , "query=" + query.getQueryObject().toString());
+		    }
 			ResponseBuilder response = Response.status(Response.Status.OK);
 			response.header(Constants.ARTIFACT_COUNT_RESULT, count(APPLICATION_INFO_COLLECTION_NAME, query));
+			if (isDebugEnabled) {
+		        LOGGER.debug("ComponentService.findPilots : Exit");
+		    }
 			return response.entity(applicationInfos).build();
 		} catch (Exception e) {
+			if(isDebugEnabled) {
+				LOGGER.error("ComponentService.findPilots", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+        		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, APPLICATION_INFO_COLLECTION_NAME);
 		}
 	}
@@ -1330,9 +1589,11 @@ public class ComponentService extends DbService {
     @Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
     @Produces (MediaType.APPLICATION_JSON)
     @Path (REST_API_PILOTS)
-    public Response createPilots(MultiPart pilotInfo) throws PhrescoException {
+    public Response createPilots(@Context HttpServletRequest request, MultiPart pilotInfo) throws PhrescoException {
         if (isDebugEnabled) {
-            S_LOGGER.debug("Entered into ComponentService.createPilots(List<ProjectInfo> projectInfos)");
+            LOGGER.debug("ComponentService.createPilots : Entry");
+            LOGGER.debug("ComponentService.findPilots" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"));
         }
 
         return createOrUpdatePilots(pilotInfo);
@@ -1375,12 +1636,12 @@ public class ComponentService extends DbService {
 		if(!validate(applicationInfo)) {
 			return;
 		}
-			Converter<ApplicationInfoDAO, ApplicationInfo> appConverter = 
-			(Converter<ApplicationInfoDAO, ApplicationInfo>) ConvertersFactory.getConverter(ApplicationInfoDAO.class);
-			ApplicationInfoDAO applicationInfoDAO = appConverter.convertObjectToDAO(applicationInfo);
-			mongoOperation.save(APPLICATION_INFO_COLLECTION_NAME, applicationInfoDAO);
-			ArtifactGroup pilotContent = applicationInfo.getPilotContent();
-			saveModuleGroup(pilotContent);
+		Converter<ApplicationInfoDAO, ApplicationInfo> appConverter = 
+		(Converter<ApplicationInfoDAO, ApplicationInfo>) ConvertersFactory.getConverter(ApplicationInfoDAO.class);
+		ApplicationInfoDAO applicationInfoDAO = appConverter.convertObjectToDAO(applicationInfo);
+		mongoOperation.save(APPLICATION_INFO_COLLECTION_NAME, applicationInfoDAO);
+		ArtifactGroup pilotContent = applicationInfo.getPilotContent();
+		saveModuleGroup(pilotContent);
 	}
 	
 	/**
@@ -1393,9 +1654,11 @@ public class ComponentService extends DbService {
 	@Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
     @Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_PILOTS)
-	public Response updatePilots(MultiPart pilotInfo) throws PhrescoException {
+	public Response updatePilots(@Context HttpServletRequest request, MultiPart pilotInfo) throws PhrescoException {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.updatePilots(List<ProjectInfo> pilots)");
+	        LOGGER.debug("ComponentService.updatePilots : Entry");
+	        LOGGER.debug("ComponentService.findPilots" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"));
 	    }
 	    
 		return createOrUpdatePilots(pilotInfo);
@@ -1410,11 +1673,13 @@ public class ComponentService extends DbService {
 	@Path (REST_API_PILOTS)
 	public void deletePilots(List<ApplicationInfo> pilots) throws PhrescoException {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.deletePilots(List<ProjectInfo> pilots)");
+	        LOGGER.debug("ComponentService.deletePilots : Entry");
 	    }
 		
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-		S_LOGGER.error(exceptionString + phrescoException.getErrorMessage());
+		if (isDebugEnabled) {
+	        LOGGER.debug("ComponentService.deletePilots" , "status=\"Failure\"", "message=\"" + phrescoException.getLocalizedMessage() + "\"");
+	    }
 		throw phrescoException;
 	}
 	
@@ -1426,11 +1691,12 @@ public class ComponentService extends DbService {
 	@GET
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_PILOTS + REST_API_PATH_ID)
-	public Response getPilot(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	public Response getPilot(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.getPilot(String id)" + id);
+	        LOGGER.debug("ComponentService.getPilot : Entry ");
+	        LOGGER.debug("ComponentService.getPilot" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"), "id=" + id);
 	    }
-		
 		try {
 			ApplicationInfo appInfo = mongoOperation.findOne(APPLICATION_INFO_COLLECTION_NAME, 
 			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ApplicationInfo.class);
@@ -1439,6 +1705,10 @@ public class ComponentService extends DbService {
 				return Response.status(Response.Status.OK).entity(appInfo).build();
 			}
 		} catch (Exception e) {
+			if(isDebugEnabled) {
+				LOGGER.error("ComponentService.getPilot", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+        		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, APPLICATION_INFO_COLLECTION_NAME);
 		}
 		
@@ -1455,17 +1725,25 @@ public class ComponentService extends DbService {
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_PILOTS + REST_API_PATH_ID)
-	public Response updatePilot(@PathParam(REST_API_PATH_PARAM_ID) String id , ApplicationInfo pilot) {
+	public Response updatePilot(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id , ApplicationInfo pilot) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.updatePilot(String id, ProjectInfo pilot)" + id); 
+	        LOGGER.debug("ComponentService.updatePilot : Entry"); 
+	        LOGGER.debug("ComponentService.updatePilot" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"), "id=" + id);
 	    }
-		
 		try {
 			if (id.equals(pilot.getId())) {
 				mongoOperation.save(APPLICATION_INFO_COLLECTION_NAME, pilot);
+				if (isDebugEnabled) {
+			        LOGGER.debug("ComponentService.updatePilot : Exit"); 
+			    }
 				return  Response.status(Response.Status.OK).entity(pilot).build();
 			}
 		} catch (Exception e) {
+			if(isDebugEnabled) {
+				LOGGER.error("ComponentService.updatePilot", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+        		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
 		}
 		
@@ -1479,15 +1757,26 @@ public class ComponentService extends DbService {
 	 */
 	@DELETE
 	@Path (REST_API_PILOTS + REST_API_PATH_ID)
-	public Response deletePilot(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	public Response deletePilot(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.deletePilot(String id)" + id);
+	        LOGGER.debug("ComponentService.deletePilot : Entry ");
+	        LOGGER.debug("ComponentService.deletePilot" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"), "id=" + id);
 	    }
 	    Query query = new Query(Criteria.whereId().is(id));
 	    ApplicationInfoDAO applicationInfoDAO = mongoOperation.findOne(APPLICATION_INFO_COLLECTION_NAME, query, ApplicationInfoDAO.class);
 	    if(applicationInfoDAO != null) {
 	    	deleteAttifact(applicationInfoDAO.getArtifactGroupId());
 	    	mongoOperation.remove(APPLICATION_INFO_COLLECTION_NAME, query, ApplicationInfoDAO.class);
+	    } else {
+	    	if (isDebugEnabled) {
+		        LOGGER.info("ComponentService.deletePilot", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+		        		"user=" + request.getParameter("userId"), "status=\"Not Found\"");
+		        LOGGER.info("ComponentService.deletePilot", "query=" + query.getQueryObject().toString());
+		    }
+	    }
+	    if (isDebugEnabled) {
+	        LOGGER.debug("ComponentService.deletePilot : Exit ");
 	    }
 		return Response.status(Response.Status.OK).build(); 
 	}
@@ -1499,18 +1788,30 @@ public class ComponentService extends DbService {
 	@GET
 	@Path (REST_API_WEBSERVICES)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findWebServices(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
+	public Response findWebServices(@Context HttpServletRequest request, @QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.findWebServices()");
+	        LOGGER.debug("ComponentService.findWebServices : Entry ");
+	        LOGGER.debug("ComponentService.findWebServices" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"), "customer" + getCustomerNameById(customerId));
 	    }
-		
 		try {
 			List<WebService> webServiceList = mongoOperation.getCollection(WEBSERVICES_COLLECTION_NAME, WebService.class);
 			if(CollectionUtils.isEmpty(webServiceList)) {
+				if (isDebugEnabled) {
+			        LOGGER.debug("ComponentService.findWebServices", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+			        		"user=" + request.getParameter("userId"), "status=\"Not Found\"");
+			    }
 				return  Response.status(Response.Status.NO_CONTENT).build();
 			}
+			if (isDebugEnabled) {
+		        LOGGER.debug("ComponentService.findWebServices : Exit ");
+		    }
 			return  Response.status(Response.Status.OK).entity(webServiceList).build();
 		} catch (Exception e) {
+			if(isDebugEnabled) {
+				LOGGER.error("ComponentService.findWebServices", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+        		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, WEBSERVICES_COLLECTION_NAME);
 		}
 	}
@@ -1523,9 +1824,11 @@ public class ComponentService extends DbService {
 	@POST
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Path (REST_API_WEBSERVICES)
-	public Response createWebServices(List<WebService> webServices) {
+	public Response createWebServices(@Context HttpServletRequest request, List<WebService> webServices) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.createWebServices(List<WebService> webServices)");
+	        LOGGER.debug("ComponentService.createWebServices : Entry");
+	        LOGGER.debug("ComponentService.createWebServices" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"), "id=" + webServices.get(0).getId());
 	    }
 		
 		try {
@@ -1535,9 +1838,15 @@ public class ComponentService extends DbService {
 				}
 			}
 		} catch (Exception e) {
+			if(isDebugEnabled) {
+				LOGGER.error("ComponentService.createWebServices", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+        		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
 		}
-		
+		if (isDebugEnabled) {
+	        LOGGER.debug("ComponentService.createWebServices : Exit");
+	    }
 		return Response.status(Response.Status.OK).build();
 	}
 	
@@ -1550,11 +1859,12 @@ public class ComponentService extends DbService {
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_WEBSERVICES)
-	public Response updateWebServices(List<WebService> webServices) {
+	public Response updateWebServices(@Context HttpServletRequest request, List<WebService> webServices) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.updateWebServices(List<WebService> webServices)");
+	        LOGGER.debug("ComponentService.updateWebServices : Entry");
+	        LOGGER.debug("ComponentService.updateWebServices" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"), "id=" + webServices.get(0).getId());
 	    }
-		
 		try {
 			for (WebService webService : webServices) {
 				WebService webServiceInfo = mongoOperation.findOne(WEBSERVICES_COLLECTION_NAME , 
@@ -1564,9 +1874,15 @@ public class ComponentService extends DbService {
 				}
 			}
 		} catch (Exception e) {
+			if(isDebugEnabled) {
+				LOGGER.error("ComponentService.updateWebServices", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+        		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
 		}
-		
+		if (isDebugEnabled) {
+	        LOGGER.debug("ComponentService.updateWebServices : Exit");
+	    }
 		return Response.status(Response.Status.OK).entity(webServices).build();
 	}
 	
@@ -1577,13 +1893,15 @@ public class ComponentService extends DbService {
 	 */
 	@DELETE
 	@Path (REST_API_WEBSERVICES)
-	public void deleteWebServices(List<WebService> webServices) throws PhrescoException {
+	public void deleteWebServices(@Context HttpServletRequest request, List<WebService> webServices) throws PhrescoException {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.deleteWebServices(List<WebService> webServices)");
+	        LOGGER.debug("ComponentService.deleteWebServices : Entry");
 	    }
-		
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-		S_LOGGER.error(exceptionString + phrescoException.getErrorMessage());
+		if(isDebugEnabled) {
+			LOGGER.error("ComponentService.deleteWebServices", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+    		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + phrescoException.getLocalizedMessage() + "\"");
+		}
 		throw phrescoException;
 	}
 	
@@ -1595,11 +1913,12 @@ public class ComponentService extends DbService {
 	@GET
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_WEBSERVICES + REST_API_PATH_ID)
-	public Response getWebService(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	public Response getWebService(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.getWebService(String id)" + id);
+	        LOGGER.debug("ComponentService.getWebService : Entry");
+	        LOGGER.debug("ComponentService.getWebService" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"), "id=" + id);
 	    }
-		
 		try {
 			WebService webService = mongoOperation.findOne(WEBSERVICES_COLLECTION_NAME, 
 					new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), WebService.class);
@@ -1607,9 +1926,15 @@ public class ComponentService extends DbService {
 				return Response.status(Response.Status.OK).entity(webService).build();
 			} 
 		} catch (Exception e) {
+			if(isDebugEnabled) {
+				LOGGER.error("ComponentService.getWebService", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+        		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, WEBSERVICES_COLLECTION_NAME);
 		}
-		
+		if (isDebugEnabled) {
+	        LOGGER.debug("ComponentService.getWebService : Exit");
+	    }
 		return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
 	}
 	
@@ -1623,9 +1948,11 @@ public class ComponentService extends DbService {
 	@Consumes (MediaType.APPLICATION_JSON)
 	@Produces (MediaType.APPLICATION_JSON)
 	@Path (REST_API_WEBSERVICES + REST_API_PATH_ID)
-	public Response updateWebService(@PathParam(REST_API_PATH_PARAM_ID) String id , WebService webService) {
+	public Response updateWebService(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id , WebService webService) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.updateWebService(String id, WebService webService)" + id);
+	        LOGGER.debug("ComponentService.updateWebService : Entry");
+	        LOGGER.debug("ComponentService.updateWebService" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"), "id=" + id);
 	    }
 		
 		try {
@@ -1634,9 +1961,15 @@ public class ComponentService extends DbService {
 				return Response.status(Response.Status.OK).entity(webService).build();
 			} 
 		} catch (Exception e) {
+			if(isDebugEnabled) {
+				LOGGER.error("ComponentService.updateWebService", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+        		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
 		}
-		
+		if (isDebugEnabled) {
+	        LOGGER.debug("ComponentService.updateWebService : Exit");
+	    }
 		return Response.status(Response.Status.BAD_REQUEST).entity(ERROR_MSG_ID_NOT_EQUAL).build();
 	}
 	
@@ -1647,18 +1980,25 @@ public class ComponentService extends DbService {
 	 */
 	@DELETE
 	@Path (REST_API_WEBSERVICES + REST_API_PATH_ID)
-	public Response deleteWebService(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	public Response deleteWebService(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.deleteWebService(String id)" + id);
+	        LOGGER.debug("ComponentService.deleteWebService : Entry ");
+	        LOGGER.debug("ComponentService.updateWebService" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"), "id=" + id);
 	    }
-		
 		try {
 			mongoOperation.remove(WEBSERVICES_COLLECTION_NAME, 
 			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), WebService.class);
 		} catch (Exception e) {
+			if(isDebugEnabled) {
+				LOGGER.error("ComponentService.updateWebService", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+        		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
 		}
-		
+		if (isDebugEnabled) {
+	        LOGGER.debug("ComponentService.deleteWebService : Exit ");
+	    }
 		return Response.status(Response.Status.OK).build();
 	}
 
@@ -1669,11 +2009,13 @@ public class ComponentService extends DbService {
     @GET
     @Path (REST_API_DOWNLOADS)
     @Produces (MediaType.APPLICATION_JSON)
-    public Response findDownloadInfo(@QueryParam(REST_QUERY_CUSTOMERID) String customerId, 
+    public Response findDownloadInfo(@Context HttpServletRequest request, @QueryParam(REST_QUERY_CUSTOMERID) String customerId, 
     		@QueryParam(REST_QUERY_TECHID) String techId, @QueryParam(REST_QUERY_TYPE) String type, 
     		@QueryParam(REST_QUERY_PLATFORM) String platform) {
         if (isDebugEnabled) {
-            S_LOGGER.debug("Entered into AdminService.findDownloadInfo()");
+            LOGGER.debug("ComponentService.findDownloadInfo : Entry");
+            LOGGER.debug("ComponentService.findDownloadInfo" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"), "customerId=" + customerId, "techId=" + techId, "type=" + type, "platform=" + platform);
         }
         List<DownloadInfo> downloads = new ArrayList<DownloadInfo>();
         Query query = new Query();
@@ -1710,18 +2052,23 @@ public class ComponentService extends DbService {
         	}
         	List<DownloadsDAO> downloadList = mongoOperation.find(DOWNLOAD_COLLECTION_NAME, query, DownloadsDAO.class);
         	if(CollectionUtils.isEmpty(downloadList)) {
+        		LOGGER.debug("ComponentService.findDownloadInfo" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+    	        		"user=" + request.getParameter("userId"), "status=\"Bad Request\"", "message=" + "Not Found");
             	return  Response.status(Response.Status.NO_CONTENT).build();
             }
-            if (downloadList != null) {
-            	Converter<DownloadsDAO, DownloadInfo> downloadConverter = 
-            		(Converter<DownloadsDAO, DownloadInfo>) ConvertersFactory.getConverter(DownloadsDAO.class);
-            	for (DownloadsDAO downloadsDAO : downloadList) {
-					DownloadInfo downloadInfo = downloadConverter.convertDAOToObject(downloadsDAO, mongoOperation);
-					downloads.add(downloadInfo);
-				}
-            } 
+        	Converter<DownloadsDAO, DownloadInfo> downloadConverter = 
+        		(Converter<DownloadsDAO, DownloadInfo>) ConvertersFactory.getConverter(DownloadsDAO.class);
+        	for (DownloadsDAO downloadsDAO : downloadList) {
+				DownloadInfo downloadInfo = downloadConverter.convertDAOToObject(downloadsDAO, mongoOperation);
+				downloads.add(downloadInfo);
+			}
+        	LOGGER.debug("ComponentService.findDownloadInfo" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"), "query=" + query.getQueryObject().toString());
         } catch (Exception e) {
-        	e.printStackTrace();
+        	if(isDebugEnabled) {
+				LOGGER.error("ComponentService.updateWebService", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+        		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
             throw new PhrescoWebServiceException(e, EX_PHEX00006, DOWNLOAD_COLLECTION_NAME);
         }
         ResponseBuilder response = Response.status(Response.Status.OK);
@@ -1740,9 +2087,11 @@ public class ComponentService extends DbService {
     @Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
     @Produces (MediaType.APPLICATION_JSON)
     @Path (REST_API_DOWNLOADS)
-    public Response createDownloads(MultiPart downloadPart) throws PhrescoException {
+    public Response createDownloads(@Context HttpServletRequest request, MultiPart downloadPart) throws PhrescoException {
         if (isDebugEnabled) {
-            S_LOGGER.debug("Entered into ComponentService.createModules(List<ModuleGroup> modules)");
+            LOGGER.debug("ComponentService.createDownloads : Entry");
+            LOGGER.debug("ComponentService.createDownloads" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"));
         }
         return createOrUpdateDownloads(downloadPart);
     }
@@ -1762,6 +2111,10 @@ public class ComponentService extends DbService {
                 }
             }
         }
+        if (isDebugEnabled) {
+            LOGGER.debug("ComponentService.createDownloads " , "id=" + downloadInfo.getId() , "customer=" + 
+            		getCustomerNameById(downloadInfo.getCustomerIds().get(0)));
+        }
         if(bodyPartEntity != null) {
             downloadFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null,
             		downloadInfo.getArtifactGroup().getPackaging(), downloadInfo.getName());
@@ -1775,7 +2128,9 @@ public class ComponentService extends DbService {
         if(bodyPartEntity == null && downloadInfo != null) {
         	saveDownloads(downloadInfo);
         }
-        
+        if (isDebugEnabled) {
+            LOGGER.debug("ComponentService.createDownloads : Exit");
+        }
         return Response.status(Response.Status.CREATED).entity(downloadInfo).build();
 		
 	}
@@ -1818,9 +2173,11 @@ public class ComponentService extends DbService {
     @Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
     @Produces (MediaType.APPLICATION_JSON)
     @Path (REST_API_DOWNLOADS)
-    public Response updateDownloadInfo(MultiPart multiPart) throws PhrescoException {
-        if (isDebugEnabled) {
-            S_LOGGER.debug("Entered into AdminService.updateDownloadInfo(List<DownloadInfo> downloads)");
+    public Response updateDownloadInfo(@Context HttpServletRequest request, MultiPart multiPart) throws PhrescoException {
+    	if (isDebugEnabled) {
+            LOGGER.debug("ComponentService.updateDownloadInfo : Entry");
+            LOGGER.debug("ComponentService.createDownloads" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"));
         }
         
         return createOrUpdateDownloads(multiPart);
@@ -1835,11 +2192,13 @@ public class ComponentService extends DbService {
     @Path (REST_API_DOWNLOADS)
     public void deleteDownloadInfo(List<DownloadInfo> downloadInfos) throws PhrescoException {
         if (isDebugEnabled) {
-            S_LOGGER.debug("Entered into AdminService.deleteDownloadInfo(List<DownloadInfo> downloadInfos)");
+            LOGGER.debug("ComponentService.deleteDownloadInfo : Entry");
         }
         
         PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-        S_LOGGER.error(exceptionString  + phrescoException.getErrorMessage());
+        if (isDebugEnabled) {
+			LOGGER.error("ComponentService.deleteDownloadInfo", "status=\"Failure\"", "message=\"" + phrescoException.getLocalizedMessage() + "\"");
+        }
         throw phrescoException;
     }
 
@@ -1851,9 +2210,11 @@ public class ComponentService extends DbService {
     @GET
     @Produces (MediaType.APPLICATION_JSON)
     @Path (REST_API_DOWNLOADS + REST_API_PATH_ID)
-    public Response getDownloadInfo(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+    public Response getDownloadInfo(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id) {
         if (isDebugEnabled) {
-            S_LOGGER.debug("Entered into AdminService.getDownloadInfo(String id)" + id);
+            LOGGER.debug("ComponentService.getDownloadInfo : Entry ");
+            LOGGER.debug("ComponentService.getDownloadInfo" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"), "id=" + id);
         }
         
         try {
@@ -1867,6 +2228,10 @@ public class ComponentService extends DbService {
         	}
         	
         } catch (Exception e) {
+        	if(isDebugEnabled) {
+				LOGGER.error("ComponentService.getDownloadInfo", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+        		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
             throw new PhrescoWebServiceException(e, EX_PHEX00005, DOWNLOAD_COLLECTION_NAME);
         }
         
@@ -1882,20 +2247,25 @@ public class ComponentService extends DbService {
     @Consumes (MediaType.APPLICATION_JSON)
     @Produces (MediaType.APPLICATION_JSON)
     @Path (REST_API_DOWNLOADS + REST_API_PATH_ID)
-    public Response updateDownloadInfo(@PathParam(REST_API_PATH_PARAM_ID) String id , DownloadInfo downloadInfo) {
+    public Response updateDownloadInfo(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id , DownloadInfo downloadInfo) {
         if (isDebugEnabled) {
-            S_LOGGER.debug("Entered into AdminService.updateDownloadInfo(String id , DownloadInfo downloadInfos)" + id);
+            LOGGER.debug("ComponentService.updateDownloadInfo : Entry ");
+            LOGGER.debug("ComponentService.updateDownloadInfo" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"), "id=" + id);
         }
-        
         try {
             if (id.equals(downloadInfo.getId())) {
                 mongoOperation.save(DOWNLOAD_COLLECTION_NAME, downloadInfo);
                 return Response.status(Response.Status.OK).entity(downloadInfo).build();
             } 
         } catch (Exception e) {
+        	if(isDebugEnabled) {
+				LOGGER.error("ComponentService.updateDownloadInfo", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+        		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
             throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
         }
-        
+        LOGGER.debug("ComponentService.updateDownloadInfo : Exit ");
         return Response.status(Response.Status.BAD_REQUEST).entity(ERROR_MSG_ID_NOT_EQUAL).build();
     }
     
@@ -1906,16 +2276,21 @@ public class ComponentService extends DbService {
      */
     @DELETE
     @Path (REST_API_DOWNLOADS + REST_API_PATH_ID)
-    public Response deleteDownloadInfo(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+    public Response deleteDownloadInfo(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id) {
         if (isDebugEnabled) {
-            S_LOGGER.debug("Entered into AdminService.deleteDownloadInfo(String id)" + id);
+            LOGGER.debug("ComponentService.deleteDownloadInfo : Entry");
+            LOGGER.debug("ComponentService.deleteDownloadInfo" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"), "id=" + id);
         }
         Query query = new Query(Criteria.whereId().is(id));
+        LOGGER.debug("ComponentService.deleteDownloadInfo" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+        		"user=" + request.getParameter("userId"), "query=" + query.getQueryObject().toString());
 	    DownloadsDAO downloadsDAO = mongoOperation.findOne(DOWNLOAD_COLLECTION_NAME, query, DownloadsDAO.class);
 	    if(downloadsDAO != null) {
 	    	deleteAttifact(downloadsDAO.getArtifactGroupId());
 	    	mongoOperation.remove(DOWNLOAD_COLLECTION_NAME, query, DownloadsDAO.class);
 	    }
+	    LOGGER.debug("ComponentService.deleteDownloadInfo : Exit");
 		return Response.status(Response.Status.OK).build(); 
     }
     
@@ -1926,9 +2301,11 @@ public class ComponentService extends DbService {
 	@GET
 	@Path (REST_API_PLATFORMS)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findPlatforms() {
+	public Response findPlatforms(@Context HttpServletRequest request) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.findPlatforms()");
+	        LOGGER.debug("ComponentService.findPlatforms : Entry ");
+	        LOGGER.debug("ComponentService.findPlatforms" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"));
 	    }
 		
 		try {
@@ -1936,8 +2313,13 @@ public class ComponentService extends DbService {
 			if(CollectionUtils.isEmpty(platformList)) {
 				return Response.status(Response.Status.NO_CONTENT).build();
 			}
+			LOGGER.debug("ComponentService.findPlatforms : Exit ");
 			return Response.status(Response.Status.OK).entity(platformList).build();
 		} catch (Exception e) {
+			if(isDebugEnabled) {
+				LOGGER.error("ComponentService.findPlatforms", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+        		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, SETTINGS_COLLECTION_NAME);
 		}
 	}
@@ -1949,9 +2331,11 @@ public class ComponentService extends DbService {
 	@GET
 	@Path (REST_API_REPORTS)
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response findReports(@QueryParam(REST_QUERY_TECHID) String techId) {
+	public Response findReports(@Context HttpServletRequest request ,@QueryParam(REST_QUERY_TECHID) String techId) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.findReports(String techId)");
+	        LOGGER.debug("ComponentService.findReports : Entry ");
+	        LOGGER.debug("ComponentService.findReports" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"), "techId=" + techId);
 	    }
 	    List<Reports> reports = new ArrayList<Reports>();
 		try {
@@ -1971,8 +2355,13 @@ public class ComponentService extends DbService {
 			if(CollectionUtils.isEmpty(reports)) {
 				return  Response.status(Response.Status.NO_CONTENT).build();
 			}
+			LOGGER.debug("ComponentService.findReports : Exit ");
 			return  Response.status(Response.Status.OK).entity(reports).build();
 		} catch (Exception e) {
+			if(isDebugEnabled) {
+				LOGGER.error("ComponentService.findReports", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+        		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, REPORTS_COLLECTION_NAME);
 		}
 	}
@@ -1987,7 +2376,7 @@ public class ComponentService extends DbService {
 	@Path (REST_API_REPORTS)
 	public Response createReports(List<Reports> reports) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.createReports(List<Reports> reports)");
+	        LOGGER.debug("Entered into ComponentService.createReports(List<Reports> reports)");
 	    }
 		
 		try {
@@ -2014,7 +2403,7 @@ public class ComponentService extends DbService {
 	@Path (REST_API_REPORTS)
 	public Response updateReports(List<Reports> reports) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.updateReports(List<Reports> reports)");
+	        LOGGER.debug("Entered into ComponentService.updateReports(List<Reports> reports)");
 	    }
 		
 		try {
@@ -2037,11 +2426,11 @@ public class ComponentService extends DbService {
 	@Path (REST_API_REPORTS)
 	public void deleteReports(List<Reports> reports) throws PhrescoException {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.deleteReports(List<Reports> reports)");
+	        LOGGER.debug("Entered into ComponentService.deleteReports(List<Reports> reports)");
 	    }
 		
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-		S_LOGGER.error(exceptionString + phrescoException.getErrorMessage());
+		LOGGER.error(exceptionString + phrescoException.getErrorMessage());
 		throw phrescoException;
 	}
 	
@@ -2055,7 +2444,7 @@ public class ComponentService extends DbService {
 	@Path (REST_API_REPORTS + REST_API_PATH_ID)
 	public Response getReports(@PathParam(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.getReports(String id)" + id);
+	        LOGGER.debug("Entered into ComponentService.getReports(String id)" + id);
 	    }
 		
 		try {
@@ -2082,7 +2471,7 @@ public class ComponentService extends DbService {
 	@Path (REST_API_REPORTS + REST_API_PATH_ID)
 	public Response updateReports(@PathParam(REST_API_PATH_PARAM_ID) String id , Reports reports) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.updateReports(String id, Reports reports)" + id);
+	        LOGGER.debug("Entered into ComponentService.updateReports(String id, Reports reports)" + id);
 	    }
 		
 		try {
@@ -2103,7 +2492,7 @@ public class ComponentService extends DbService {
 	@Path (REST_API_REPORTS + REST_API_PATH_ID)
 	public Response deleteReports(@PathParam(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.deleteReportse(String id)" + id);
+	        LOGGER.debug("Entered into ComponentService.deleteReportse(String id)" + id);
 	    }
 		
 		try {
@@ -2125,7 +2514,7 @@ public class ComponentService extends DbService {
 	@Produces (MediaType.APPLICATION_JSON)
 	public Response findProperties() {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.findProperties()");
+	        LOGGER.debug("Entered into ComponentService.findProperties()");
 	    }
 		try {
 			List<Property> properties = mongoOperation.getCollection(PROPERTIES_COLLECTION_NAME, Property.class);
@@ -2148,7 +2537,7 @@ public class ComponentService extends DbService {
 	@Path (REST_API_PROPERTY)
 	public Response createProperties(List<Property> properties) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.createProperties(List<Property> properties)");
+	        LOGGER.debug("Entered into ComponentService.createProperties(List<Property> properties)");
 	    }
 		
 		try {
@@ -2175,7 +2564,7 @@ public class ComponentService extends DbService {
 	@Path (REST_API_PROPERTY)
 	public Response updateProperties(List<Property> properties) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.updateProperties(List<Property> properties)");
+	        LOGGER.debug("Entered into ComponentService.updateProperties(List<Property> properties)");
 	    }
 	   
 		try {
@@ -2198,11 +2587,11 @@ public class ComponentService extends DbService {
 	@Path (REST_API_PROPERTY)
 	public void deleteProperties(List<Property> properties) throws PhrescoException {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.deleteProperties(List<Property> properties)");
+	        LOGGER.debug("Entered into ComponentService.deleteProperties(List<Property> properties)");
 	    }
 		
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-		S_LOGGER.error(exceptionString + phrescoException.getErrorMessage());
+		LOGGER.error(exceptionString + phrescoException.getErrorMessage());
 		throw phrescoException;
 	}
 	
@@ -2216,7 +2605,7 @@ public class ComponentService extends DbService {
 	@Path (REST_API_PROPERTY + REST_API_PATH_ID)
 	public Response getProperty(@PathParam(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.getProperty(String id)" + id);
+	        LOGGER.debug("Entered into ComponentService.getProperty(String id)" + id);
 	    }
 		
 		try {
@@ -2243,7 +2632,7 @@ public class ComponentService extends DbService {
 	@Path (REST_API_PROPERTY + REST_API_PATH_ID)
 	public Response updateProperty(@PathParam(REST_API_PATH_PARAM_ID) String id , Property property) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.updateProperty(String id, Property property)" + id);
+	        LOGGER.debug("Entered into ComponentService.updateProperty(String id, Property property)" + id);
 	    }
 	   	try {
 			mongoOperation.save(PROPERTIES_COLLECTION_NAME, property);
@@ -2263,7 +2652,7 @@ public class ComponentService extends DbService {
 	@Path (REST_API_PROPERTY + REST_API_PATH_ID)
 	public Response deleteProperty(@PathParam(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.deleteProperty(String id)" + id);
+	        LOGGER.debug("Entered into ComponentService.deleteProperty(String id)" + id);
 	    }
 		
 		try {
@@ -2285,7 +2674,7 @@ public class ComponentService extends DbService {
 	@Produces (MediaType.APPLICATION_JSON)
 	public Response findOptions() {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.findOptions()");
+	        LOGGER.debug("Entered into ComponentService.findOptions()");
 	    }
 		try {
 			List<TechnologyOptions> techOptions = mongoOperation.getCollection(OPTIONS_COLLECTION_NAME, TechnologyOptions.class);
@@ -2307,7 +2696,7 @@ public class ComponentService extends DbService {
 	@Produces (MediaType.APPLICATION_JSON)
 	public Response findFunctionalTestFrameworks(@QueryParam(REST_QUERY_TECHID) String techId, @QueryParam("name") String name) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.findFunctionalTestFrameworks()");
+	        LOGGER.debug("Entered into ComponentService.findFunctionalTestFrameworks()");
 	    }
 		try {
 			if (StringUtils.isNotEmpty(techId) && StringUtils.isNotEmpty(name)) {
@@ -2343,7 +2732,7 @@ public class ComponentService extends DbService {
     @Produces (MediaType.APPLICATION_JSON)
     public Response findCustomerOptions() {
         if (isDebugEnabled) {
-            S_LOGGER.debug("Entered into ComponentService.findCustomerOptions()");
+            LOGGER.debug("Entered into ComponentService.findCustomerOptions()");
         }
         try {
             List<TechnologyOptions> techOptions = mongoOperation.getCollection(CUSTOMER_OPTIONS_COLLECTION_NAME, TechnologyOptions.class);
@@ -2365,7 +2754,7 @@ public class ComponentService extends DbService {
 	@Produces (MediaType.APPLICATION_JSON)
 	public Response findLicenses() {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.findLicenses()");
+	        LOGGER.debug("Entered into ComponentService.findLicenses()");
 	    }
 		try {
 			List<License> licenses = mongoOperation.getCollection(LICENSE_COLLECTION_NAME, License.class);
@@ -2388,7 +2777,7 @@ public class ComponentService extends DbService {
 	@Path (REST_API_LICENSE)
 	public Response createLicenses(List<License> licenses) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.createLicenses(List<License> licenses)");
+	        LOGGER.debug("Entered into ComponentService.createLicenses(List<License> licenses)");
 	    }
 		
 		try {
@@ -2413,7 +2802,7 @@ public class ComponentService extends DbService {
 	@Produces (MediaType.APPLICATION_JSON)
 	public Response findTechnologyGroups(@QueryParam(REST_QUERY_CUSTOMERID) String customerId, @QueryParam(REST_QUERY_APPTYPEID) String appTypeId) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.findTechnologyGroups()");
+	        LOGGER.debug("Entered into ComponentService.findTechnologyGroups()");
 	    }
 	    List<TechnologyGroup> technologyGroups = new ArrayList<TechnologyGroup>();
 		try {
@@ -2440,7 +2829,7 @@ public class ComponentService extends DbService {
 	@Path (REST_API_TECHGROUPS)
 	public Response createTechnologyGroups(List<TechnologyGroup> techGroups) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.createTechnologyGroups(List<TechnologyGroup> techGroups)");
+	        LOGGER.debug("Entered into ComponentService.createTechnologyGroups(List<TechnologyGroup> techGroups)");
 	    }
 		
 		try {
@@ -2475,7 +2864,7 @@ public class ComponentService extends DbService {
 	@Path (REST_API_TECHGROUPS)
 	public Response updateTechnologyGroups(List<TechnologyGroup> techGroups) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.updateTechnologyGroups(List<TechnologyGroup> techGroups)");
+	        LOGGER.debug("Entered into ComponentService.updateTechnologyGroups(List<TechnologyGroup> techGroups)");
 	    }
 		
 		try {
@@ -2498,11 +2887,11 @@ public class ComponentService extends DbService {
 	@Path (REST_API_TECHGROUPS)
 	public void deleteTechnologyGroups(List<TechnologyGroup> techGroups) throws PhrescoException {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.deleteTechnologyGroups(List<TechnologyGroup> techGroups)");
+	        LOGGER.debug("Entered into ComponentService.deleteTechnologyGroups(List<TechnologyGroup> techGroups)");
 	    }
 		
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
-		S_LOGGER.error(exceptionString + phrescoException.getErrorMessage());
+		LOGGER.error(exceptionString + phrescoException.getErrorMessage());
 		throw phrescoException;
 	}
 	
@@ -2516,7 +2905,7 @@ public class ComponentService extends DbService {
 	@Path (REST_API_TECHGROUPS + REST_API_PATH_ID)
 	public Response getTechnologyGroup(@PathParam(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.getTechnologyGroup(String id)" + id);
+	        LOGGER.debug("Entered into ComponentService.getTechnologyGroup(String id)" + id);
 	    }
 		
 		try {
@@ -2544,7 +2933,7 @@ public class ComponentService extends DbService {
 	@Path (REST_API_TECHGROUPS + REST_API_PATH_ID)
 	public Response updateTechnologyGroup(@PathParam(REST_API_PATH_PARAM_ID) String id , TechnologyGroup techGroup) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.updateTechnologyGroup(String id, TechnologyGroup techGroup)" + id);
+	        LOGGER.debug("Entered into ComponentService.updateTechnologyGroup(String id, TechnologyGroup techGroup)" + id);
 	    }
 		
 		try {
@@ -2565,7 +2954,7 @@ public class ComponentService extends DbService {
 	@Path (REST_API_TECHGROUPS + REST_API_PATH_ID)
 	public Response deleteTechnologyGroup(@PathParam(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into ComponentService.deleteTechnologyGroup((String id)" + id);
+	        LOGGER.debug("Entered into ComponentService.deleteTechnologyGroup((String id)" + id);
 	    }
 		
 		try {

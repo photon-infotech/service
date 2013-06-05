@@ -28,11 +28,15 @@ import org.springframework.data.document.mongodb.config.AbstractMongoConfigurati
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.model.ServerConfiguration;
 import com.photon.phresco.util.ServiceConstants;
 
 @Configuration
 public class MongoConfig extends AbstractMongoConfiguration implements ServiceConstants{
+	
+	private static final SplunkLogger LOGGER = SplunkLogger.getSplunkLogger(MongoConfig.class.getName());
+	private static Boolean isDebugEnabled = LOGGER.isDebugEnabled();
 	
 	private ServerConfiguration config;
 	
@@ -44,13 +48,22 @@ public class MongoConfig extends AbstractMongoConfiguration implements ServiceCo
 	@Override
 	@Bean 
 	public Mongo mongo() throws PhrescoException {
+		if(isDebugEnabled) {
+			LOGGER.debug("MongoConfig.mongo : Entry");
+			LOGGER.debug("MongoConfig.mongo", "host=" + config.getDbHost(), "port=" + config.getDbPort());
+		}
 		Mongo mongo = null;
 		try {
 			mongo = new Mongo(config.getDbHost(), config.getDbPort());
 		} catch (UnknownHostException e) {
+			LOGGER.error("MongoConfig.mongo " , "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"" );
 			throw new PhrescoException(e, EX_PHEX00002);
 		} catch (MongoException e) {
+			LOGGER.error("MongoConfig.mongo " , "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"" );
 			throw new PhrescoException(e, EX_PHEX00003);
+		}
+		if(isDebugEnabled) {
+			LOGGER.debug("MongoConfig.mongo : Exit");
 		}
 		return mongo;
 	}
@@ -58,6 +71,11 @@ public class MongoConfig extends AbstractMongoConfiguration implements ServiceCo
 	@Override
 	@Bean
 	public MongoTemplate mongoTemplate() throws PhrescoException {
+		if(isDebugEnabled) {
+			LOGGER.debug("MongoConfig.mongoTemplate : Entry");
+			LOGGER.debug("MongoConfig.mongoTemplate", "dbname=" + config.getDbName(), "dbcollection=" + config.getDbCollection(),
+					"username=" + config.getDbUserName(), "password=" + config.getDbPassword());
+		}
 		MongoTemplate mongoTemplate = null;
 		try {
 			mongoTemplate = new MongoTemplate(mongo(), config.getDbName() , config.getDbCollection());
@@ -68,7 +86,11 @@ public class MongoConfig extends AbstractMongoConfiguration implements ServiceCo
 				mongoTemplate.setPassword(config.getDbPassword());
 			}
 		}catch (MongoException e) {
+			LOGGER.error("MongoConfig.mongoTemplate " , "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"" );
 			throw new PhrescoException(e, EX_PHEX00003);
+		}
+		if(isDebugEnabled) {
+			LOGGER.debug("MongoConfig.mongoTemplate : Exit");
 		}
 		return mongoTemplate;
 	}

@@ -22,6 +22,8 @@ import java.net.URI;
 import org.apache.log4j.Logger;
 
 import com.photon.phresco.exception.PhrescoException;
+import com.photon.phresco.logger.SplunkLogger;
+import com.photon.phresco.service.api.MongoConfig;
 import com.photon.phresco.service.rest.util.AuthenticationUtil;
 import com.photon.phresco.util.Constants;
 import com.photon.phresco.util.ServiceConstants;
@@ -30,10 +32,11 @@ import com.sun.jersey.spi.container.ContainerRequestFilter;
 
 public class SecurityInterceptor implements ContainerRequestFilter {
 
-	private static final Logger LOGGER = Logger.getLogger(SecurityInterceptor.class); 
+	private static final SplunkLogger LOGGER = SplunkLogger.getSplunkLogger(MongoConfig.class.getName());
+	private static Boolean isDebugEnabled = LOGGER.isDebugEnabled();
 	
 	public ContainerRequest filter(ContainerRequest request) {
-
+		LOGGER.debug("SecurityInterceptor.filter : Entry");
 	    URI absolutePath = request.getAbsolutePath();
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug(absolutePath);
@@ -48,14 +51,17 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 			AuthenticationUtil authTokenUtil = AuthenticationUtil.getInstance();
 			boolean isValid = authTokenUtil.isValidToken(headerValue);
 			if(isValid) {
+				LOGGER.debug("SecurityInterceptor.filter : Exit");
 				return request;
 			}
 		} catch (Exception e) {
 			try {
 				throw new PhrescoException(e, ServiceConstants.EX_PHEX00007);
 			} catch (PhrescoException e1) {
+				LOGGER.error("SecurityInterceptor.filter " , "status=\"Failure\"", "message=\"" + e1.getLocalizedMessage() + "\"" );
 			}
 		}
+		LOGGER.debug("SecurityInterceptor.filter : Exit");
 		return null;
 	}
 

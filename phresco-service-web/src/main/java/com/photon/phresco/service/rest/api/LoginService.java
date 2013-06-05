@@ -20,10 +20,12 @@ package com.photon.phresco.service.rest.api;
 import java.util.Arrays;
 import java.util.Date;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -32,6 +34,7 @@ import com.photon.phresco.commons.model.User;
 import com.photon.phresco.commons.model.User.AuthType;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.exception.PhrescoWebServiceException;
+import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
@@ -51,34 +54,22 @@ public class LoginService extends DbService {
 	
 	private final String SERVICE_VIEW_ROLE_ID = "4e8c0bed7-fb39-4erta-ae73-2d1286ae4ad0";
 	private final String FRAMEWORK_VIEW_ROLE_ID = "4e8c0bed7-fb39-4aea-ae73-2d1286ae4ad0";
+	private static final SplunkLogger LOGGER = SplunkLogger.getSplunkLogger(LoginService.class.getName());
+	private static Boolean isDebugEnabled = LOGGER.isDebugEnabled();
 	
 	public LoginService() {
 		super();
 	}
 
-//	@POST
-//    @Produces(MediaType.APPLICATION_JSON)
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    public User login(Credentials credentials) throws PhrescoException {
-//		System.out.println("In Login Service");
-//        User user = new User();
-//        user.setLoginId("demo_user");
-//        user.setEmail("demo_user@photon.in");
-//        user.setFirstName("Demo");
-//        user.setLastName("User");
-//        user.setDisplayName("Demo User");
-//        
-//        AuthenticationUtil authTokenUtil = AuthenticationUtil.getInstance();
-//        user.setToken(authTokenUtil.generateToken(credentials.getUsername()));
-//        user.setPhrescoEnabled(true);
-//        return user;
-//	}
-	
-	
 	@POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public User login(Credentials credentials) throws PhrescoException {
+    public User login(@Context HttpServletRequest request, Credentials credentials) throws PhrescoException {
+		if(isDebugEnabled) {
+			LOGGER.debug("LoginService.login : Entry");
+			LOGGER.debug("LoginService.login ", "remoteAddress=" + request.getRemoteAddr() , "userName=" + credentials.getUsername(),
+					"endpoint=" + request.getRequestURI(),  "method=" + request.getMethod());
+		}
 		User user = null;
 		PhrescoServerFactory.initialize();
 		DbManager dbManager = PhrescoServerFactory.getDbManager();
@@ -92,6 +83,9 @@ public class LoginService extends DbService {
         	return user;
         }
         user = loginUsingAuth(credentials);
+        if(isDebugEnabled) {
+        	LOGGER.debug("LoginService.createProject : Exit");
+		}
 		return user;
     }
 	
@@ -104,6 +98,7 @@ public class LoginService extends DbService {
         resource.accept(MediaType.APPLICATION_JSON_TYPE);
         ClientResponse response = resource.type(MediaType.APPLICATION_JSON_TYPE).post(ClientResponse.class, credentials);
         if(response.getStatus() == 204) {
+        	LOGGER.info("LoginService.loginUsingAuth", "authUrl=" + repoMgr.getAuthServiceURL(), "userName=" + credentials.getUsername());
         	throw new PhrescoWebServiceException(Response.status(Status.NO_CONTENT).build());
         }
         GenericType<User> genericType = new GenericType<User>() {};

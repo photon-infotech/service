@@ -100,6 +100,10 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 			for (int i = 0; i < createdAppInfos.size(); i++) {
 				projectInfoClone.setAppInfos(Arrays.asList(createdAppInfos.get(i)));
 				createProject(projectInfoClone, tempFolderPath);
+				if (isDebugEnabled) {
+					LOGGER.debug("ProjectServiceManagerImpl.updateProject", "technology=" + projectInfo.getAppInfos().get(0).getTechInfo().getName(),
+							"customerId=" + projectInfo.getCustomerIds().get(0), "action=" + "UPDATE", "projectCode=" + projectInfo.getProjectCode());
+				}
 			}
 		}
 		

@@ -19,16 +19,34 @@
 
 -->
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
-<log4j:configuration xmlns:log4j='http://jakarta.apache.org/log4j/' debug="true">
-	<appender name="Daily" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="File" value="../logs/phresco-engine.log"/>
-		<param name="DatePattern" value="'.'dd-MM-yyyy" /> 
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+	<appender name="ServiceLogFile" class="org.apache.log4j.RollingFileAppender">
+		<param name="File" value="../logs/phresco-engine.log" />
+		<param name="Threshold" value="DEBUG" />
+		<param name="maxBackupIndex" value="10" />
+		<param name="maxFileSize" value="512MB" />
+        <param name="Append" value="true" />
 		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern" value="%d{dd-MM-yyyy HH:mm:ss.SSSS} %p %t %c : %m%n" />
+			<param name="ConversionPattern" value="%p %d{yyyy-MM-dd HH:mm:ss} %c %x- %m%n" />
 		</layout>
 	</appender>
+
+  	 <appender name="ServiceAsync" class="org.apache.log4j.AsyncAppender">
+  	 	  <param name="BufferSize" value="500"/>
+  	 	   <param name="Blocking" value="false"/>
+    	<appender-ref ref="ServiceLogFile"/>
+  	</appender>
+  	
+	<category name="com.photon.phresco.logger" additivity="false">
+		<appender-ref ref="ServiceAsync" />
+	</category>
+
 	<root>
-		<level value="DEBUG" />
-		<appender-ref ref="Daily" />
+		<appender-ref ref="ServiceAsync" />
 	</root>
+
+	<loggerFactory class="com.photon.phresco.logger.SplunkLog4JFactory"/>
+
 </log4j:configuration>
+
