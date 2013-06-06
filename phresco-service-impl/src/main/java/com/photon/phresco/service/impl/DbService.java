@@ -635,7 +635,7 @@ public class DbService implements ServiceConstants {
 	}
 	
 	protected String getSelectedDownloadString(List<ArtifactGroupInfo> selected) {
-		if(CollectionUtils.isNotEmpty(selected)) {
+		if(CollectionUtils.isEmpty(selected)) {
 			return "";
 		}
 		StringBuffer buffer = new StringBuffer();
