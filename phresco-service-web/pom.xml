@@ -360,13 +360,4 @@
             </plugin>
         </plugins>
     </build>
-    
-    <repositories>
-			   <repository>
-					 <id>repo2</id>
-					 <name>kumar</name>
-					 <url>http://172.16.17.226:8080/repository/content/repositories/snapshots/</url>
-			   </repository>
-			</repositories>
-			
 </project>
