@@ -67,6 +67,9 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 		}
 		PhrescoServerFactory.initialize();
 		PhrescoServerFactory.getArchetypeExecutor().execute(projectInfo, tempFolderPath);
+		if(projectInfo.isPreBuilt()) {
+			createPilots(projectInfo.getAppInfos().get(0), tempFolderPath, projectInfo.getCustomerIds().get(0));
+		}
 		if(isDebugEnabled) {
 			LOGGER.debug("ProjectServiceManagerImpl.createProject:Exit");
 		}
@@ -151,8 +154,14 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 			}
 			LOGGER.info("ProjectServiceManagerImpl.createPilots", "customerId=\""+ customerId +"\"");
 		}
+		String appId = "";
 		Element pilotElement = applicationInfo.getPilotInfo();
-		ApplicationInfo pilotInfo = dbManager.getApplicationInfo(pilotElement.getId());
+		if(pilotElement != null) {
+			appId = pilotElement.getId();
+		} else {
+			appId = applicationInfo.getId();
+		}
+		ApplicationInfo pilotInfo = dbManager.getApplicationInfo(appId);
 		ArtifactGroup pilotContent = pilotInfo.getPilotContent();
 		String version = pilotContent.getVersions().get(0).getVersion();
 		String contentURL = ServerUtil.createContentURL(pilotContent.getGroupId(), pilotContent.getArtifactId(), 

@@ -21,8 +21,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.photon.phresco.commons.model.Element;
+import com.photon.phresco.framework.converters.FrameworkApplicationInfoConverter;
 import com.photon.phresco.framework.converters.FrameworkArtifactGroupConverter;
 import com.photon.phresco.framework.converters.FrameworkCustomerConverter;
+import com.photon.phresco.framework.converters.FrameworkProjectInfoConverter;
 import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.dao.ApplicationInfoDAO;
 import com.photon.phresco.service.dao.ApplicationTypeDAO;
@@ -79,6 +81,8 @@ public class ConvertersFactory {
 	private static void initFrameworkConverters() {
 		FRAMEWORK_CONVERTERS_MAP.put(CustomerDAO.class, new FrameworkCustomerConverter());
 		FRAMEWORK_CONVERTERS_MAP.put(ArtifactGroupDAO.class, new FrameworkArtifactGroupConverter());
+		FRAMEWORK_CONVERTERS_MAP.put(ProjectInfoDAO.class, new FrameworkProjectInfoConverter());
+		FRAMEWORK_CONVERTERS_MAP.put(ApplicationInfoDAO.class, new FrameworkApplicationInfoConverter());
 	}
 
 	/**

@@ -22,6 +22,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,15 +35,20 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
+import org.springframework.data.document.mongodb.query.Criteria;
+import org.springframework.data.document.mongodb.query.Query;
 
 import com.photon.phresco.commons.model.ApplicationInfo;
+import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.ProjectServiceManager;
+import com.photon.phresco.service.dao.ArtifactGroupDAO;
 import com.photon.phresco.service.impl.DbService;
 import com.photon.phresco.service.util.MAGICNUMBER;
 import com.photon.phresco.service.util.ServerUtil;
@@ -81,15 +87,9 @@ public class ProjectService extends DbService {
 		String tempFolderPath = "";
 		try {
 			tempFolderPath = ServerUtil.getTempFolderPath();
-			
 			ProjectServiceManager projectService = PhrescoServerFactory.getProjectService();
+			buildCreateLogMessage(request, projectInfo);
 			for (int i=0; i < projectInfo.getNoOfApps(); i++) {
-				if (isDebugEnabled) {
-					LOGGER.debug("ProjectService.createProject", "remoteAddress=" + request.getRemoteAddr() , "technology=" + 
-							projectInfo.getAppInfos().get(0).getTechInfo().getName(), "user=" + request.getParameter("userId"),
-							"authType=" + request.getParameter("authType"),"customer=" + getCustomerNameById(projectInfo.getCustomerIds().get(0)),
-							"action=" + "CREATE", "endpoint=" + request.getRequestURI(),  "method=" + request.getMethod(), "projectCode=" + projectInfo.getProjectCode());
-				}
 				projectService.createProject(cloneProjectInfo(projectInfo, i), tempFolderPath);
 			}
 			
@@ -106,6 +106,90 @@ public class ProjectService extends DbService {
 		}
 	}
 
+	private void buildCreateLogMessage(HttpServletRequest request, ProjectInfo projectInfo) {
+		if (isDebugEnabled) {
+			for (ApplicationInfo applicationInfo : projectInfo.getAppInfos()) {
+				LOGGER.warn("ProjectService.createProject", "remoteAddress=" + request.getRemoteAddr() , "technology=" + 
+						applicationInfo.getTechInfo().getName(), "user=" + request.getParameter("userId"),
+						"authType=" + request.getParameter("authType"),"customer=" + getCustomerNameById(projectInfo.getCustomerIds().get(0)),
+						"action=" + "CREATE", "endpoint=" + request.getRequestURI(),  "method=" + request.getMethod(), 
+						"projectCode=" + "\"" + projectInfo.getProjectCode() + "\"", "totalNoOfApps=" + projectInfo.getNoOfApps(), getApplications(projectInfo));
+			}
+		}
+	}
+	
+	private void buildUpdateLogMessage(HttpServletRequest request, ProjectInfo projectInfo) {
+		if (isDebugEnabled) {
+			for (ApplicationInfo applicationInfo : projectInfo.getAppInfos()) {
+				LOGGER.warn("ProjectService.updateProject", "remoteAddress=" + request.getRemoteAddr() , "technology=" + 
+						applicationInfo.getTechInfo().getName(), "user=" + request.getParameter("userId"),
+						"authType=" + request.getParameter("authType"),"customer=" + getCustomerNameById(projectInfo.getCustomerIds().get(0)),
+						"action=" + "UPDATE", "endpoint=" + request.getRequestURI(),  "method=" + request.getMethod(), 
+						"projectCode=" + "\"" + projectInfo.getProjectCode() + "\"", "totalNoOfApps=" + projectInfo.getNoOfApps(), 
+						getApplications(projectInfo), getFeatures(applicationInfo), getJslibs(applicationInfo));
+			}
+		}
+	}
+	
+	private String getApplications(ProjectInfo projectInfo) {
+		StringBuffer stringBuffer = new StringBuffer();
+		List<ApplicationInfo> appInfos = projectInfo.getAppInfos();
+		int j = 1;
+		for (int i = 0; i < appInfos.size(); i++) {
+			stringBuffer.append("application" + j + "_appCode=");
+			stringBuffer.append( "\""+ appInfos.get(i).getCode() + "\"" + ",");
+			stringBuffer.append("application" + j + "_technology=");
+			stringBuffer.append( "\""+ appInfos.get(i).getTechInfo().getName() + "\"");
+			if(! (i == appInfos.size()-1 )) {
+				stringBuffer.append(",");
+			}
+			j++;
+		}
+		return stringBuffer.toString();
+	}
+	
+	private String getFeatures(ApplicationInfo applicationInfo) {
+		StringBuffer buffer = new StringBuffer();
+		List<String> selectedModules = applicationInfo.getSelectedModules();
+		if(CollectionUtils.isEmpty(selectedModules)) {
+			return "";
+		}
+		int j = 1;
+		List<ArtifactInfo> infos = mongoOperation.find(ARTIFACT_INFO_COLLECTION_NAME, 
+				new Query(Criteria.whereId().in(selectedModules.toArray())), ArtifactInfo.class);
+		for (int i = 0; i < infos.size(); i++) {
+			ArtifactGroupDAO group = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
+					new Query(Criteria.whereId().is(infos.get(i).getArtifactGroupId())), ArtifactGroupDAO.class);
+			if(! (i == 0)) {
+				buffer.append(",");
+			}
+			buffer.append("feature" + j + "_name=" + "\""+ group.getName() + "\"" + ",");
+			buffer.append("feature" + j + "_version=" + "\""+ infos.get(i).getVersion() + "\"");
+		}
+		return buffer.toString();
+	}
+	
+	private String getJslibs(ApplicationInfo applicationInfo) {
+		StringBuffer buffer = new StringBuffer();
+		List<String> selectedModules = applicationInfo.getSelectedJSLibs();
+		if(CollectionUtils.isEmpty(selectedModules)) {
+			return "";
+		}
+		int j = 1;
+		List<ArtifactInfo> infos = mongoOperation.find(ARTIFACT_INFO_COLLECTION_NAME, 
+				new Query(Criteria.whereId().in(selectedModules.toArray())), ArtifactInfo.class);
+		for (int i = 0; i < infos.size(); i++) {
+			ArtifactGroupDAO group = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
+					new Query(Criteria.whereId().is(infos.get(i).getArtifactGroupId())), ArtifactGroupDAO.class);
+			if(! (i == 0)) {
+				buffer.append(",");
+			}
+			buffer.append("jslibrary" + j + "_name=" + "\""+ group.getName() + "\"" + ",");
+			buffer.append("jslibrary" + j + "_version=" + "\""+ infos.get(i).getVersion() + "\"");
+		}
+		return buffer.toString();
+	}
+	
 	private ProjectInfo cloneProjectInfo(ProjectInfo projectInfo, int i) {
 		ProjectInfo clonedProjectInfo = projectInfo.clone();
 		ApplicationInfo applicationInfo = clonedProjectInfo.getAppInfos().get(i);
@@ -119,34 +203,24 @@ public class ProjectService extends DbService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public StreamingOutput updateProject(@Context HttpServletRequest request, ProjectInfo projectInfo) throws PhrescoException {
     	if (isDebugEnabled) {
-			LOGGER.debug("ProjectService.updateProject() : Entry");
+			LOGGER.debug("ProjectService.updateProject : Entry");
 		}
     	if(projectInfo == null) {
 			if (isDebugEnabled) {
-				LOGGER.warn("ProjectService.createProject" , "status=\"Bad Request\"" , "remoteAddress=" + request.getRemoteAddr(),
+				LOGGER.warn("ProjectService.updateProject" , "status=\"Bad Request\"" , "remoteAddress=" + request.getRemoteAddr(),
 						"user=" + request.getParameter("userId"));
 			}
 			return null;
 		}
+    	buildUpdateLogMessage(request, projectInfo);
 		String projectPathStr = Utility.getPhrescoTemp() + UUID.randomUUID().toString();
 		try {
 			ProjectServiceManager projectService = PhrescoServerFactory.getProjectService();
 			projectService.updateProject(projectInfo, projectPathStr);
 			
-			if (isDebugEnabled) {
-				LOGGER.debug("ProjectService.createProject", "remoteAddress=" + request.getRemoteAddr() , "technology=" + 
-						projectInfo.getAppInfos().get(0).getTechInfo().getName(), "user=" + request.getParameter("userId"),
-						"authType=" + request.getParameter("authType"),"customer=" + getCustomerNameById(projectInfo.getCustomerIds().get(0)),
-						"action=" + "UPDATE", "endpoint=" + request.getRequestURI(),  "method=" + request.getMethod(),
-						"projectCode=" + projectInfo.getProjectCode(), "features=" + getSelectedFeatureString(projectInfo.getAppInfos().get(0).getSelectedModules()) ,
-						"jslibraries=" + getSelectedFeatureString(projectInfo.getAppInfos().get(0).getSelectedJSLibs()), "components=" + 
-						getSelectedFeatureString(projectInfo.getAppInfos().get(0).getSelectedComponents()), 
-						"servers=" + getSelectedDownloadString(projectInfo.getAppInfos().get(0).getSelectedServers()),
-						"databases=" + getSelectedDownloadString(projectInfo.getAppInfos().get(0).getSelectedDatabases()));
-			}
 			ArchiveUtil.createArchive(projectPathStr, projectPathStr + ZIP, ArchiveType.ZIP);
 		} catch (Exception pe) {
-			LOGGER.error("ProjectService.createProject", "remoteAddress=" + request.getRemoteAddr(),
+			LOGGER.error("ProjectService.updateProject", "remoteAddress=" + request.getRemoteAddr(),
 					"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + pe.getLocalizedMessage() + "\"");
 			throw new PhrescoException(pe);
 		}
@@ -204,7 +278,7 @@ public class ProjectService extends DbService {
 			} finally {
 				if (fis != null) {
 					fis.close();
-					FileUtils.deleteDirectory(path.getParentFile());
+//					FileUtils.deleteDirectory(path.getParentFile());
 				}
 			}
 		}

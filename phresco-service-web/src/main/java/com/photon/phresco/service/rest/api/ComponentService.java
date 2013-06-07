@@ -59,6 +59,7 @@ import com.photon.phresco.commons.model.FunctionalFramework;
 import com.photon.phresco.commons.model.FunctionalFrameworkProperties;
 import com.photon.phresco.commons.model.License;
 import com.photon.phresco.commons.model.PlatformType;
+import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.commons.model.Property;
 import com.photon.phresco.commons.model.SettingsTemplate;
 import com.photon.phresco.commons.model.Technology;
@@ -79,6 +80,7 @@ import com.photon.phresco.service.dao.ApplicationTypeDAO;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
 import com.photon.phresco.service.dao.CustomerDAO;
 import com.photon.phresco.service.dao.DownloadsDAO;
+import com.photon.phresco.service.dao.ProjectInfoDAO;
 import com.photon.phresco.service.dao.TechnologyDAO;
 import com.photon.phresco.service.impl.DbService;
 import com.photon.phresco.service.util.ServerUtil;
@@ -2973,4 +2975,62 @@ public class ComponentService extends DbService {
 		
 		return Response.status(Response.Status.OK).build();
 	}
+	
+	/**
+	 * Returns the list of Prebuilt Projects
+	 * @return
+	 */
+	@GET
+	@Path (REST_API_PREBUILT)
+	@Produces (MediaType.APPLICATION_JSON)
+	public Response findPreBuiltProjects(@Context HttpServletRequest request, @QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
+	    if (isDebugEnabled) {
+	        LOGGER.debug("ComponentService.findPreBuiltProjects : Entry ");
+	        LOGGER.debug("ComponentService.findPreBuiltProjects ", "remoteAddress=" + request.getRemoteAddr() , "customer" + getCustomerNameById(customerId),
+	        		"endpoint=" + request.getRequestURI() , "user=" + request.getParameter("userId"), "customer=" + getCustomerNameById(customerId));
+	    }
+	    List<ProjectInfo> projectInfos = new ArrayList<ProjectInfo>();
+		try {
+			List<ProjectInfoDAO> projectDAOs = mongoOperation.find(PROJECTINFO_COLLECTION_NAME, 
+					new Query(Criteria.where(DB_COLUMN_PREBUILT).is(true)), ProjectInfoDAO.class);
+			Converter<ProjectInfoDAO, ProjectInfo> converter = (Converter<ProjectInfoDAO, ProjectInfo>) 
+				ConvertersFactory.getFrameworkConverter(ProjectInfoDAO.class);
+			for (ProjectInfoDAO projectInfoDAO : projectDAOs) {
+				ProjectInfo pInfo = converter.convertDAOToObject(projectInfoDAO, mongoOperation);
+				if(isApplicable(customerId, pInfo)) {
+					projectInfos.add(pInfo);
+				}
+			}
+			if (isDebugEnabled) {
+		        LOGGER.debug("ComponentService.findPreBuiltProjects : Exit ");
+		    }
+			return Response.status(Response.Status.OK).entity(projectInfos).build();
+		} catch (Exception e) {
+			if (isDebugEnabled) {
+		        LOGGER.error("ComponentService.findPreBuiltProjects", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
+			throw new PhrescoWebServiceException(e, EX_PHEX00005, OPTIONS_COLLECTION_NAME);
+		}
+		
+	}
+
+	private boolean isApplicable(String customerId, ProjectInfo pInfo) {
+		CustomerDAO customer = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME, 
+				new Query(Criteria.whereId().is(customerId)), CustomerDAO.class);
+		if(customer == null) {
+			return false;
+		}
+		List<String> techs = customer.getApplicableTechnologies();
+		List<ApplicationInfo> appInfos = pInfo.getAppInfos();
+		if(CollectionUtils.isEmpty(appInfos)) {
+			return false;
+		}
+		for (ApplicationInfo applicationInfo : appInfos) {
+			if(!techs.contains(applicationInfo.getTechInfo().getId())) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 }

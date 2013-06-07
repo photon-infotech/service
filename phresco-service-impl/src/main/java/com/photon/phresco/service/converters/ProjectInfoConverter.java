@@ -55,6 +55,7 @@ public class ProjectInfoConverter implements Converter<ProjectInfoDAO, ProjectIn
 			projectInfo.setAppInfos(applicationInfos);
 		}
 		projectInfo.setCustomerIds(dao.getCustomerIds());
+		projectInfo.setPreBuilt(dao.isPreBuilt());
 		if (isDebugEnabled) {
 			LOGGER.debug("ArtifactGroupConverter.convertDAOToObject:Exit");
 		}
@@ -74,6 +75,7 @@ public class ProjectInfoConverter implements Converter<ProjectInfoDAO, ProjectIn
 		projectInfoDAO.setProjectCode(projectInfo.getProjectCode());
 		projectInfoDAO.setApplicationInfoIds(createAppInfoIds(projectInfo));
 		projectInfoDAO.setCustomerIds(projectInfo.getCustomerIds());
+		projectInfoDAO.setPreBuilt(projectInfo.isPreBuilt());
 		if (isDebugEnabled) {
 			LOGGER.debug("ArtifactGroupConverter.convertObjectToDAO:Exit");
 		}

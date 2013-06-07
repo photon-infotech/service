@@ -50,6 +50,10 @@ public class ProjectInfoDAO extends CustomerBaseDAO {
      */
     private Date endDate;
 	
+    private boolean preBuilt;
+    
+    private int noOfApps;
+    
 	/**
 	 * 
 	 */
@@ -111,6 +115,22 @@ public class ProjectInfoDAO extends CustomerBaseDAO {
 	 */
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
+	}
+
+	public void setPreBuilt(boolean preBuilt) {
+		this.preBuilt = preBuilt;
+	}
+
+	public boolean isPreBuilt() {
+		return preBuilt;
+	}
+
+	public void setNoOfApps(int noOfApps) {
+		this.noOfApps = noOfApps;
+	}
+
+	public int getNoOfApps() {
+		return noOfApps;
 	}
 	
 }
