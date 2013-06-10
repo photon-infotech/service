@@ -17,7 +17,9 @@
  */
 package com.photon.phresco.service.model;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -70,8 +72,10 @@ public class ServerConfiguration {
 	private String dbDefaultCollectionName;
 	private String twitterServiceURL; 
 	private String configFilePath =  "phresco-env-config.xml";
-
+	private static Properties serverProperties;
+	
 	public ServerConfiguration() throws PhrescoException {
+		
 	}
 
 	public String getApptypeFile() {
@@ -291,5 +295,29 @@ public class ServerConfiguration {
         }
         return repoPassword;
     }
+	
+	public String getDefaultCustomerId() {
+		return getServerProperties().getProperty("phreso.default.customer");
+	}
+	
+	public List<String> getDefaultRoles() {
+		String serverRole = getServerProperties().getProperty("service.view.roleid");
+		String fworkRole = getServerProperties().getProperty("framework.view.roleid");
+		return Arrays.asList(serverRole, fworkRole);
+	}
+	
+	private Properties getServerProperties() {
+		if(serverProperties != null) {
+			return serverProperties;
+		}
+		serverProperties = new Properties();
+		InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream("server.config");
+		try {
+			serverProperties.load(resourceAsStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return serverProperties;
+	}
 	
 }

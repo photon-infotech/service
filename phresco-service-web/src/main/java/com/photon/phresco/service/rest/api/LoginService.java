@@ -39,6 +39,7 @@ import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.impl.DbService;
+import com.photon.phresco.service.model.ServerConfiguration;
 import com.photon.phresco.service.rest.util.AuthenticationUtil;
 import com.photon.phresco.service.util.ServerConstants;
 import com.photon.phresco.service.util.ServerUtil;
@@ -90,6 +91,7 @@ public class LoginService extends DbService {
     }
 	
 	private User loginUsingAuth(Credentials credentials) throws PhrescoException {
+		ServerConfiguration serverConfig = PhrescoServerFactory.getServerConfig();
 		Client client = Client.create();
 		PhrescoServerFactory.initialize();
 		RepositoryManager repoMgr = PhrescoServerFactory.getRepositoryManager();
@@ -106,7 +108,7 @@ public class LoginService extends DbService {
         user.setToken(createAuthToken(credentials.getUsername()));
         user.setPhrescoEnabled(true);
         user.setValidLogin(true);
-        user.setRoleIds(Arrays.asList(SERVICE_VIEW_ROLE_ID, FRAMEWORK_VIEW_ROLE_ID));
+        user.setRoleIds(serverConfig.getDefaultRoles());
         if(user != null) {
         	user.setCreationDate(new Date());
         	user.setPassword(ServerUtil.encodeUsingHash(credentials.getUsername(), 

@@ -165,6 +165,7 @@ public class ProjectService extends DbService {
 			}
 			buffer.append("feature" + j + "_name=" + "\""+ group.getName() + "\"" + ",");
 			buffer.append("feature" + j + "_version=" + "\""+ infos.get(i).getVersion() + "\"");
+			j++;
 		}
 		return buffer.toString();
 	}
@@ -186,6 +187,7 @@ public class ProjectService extends DbService {
 			}
 			buffer.append("jslibrary" + j + "_name=" + "\""+ group.getName() + "\"" + ",");
 			buffer.append("jslibrary" + j + "_version=" + "\""+ infos.get(i).getVersion() + "\"");
+			j++;
 		}
 		return buffer.toString();
 	}
