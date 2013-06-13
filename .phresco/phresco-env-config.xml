@@ -16,8 +16,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 
--->
-<environments>
+--><environments>
     <environment default="false" name="Production">
         <WebService name="webservice">
             <port>8080</port>
@@ -27,10 +26,10 @@
             <protocol>http</protocol>
             <username/>
         </WebService>	
-	<Database  desc="" name="database">
+	<Database desc="" name="database">
 		<host>localhost</host>
 		<port>27017</port>
-		<username></username>
+		<username/>
 		<password/>
 		<dbname>database-dump</dbname>
 		<type>mongodb</type>
@@ -60,10 +59,10 @@
             <protocol>http</protocol>
             <username/>
         </WebService>	
-	<Database  desc="" name="database">
+	<Database desc="" name="database">
 		<host>localhost</host>
 		<port>27017</port>
-		<username></username>
+		<username/>
 		<password/>
 		<dbname>database-dump</dbname>
 		<type>mongodb</type>
@@ -93,27 +92,27 @@
             <protocol>http</protocol>
             <username/>
         </WebService>	
-	<Database  desc="" name="database">
+	<Database desc="" name="database">
 		<host>172.16.17.227</host>
 		<port>27017</port>
-		<username></username>
+		<username/>
 		<password/>
 		<dbname>phresco-dev3-0</dbname>
 		<type>mongodb</type>
 		<version>2.0.4</version>
 	</Database>
-	<Server appliesTo="" desc="" name="server">
-            <protocol>http</protocol>
-            <host>172.16.17.226</host>
-            <port>8080</port>
+	<Server desc="" name="server">
+            <context>service</context>
+            <deploy_dir>D:/phresco/Tomcat/Tomcat-7.0.14/webapps/</deploy_dir>
             <admin_username>admin</admin_username>
-            <admin_password>ZGV2cmVwbzI=</admin_password>
-            <remoteDeployment>No</remoteDeployment>
-            <type>Apache Tomcat</type>
-            <version>7.0.x</version>
-            <deploy_dir>D:\phresco\Tomcat\Tomcat-7.0.14\webapps</deploy_dir>
-            <context>repository</context>
             <additional_context>/</additional_context>
+            <port>3030</port>
+            <admin_password>ZGV2cmVwbzI=</admin_password>
+            <version>7.0.x</version>
+            <type>Apache Tomcat</type>
+            <remoteDeployment>false</remoteDeployment>
+            <protocol>http</protocol>
+            <host>localhost</host>
         </Server>
 	</environment>
 </environments>
