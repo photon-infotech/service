@@ -42,6 +42,9 @@ import com.photon.phresco.service.util.DependencyUtils;
 import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.Constants;
 import com.photon.phresco.util.Utility;
+import com.phresco.pom.exception.PhrescoPomException;
+import com.phresco.pom.model.Model.Modules;
+import com.phresco.pom.util.PomProcessor;
 
 public class ProjectServiceManagerImpl implements ProjectServiceManager, Constants {
 	
@@ -66,6 +69,9 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 					"projectCode=\"" + projectInfo.getProjectCode() + "\"");
 		}
 		PhrescoServerFactory.initialize();
+		if(projectInfo.isMultiModule()) {
+			tempFolderPath = tempFolderPath + "/" + projectInfo.getName();
+		}
 		PhrescoServerFactory.getArchetypeExecutor().execute(projectInfo, tempFolderPath);
 		if(projectInfo.isPreBuilt()) {
 			createPilots(projectInfo.getAppInfos().get(0), tempFolderPath, projectInfo.getCustomerIds().get(0));
