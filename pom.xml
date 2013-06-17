@@ -7,6 +7,9 @@
     <name>Phresco Service Root</name>
     <version>3.0.0.13001-SNAPSHOT</version>
     <url>http://www.phresco.org</url>
+    <scm>
+        <connection>https://github.com/photon-infotech/service.git</connection>
+    </scm>
     <build>
         <sourceDirectory>${phresco.source.directory}</sourceDirectory>
         <testSourceDirectory>${testSourceDirectory}</testSourceDirectory>
