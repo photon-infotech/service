@@ -18,6 +18,7 @@
 package com.photon.phresco.service.rest.api;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,6 +49,7 @@ import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
 import org.springframework.stereotype.Component;
 
+import com.google.gson.Gson;
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactElement;
@@ -126,17 +128,24 @@ public class ComponentService extends DbService {
 	    }
 		try {
 			List<ApplicationType> applicationTypes = new ArrayList<ApplicationType>();
-			List<ApplicationTypeDAO> applicationTypeDAOs = mongoOperation.getCollection(APPTYPES_COLLECTION_NAME, ApplicationTypeDAO.class);
+			List<ApplicationType> applicationTypeDAOs = mongoOperation.getCollection(APPTYPES_COLLECTION_NAME, ApplicationType.class);
 			
-			Converter<ApplicationTypeDAO, ApplicationType> converter = (Converter<ApplicationTypeDAO, ApplicationType>) 
-				ConvertersFactory.getConverter(ApplicationTypeDAO.class);
-			for (ApplicationTypeDAO applicationTypeDAO : applicationTypeDAOs) {
-				ApplicationType convertDAOToObject = converter.convertDAOToObject(applicationTypeDAO, mongoOperation);
-				if(StringUtils.isNotEmpty(customerId)) {
-					List<TechnologyGroup> techGroupByCustomer = getTechGroupByCustomer(customerId, applicationTypeDAO.getId());
-					convertDAOToObject.setTechGroups(techGroupByCustomer);
-					applicationTypes.add(convertDAOToObject);
+			for (ApplicationType applicationType : applicationTypeDAOs) {
+				List<TechnologyGroup> techGroupss = new ArrayList<TechnologyGroup>();
+				Query query = createCustomerIdQuery(customerId);
+				Criteria appCriteria = Criteria.where("appTypeId").is(applicationType.getId());
+				query.addCriteria(appCriteria);
+				List<TechnologyGroup> techGroups = mongoOperation.find(TECH_GROUP_COLLECTION_NAME, query, TechnologyGroup.class);
+				for (TechnologyGroup techGroup : techGroups) {
+					query = createCustomerIdQuery(customerId);
+					Criteria criteria = Criteria.where("techGroupId").is(techGroup.getId());
+					query.addCriteria(criteria);
+					List<TechnologyInfo> techInfos = mongoOperation.find("techInfos", query, TechnologyInfo.class);
+					techGroup.setTechInfos(techInfos);
+					techGroupss.add(techGroup);
 				}
+				applicationType.setTechGroups(techGroupss);
+				applicationTypes.add(applicationType);
 			}
 			if(CollectionUtils.isEmpty(applicationTypes)) {
 				if (isDebugEnabled) {
@@ -570,9 +579,19 @@ public class ComponentService extends DbService {
     	
     	addTechnologyToGroup(technologyDAO);
     	mongoOperation.save(TECHNOLOGIES_COLLECTION_NAME, technologyDAO);
-    	
+    	mongoOperation.save("techInfos", createTechInfo(technologyDAO));
 	}
-
+	
+	private TechnologyInfo createTechInfo(TechnologyDAO dao) {
+		TechnologyInfo info = new TechnologyInfo();
+		info.setId(dao.getId());
+		info.setAppTypeId(dao.getAppTypeId());
+		info.setName(dao.getName());
+		info.setCustomerIds(dao.getCustomerIds());
+		info.setTechGroupId(dao.getTechGroupId());
+		return info;
+	}
+	
 	private void addTechnologyToGroup(TechnologyDAO technologyDAO) {
 		TechnologyGroup technologyGroup = mongoOperation.findOne(TECH_GROUP_COLLECTION_NAME, 
 				new Query(Criteria.whereId().is(technologyDAO.getTechGroupId())), TechnologyGroup.class);

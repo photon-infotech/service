@@ -51,6 +51,8 @@ import com.photon.phresco.commons.model.Permission;
 import com.photon.phresco.commons.model.Property;
 import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.commons.model.Role;
+import com.photon.phresco.commons.model.TechnologyGroup;
+import com.photon.phresco.commons.model.TechnologyInfo;
 import com.photon.phresco.commons.model.User;
 import com.photon.phresco.commons.model.User.AuthType;
 import com.photon.phresco.commons.model.VideoInfo;
@@ -64,6 +66,7 @@ import com.photon.phresco.service.client.impl.ClientHelper;
 import com.photon.phresco.service.converters.ConvertersFactory;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
 import com.photon.phresco.service.dao.CustomerDAO;
+import com.photon.phresco.service.dao.TechnologyDAO;
 import com.photon.phresco.service.dao.VideoInfoDAO;
 import com.photon.phresco.service.dao.VideoTypeDAO;
 import com.photon.phresco.service.impl.DbService;
@@ -246,6 +249,30 @@ public class AdminService extends DbService {
     			CustomerDAO customerDAO = customerConverter.convertObjectToDAO(customer);
 		        mongoOperation.save(CUSTOMERDAO_COLLECTION_NAME, customerDAO);
 		        mongoOperation.save(REPOINFO_COLLECTION_NAME, customer.getRepoInfo());
+		        List<TechnologyDAO> techDAOs = mongoOperation.find(TECHNOLOGIES_COLLECTION_NAME, 
+		        		new Query(Criteria.whereId().in(customerDAO.getApplicableTechnologies().toArray())), TechnologyDAO.class);
+		        if(CollectionUtils.isNotEmpty(techDAOs)) {
+		        	for (TechnologyDAO technologyDAO : techDAOs) {
+						List<String> customerIds = technologyDAO.getCustomerIds();
+						customerIds.add(customerDAO.getId());
+						technologyDAO.setCustomerIds(customerIds);
+						mongoOperation.save(TECHNOLOGIES_COLLECTION_NAME, technologyDAO);
+						
+						TechnologyGroup tg = mongoOperation.findOne(TECH_GROUP_COLLECTION_NAME, 
+								new Query(Criteria.whereId().is(technologyDAO.getTechGroupId())), TechnologyGroup.class);
+						customerIds = tg.getCustomerIds();
+						customerIds.add(customerDAO.getId());
+						tg.setCustomerIds(customerIds);
+						mongoOperation.save(TECH_GROUP_COLLECTION_NAME, tg);
+						
+						TechnologyInfo techInfo = mongoOperation.findOne("techInfos", 
+								new Query(Criteria.whereId().is(technologyDAO.getId())), TechnologyInfo.class);
+						customerIds = techInfo.getCustomerIds();
+						customerIds.add(customerDAO.getId());
+						techInfo.setCustomerIds(customerIds);
+						mongoOperation.save("techInfos", techInfo);
+					}
+		        }
 			}	
     	} catch (Exception e) {
     		throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
