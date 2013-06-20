@@ -108,6 +108,8 @@ public class Customers extends ServiceBaseAction  {
 	private String snapshotRepoUrl = "";
 	private String groupRepoUrl = "";
 	private String baseRepoUrl = "";
+	private String gradientTop = "";
+	private String gradientBottom = "";
 	private String loginlogo = "";
 	private String logopadding = "";
 	private List<String> appliesTo = new ArrayList<String>();
@@ -383,6 +385,8 @@ public class Customers extends ServiceBaseAction  {
 			frameworkTheme.put(COPYRIGHT, getCopyRight());
 			frameworkTheme.put(LOGIN_LOGO, getLoginlogo());
 			frameworkTheme.put(LOGO_PADDING, getLogopadding());
+			frameworkTheme.put(GRADIENT_TOP, getGradientTop());
+			frameworkTheme.put(GRADIENT_BOTTOM, getGradientBottom());
 			customer.setFrameworkTheme(frameworkTheme);
 			customer.setContext(context);
 		} catch (Exception e) {
@@ -1088,5 +1092,21 @@ public class Customers extends ServiceBaseAction  {
 
 	public String getOldContext() {
 		return oldContext;
+	}
+
+	public String getGradientTop() {
+		return gradientTop;
+	}
+
+	public void setGradientTop(String gradientTop) {
+		this.gradientTop = gradientTop;
+	}
+
+	public String getGradientBottom() {
+		return gradientBottom;
+	}
+
+	public void setGradientBottom(String gradientBottom) {
+		this.gradientBottom = gradientBottom;
 	}
 }

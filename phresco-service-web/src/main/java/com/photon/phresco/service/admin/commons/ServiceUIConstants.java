@@ -498,6 +498,8 @@ public interface ServiceUIConstants {
     String SUB_MENU_BACKGROUND_COLOR = "SubMenuBackGround";
     String COPYRIGHT = "CopyRight";
     String DISABLED_LABEL_COLOR = "DisabledLabelColor";
+    String GRADIENT_TOP = "gradientTop";
+    String GRADIENT_BOTTOM = "gradientBottom";
     String LOGIN_LOGO = "loginlogo";
     String LOGO_PADDING = "logopadding";
 

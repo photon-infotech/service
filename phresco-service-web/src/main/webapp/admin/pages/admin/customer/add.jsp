@@ -92,6 +92,8 @@
 	String copyRight = "";
 	String loginlogo = "";
 	String logopadding = "";
+	String gradientTop = "";
+	String gradientBottom = "";
 	String context = "";
 	
 	List<String> applicableTechnologies = new ArrayList();
@@ -186,6 +188,8 @@
 			copyRight = frameworkTheme.get("CopyRight");
 			loginlogo = frameworkTheme.get("loginlogo");
 			logopadding = frameworkTheme.get("logopadding");
+			gradientTop = frameworkTheme.get("gradientTop");
+			gradientBottom = frameworkTheme.get("gradientBottom");
 		}
 		
 		if (StringUtils.isNotEmpty(customer.getRepoInfo().getRepoName())) {
@@ -867,6 +871,26 @@
 								<%-- <input id="copyright" placeholder="<s:text name='place.hldr.cust.add.copyright'/>" class="input-xlarge" type="text" name="CopyRight"
 								   value="<%=copyRight%>"  maxlength="50" title="50 Characters only"> --%>
 								<textarea id="copyright" placeholder="<s:text name='place.hldr.cust.add.copyright'/>" class="input-xlarge" name="CopyRight"><%= copyRight %></textarea>
+							</div>
+						</div>
+												
+						<div class="control-group">
+							<label class="control-label labelbold">
+								<s:text name='lbl.hdr.adm.cust.gradientTop'/>
+							</label>
+							<div class="controls">
+								<input id="gradientTop" placeholder="<s:text name='place.hldr.cust.add.gradienttop'/>" class="input-xlarge" type="text" name="gradientTop"
+								   value="<%=gradientTop%>"  maxlength="50" title="In pixels eg: 10px">
+							</div>
+						</div>
+						
+						<div class="control-group">
+							<label class="control-label labelbold">
+								<s:text name='lbl.hdr.adm.cust.gradientBottom'/>
+							</label>
+							<div class="controls">
+								<input id="gradientBottom" placeholder="<s:text name='lbl.hdr.adm.cust.gradientBottom'/>" class="input-xlarge" type="text" name="gradientBottom"
+								   value="<%=gradientBottom%>"  maxlength="50" title="In pixels eg: 10px">
 							</div>
 						</div>
 						
