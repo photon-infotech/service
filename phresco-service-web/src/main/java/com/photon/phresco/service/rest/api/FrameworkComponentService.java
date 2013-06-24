@@ -57,7 +57,7 @@ public class FrameworkComponentService extends DbService{
         		List<String> customers = new ArrayList<String>();
         		customers.add(customerId);
         		if(StringUtils.isNotEmpty(techId)) {
-        			CustomerDAO customer = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME, 
+        			CustomerDAO customer = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME, 
         					new Query(Criteria.whereId().is(customerId)), CustomerDAO.class);
         			if(CollectionUtils.isNotEmpty(customer.getApplicableTechnologies())) {
         				if(customer.getApplicableTechnologies().contains(techId)) {
@@ -81,7 +81,7 @@ public class FrameworkComponentService extends DbService{
 			query = query.addCriteria(typeQuery);
 			query = query.addCriteria(techIdQuery);
 			
-			List<ArtifactGroupDAO> artifactGroupDAOs = mongoOperation.find(ARTIFACT_GROUP_COLLECTION_NAME,
+			List<ArtifactGroupDAO> artifactGroupDAOs = DbService.getMongoOperation().find(ARTIFACT_GROUP_COLLECTION_NAME,
 					query, ArtifactGroupDAO.class);
 			if(CollectionUtils.isEmpty(artifactGroupDAOs)) {
 		    	return Response.status(Response.Status.NO_CONTENT).build();
@@ -99,7 +99,7 @@ public class FrameworkComponentService extends DbService{
             (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getFrameworkConverter(ArtifactGroupDAO.class);
 	    List<ArtifactGroup> modules = new ArrayList<ArtifactGroup>();
 	    for (ArtifactGroupDAO artifactGroupDAO : moduleDAOs) {
-			ArtifactGroup artifactGroup = artifactConverter.convertDAOToObject(artifactGroupDAO, mongoOperation);
+			ArtifactGroup artifactGroup = artifactConverter.convertDAOToObject(artifactGroupDAO, DbService.getMongoOperation());
 			modules.add(artifactGroup);
 		}
         return modules;
@@ -113,7 +113,7 @@ public class FrameworkComponentService extends DbService{
 	        S_LOGGER.debug("Entered into FrameworkComponentService.artifactGroupId()" + artifactGroupId);
 	    }
 		try {
-			ArtifactElement artifactElement = mongoOperation.findOne(ARTIFACT_ELEMENT_COLLECTION_NAME, 
+			ArtifactElement artifactElement = DbService.getMongoOperation().findOne(ARTIFACT_ELEMENT_COLLECTION_NAME, 
 					new Query(Criteria.where(DB_COLUMN_ARTIFACT_GROUP_ID).is(artifactGroupId)), ArtifactElement.class);
 		    ResponseBuilder response = Response.status(Response.Status.OK);
 			return response.entity(artifactElement).build();

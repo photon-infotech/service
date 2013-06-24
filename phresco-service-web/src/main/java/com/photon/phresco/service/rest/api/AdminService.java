@@ -109,12 +109,12 @@ public class AdminService extends DbService {
         }
         try {
 			if(StringUtils.isNotEmpty(customerName)) {
-				CustomerDAO customer = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME, 
+				CustomerDAO customer = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME, 
 				        new Query(Criteria.where("name").is(customerName)), CustomerDAO.class);
 				if (customer != null) {
 					Converter<CustomerDAO, Customer> customerConverter = 
 						(Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
-					Customer customerInfo = customerConverter.convertDAOToObject(customer, mongoOperation);
+					Customer customerInfo = customerConverter.convertDAOToObject(customer, DbService.getMongoOperation());
 					return Response.status(Response.Status.OK).entity(customerInfo).build();
 				}
 			}
@@ -160,14 +160,14 @@ public class AdminService extends DbService {
          try {
 			if(StringUtils.isNotEmpty(context)) {
 				
-				CustomerDAO customer = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME, 
+				CustomerDAO customer = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME, 
 				        new Query(Criteria.where("context").is(context)), CustomerDAO.class);
 				
 				if (customer != null) {
 					
 					Converter<CustomerDAO, Customer> customerConverter = 
 						(Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
-					customerInfo = customerConverter.convertDAOToObject(customer, mongoOperation);
+					customerInfo = customerConverter.convertDAOToObject(customer, DbService.getMongoOperation());
 					
 					inputStream = getFileFromDB(customerInfo.getId());
 					
@@ -247,30 +247,30 @@ public class AdminService extends DbService {
     			Converter<CustomerDAO, Customer> customerConverter = 
         			(Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
     			CustomerDAO customerDAO = customerConverter.convertObjectToDAO(customer);
-		        mongoOperation.save(CUSTOMERDAO_COLLECTION_NAME, customerDAO);
-		        mongoOperation.save(REPOINFO_COLLECTION_NAME, customer.getRepoInfo());
-		        List<TechnologyDAO> techDAOs = mongoOperation.find(TECHNOLOGIES_COLLECTION_NAME, 
+		        DbService.getMongoOperation().save(CUSTOMERDAO_COLLECTION_NAME, customerDAO);
+		        DbService.getMongoOperation().save(REPOINFO_COLLECTION_NAME, customer.getRepoInfo());
+		        List<TechnologyDAO> techDAOs = DbService.getMongoOperation().find(TECHNOLOGIES_COLLECTION_NAME, 
 		        		new Query(Criteria.whereId().in(customerDAO.getApplicableTechnologies().toArray())), TechnologyDAO.class);
 		        if(CollectionUtils.isNotEmpty(techDAOs)) {
 		        	for (TechnologyDAO technologyDAO : techDAOs) {
 						List<String> customerIds = technologyDAO.getCustomerIds();
 						customerIds.add(customerDAO.getId());
 						technologyDAO.setCustomerIds(customerIds);
-						mongoOperation.save(TECHNOLOGIES_COLLECTION_NAME, technologyDAO);
+						DbService.getMongoOperation().save(TECHNOLOGIES_COLLECTION_NAME, technologyDAO);
 						
-						TechnologyGroup tg = mongoOperation.findOne(TECH_GROUP_COLLECTION_NAME, 
+						TechnologyGroup tg = DbService.getMongoOperation().findOne(TECH_GROUP_COLLECTION_NAME, 
 								new Query(Criteria.whereId().is(technologyDAO.getTechGroupId())), TechnologyGroup.class);
 						customerIds = tg.getCustomerIds();
 						customerIds.add(customerDAO.getId());
 						tg.setCustomerIds(customerIds);
-						mongoOperation.save(TECH_GROUP_COLLECTION_NAME, tg);
+						DbService.getMongoOperation().save(TECH_GROUP_COLLECTION_NAME, tg);
 						
-						TechnologyInfo techInfo = mongoOperation.findOne("techInfos", 
+						TechnologyInfo techInfo = DbService.getMongoOperation().findOne("techInfos", 
 								new Query(Criteria.whereId().is(technologyDAO.getId())), TechnologyInfo.class);
 						customerIds = techInfo.getCustomerIds();
 						customerIds.add(customerDAO.getId());
 						techInfo.setCustomerIds(customerIds);
-						mongoOperation.save("techInfos", techInfo);
+						DbService.getMongoOperation().save("techInfos", techInfo);
 					}
 		        }
 			}	
@@ -327,12 +327,12 @@ public class AdminService extends DbService {
         }
     	
     	try {
-    		CustomerDAO customer = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME, 
+    		CustomerDAO customer = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME, 
     		        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), CustomerDAO.class);
     		if (customer != null) {
     			Converter<CustomerDAO, Customer> customerConverter = 
         			(Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
-    			Customer foundcustomer = customerConverter.convertDAOToObject(customer, mongoOperation);
+    			Customer foundcustomer = customerConverter.convertDAOToObject(customer, DbService.getMongoOperation());
     			return Response.status(Response.Status.OK).entity(foundcustomer).build();
     		}
     	} catch (Exception e) {
@@ -361,7 +361,7 @@ public class AdminService extends DbService {
     			Converter<CustomerDAO, Customer> customerConverter = 
         			(Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
     			CustomerDAO customerDao = customerConverter.convertObjectToDAO(updateCustomers);
-        		mongoOperation.save(CUSTOMERS_COLLECTION_NAME, customerDao);
+        		DbService.getMongoOperation().save(CUSTOMERS_COLLECTION_NAME, customerDao);
         		return Response.status(Response.Status.OK).entity(updateCustomers).build();
          	} 
     	} catch (Exception e) {
@@ -385,7 +385,7 @@ public class AdminService extends DbService {
         }
     	
     	try {
-    		mongoOperation.remove(CUSTOMERS_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), CustomerDAO.class);
+    		DbService.getMongoOperation().remove(CUSTOMERS_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), CustomerDAO.class);
     	} catch (Exception e) {
     		throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
     	}
@@ -407,11 +407,11 @@ public class AdminService extends DbService {
 	    }
 		List<VideoInfo> videoInfos = new ArrayList<VideoInfo>();
 		try {
-			List<VideoInfoDAO> videoList = mongoOperation.getCollection(VIDEODAO_COLLECTION_NAME , VideoInfoDAO.class);
+			List<VideoInfoDAO> videoList = DbService.getMongoOperation().getCollection(VIDEODAO_COLLECTION_NAME , VideoInfoDAO.class);
 			if (videoList != null) {
 				Converter<VideoInfoDAO, VideoInfo> videoInfoConverter =  (Converter<VideoInfoDAO, VideoInfo>) ConvertersFactory.getConverter(VideoInfoDAO.class);
 				for (VideoInfoDAO videoInfoDAO : videoList) {
-					VideoInfo videoInfo = videoInfoConverter.convertDAOToObject(videoInfoDAO, mongoOperation);
+					VideoInfo videoInfo = videoInfoConverter.convertDAOToObject(videoInfoDAO, DbService.getMongoOperation());
 					videoInfos.add(videoInfo);
 				}
 				return Response.status(Response.Status.OK).entity(videoInfos).build(); 
@@ -526,14 +526,14 @@ public class AdminService extends DbService {
 		Converter<VideoInfoDAO, VideoInfo> converter = 
 	            (Converter<VideoInfoDAO, VideoInfo>) ConvertersFactory.getConverter(VideoInfoDAO.class);
 		VideoInfoDAO videoDAO = converter.convertObjectToDAO(video);
-		mongoOperation.save(VIDEODAO_COLLECTION_NAME, videoDAO);
+		DbService.getMongoOperation().save(VIDEODAO_COLLECTION_NAME, videoDAO);
 		List<VideoType> videoList = video.getVideoList();
 		Converter<VideoTypeDAO, VideoType> videoTypeconverter = 
             (Converter<VideoTypeDAO, VideoType>) ConvertersFactory.getConverter(VideoTypeDAO.class);
 		Converter<ArtifactGroupDAO, ArtifactGroup> agConverter = 
             (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
 		for (VideoType videoType : videoList) {
-			mongoOperation.save(VIDEOTYPESDAO_COLLECTION_NAME, videoTypeconverter.convertObjectToDAO(videoType));
+			DbService.getMongoOperation().save(VIDEOTYPESDAO_COLLECTION_NAME, videoTypeconverter.convertObjectToDAO(videoType));
 			
 			saveModuleGroup(videoType.getArtifactGroup());
 		}
@@ -548,14 +548,14 @@ public class AdminService extends DbService {
 //        List<com.photon.phresco.commons.model.ArtifactInfo> moduleGroupVersions = moduleGroup.getVersions();
         List<String> versionIds = new ArrayList<String>();
         
-        ArtifactGroupDAO moduleDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
+        ArtifactGroupDAO moduleDAO = DbService.getMongoOperation().findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
 		        new Query(Criteria.where(REST_API_NAME).is(moduleGroupDAO.getName())), ArtifactGroupDAO.class);
         
         com.photon.phresco.commons.model.ArtifactInfo newVersion = moduleGroup.getVersions().get(0);
         if(moduleDAO != null) {
         	moduleGroupDAO.setId(moduleDAO.getId());
         	versionIds.addAll(moduleDAO.getVersionIds());
-        	List<com.photon.phresco.commons.model.ArtifactInfo> info = mongoOperation.find(ARTIFACT_INFO_COLLECTION_NAME, 
+        	List<com.photon.phresco.commons.model.ArtifactInfo> info = DbService.getMongoOperation().find(ARTIFACT_INFO_COLLECTION_NAME, 
         			new Query(Criteria.where(DB_COLUMN_ARTIFACT_GROUP_ID).is(moduleDAO.getId())),
         			com.photon.phresco.commons.model.ArtifactInfo.class);
         	
@@ -569,14 +569,14 @@ public class AdminService extends DbService {
         		versionIds.add(newVersion.getId());
         	}
 			newVersion.setId(id);
-    		mongoOperation.save(ARTIFACT_INFO_COLLECTION_NAME, newVersion);
+    		DbService.getMongoOperation().save(ARTIFACT_INFO_COLLECTION_NAME, newVersion);
         }  else {
         		versionIds.add(newVersion.getId());
         		newVersion.setArtifactGroupId(moduleGroupDAO.getId());
-                mongoOperation.save(ARTIFACT_INFO_COLLECTION_NAME, newVersion);
+                DbService.getMongoOperation().save(ARTIFACT_INFO_COLLECTION_NAME, newVersion);
         }
         moduleGroupDAO.setVersionIds(versionIds);
-        mongoOperation.save(ARTIFACT_GROUP_COLLECTION_NAME, moduleGroupDAO);
+        DbService.getMongoOperation().save(ARTIFACT_GROUP_COLLECTION_NAME, moduleGroupDAO);
     }
 
 	private String checkVersionAvailable(List<com.photon.phresco.commons.model.ArtifactInfo> info, String version) {
@@ -636,12 +636,12 @@ public class AdminService extends DbService {
 	    }
 		
 		try {
-			VideoInfoDAO videoInfo = mongoOperation.findOne(VIDEODAO_COLLECTION_NAME, 
+			VideoInfoDAO videoInfo = DbService.getMongoOperation().findOne(VIDEODAO_COLLECTION_NAME, 
 			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), VideoInfoDAO.class);
 			if (videoInfo != null) {
 				Converter<VideoInfoDAO, VideoInfo> videoInfoConverter = 
 						(Converter<VideoInfoDAO, VideoInfo>) ConvertersFactory.getConverter(VideoInfoDAO.class);
-					VideoInfo videoInfos = videoInfoConverter.convertDAOToObject(videoInfo, mongoOperation);
+					VideoInfo videoInfos = videoInfoConverter.convertDAOToObject(videoInfo, DbService.getMongoOperation());
 				return Response.status(Response.Status.OK).entity(videoInfos).build(); 
 			}
 		} catch (Exception e) {
@@ -681,24 +681,24 @@ public class AdminService extends DbService {
 	        S_LOGGER.debug("Entered into AdminService.deleteVideo(String id)" + id);
 	    }
 		try {
-			VideoInfoDAO videoInfoDAO = mongoOperation.findOne(VIDEODAO_COLLECTION_NAME, 
+			VideoInfoDAO videoInfoDAO = DbService.getMongoOperation().findOne(VIDEODAO_COLLECTION_NAME, 
 					new Query(Criteria.whereId().is(id)), VideoInfoDAO.class);
 			if(videoInfoDAO != null) {
-				mongoOperation.remove(VIDEODAO_COLLECTION_NAME, new Query(Criteria.whereId().is(id)), VideoInfoDAO.class);
-				List<VideoTypeDAO> videotypeDAOs = mongoOperation.find(VIDEODAO_COLLECTION_NAME, 
+				DbService.getMongoOperation().remove(VIDEODAO_COLLECTION_NAME, new Query(Criteria.whereId().is(id)), VideoInfoDAO.class);
+				List<VideoTypeDAO> videotypeDAOs = DbService.getMongoOperation().find(VIDEODAO_COLLECTION_NAME, 
 						new Query(Criteria.whereId().in(videoInfoDAO.getVideoListId().toArray())), VideoTypeDAO.class);
 				if(CollectionUtils.isNotEmpty(videotypeDAOs)) {
 					for (VideoTypeDAO videoTypeDAO : videotypeDAOs) {
-						ArtifactGroupDAO artifactGroupDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, new Query(Criteria.whereId().is(videoTypeDAO.getArtifactGroupId())), 
+						ArtifactGroupDAO artifactGroupDAO = DbService.getMongoOperation().findOne(ARTIFACT_GROUP_COLLECTION_NAME, new Query(Criteria.whereId().is(videoTypeDAO.getArtifactGroupId())), 
 								ArtifactGroupDAO.class);
 						if(artifactGroupDAO != null) {
-							mongoOperation.remove(ARTIFACT_GROUP_COLLECTION_NAME, new Query(Criteria.whereId().is(videoTypeDAO.getArtifactGroupId())), 
+							DbService.getMongoOperation().remove(ARTIFACT_GROUP_COLLECTION_NAME, new Query(Criteria.whereId().is(videoTypeDAO.getArtifactGroupId())), 
 									ArtifactGroupDAO.class);
-							mongoOperation.remove(ARTIFACT_INFO_COLLECTION_NAME, 
+							DbService.getMongoOperation().remove(ARTIFACT_INFO_COLLECTION_NAME, 
 									new Query(Criteria.whereId().in(artifactGroupDAO.getVersionIds().toArray())), com.photon.phresco.commons.model.ArtifactInfo.class);
 						}
 					}
-					mongoOperation.remove(VIDEOTYPESDAO_COLLECTION_NAME, 
+					DbService.getMongoOperation().remove(VIDEOTYPESDAO_COLLECTION_NAME, 
 							new Query(Criteria.whereId().in(videoInfoDAO.getVideoListId().toArray())), VideoTypeDAO.class);
 				}
 			}
@@ -722,7 +722,7 @@ public class AdminService extends DbService {
 	    }
 		
 		try {
-			List<User> userList = mongoOperation.getCollection(USERS_COLLECTION_NAME, User.class);
+			List<User> userList = DbService.getMongoOperation().getCollection(USERS_COLLECTION_NAME, User.class);
 			if (userList.isEmpty()) {
 				return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
 			}
@@ -752,7 +752,7 @@ public class AdminService extends DbService {
 					user.setPhrescoEnabled(true);
 					user.setAuthType(AuthType.LOCAL);
 					user.setPassword(ServerUtil.encodeUsingHash(user.getName(),user.getPassword()));
-					mongoOperation.save(USERS_COLLECTION_NAME, user);
+					DbService.getMongoOperation().save(USERS_COLLECTION_NAME, user);
 				}
 			}
 			
@@ -787,7 +787,7 @@ public class AdminService extends DbService {
         List<User> users = response.getEntity(genericType);
         
         //To save the users into user table
-        mongoOperation.insertList(USERS_COLLECTION_NAME, users);
+        DbService.getMongoOperation().insertList(USERS_COLLECTION_NAME, users);
 		return Response.status(Response.Status.OK).entity(users).build();
 	}
 
@@ -808,10 +808,10 @@ public class AdminService extends DbService {
 		
 		try {
 			for (User user : users) {
-				User userInfo = mongoOperation.findOne(USERS_COLLECTION_NAME , 
+				User userInfo = DbService.getMongoOperation().findOne(USERS_COLLECTION_NAME , 
 				        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(user.getId())), User.class);
 				if (userInfo  != null) {
-					mongoOperation.save(USERS_COLLECTION_NAME, user);
+					DbService.getMongoOperation().save(USERS_COLLECTION_NAME, user);
 				}
 			}
 		} catch (Exception e) {
@@ -852,7 +852,7 @@ public class AdminService extends DbService {
 	    }
 		
 		try {
-			User userInfo = mongoOperation.findOne(USERS_COLLECTION_NAME, 
+			User userInfo = DbService.getMongoOperation().findOne(USERS_COLLECTION_NAME, 
 			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), User.class);
 			if (userInfo != null) {
 				return Response.status(Response.Status.OK).entity(userInfo).build(); 
@@ -880,7 +880,7 @@ public class AdminService extends DbService {
 		
 		try {
 			if (id.equals(user.getId())) {
-				mongoOperation.save(USERS_COLLECTION_NAME, user);
+				DbService.getMongoOperation().save(USERS_COLLECTION_NAME, user);
 				return Response.status(Response.Status.OK).entity(user).build();
 			} 
 		} catch (Exception e) {
@@ -903,7 +903,7 @@ public class AdminService extends DbService {
 	    }
 		
 		try {
-			mongoOperation.remove(USERS_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), User.class);
+			DbService.getMongoOperation().remove(USERS_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), User.class);
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
 		}
@@ -925,10 +925,10 @@ public class AdminService extends DbService {
 		List<Role> roles = new ArrayList<Role>();
 		try {
 			if(StringUtils.isNotEmpty(applyTo)) {
-				roles = mongoOperation.find(ROLES_COLLECTION_NAME, new Query(Criteria.where("appliesTo").is(applyTo)), Role.class);
+				roles = DbService.getMongoOperation().find(ROLES_COLLECTION_NAME, new Query(Criteria.where("appliesTo").is(applyTo)), Role.class);
 				return Response.status(Response.Status.OK).entity(roles).build();
 			}
-			roles = mongoOperation.getCollection(ROLES_COLLECTION_NAME , Role.class);
+			roles = DbService.getMongoOperation().getCollection(ROLES_COLLECTION_NAME , Role.class);
 			if (roles != null) {
 				return Response.status(Response.Status.OK).entity(roles).build();
 			} 
@@ -955,7 +955,7 @@ public class AdminService extends DbService {
 		try {
 			for (Role role : roles) {
 				if(validate(role)) {
-					mongoOperation.save(ROLES_COLLECTION_NAME , role);
+					DbService.getMongoOperation().save(ROLES_COLLECTION_NAME , role);
 				}
 			}
 		} catch (Exception e) {
@@ -981,10 +981,10 @@ public class AdminService extends DbService {
 		
 		try {
 			for (Role role : roles) {
-				Role roleInfo = mongoOperation.findOne(ROLES_COLLECTION_NAME , 
+				Role roleInfo = DbService.getMongoOperation().findOne(ROLES_COLLECTION_NAME , 
 				        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(role.getId())), Role.class);
 				if (roleInfo  != null) {
-					mongoOperation.save(ROLES_COLLECTION_NAME, role);
+					DbService.getMongoOperation().save(ROLES_COLLECTION_NAME, role);
 				}
 			}
 		} catch (Exception e) {
@@ -1025,7 +1025,7 @@ public class AdminService extends DbService {
 	    }
 		
 		try {
-			Role role = mongoOperation.findOne(ROLES_COLLECTION_NAME, 
+			Role role = DbService.getMongoOperation().findOne(ROLES_COLLECTION_NAME, 
 			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), Role.class);
 			if (role != null) {
 				return Response.status(Response.Status.OK).entity(role).build();
@@ -1053,7 +1053,7 @@ public class AdminService extends DbService {
 		
 		try {
 			if (id.equals(role.getId())) {
-				mongoOperation.save(ROLES_COLLECTION_NAME, role);
+				DbService.getMongoOperation().save(ROLES_COLLECTION_NAME, role);
 				return Response.status(Response.Status.OK).entity(role).build();
 			} 
 		} catch (Exception e) {
@@ -1076,7 +1076,7 @@ public class AdminService extends DbService {
 	    }
 		
 		try {
-			mongoOperation.remove(ROLES_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), Role.class);
+			DbService.getMongoOperation().remove(ROLES_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), Role.class);
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
 		}
@@ -1099,10 +1099,10 @@ public class AdminService extends DbService {
 		List<Permission> permissions = new ArrayList<Permission>();
 		try {
 			if(StringUtils.isNotBlank(applyTo)) {
-				permissions = mongoOperation.find(PERMISSION_COLLECTION_NAME, new Query(Criteria.where("appliesTo").is(applyTo)), Permission.class);
+				permissions = DbService.getMongoOperation().find(PERMISSION_COLLECTION_NAME, new Query(Criteria.where("appliesTo").is(applyTo)), Permission.class);
 				return Response.status(Response.Status.OK).entity(permissions).build();
 			}
-			permissions = mongoOperation.getCollection(PERMISSION_COLLECTION_NAME , Permission.class);
+			permissions = DbService.getMongoOperation().getCollection(PERMISSION_COLLECTION_NAME , Permission.class);
 			if (permissions != null) {
 				return Response.status(Response.Status.OK).entity(permissions).build();
 			} 
@@ -1129,7 +1129,7 @@ public class AdminService extends DbService {
 		try {
 			for (Permission permission : permissions) {
 				if(validate(permission)) {
-					mongoOperation.save(PERMISSION_COLLECTION_NAME , permission);
+					DbService.getMongoOperation().save(PERMISSION_COLLECTION_NAME , permission);
 				}
 			}
 		} catch (Exception e) {
@@ -1155,10 +1155,10 @@ public class AdminService extends DbService {
 		
 		try {
 			for (Permission permission : permissions) {
-				Permission permisonInfo = mongoOperation.findOne(PERMISSION_COLLECTION_NAME , 
+				Permission permisonInfo = DbService.getMongoOperation().findOne(PERMISSION_COLLECTION_NAME , 
 				        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(permission.getId())), Permission.class);
 				if (permisonInfo  != null) {
-					mongoOperation.save(PERMISSION_COLLECTION_NAME, permission);
+					DbService.getMongoOperation().save(PERMISSION_COLLECTION_NAME, permission);
 				}
 			}
 		} catch (Exception e) {
@@ -1199,7 +1199,7 @@ public class AdminService extends DbService {
 	    }
 		
 		try {
-			Permission permission = mongoOperation.findOne(PERMISSION_COLLECTION_NAME, 
+			Permission permission = DbService.getMongoOperation().findOne(PERMISSION_COLLECTION_NAME, 
 			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), Permission.class);
 			if (permission != null) {
 				return Response.status(Response.Status.OK).entity(permission).build();
@@ -1227,7 +1227,7 @@ public class AdminService extends DbService {
 		
 		try {
 			if (id.equals(permission.getId())) {
-				mongoOperation.save(PERMISSION_COLLECTION_NAME, permission);
+				DbService.getMongoOperation().save(PERMISSION_COLLECTION_NAME, permission);
 				return Response.status(Response.Status.OK).entity(permission).build();
 			} 
 		} catch (Exception e) {
@@ -1250,7 +1250,7 @@ public class AdminService extends DbService {
 	    }
 		
 		try {
-			mongoOperation.remove(PERMISSION_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), Permission.class);
+			DbService.getMongoOperation().remove(PERMISSION_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), Permission.class);
 		} catch (Exception e) {
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
 		}
@@ -1274,7 +1274,7 @@ public class AdminService extends DbService {
 		try {
 			for (Property property : adminConfigInfo) {
 				if(validate(property)) {
-					mongoOperation.save(FORUM_COLLECTION_NAME , property);
+					DbService.getMongoOperation().save(FORUM_COLLECTION_NAME , property);
 				}
 			}
 		} catch (Exception e) {
@@ -1298,7 +1298,7 @@ public class AdminService extends DbService {
         }
     	
     	try {
-    		Property adminConfig = mongoOperation.findOne(FORUM_COLLECTION_NAME, 
+    		Property adminConfig = DbService.getMongoOperation().findOne(FORUM_COLLECTION_NAME, 
     		        new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)), Property.class);
     		if (adminConfig != null) {
     			return Response.status(Response.Status.OK).entity(adminConfig).build();
@@ -1325,7 +1325,7 @@ public class AdminService extends DbService {
 		
 		try {
 			for (LogInfo logInfo : logInfos) {
-				mongoOperation.save(LOG_COLLECTION_NAME, logInfo);
+				DbService.getMongoOperation().save(LOG_COLLECTION_NAME, logInfo);
 			}
 			
 		} catch (Exception e) {

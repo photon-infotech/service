@@ -45,6 +45,7 @@ import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
 import com.photon.phresco.service.impl.DbManagerImpl;
+import com.photon.phresco.service.impl.DbService;
 import com.photon.phresco.util.ServiceConstants;
 import com.phresco.pom.site.Reports;
 
@@ -704,7 +705,7 @@ public class ComponentServiceTest extends DbManagerImpl implements ServiceConsta
 		report.setGroupId("org.codehaus.mojo");
 		reporesList.add(report);
 		
-		mongoOperation.insertList("reportsfinal", reporesList);
+		DbService.getMongoOperation().insertList("reportsfinal", reporesList);
 		
 	}
 	
@@ -726,11 +727,11 @@ public class ComponentServiceTest extends DbManagerImpl implements ServiceConsta
 	public void createRepository() throws JsonParseException, JsonMappingException, IOException {
 //		Query query = new Query(Criteria.where("type").is(Type.FEATURE.name()));
 		Query query = new Query(Criteria.where("type").is(Type.COMPONENT.name()));
-		List<ArtifactGroupDAO> artifactGroupDAOs = mongoOperation.find(ARTIFACT_GROUP_COLLECTION_NAME, query, ArtifactGroupDAO.class);
+		List<ArtifactGroupDAO> artifactGroupDAOs = DbService.getMongoOperation().find(ARTIFACT_GROUP_COLLECTION_NAME, query, ArtifactGroupDAO.class);
 		for (ArtifactGroupDAO artifactGroupDAO : artifactGroupDAOs) {
 			artifactGroupDAO.setDisplayName(artifactGroupDAO.getName());
 			System.out.println(artifactGroupDAO.getName());
-			mongoOperation.save(ARTIFACT_GROUP_COLLECTION_NAME, artifactGroupDAO);
+			DbService.getMongoOperation().save(ARTIFACT_GROUP_COLLECTION_NAME, artifactGroupDAO);
 		}
 	}
 	

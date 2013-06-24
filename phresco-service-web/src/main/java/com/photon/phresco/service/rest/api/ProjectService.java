@@ -215,10 +215,10 @@ public class ProjectService extends DbService {
 			return "";
 		}
 		int j = 1;
-		List<ArtifactInfo> infos = mongoOperation.find(ARTIFACT_INFO_COLLECTION_NAME, 
+		List<ArtifactInfo> infos = DbService.getMongoOperation().find(ARTIFACT_INFO_COLLECTION_NAME, 
 				new Query(Criteria.whereId().in(selectedModules.toArray())), ArtifactInfo.class);
 		for (int i = 0; i < infos.size(); i++) {
-			ArtifactGroupDAO group = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
+			ArtifactGroupDAO group = DbService.getMongoOperation().findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
 					new Query(Criteria.whereId().is(infos.get(i).getArtifactGroupId())), ArtifactGroupDAO.class);
 			if(! (i == 0)) {
 				buffer.append(",");
@@ -237,10 +237,10 @@ public class ProjectService extends DbService {
 			return "";
 		}
 		int j = 1;
-		List<ArtifactInfo> infos = mongoOperation.find(ARTIFACT_INFO_COLLECTION_NAME, 
+		List<ArtifactInfo> infos = DbService.getMongoOperation().find(ARTIFACT_INFO_COLLECTION_NAME, 
 				new Query(Criteria.whereId().in(selectedModules.toArray())), ArtifactInfo.class);
 		for (int i = 0; i < infos.size(); i++) {
-			ArtifactGroupDAO group = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
+			ArtifactGroupDAO group = DbService.getMongoOperation().findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
 					new Query(Criteria.whereId().is(infos.get(i).getArtifactGroupId())), ArtifactGroupDAO.class);
 			if(! (i == 0)) {
 				buffer.append(",");

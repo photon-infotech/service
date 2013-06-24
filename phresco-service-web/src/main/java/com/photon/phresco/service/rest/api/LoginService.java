@@ -114,7 +114,7 @@ public class LoginService extends DbService {
         	user.setPassword(ServerUtil.encodeUsingHash(credentials.getUsername(), 
         			ServerUtil.decryptString(credentials.getPassword())));
         	user.setAuthType(AuthType.LOCAL);
-        	mongoOperation.save(USERS_COLLECTION_NAME, user);
+        	DbService.getMongoOperation().save(USERS_COLLECTION_NAME, user);
         }
         user.setCustomers(findCustomersFromDB());
         return user;

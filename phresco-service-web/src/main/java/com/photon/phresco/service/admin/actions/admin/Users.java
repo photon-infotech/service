@@ -31,6 +31,7 @@ import com.photon.phresco.commons.model.User;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
+import com.photon.phresco.util.ServiceConstants;
 
 public class Users extends ServiceBaseAction { 
 
@@ -152,7 +153,7 @@ public class Users extends ServiceBaseAction {
 			}
 			User user = getServiceManager().getUserInfo(getUserId());
 			if (user != null && StringUtils.isNotEmpty(getSelectedRoles())) {
-				List<String> rolesIds = Arrays.asList(getSelectedRoles().split(COMMA));
+				List<String> rolesIds = Arrays.asList(getSelectedRoles().split(ServiceConstants.COMMA));
 				user.setRoleIds(rolesIds);
 				getServiceManager().updateUserInfo(user, userId);
 				setUserName(user.getName());
