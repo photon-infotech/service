@@ -33,10 +33,10 @@ import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.api.ArchetypeExecutor;
 import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.PhrescoServerFactory;
-import com.photon.phresco.service.model.ServerConfiguration;
 import com.photon.phresco.service.util.ServerConstants;
 import com.photon.phresco.util.Constants;
 import com.photon.phresco.util.ProjectUtils;
+import com.photon.phresco.util.ServiceConstants;
 import com.photon.phresco.util.Utility;
 import com.phresco.pom.exception.PhrescoPomException;
 import com.phresco.pom.util.PomProcessor;
@@ -50,12 +50,10 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 	public static final String WINDOWS = "Windows";
 	private static final String PHRESCO_FOLDER_NAME = "phresco";
 	private static final String DOT_PHRESCO_FOLDER = "." + PHRESCO_FOLDER_NAME;
-	// private ServerConfiguration serverConfiguration;
 	private DbManager dbManager = null;
 
-	public ArchetypeExecutorImpl(ServerConfiguration serverConfiguration)
+	public ArchetypeExecutorImpl()
 			throws PhrescoException {
-		// this.serverConfiguration = serverConfiguration;
 		PhrescoServerFactory.initialize();
 		dbManager = PhrescoServerFactory.getDbManager();
 	}
@@ -66,7 +64,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 			LOGGER.debug("ArchetypeExecutorImpl.execute:Entry");
 			if (projectInfo == null) {
 				LOGGER.warn("ArchetypeExecutorImpl.execute",
-						"status=\"Bad Request\"",
+						ServiceConstants.STATUS_BAD_REQUEST,
 						"message=\"ProjectInfo is empty\"");
 				throw new PhrescoException("ProjectInfo is empty");
 			}
@@ -120,18 +118,18 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 		if (isDebugEnabled) {
 			LOGGER.debug("ArchetypeExecutorImpl.updateRepository:Entry");
 			if (StringUtils.isEmpty(customerId)) {
-				LOGGER.warn("ArchetypeExecutorImpl.updateRepository",
-						"status=\"Bad Request\"",
+				LOGGER.warn(ServiceConstants.ARCHETYPE_EXE_IMPL_UPDATE_REPO,
+						ServiceConstants.STATUS_BAD_REQUEST,
 						"message=\"customerId is empty\"");
 				throw new PhrescoException("Customer Id is Empty");
 			}
 			if (appInfo == null) {
-				LOGGER.warn("ArchetypeExecutorImpl.updateRepository",
-						"status=\"Bad Request\"",
+				LOGGER.warn(ServiceConstants.ARCHETYPE_EXE_IMPL_UPDATE_REPO,
+						ServiceConstants.STATUS_BAD_REQUEST,
 						"message=\"applicationInfo is empty\"");
 				throw new PhrescoException("ApplicationInfo is Empty");
 			}
-			LOGGER.info("ArchetypeExecutorImpl.updateRepository",
+			LOGGER.info(ServiceConstants.ARCHETYPE_EXE_IMPL_UPDATE_REPO,
 					"customerId=\"" + customerId + "\"");
 		}
 		RepoInfo repoInfo = dbManager.getRepoInfo(customerId);
@@ -146,7 +144,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 				LOGGER.debug("ArchetypeExecutorImpl.updateRepository:Exit");
 			}
 		} catch (PhrescoPomException e) {
-			LOGGER.error("ArchetypeExecutorImpl.updateRepository",
+			LOGGER.error(ServiceConstants.ARCHETYPE_EXE_IMPL_UPDATE_REPO,
 					"status=\"Failure\"",
 					"message=\"" + e.getLocalizedMessage() + "\"");
 			throw new PhrescoException(e);
@@ -159,7 +157,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 			LOGGER.debug("ArchetypeExecutorImpl.createProjectFolders:Entry");
 			if (info == null) {
 				LOGGER.warn("ArchetypeExecutorImpl.createProjectFolders",
-						"status=\"Bad Request\"",
+						ServiceConstants.STATUS_BAD_REQUEST,
 						"message=\"ProjectInfo is empty\"");
 				throw new PhrescoException("ProjectInfo is empty");
 			}
@@ -189,7 +187,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 					+ "\"" + info.getCode() + "\"");
 			if (StringUtils.isEmpty(customerId)) {
 				LOGGER.warn("ArchetypeExecutorImpl.buildCommandString",
-						"status=\"Bad Request\"",
+						ServiceConstants.STATUS_BAD_REQUEST,
 						"message=Customer Id Should Not Be Null");
 				throw new PhrescoException("Customer Id Should Not Be Null");
 			}
@@ -197,7 +195,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 		String techId = info.getTechInfo().getId();
 		if (StringUtils.isEmpty(techId)) {
 			LOGGER.warn("ArchetypeExecutorImpl.buildCommandString",
-					"status=\"Bad Request\"", "message=\"techId is empty\"");
+					ServiceConstants.STATUS_BAD_REQUEST, "message=\"techId is empty\"");
 			throw new PhrescoException("techId Should Not Be Null");
 		}
 		ArtifactGroup archetypeInfo = dbManager.getArchetypeInfo(techId,

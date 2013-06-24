@@ -27,8 +27,6 @@ import java.util.UUID;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.Element;
@@ -42,9 +40,6 @@ import com.photon.phresco.service.util.DependencyUtils;
 import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.Constants;
 import com.photon.phresco.util.Utility;
-import com.phresco.pom.exception.PhrescoPomException;
-import com.phresco.pom.model.Model.Modules;
-import com.phresco.pom.util.PomProcessor;
 
 public class ProjectServiceManagerImpl implements ProjectServiceManager, Constants {
 	
@@ -68,13 +63,14 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 			LOGGER.info("ProjectServiceManagerImpl.createProject", "customerId=\"" + projectInfo.getCustomerIds().get(0) + "\"", "creationDate=\"" + projectInfo.getCreationDate() + "\"",
 					"projectCode=\"" + projectInfo.getProjectCode() + "\"");
 		}
+		String folderPath = null;
 		PhrescoServerFactory.initialize();
 		if(projectInfo.isMultiModule()) {
-			tempFolderPath = tempFolderPath + "/" + projectInfo.getName();
+			folderPath =tempFolderPath + "/" + projectInfo.getName();
 		}
-		PhrescoServerFactory.getArchetypeExecutor().execute(projectInfo, tempFolderPath);
+		PhrescoServerFactory.getArchetypeExecutor().execute(projectInfo, folderPath);
 		if(projectInfo.isPreBuilt()) {
-			createPilots(projectInfo.getAppInfos().get(0), tempFolderPath, projectInfo.getCustomerIds().get(0));
+			createPilots(projectInfo.getAppInfos().get(0), folderPath, projectInfo.getCustomerIds().get(0));
 		}
 		if(isDebugEnabled) {
 			LOGGER.debug("ProjectServiceManagerImpl.createProject:Exit");
@@ -115,7 +111,16 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 				}
 			}
 		}
-		
+		pilotCreationFromAppInfos(tempFolderPath, customerId, dBManager, appInfos);
+		dBManager.storeCreatedProjects(projectInfo);
+		if (isDebugEnabled) {
+			LOGGER.debug("ProjectServiceManagerImpl.updateProject:Exit");
+		}
+	}
+
+	private void pilotCreationFromAppInfos(String tempFolderPath, String customerId,
+			DbManager dBManager, List<ApplicationInfo> appInfos)
+			throws PhrescoException {
 		for (ApplicationInfo applicationInfo : appInfos) {
 			if(applicationInfo.getPilotInfo() != null) {
 				ApplicationInfo appInfo = dBManager.getApplicationInfo(applicationInfo.getId());
@@ -125,11 +130,6 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 					createPilots(applicationInfo, tempFolderPath, customerId);
 				}
 			}
-		}
-		
-		dBManager.storeCreatedProjects(projectInfo);
-		if (isDebugEnabled) {
-			LOGGER.debug("ProjectServiceManagerImpl.updateProject:Exit");
 		}
 	}
 
@@ -183,14 +183,6 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 			LOGGER.debug("ProjectServiceManagerImpl.updateDocumentProject:Entry");
 		}
 		File tempPath = new File(Utility.getPhrescoTemp(), UUID.randomUUID().toString() + File.separator + projectInfo.getCode());
-		try {
-//			PhrescoServerFactory.getDocumentGenerator().generate(projectInfo, tempPath);
-		} catch (Exception e) {
-			if(isDebugEnabled) {
-				LOGGER.error("ProjectServiceManagerImpl.updateDocumentProject", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
-			}
-			throw new PhrescoException(e);
-		}
 		if(isDebugEnabled) {
 			LOGGER.debug("ProjectServiceManagerImpl.updateDocumentProject:Exit");
 		}

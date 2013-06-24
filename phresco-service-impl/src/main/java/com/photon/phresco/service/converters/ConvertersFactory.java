@@ -41,7 +41,11 @@ import com.photon.phresco.service.dao.VideoTypeDAO;
  * @author kumar_s
  *
  */
-public class ConvertersFactory {
+public final class ConvertersFactory {
+	
+	private ConvertersFactory() {
+		
+	}
 	
 	/**
 	 * 
@@ -89,7 +93,7 @@ public class ConvertersFactory {
 	 * @param clazz
 	 * @return
 	 */
-	public static final Converter<? extends BaseDAO, ? extends Element> getConverter(Class<? extends BaseDAO> clazz) {
+	public static Converter<? extends BaseDAO, ? extends Element> getConverter(Class<? extends BaseDAO> clazz) {
 		return CONVERTERS_MAP.get(clazz);
 	}
 	
@@ -97,7 +101,7 @@ public class ConvertersFactory {
 	 * @param clazz
 	 * @return
 	 */
-	public static final Converter<? extends BaseDAO, ? extends Element> getFrameworkConverter(Class<? extends BaseDAO> clazz) {
+	public static Converter<? extends BaseDAO, ? extends Element> getFrameworkConverter(Class<? extends BaseDAO> clazz) {
 		return FRAMEWORK_CONVERTERS_MAP.get(clazz);
 	}
 	

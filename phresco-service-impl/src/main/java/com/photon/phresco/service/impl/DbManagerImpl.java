@@ -30,7 +30,6 @@ import org.springframework.data.document.mongodb.query.Update;
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactGroupInfo;
-import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.DownloadInfo;
 import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.commons.model.RepoInfo;
@@ -57,7 +56,7 @@ import com.photon.phresco.util.ServiceConstants;
 
 public class DbManagerImpl extends DbService implements DbManager, ServiceConstants {
 
-	private static final SplunkLogger LOGGER 			= SplunkLogger.getSplunkLogger(DbManagerImpl.class.getName());
+	private static final SplunkLogger LOGGER = SplunkLogger.getSplunkLogger(DbManagerImpl.class.getName());
     private static Boolean isDebugEnabled = LOGGER.isDebugEnabled();
     
     @Override
@@ -66,18 +65,17 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
     	if (isDebugEnabled) {
 			LOGGER.debug("DbManagerImpl.getArchetypeInfo:Entry");
 			if(StringUtils.isEmpty(techId)) {
-				LOGGER.warn("DbManagerImpl.getArchetypeInfo","status=\"Bad Request\"", "message=\"techId is empty\"");
+				LOGGER.warn("DbManagerImpl.getArchetypeInfo",STATUS_BAD_REQUEST, "message=\"techId is empty\"");
 				throw new PhrescoException("techId is empty");
 			}
 			LOGGER.info("DbManagerImpl.getArchetypeInfo", "techId=\"" + techId + "\"");
 		}
-//    	Query techQuery = createCustomerIdQuery(customerId);
     	Query techQuery = new Query();
     	Criteria criteria = Criteria.whereId().is(techId);
     	techQuery.addCriteria(criteria);
-    	TechnologyDAO techDAO = mongoOperation.findOne(TECHNOLOGIES_COLLECTION_NAME, 
+    	TechnologyDAO techDAO = DbService.getMongoOperation().findOne(TECHNOLOGIES_COLLECTION_NAME, 
     			techQuery, TechnologyDAO.class);
-    	ArtifactGroupDAO artifactGroupDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
+    	ArtifactGroupDAO artifactGroupDAO = DbService.getMongoOperation().findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
     			new Query(Criteria.whereId().is(techDAO.getArchetypeGroupDAOId())), ArtifactGroupDAO.class);
     	if(isDebugEnabled) {
     		LOGGER.debug("DbManagerImpl.getArchetypeInfo:Exit");
@@ -91,7 +89,7 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
     	if (isDebugEnabled) {
 			LOGGER.debug("DbManagerImpl.getApplicationInfo:Entry");
 			if(StringUtils.isEmpty(pilotId)) {
-				LOGGER.warn("DbManagerImpl.getApplicationInfo","status=\"Bad Request\"", "message=\"pilotId is empty\"");
+				LOGGER.warn("DbManagerImpl.getApplicationInfo",STATUS_BAD_REQUEST, "message=\"pilotId is empty\"");
 				throw new PhrescoException("pilotId is empty");
 			}
 			LOGGER.info("DbManagerImpl.getApplicationInfo", "pilotId=\"" + pilotId + "\"");
@@ -99,7 +97,7 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
     	Criteria criteria = Criteria.whereId().is(pilotId);
     	Query pilotQuery = new Query();
     	pilotQuery.addCriteria(criteria);
-    	ApplicationInfoDAO appDAO = mongoOperation.findOne(APPLICATION_INFO_COLLECTION_NAME, pilotQuery, ApplicationInfoDAO.class);
+    	ApplicationInfoDAO appDAO = DbService.getMongoOperation().findOne(APPLICATION_INFO_COLLECTION_NAME, pilotQuery, ApplicationInfoDAO.class);
     	if(isDebugEnabled) {
     		LOGGER.debug("DbManagerImpl.getApplicationInfo:Exit");
     	}
@@ -112,12 +110,12 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
     	if (isDebugEnabled) {
 			LOGGER.debug("DbManagerImpl.getTechnologyDoc:Entry");
 			if(StringUtils.isEmpty(techId)) {
-				LOGGER.warn("DbManagerImpl.getTechnologyDoc","status=\"Bad Request\"", "message=\"techId is empty\"");
+				LOGGER.warn("DbManagerImpl.getTechnologyDoc",STATUS_BAD_REQUEST, "message=\"techId is empty\"");
 				throw new PhrescoException("techId is empty");
 			}
 			LOGGER.info("DbManagerImpl.getTechnologyDoc", "techId=\"" + techId + "\"");
 		}
-        Technology technology = mongoOperation.findOne(TECHNOLOGIES_COLLECTION_NAME, 
+        Technology technology = DbService.getMongoOperation().findOne(TECHNOLOGIES_COLLECTION_NAME, 
                 new Query(Criteria.whereId().is(techId)), Technology.class);
         if(isDebugEnabled) {
         	LOGGER.debug("DbManagerImpl.getTechnologyDoc:Exit");
@@ -130,14 +128,14 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
     	if (isDebugEnabled) {
 			LOGGER.debug("DbManagerImpl.getRepoInfo:Entry");
 			if(StringUtils.isEmpty(customerId)) {
-				LOGGER.warn("DbManagerImpl.getRepoInfo","status=\"Bad Request\"", "message=\"customerId is empty\"");
+				LOGGER.warn("DbManagerImpl.getRepoInfo",STATUS_BAD_REQUEST, "message=\"customerId is empty\"");
 				throw new PhrescoException("customerId is empty");
 			}
-			LOGGER.info("DbManagerImpl.getRepoInfo", "customerId=\"" + customerId + "\"");
+			LOGGER.info("DbManagerImpl.getRepoInfo", CUSTOMER_ID_EQUALS_SLASH + customerId + "\"");
 		}
-    	CustomerDAO customer = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME, new Query(Criteria.whereId().is(customerId)), CustomerDAO.class);
+    	CustomerDAO customer = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME, new Query(Criteria.whereId().is(customerId)), CustomerDAO.class);
     	if(customer != null) {
-    		return mongoOperation.findOne(ServiceConstants.REPOINFO_COLLECTION_NAME, 
+    		return DbService.getMongoOperation().findOne(ServiceConstants.REPOINFO_COLLECTION_NAME, 
     				new Query(Criteria.whereId().is(customer.getRepoInfoId())), RepoInfo.class);
     	}
     	if(isDebugEnabled) {
@@ -147,22 +145,23 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void storeCreatedProjects(ProjectInfo projectInfo) throws PhrescoException {
     	if (isDebugEnabled) {
 			LOGGER.debug("DbManagerImpl.storeCreatedProjects:Entry");
 			if(projectInfo == null) {
-				LOGGER.warn("DbManagerImpl.storeCreatedProjects","status=\"Bad Request\"", "message=\"ProjectInfo is empty\"");
+				LOGGER.warn("DbManagerImpl.storeCreatedProjects",STATUS_BAD_REQUEST, "message=\"ProjectInfo is empty\"");
 				throw new PhrescoException("ProjectInfo is empty");
 			}
-			LOGGER.info("DbManagerImpl.storeCreatedProjects", "customerId=\"" + projectInfo.getCustomerIds().get(0) + "\"", "creationDate=\"" + projectInfo.getCreationDate() + "\"",
+			LOGGER.info("DbManagerImpl.storeCreatedProjects", CUSTOMER_ID_EQUALS_SLASH + projectInfo.getCustomerIds().get(0) + "\"", "creationDate=\"" + projectInfo.getCreationDate() + "\"",
 					"projectCode=\"" + projectInfo.getProjectCode() + "\"");
 		}
         if(projectInfo != null) {
-        	Converter<ProjectInfoDAO, ProjectInfo> projectConverter = 
+			Converter<ProjectInfoDAO, ProjectInfo> projectConverter = 
         		(Converter<ProjectInfoDAO, ProjectInfo>) ConvertersFactory.getConverter(ProjectInfoDAO.class);
         	ProjectInfoDAO projectInfoDAO = projectConverter.convertObjectToDAO(projectInfo);
         	
-        	ProjectInfoDAO pDAO = mongoOperation.findOne("projectInfo", 
+        	ProjectInfoDAO pDAO = DbService.getMongoOperation().findOne("projectInfo", 
         			new Query(Criteria.whereId().is(projectInfo.getId())), ProjectInfoDAO.class);
         	if (pDAO != null) {
         		List<String> applicationInfoIdsFromDB = pDAO.getApplicationInfoIds();
@@ -174,12 +173,12 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
     			}
             	projectInfoDAO.setApplicationInfoIds(applicationInfoIdsFromDB);
         	} 
-        	mongoOperation.save("projectInfo", projectInfoDAO);
+        	DbService.getMongoOperation().save("projectInfo", projectInfoDAO);
         	List<ApplicationInfo> appInfos = projectInfo.getAppInfos();
         	Converter<ApplicationInfoDAO, ApplicationInfo> appConverter = 
         		(Converter<ApplicationInfoDAO, ApplicationInfo>) ConvertersFactory.getConverter(ApplicationInfoDAO.class);
         	for (ApplicationInfo applicationInfo : appInfos) {
-        		mongoOperation.save(APPLICATION_INFO_COLLECTION_NAME, appConverter.convertObjectToDAO(applicationInfo));
+        		DbService.getMongoOperation().save(APPLICATION_INFO_COLLECTION_NAME, appConverter.convertObjectToDAO(applicationInfo));
 			}
         }
         if(isDebugEnabled) {
@@ -193,13 +192,13 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
     	if (isDebugEnabled) {
 			LOGGER.debug("DbManagerImpl.updateCreatedProjects:Entry");
 			if(applicationInfo == null) {
-				LOGGER.warn("DbManagerImpl.updateCreatedProjects","status=\"Bad Request\"", "message=\"applicationInfo is empty\"");
+				LOGGER.warn("DbManagerImpl.updateCreatedProjects",STATUS_BAD_REQUEST, "message=\"applicationInfo is empty\"");
 				throw new PhrescoException("ProjectInfo is empty");
 			}
 			LOGGER.info("DbManagerImpl.updateCreatedProjects", "appCode=\"" + applicationInfo.getCode() + "\"");
 		}
         if(applicationInfo != null) {
-            mongoOperation.save(CREATEDPROJECTS_COLLECTION_NAME, applicationInfo);
+        	DbService.getMongoOperation().save(CREATEDPROJECTS_COLLECTION_NAME, applicationInfo);
         }
         if(isDebugEnabled) {
         	LOGGER.debug("DbManagerImpl.updateCreatedProjects:Exit");
@@ -212,10 +211,10 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
     	if (isDebugEnabled) {
 			LOGGER.debug("DbManagerImpl.updateUsedObjects:Entry");
 			if(projectInfo == null) {
-				LOGGER.warn("DbManagerImpl.updateUsedObjects","status=\"Bad Request\"", "message=\"ProjectInfo is empty\"");
+				LOGGER.warn("DbManagerImpl.updateUsedObjects",STATUS_BAD_REQUEST, "message=\"ProjectInfo is empty\"");
 				throw new PhrescoException("ProjectInfo is empty");
 			}
-			LOGGER.info("DbManagerImpl.updateUsedObjects", "customerId=\"" + projectInfo.getCustomerIds().get(0) + "\"", "creationDate=\"" + projectInfo.getCreationDate() + "\"",
+			LOGGER.info("DbManagerImpl.updateUsedObjects", CUSTOMER_ID_EQUALS_SLASH + projectInfo.getCustomerIds().get(0) + "\"", "creationDate=\"" + projectInfo.getCreationDate() + "\"",
 					"projectCode=\"" + projectInfo.getProjectCode() + "\"");
 		}
     	List<ApplicationInfo> appInfos = projectInfo.getAppInfos();
@@ -257,12 +256,12 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
 		if(isDebugEnabled) {
 			LOGGER.debug("DbManagerImpl.updateUsedObjectsId:Entry");
 			if(CollectionUtils.isEmpty(selectedModulesIds)) {
-				LOGGER.warn("DbManagerImpl.updateUsedObjectsId", "status=\"Bad Request\"", "message=\"selectedModulesIds is empty\"");
+				LOGGER.warn("DbManagerImpl.updateUsedObjectsId", STATUS_BAD_REQUEST, "message=\"selectedModulesIds is empty\"");
 			}
 		}
     	for (String id : selectedModulesIds) {
 			Query query = new Query(Criteria.where("_id").is(id));
-			mongoOperation.updateFirst(ARTIFACT_INFO_COLLECTION_NAME, 
+			DbService.getMongoOperation().updateFirst(ARTIFACT_INFO_COLLECTION_NAME, 
 					query, Update.update("used", true));
 		}
     	if(isDebugEnabled) {
@@ -276,13 +275,13 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
 		if (isDebugEnabled) {
 			LOGGER.debug("DbManagerImpl.findSelectedArtifacts:Entry");
 			if(StringUtils.isEmpty(customerId)) {
-	    		LOGGER.warn("DbManagerImpl.findSelectedArtifacts", "status=\"Bad Request\"","message=Customer Id Should Not Be Null");
+	    		LOGGER.warn(DB_MGR_IMPL_FIND_SELCTD_ARTF, STATUS_BAD_REQUEST,"message=Customer Id Should Not Be Null");
 	    		throw new PhrescoException("Customer Id Should Not Be Null");
 	    	} if(StringUtils.isEmpty(type)) {
-	    		LOGGER.warn("DbManagerImpl.findSelectedArtifacts", "status=\"Bad Request\"","message=type Should Not Be Null");
+	    		LOGGER.warn(DB_MGR_IMPL_FIND_SELCTD_ARTF, STATUS_BAD_REQUEST,"message=type Should Not Be Null");
 	    		throw new PhrescoException("Type Should Not Be Null");
 	    	}
-	    	LOGGER.info("DbManagerImpl.findSelectedArtifacts", "customerId=\""+customerId+"\"","type=\""+type+"\"");
+	    	LOGGER.info(DB_MGR_IMPL_FIND_SELCTD_ARTF, CUSTOMER_ID_EQUALS_SLASH+customerId+"\"","type=\""+type+"\"");
 		}
 		List<ArtifactGroup> artifactGroups = new ArrayList<ArtifactGroup>();
 		for (String id : ids) {
@@ -300,21 +299,21 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
 		if (isDebugEnabled) {
 			LOGGER.debug("DbManagerImpl.getArtifactGroup:Entry");
 			if(StringUtils.isEmpty(customerId)) {
-	    		LOGGER.warn("DbManagerImpl.getArtifactGroup", "status=\"Bad Request\"","message=Customer Id is Empty");
+	    		LOGGER.warn(DB_MGR_IMPL_GET_ARTF_GRP, STATUS_BAD_REQUEST,"message=Customer Id is Empty");
 	    		throw new PhrescoException("Customer Id is Empty");
 	    	} if(StringUtils.isEmpty(type)) {
-	    		LOGGER.warn("DbManagerImpl.getArtifactGroup", "status=\"Bad Request\"","message=type is Empty");
+	    		LOGGER.warn(DB_MGR_IMPL_GET_ARTF_GRP, STATUS_BAD_REQUEST,"message=type is Empty");
 	    		throw new PhrescoException("Type is Empty");
 	    	} if(StringUtils.isEmpty(id)) {
-	    		LOGGER.warn("DbManagerImpl.getArtifactGroup", "status=\"Bad Request\"","message=id is Empty");
+	    		LOGGER.warn(DB_MGR_IMPL_GET_ARTF_GRP, STATUS_BAD_REQUEST,"message=id is Empty");
 	    		throw new PhrescoException("id is Empty");
 	    	}
-	    	LOGGER.info("DbManagerImpl.findSelectedArtifacts", "id=\""+id+"\"", "customerId=\""+customerId+"\"","type=\""+type+"\"");
+	    	LOGGER.info(DB_MGR_IMPL_FIND_SELCTD_ARTF, "id=\""+id+"\"", CUSTOMER_ID_EQUALS_SLASH+customerId+"\"","type=\""+type+"\"");
 		}
-		com.photon.phresco.commons.model.ArtifactInfo artifactInfo = mongoOperation.findOne(ARTIFACT_INFO_COLLECTION_NAME, 
+		com.photon.phresco.commons.model.ArtifactInfo artifactInfo = DbService.getMongoOperation().findOne(ARTIFACT_INFO_COLLECTION_NAME, 
 				new Query(Criteria.whereId().is(id)), com.photon.phresco.commons.model.ArtifactInfo.class);
 		if(artifactInfo == null) {
-			LOGGER.warn("DbManagerImpl.getArtifactGroup", "status=\"Bad Request\"","message=artifactInfo is Empty");
+			LOGGER.warn(DB_MGR_IMPL_GET_ARTF_GRP, STATUS_BAD_REQUEST,"message=artifactInfo is Empty");
     		throw new PhrescoException("artifactInfo is Empty");
 		}
 		String artifactGroupId = artifactInfo.getArtifactGroupId();
@@ -323,7 +322,7 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
 		query.addCriteria(typeCriteria);
 		Criteria artifactGroupCriteria = Criteria.whereId().is(artifactGroupId);
 		query.addCriteria(artifactGroupCriteria);
-		ArtifactGroupDAO artifactGroupDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, query, ArtifactGroupDAO.class);
+		ArtifactGroupDAO artifactGroupDAO = DbService.getMongoOperation().findOne(ARTIFACT_GROUP_COLLECTION_NAME, query, ArtifactGroupDAO.class);
 		ArtifactGroup artifactGroup = convertArtifactDAO(artifactGroupDAO);
 		if(isDebugEnabled) {
 			LOGGER.debug("DbManagerImpl.getArtifactGroup:Exit");
@@ -352,7 +351,7 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
 	@Override
 	public List<WebService> findSelectedWebservices(List<String> ids)
 			throws PhrescoException {
-		return mongoOperation.find(WEBSERVICES_COLLECTION_NAME, new Query(Criteria.whereId().in(ids.toArray())), WebService.class);
+		return DbService.getMongoOperation().find(WEBSERVICES_COLLECTION_NAME, new Query(Criteria.whereId().in(ids.toArray())), WebService.class);
 	}
 
 	@Override
@@ -361,21 +360,21 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
 		if(isDebugEnabled) {
     		LOGGER.debug("DbManagerImpl.findSelectedServers:Entry");
     		if(StringUtils.isEmpty(customerId)) {
-    			LOGGER.warn("DbManagerImpl.findSelectedServers", "status=\"Bad Request\"","message=CustomerId is Empty");
+    			LOGGER.warn("DbManagerImpl.findSelectedServers", STATUS_BAD_REQUEST,"message=CustomerId is Empty");
     			throw new PhrescoException("customerId is Empty");
     		} 
     		if(CollectionUtils.isEmpty(ids)) {
-    			LOGGER.warn("DbManagerImpl.findSelectedServers", "status=\"Bad Request\"","message=ids is Empty");
+    			LOGGER.warn("DbManagerImpl.findSelectedServers", STATUS_BAD_REQUEST,"message=ids is Empty");
     			throw new PhrescoException("ids is Empty");
     		}
-    		LOGGER.info("DbManagerImpl.findSelectedServers","customerId=\""+ customerId +"\"");
+    		LOGGER.info("DbManagerImpl.findSelectedServers",CUSTOMER_ID_EQUALS_SLASH+ customerId +"\"");
     	}
 		Query query = createCustomerIdQuery(customerId);
 		Criteria idCriteria = Criteria.whereId().in(ids.toArray());
 		query.addCriteria(idCriteria);
 		Criteria categoryCriteria = Criteria.where(CATEGORY).is(SERVER);
 		query.addCriteria(categoryCriteria);
-		List<DownloadsDAO> downloadsDAOs = mongoOperation.find(DOWNLOAD_COLLECTION_NAME, query, DownloadsDAO.class);
+		List<DownloadsDAO> downloadsDAOs = DbService.getMongoOperation().find(DOWNLOAD_COLLECTION_NAME, query, DownloadsDAO.class);
 		if(isDebugEnabled) {
 			LOGGER.debug("DbManagerImpl.findSelectedServers:Exit");
 		}
@@ -388,21 +387,21 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
 		if(isDebugEnabled) {
     		LOGGER.debug("DbManagerImpl.findSelectedDatabases:Entry");
     		if(StringUtils.isEmpty(customerId)) {
-    			LOGGER.warn("DbManagerImpl.findSelectedDatabases", "status=\"Bad Request\"","message=CustomerId is Empty");
+    			LOGGER.warn("DbManagerImpl.findSelectedDatabases", STATUS_BAD_REQUEST,"message=CustomerId is Empty");
     			throw new PhrescoException("customerId is Empty");
     		} 
     		if(CollectionUtils.isEmpty(ids)) {
-    			LOGGER.warn("DbManagerImpl.findSelectedDatabases", "status=\"Bad Request\"","message=ids is Empty");
+    			LOGGER.warn("DbManagerImpl.findSelectedDatabases", STATUS_BAD_REQUEST,"message=ids is Empty");
     			throw new PhrescoException("ids is Empty");
     		}
-    		LOGGER.info("DbManagerImpl.findSelectedDatabases","customerId=\""+ customerId +"\"");
+    		LOGGER.info("DbManagerImpl.findSelectedDatabases",CUSTOMER_ID_EQUALS_SLASH+ customerId +"\"");
     	}
 		Query query = createCustomerIdQuery(customerId);
 		Criteria idCriteria = Criteria.whereId().in(ids.toArray());
 		query.addCriteria(idCriteria);
 		Criteria categoryCriteria = Criteria.where(CATEGORY).is(DATABASE);
 		query.addCriteria(categoryCriteria);
-		List<DownloadsDAO> downloadsDAOs = mongoOperation.find(DOWNLOAD_COLLECTION_NAME, query, DownloadsDAO.class);
+		List<DownloadsDAO> downloadsDAOs = DbService.getMongoOperation().find(DOWNLOAD_COLLECTION_NAME, query, DownloadsDAO.class);
 		if(isDebugEnabled) {
 			LOGGER.debug("DbManagerImpl.findSelectedDatabases:Exit");
 		}
@@ -415,11 +414,11 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
 		if(isDebugEnabled) {
     		LOGGER.debug("DbManagerImpl.authenticate:Entry");
     		if(StringUtils.isEmpty(username)) {
-    			LOGGER.warn("DbManagerImpl.authenticate", "status=\"Bad Request\"","message=username is Empty");
+    			LOGGER.warn("DbManagerImpl.authenticate", STATUS_BAD_REQUEST,"message=username is Empty");
     			throw new PhrescoException("username is Empty");
     		}
     		if(StringUtils.isEmpty(password)) {
-    			LOGGER.warn("DbManagerImpl.authenticate", "status=\"Bad Request\"","message=password is Empty");
+    			LOGGER.warn("DbManagerImpl.authenticate", STATUS_BAD_REQUEST,"message=password is Empty");
     			throw new PhrescoException("password is Empty");
     		} LOGGER.info("DbManagerImpl.authenticate","username=\""+ username +"\"");
     	}
@@ -435,45 +434,47 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
 		if(isDebugEnabled) {
     		LOGGER.debug("DbManagerImpl.authenticate:Exit");
     	}
-		return mongoOperation.findOne(USERS_COLLECTION_NAME, query, User.class);
+		return DbService.getMongoOperation().findOne(USERS_COLLECTION_NAME, query, User.class);
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public ProjectInfo getProjectInfo(String projectInfoId)
 			throws PhrescoException {
 		if(isDebugEnabled) {
     		LOGGER.debug("DbManagerImpl.getProjectInfo:Entry");
     		if(StringUtils.isEmpty(projectInfoId)) {
-    			LOGGER.warn("DbManagerImpl.getProjectInfo", "status=\"Bad Request\"","message=projectInfoId is Empty");
+    			LOGGER.warn("DbManagerImpl.getProjectInfo", STATUS_BAD_REQUEST,"message=projectInfoId is Empty");
     			throw new PhrescoException("projectInfoId is Empty");
     		} LOGGER.info("DbManagerImpl.getProjectInfo","projectInfoId=\""+ projectInfoId +"\"");
     	}
-		ProjectInfoDAO projectInfoDAO = mongoOperation.findOne("projectInfo", 
+		ProjectInfoDAO projectInfoDAO = DbService.getMongoOperation().findOne("projectInfo", 
 				new Query(Criteria.whereId().is(projectInfoId)), ProjectInfoDAO.class);
 		Converter<ProjectInfoDAO, ProjectInfo> converter = 
 			(Converter<ProjectInfoDAO, ProjectInfo>) ConvertersFactory.getConverter(ProjectInfoDAO.class);
 		if(isDebugEnabled) {
     		LOGGER.debug("DbManagerImpl.getProjectInfo:Exit");
     	}
-		return converter.convertDAOToObject(projectInfoDAO, mongoOperation);
+		return converter.convertDAOToObject(projectInfoDAO, DbService.getMongoOperation());
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public List<VideoInfo> getVideos() throws PhrescoException {
 		if(isDebugEnabled) {
     		LOGGER.debug("DbManagerImpl.getVideos:Entry");
     	}
 		List<VideoInfo> videoInfos = new ArrayList<VideoInfo>();
-		List<VideoInfoDAO> videoList = mongoOperation.getCollection(VIDEODAO_COLLECTION_NAME , VideoInfoDAO.class);
+		List<VideoInfoDAO> videoList = DbService.getMongoOperation().getCollection(VIDEODAO_COLLECTION_NAME , VideoInfoDAO.class);
 		if (videoList != null) {
 			Converter<VideoInfoDAO, VideoInfo> videoInfoConverter = 
 					(Converter<VideoInfoDAO, VideoInfo>) ConvertersFactory.getConverter(VideoInfoDAO.class);
 			for (VideoInfoDAO videoInfoDAO : videoList) {
-				VideoInfo videoInfo = videoInfoConverter.convertDAOToObject(videoInfoDAO, mongoOperation);
+				VideoInfo videoInfo = videoInfoConverter.convertDAOToObject(videoInfoDAO, DbService.getMongoOperation());
 				videoInfos.add(videoInfo);
 			}
 		} else {
-			LOGGER.warn("DbManagerImpl.getProjectInfo", "status=\"Bad Request\"","message=videoList is Empty");
+			LOGGER.warn("DbManagerImpl.getProjectInfo", STATUS_BAD_REQUEST,"message=videoList is Empty");
 		}
 		if(isDebugEnabled) {
     		LOGGER.debug("DbManagerImpl.getVideos:Exit");
@@ -488,7 +489,7 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
     	}
 		Query query = new Query();
 		query.sort().on(DB_COLUMN_CREATIONDATE, Order.DESCENDING);
-		List<VersionInfo> versionInfos = mongoOperation.find("versionInfo", query, VersionInfo.class);
+		List<VersionInfo> versionInfos = DbService.getMongoOperation().find("versionInfo", query, VersionInfo.class);
 		if(isDebugEnabled) {
     		LOGGER.debug("DbManagerImpl.getLatestFrameWorkVersion:Exit");
     	}
@@ -497,6 +498,6 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
 
 	@Override
 	public RepoInfo getRepoInfoById(String id) throws PhrescoException {
-		return mongoOperation.findOne(REPOINFO_COLLECTION_NAME, new Query(Criteria.whereId().is(id)), RepoInfo.class);
+		return DbService.getMongoOperation().findOne(REPOINFO_COLLECTION_NAME, new Query(Criteria.whereId().is(id)), RepoInfo.class);
 	}
 }

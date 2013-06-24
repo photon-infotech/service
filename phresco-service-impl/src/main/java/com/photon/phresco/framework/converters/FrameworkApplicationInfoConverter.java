@@ -18,17 +18,11 @@
 package com.photon.phresco.framework.converters;
 
 import org.springframework.data.document.mongodb.MongoOperations;
-import org.springframework.data.document.mongodb.query.Criteria;
-import org.springframework.data.document.mongodb.query.Query;
-
 import com.photon.phresco.commons.model.ApplicationInfo;
-import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.api.Converter;
-import com.photon.phresco.service.converters.ConvertersFactory;
 import com.photon.phresco.service.dao.ApplicationInfoDAO;
-import com.photon.phresco.service.dao.ArtifactGroupDAO;
 import com.photon.phresco.util.ServiceConstants;
 
 public class FrameworkApplicationInfoConverter implements Converter<ApplicationInfoDAO, ApplicationInfo>, ServiceConstants{

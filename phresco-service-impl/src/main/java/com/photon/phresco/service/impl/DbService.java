@@ -45,7 +45,6 @@ import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSInputFile;
 import com.photon.phresco.commons.model.ApplicationInfo;
-import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactGroupInfo;
 import com.photon.phresco.commons.model.ArtifactInfo;
@@ -79,7 +78,15 @@ public class DbService implements ServiceConstants {
 	private static Boolean isDebugEnabled = LOGGER.isDebugEnabled();
 	
 	private static final String MONGO_TEMPLATE = "mongoTemplate";
-	protected static MongoOperations mongoOperation;
+	private static MongoOperations mongoOperation;
+	public static MongoOperations getMongoOperation() {
+		return mongoOperation;
+	}
+
+	public static void setMongoOperation(MongoOperations mongoOperation) {
+		DbService.mongoOperation = mongoOperation;
+	}
+
 	private static ServerConfiguration serverConfig = null;
 	private static Map<String, String> customerMap = new HashMap<String, String>();
 	
@@ -95,9 +102,9 @@ public class DbService implements ServiceConstants {
 		if (isDebugEnabled) {
 			LOGGER.debug("DbService.createCustomerIdQuery:Entry");
 			if(StringUtils.isEmpty(customerId)) {
-				LOGGER.warn("DbService.createCustomerIdQuery","status=\"Bad Request\"", "message=\"customerId is empty\"");
+				LOGGER.warn("DbService.createCustomerIdQuery",STATUS_BAD_REQUEST, "message=\"customerId is empty\"");
 			}
-			LOGGER.info("DbManagerImpl.getArchetypeInfo", "customerId=\"" + customerId + "\"");
+			LOGGER.info("DbManagerImpl.getArchetypeInfo", CUSTOMER_ID_EQUALS_SLASH + customerId + "\"");
 		}
 		List<String> customerIds = new ArrayList<String>();
 		customerIds.add(customerId);
@@ -114,11 +121,12 @@ public class DbService implements ServiceConstants {
 	    return query;
 	}
 	
+	@SuppressWarnings(UNCHECKED)
 	protected List<ArtifactGroup> convertArtifactDAOs(List<ArtifactGroupDAO> artifactGroupDAOs) throws PhrescoException {
 		if(isDebugEnabled) {
 			LOGGER.debug("DbService.convertArtifactDAOs:Entry");
 			if(CollectionUtils.isEmpty(artifactGroupDAOs)) {
-				LOGGER.warn("DbService.convertArtifactDAOs","status=\"Bad Request\"", "message=\"artifactGroupDAOs is empty\"");
+				LOGGER.warn("DbService.convertArtifactDAOs",STATUS_BAD_REQUEST, "message=\"artifactGroupDAOs is empty\"");
 				throw new PhrescoException("artifactGroupDAOs is empty");
 			}
 		}
@@ -134,11 +142,12 @@ public class DbService implements ServiceConstants {
 		return artifactGroups;
 	}
 	
+	@SuppressWarnings(UNCHECKED)
 	protected List<DownloadInfo> convertDownloadDAOs(List<DownloadsDAO> downloadsDAOs) throws PhrescoException {
 		if(isDebugEnabled) {
 			LOGGER.debug("DbService.convertDownloadDAOs:Entry");
 			if(CollectionUtils.isEmpty(downloadsDAOs)) {
-				LOGGER.warn("DbService.convertDownloadDAOs","status=\"Bad Request\"", "message=\"downloadsDAOs is empty\"");
+				LOGGER.warn("DbService.convertDownloadDAOs",STATUS_BAD_REQUEST, "message=\"downloadsDAOs is empty\"");
 				throw new PhrescoException("downloadsDAOs is empty");
 			}
 		}
@@ -154,11 +163,12 @@ public class DbService implements ServiceConstants {
 		return infos;
 	}
 	
+	@SuppressWarnings(UNCHECKED)
 	protected ArtifactGroup convertArtifactDAO(ArtifactGroupDAO artifactGroupDAO) throws PhrescoException {
 		if(isDebugEnabled) {
 			LOGGER.debug("DbService.convertArtifactDAO:Entry");
 			if(artifactGroupDAO == null) {
-				LOGGER.warn("DbService.convertDownloadDAOs","status=\"Bad Request\"", "message=\"artifactGroupDAO is null\"");
+				LOGGER.warn("DbService.convertDownloadDAOs",STATUS_BAD_REQUEST, "message=\"artifactGroupDAO is null\"");
 				throw new PhrescoException("artifactGroupDAO is null");
 			} LOGGER.info("DbService.convertDownloadDAOs","arifactId=\"" + artifactGroupDAO.getArtifactId() +"\"");
 		}
@@ -170,11 +180,12 @@ public class DbService implements ServiceConstants {
 		return converter.convertDAOToObject(artifactGroupDAO, mongoOperation);
 	}
 	
+	@SuppressWarnings(UNCHECKED)
 	protected ApplicationInfo convertApplicationDAO(ApplicationInfoDAO applicationInfoDAO) throws PhrescoException {
 		if(isDebugEnabled) {
 			LOGGER.debug("DbService.convertApplicationDAO:Entry");
 			if(applicationInfoDAO == null) {
-				LOGGER.warn("DbService.convertApplicationDAO","status=\"Bad Request\"", "message=\"applicationInfoDAO is null\"");
+				LOGGER.warn("DbService.convertApplicationDAO",STATUS_BAD_REQUEST, "message=\"applicationInfoDAO is null\"");
 				throw new PhrescoException("applicationInfoDAO is null");
 			} 
 		}
@@ -202,7 +213,7 @@ public class DbService implements ServiceConstants {
 		javax.validation.Validator validator = factory.getValidator();
 		Set<ConstraintViolation<Object>> constraintViolations = validator.validate(object);
 		if (constraintViolations.isEmpty()) {
-			LOGGER.warn("DbService.validate","status=\"Bad Request\"", "message=\"constraintViolations is empty\"");
+			LOGGER.warn("DbService.validate",STATUS_BAD_REQUEST, "message=\"constraintViolations is empty\"");
 			return true;
 		}
 		for (ConstraintViolation<Object> constraintViolation : constraintViolations) {
@@ -227,7 +238,7 @@ public class DbService implements ServiceConstants {
 			}
 		} catch (Exception e) {
 			if(isDebugEnabled) {
-				LOGGER.error("DbService.createArtifact", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+				LOGGER.error("DbService.createArtifact", STATUS_FAILURE, MESSAGE_EQUALS + "\"" + e.getLocalizedMessage() + "\"");
 			}
 			throw new PhrescoWebServiceException(e);
 		}
@@ -276,11 +287,12 @@ public class DbService implements ServiceConstants {
         return addArtifact;
     }
     
-    protected Technology getTechnologyById(String techId) throws PhrescoException {
+    @SuppressWarnings(UNCHECKED)
+	protected Technology getTechnologyById(String techId) throws PhrescoException {
     	if(isDebugEnabled) {
     		LOGGER.debug("DbService.getTechnologyById:Entry");
     		if(StringUtils.isEmpty(techId)) {
-    			LOGGER.warn("DbService.getTechnologyById","status=\"Bad Request\"", "message=\"techId is empty\"");
+    			LOGGER.warn("DbService.getTechnologyById",STATUS_BAD_REQUEST, "message=\"techId is empty\"");
 				throw new PhrescoException("techId is empty");
     		}
     		LOGGER.info("DbService.getTechnologyById","techId=\""+ techId + "\"");
@@ -309,7 +321,7 @@ public class DbService implements ServiceConstants {
     	if(isDebugEnabled) {
     		LOGGER.debug("DbService.saveFileToDB:Entry");
     		if(StringUtils.isEmpty(id)) {
-    			LOGGER.warn("DbService.saveFileToDB","status=\"Bad Request\"", "message=\"id is empty\"");
+    			LOGGER.warn("DbService.saveFileToDB",STATUS_BAD_REQUEST, "message=\"id is empty\"");
 				throw new PhrescoException("id is empty");
     		} 
     		LOGGER.info("DbService.saveFileToDB","id=\""+ id +"\"");
@@ -327,7 +339,7 @@ public class DbService implements ServiceConstants {
     	if(isDebugEnabled) {
     		LOGGER.debug("DbService.getFileFromDB:Entry");
     		if(StringUtils.isEmpty(id)) {
-    			LOGGER.warn("DbService.getFileFromDB","status=\"Bad Request\"", "message=\"id is empty\"");
+    			LOGGER.warn("DbService.getFileFromDB",STATUS_BAD_REQUEST, "message=\"id is empty\"");
 				throw new PhrescoException("id is empty");
     		} 
     		LOGGER.info("DbService.getFileFromDB","id=\""+ id +"\"");
@@ -355,17 +367,18 @@ public class DbService implements ServiceConstants {
 			return gfsPhoto;
 		} catch (UnknownHostException e) {
 			if(isDebugEnabled) {
-				LOGGER.error("DbService.getGridFs", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+				LOGGER.error("DbService.getGridFs", STATUS_FAILURE,MESSAGE_EQUALS + "\"" + e.getLocalizedMessage() + "\"");
 			}
 			throw new PhrescoException(e);
 		} catch (MongoException e) {
 			if(isDebugEnabled) {
-				LOGGER.error("DbService.getGridFs", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+				LOGGER.error("DbService.getGridFs", STATUS_FAILURE,MESSAGE_EQUALS + "\"" + e.getLocalizedMessage() + "\"");
 			}
 			throw new PhrescoException(e);
 		}
 	}
 	
+	@SuppressWarnings(UNCHECKED)
 	protected List<Customer> findCustomersFromDB() {
 		if(isDebugEnabled) {
 			LOGGER.debug("DbService.findCustomersFromDB:Entry");
@@ -384,7 +397,7 @@ public class DbService implements ServiceConstants {
     		return customersInDb;
     	} catch (Exception e) {
     		if(isDebugEnabled) {
-				LOGGER.error("DbService.findCustomersFromDB", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+				LOGGER.error("DbService.findCustomersFromDB", STATUS_FAILURE,MESSAGE_EQUALS + "\"" + e.getLocalizedMessage() + "\"");
 			}
     		throw new PhrescoWebServiceException(e, EX_PHEX00005, CUSTOMERS_COLLECTION_NAME);
 		}
@@ -394,14 +407,14 @@ public class DbService implements ServiceConstants {
 		if(isDebugEnabled) {
 			LOGGER.debug("DbService.getTechGroupByCustomer:Entry");
 			if(StringUtils.isEmpty(customerId)) {
-				LOGGER.warn("DbService.getTechGroupByCustomer","status=\"Bad Request\"", "message=\"customerId is empty\"");
+				LOGGER.warn("DbService.getTechGroupByCustomer",STATUS_BAD_REQUEST, "message=\"customerId is empty\"");
 				throw new PhrescoException("customerId is empty");
 			}
 			if(StringUtils.isEmpty(appTypeId)) {
-				LOGGER.warn("DbService.getTechGroupByCustomer","status=\"Bad Request\"", "message=\"appTypeId is empty\"");
+				LOGGER.warn("DbService.getTechGroupByCustomer",STATUS_BAD_REQUEST, "message=\"appTypeId is empty\"");
 				throw new PhrescoException("appTypeId is empty");
 			}
-			LOGGER.info("DbService.getTechGroupByCustomer", "customerId=\"" + customerId + "\"","appTypeId\""+ appTypeId +"\"");
+			LOGGER.info("DbService.getTechGroupByCustomer", CUSTOMER_ID_EQUALS_SLASH + customerId + "\"","appTypeId\""+ appTypeId +"\"");
 		}
 		List<String> applicableTechnologies = new ArrayList<String>();
 		CustomerDAO customer = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME, 
@@ -426,7 +439,7 @@ public class DbService implements ServiceConstants {
 		if(isDebugEnabled) {
 			LOGGER.debug("DbService.createTechGroup:Entry");
 			if(StringUtils.isEmpty(appTypeId)) {
-				LOGGER.warn("DbService.createTechGroup","status=\"Bad Request\"", "message=\"appTypeId is empty\"");
+				LOGGER.warn("DbService.createTechGroup",STATUS_BAD_REQUEST, "message=\"appTypeId is empty\"");
 			}
 			LOGGER.info("DbService.createTechGroup","appTypeId\""+ appTypeId +"\"");
 		}
@@ -446,9 +459,9 @@ public class DbService implements ServiceConstants {
 		if(isDebugEnabled) {
 			LOGGER.debug("DbService.getApplicableForomDB:Entry");
 			if(StringUtils.isEmpty(customerId)) {
-				LOGGER.warn("DbService.getApplicableForomDB","status=\"Bad Request\"", "message=\"customerId is empty\"");
+				LOGGER.warn("DbService.getApplicableForomDB",STATUS_BAD_REQUEST, "message=\"customerId is empty\"");
 			}
-			LOGGER.info("DbService.getApplicableForomDB", "customerId=\"" + customerId + "\"");
+			LOGGER.info("DbService.getApplicableForomDB", CUSTOMER_ID_EQUALS_SLASH + customerId + "\"");
 		}
 		List<String> techIds = new ArrayList<String>();
 		List<TechnologyDAO> techs = mongoOperation.find(TECHNOLOGIES_COLLECTION_NAME, 
@@ -461,11 +474,6 @@ public class DbService implements ServiceConstants {
 			}
 			return techIds;
 		}
-//		if(CollectionUtils.isNotEmpty(techs)) {
-//			for (TechnologyDAO dao : techs) {
-//				techIds.add(dao.getId());
-//			}
-//		}
 		if(isDebugEnabled) {
 			LOGGER.debug("DbService.getApplicableForomDB:Exit");
 		}
@@ -483,7 +491,7 @@ public class DbService implements ServiceConstants {
 			}
 		} catch (Exception e) {
 			if(isDebugEnabled) {
-				LOGGER.error("DbService.createTechnology", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+				LOGGER.error("DbService.createTechnology", STATUS_FAILURE,MESSAGE_EQUALS + "\"" + e.getLocalizedMessage() + "\"");
 			}
 			throw new PhrescoException(e);
 		}
@@ -530,48 +538,14 @@ public class DbService implements ServiceConstants {
 		return techGroups;
 	}
 	
-	private List<ApplicationType> createApplicationTypes(Map<String, List<TechnologyGroup>> appTypeMap) {
-		Set<String> keySet = appTypeMap.keySet();
-		List<ApplicationType> appTypes = new ArrayList<ApplicationType>();
-		for (String key : keySet) {
-			List<TechnologyGroup> list = appTypeMap.get(key);
-			ApplicationType appType = new ApplicationType();
-			String appTypeId = list.get(0).getAppTypeId();
-			ApplicationTypeDAO apptypeById = getApptypeById(appTypeId);
-			appType.setId(appTypeId);
-			appType.setName(apptypeById.getName());
-			appType.setTechGroups(list);
-			appTypes.add(appType);
-		}
-		
-		return appTypes;
-	}
-	
-	private void createAppTypeMap(List<TechnologyGroup> techGroups, Map<String, List<TechnologyGroup>> appTypeMap) {
-		for (TechnologyGroup technologyGroup : techGroups) {
-			String appTypeId = technologyGroup.getAppTypeId();
-			List<TechnologyGroup> newTechGroups = new ArrayList<TechnologyGroup>();
-			if (appTypeMap.containsKey(appTypeId)) {
-				List<TechnologyGroup> list = appTypeMap.get(appTypeId);
-				list.add(technologyGroup);
-				appTypeMap.put(appTypeId, list);
-			} else {
-				newTechGroups.add(technologyGroup);
-				appTypeMap.put(appTypeId, newTechGroups);
-			}
-		}
-	}
-	
 	private void createTechGroupMap(Technology technology, Map<String, List<TechnologyInfo>> techGroupMap) {
 		if(isDebugEnabled) {
 			LOGGER.debug("DbService.createTechGroupMap:Entry");
 		}
 		TechnologyInfo techInfo = createTechInfo(technology);
 		String techGroupId = technology.getTechGroupId();
-		if(StringUtils.isEmpty(techGroupId)) {
-			if(isDebugEnabled) {
-				LOGGER.warn("DbService.createTechGroupMap","status=\"Bad Request\"", "message=\"techGroupId is empty\"");
-			}
+		if(StringUtils.isEmpty(techGroupId) && isDebugEnabled) {
+			LOGGER.warn("DbService.createTechGroupMap",STATUS_BAD_REQUEST, "message=\"techGroupId is empty\"");
 		}
 		List<TechnologyInfo> infos = new ArrayList<TechnologyInfo>();
 		if(techGroupMap.containsKey(techGroupId)) {
@@ -629,7 +603,10 @@ public class DbService implements ServiceConstants {
 		for (ArtifactInfo artifactInfo : infos) {
 			ArtifactGroupDAO group = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
 					new Query(Criteria.whereId().is(artifactInfo.getArtifactGroupId())), ArtifactGroupDAO.class);
-			buffer.append(group.getName() + "-" + artifactInfo.getVersion() + ",");
+			buffer.append(group.getName());
+			buffer.append(HYPEN);
+			buffer.append(artifactInfo.getVersion());
+			buffer.append(COMMA);
 		}
 		return buffer.toString();
 	}
@@ -640,13 +617,15 @@ public class DbService implements ServiceConstants {
 		}
 		StringBuffer buffer = new StringBuffer();
 		for (ArtifactGroupInfo artifactGroupInfo : selected) {
-			buffer.append(artifactGroupInfo.getName() + "-");
+			buffer.append(artifactGroupInfo.getName());
+			buffer.append(HYPEN);
 			List<ArtifactInfo> infos = mongoOperation.find(ARTIFACT_INFO_COLLECTION_NAME, 
 					new Query(Criteria.whereId().in(artifactGroupInfo.getArtifactInfoIds().toArray())), ArtifactInfo.class);
 			for (ArtifactInfo artifactInfo : infos) {
-				buffer.append(artifactInfo.getVersion() + ",");
+				buffer.append(artifactInfo.getVersion());
+				buffer.append(COMMA);
 			}
-			buffer.append(",");
+			buffer.append(COMMA);
 		}
 		return buffer.toString();
 	}

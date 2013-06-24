@@ -28,7 +28,6 @@ import com.sun.jersey.api.client.WebResource;
 public class TweetCacheManagerImpl implements TweetCacheManager {
 
 	private static final String KEY = "tweet";
-	//private static final String Default = "[{\"error\":\"Rate limit exceeded. Clients may not make more than 150 requests per hour.\",\"request\":\"\\/statuses\\/user_timeline\\/photoninfotech.json\"}]";
 	private static final String DEFAULT_TWEET_MSG = "[{}]";
 	private static final Logger S_LOGGER = Logger.getLogger(TweetCacheManagerImpl.class);
 	private EHCacheManager manager;
@@ -59,7 +58,7 @@ public class TweetCacheManagerImpl implements TweetCacheManager {
 		String twitterMessage = DEFAULT_TWEET_MSG;
 		try {
 			Client client = Client.create();
-//			//TODO: Read the twitter service url from server.config
+			//TODO: Read the twitter service url from server.config
 			WebResource webResource = client.resource(config.getTwitterServiceURL());
 			twitterMessage = webResource.get(String.class);
 		} catch (java.lang.Exception e) {

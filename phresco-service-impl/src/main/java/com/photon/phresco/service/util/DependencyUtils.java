@@ -25,17 +25,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.util.ArchiveUtil;
 import com.photon.phresco.util.ArchiveUtil.ArchiveType;
+import com.photon.phresco.util.ServiceConstants;
 import com.photon.phresco.util.Utility;
 
 /**
@@ -109,9 +107,9 @@ public final class DependencyUtils {
 		if (isDebugEnabled) {
 			LOGGER.debug("DependencyUtils.extractFiles:Entry");
 			if(StringUtils.isEmpty(customerId)) {
-				LOGGER.warn("DependencyUtils.extractFiles","status=\"Bad Request\"", "message=\"customerId is empty\"");
+				LOGGER.warn(ServiceConstants.DEPENDENCY_UTIL_EXTRACT_FILES,ServiceConstants.STATUS_BAD_REQUEST, "message=\"customerId is empty\"");
 			}
-			LOGGER.info("DependencyUtils.extractFiles","contentURL=\""+ contentURL +"\"", "path=\""+ path.getPath()+"\"", "customerId=\""+ customerId +"\"");
+			LOGGER.info(ServiceConstants.DEPENDENCY_UTIL_EXTRACT_FILES,"contentURL=\""+ contentURL +"\"", ServiceConstants.PATH_EQUALS_SLASH+ path.getPath()+"\"", ServiceConstants.CUSTOMER_ID_EQUALS_SLASH+ customerId +"\"");
 		}
 		extractFiles(contentURL, null, path, customerId);
 		if(isDebugEnabled) {
@@ -130,8 +128,8 @@ public final class DependencyUtils {
 	public static void extractFiles(String contentURL, String folderName, File path, String customerId) throws PhrescoException {
 		if (isDebugEnabled) {
 			LOGGER.debug("DependencyUtils.extractFiles:Entry");
-			LOGGER.info("DependencyUtils.extractFiles","contentURL=\""+ contentURL +"\"","folderName=\""+ folderName +"\""
-					,"path=\""+ path.getName() +"\"","customerId=\""+ customerId +"\"");
+			LOGGER.info(ServiceConstants.DEPENDENCY_UTIL_EXTRACT_FILES,"contentURL=\""+ contentURL +"\"","folderName=\""+ folderName +"\""
+					,ServiceConstants.PATH_EQUALS_SLASH+ path.getName() +"\"",ServiceConstants.CUSTOMER_ID_EQUALS_SLASH+ customerId +"\"");
 		}
 		assert !StringUtils.isEmpty(contentURL);
 		
@@ -161,15 +159,15 @@ public final class DependencyUtils {
 			}
 		} 
 		catch (FileNotFoundException e) {
-			LOGGER.error("DependencyUtils.extractFiles", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			LOGGER.error(ServiceConstants.DEPENDENCY_UTIL_EXTRACT_FILES, ServiceConstants.STATUS_FAILURE, "message=\"" + e.getLocalizedMessage() + "\"");
 			return;
 		}
 		
 		catch (IOException e) {
-			LOGGER.error("DependencyUtils.extractFiles", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			LOGGER.error(ServiceConstants.DEPENDENCY_UTIL_EXTRACT_FILES, ServiceConstants.STATUS_FAILURE, "message=\"" + e.getLocalizedMessage() + "\"");
 			throw new PhrescoException(e);
 		} catch (PhrescoException pe ){
-			LOGGER.error("DependencyUtils.extractFiles", "status=\"Failure\"", "message=\"" + pe.getLocalizedMessage() + "\"");
+			LOGGER.error(ServiceConstants.DEPENDENCY_UTIL_EXTRACT_FILES, ServiceConstants.STATUS_FAILURE, "message=\"" + pe.getLocalizedMessage() + "\"");
 			if(pe.getCause() instanceof FileNotFoundException) {
 				return;
 			}
@@ -186,7 +184,8 @@ public final class DependencyUtils {
 			LOGGER.info("DependencyUtils.copyFilesTo","destPath=\""+ destPath +"\"");
 		}
 		if(files == null || destPath == null) {
-			return; //nothing to copy
+			//nothing to copy
+			return; 
 		}
 		for (File file : files) {
 			if(file.isDirectory()) {

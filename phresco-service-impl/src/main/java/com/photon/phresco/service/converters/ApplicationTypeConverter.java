@@ -46,11 +46,6 @@ public class ApplicationTypeConverter implements Converter<ApplicationTypeDAO, A
 		applicationType.setName(applicationTypeDAO.getName());
 		applicationType.setSystem(applicationTypeDAO.isSystem());
 		applicationType.setDescription(applicationTypeDAO.getDescription());
-//		if(CollectionUtils.isNotEmpty(applicationTypeDAO.getTechGroupIds())) {
-//			List<TechnologyGroup> techGroups = mongoOperation.find(TECH_GROUP_COLLECTION_NAME, 
-//					new Query(Criteria.whereId().in(applicationTypeDAO.getTechGroupIds().toArray())), TechnologyGroup.class);
-//			applicationType.setTechGroups(techGroups);
-//		}
 		applicationType.setCustomerIds(applicationTypeDAO.getCustomerIds());
 		if (isDebugEnabled) {
 			LOGGER.debug("ApplicationTypeConverter.convertDAOToObject:Exit");

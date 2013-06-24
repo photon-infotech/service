@@ -82,14 +82,11 @@ import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 
 public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstants {
 
-	//private static final Logger S_LOGGER= Logger.getLogger(RepositoryManagerImpl.class);
 	private static final SplunkLogger LOGGER = SplunkLogger.getSplunkLogger(RepositoryManagerImpl.class.getName());
 	private static Boolean isDebugEnabled = LOGGER.isDebugEnabled();
 	private static final String DEFAULT = "default";
-	//	private static final String JAXB_PACKAGE_NAME = "com.photon.phresco.service.jaxb";
 	private static final int HTTP_NOT_FOUND = 404;
 	private static final String LOCAL_REPO = "../temp/target/local-repo";
-
 	private ServerConfiguration config = null;
 
 	// TODO:Add ehcaching
@@ -106,8 +103,6 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 		versionMap.put(TechnologyTypes.HTML5_WIDGET, new String[]{MAGICNUMBER.VERSIONNUMSIX, MAGICNUMBER.VERSIONNUMFIVE});
 		versionMap.put(TechnologyTypes.ANDROID_HYBRID, new String[]{"4.0.3", "2.3.3", "2.2"});
 		versionMap.put(TechnologyTypes.ANDROID_NATIVE, new String[]{"4.0.3", "2.3.3", "2.2"});
-		/*versionMap.put(TechnologyTypes.IPHONE_HYBRID, new String[]{"4.0.3", "2.3.3", "2.2"});
-		versionMap.put(TechnologyTypes.IPHONE_NATIVE, new String[]{"4.0.3", "2.3.3", "2.2"});*/
 		versionMap.put(TechnologyTypes.WORDPRESS, new String[]{"3.3.1"});
 		versionMap.put(TechnologyTypes.DOT_NET, new String[]{"3.5", "3.0", "2.0"});
 		versionMap.put(TechnologyTypes.SHAREPOINT, new String[]{"3.5", "3.0", "2.0"});
@@ -124,7 +119,7 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 			initMap();
 		} catch (Exception e) {
 			if(isDebugEnabled) {
-				LOGGER.error("RepositoryManagerImpl.RepositoryManagerImpl", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+				LOGGER.error("RepositoryManagerImpl.RepositoryManagerImpl", STATUS_FAILURE, MESSAGE_EQUALS + "\"" + e.getLocalizedMessage() + "\"");
 			}
 			throw new PhrescoException(e);
 		}
@@ -140,9 +135,9 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 
 		if(isDebugEnabled) {
 			if (StringUtils.isEmpty(techId)) {
-				LOGGER.warn("RepositoryManagerImpl.getModules", "status=\"Bad Request\"", "message=\"Video Info is empty\"");
+				LOGGER.warn(REPO_MGR_IMPL_GET_MODULES, STATUS_BAD_REQUEST, "message=\"Video Info is empty\"");
 			}
-			LOGGER.info("RepositoryManagerImpl.getModules", "techId=" + "\"" + techId);
+			LOGGER.info(REPO_MGR_IMPL_GET_MODULES, "techId=" + "\"" + techId);
 		}
 
 		if (isDebugEnabled) {
@@ -158,9 +153,9 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 
 		if(isDebugEnabled) {
 			if (StringUtils.isEmpty(techId)) {
-				LOGGER.warn("RepositoryManagerImpl.getModules", "status=\"Bad Request\"", "message=\"Video Info is empty\"");
+				LOGGER.warn(REPO_MGR_IMPL_GET_MODULES, STATUS_BAD_REQUEST, "message=\"Video Info is empty\"");
 			}
-			LOGGER.info("RepositoryManagerImpl.getModules", "techId=" + "\"" + techId);
+			LOGGER.info(REPO_MGR_IMPL_GET_MODULES, "techId=" + "\"" + techId);
 		}
 
 		String jslibraryFile = config.getjsLibrariesFile(techId);
@@ -185,12 +180,12 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 			return new DefaultPlexusContainer().lookup(RepositorySystem.class);
 		} catch (ComponentLookupException e) {
 			if(isDebugEnabled) {
-				LOGGER.error("RepositoryManagerImpl.newRepositorySystem", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+				LOGGER.error("RepositoryManagerImpl.newRepositorySystem", STATUS_FAILURE, MESSAGE_EQUALS + "\"" + e.getLocalizedMessage() + "\"");
 			}
 			throw new PhrescoException(e);
 		} catch (PlexusContainerException e) {
 			if(isDebugEnabled) {
-				LOGGER.error("RepositoryManagerImpl.newRepositorySystem", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+				LOGGER.error("RepositoryManagerImpl.newRepositorySystem", STATUS_FAILURE, MESSAGE_EQUALS + "\"" + e.getLocalizedMessage() + "\"");
 			}
 			throw new PhrescoException(e);
 		}
@@ -203,7 +198,7 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 
 		if(isDebugEnabled) {
 			if (system == null) {
-				LOGGER.warn("RepositoryManagerImpl.newRepositorySystemSession", "status=\"Bad Request\"", "message=\"RepositorySystem is empty\"");
+				LOGGER.warn("RepositoryManagerImpl.newRepositorySystemSession", STATUS_BAD_REQUEST, "message=\"RepositorySystem is empty\"");
 			}
 			LOGGER.info("RepositoryManagerImpl.newRepositorySystemSession", "system=" + "\"" + system);
 		}
@@ -225,18 +220,18 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 
 		if(isDebugEnabled) {
 			if (StringUtils.isEmpty(customerId)) {
-				LOGGER.warn("RepositoryManagerImpl.addArtifact", "status=\"Bad Request\"", "message=\"customerId is empty\"");
-				throw new PhrescoException("customerId is Empty");
+				LOGGER.warn(REPO_MGR_IMPL_ADD_ARTIFACT, STATUS_BAD_REQUEST, MESSAGE_CUST_ID_EMPTY);
+				throw new PhrescoException(CUST_ID_EMPTY);
 			}
-			LOGGER.info("RepositoryManagerImpl.addArtifact", "customerId=" + "\"" + customerId);
+			LOGGER.info(REPO_MGR_IMPL_ADD_ARTIFACT, CUSTOMER_ID_EQUALS + "\"" + customerId);
 		}
 
 		if(isDebugEnabled) {
 			if (artifactFile == null) {
-				LOGGER.warn("RepositoryManagerImpl.addArtifact", "status=\"Bad Request\"", "message=\"artifactFile is empty\"");
+				LOGGER.warn(REPO_MGR_IMPL_ADD_ARTIFACT, STATUS_BAD_REQUEST, "message=\"artifactFile is empty\"");
 				throw new PhrescoException("artifactFile is Empty");
 			}
-			LOGGER.info("RepositoryManagerImpl.addArtifact", "artifactFile=" + "\"" + artifactFile);
+			LOGGER.info(REPO_MGR_IMPL_ADD_ARTIFACT, "artifactFile=" + "\"" + artifactFile);
 		}
 
 		DbManager dbManager = PhrescoServerFactory.getDbManager();
@@ -255,13 +250,7 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 		RemoteRepository distRepo = new RemoteRepository("", DEFAULT, repoInfo.getReleaseRepoURL());
 		Authentication authentication = new Authentication(repoInfo.getRepoUserName(), password);
 		distRepo.setAuthentication(authentication);
-		DeployRequest deployRequest = new DeployRequest();
-		deployRequest.addArtifact(artifact);
-		if (info.getPomFile() != null) {
-			Artifact pom = new SubArtifact(artifact, null, "pom");
-			pom = pom.setFile(info.getPomFile());
-			deployRequest.addArtifact(pom);
-		}
+		DeployRequest deployRequest = addArtifactForDeploy(info, artifact);
 
 		deployRequest.setRepository(distRepo);
 
@@ -269,7 +258,7 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 			system.deploy(session, deployRequest);
 		} catch (DeploymentException e) {
 			if(isDebugEnabled) {
-				LOGGER.error("RepositoryManagerImpl.addArtifact", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+				LOGGER.error(REPO_MGR_IMPL_ADD_ARTIFACT, STATUS_FAILURE, MESSAGE_EQUALS + "\"" + e.getLocalizedMessage() + "\"");
 			}
 			throw new PhrescoException(e);
 		}
@@ -279,6 +268,18 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 		}
 
 		return true;
+	}
+
+	private DeployRequest addArtifactForDeploy(ArtifactInfo info,
+			Artifact artifact) {
+		DeployRequest deployRequest = new DeployRequest();
+		deployRequest.addArtifact(artifact);
+		if (info.getPomFile() != null) {
+			Artifact pom = new SubArtifact(artifact, null, "pom");
+			pom = pom.setFile(info.getPomFile());
+			deployRequest.addArtifact(pom);
+		}
+		return deployRequest;
 	}
 
 	@Override
@@ -315,10 +316,10 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 		try {
 			if(isDebugEnabled) {
 				if (StringUtils.isEmpty(customerId)) {
-					LOGGER.warn("RepositoryManagerImpl.isExist", "status=\"Bad Request\"", "message=\"customerId is empty\"");
-					throw new PhrescoException("customerId is Empty");
+					LOGGER.warn(REPO_MGR_IMPL_IS_EXIST, STATUS_BAD_REQUEST, MESSAGE_CUST_ID_EMPTY);
+					throw new PhrescoException(CUST_ID_EMPTY);
 				}
-				LOGGER.info("RepositoryManagerImpl.isExist", "customerId=" + "\"" + customerId);
+				LOGGER.info(REPO_MGR_IMPL_IS_EXIST, CUSTOMER_ID_EQUALS + "\"" + customerId);
 			}
 			RepoInfo repoInfo = getDBManager().getRepoInfo(customerId);
 			URL url = new URL(repoInfo.getGroupRepoURL() + filePath);
@@ -330,7 +331,7 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 			return (responseCode != HTTP_NOT_FOUND);
 		} catch (IOException e) {
 			if(isDebugEnabled) {
-				LOGGER.error("RepositoryManagerImpl.isExist", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+				LOGGER.error(REPO_MGR_IMPL_IS_EXIST, STATUS_FAILURE, MESSAGE_EQUALS + "\"" + e.getLocalizedMessage() + "\"");
 			}
 			throw new PhrescoException(e);
 		} finally {
@@ -339,7 +340,7 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 					is.close();
 				} catch (IOException e) {
 					if(isDebugEnabled) {
-						LOGGER.error("RepositoryManagerImpl.isExist", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+						LOGGER.error(REPO_MGR_IMPL_IS_EXIST, STATUS_FAILURE, MESSAGE_EQUALS + "\"" + e.getLocalizedMessage() + "\"");
 					}
 					throw new PhrescoException(e);
 				}
@@ -356,10 +357,10 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 		try {
 			if(isDebugEnabled) {
 				if (StringUtils.isEmpty(customerId)) {
-					LOGGER.warn("RepositoryManagerImpl.getArtifactAsString", "status=\"Bad Request\"", "message=\"customerId is empty\"");
-					throw new PhrescoException("customerId is Empty");
+					LOGGER.warn(REPO_MGR_IMPL_GET_ARTF_AS_STRING, STATUS_BAD_REQUEST, MESSAGE_CUST_ID_EMPTY);
+					throw new PhrescoException(CUST_ID_EMPTY);
 				}
-				LOGGER.info("RepositoryManagerImpl.getArtifactAsString", "customerId=" + "\"" + customerId);
+				LOGGER.info(REPO_MGR_IMPL_GET_ARTF_AS_STRING, CUSTOMER_ID_EQUALS + "\"" + customerId);
 			}
 			RepoInfo repoInfo = getDBManager().getRepoInfo(customerId);
 			URL url = new URL(repoInfo.getGroupRepoURL() + filePath);
@@ -370,7 +371,7 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 			return IOUtils.toString(is);
 		} catch (IOException e) {
 			if(isDebugEnabled) {
-				LOGGER.error("RepositoryManagerImpl.getArtifactAsString", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+				LOGGER.error(REPO_MGR_IMPL_GET_ARTF_AS_STRING, STATUS_FAILURE, MESSAGE_EQUALS + "\"" + e.getLocalizedMessage() + "\"");
 			}
 			throw new PhrescoException(e);
 		} finally {
@@ -379,7 +380,7 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 					is.close();
 				} catch (IOException e) {
 					if(isDebugEnabled) {
-						LOGGER.error("RepositoryManagerImpl.getArtifactAsString", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+						LOGGER.error(REPO_MGR_IMPL_GET_ARTF_AS_STRING, STATUS_FAILURE, MESSAGE_EQUALS + "\"" + e.getLocalizedMessage() + "\"");
 					}
 					throw new PhrescoException(e);
 				}
@@ -400,10 +401,10 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 		try {
 			if(isDebugEnabled) {
 				if (StringUtils.isEmpty(customerId)) {
-					LOGGER.warn("RepositoryManagerImpl.getArtifactAsStream", "status=\"Bad Request\"", "message=\"customerId is empty\"");
-					throw new PhrescoException("customerId is Empty");
+					LOGGER.warn(REPO_MGR_IMPL_GET_ARTF_AS_STREAM, STATUS_BAD_REQUEST, MESSAGE_CUST_ID_EMPTY);
+					throw new PhrescoException(CUST_ID_EMPTY);
 				}
-				LOGGER.info("RepositoryManagerImpl.getArtifactAsStream", "customerId=" + "\"" + customerId);
+				LOGGER.info(REPO_MGR_IMPL_GET_ARTF_AS_STREAM, CUSTOMER_ID_EQUALS + "\"" + customerId);
 			}
 			RepoInfo repoInfo = getDBManager().getRepoInfo(customerId);
 			URL url = new URL(repoInfo.getGroupRepoURL() + "/" + filePath);
@@ -413,12 +414,12 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 			return url.openStream();
 		} catch (MalformedURLException e) {
 			if(isDebugEnabled) {
-				LOGGER.error("RepositoryManagerImpl.getArtifactAsStream", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+				LOGGER.error(REPO_MGR_IMPL_GET_ARTF_AS_STREAM, STATUS_FAILURE, MESSAGE_EQUALS + "\"" + e.getLocalizedMessage() + "\"");
 			}
 			throw new PhrescoException(e);
 		} catch (IOException e) {
 			if(isDebugEnabled) {
-				LOGGER.error("RepositoryManagerImpl.getArtifactAsStream", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+				LOGGER.error(REPO_MGR_IMPL_GET_ARTF_AS_STREAM, STATUS_FAILURE, MESSAGE_EQUALS + "\"" + e.getLocalizedMessage() + "\"");
 			}
 			throw new PhrescoException(e);
 		}
@@ -549,10 +550,6 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 		if(StringUtils.isNotEmpty(releaseRepo)) {
 			repoInfo.setReleaseRepoURL(releaseRepo);
 		}
-		//        String snapshotRepo = createHostedRepo(customerId, repoBaseURL, REPOTYPE_SNAPSHOT);
-		//        if(StringUtils.isNotEmpty(snapshotRepo)) {
-		//            repoInfo.setSnapshotRepoURL(snapshotRepo);
-		//        }
 		String groupRepo = createGroupRepo(repoName, repoBaseURL, REPOTYPE_GROUP);
 		if(StringUtils.isNotEmpty(groupRepo)) {
 			repoInfo.setGroupRepoURL(groupRepo);
@@ -623,15 +620,12 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 	private String createGroupRepoData(String repoName, String repoBaseURL, String repoType) {
 		String repoId = repoName + repoType.toLowerCase();
 		String releaseId = repoName + REPO_RELEASE_NAME;
-		//        String snapshotId = repoName + REPO_SNAPSHOT_NAME;
 		List<Repository> repositories = new ArrayList<Repository>();
 		Repository repo = new Repository(releaseId, releaseId, repoBaseURL + LOCAL_REPO_GROUP + releaseId);
 		repositories.add(repo);
 		String phrescoRepoId = PHRESCO_REPO_NAME.toLowerCase();
 		repo = new Repository(phrescoRepoId, PHRESCO_REPO_NAME, repoBaseURL + LOCAL_REPO_GROUP + phrescoRepoId);
 		repositories.add(repo);
-		//        repo = new Repository(snapshotId, snapshotId, repoBaseURL + LOCAL_REPO_GROUP + snapshotId);
-		//        repositories.add(repo);
 		GroupRepository data =  new GroupRepository(repoBaseURL + REPO_GROUP_CONTENT + repoId, repoId, repoId, REPO_PROVIDER, 
 				REPO_PROVIDER, REPO_HOSTED, true, repositories);
 		String json = new Gson().toJson(data);
@@ -696,8 +690,6 @@ public  class RepositoryManagerImpl implements RepositoryManager, ServiceConstan
 		Authentication authentication = new Authentication("admin", "devrepo2");
 		repo.setAuthentication(authentication);
 		repo.setUrl("http://172.16.17.226:8080/repository/content/repositories/releases/");
-		//        FileRepositoryConnectorFactory factory = new FileRepositoryConnectorFactory();
-		//        RepositoryConnector newInstance = factory.newInstance(session, repo);
 		ArtifactRequest artifactRequest = new ArtifactRequest();
 		artifactRequest.setArtifact( artifact );
 		artifactRequest.addRepository( repo );

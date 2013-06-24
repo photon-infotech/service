@@ -67,18 +67,8 @@ public class TechnologyConverter implements Converter<TechnologyDAO, Technology>
 	        ArtifactGroup artifactGroup = artifactConverter.convertDAOToObject(artifactGrpDAO, mongoOperation);
 	        technology.setArchetypeInfo(artifactGroup);
         }
-        if(CollectionUtils.isNotEmpty(technologyDAO.getPluginIds())) {
-        	List<ArtifactGroupDAO> pluginsDAO = mongoOperation.find(ARTIFACT_GROUP_COLLECTION_NAME, 
-            		new Query(Criteria.whereId().is(technologyDAO.getPluginIds().toArray())), ArtifactGroupDAO.class);
-            List<ArtifactGroup> plugins = new ArrayList<ArtifactGroup>();
-            if(pluginsDAO != null) {
-            	for (ArtifactGroupDAO artifactGroupDAO : pluginsDAO) {
-                	ArtifactGroup artifactGroup = artifactConverter.convertDAOToObject(artifactGroupDAO, mongoOperation);
-                	plugins.add(artifactGroup);
-        		}
-                technology.setPlugins(plugins);
-            }
-        }
+        setPlugins(technologyDAO, mongoOperation, technology, artifactConverter);
+        
         if(CollectionUtils.isNotEmpty(technologyDAO.getOptions())) {
         	technology.setOptions(technologyDAO.getOptions());
         }
@@ -100,6 +90,24 @@ public class TechnologyConverter implements Converter<TechnologyDAO, Technology>
         return technology;
     }
 
+    private void setPlugins(TechnologyDAO technologyDAO,
+    		MongoOperations mongoOperation, Technology technology,
+    		Converter<ArtifactGroupDAO, ArtifactGroup> artifactConverter)
+    throws PhrescoException {
+    	if(CollectionUtils.isNotEmpty(technologyDAO.getPluginIds())) {
+    		List<ArtifactGroupDAO> pluginsDAO = mongoOperation.find(ARTIFACT_GROUP_COLLECTION_NAME, 
+    				new Query(Criteria.whereId().is(technologyDAO.getPluginIds().toArray())), ArtifactGroupDAO.class);
+    		List<ArtifactGroup> plugins = new ArrayList<ArtifactGroup>();
+    		if(pluginsDAO != null) {
+    			for (ArtifactGroupDAO artifactGroupDAO : pluginsDAO) {
+    				ArtifactGroup artifactGroup = artifactConverter.convertDAOToObject(artifactGroupDAO, mongoOperation);
+    				plugins.add(artifactGroup);
+    			}
+    			technology.setPlugins(plugins);
+    		}
+    	}
+    }
+
     @Override
     public TechnologyDAO convertObjectToDAO(Technology technology) throws PhrescoException {
     	if (isDebugEnabled) {
@@ -116,11 +124,6 @@ public class TechnologyConverter implements Converter<TechnologyDAO, Technology>
         techDAO.setSystem(technology.isSystem());
         techDAO.setTechVersions(technology.getTechVersions());
         techDAO.setUsed(technology.isUsed());
-//        techDAO.setArchetypeGroupDAOId(technology.getArchetypeInfo().getId());
-        List<ArtifactGroup> plugins = technology.getPlugins();
-//        if(plugins != null) {
-//        	techDAO.setPluginIds(createPluginId(plugins));
-//        }
         techDAO.setOptions(technology.getOptions());
         techDAO.setTechGroupId(technology.getTechGroupId());
         techDAO.setReports(technology.getReports());
@@ -147,12 +150,4 @@ public class TechnologyConverter implements Converter<TechnologyDAO, Technology>
 		}
     	return ids;
     }
-    
-	private List<String> createPluginId(List<ArtifactGroup> plugins) {
-		List<String> ids = new ArrayList<String>();
-		for (ArtifactGroup artifactGroup : plugins) {
-			ids.add(artifactGroup.getId());
-		}
-		return ids;
-	}
 }

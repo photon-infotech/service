@@ -86,6 +86,7 @@ public class FrameworkProjectInfoConverter implements Converter<ProjectInfoDAO, 
 		return appInfoIds;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private List<ApplicationInfo> getApplicationInfos(List<String> appIds, MongoOperations mongoOperation) throws PhrescoException {
 		List<ApplicationInfo> applicationInfos = new ArrayList<ApplicationInfo>();
 		List<ApplicationInfoDAO> appInfoDAOs = mongoOperation.find(APPLICATION_INFO_COLLECTION_NAME, 
