@@ -22,9 +22,12 @@ import java.lang.reflect.Constructor;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.model.ServerConfiguration;
 
-public class PhrescoServerFactory {
+public final class PhrescoServerFactory {
+	
+	private PhrescoServerFactory() {
+		
+	}
 
-    private static final String DOCUMENT_GENERATOR_IMPL_CLASS = "com.photon.phresco.service.impl.DocumentGeneratorImpl";
     private static final String ARCHETYPE_EXECUTOR_IMPL_CLASS = "com.photon.phresco.service.impl.ArchetypeExecutorImpl";
     private static final String REPOSITORY_MANAGER_IMPL_CLASS = "com.photon.phresco.service.impl.RepositoryManagerImpl";
 	private static final String DB_MANAGER_IMPL_CLASS = "com.photon.phresco.service.impl.DbManagerImpl";

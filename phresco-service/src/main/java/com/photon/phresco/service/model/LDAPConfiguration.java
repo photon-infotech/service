@@ -30,11 +30,6 @@ public class LDAPConfiguration implements ServerConstants {
 	/**
 	 * 
 	 */
-	private Properties ldapProps;
-	
-	/**
-	 * 
-	 */
 	private String ldapContextFactory;
 	
 	/**
@@ -80,7 +75,8 @@ public class LDAPConfiguration implements ServerConstants {
 		if (serverProps == null) {
 			throw new PhrescoException("LDAP Properties cannot be null");
 		}
-		this.ldapProps = serverProps;
+		
+		Properties ldapProps = serverProps;
 		ldapContextFactory = (String) ldapProps.get(LDAP_CONTEXT_FACTORY);
 		ldapUrl = (String) ldapProps.get(LDAP_URL);
 		ldapBaseDn = (String) ldapProps.get(LDAP_BASEDN);

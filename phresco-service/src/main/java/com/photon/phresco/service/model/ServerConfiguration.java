@@ -296,17 +296,17 @@ public class ServerConfiguration {
         return repoPassword;
     }
 	
-	public String getDefaultCustomerId() {
+	public String getDefaultCustomerId() throws PhrescoException {
 		return getServerProperties().getProperty("phreso.default.customer");
 	}
 	
-	public List<String> getDefaultRoles() {
+	public List<String> getDefaultRoles() throws PhrescoException {
 		String serverRole = getServerProperties().getProperty("service.view.roleid");
 		String fworkRole = getServerProperties().getProperty("framework.view.roleid");
 		return Arrays.asList(serverRole, fworkRole);
 	}
 	
-	private Properties getServerProperties() {
+	private Properties getServerProperties() throws PhrescoException {
 		if(serverProperties != null) {
 			return serverProperties;
 		}
@@ -315,7 +315,7 @@ public class ServerConfiguration {
 		try {
 			serverProperties.load(resourceAsStream);
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new PhrescoException(e);
 		}
 		return serverProperties;
 	}

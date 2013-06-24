@@ -35,7 +35,6 @@ import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 import java.util.zip.ZipEntry;
 
-import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
@@ -55,7 +54,11 @@ import com.photon.phresco.util.FileUtil;
 import com.photon.phresco.util.Utility;
 import com.phresco.pom.util.PomProcessor;
 
-public class ServerUtil {
+public final class ServerUtil {
+	
+	private ServerUtil() {
+		
+	}
 
     private static JarInputStream jarInputStream = null;
 
@@ -119,8 +122,7 @@ public class ServerUtil {
 					}
 					if (pomFile != null) {
 						ZipEntry entry = jarfile.getEntry(pomFile);
-						InputStream inputStream = jarfile.getInputStream(entry);
-						return inputStream;
+						return jarfile.getInputStream(entry);
 					}
 				} catch (Exception e) {					
 					throw new PhrescoException(e);
