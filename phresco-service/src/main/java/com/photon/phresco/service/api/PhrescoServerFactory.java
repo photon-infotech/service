@@ -81,7 +81,7 @@ public final class PhrescoServerFactory {
     }
     
     public static ArchetypeExecutor getArchetypeExecutor() throws PhrescoException {
-        return (ArchetypeExecutor) constructClass(ARCHETYPE_EXECUTOR_IMPL_CLASS, serverConfig);
+        return (ArchetypeExecutor) constructClass(ARCHETYPE_EXECUTOR_IMPL_CLASS);
     }
 
     public static synchronized ProjectServiceManager getProjectService() throws PhrescoException {

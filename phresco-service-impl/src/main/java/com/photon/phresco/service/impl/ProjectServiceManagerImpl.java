@@ -63,14 +63,13 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 			LOGGER.info("ProjectServiceManagerImpl.createProject", "customerId=\"" + projectInfo.getCustomerIds().get(0) + "\"", "creationDate=\"" + projectInfo.getCreationDate() + "\"",
 					"projectCode=\"" + projectInfo.getProjectCode() + "\"");
 		}
-		String folderPath = null;
 		PhrescoServerFactory.initialize();
 		if(projectInfo.isMultiModule()) {
-			folderPath =tempFolderPath + "/" + projectInfo.getName();
+			tempFolderPath = tempFolderPath + "/" + projectInfo.getName();
 		}
-		PhrescoServerFactory.getArchetypeExecutor().execute(projectInfo, folderPath);
+		PhrescoServerFactory.getArchetypeExecutor().execute(projectInfo, tempFolderPath);
 		if(projectInfo.isPreBuilt()) {
-			createPilots(projectInfo.getAppInfos().get(0), folderPath, projectInfo.getCustomerIds().get(0));
+			createPilots(projectInfo.getAppInfos().get(0), tempFolderPath, projectInfo.getCustomerIds().get(0));
 		}
 		if(isDebugEnabled) {
 			LOGGER.debug("ProjectServiceManagerImpl.createProject:Exit");
