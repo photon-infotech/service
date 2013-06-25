@@ -1138,7 +1138,6 @@ public class ComponentService extends DbService {
 		        		"user=" + request.getParameter("userId"), "query=" + query.getQueryObject().toString());
 			}
 		    List<ArtifactGroup> modules = convertDAOToModule(artifactGroupDAOs);
-		 
 		    ResponseBuilder response = Response.status(Response.Status.OK);
 		    response.header(Constants.ARTIFACT_COUNT_RESULT, count(ARTIFACT_GROUP_COLLECTION_NAME, query));
 		    if (isDebugEnabled) {
@@ -1157,23 +1156,27 @@ public class ComponentService extends DbService {
 	}
 	
     private List<ArtifactGroup> convertDAOToModule(List<ArtifactGroupDAO> moduleDAOs) throws PhrescoException {
-		Converter<ArtifactGroupDAO, ArtifactGroup> artifactConverter = 
-            (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
-	    List<ArtifactGroup> modules = new ArrayList<ArtifactGroup>();
-	    for (ArtifactGroupDAO artifactGroupDAO : moduleDAOs) {
-			ArtifactGroup artifactGroup = artifactConverter.convertDAOToObject(artifactGroupDAO, DbService.getMongoOperation());
-			ArtifactElement artifactElement = DbService.getMongoOperation().findOne(ARTIFACT_ELEMENT_COLLECTION_NAME, 
-					new Query(Criteria.whereId().is(artifactGroupDAO.getId())), ArtifactElement.class);
-		    if(artifactElement != null) {
-		    	artifactGroup.setDescription(artifactElement.getDescription());
-		    	artifactGroup.setHelpText(artifactElement.getHelpText());
-		    	artifactGroup.setSystem(artifactElement.isSystem());
-		    	artifactGroup.setLicenseId(artifactElement.getLicenseId());
-		    	artifactGroup.setCreationDate(artifactElement.getCreationDate());
-		    }
-			modules.add(artifactGroup);
+		try {
+			Converter<ArtifactGroupDAO, ArtifactGroup> artifactConverter = 
+			    (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
+			List<ArtifactGroup> modules = new ArrayList<ArtifactGroup>();
+			for (ArtifactGroupDAO artifactGroupDAO : moduleDAOs) {
+				ArtifactGroup artifactGroup = artifactConverter.convertDAOToObject(artifactGroupDAO, DbService.getMongoOperation());
+				ArtifactElement artifactElement = DbService.getMongoOperation().findOne(ARTIFACT_ELEMENT_COLLECTION_NAME, 
+						new Query(Criteria.whereId().is(artifactGroupDAO.getId())), ArtifactElement.class);
+			    if(artifactElement != null) {
+			    	artifactGroup.setDescription(artifactElement.getDescription());
+			    	artifactGroup.setHelpText(artifactElement.getHelpText());
+			    	artifactGroup.setSystem(artifactElement.isSystem());
+			    	artifactGroup.setLicenseId(artifactElement.getLicenseId());
+			    	artifactGroup.setCreationDate(artifactElement.getCreationDate());
+			    }
+				modules.add(artifactGroup);
+			}
+			return modules;
+		} catch (PhrescoException e) {
+			throw new PhrescoException(e);
 		}
-        return modules;
     }
 
     /**
@@ -1379,14 +1382,14 @@ public class ComponentService extends DbService {
 	        LOGGER.debug("ComponentService.getModule" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 	        		"user=" + request.getParameter("userId") , "id=" + id);
 	    }
+	    ArtifactGroup moduleGroup = null;
 		try {
 			ArtifactGroupDAO moduleDAO = DbService.getMongoOperation().findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
 			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ArtifactGroupDAO.class);
-			
 			if (moduleDAO != null) {
 		        Converter<ArtifactGroupDAO, ArtifactGroup> converter = 
 		            (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
-		        ArtifactGroup moduleGroup = converter.convertDAOToObject(moduleDAO, DbService.getMongoOperation());
+		        moduleGroup = converter.convertDAOToObject(moduleDAO, DbService.getMongoOperation());
 		        ArtifactElement artifactElement = DbService.getMongoOperation().findOne("artifactElement", 
 						new Query(Criteria.whereId().is(moduleGroup.getId())), ArtifactElement.class);
 			    if(artifactElement != null) {
@@ -1395,15 +1398,9 @@ public class ComponentService extends DbService {
 			    	moduleGroup.setSystem(artifactElement.isSystem());
 			    	moduleGroup.setLicenseId(artifactElement.getLicenseId());
 			    	moduleGroup.setCreationDate(artifactElement.getCreationDate());
-			    	return  Response.status(Response.Status.OK).entity(moduleGroup).build();
-			    } else {
-			    	if(isDebugEnabled) {
-						LOGGER.info("ComponentService.getModule", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
-		        		"user=" + request.getParameter("userId"), "status=\"NotFound\"");
-					}
-			    	return Response.status(Response.Status.NO_CONTENT).build();
-			    }
+			    } 
 			}
+			return  Response.status(Response.Status.OK).entity(moduleGroup).build();
 		} catch (Exception e) {
 			if(isDebugEnabled) {
 				LOGGER.error("ComponentService.getModule", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
@@ -1411,7 +1408,6 @@ public class ComponentService extends DbService {
 			}
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, ARTIFACT_GROUP_COLLECTION_NAME);
 		}
-		return null;
 	}
 	
 	/**
