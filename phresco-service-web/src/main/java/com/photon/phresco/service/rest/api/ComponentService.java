@@ -136,7 +136,6 @@ public class ComponentService extends DbService {
 				Criteria appCriteria = Criteria.where("appTypeId").is(applicationType.getId());
 				query.addCriteria(appCriteria);
 				List<TechnologyGroup> techGroups = DbService.getMongoOperation().find(TECH_GROUP_COLLECTION_NAME, query, TechnologyGroup.class);
-				System.out.println("List of TechGroups===>" +techGroups);
 				for (TechnologyGroup techGroup : techGroups) {
 					query = createCustomerIdQuery(customerId);
 					Criteria criteria = Criteria.where("techGroupId").is(techGroup.getId());
