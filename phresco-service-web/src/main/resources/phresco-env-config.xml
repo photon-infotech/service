@@ -94,11 +94,11 @@
             <username/>
         </WebService>	
 	<Database  desc="" name="database">
-		<host>localhost</host>
+		<host>172.16.17.227</host>
 		<port>27017</port>
 		<username></username>
 		<password/>
-		<dbname>database-dump</dbname>
+		<dbname>phresco-dev3-0</dbname>
 		<type>mongodb</type>
 		<version>2.0.4</version>
 	</Database>
