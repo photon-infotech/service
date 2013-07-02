@@ -51,7 +51,7 @@
         </Server>
 	</environment>
     
-	<environment default="false" name="Development">
+	<environment default="true" name="Development">
         <WebService name="webservice">
             <port>8080</port>
             <password/>
@@ -61,11 +61,11 @@
             <username/>
         </WebService>	
 	<Database  desc="" name="database">
-		<host>localhost</host>
+		<host>172.16.8.250</host>
 		<port>27017</port>
 		<username></username>
 		<password/>
-		<dbname>database-dump</dbname>
+		<dbname>testing-3-0</dbname>
 		<type>mongodb</type>
 		<version>2.0.4</version>
 	</Database>
