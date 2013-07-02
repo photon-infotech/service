@@ -84,7 +84,7 @@
         </Server>
 	</environment>
 	
-    <environment default="true" name="Testing">
+    <environment default="false" name="Testing">
         <WebService name="webservice">
             <port>8080</port>
             <password/>
@@ -98,7 +98,7 @@
 		<port>27017</port>
 		<username></username>
 		<password/>
-		<dbname>database-dump</dbname>
+		<dbname>testing-3-0</dbname>
 		<type>mongodb</type>
 		<version>2.0.4</version>
 	</Database>
