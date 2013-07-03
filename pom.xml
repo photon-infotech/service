@@ -369,7 +369,7 @@
                 <artifactId>maven-surefire-report-plugin</artifactId>
                 <version>2.8</version>
                 <configuration>
-                    <skipTests>true</skipTests>
+                    <reportsDirectory>${project.basedir}/do_not_checkin/reports/unitReports</reportsDirectory>
                 </configuration>
             </plugin>
         </plugins>
@@ -405,7 +405,7 @@
         <phresco.unitTest.js.testsuite.xpath>/testsuite</phresco.unitTest.js.testsuite.xpath>
         <phresco.unitTest.js.testcase.path>/testcase</phresco.unitTest.js.testcase.path>
         <phresco.manualTest.testcase.path>/test/manual</phresco.manualTest.testcase.path>
-        <phresco.unitTest.java.report.dir>/do_not_checkin/target/surefire-reports</phresco.unitTest.java.report.dir>
+        <phresco.unitTest.java.report.dir>/do_not_checkin/reports/unitReports</phresco.unitTest.java.report.dir>
         <phresco.unitTest.java.testsuite.xpath>/testsuite</phresco.unitTest.java.testsuite.xpath>
         <phresco.unitTest.java.testcase.path>/testcase</phresco.unitTest.java.testcase.path>
         <phresco.functionalTest.selenium.tool>grid</phresco.functionalTest.selenium.tool>
