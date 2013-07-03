@@ -166,31 +166,39 @@ public class ProjectService extends DbService {
 		return null;
 	}
 	
-	private void buildCreateLogMessage(HttpServletRequest request, ProjectInfo projectInfo) {
-		if (isDebugEnabled) {
-			for (ApplicationInfo applicationInfo : projectInfo.getAppInfos()) {
-				LOGGER.warn("ProjectService.createProject", "remoteAddress=" + request.getRemoteAddr() , "technology=" + 
-						applicationInfo.getTechInfo().getName(), "user=" + request.getParameter("userId"),
-						"authType=" + request.getParameter("authType"),"customer=" + getCustomerNameById(projectInfo.getCustomerIds().get(0)),
-						"action=" + "CREATE", "endpoint=" + request.getRequestURI(),  "method=" + request.getMethod(), 
-						"projectCode=" + "\"" + projectInfo.getProjectCode() + "\"", "totalNoOfApps=" + projectInfo.getNoOfApps(), getApplications(projectInfo));
+	private void buildCreateLogMessage(HttpServletRequest request, ProjectInfo projectInfo) throws PhrescoException {
+		try {
+			if (isDebugEnabled) {
+				for (ApplicationInfo applicationInfo : projectInfo.getAppInfos()) {
+					LOGGER.warn("ProjectService.createProject", "remoteAddress=" + request.getRemoteAddr() , "technology=" + 
+							applicationInfo.getTechInfo().getName(), "user=" + request.getParameter("userId"),
+							"authType=" + request.getParameter("authType"),"customer=" + getCustomerNameById(projectInfo.getCustomerIds().get(0)),
+							"action=" + "CREATE", "endpoint=" + request.getRequestURI(),  "method=" + request.getMethod(), 
+							"projectCode=" + "\"" + projectInfo.getProjectCode() + "\"", "totalNoOfApps=" + projectInfo.getNoOfApps(), getApplications(projectInfo));
+				}
 			}
+		} catch (Exception e) {
+			throw new PhrescoException(e); 
 		}
 	}
 	
-	private void buildUpdateLogMessage(HttpServletRequest request, ProjectInfo projectInfo) {
-		if (isDebugEnabled) {
-			for (ApplicationInfo applicationInfo : projectInfo.getAppInfos()) {
-				LOGGER.warn("ProjectService.updateProject", "remoteAddress=" + request.getRemoteAddr() , "technology=" + 
-						applicationInfo.getTechInfo().getName(), "user=" + request.getParameter("userId"),
-						"authType=" + request.getParameter("authType"),"customer=" + getCustomerNameById(projectInfo.getCustomerIds().get(0)),
-						"action=" + "UPDATE", "endpoint=" + request.getRequestURI(),  "method=" + request.getMethod(), 
-						"projectCode=" + "\"" + projectInfo.getProjectCode() + "\"", "totalNoOfApps=" + projectInfo.getNoOfApps(), 
-						getApplications(projectInfo), getFeatures(applicationInfo), getJslibs(applicationInfo));
+	private void buildUpdateLogMessage(HttpServletRequest request, ProjectInfo projectInfo) throws PhrescoException {
+		try {
+			if (isDebugEnabled) {
+				for (ApplicationInfo applicationInfo : projectInfo.getAppInfos()) {
+					LOGGER.warn("ProjectService.updateProject", "remoteAddress=" + request.getRemoteAddr() , "technology=" + 
+							applicationInfo.getTechInfo().getName(), "user=" + request.getParameter("userId"),
+							"authType=" + request.getParameter("authType"),"customer=" + getCustomerNameById(projectInfo.getCustomerIds().get(0)),
+							"action=" + "UPDATE", "endpoint=" + request.getRequestURI(),  "method=" + request.getMethod(), 
+							"projectCode=" + "\"" + projectInfo.getProjectCode() + "\"", "totalNoOfApps=" + projectInfo.getNoOfApps(), 
+							getApplications(projectInfo), getFeatures(applicationInfo), getJslibs(applicationInfo));
+				}
 			}
+		} catch (Exception e) {
+			throw new PhrescoException(e); 
 		}
-	}
-	
+	}	
+
 	private String getApplications(ProjectInfo projectInfo) {
 		StringBuffer stringBuffer = new StringBuffer();
 		List<ApplicationInfo> appInfos = projectInfo.getAppInfos();
