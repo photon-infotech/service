@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<suite name="JsLibrariesTestSuite" verbose="1">
+	<test name="JslibrariesUploadPage" junit="false" preserve-order="true">
+		<parameter name="browser" value="googlechrome" />
+		<parameter name="platform" value="WINDOWS" />
+		<classes>
+			<class name="com.photon.phresco.testcases.JsLibrariesPageTest" />
+			<methods>
+				<include name="testValidLogin" />
+				<include name="testPHPReusableComponentsAddJSlibrariesPage" />
+		    	 <include name="testDrupal6ReusableComponentsAddJSlibrariesPage" />
+				<include name="testDrupal7ReusableComponentsAddJSlibrariesPage" />
+				<include name="testWordPressReusableComponentsAddJSlibrariesPage" />
+				<include name="testMultiYUIReusableComponentsAddJSlibrariesPage" />
+				<include name="testMultiJQueryReusableComponentsAddJSlibrariesPage" />
+				<include name="testYUIMobileReusableComponentsAddJSlibrariesPage" />
+				<include name="testJQueryMobileReusableComponentsAddJSlibrariesPage" />
+				<include name="testDOTNETReusableComponentsAddJSlibrariesPage" />
+				<include name="testSharePointReusableComponentsAddJSlibrariesPage" />
+				<include name="testSiteCoreReusableComponentsAddJSlibrariesPage" />
+				<include name="testJavaaloneReusableComponentsAddJSlibrariesPage" />
+				<include name="testJavaWebServiceReusableComponentsAddJSlibrariesPage" />
+				<include name="testNodejsReusableComponentsAddJSlibrariesPage" />
+				<include name="testiPhoneHybridReusableComponentsAddJSlibrariesPage" />
+				<include name="testiphoneNativeReusableComponentsAddJSlibrariesPage" />
+				<include name="testiPhoneLibraryReusableComponentsAddJSlibrariesPage" />
+				<include name="teroidHybridReusableComponentsAddJSlibrariesPage" />
+				<include name="teroidNativeReusableComponentsAddJSlibrariesPage" />
+				<include name="teroidLibraryReusableComponentsAddJSlibrariesPage" />
+				<include name="testWindowsMetroReusableComponentsAddJSlibrariesPage" />
+				<include name="testWindowsPhoneReusableComponentsAddJSlibrariesPage" />
+				<include name="testBlackBerryHybridReusableComponentsAddJSlibrariesPage" /> 
+			</methods>
+		</classes>
+	</test>
+</suite> 
+                                           

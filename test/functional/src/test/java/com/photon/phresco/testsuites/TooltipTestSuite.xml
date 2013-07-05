@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<suite name="TooltipVerificationTestSuite" verbose="1">
+	<test name="TooltipVerification" junit="false" preserve-order="true">
+		<parameter name="browser" value="googlechrome" />
+		<parameter name="platform" value="WINDOWS" />
+		<classes>
+			<class name="com.photon.phresco.testcases.ToolTipVerificationTest" />
+			<methods>
+				<include name="testToolTipVerifyforArchetype" />
+				<include name="testToolTipVerifyforModules" />
+				<include name="testToolTipVerifyforJsLibraries" />
+				<include name="testToolTipVerifyforComponent" />
+				<include name="testToolTipVerifyforConfigurationTemplate" />
+				<include name="testToolTipVerifyforPilotProjetcs" />
+				<include name="testToolTipVerifyforDownloads" />
+			</methods>
+		</classes>
+	</test>
+</suite> 
+    
+    
+    

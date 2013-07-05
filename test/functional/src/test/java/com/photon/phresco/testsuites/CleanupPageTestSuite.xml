@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<suite name="CleanupPageTestSuite" verbose="1">
+	<test name="CleanupPageTest" junit="false" preserve-order="true">
+		<parameter name="browser" value="googlechrome" />
+		<parameter name="platform" value="WINDOWS" />
+		<classes>
+			<class name="com.photon.phresco.testcases.CleanUpPageTest" />
+			<methods>
+				<include name="testValidLogin" />
+				<include name="testDeleteCreatedArchetypes" />
+				<include name="testdeleteCustomer" />
+				<include name="testDeleteCreatedApplicationtypes" />
+				<include name="testDeleteCreatedConfigurationTemplates" />
+				<include name="testDeleteCreatedPilotProject" />
+				<include name="testDeleteCreatedDownload" />
+				<include name="testDeleteAdminGlobalUrl" />
+			</methods>
+		</classes>
+	</test>
+</suite> 
+

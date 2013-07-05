@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<suite name="ExternalModuleTestSuite" verbose="1">
+	<test name="ExternalModulesPageTest" junit="false" preserve-order="true">
+		<parameter name="browser" value="googlechrome" />
+		<parameter name="platform" value="WINDOWS" />
+		<classes>
+			<class name="com.photon.phresco.testcases.ExternalModulesUploadPageTest" />
+			<methods>
+				<include name="testValidLogin" />
+				<include name="testPHPReusableComponentsAddExternalModules" />
+				<include name="testWordPressReusableComponentsAddExternalModules" />
+				<include name="testDrupal6ReusableComponentsAddExternalModules" />
+				<include name="testDrupal7ReusableComponentsAddExternalModules" />
+				<include name="testMultiYUIReusableComponentsAddExternalModules" />
+				<include name="testMultiJQueryReusableComponentsAddExternalModules" />
+				<include name=" testYUIMobileReusableComponentsAddExternalModules" />
+				<include name="testJQueryMobileReusableComponentsAddExternalModules" />
+				<include name="testDOTNETReusableComponentsAddExternalModules" />
+				<include name="testSharePointReusableComponentsAddExternalModules" />
+				<include name="testSiteCoreReusableComponentsAddExternalModules" />
+				<include name="testJavaStandaloneReusableComponentsAddExternalModules" />
+				<include name="testJavaWebServiceReusableComponentsAddExternalModules" />
+				<include name="testNodejsReusableComponentsAddExternalModules" />
+				<include name="testiPhoneHybridReusableComponentsAddExternalModules" />
+				<include name="testiphoneNativeReusableComponentsAddExternalModules" />
+				<include name="testiPhoneLibraryReusableComponentsAddExternalModules" />
+				<include name="testAndroidNativeReusableComponentsAddExternalModules" />
+				<include name="testAndroidLibraryReusableComponentsAddExternalModules" />
+				<include name="testWindowsMetroReusableComponentsAddExternalModules" />
+				<include name="testWindowsPhoneReusableComponentsAddExternalModules" />
+				<include name="testBlackBerryHybridReusableComponentsAddExternalModules" />
+			</methods>
+		</classes>
+	</test>
+</suite>

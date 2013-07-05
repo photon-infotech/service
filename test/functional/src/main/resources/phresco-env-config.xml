@@ -1,0 +1,22 @@
+<environment>
+           <Browser/>
+		   
+ 
+
+<Resolution/>
+
+<Server desc="server configuration for adminUI" name="Server configuration">
+        <context>service</context>
+        <admin_username/>
+        <deploy_dir>C:/wamp/www/</deploy_dir>
+        <additional_context/>
+        <port>3030</port>
+        <admin_password/>
+        <version>2.1e</version>
+        <type>Wamp</type>
+        <remoteDeployment>false</remoteDeployment>
+        <host>172.16.27.105</host>
+        <protocol>http</protocol>
+    </Server>
+</environment>
+

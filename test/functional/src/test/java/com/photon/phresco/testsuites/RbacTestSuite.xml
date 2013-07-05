@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<suite name="RBACTestSuite" verbose="1">
+	<test name="RBACTest" junit="false" preserve-order="true">
+		<parameter name="browser" value="googlechrome" />
+		<parameter name="platform" value="WINDOWS" />
+		<classes>
+			<class name="com.photon.phresco.testcases.RbacPageTest" />
+			<methods>
+				<include name="testValidLogin" />
+			 	<include name="testRBACMechanism" />
+				<include name="testServiceAdmin" />
+				<include name="testRBACAssignPermissionMultiple" />  
+				<include name="testRBACAssignPermissionSingle" />
+				<include name="testDeleteAssignPermissionSingle" />
+			 	<include name="testDeleteAssignPermissionMultiple" />  
+				<include name="testServiceAdminVerification" /> 
+				<include name="testProjectAdminVerification" />
+				 <include name="testViewServiceVerification" />
+				<include name="testModuleAdminVerification" />   
+			</methods>
+		</classes>
+	</test>
+</suite> 
+

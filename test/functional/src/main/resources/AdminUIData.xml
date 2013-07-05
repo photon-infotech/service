@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<environment>
+<phresco>
+    
+   <invalidLoginUsername>anbarasu</invalidLoginUsername>
+ <invalidLoginPassword>jjjj</invalidLoginPassword>
+ 
+ <emptyErrorMsgLogin>Username or password is empty</emptyErrorMsgLogin>
+ 
+ 
+ <customerDropdownvalue>Photon</customerDropdownvalue>
+
+ 
+ /*********Pilot Projects different technology values****/
+ <addPilotProjectsTechnologyPHP>//label[contains(text(),'PHP')]</addPilotProjectsTechnologyPHP>
+ <addPilotProjectsTechnologyDrupal6>//label[contains(text(),'Drupal6')]</addPilotProjectsTechnologyDrupal6>
+ <addPilotProjectsTechnologyDrupal7>//label[contains(text(),'Drupal7')]</addPilotProjectsTechnologyDrupal7>
+ <addPilotProjectsTechnologyWordPress>//label[contains(text(),'WordPress')]</addPilotProjectsTechnologyWordPress>
+ <addPilotProjectsTechnologyMultiYUI>//label[contains(text(),'HTML5 Multichannel YUI Widget')]</addPilotProjectsTechnologyMultiYUI>
+ <addPilotProjectsTechnologyMultiJQuery>//label[contains(text(),'HTML5 Multichannel JQuery Widget')]</addPilotProjectsTechnologyMultiJQuery>
+ <addPilotProjectsTechnologyYUIMobile>//label[contains(text(),'HTML5 YUI Mobile Widget')]</addPilotProjectsTechnologyYUIMobile>
+ <addPilotProjectsTechnologyJQueryMobile>//label[contains(text(),'HTML5 JQuery Mobile Widget')]</addPilotProjectsTechnologyJQueryMobile>
+ <addPilotProjectsTechnologyDotNet>//label[contains(text(),'ASP.NET')]</addPilotProjectsTechnologyDotNet>
+ <addPilotProjectsTechnologySharePoint>//label[contains(text(),'Sharepoint')]</addPilotProjectsTechnologySharePoint>
+ <addPilotProjectsTechnologySiteCore>//label[contains(text(),'Sitecore')]</addPilotProjectsTechnologySiteCore>
+ <addPilotProjectsTechnologyNodejs>//label[contains(text(),'Node JS')]</addPilotProjectsTechnologyNodejs>
+ <addPilotProjectsTechnologyJavaStandalone>//label[contains(text(),'Java Standalone')]</addPilotProjectsTechnologyJavaStandalone>
+ <addPilotProjectsTechnologyJavaWebService>//label[contains(text(),'Java WebService')]</addPilotProjectsTechnologyJavaWebService>
+ <addPilotProjectsTechnologyiPhoneHybrid>//label[contains(text(),'iPhone Hybrid')]</addPilotProjectsTechnologyiPhoneHybrid>
+ <addPilotProjectsTechnologyiPhoneNative>//label[contains(text(),'iPhone Native')]</addPilotProjectsTechnologyiPhoneNative>
+ <addPilotProjectsTechnologyiPhoneLibrary>//label[contains(text(),'Iphone Library')]</addPilotProjectsTechnologyiPhoneLibrary>
+ <addPilotProjectsTechnologyiPhoneWorkSpace>//label[contains(text(),'Iphone Workspace')]</addPilotProjectsTechnologyiPhoneWorkSpace>
+ <addPilotProjectsTechnologyAndroidHybrid>//label[contains(text(),'Android Hybrid')]</addPilotProjectsTechnologyAndroidHybrid>
+ <addPilotProjectsTechnologyAndroidNative>//label[contains(text(),'Android Native')]</addPilotProjectsTechnologyAndroidNative>
+ <addPilotProjectsTechnologyAndroidlibrary>//label[contains(text(),'Android library')]</addPilotProjectsTechnologyAndroidlibrary>
+ <addPilotProjectsTechnologyWindowsMetro>//label[contains(text(),'Windows Metro')]</addPilotProjectsTechnologyWindowsMetro>
+ <addPilotProjectsTechnologyWindowsPhone>//label[contains(text(),'Windows Phone')]</addPilotProjectsTechnologyWindowsPhone>
+ <addPilotProjectsTechnologyBlackberryHybrid>//label[contains(text(),'Blackberry Hybrid')]</addPilotProjectsTechnologyBlackberryHybrid>
+
+ 
+ /**********TECH GROUP**********/
+ <addTechGroupDotNet>Dot Net</addTechGroupDotNet>
+ <addTechGroupJava>Java</addTechGroupJava>
+ <addTechGroupiPhone>Iphone</addTechGroupiPhone>
+ <addTechGroupAndroid>Android</addTechGroupAndroid>
+ <addTechGroupWindows>Windows</addTechGroupWindows>
+ <addTechGroupBlackBerry>Black Berry</addTechGroupBlackBerry>
+ <SuccessTextMsg>successfully</SuccessTextMsg>
+ 
+ ******Invalid error message******
+  <ErrorTextMsg>Choose only js, zip or war file </ErrorTextMsg>
+  
+  ******Sample name for adding reusable component for created archetype********
+  <samplearchetypenameforRC>Sample</samplearchetypenameforRC>
+  <jstechnologyversion>Version1</jstechnologyversion>
+
+ /**********PHP*********/
+<addModulePhpNameValue>sample Module</addModulePhpNameValue>
+<addModulePhpDescriptionValue>This is Module</addModulePhpDescriptionValue>
+<addModulePhpHelpTextValue>This is the Help text for Module</addModulePhpHelpTextValue>
+
+<addModulePhpModuleTypeValue>Custom Module</addModulePhpModuleTypeValue>
+<addModulePhpExternalModuleTypeValue>External Module</addModulePhpExternalModuleTypeValue>
+<addModulePhpLicenseTypeValue>HPND</addModulePhpLicenseTypeValue>
+
+<updateModuleNameValue>UPDATE MODULE</updateModuleNameValue>
+<updateModuleDescriptionValue>UPDATE MODULE</updateModuleDescriptionValue>
+<updateModuleHelpTextValue>UPDATE MODULE</updateModuleHelpTextValue>
+    
+
+
+<emptyAddModuleNameMsg>Name is missing</emptyAddModuleNameMsg>
+<emptyAddModuleLicenseType>Select Licence Type</emptyAddModuleLicenseType>
+<emptyAddModuleUploadFileMsg>File is missing</emptyAddModuleUploadFileMsg>
+
+<invalidCreateModuleUploadFileValue></invalidCreateModuleUploadFileValue>
+
+<invalidCreateModuleUploadFileMsg>Choose only jar or zip file</invalidCreateModuleUploadFileMsg>
+
+
+
+
+
+<emptyAddJSlibrariesNameMsg>Name is missing</emptyAddJSlibrariesNameMsg>
+<emptyAddJSlibrariesUploadFileMsg>File is missing</emptyAddJSlibrariesUploadFileMsg>
+<emptyAddJSlibrariesLicenseType>Select Licence Type</emptyAddJSlibrariesLicenseType>
+
+<invalidAddJSlibrariesUploadFileMsg>Choose only jar or zip file </invalidAddJSlibrariesUploadFileMsg>
+/*Update Components Features Modules Value*/
+<editModuleDescriptionValue>This EDIT  is the Common-net Description</editModuleDescriptionValue>
+
+ /*Create Components Features JSlibraries Value*/
+<addJSlibrariesNameValue>JSlibraries</addJSlibrariesNameValue>
+<addJSlibrariesDescriptionValue>This is the JSlibraries Description</addJSlibrariesDescriptionValue>
+<addJSlibrariesHelpTextValue>This is the Help text for JSlibraries</addJSlibrariesHelpTextValue>
+<addJSlibrariesTechnologyPHP>PHP</addJSlibrariesTechnologyPHP>
+
+
+ /*Update Components Features JSlibraries Value*/
+<updateFeatureJSlibrariesNameValue>DSFDSF</updateFeatureJSlibrariesNameValue>
+<updateFeatureJSlibrariesDescriptionValue>ASDSD</updateFeatureJSlibrariesDescriptionValue>
+<updateFeatureJSlibrariesHelpTextValue>ASDSDSDSDASD</updateFeatureJSlibrariesHelpTextValue>
+ 
+
+ <emptyAddComponentNameMsg>Name is missing</emptyAddComponentNameMsg>
+<emptyAddComponentUploadFileMsg>File is missing</emptyAddComponentUploadFileMsg>
+<emptyAddComponentLicenseType>Select Licence Type</emptyAddComponentLicenseType>
+
+<addComponentNameValue>component</addComponentNameValue>
+<addComponentDescriptionValue>This is the Component Description</addComponentDescriptionValue>
+<addComponentHelpTextValue>This is the Help text</addComponentHelpTextValue>
+<addComponentTechnologyPHP>PHP</addComponentTechnologyPHP>
+<addComponentLicenseType>Entessa</addComponentLicenseType>
+ 
+
+/*Create Components Application Types Value*/
+<createApplicationTypesNameValue>Application types</createApplicationTypesNameValue>
+<createApplicationTypesDescriptionValue>This is application types description</createApplicationTypesDescriptionValue>
+ 
+
+<createEmptyApplicationTypeNameErrorMsg>Name is missing</createEmptyApplicationTypeNameErrorMsg>
+
+/*Update Components Application Types Value*/
+<updateApplicationTypesDescriptionValue>This is the Application types description update</updateApplicationTypesDescriptionValue>
+
+/*Create Admin Customer Value*/
+<iPhoneVideoValue>iPhoneVideo</iPhoneVideoValue>
+<descriptionValue>This is an iPhone project cycle video</descriptionValue>
+<adminGlobalurlMessage>new url added successfully</adminGlobalurlMessage>
+
+
+<createCustomerNameValue>anbarasu</createCustomerNameValue>              
+<createCustomerDescriptionValue>This the anbuselvan</createCustomerDescriptionValue>
+<createCustomerEmailValue>anbarasu</createCustomerEmailValue>
+<createCustomerAddressValue>jjjjjjjjj</createCustomerAddressValue>
+<createCustomerCountryValue>India</createCustomerCountryValue>
+<createCustomerStateValue>TamilNadu</createCustomerStateValue>
+<createCustomerZipcodeValue>4556666</createCustomerZipcodeValue>
+<createCustomerContactNumberValue>9751055807</createCustomerContactNumberValue>
+<createCustomerFaxValue>456977445</createCustomerFaxValue>
+<createCustomerHelpTextValue>44646464</createCustomerHelpTextValue>
+<createCustomerLicenceTypeValue>TYPE_SILVER</createCustomerLicenceTypeValue>
+<createCustomerRepoNameValue>Sample</createCustomerRepoNameValue>
+<createCustomerRepoUrlValue>http://www.github.com</createCustomerRepoUrlValue>
+
+
+<errorCustomerNameMsg>Name is missing</errorCustomerNameMsg>
+<errorCustomerEmailMsg>Email is missing</errorCustomerEmailMsg>
+<errorCustomerAddressMsg>Address is missing</errorCustomerAddressMsg>
+<errorCustomerCountryMsg>Select country</errorCustomerCountryMsg>
+<errorCustomerZipcodeMsg>Zipcode is missing</errorCustomerZipcodeMsg>
+<errorCustomerContactNumberMsg>Contact number is missing</errorCustomerContactNumberMsg>
+<errorCustomerFaxNumberMsg>Fax number is missing</errorCustomerFaxNumberMsg>
+<errorCustomerLicenceTypeMsg>Select licence type</errorCustomerLicenceTypeMsg>
+
+
+<invalidCreateCustomerNameValue>JJJJJJJJJJJJJHVVVVVVVVVVVVVVVVVVV</invalidCreateCustomerNameValue>         
+<invalidCreateCustomerDescriptionValue>klndfkldfdafieeipwipjiieee2451</invalidCreateCustomerDescriptionValue>
+<invalidCreateCustomerEmailValue>dfjkbafikbdfkbddkjspsdpwdsodisodosdsdosds</invalidCreateCustomerEmailValue>
+<invalidCreateCustomerAddressValue>fbudfdfoadiofiodfodfck mmkllkklnzXCC8u</invalidCreateCustomerAddressValue>
+<invalidCreateCustomerCountryValue>India</invalidCreateCustomerCountryValue>
+<invalidCreateCustomerStateValue>799999999999</invalidCreateCustomerStateValue>
+<invalidCreateCustomerZipcodeValue>4666666666666664464</invalidCreateCustomerZipcodeValue>
+<invalidCreateCustomerContactNumberValue>444444444444444444446</invalidCreateCustomerContactNumberValue>
+<invalidCreateCustomerFaxValue>456789999999999999999999</invalidCreateCustomerFaxValue>
+<invalidCreateCustomerHelpTextValue>hgkgkgk</invalidCreateCustomerHelpTextValue>
+<invalidCreateCustomerLicenceTypeValue>TYPE_SILVER</invalidCreateCustomerLicenceTypeValue>
+ 
+<invalidCreateCustomerEmailMsg>Enter Valid Email</invalidCreateCustomerEmailMsg>
+
+
+
+<updateCustomerNameValue>jjjjjjs</updateCustomerNameValue>
+<updateCustomerDescriptionValue>hiiiiiiiiiii</updateCustomerDescriptionValue>
+<updateCustomerEmailValue>assssssssss</updateCustomerEmailValue>
+<updateCustomerAddressValue>asdd</updateCustomerAddressValue>
+<updateCustomerHelpTextValue>JHHHHK</updateCustomerHelpTextValue>
+
+
+
+<createWebLayerArchetypeNameValue>Web Layer</createWebLayerArchetypeNameValue>
+<createWebLayerArchetypeDescriptionValue>Web Layer</createWebLayerArchetypeDescriptionValue>
+<createWebLayerArchetypeTechnologyVersionValue>WebVersion1</createWebLayerArchetypeTechnologyVersionValue>
+<createWebLayerArchetypeVersionCommentValue>version</createWebLayerArchetypeVersionCommentValue>
+<createWebLayerArchetypeApplicationTypeValue>Web Layer</createWebLayerArchetypeApplicationTypeValue>
+
+<createApplicationLayerArchetypeNameValue>Application Layer</createApplicationLayerArchetypeNameValue>
+<createApplicationLayerArchetypeDescriptionValue>Application layer</createApplicationLayerArchetypeDescriptionValue>
+<createApplicationLayerArchetypeTechnologyVersionValue>versionapp1</createApplicationLayerArchetypeTechnologyVersionValue>
+<createApplicationLayerArchetypeVersionCommentValue>vcCmm</createApplicationLayerArchetypeVersionCommentValue>
+<createApplicationLayerArchetypeApplicationTypeValue>Application Layer</createApplicationLayerArchetypeApplicationTypeValue>
+<createApplicationLayerArchetypeGroupTypeValue>PHP</createApplicationLayerArchetypeGroupTypeValue>
+
+<createMobileLayerArchetypeNameValue>Mobile Layer</createMobileLayerArchetypeNameValue>
+<createMobileLayerArchetypeDescriptionValue>Mobile Layer</createMobileLayerArchetypeDescriptionValue>
+<createMobileLayerArchetypeTechnologyVersionValue>version1.0</createMobileLayerArchetypeTechnologyVersionValue>
+<createMobileLayerArchetypeVersionCommentValue>MlComment</createMobileLayerArchetypeVersionCommentValue>
+<createMobileLayerArchetypeApplicationTypeValue>Mobile Layer</createMobileLayerArchetypeApplicationTypeValue>
+
+
+<addConfigurationTempletsName>Configuration Templet</addConfigurationTempletsName>
+<addConfigurationTempletsDescription>Configuration applicable for all Tech</addConfigurationTempletsDescription>
+<addConfigurationTempletsKeyvalue>server</addConfigurationTempletsKeyvalue>
+<addConfigurationTempletNamevalue>Sample</addConfigurationTempletNamevalue>
+<addConfigurationTemplateKeyvalueforNumber>Number</addConfigurationTemplateKeyvalueforNumber>
+<addConfigurationTemplateKeyvalueforPassword>Password</addConfigurationTemplateKeyvalueforPassword>
+<addConfigurationTemplateKeyvalueforFiletype>Filetype</addConfigurationTemplateKeyvalueforFiletype>
+<addConfigurationTemplateKeyvalueforBoolean>Boolean</addConfigurationTemplateKeyvalueforBoolean>
+<addConfigurationTemplateKeyvalueforActions>Actions</addConfigurationTemplateKeyvalueforActions>
+<addConfigSucessMesg>server test ConfigTemplate added</addConfigSucessMesg>
+
+<createEmptyArchetypeNameErrorMsg>Name is missing</createEmptyArchetypeNameErrorMsg>
+<createEmptyArchetypeTechnologyVersionErrorMsg>Technology version is missing</createEmptyArchetypeTechnologyVersionErrorMsg>
+<createEmptyArchetypeJarErrorMsg>Archetype Jar is missing</createEmptyArchetypeJarErrorMsg> 
+<createEmptyArchetypeFeatureErrorMsg>Select atleast one feature</createEmptyArchetypeFeatureErrorMsg> 
+ 
+ 
+<addEmptyPilotProjectNameErrorMsg>Name is missing</addEmptyPilotProjectNameErrorMsg>
+<addEmptyPilotProjectVersionErrorMsg>Version is missing</addEmptyPilotProjectVersionErrorMsg>
+<addEmptyPilotProjectProjectSourceErrorMsg>Project source is missing</addEmptyPilotProjectProjectSourceErrorMsg>
+
+<addPilotProjectNameValue>eshop test</addPilotProjectNameValue>
+<addPilotProjectDescriptionValue>This is Pilot project</addPilotProjectDescriptionValue>
+<addPilotProjectVersionValue>2.5</addPilotProjectVersionValue>
+
+<addPilotProjectPhpTechnologyValue>PHP</addPilotProjectPhpTechnologyValue>
+
+<addPilotProjectGroupidValue>id 1</addPilotProjectGroupidValue>
+<addPilotProjectArtifactidValue>artf444</addPilotProjectArtifactidValue>
+<addPilotProjectVersionProjectValue>2.0</addPilotProjectVersionProjectValue>
+
+<updatePilotProjectNameValue>PilotProject</updatePilotProjectNameValue>
+<updatePilotProjectDescriptionValue>PilotProject Updation</updatePilotProjectDescriptionValue>
+    
+ 
+<addEmptyDownloadNameErrorMsg></addEmptyDownloadNameErrorMsg>
+<addEmptyDownloadTechnologyErrorMsg>Select atleast one</addEmptyDownloadTechnologyErrorMsg>
+<addEmptyDownloadLicenseTypeErrorMsg>Select Licence Type</addEmptyDownloadLicenseTypeErrorMsg>
+<addEmptyDownloadApplicationTypeErrorMsg>Select atleast one application</addEmptyDownloadApplicationTypeErrorMsg>
+<addEmptyDownloadVersionErrorMsg>Version is missing</addEmptyDownloadVersionErrorMsg>
+<addEmptyDownloadGroupErrorMsg></addEmptyDownloadGroupErrorMsg>
+
+<addDownloadNameValue>Download</addDownloadNameValue>
+<addDownloadDescriptionValue>Download for all technologies</addDownloadDescriptionValue>
+<addDownloadLicenseTypeValue>Zlib</addDownloadLicenseTypeValue>
+<addDownloadVersionValue>version</addDownloadVersionValue>
+<addDownloadGroupValue>Server</addDownloadGroupValue>
+
+
+<updateDownloadNameValue>Download</updateDownloadNameValue>
+<updateDownloadDescriptionValue>Download update</updateDownloadDescriptionValue>
+
+<updateDownloadGroupIdValue>GroupId</updateDownloadGroupIdValue>
+<updateDownloadArtifactIdValue>ArtifactId</updateDownloadArtifactIdValue>
+
+<adminGlobalurlNameValue>Sample</adminGlobalurlNameValue>
+<adminGlobalurlDescriptionValue>GlobalUrl</adminGlobalurlDescriptionValue>
+<adminGlobalurlUrlValue>https://www.google.com</adminGlobalurlUrlValue>
+
+<!-- RBAC VALUE -->
+
+<NameValueRbac>Service</NameValueRbac>
+<DecriptionValue>Sample Creation</DecriptionValue>
+<NameValueSingle>AdminSerive</NameValueSingle>
+<RoleValueSingle>Manage Pilot Projects</RoleValueSingle>
+
+
+
+ </phresco>
+</environment>

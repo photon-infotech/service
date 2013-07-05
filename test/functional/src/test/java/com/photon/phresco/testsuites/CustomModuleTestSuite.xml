@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<suite name="CustomModuleTestSuite" verbose="1">
+
+	<test name="CustomModuleTest" junit="false" preserve-order="true">
+		<parameter name="browser" value="googlechrome" />
+		<parameter name="platform" value="WINDOWS" />
+		<classes>
+			<class name="com.photon.phresco.testcases.CustomModulesUploadPageTest" />
+			<methods>
+				<include name="testValidLogin" />
+				<include name="testPHPReusableComponentsAddModulesPage" />
+				<include name="testWordPressReusableComponentsAddModulesPage" />
+				<include name="testDrupal6ReusableComponentsAddModulesPage" />
+				<include name="testDrupal7ReusableComponentsAddModulesPage" />
+				<include name="testMultiYUIReusableComponentsAddModulesPage" />
+				<include name="testMultiJQueryReusableComponentsAddModulesPage" />
+				<include name="testYUIMobileReusableComponentsAddModulesPage" />
+				<include name="testJQueryMobileReusableComponentsAddModulesPage" />
+				<include name="testDOTNETReusableComponentsAddModulesPage" />
+				<include name="testSharePointReusableComponentsAddModulesPage" />
+				<include name="testSiteCoreReusableComponentsAddModulesPage" />
+				<include name="testJavaaloneReusableComponentsAddModulesPage" />
+				<include name="testJavaWebServiceReusableComponentsAddModulesPage" />
+				<include name="testNodejsReusableComponentsAddModulesPage" />
+				<include name="testiPhoneHybridReusableComponentsAddModulesPage" />
+				<include name="testiphoneNativeReusableComponentsAddModulesPage" />
+				<include name="testiPhoneLibraryReusableComponentsAddModulesPage" />
+				<include name="teroidNativeReusableComponentsAddModulesPage" />
+				<include name="teroidLibraryReusableComponentsAddModulesPage" />
+				<include name="testWindowsMetroReusableComponentsAddModulesPage" />
+				<include name="testWindowsPhoneReusableComponentsAddModulesPage" />
+				<include name="testBlackBerryHybridReusableComponentsAddModulesPage" />
+			</methods>
+		</classes>
+	</test>
+</suite>

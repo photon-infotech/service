@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<suite name="AdminuiCustomerTestSuite" verbose="1">
+	<test name="CustomerTest" junit="false" preserve-order="true">
+		<parameter name="browser" value="googlechrome" />
+		<parameter name="platform" value="WINDOWS" />
+		<classes>
+			<class name="com.photon.phresco.testcases.AdminCustomersPageTest" />
+			<methods>
+				<include name="testValidLogin" />
+				<include name="testcreateValidCustomer" />
+			</methods>
+		</classes>
+	</test>
+</suite> 
+

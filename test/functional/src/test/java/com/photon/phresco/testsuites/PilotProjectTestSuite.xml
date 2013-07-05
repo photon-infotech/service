@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<suite name="PilotProjectsTestSuite" verbose="1">
+	<test name="PilotProjectsPage" junit="false" preserve-order="true">
+		<parameter name="browser" value="googlechrome" />
+		<parameter name="platform" value="WINDOWS" />
+		<classes>
+			<class name="com.photon.phresco.testcases.PilotProjectPageTest" />
+			<methods>
+				<include name="testValidLogin" />
+				<include name="testAndroidHybridComponentsAddValidPilotProjectsPage" />
+				<include name="testAndroidLibraryComponentsAddValidPilotProjectsPage" />
+				<include name="testAndroidNativeComponentsAddValidPilotProjectsPage" />
+				<include name="testDOTNETComponentsAddValidPilotProjectsPage" />
+				<include name="testBlackBerryHybridComponentsAddValidPilotProjectsPage" />
+				<include name="testDrupal6ComponentsAddValidPilotProjectsPage" />
+				<include name="testDrupal7ComponentsAddValidPilotProjectsPage" />
+				<include name="testJQueryMobileComponentsAddValidPilotProjectsPage" />
+				<include name="testMultiJQueryComponentsAddValidPilotProjectsPage" />
+				<include name="testMultiYUIComponentsAddValidPilotProjectsPage" />
+				<include name="testYUIMobileComponentsAddValidPilotProjectsPage" />
+				<include name="testiPhoneHybridComponentsAddValidPilotProjectsPage" />
+				<include name="testiPhoneLibraryComponentsAddValidPilotProjectsPage" />
+				<include name="testiphoneNativeComponentsAddValidPilotProjectsPage" />
+				<include name="testJavaStandaloneComponentsAddValidPilotProjectsPage" />
+				<include name="testJavaWebServiceComponentsAddValidPilotProjectsPage" />
+				<include name="testNodejsComponentsAddValidPilotProjectsPage" />
+				<include name="testPHPComponentsAddValidPilotProjectsPage" />
+				<include name="testSharepointComponentsAddValidPilotProjectsPage" />
+				<include name="testSiteCoreComponentsAddValidPilotProjectsPage" />
+				<include name="testWindowsMetroComponentsAddValidPilotProjectsPage" />
+				<include name="testWindowsPhoneComponentsAddValidPilotProjectsPage" />
+				<include name="testWordPressComponentsAddValidPilotProjectsPage" />
+			</methods>
+		</classes>
+	</test>
+</suite>

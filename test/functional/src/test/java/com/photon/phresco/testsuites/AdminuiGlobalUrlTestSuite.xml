@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<suite name="ArchetypesTestSuite" verbose="1">
+
+	<test name="ArchetypeUpload" parallel="tests" junit="false"
+		preserve-order="true">
+		<parameter name="browser" value="googlechrome" />
+		<parameter name="platform" value="WINDOWS" />
+		<classes>
+			<class name="com.photon.phresco.testcases.AdminGlobalurlPageTest" />
+			<methods>
+				<include name="testValidLogin" />
+				<include name="testPHPCreateApplicationLayerArchetypesPage" />
+				<include name="testDrupal6CreateApplicationLayerArchetypesPage" />
+				<include name="testDrupal7CreateApplicationLayerArchetypesPage" />
+				<include name="testWordPressCreateApplicationLayerArchetypesPage" />
+				<include name="testMultiYUICreateWebLayerArchetypesPage" />
+				<include name="testMultiJQueryCreateWebLayerArchetypesPage" />
+				<include name="testYUIMobileCreateWebLayerArchetypesPage" />
+				<include name="testJQueryMobileCreateWebLayerArchetypesPage" />
+				<include name="testDOTNETCreateApplicationLayerArchetypesPage" />
+				<include name="testSharePointCreateApplicationLayerArchetypesPage" />
+				<include name="testSiteCoreCreateApplicationLayerArchetypesPage" />
+				<include name="testJavaaloneCreateApplicationLayerArchetypesPage" />
+				<include name="testJavaWebServiceCreateApplicationLayerArchetypesPage" />
+				<include name="testNodejsCreateApplicationLayerArchetypesPage" />
+				<include name="testiPhoneHybridCreateMobileLayerArchetypes" />
+				<include name="testiphoneNativeCreateMobileLayerArchetypes" />
+				<include name="testiPhoneLibraryCreateMobileLayerArchetypes" />
+				<include name="testiPhoneWorkSpaceCreateMobileLayerArchetypes" />
+				<include name="testAndroidHybridCreateMobileLayerArchetypes" />
+				<include name="testAndroidNativeCreateMobileLayerArchetypes" />
+				<include name="testAndroidLibraryCreateMobileLayerArchetypes" />
+				<include name="testWindowsMetroCreateMobileLayerArchetypes" />
+				<include name="testWindowsPhoneCreateMobileLayerArchetypes" />
+				<include name="testBlackBerryHybridCreateMobileLayerArchetypes" />
+
+			</methods>
+		</classes>
+	</test>
+</suite>
+

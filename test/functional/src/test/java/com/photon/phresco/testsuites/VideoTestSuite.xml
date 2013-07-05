@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<suite name="VideoPageTestSuite" verbose="1">
+	<test name="VideoPageTest" junit="false" preserve-order="true">
+		<parameter name="browser" value="googlechrome" />
+		<parameter name="platform" value="WINDOWS" />
+		<classes>
+			<class name="com.photon.phresco.testcases.VideoPageTest" />
+			<methods>
+				<include name="testValidLogin" />
+		 		<include name="testAddingNewVideose" />
+				<include name="testCancelNewVideos" /> 
+				<include name="testDeleteAddedVideos" />
+			</methods>
+		</classes>
+	</test>
+</suite> 
+    
+    

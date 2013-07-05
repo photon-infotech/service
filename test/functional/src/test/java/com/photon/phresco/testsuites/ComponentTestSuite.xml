@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<suite name="ComponentsUploadTestSuite" verbose="1">
+
+	<test name="ComponentsUploadTest" junit="false" preserve-order="true">
+		<parameter name="browser" value="googlechrome" />
+		<parameter name="platform" value="WINDOWS" />
+		<classes>
+			<class name="com.photon.phresco.testcases.ComponentsUploadPageTest" />
+			<methods>
+				<include name="testValidLogin" />
+				<include name="testAndroidHybridReusableComponentsAddvalidComponentPage" />
+				<include name="testAndroidLibraryReusableComponentsAddvalidComponentPage" />
+				<include name="testAndroidNativeReusableComponentsAddvalidComponentPage" />
+				<include name="testDOTNETReusableComponentsAddvalidComponentPage" />
+				<include name="testBlackBerryHybridReusableComponentsAddvalidComponentPage" />
+				<include name="testDrupal6ReusableComponentsAddvalidComponentPage" />
+				<include name="testDrupal7ReusableComponentsAddvalidComponentPage" />
+				<include name="testJQueryMobileReusableComponentsAddvalidComponentPage" />
+				<include name="testMultiJQueryReusableComponentsAddvalidComponentPage" />
+				<include name="testMultiYUIReusableComponentsAddvalidComponentPage" />
+				<include name="testYUIMobileReusableComponentsAddvalidComponentPage" />
+				<include name="testiPhoneHybridReusableComponentsAddvalidComponentPage" />
+				<include name="testiPhoneLibraryReusableComponentsAddvalidComponentPage" />
+				<include name="testiphoneNativeReusableComponentsAddvalidComponentPage" />
+				<include name="testJavaStandaloneReusableComponentsAddvalidComponentPage" />
+				<include name="testJavaWebServiceReusableComponentsAddvalidComponentPage" />
+				<include name="testNodejsReusableComponentsAddvalidComponentPage" />
+				<include name="testPHPReusableComponentsAddvalidComponentPage" />
+				<include name="testSharePointReusableComponentsAddvalidComponentPage" />
+				<include name="testSiteCoreReusableComponentsAddvalidComponentPage" />
+				<include name="testWindowsMetroReusableComponentsAddvalidComponentPage" />
+				<include name="testWindowsPhoneReusableComponentsAddvalidComponentPage" />
+				<include name="testWordPressReusableComponentsAddvalidComponentPage" />
+			</methods>
+		</classes>
+	</test>
+</suite>

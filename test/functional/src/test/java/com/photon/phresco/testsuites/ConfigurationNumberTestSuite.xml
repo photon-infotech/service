@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<suite name="ConfigurationNumberTestSuite" verbose="1">
+
+	<test name="ConfigurationNumberTestSuite" junit="false"
+		preserve-order="true">
+		<parameter name="browser" value="googlechrome" />
+		<parameter name="platform" value="WINDOWS" />
+		<classes>
+			<class name="com.photon.phresco.testcases.ConfigurationNumberPageTest" />
+			<methods>
+				<include name="testValidLogin" />
+				<include name="testAndroidHybridCompAddConfigTemplateNumber" />
+			</methods>
+		</classes>
+	</test>
+</suite>
+
+

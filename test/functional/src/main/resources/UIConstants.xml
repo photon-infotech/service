@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<environment>
+<phresco>
+/*.....................LOGIN PAGE XPATH.....................*/
+<usernameXpath>//input[@id='xlInput']</usernameXpath>
+<passwordXpath>//div[2]/div[2]/input</passwordXpath>
+<loginButtonXpath>//input[@id='Login']</loginButtonXpath>
+
+ /*...............DASHBOARD PAGE XPATH.....................*/
+<dashboardLinkXpath>//a[@id='dashboard']/label</dashboardLinkXpath>   
+<mostUsedArchetypesXpath>//img[@id='replaceimg1']</mostUsedArchetypesXpath>
+<mostusedFeatureXpath>//img[@id='replaceimg2']</mostusedFeatureXpath>
+<mostusedPilotProjectsXpath>//img[@id='replaceimg3']</mostusedPilotProjectsXpath>
+
+/*.................COMPONENTS LINK XPATH...................*/
+<componentsLinkXpath>//li[2]/a/label</componentsLinkXpath>
+<customerDropdown>//div[@id='customerSelect']/div/a/label</customerDropdown>
+<customerDropdownValue>//label[contains(text(),'Photon')]</customerDropdownValue>
+
+/*.................COMPONENTS REASUABLE COMPONENTS TAB XPATH...................*/
+<componentsReasuableComponentsXpath>//label[contains(text(),'Reusable Components')]</componentsReasuableComponentsXpath>
+
+/*.................REASUABLE COMPONENTS  MODULE TAB XPATH...................*/
+<ReasuableComponentsModulesTabXpath>//div[@id='subTabcontent']/nav/div/ul/li/a</ReasuableComponentsModulesTabXpath>
+
+/*......REUSABLE COMPONENTS FOR NEWLY CREATED ARCHETYPE.............*/
+
+<rccreatedsamplemobilelayer>//select[@id='tech_id']</rccreatedsamplemobilelayer>
+<rcselectmobiletechnology>//div[@id='applicableToDiv']/div/div/div/div/ul/li[19]/input</rcselectmobiletechnology>
+<jstechnologyversion>//input[@name='version']</jstechnologyversion>
+
+
+/*...................REASUABLE COMPONENTS MODULE CREATE TAB XPATH........................*/
+<modulesAddButtonXpath>//input[@name='features_add']</modulesAddButtonXpath>
+<modulesNameXpath>//input[@id='featureName']</modulesNameXpath>
+<modulesDescriptionXpath>//textarea[@id='featureDesc']</modulesDescriptionXpath>
+<modulesHelpTextXpath>//textarea[@id='hlptext']</modulesHelpTextXpath>
+<modulesTechnologyXpath>//div[4]/div/select</modulesTechnologyXpath>
+<modulesModuleTypeXpath>//div[@id='moduleSelection']/div/select</modulesModuleTypeXpath>
+<modulesExternalModuleTypeXpath>//div[@id='moduleSelection']/div/select</modulesExternalModuleTypeXpath>
+<moduleDefaultmodule>//div[7]/div/input</moduleDefaultmodule>
+<moduleLicenseTypeXpath>//select[@name='license']</moduleLicenseTypeXpath>
+<modulesUploadFileXpath>//div[2]/input</modulesUploadFileXpath>
+<modulesSelectDependencyXpath>//input[@value='Select Dependency']</modulesSelectDependencyXpath>
+<modulesDependencyLoginCheckboxXpath>//span[5]/span/input</modulesDependencyLoginCheckboxXpath>
+<modulesDependencyOKButtonXpath>//a[@id='saveDependency']/label</modulesDependencyOKButtonXpath>
+<moduleSaveButtonXpath>//form/div[2]/input</moduleSaveButtonXpath>
+<moduleCancelButtonXpath>//input[@value='Cancel']</moduleCancelButtonXpath>
+<moduleCreationSuccessMsg>//div[@id='successmsg']/ul/li/span</moduleCreationSuccessMsg>
+                      
+<updateModulesCheckBoxXpath>//input[@id='f4b324fe-8dfc-4748-a3d2-2d2bcd87608echeckBox']</updateModulesCheckBoxXpath>
+<updateModulesLinkXpath>//div[@id='feature_list']/div/div[2]/section/div/div/div/div/div/section/div[128]/div/section/table/tbody/tr/td[2]/a</updateModulesLinkXpath>
+<updateModuleUpdateButtonXpath>//input[@id='featuresUpdate']</updateModuleUpdateButtonXpath>
+
+<deleteModuleCheckBoxXpath>//input[@id='c0fad1b8-d955-4d0f-b2a9-d3d31bb2de99checkBox']</deleteModuleCheckBoxXpath>
+<deleteModuleDeleteButtonXpath>//input[@id='del']</deleteModuleDeleteButtonXpath>
+<deleteModuleDialogBoxOkButtonXpath>//input[@id='ok']</deleteModuleDialogBoxOkButtonXpath>
+
+<ReasuableComponentsJSlibrariesTabXpath>//a [contains(text(),'JS libraries')]</ReasuableComponentsJSlibrariesTabXpath>
+<JSlibrariesButtonXpath>//a[contains(text(),'JS libraries')]</JSlibrariesButtonXpath>>
+<JSlibrariesAddButtonXpath>//input[@name='features_add']</JSlibrariesAddButtonXpath>
+<JSlibrariesNameXpath>//input[@id='featureName']</JSlibrariesNameXpath>
+<JSlibrariesDescriptionXpath>//textarea[@id='featureDesc']</JSlibrariesDescriptionXpath>
+<JSlibrariesHelpTextXpath>//textarea[@id='hlptext']</JSlibrariesHelpTextXpath>
+<JSlibrariesTechnologyXpath>//select[@name='technology']</JSlibrariesTechnologyXpath>
+<JSlibrariesLicenseTypeXpath>//select[@name='license']</JSlibrariesLicenseTypeXpath>
+ <addJSlibrariesLicenseType>//div[@id='licenseControl']/div/select/option[53]</addJSlibrariesLicenseType>
+<JSlibrariesSelectDependencyXpath>//form[@id='formFeatureAdd']/div/div/div/div/div/div[9]/div/input</JSlibrariesSelectDependencyXpath>
+<dependencyPhonegapCheckboxButtonXpath>//form[@id='formDependency']/div/div[2]/div/section/div/div/div/div/div/section/span[6]/span/input</dependencyPhonegapCheckboxButtonXpath>
+<JSlibrariesDependencyOKButtonXpath>//label[@id='lbl_btn_ok']</JSlibrariesDependencyOKButtonXpath>
+
+<JSlibrarieSaveButtonXpath>//input[@id='featuresUpdate']</JSlibrarieSaveButtonXpath>
+<JSlibrariesCancelButtonXpath>//input[@value='Cancel']</JSlibrariesCancelButtonXpath>
+
+<updateJSlibrariesLinkXpath>//div[@id='feature_list']/div/div[2]/section/div/div/div/div/div/section/span[9]/span</updateJSlibrariesLinkXpath>
+<updateJSlibrariesOptionButtonXpath>//div[@id='feature_list']/div/div[2]/section/div/div/div/div/div/section/div[9]/div/section/table/tbody/tr/td[2]/a</updateJSlibrariesOptionButtonXpath>
+<JSlibrariesUpdateButtonXpath>//input[@value='Cancel']</JSlibrariesUpdateButtonXpath>
+
+<ReasuableComponentsComponentTabXpath>//a [contains(text(),'Component')]</ReasuableComponentsComponentTabXpath>
+<ComponentAddButtonXpath>//input[@name='features_add']</ComponentAddButtonXpath>
+<ComponentNameXpath>//input[@id='featureName']</ComponentNameXpath>
+<ComponentDescriptionXpath>//textarea[@id='featureDesc']</ComponentDescriptionXpath>
+<ComponentHelpTextXpath>//textarea[@id='hlptext']</ComponentHelpTextXpath>
+<ComponentTechnologyXpath>//select[@name='technology']</ComponentTechnologyXpath>
+<ComponentLicenseTypeXpath>//select[@name='license']</ComponentLicenseTypeXpath>
+<ComponentSelectDependencyXpath>//input[@value='Select Dependency']</ComponentSelectDependencyXpath>
+<dependencyPhonegapCheckboxButtonXpath>//form[@id='formDependency']/div/div[2]/div/section/div/div/div/div/div/section/span[6]/span/input</dependencyPhonegapCheckboxButtonXpath>
+<ComponentDependencyOKButtonXpath>//div[@id='popupPage']/div[3]/input[2]</ComponentDependencyOKButtonXpath>
+
+<ComponentSaveButtonXpath>//input[@id='featuresUpdate']</ComponentSaveButtonXpath>
+<ComponentCancelButtonXpath>//input[@value='Cancel']</ComponentCancelButtonXpath>
+
+<applicationTypesTabXpath>//li[4]/a/label</applicationTypesTabXpath>
+<applicationTypesCreateButtonXpath>//input</applicationTypesCreateButtonXpath>
+<applicationTypeNameXpath>//input</applicationTypeNameXpath>
+<applicationTypeDescriptionXpath>//textarea</applicationTypeDescriptionXpath>
+<applicationTypeSaveButtonXpath>//div[2]/input</applicationTypeSaveButtonXpath>>
+<applicationTypeCancelButtonXpath>//form[@id='formAppTypeAdd']/div[2]/input[2]</applicationTypeCancelButtonXpath>
+   
+<updateApplicationTypesLinkXpath></updateApplicationTypesLinkXpath>
+<updateApplicationTypesDescriptionXpath></updateApplicationTypesDescriptionXpath>
+<updateDescriptionUpdateButtonXpath></updateDescriptionUpdateButtonXpath>
+
+ /*...............VIDEO PAGE PAGE XPATH.....................*/
+<videoLinkXpath>//a[@id='videoList']/label</videoLinkXpath>
+<videosAddXpath>id=videoAdd</videosAddXpath>
+<videoName>//div[@id='nameControl']/div/input</videoName>
+<videoDescription>//textarea[@id='description']</videoDescription>
+<videoSavebutton>//form[@id='formDownloadAdd']/div[2]/input</videoSavebutton>
+<videocancelbutton>//input[@value='cancel']</videocancelbutton>
+
+
+
+
+<adminLinkXpath>//a[@id='adminMenu']/label</adminLinkXpath>
+<adminCustomerTabXpath>//a[@id='customerList']/label</adminCustomerTabXpath>
+
+<customerCreateButtonXpath>//div[@id='operation']/input</customerCreateButtonXpath>
+<customerNameXpath>//div[@id='nameControl']/div/input</customerNameXpath>
+<customerDescriptionXpath>//textarea[@id='textarea']</customerDescriptionXpath>
+<customerEmailXpath>//div[@id='mailControl']/div/div/input</customerEmailXpath>
+<customerAddressXpath>//div[@id='addresControl']/div/textarea</customerAddressXpath>
+<customerCountryXpath>//div[@id='conControl']/div/select</customerCountryXpath>
+<customerStateXpath>//input[@id='statefld']</customerStateXpath>
+<customerZipcodeXpath>//input[@id='zipcodefld']</customerZipcodeXpath>
+<customerContactNumberXpath>//input[@id='contactNo']</customerContactNumberXpath>
+<customerFaxXpath>//input[@id='faxfld']</customerFaxXpath>
+<customerHelpTextXpath>//textarea[@id='hlptext']</customerHelpTextXpath>
+<customerLicenceTypeXpath>//select[@id='licenseType']</customerLicenceTypeXpath>
+<customerCalenderValidFromXpath>//form[@id='formCustomerAdd']/div/div/div/div/div/div[12]/div/img</customerCalenderValidFromXpath>
+<customerCalenderValidFromBackArrowXpath>//div[@id='ui-datepicker-div']/div/a[2]/span</customerCalenderValidFromBackArrowXpath>
+<customerCalenderValidFromDateXpath>//div[@id='ui-datepicker-div']/table/tbody/tr[3]/td[5]/a</customerCalenderValidFromDateXpath>
+<customerCalenderValidUptoXpath>//form[@id='formCustomerAdd']/div/div/div/div/div/div[13]/div/img</customerCalenderValidUptoXpath>
+<customerCalenderValidUptoBackArrowXpath>//div[@id='ui-datepicker-div']/div/a[2]/span</customerCalenderValidUptoBackArrowXpath>
+<customerCalenderValidUptoDateXpath>//div[@id='ui-datepicker-div']/table/tbody/tr[2]/td[6]/a</customerCalenderValidUptoDateXpath>
+<customerReponameXpath>//input[@id='reponame']</customerReponameXpath>
+<customerRepoUrl>//input[@id='repourl']</customerRepoUrl>
+<customerAppliestoCheckboxXpath>//input[@id='checkAllAuto']</customerAppliestoCheckboxXpath>
+
+<customerSaveButtonXpath>//form[@id='formCustomerAdd']/div/div/div/div/div/div[20]/input</customerSaveButtonXpath>
+<customerCancelButtonXpath>//input[@id='customerCancel']</customerCancelButtonXpath>
+
+
+<updateCustomerLinkXpath>//form[@id='formCustomerList']/div[2]/div/div[2]/div/div/div/div/table/tbody/tr/td[2]/a</updateCustomerLinkXpath>
+<updateCustomerUpdateButtonXpath>//form[@id='formCustomerAdd']/div[2]/input</updateCustomerUpdateButtonXpath>
+
+-----AdminGlobalUrl----------
+<adminGlobalurlTabXpath>//label[@id='lbl_hdr_adm_glblurl']</adminGlobalurlTabXpath>
+<adminGlobalurlAddXpath>//input[@id='globalurlAdd']</adminGlobalurlAddXpath>
+<adminGlobalurlNameXpath>//input</adminGlobalurlNameXpath>
+<adminGlobalurlDescriptionXpath>//form[@id='formGlobalUrlAdd']/div/div/div/div/div/div[2]/div/textarea</adminGlobalurlDescriptionXpath>
+<adminGlobalurlUrlXpath>//div[@id='urlControl']/div/input</adminGlobalurlUrlXpath>
+<adminGlobalurlSavebuttonXpath>//form[@id='formGlobalUrlAdd']/div[2]/input</adminGlobalurlSavebuttonXpath>
+<adminGlobalurlCancelbuttonXpath>//input[@id='globalurlCancel']</adminGlobalurlCancelbuttonXpath>
+
+
+
+
+
+
+
+<deleteJSlibrariesXpath></deleteJSlibrariesXpath>
+
+<archetypeTabXpath>//label[contains(text(),'ArcheTypes')]</archetypeTabXpath>
+<archetypeCreateButtonXpath>//input[@id='archetypeAdd']</archetypeCreateButtonXpath>
+<archetypeNameXpath>//input[@id='archename']</archetypeNameXpath>
+<archetypeDescriptionXpath>//form[@id='formArcheTypeAdd']/div/div/div/div/div/div[2]/div/textarea</archetypeDescriptionXpath>
+<archetypeTechnologyVersionXpath>//input[@id='techVersion']</archetypeTechnologyVersionXpath>
+<archetypeVersionCommentXpath>//textarea[@name='versionComment']</archetypeVersionCommentXpath>
+<archetypeApplicationTypeXpath>//select[@id='appTypeLayer']</archetypeApplicationTypeXpath>
+<createApplicationLayerArchetypeGroupTypeXpath>//select[@id='techGroup']</createApplicationLayerArchetypeGroupTypeXpath>
+<archetypeUploadJarXpath></archetypeUploadJarXpath>
+<archetypeUploadPluginJarXpath></archetypeUploadPluginJarXpath>
+<archetypeApplicationFeaturesAllXpath>//input[@id='checkAllFeatures']</archetypeApplicationFeaturesAllXpath>
+<archetypeApplicationFeaturesCodeXpath>//div[@id='applicableToDiv']/div/div/div/div/ul/li[2]/input</archetypeApplicationFeaturesCodeXpath>
+<archetypeApplicationFeaturesBuildXpath>//div[@id='applicableToDiv']/div/div/div/div/ul/li[3]/input</archetypeApplicationFeaturesBuildXpath>
+<archetypeApplicationFeaturesDeployXpath>//div[@id='applicableToDiv']/div/div/div/div/ul/li[4]/input</archetypeApplicationFeaturesDeployXpath>
+<archetypeApplicationFeaturesRunAgainstSourceXpath>//div[@id='applicableToDiv']/div/div/div/div/ul/li[5]/input</archetypeApplicationFeaturesRunAgainstSourceXpath>
+<archetypeApplicationFeaturesUnitTestXpath>//div[@id='applicableToDiv']/div/div/div/div/ul/li[6]/input</archetypeApplicationFeaturesUnitTestXpath>
+<archetypeApplicationFeaturesFunctionalTestXpath>//div[@id='applicableToDiv']/div/div/div/div/ul/li[7]/input</archetypeApplicationFeaturesFunctionalTestXpath>
+<archetypeApplicationFeaturesPerformanceTestRunXpath>//div[@id='applicableToDiv']/div/div/div/div/ul/li[8]/input</archetypeApplicationFeaturesPerformanceTestRunXpath>
+<archetypeApplicationFeaturesLoadTestXpath>//div[@id='applicableToDiv']/div/div/div/div/ul/li[9]/input</archetypeApplicationFeaturesLoadTestXpath>
+<archetypeApplicationFeaturesReportsXpath>//div[@id='applicableToDiv']/div/div/div/div/ul/li[10]/input</archetypeApplicationFeaturesReportsXpath>
+<archetypeApplicationFeaturesCIXpath>//div[@id='applicableToDiv']/div/div/div/div/ul/li[11]/input</archetypeApplicationFeaturesCIXpath>
+<archetypeApplicableReportsAllXpath>//div[11]/div/div/div/div/div/div/div/ul/li/input</archetypeApplicableReportsAllXpath>
+<archetypeApplicableReportsProjectInfoReportXpath>//div[10]/div/div/div/div/div/div/div/ul/li[2]/input</archetypeApplicableReportsProjectInfoReportXpath>
+<archetypeApplicableReportsJavadocReportXpath>//div[10]/div/div/div/div/div/div/div/ul/li[3]/input</archetypeApplicableReportsJavadocReportXpath>
+<archetypeApplicableReportsCoberturaReportXpath>//div[10]/div/div/div/div/div/div/div/ul/li[4]/input</archetypeApplicableReportsCoberturaReportXpath>
+<archetypeApplicableReportsJdependReportXpath>//div[10]/div/div/div/div/div/div/div/ul/li[5]/input</archetypeApplicableReportsJdependReportXpath>
+<archetypeApplicableReportsJXRReportXpath>//div[10]/div/div/div/div/div/div/div/ul/li[6]/input</archetypeApplicableReportsJXRReportXpath>
+<archetypeApplicableReportsPMDReportXpath>//div[10]/div/div/div/div/div/div/div/ul/li[7]/input</archetypeApplicableReportsPMDReportXpath>
+<archetypeApplicableReportsSurefireReportXpath>//div[10]/div/div/div/div/div/div/div/ul/li[8]/input</archetypeApplicableReportsSurefireReportXpath> 
+<archetypeSaveButtonXpath>//form[@id='formArcheTypeAdd']/div[2]/input</archetypeSaveButtonXpath>
+<functionalTestclickXpath>//div[@id='funcFrameworksDiv']/div/div/div/div/ul/li/input</functionalTestclickXpath>
+<archetypeCancelButtonXpath>//form[@id='formArcheTypeAdd']/div[2]/input[2]</archetypeCancelButtonXpath>
+
+
+<pilotProjectTabXpath>//label[contains(text(),'Pilot Projects')]</pilotProjectTabXpath>
+<pilotProjectAddButtonXpath>//input[@id='pilotprojAdd']</pilotProjectAddButtonXpath>
+<pilotProjectAddNameXpath>//input[@id='pilotname']</pilotProjectAddNameXpath>
+<pilotProjectAddDescriptionXpath>//textarea[@id='pilotDesc']</pilotProjectAddDescriptionXpath>
+<pilotProjectAddVersionXpath>//input[@id='versionname']</pilotProjectAddVersionXpath>
+<pilotProjectAddTechnologyXpath>//select[@id='multiSelect']</pilotProjectAddTechnologyXpath>
+<pilotProjectAddGroupidXpath>//input[@name='groupId']</pilotProjectAddGroupidXpath>
+<pilotProjectAddArtifactidXpath>//input[@name='artifactId']</pilotProjectAddArtifactidXpath>
+<pilotProjectAddVersionOfProject>//input[@name='jarVersion']</pilotProjectAddVersionOfProject>
+<pilotProjectAddSaveButtonXpath>//form[@id='formPilotProAdd']/div[2]/input</pilotProjectAddSaveButtonXpath>
+<pilotProjectAddCancelButtonXpath>//input[@id='pilotprojCancel']</pilotProjectAddCancelButtonXpath>
+
+
+<pilotProjectUpdateProjectLinkXpath>//a[contains(text(),'HelloWorld')]</pilotProjectUpdateProjectLinkXpath>
+<pilotProjectUpdateButtonXpath>//form[@id='formPilotProAdd']/div[2]/input</pilotProjectUpdateButtonXpath>
+
+<downloadTabXpath>//label[contains(text(),'Downloads')]</downloadTabXpath>
+<downloadAddButtonXpath>//input[@id='downloadAdd']</downloadAddButtonXpath>
+<downloadAddNameXpath>//input[@id='downloadName']</downloadAddNameXpath>
+<downloadAddDescriptionXpath>//textarea[@id='downloadDesc']</downloadAddDescriptionXpath>
+<downloadAddTechnologyXpath>//input[@id='checkAllTechnology']</downloadAddTechnologyXpath>
+<downloadAddLicenseTypeXpath>//div[@id='licenseControl']/div/select</downloadAddLicenseTypeXpath>
+<downloadApplicationPlatformXpath>//div[@id='platformControl']/div/div/div/div/div/div/div/ul/li/input</downloadApplicationPlatformXpath>
+<downloadAddVersionXpath>//div[@id='verControl']/div/input</downloadAddVersionXpath>
+<downloadAddGroupIdXpath>//input[@id='grpId']</downloadAddGroupIdXpath>
+<downloadAddArtifactIdXpath>//input[@id='arftId']</downloadAddArtifactIdXpath>
+<downloadAddGroupXpath>//div[@id='groupControl']/div/select</downloadAddGroupXpath>
+<downloadSaveButtonXpath>//form[@id='formDownloadAdd']/div[2]/input</downloadSaveButtonXpath>
+<downloadCancelXpath>//input[@id='downloadCancel']</downloadCancelXpath>
+
+
+<downloadUpdateDownloadLinkXpath>//form[@id='formDownloadList']/div[2]/div/div[2]/div/div/div/div/table/tbody/tr/td[2]/a</downloadUpdateDownloadLinkXpath>
+<downloadUpdateButtonXpath>//form[@id='formPilotProAdd']/div[2]/input</downloadUpdateButtonXpath>
+
+<configurationTemplateTabXpath>//label[contains(text(),'Configuration Templates')]</configurationTemplateTabXpath>
+<configurationTemplateAddButtonXpath>//input[@id='configtempAdd']</configurationTemplateAddButtonXpath>
+<configurationTemplateAddNameXpath>//input[@id='configname']</configurationTemplateAddNameXpath>
+<configurationTemplateAddDescriptionXpath>//textarea[@name='description']</configurationTemplateAddDescriptionXpath>
+<configurationTemplateAddCheckAllAppliesToXpath>//input[@id='checkAllAuto']</configurationTemplateAddCheckAllAppliesToXpath>
+<configurationcustomproperties>//input[@name='defaultCustProp']</configurationcustomproperties>
+<configurationPropertyTemTypeNumber>//select[@id='1_type']</configurationPropertyTemTypeNumber>
+<configurationPropertyTempTypePassword></configurationPropertyTempTypePassword>
+<configurationPropertyTempTypeFileType></configurationPropertyTempTypeFileType>
+<configurationPropertyTempTypeBoolean></configurationPropertyTempTypeBoolean>
+<configurationPropertyTempTypeActions></configurationPropertyTempTypeActions>
+<configurationTemplateAddKeyXpath>//input[@id='1']</configurationTemplateAddKeyXpath>
+<congigurationTemplateAddNameXpath>//input[@id='1_propTempName']</congigurationTemplateAddNameXpath>
+<configurationTemplateAddSaveButtonXpath>//form[@id='formConfigTempAdd']/div[2]/input</configurationTemplateAddSaveButtonXpath>
+
+/*different technology values*/
+ <addModulePhpTechnologyValue>//input[@value='tech-php']</addModulePhpTechnologyValue>
+ <addComponentTechnologyDrupal6>//input[@value='tech-phpdru6']</addComponentTechnologyDrupal6>
+ <addComponentTechnologyDrupal7>//input[@value='tech-phpdru7']</addComponentTechnologyDrupal7>
+ <addComponentTechnologyWordPress>//input[@value='tech-wordpress']</addComponentTechnologyWordPress>
+ <addComponentTechnologyMultiYUI>//input[@value='tech-html5']</addComponentTechnologyMultiYUI>
+ <addComponentTechnologyMultiJQuery>//input[@value='tech-html5-jquery-widget']</addComponentTechnologyMultiJQuery>
+ <addComponentTechnologyYUIMobile>//input[@value='tech-html5-mobile-widget']</addComponentTechnologyYUIMobile>
+ <addComponentTechnologyJQueryMobile>//input[@value='tech-html5-jquery-mobile-widget']</addComponentTechnologyJQueryMobile>
+ <addComponentTechnologyDotNet>//input[@value='tech-dotnet']</addComponentTechnologyDotNet>
+ <addComponentTechnologySharePoint>//input[@value='tech-sharepoint']</addComponentTechnologySharePoint>
+ <addComponentTechnologySiteCore>//input[@value='tech-sitecore']</addComponentTechnologySiteCore>
+ <addComponentTechnologyNodejs>//input[@value='tech-nodejs-webservice']</addComponentTechnologyNodejs>
+ <addComponentTechnologyJavaStandalone>//input[@value='tech-java-standalone']</addComponentTechnologyJavaStandalone>
+ <addComponentTechnologyJavaWebservice>//input[@value='tech-java-webservice']</addComponentTechnologyJavaWebservice>
+ <addComponentTechnologyiPhoneHybrid>//input[@value='tech-iphone-hybrid']</addComponentTechnologyiPhoneHybrid>
+ <addComponentTechnologyiPhoneNative>//input[@value='tech-iphone-native']</addComponentTechnologyiPhoneNative>
+ <addComponentTechnologyiPhoneLibrary>//input[@value='tech-iphone-library']</addComponentTechnologyiPhoneLibrary>
+ <addComponentTechnologyiPhoneWorkSpace>//input[@value='tech-iphone-workspace']</addComponentTechnologyiPhoneWorkSpace>
+ <addComponentTechnologyAndroidHybrid>//input[@value='tech-android-hybrid']</addComponentTechnologyAndroidHybrid>
+ <addComponentTechnologyAndroidNative>//input[@value='tech-android-native']</addComponentTechnologyAndroidNative>
+ <addComponentTechnologyAvdroidLibrary>//input[@value='tech-android-library']</addComponentTechnologyAvdroidLibrary>
+ <addComponentTechnologyWindowsMetro>//input[@value='tech-win-metro']</addComponentTechnologyWindowsMetro>
+ <addComponentTechnologyWindowsPhone>//input[@value='tech-win-phone']</addComponentTechnologyWindowsPhone>
+ <addComponentTechnologyBlackBerryHybrid>//input[@value='tech-blackberry-hybrid']</addComponentTechnologyBlackBerryHybrid>
+ 
+ 	/* Element ID for Technology in modules,js libraries and components    */
+ 	
+ 	<selectTechnologyDropDown>//div[@id='tech_id']/div/a/label</selectTechnologyDropDown>
+ 	
+ 	/* Element ID for Deleting the samples    */
+ 	<Archetypecheckbox>//input[@id='checkAllFeature']</Archetypecheckbox>
+ 	<CheckAll>//input[@id='checkAllAuto']</CheckAll>
+	<DeleteButton>//input[@id='del']</DeleteButton>
+	<acceptDelete>//input[@value='Ok']</acceptDelete>
+	
+	/* Element ID for Technology RBAC    */
+	
+	  <userxpath>//label[contains(text(),'Users')]</userxpath>
+      <rolesxpath>//label[contains(text(),'Roles')]</rolesxpath>
+      <servicexpath>//a[@id='roleList']</servicexpath>
+      <serviceAddButtonxpath>//div[@id='operation']/input</serviceAddButtonxpath>
+      <serviceNamevalueXpath>//input[@id='input01']</serviceNamevalueXpath>
+      <serviceDescriptionValueXpath>//textarea[@id='input01']</serviceDescriptionValueXpath>
+      <serviceSaveXpath>//input[@id='roleSave']</serviceSaveXpath>
+      <frameworkXpath>//ul[@id='rolesSubmenu']/li[2]/a</frameworkXpath>
+      <frameworkAddButtonXpath>//input[@id='roleAdd']</frameworkAddButtonXpath>
+      <frameworkNameValeXpath>//input[@id='input01']</frameworkNameValeXpath>
+      <frameworkDescriptionXpath>//textarea[@id='input01']</frameworkDescriptionXpath>
+      <frameworkSavaXpath>//input[@id='roleSave']</frameworkSavaXpath>
+      <permissionxpath>//label[@id='lbl_hdr_adm_perms']</permissionxpath>
+      <permissionServiceXpath>//a[@id='permissionList']</permissionServiceXpath>
+      <permissionFrameworkxpath>//ul[@id='permissionsSubmenu']/li[2]/a</permissionFrameworkxpath>
+      
+      /* Xpath declaration for Service Admin
+      
+      <adminRolesXpath>//form[@id='userListForm']/div/div/div[2]/div/div/div/div/table/tbody/tr/td[4]/input</adminRolesXpath>
+      <AdminRolesAssignXpath>//form[@id='userAssignRoleForm']/div[3]/div[2]/div[2]/input</AdminRolesAssignXpath>
+      <serviceAddOkXpath>//div[@id='popupPage']/div[3]/input[2]</serviceAddOkXpath>
+      <AssignPermissionXpath>//form[@id='formRoleList']/div[2]/div/div[2]/div/div/div/div/table/tbody/tr[5]/td[4]/input</AssignPermissionXpath>
+      <AssingPermissionSingle>//form[@id='formRoleList']/div[2]/div/div[2]/div/div/div/div/table/tbody/tr[6]/td[4]/input</AssingPermissionSingle>
+      <AssignSingleValueXpath>//form[@id='formAssignPermission']/div[3]/div[2]/div/input</AssignSingleValueXpath>
+      <PopUpCancelButton>//div[@id='popupPage']/div[3]/input</PopUpCancelButton>
+      <SelectSingleService>//form[@id='formRoleList']/div[2]/div/div[2]/div/div/div/div/table/tbody/tr[5]/td/input</SelectSingleService>
+      <DeletebuttonOkXpath>//div[@id='popupPage']/div[3]/input[2]</DeletebuttonOkXpath>
+      <SelectMultipleServiceXpath>//form[@id='formRoleList']/div[2]/div/div[2]/div/div/div/div/table/tbody/tr[6]/td/input</SelectMultipleServiceXpath>
+      <serviceAdminXpath>//form[@id='formRoleList']/div[2]/div/div[2]/div/div/div/div/table/tbody/tr/td[4]/input</serviceAdminXpath>
+      <ProjectAdminXpath>//form[@id='formRoleList']/div[2]/div/div[2]/div/div/div/div/table/tbody/tr[2]/td[4]/input</ProjectAdminXpath>
+      <ViewServiceXpath>//form[@id='formRoleList']/div[2]/div/div[2]/div/div/div/div/table/tbody/tr[3]/td[4]/input</ViewServiceXpath>
+      <ModuleAdminXpath>//form[@id='formRoleList']/div[2]/div/div[2]/div/div/div/div/table/tbody/tr[4]/td[4]/input</ModuleAdminXpath>
+   
+    
+    
+      
+      
+      
+</phresco>
+</environment>

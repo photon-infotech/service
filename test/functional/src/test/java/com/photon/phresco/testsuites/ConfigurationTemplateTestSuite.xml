@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<suite name="ConfigurationTemplateTestSuite" verbose="1">
+
+	<test name="ConfigurationTemplateTest" junit="false"
+		preserve-order="true">
+		<parameter name="browser" value="googlechrome" />
+		<parameter name="platform" value="WINDOWS" />
+		<classes>
+			<class name="com.photon.phresco.testcases.ConfigurationTemplatePageTest" />
+			<methods>
+				<include name="testValidLogin" />
+				<include name="testAndroidHybridCompAddConfigTemplateNumber" />
+				<include name="testAndroidLibraryComponentsAddConfigurationTemplatePage" />
+				<include name="testAndroidNativeComponentsAddConfigurationTemplatePage" />
+				<include name="testDOTNETComponentsAddConfigurationTemplatePage" />
+				<include name="testBlackBerryHybridComponentsAddConfigurationTemplatePage" />
+				<include name="testDrupal6ComponentsAddConfigurationTemplatePage" />
+				<include name="testDrupal7ComponentsAddConfigurationTemplatePage" />
+				<include name="testJQueryMobileComponentsAddConfigurationTemplatePage" />
+				<include name="testMultiJQueryComponentsAddConfigurationTemplatePage" />
+				<include name="testMultiYUIComponentsAddConfigurationTemplatePage" />
+				<include name="testYUIMobileComponentsAddConfigurationTemplatePage" />
+				<include name="testiPhoneHybridComponentsAddConfigurationTemplatePage" />
+				<include name="testiPhoneLibraryComponentsAddConfigurationTemplatePage" />
+				<include name="testiphoneNativeComponentsAddConfigurationTemplatePage" />
+				<include name="testJavaStandaloneComponentsAddConfigurationTemplatePage" />
+				<include name="testJavaWebServiceComponentsAddConfigurationTemplatePage" />
+				<include name="testNodejsComponentsAddConfigurationTemplatePage" />
+				<include name="testPHPComponentsAddConfigurationTemplatePage" />
+				<include name="testSharePointComponentsAddConfigurationTemplatePage" />
+				<include name="testSiteCoreComponentsAddConfigurationTemplatePage" />
+				<include name="testWindowsMetroComponentsAddConfigurationTemplatePage" />
+				<include name="testWindowsPhoneComponentsAddConfigurationTemplatePage" />
+				<include name="testWordPressComponentsAddConfigurationTemplatePage" />
+			</methods>
+		</classes>
+	</test>
+</suite>

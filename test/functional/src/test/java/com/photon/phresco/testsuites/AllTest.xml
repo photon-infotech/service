@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suite name="AllTest" thread-count="20">
+	<suite-files>
+
+		<suite-file
+			path="./src/test/java/com/photon/phresco/testsuites/CustomModuleTestSuite.xml" />
+		<suite-file
+			path="./src/test/java/com/photon/phresco/testsuites/ExternalModuleTestSuite.xml" />
+		<suite-file
+			path="./src/test/java/com/photon/phresco/testsuites/JsLibrariesTestSuite.xml" />
+		<suite-file
+			path="./src/test/java/com/photon/phresco/testsuites/ComponentTestSuite.xml" />
+		<suite-file
+			path="./src/test/java/com/photon/phresco/testsuites/AdminuiGlobalUrlTestSuite.xml" />
+		<suite-file
+			path="./src/test/java/com/photon/phresco/testsuites/ConfigurationTemplateTestSuite.xml" />
+		<suite-file
+			path="./src/test/java/com/photon/phresco/testsuites/PilotProjectTestSuite.xml" />
+		<suite-file
+			path="./src/test/java/com/photon/phresco/testsuites/RbacTestSuite.xml" />
+		<suite-file
+			path="./src/test/java/com/photon/phresco/testsuites/DownloadsTestSuite.xml" />
+		<suite-file
+			path="./src/test/java/com/photon/phresco/testsuites/TooltipTestSuite.xml" />
+		<suite-file
+			path="./src/test/java/com/photon/phresco/testsuites/VideoTestSuite.xml" />
+		<suite-file
+			path="./src/test/java/com/photon/phresco/testsuites/ConfigurationNumberTestSuite.xml" />
+		<suite-file
+			path="./src/test/java/com/photon/phresco/testsuites/InvalidFileTestSuite.xml" />
+		<suite-file
+			path="./src/test/java/com/photon/phresco/testsuites/CleanupPageTestSuite.xml" />
+		<suite-file
+			path="./src/test/java/com/photon/phresco/testsuites/AdminuiCustomreTestSuite.xml" />
+	</suite-files>
+</suite>
+
+
+
+
+ 

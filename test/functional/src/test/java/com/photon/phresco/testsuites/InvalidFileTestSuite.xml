@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<suite name="InvalidfileTestSuite" verbose="1">
+	<test name="Invalidfileupload" junit="false" preserve-order="true">
+		<parameter name="browser" value="googlechrome" />
+		<parameter name="platform" value="WINDOWS" />
+		<classes>
+			<class name="com.photon.phresco.testcases.InvalidfileuploadPageTest">
+				<methods>
+					<include name="testValidLogin" />
+					<include name="addInvalidJarPhpModules" />
+					<include name="addInvalidJarDrupal6Modules" />
+					<include name="addInvalidJarDrupal7Modules" />
+					<include name="addInvalidJarWordPressModules" />
+					<include name="addInvalidJarMultiYUIModules" />
+					<include name="addInvalidJarMultiJQueryModules" />
+					<include name="addInvalidJarYUIMobileModules" />
+					<include name="addInvalidJarJQueryMobileModules" />
+					<include name="addInvalidJarDOTNETModules" />
+					<include name="addInvalidJarSharePointModules" />
+					<include name="addInvalidJarSiteCoreModules" />
+					<include name="addInvalidJarNodejsModules" />
+					<include name="addInvalidJarJavaStandaloneModules" />
+					<include name="addInvalidJarJavaWebServiceModules" />
+					<include name="addInvalidJariPhoneHybridModules" />
+					<include name="addInvalidJariphoneNativeModules" />
+					<include name="addInvalidJariPhoneLibraryModules" />
+					<include name="addInvalidJarAndroidHybridModules" />
+					<include name="addInvalidJarAndroidNativeModules" />
+					<include name="addInvalidJarAndroidLibraryModules" />
+					<include name="addInvalidJarWindowsMetroModules" />
+					<include name="addInvalidJarWindowsPhoneModules" />
+					<include name="addInvalidJarBlackBerryHybridModules" />
+					<include name="addInvalidJarPhpJslibraries" />
+					<include name="addInvalidJarDrupal6Jslibraries" />
+					<include name="addInvalidJarDrupal7Jslibraries" />
+					<include name="addInvalidJarWordPressJslibraries" />
+					<include name="addInvalidJarMultiYUIJslibraries" />
+					<include name="addInvalidJarMultiJQueryJslibraries" />
+					<include name="addInvalidJarYUIMobileJslibraries" />
+					<include name="addInvalidJarJQueryMobileJslibraries" />
+					<include name="addInvalidJarDOTNETJslibraries" />
+					<include name="addInvalidJarSharePointJslibraries" />
+					<include name="addInvalidJarSiteCoreJslibraries" />
+					<include name="addInvalidJarNodejsJslibraries" />
+					<include name="addInvalidJarJavaStandaloneJslibraries" />
+					<include name="addInvalidJarJavaWebServiceJslibraries" />
+					<include name="addInvalidJariPhoneHybridJslibraries" />
+					<include name="addInvalidJariphoneNativeJslibraries" />
+					<include name="addInvalidJariPhoneLibraryJslibraries" />
+					<include name="addInvalidJarAndroidHybridJslibraries" />
+					<include name="addInvalidJarAndroidNativeJslibraries" />
+					<include name="addInvalidJarAndroidLibraryJslibraries" />
+					<include name="addInvalidJarWindowsMetroJslibraries" />
+					<include name="addInvalidJarWindowsPhoneJslibraries" />
+					<include name="addInvalidJarBlackBerryHybridJslibraries" />
+					<include name="addInvalidJarPHPComponents" />
+					<include name="addInvalidJarDrupal6Components" />
+					<include name="addInvalidJarDrupal7Components" />
+					<include name="addInvalidJarWordPressComponents" />
+					<include name="addInvalidJarMultiYUIComponents" />
+					<include name="addInvalidJarMultiJQueryComponents" />
+					<include name="addInvalidJarYUIMobileComponents" />
+					<include name="addInvalidJarJQueryMobileComponents" />
+					<include name="addInvalidJarDOTNETComponents" />
+					<include name="addInvalidJarSharePointComponents" />
+					<include name="addInvalidJarSiteCoreComponents" />
+					<include name="addInvalidJarNodejsComponents" />
+					<include name="addInvalidJarJavaStandaloneComponents" />
+					<include name="addInvalidJarJavaWebServiceComponents" />
+					<include name="addInvalidJariPhoneHybridComponents" />
+					<include name="addInvalidJariphoneNativeComponents" />
+					<include name="addInvalidJariPhoneLibraryComponents" />
+					<include name="addInvalidJariPhoneWorkSpaceComponents" />
+					<include name="addInvalidJarAndroidHybridComponents" />
+					<include name="addInvalidJarAndroidNativeComponents" />
+					<include name="addInvalidJarAndroidLibraryComponents" />
+					<include name="addInvalidJarWindowsMetroComponents" />
+					<include name="addInvalidJarWindowsPhoneComponents" />
+					<include name="addInvalidJarBlackBerryHybridComponents" />
+					<include name="addInvalidJarArchetypeCreationAppLayer" />
+					<include name="addInvalidJarArchetypeCreationWebLayer" />
+					<include name="addInvalidJarArchetypeCreationMobileLayer" />
+					<include name="addInvalidPilotProjectPage" />
+					<include name="addInvalidVideoFilePage" />
+				</methods>
+			</class>
+		</classes>
+	</test>
+</suite>
+
+
