@@ -60,26 +60,26 @@
             <username/>
         </WebService>	
 	<Database desc="" name="database">
-		<host>localhost</host>
-		<port>27017</port>
-		<username/>
-		<password/>
-		<dbname>database-dump</dbname>
-		<type>mongodb</type>
-		<version>2.0.4</version>
-	</Database>
-	<Server appliesTo="" desc="" name="server">
-            <protocol>http</protocol>
-            <host>172.16.17.226</host>
-            <port>8080</port>
+            <version>2.2.0</version>
+            <port>27017</port>
+            <password/>
+            <type>MongoDB</type>
+            <host>172.16.8.250</host>
+            <dbname>testing-3-0</dbname>
+            <username>admin</username>
+        </Database>
+	<Server desc="" name="server">
+            <context>service</context>
+            <deploy_dir>D:/Softwares/apache-tomcat-7.0.14/webapps/</deploy_dir>
             <admin_username>admin</admin_username>
-            <admin_password>ZGV2cmVwbzI=</admin_password>
-            <remoteDeployment>No</remoteDeployment>
-            <type>Apache Tomcat</type>
-            <version>7.0.x</version>
-            <deploy_dir>c:/</deploy_dir>
-            <context>repository</context>
             <additional_context>/</additional_context>
+            <port>3030</port>
+            <admin_password>ZGV2cmVwbzI=</admin_password>
+            <version>7.0.x</version>
+            <type>Apache Tomcat</type>
+            <remoteDeployment>false</remoteDeployment>
+            <protocol>http</protocol>
+            <host>localhost</host>
         </Server>
 	</environment>
 	
@@ -103,10 +103,10 @@
 	</Database>
 	<Server desc="" name="server">
             <context>service</context>
-            <deploy_dir>D:/phresco/Tomcat/Tomcat-7.0.14/webapps/</deploy_dir>
+            <deploy_dir>D:/Softwares/apache-tomcat-7.0.14/webapps/</deploy_dir>
             <admin_username>admin</admin_username>
             <additional_context>/</additional_context>
-            <port>3030</port>
+            <port>8080</port>
             <admin_password>ZGV2cmVwbzI=</admin_password>
             <version>7.0.x</version>
             <type>Apache Tomcat</type>

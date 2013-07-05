@@ -48,11 +48,11 @@
                         <value key="js" dependency="showSettings,environmentName">js</value>
                     </possibleValues>
                     <multiple>false</multiple>
-                    <value></value>
+                    <value>js</value>
                     <sort>false</sort>
                     <show>true</show>
                 </parameter>
-				 <parameter>
+                <parameter>
                     <name>
                         <value lang="en">Show Settings</value>
                     </name>
@@ -62,12 +62,12 @@
                     <description></description>
                     <key>showSettings</key>
                     <multiple>false</multiple>
-                    <value></value>
+                    <value>false</value>
                     <sort>false</sort>
                     <show>false</show>
                     <dependency>environmentName</dependency>
                 </parameter>
-				  <parameter>
+                <parameter>
                     <name>
                         <value lang="en">Environment</value>
                     </name>
@@ -76,10 +76,10 @@
                         <class>com.photon.phresco.impl.EnvironmentsParameterImpl</class>
                         <dependencies>
                             <dependency>
-								<groupId>com.photon.phresco.commons</groupId>
-								<artifactId>phresco-commons</artifactId>
-								<type>jar</type>
-								<version>2.2.1.1000</version>
+<groupId>com.photon.phresco.commons</groupId>
+<artifactId>phresco-commons</artifactId>
+<type>jar</type>
+<version>2.2.1.1000</version>
                             </dependency>
                         </dependencies>
                     </dynamicParameter>
@@ -87,7 +87,7 @@
                     <editable>true</editable>
                     <key>environmentName</key>
                     <multiple>false</multiple>
-                    <value></value>
+                    <value>Testing</value>
                     <sort>false</sort>
                     <show>true</show>
                 </parameter>

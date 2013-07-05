@@ -34,7 +34,7 @@
                     <description></description>
                     <key>buildNumber</key>
                     <multiple>false</multiple>
-                    <value>1</value>
+                    <value>2</value>
                     <sort>false</sort>
                     <show>true</show>
                 </parameter>
