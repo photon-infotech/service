@@ -734,7 +734,7 @@
                     <possibleValues>
                         <value key="server" dependency="showSettings">Server</value>
                     </possibleValues>
-                    <value></value>
+                    <value>server</value>
                     <sort>false</sort>
                     <show>true</show>
                 </parameter>
@@ -773,6 +773,7 @@
                     <editable>true</editable>
                     <key>environmentName</key>
                     <multiple>false</multiple>
+                    <value>Testing</value>
                     <sort>false</sort>
                     <show>true</show>
                 </parameter>
@@ -796,7 +797,7 @@
                         <value key="1600x900">1600x900</value>
                     </possibleValues>
                     <multiple>false</multiple>
-                    <value></value>
+                    <value>320x480</value>
                     <sort>false</sort>
                     <show>true</show>
                 </parameter>
