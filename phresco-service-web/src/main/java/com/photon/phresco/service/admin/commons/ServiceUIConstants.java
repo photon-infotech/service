@@ -495,6 +495,9 @@ public interface ServiceUIConstants {
     String SUB_MENU_BACKGROUND_COLOR = "SubMenuBackGround";
     String COPYRIGHT = "CopyRight";
     String DISABLED_LABEL_COLOR = "DisabledLabelColor";
+    String EDIT_MENU_BACKGROUND_COLOR = "editMenuColor";
+    String HEADER_BACKGROUND_COLOR = "headerBackGroundcolor";
+    String FOOTER_BACKGROUND_COLOR = "footerBackGroundcolor";
     
     /*****************************
      * Permission Constants

@@ -115,7 +115,10 @@ public class Customers extends ServiceBaseAction  {
 	
 	private String oldName = "";
 	private String oldContext = "";
-
+	private String editMenuColor="";
+	private String headerBackGroundcolor="";
+	private String footerBackGroundcolor="";
+	
     /**
      * To get the all the customers from the DB
      * @return List of Customer
@@ -340,6 +343,9 @@ public class Customers extends ServiceBaseAction  {
 	        frameworkTheme.put(SUB_MENU_BACKGROUND_COLOR, getSubMenuBackGround());
 	        frameworkTheme.put(COPYRIGHT, getCopyRight());
 	        frameworkTheme.put(DISABLED_LABEL_COLOR, getDisabledLabelColor());
+	        frameworkTheme.put(EDIT_MENU_BACKGROUND_COLOR, getEditMenuColor());
+	        frameworkTheme.put(HEADER_BACKGROUND_COLOR, getHeaderBackGroundcolor());
+	        frameworkTheme.put(FOOTER_BACKGROUND_COLOR, getFooterBackGroundcolor());
 	        customer.setFrameworkTheme(frameworkTheme);
 	        customer.setContext(context);
 	    } catch (Exception e) {
@@ -1014,5 +1020,29 @@ public class Customers extends ServiceBaseAction  {
 
 	public String getOldContext() {
 		return oldContext;
+	}
+
+	public String getEditMenuColor() {
+		return editMenuColor;
+	}
+
+	public void setEditMenuColor(String editMenuColor) {
+		this.editMenuColor = editMenuColor;
+	}
+
+	public String getHeaderBackGroundcolor() {
+		return headerBackGroundcolor;
+	}
+
+	public void setHeaderBackGroundcolor(String headerBackGroundcolor) {
+		this.headerBackGroundcolor = headerBackGroundcolor;
+	}
+
+	public String getFooterBackGroundcolor() {
+		return footerBackGroundcolor;
+	}
+
+	public void setFooterBackGroundcolor(String footerBackGroundcolor) {
+		this.footerBackGroundcolor = footerBackGroundcolor;
 	}
 }

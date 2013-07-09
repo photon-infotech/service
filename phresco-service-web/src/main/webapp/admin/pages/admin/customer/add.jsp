@@ -91,6 +91,9 @@
 	String copyRightColor = "";
 	String copyRight = "";
 	String context = "";
+	String editMenuColor = "";
+	String headerBackGroundcolor = "";
+	String footerBackGroundcolor = "";
 	
 	List<String> applicableTechnologies = new ArrayList();
 	List<ApplicationType> applicableAppTypes = null;
@@ -182,6 +185,9 @@
 			disabledLabelColor = frameworkTheme.get("DisabledLabelColor");
 			copyRightColor = frameworkTheme.get("CopyRightColor");
 			copyRight = frameworkTheme.get("CopyRight");
+			editMenuColor = frameworkTheme.get("editMenuColor");
+			headerBackGroundcolor = frameworkTheme.get("headerBackGroundcolor");
+			footerBackGroundcolor = frameworkTheme.get("footerBackGroundcolor");
 		}
 		
 		if (StringUtils.isNotEmpty(customer.getRepoInfo().getRepoName())) {
@@ -841,6 +847,36 @@
 							<div class="controls">
 								<input id="labelcolor" placeholder="<s:text name='place.hldr.cust.add.submenu.backgroundcolor'/>" class="input-xlarge" type="text" name="SubMenuBackGround"
 								   value="<%= subMenuBackGround %>"  maxlength="50" title="50 Characters only">
+							</div>
+						</div>
+						
+						<div class="control-group">
+							<label class="control-label labelbold">
+								<s:text name='lbl.hdr.adm.cust.submenu.editMenuColor'/>
+							</label>
+							<div class="controls">
+								<input id="editMenuColor" placeholder="<s:text name='place.hldr.cust.add.submenu.editMenuColor'/>" class="input-xlarge" type="text" name="editMenuColor"
+								   value="<%= editMenuColor %>"  maxlength="50" title="50 Characters only">
+							</div>
+						</div>
+						
+						<div class="control-group">
+							<label class="control-label labelbold">
+								<s:text name='lbl.hdr.adm.cust.submenu.headerBackGroundcolor'/>
+							</label>
+							<div class="controls">
+								<input id="headerBackGroundcolor" placeholder="<s:text name='place.hldr.cust.add.submenu.headerBackGroundcolor'/>" class="input-xlarge" type="text" name="headerBackGroundcolor"
+								   value="<%= headerBackGroundcolor %>"  maxlength="50" title="50 Characters only">
+							</div>
+						</div>
+						
+						<div class="control-group">
+							<label class="control-label labelbold">
+								<s:text name='lbl.hdr.adm.cust.submenu.footerBackGroundcolor'/>
+							</label>
+							<div class="controls">
+								<input id="footerBackGroundcolor" placeholder="<s:text name='place.hldr.cust.add.submenu.footerBackGroundcolor'/>" class="input-xlarge" type="text" name="footerBackGroundcolor"
+								   value="<%= footerBackGroundcolor %>"  maxlength="50" title="50 Characters only">
 							</div>
 						</div>
 						
