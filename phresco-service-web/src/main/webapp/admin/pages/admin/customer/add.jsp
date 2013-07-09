@@ -94,6 +94,7 @@
 	String editMenuColor = "";
 	String headerBackGroundcolor = "";
 	String footerBackGroundcolor = "";
+	String userSettingColor = "";
 	
 	List<String> applicableTechnologies = new ArrayList();
 	List<ApplicationType> applicableAppTypes = null;
@@ -188,6 +189,7 @@
 			editMenuColor = frameworkTheme.get("editMenuColor");
 			headerBackGroundcolor = frameworkTheme.get("headerBackGroundcolor");
 			footerBackGroundcolor = frameworkTheme.get("footerBackGroundcolor");
+			userSettingColor = frameworkTheme.get("userSettingColor");
 		}
 		
 		if (StringUtils.isNotEmpty(customer.getRepoInfo().getRepoName())) {
@@ -877,6 +879,16 @@
 							<div class="controls">
 								<input id="footerBackGroundcolor" placeholder="<s:text name='place.hldr.cust.add.submenu.footerBackGroundcolor'/>" class="input-xlarge" type="text" name="footerBackGroundcolor"
 								   value="<%= footerBackGroundcolor %>"  maxlength="50" title="50 Characters only">
+							</div>
+						</div>
+						
+						<div class="control-group">
+							<label class="control-label labelbold">
+								<s:text name='lbl.hdr.adm.cust.submenu.userSettingColor'/>
+							</label>
+							<div class="controls">
+								<input id="userSettingColor" placeholder="<s:text name='place.hldr.cust.add.submenu.userSettingColor'/>" class="input-xlarge" type="text" name="userSettingColor"
+								   value="<%= userSettingColor %>"  maxlength="50" title="50 Characters only">
 							</div>
 						</div>
 						

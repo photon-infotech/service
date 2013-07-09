@@ -118,6 +118,7 @@ public class Customers extends ServiceBaseAction  {
 	private String editMenuColor="";
 	private String headerBackGroundcolor="";
 	private String footerBackGroundcolor="";
+	private String userSettingColor="";
 	
     /**
      * To get the all the customers from the DB
@@ -346,6 +347,8 @@ public class Customers extends ServiceBaseAction  {
 	        frameworkTheme.put(EDIT_MENU_BACKGROUND_COLOR, getEditMenuColor());
 	        frameworkTheme.put(HEADER_BACKGROUND_COLOR, getHeaderBackGroundcolor());
 	        frameworkTheme.put(FOOTER_BACKGROUND_COLOR, getFooterBackGroundcolor());
+	        frameworkTheme.put(USER_SETTINGS_COLOR, getUserSettingColor());
+	        
 	        customer.setFrameworkTheme(frameworkTheme);
 	        customer.setContext(context);
 	    } catch (Exception e) {
@@ -1044,5 +1047,13 @@ public class Customers extends ServiceBaseAction  {
 
 	public void setFooterBackGroundcolor(String footerBackGroundcolor) {
 		this.footerBackGroundcolor = footerBackGroundcolor;
+	}
+
+	public String getUserSettingColor() {
+		return userSettingColor;
+	}
+
+	public void setUserSettingColor(String userSettingColor) {
+		this.userSettingColor = userSettingColor;
 	}
 }
