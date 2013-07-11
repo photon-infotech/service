@@ -211,6 +211,12 @@ public class Features extends ServiceBaseAction {
     	  if(CollectionUtils.isNotEmpty(getMultiTechnology())) {
     		  for(String technologyList : getMultiTechnology()){
     			  List<ArtifactGroup>  moduleGroups = getServiceManager().getFeatures(getCustomerId(), technologyList, Type.valueOf(getType()).name());
+    			  if (getType().equalsIgnoreCase("COMPONENT")) {
+    				  List<ArtifactGroup>  moduleGroupsMod = getServiceManager().getFeatures(getCustomerId(), technologyList, Type.valueOf("FEATURE").name()); 
+    				  List<ArtifactGroup>  moduleGroupsJs = getServiceManager().getFeatures(getCustomerId(), technologyList, Type.valueOf("JAVASCRIPT").name());
+    				  moduleGroups.addAll(moduleGroupsMod);
+    				  moduleGroups.addAll(moduleGroupsJs);
+    			  }
     			  setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroups); 
     		  }
     	  }

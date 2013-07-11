@@ -74,11 +74,11 @@
 		                	<span>
 	                		 	<% if (moduleGroup.isSystem()) { %>
 									<input type="checkbox" name="moduleGroup" value="<%= moduleGroup.getId() %>" disabled/>
-									&nbsp;&nbsp;<%= moduleGroup.getName() %>&nbsp;&nbsp;
+									&nbsp;&nbsp;<%= moduleGroup.getDisplayName() %>&nbsp;&nbsp;
 								<% } else { %> 
 			                		<input type="checkbox" <%= per_disabledStr %> class="check technology" name="moduleGroup" value="<%= moduleGroup.getId()%>" 
-			                			id="<%= moduleGroup.getId()%>checkBox" onclick="checkAllArchEvent(this, $('.<%= moduleGroup.getName()%>'), false); checkboxArchEvent();" value="Call2Functions" >
-			                		&nbsp;&nbsp;<%= moduleGroup.getName() %>&nbsp;&nbsp;
+			                			id="<%= moduleGroup.getId()%>checkBox" onclick="checkAllArchEvent(this, $('.<%= moduleGroup.getDisplayName()%>'), false); checkboxArchEvent();" value="Call2Functions" >
+			                		&nbsp;&nbsp;<%= moduleGroup.getDisplayName() %>&nbsp;&nbsp;
 								<% } %> 
 		                	</span>
 		                </span>
@@ -121,7 +121,7 @@
 												</td>
 												<td class="zero_padding">
 													<a href="#" name="ModuleDesc" onclick="editFeature('<%= moduleGroup.getId() %>', '<%= module.getId() %>');" >
-														<%= moduleGroup.getName() %>
+														<%= moduleGroup.getDisplayName() %>
 													</a>
 												</td>
 												<td><%= module.getVersion() %></td>

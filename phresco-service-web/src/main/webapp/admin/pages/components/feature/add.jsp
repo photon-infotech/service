@@ -674,6 +674,7 @@
 	
 	//To get the features to add the dependencies
 	function getFeatures() {
+		showPopuploadingIcon();
 		yesnoPopup("fetchFeaturesForDependency", '<s:text name="lbl.hdr.comp.featr.popup.title"/>', 'saveDependentFeatures', '<s:text name="lbl.btn.ok"/>', $('#formFeatureAdd'));
 	}
 	

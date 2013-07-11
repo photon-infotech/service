@@ -318,6 +318,14 @@ function showLoadingIcon() {
     disableScreen();
 }
 
+function showPopuploadingIcon() {
+	$("#errMsg").empty(); // remove error message while displaying loading icon
+    $(".popuploadingImg").show();
+    $(".popuploadingImg").css("float", "left");
+	$(".popuploadingImg").attr("src", "theme/photon/images/loading_green_popUp.gif");
+}
+
+
 function hideLoadingIcon() {
     $("#loadingIconDiv").hide();
     enableScreen();

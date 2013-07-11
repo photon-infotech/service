@@ -334,6 +334,7 @@
 			<div class="modal-body" id="popupPage_modal-body">
 			</div>
 			<div class="modal-footer">
+			    <img class="popuploadingImg"></img>
 				<div class="errMsg" id="reportMsg"></div>
 				<div id="updateMsg" class="updateMsg"></div>
 				<input type="button" class="btn btn-primary" data-dismiss="modal" id="popupCancel" value="<s:text name='lbl.btn.cancel'/>"/>

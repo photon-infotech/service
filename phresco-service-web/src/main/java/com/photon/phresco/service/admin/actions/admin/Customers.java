@@ -279,6 +279,7 @@ public class Customers extends ServiceBaseAction  {
 			}
 			getServiceManager().updateCustomer(customer, inputStreamMap);
 			addActionMessage(getText(CUSTOMER_UPDATED, Collections.singletonList(getName())));
+			removeImage();
 		} catch (PhrescoException e) {
 		    return showErrorPopup(e, getText(EXCEPTION_CUSTOMERS_UPDATE));
 		}
