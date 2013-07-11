@@ -106,7 +106,7 @@ function loadContent(pageUrl, form, tag, additionalParams, callSuccessEvent, cal
 		params = form.serialize();
 		if (!isBlank(additionalParams)) {
 			params = params.concat("&");
-			params = params.concat(additionalParams);	
+			params = params.concat(additionalParams);
 		} 
 	} else if (additionalParams != undefined && additionalParams != "")  {
 		params = additionalParams;
@@ -141,6 +141,7 @@ function clickSave(pageUrl, params, tag, progressText) {
 }
 
 function validate(pageUrl, form, tag, progressText, disabledDiv) {
+	showLoadingIcon();
 	if (pageUrl == 'downloadSave') {
 		showLoadingIcon();
 	}

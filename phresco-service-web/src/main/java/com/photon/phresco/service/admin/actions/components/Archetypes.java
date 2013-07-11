@@ -678,7 +678,7 @@ public class Archetypes extends ServiceBaseAction {
 				return showErrorPopup(new PhrescoException("Application type is empty"), getText(EXCEPTION_APPTYPES_TECH_GROUP));
 			}
 		}
-		List<ApplicationType> appTypes = getServiceManager().getApplicationTypes();
+		List<ApplicationType> appTypes = getServiceManager().getApplicationTypes(getCustomerId());
 		for (ApplicationType appType : appTypes) {
 			if (appType.getId().equals(getApptype())) {
 				setAppTypeTechGroups(appType.getTechGroups());
@@ -697,7 +697,7 @@ public class Archetypes extends ServiceBaseAction {
 			S_LOGGER.debug("Archetypes.showTechGroupPopup : Entry");
 		}
 		
-		List<ApplicationType> appTypes = getServiceManager().getApplicationTypes();
+		List<ApplicationType> appTypes = getServiceManager().getApplicationTypes(getCustomerId());
 		setReqAttribute(REQ_APP_TYPES, appTypes);
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Archetypes.showTechGroupPopup : Exit");
@@ -713,8 +713,11 @@ public class Archetypes extends ServiceBaseAction {
 		
 		try {
 			List<TechnologyGroup> technologyGroups = new ArrayList<TechnologyGroup>();
-			if (CollectionUtils.isNotEmpty(getTechGroups())) {
+			List<String> customerIds = new ArrayList<String>();
+			if (CollectionUtils.isNotEmpty(getTechGroups()) && StringUtils.isNotEmpty(getCustomerId())) {
 				for (TechnologyGroup groups : getTechGroups()) {
+					customerIds.add(getCustomerId());
+					groups.setCustomerIds(customerIds);
 					technologyGroups.add(groups);
 				}
 			}

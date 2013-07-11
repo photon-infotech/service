@@ -39,6 +39,7 @@
 	List<ApplicationType> appTypes = (List<ApplicationType>)request.getAttribute(ServiceUIConstants.REQ_APP_TYPES);
     Gson gson = new Gson();
    
+    String customerId = (String)request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
     String versioning = (String)request.getAttribute(ServiceUIConstants.REQ_VERSIONING);
 	String disabledVer = "";
 	if (StringUtils.isNotEmpty(versioning)) {
@@ -194,9 +195,8 @@
     }
     
     function getTechGroup() {
-    	var customerId = $('select[name=customerId]').val();
 		var params = "customerId=";
-		params = params.concat(customerId);
+		params = params.concat('<%= customerId %>');
 		loadContent('getTechGroup', $('#formTechgroup'), '', params, true);
 		$("#multiTechGroup ul").empty();
     }

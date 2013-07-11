@@ -1318,6 +1318,7 @@ public class ComponentService extends DbService {
 		artifactElement.setDescription(artifactGroup.getDescription());
 		artifactElement.setCreationDate(artifactGroup.getCreationDate());
 		artifactElement.setSystem(artifactGroup.isSystem());
+		artifactElement.setLicenseId(artifactGroup.getLicenseId());
 		return artifactElement;
 	}
 	

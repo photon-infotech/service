@@ -185,7 +185,7 @@
 						checkedStr = "";	
 					}
 				%>
-				<input type="checkbox" name="favourite" id="favourite" value="false" <%= checkedStr %>>
+				<input type="checkbox" name="favourite" id="favourite" value="false" <%= checkedStr %> <%= disabledStr %>>
 			</div>
 		</div>
 		

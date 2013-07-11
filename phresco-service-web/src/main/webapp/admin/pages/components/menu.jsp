@@ -30,14 +30,14 @@
 <%@ page import="com.photon.phresco.util.ServiceConstants"%>
 
 <% 
-    String customerId = (String)session.getAttribute("customerId"); 
+    String customerId = (String)session.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID); 
 %>
 
 <script type="text/javascript">
 	var customerId = "";
 	$(document).ready(function() {
 		var customerId = localStorage["selectedCustomerId"];
-		$("#customerSelect").val(customerId);
+		$("#customerSelect").val('<%= customerId %>');
 		
 		clickMenu($("a[name='compTab']"), $("#subcontainer"), $('#formCustomerId'));
 		activateMenu($("#features"));
@@ -60,6 +60,7 @@
         	}
         });
 	});
+	
 	
 	function customerChangeEvent(selectedId) {
 		showLoadingIcon();
@@ -113,10 +114,11 @@
 		                    if (CollectionUtils.isNotEmpty(customers)) { 
 					            for (Customer customer : customers) { 
 					    %>
-		                            <option value="<%= customer.getId() %>"><%= customer.getName() %></option>
+		                            <option  value="<%= customer.getId() %>" ><%= customer.getName() %></option>
 						<% 
 					            }
 					        }
+		                 
 					    %>
 					</select>
 					<input type="hidden" id="customerId" name="customerId" value=""/>

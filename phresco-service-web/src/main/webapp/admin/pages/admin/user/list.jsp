@@ -69,7 +69,9 @@
 						</thead>
 			            <%
 			            	if (CollectionUtils.isNotEmpty(userList)) {
-			            		for (User user : userList) {
+			            %>	
+			            <tbody>	
+			            <% 		for (User user : userList) {
 			            			if (CollectionUtils.isNotEmpty(permissionIds)) {
 				            			if (!permissionIds.contains(ServiceUIConstants.PER_MANAGE_USERS) && !user.getId().equals(userInfo.getId())) {
 				            				per_disabledStr = "disabled";
@@ -80,7 +82,7 @@
 										}
 			            			}
 			            %>
-						<tbody>
+						
 						<tr>
 							<td>
 								<%= StringUtils.isNotEmpty(user.getDisplayName()) ? user.getDisplayName() :"" %>
@@ -91,11 +93,11 @@
 								<input type="button" class="btn <%= per_disabledClass %> addiconAlign" <%= per_disabledStr %> value="Roles" onclick="showAssignRolesPopup('<%= user.getId() %>');">
 							</td>
 						</tr>
-					</tbody>
 					<%
 							}
 						}
 					%>
+					</tbody>
 				</table>
 			</div>
 		</div>
