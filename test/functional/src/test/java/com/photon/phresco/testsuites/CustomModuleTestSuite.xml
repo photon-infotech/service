@@ -9,7 +9,7 @@
 			<class name="com.photon.phresco.testcases.CustomModulesUploadPageTest" />
 			<methods>
 				<include name="testValidLogin" />
-				<include name="testPHPReusableComponentsAddModulesPage" />
+				<!-- <include name="testPHPReusableComponentsAddModulesPage" />
 				<include name="testWordPressReusableComponentsAddModulesPage" />
 				<include name="testDrupal6ReusableComponentsAddModulesPage" />
 				<include name="testDrupal7ReusableComponentsAddModulesPage" />
@@ -30,7 +30,7 @@
 				<include name="teroidLibraryReusableComponentsAddModulesPage" />
 				<include name="testWindowsMetroReusableComponentsAddModulesPage" />
 				<include name="testWindowsPhoneReusableComponentsAddModulesPage" />
-				<include name="testBlackBerryHybridReusableComponentsAddModulesPage" />
+				<include name="testBlackBerryHybridReusableComponentsAddModulesPage" /> -->
 			</methods>
 		</classes>
 	</test>

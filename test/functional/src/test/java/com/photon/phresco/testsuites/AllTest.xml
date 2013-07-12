@@ -4,7 +4,7 @@
 
 		<suite-file
 			path="./src/test/java/com/photon/phresco/testsuites/CustomModuleTestSuite.xml" />
-		<suite-file
+	<!-- 	<suite-file
 			path="./src/test/java/com/photon/phresco/testsuites/ExternalModuleTestSuite.xml" />
 		<suite-file
 			path="./src/test/java/com/photon/phresco/testsuites/JsLibrariesTestSuite.xml" />
@@ -32,7 +32,7 @@
 			path="./src/test/java/com/photon/phresco/testsuites/CleanupPageTestSuite.xml" />
 		<suite-file
 			path="./src/test/java/com/photon/phresco/testsuites/AdminuiCustomreTestSuite.xml" />
-	</suite-files>
+	 --></suite-files>
 </suite>
 
 
