@@ -54,7 +54,7 @@ import com.sun.jersey.api.client.WebResource;
 public class LoginService extends DbService {
 	
 	private final String SERVICE_VIEW_ROLE_ID = "4e8c0bed7-fb39-4erta-ae73-2d1286ae4ad0";
-	private final String FRAMEWORK_VIEW_ROLE_ID = "4e8c0bed7-fb39-4aea-ae73-2d1286ae4ad0";
+	private final String FRAMEWORK_VIEW_ROLE_ID = "4e8c0bd7-fb39-4aea-ae73-2d1286ae4ae0";
 	private static final SplunkLogger LOGGER = SplunkLogger.getSplunkLogger(LoginService.class.getName());
 	private static Boolean isDebugEnabled = LOGGER.isDebugEnabled();
 	
