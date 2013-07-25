@@ -17,18 +17,18 @@
  */
 package com.photon.phresco.service.rest.api;
 
-import java.util.Arrays;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.photon.phresco.commons.model.User;
 import com.photon.phresco.commons.model.User.AuthType;
@@ -49,23 +49,27 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 
-@Path(ServiceConstants.REST_API_LOGIN)
+@Controller
+@RequestMapping(value = ServiceConstants.REST_API_LOGIN, consumes = MediaType.APPLICATION_JSON_VALUE, 
+		produces = MediaType.APPLICATION_JSON_VALUE)
 public class LoginService extends DbService {
 	
 	private final String SERVICE_VIEW_ROLE_ID = "4e8c0bed7-fb39-4erta-ae73-2d1286ae4ad0";
 	private final String FRAMEWORK_VIEW_ROLE_ID = "4e8c0bd7-fb39-4aea-ae73-2d1286ae4ae0";
-	private static final SplunkLogger LOGGER = SplunkLogger.getSplunkLogger(LoginService.class.getName());
+	private static final SplunkLogger LOGGER = SplunkLogger.getSplunkLogger("SplunkLogger");
 	private static Boolean isDebugEnabled = LOGGER.isDebugEnabled();
 	
 	public LoginService() {
 		super();
 	}
-
-	@POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public User login(@Context HttpServletRequest request, Credentials credentials) throws PhrescoException {
+	
+	@ApiOperation(value = " Login service ")
+    @RequestMapping(method = RequestMethod.POST)
+    public @ResponseBody User login(HttpServletRequest request, 
+    		@ApiParam(value = "user credentials to login", name = "credentials")@RequestBody Credentials credentials) throws PhrescoException {
 		if(isDebugEnabled) {
 			LOGGER.debug("LoginService.login : Entry");
 			LOGGER.debug("LoginService.login ", "remoteAddress=" + request.getRemoteAddr() , "userName=" + credentials.getUsername(),
@@ -97,8 +101,8 @@ public class LoginService extends DbService {
 		RepositoryManager repoMgr = PhrescoServerFactory.getRepositoryManager();
 		WebResource resource = client.resource(repoMgr.getAuthServiceURL() + ServerConstants.AUTHENTICATE);
 		
-        resource.accept(MediaType.APPLICATION_JSON_TYPE);
-        ClientResponse response = resource.type(MediaType.APPLICATION_JSON_TYPE).post(ClientResponse.class, credentials);
+        resource.accept(MediaType.APPLICATION_JSON_VALUE);
+        ClientResponse response = resource.type(MediaType.APPLICATION_JSON_VALUE).post(ClientResponse.class, credentials);
         if(response.getStatus() == 204) {
         	LOGGER.info("LoginService.loginUsingAuth", "authUrl=" + repoMgr.getAuthServiceURL(), "userName=" + credentials.getUsername());
         	throw new PhrescoWebServiceException(Response.status(Status.NO_CONTENT).build());

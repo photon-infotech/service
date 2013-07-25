@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
+        >
+
+    <context:component-scan base-package="com.photon.phresco.service.rest.api"  />
+    <mvc:default-servlet-handler/>
+    <mvc:annotation-driven/>
+    <context:property-placeholder location="classpath:swagger.properties" />
+
+    <!-- Configuration Bean -->
+    <bean id="documentationConfig" class="com.mangofactory.swagger.configuration.DocumentationConfig"/>
+    
+ 
+	 <bean id="jacksonMessageConverter" class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter"></bean>
+	 <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+	<property name="messageConverters">
+	  <list>
+	    <ref bean="jacksonMessageConverter"/>
+	  </list>
+	</property>
+	</bean>
+	
+	<bean id="restTemplate" class="org.springframework.web.client.RestTemplate">
+		  <property name="messageConverters">
+		  <list>
+		  <bean class="org.springframework.http.converter.xml.SourceHttpMessageConverter"/>
+		  <bean class="org.springframework.http.converter.FormHttpMessageConverter"/>
+		  <bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter"/>
+		  </list>
+		  </property>
+		  </bean>
+		  
+	<bean id="multipartResolver"  class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+    <!-- one of the properties available; the maximum file size in bytes -->
+    <property name="maxUploadSize" value="10000000000"/>
+</bean>
+   <mvc:interceptors>
+  		<bean class="com.photon.phresco.service.rest.interceptors.SecurityInterceptor" />
+	</mvc:interceptors>
+	
+	
+</beans>

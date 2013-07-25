@@ -1,68 +1,63 @@
-/**
- * Service Web Archive
- *
- * Copyright (C) 1999-2013 Photon Infotech Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.photon.phresco.service.rest.interceptors;
 
-import java.net.URI;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.logger.SplunkLogger;
-import com.photon.phresco.service.api.MongoConfig;
 import com.photon.phresco.service.rest.util.AuthenticationUtil;
 import com.photon.phresco.util.Constants;
 import com.photon.phresco.util.ServiceConstants;
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerRequestFilter;
 
-public class SecurityInterceptor implements ContainerRequestFilter {
-
-	private static final SplunkLogger LOGGER = SplunkLogger.getSplunkLogger(MongoConfig.class.getName());
-	private static Boolean isDebugEnabled = LOGGER.isDebugEnabled();
+public class SecurityInterceptor implements HandlerInterceptor {
 	
-	public ContainerRequest filter(ContainerRequest request) {
-		LOGGER.debug("SecurityInterceptor.filter : Entry");
-	    URI absolutePath = request.getAbsolutePath();
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug(absolutePath);
+	private static final SplunkLogger LOGGER = SplunkLogger.getSplunkLogger("SplunkLogger");
+	
+	public void afterCompletion(HttpServletRequest arg0,
+			HttpServletResponse arg1, Object arg2, Exception arg3)
+			throws Exception {
+	}
+
+	public void postHandle(HttpServletRequest arg0, HttpServletResponse arg1,
+			Object arg2, ModelAndView arg3) throws Exception {
+	}
+
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
+			Object object) throws Exception {
+		String authToken = request.getHeader(Constants.PHR_AUTH_TOKEN);
+		String swaggerToken = request.getHeader("X-phr-requestfrom");
+		if(StringUtils.isNotEmpty(swaggerToken) && swaggerToken.equals("swagger")) {
+			return true;
 		}
-		String path = request.getPath();
-		if((ServiceConstants.LOGIN).equals(path) || (ServiceConstants.ADMIN_CUSTOMER).equals(path) || (ServiceConstants.CUSTOMER_PROPERTIES).equals(path)) {
-			return request;
+		String path = request.getRequestURI();
+		if((path).contains(ServiceConstants.LOGIN) || (path).contains(ServiceConstants.ADMIN_CUSTOMER) || 
+				(path).contains(ServiceConstants.CUSTOMER_PROPERTIES) || (path).contains("/api-docs")) {
+			LOGGER.debug("SecurityInterceptor.preHandle", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + path,
+					"method=" + request.getMethod());
+			return true;
 		}
-		
-		String headerValue = request.getHeaderValue(Constants.PHR_AUTH_TOKEN);
+		AuthenticationUtil authTokenUtil = null;
 		try {
-			AuthenticationUtil authTokenUtil = AuthenticationUtil.getInstance();
-			boolean isValid = authTokenUtil.isValidToken(headerValue);
-			if(isValid) {
-				LOGGER.debug("SecurityInterceptor.filter : Exit");
-				return request;
-			}
-		} catch (Exception e) {
+			authTokenUtil = AuthenticationUtil.getInstance();
+		} catch (PhrescoException e) {
 			try {
 				throw new PhrescoException(e, ServiceConstants.EX_PHEX00007);
 			} catch (PhrescoException e1) {
 				LOGGER.error("SecurityInterceptor.filter " , "status=\"Failure\"", "message=\"" + e1.getLocalizedMessage() + "\"" );
 			}
 		}
-		LOGGER.debug("SecurityInterceptor.filter : Exit");
-		return null;
+		LOGGER.debug("SecurityInterceptor.filter", "remoteAddress=" + request.getRemoteAddr() , "token=" + authToken , 
+				"user=" + authTokenUtil.getUserName(authToken), "endpoint=" + path);
+		boolean isValid = authTokenUtil.isValidToken(authToken);
+		if(!isValid) {
+			response.setStatus(401);
+			return false;
+		}
+		return true;
 	}
 
 }

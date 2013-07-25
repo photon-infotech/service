@@ -29,6 +29,12 @@
 		<action name="login" class="com.photon.phresco.service.admin.actions.Login" method="login">
 			<result name="success">/admin/baselayout.jsp</result>
 			<result name="failure">/admin/login.jsp</result>
+			<result name="swagger">/docs/swagger.jsp</result>
+		</action>
+		
+		<action name="swaggerLogin" class="com.photon.phresco.service.admin.actions.Login" method="swaggerLogin">
+			<result name="success">/docs/swagger.jsp</result>
+			<result name="failure">/admin/login.jsp</result>
 		</action>
 
 		<action name="logout" class="com.photon.phresco.service.admin.actions.Login"

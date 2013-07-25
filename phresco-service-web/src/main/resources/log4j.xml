@@ -31,7 +31,23 @@
 			<param name="ConversionPattern" value="%p %d{yyyy-MM-dd HH:mm:ss} %c %x- %m%n" />
 		</layout>
 	</appender>
-
+	
+	<appender name="SplunkLogging" class="org.apache.log4j.RollingFileAppender">
+		<param name="File" value="../logs/splunk-engine.log" />
+		<param name="Threshold" value="DEBUG" />
+		<param name="maxBackupIndex" value="10" />
+		<param name="maxFileSize" value="512MB" />
+        <param name="Append" value="true" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%p %d{yyyy-MM-dd HH:mm:ss} %c %x- %m%n" />
+		</layout>
+	</appender>
+	
+	<category name="SplunkLogger">
+	 	<priority value="debug"/>
+	 	<appender-ref ref="SplunkLogging"/>
+	 </category>
+	
   	 <appender name="ServiceAsync" class="org.apache.log4j.AsyncAppender">
   	 	  <param name="BufferSize" value="500"/>
   	 	   <param name="Blocking" value="false"/>

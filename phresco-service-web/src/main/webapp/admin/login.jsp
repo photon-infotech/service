@@ -115,6 +115,7 @@ $(document).ready(function() {
 	                <label class="labellg" for="xlInput" class="lgnFieldLbl">Password:</label>
 		                <%
 							String password = (String)request.getAttribute(ServiceUIConstants.REQ_PASSWORD);
+		                	String fromPage = (String)request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
 						%>
 	                <input class="xlarge settings_text lgnField" id="xlInput" id="password" name="password" type="password"
 	                	maxlength="63" title="63 Characters only" value ="" placeholder="Enter the password"/>
@@ -139,6 +140,7 @@ $(document).ready(function() {
 	            	</div>
 	            </span>
 	            <input type="hidden" name="loginFirst" value="false"/>
+	            <input type="hidden" name="fromPage" value="<%= fromPage %>"/>
 			</div>	
 		</form>
 		</div>	

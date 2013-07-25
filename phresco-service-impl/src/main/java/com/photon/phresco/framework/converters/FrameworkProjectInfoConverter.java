@@ -47,6 +47,9 @@ public class FrameworkProjectInfoConverter implements Converter<ProjectInfoDAO, 
 			LOGGER.debug("ArtifactGroupConverter.convertDAOToObject:Entry");
 		}
 		ProjectInfo projectInfo = new ProjectInfo();
+		projectInfo.setName(dao.getName());
+		projectInfo.setDisplayName(dao.getDisplayName());
+		projectInfo.setDescription(dao.getDescription());
 		projectInfo.setId(dao.getId());
 		projectInfo.setProjectCode(dao.getProjectCode());
 		projectInfo.setStartDate(dao.getStartDate());

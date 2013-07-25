@@ -19,6 +19,7 @@ package com.photon.phresco.service.rest.api;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collections;
@@ -32,12 +33,18 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.IOUtils;
 import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ArtifactInfo;
@@ -57,15 +64,20 @@ import com.photon.phresco.util.ServiceConstants;
 import com.photon.phresco.util.Utility;
 import com.phresco.pom.exception.PhrescoPomException;
 import com.phresco.pom.util.PomProcessor;
+import com.wordnik.swagger.annotations.ApiError;
+import com.wordnik.swagger.annotations.ApiErrors;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 
 /**
  * Phresco Service Class hosted at the URI path "/api"
  */
 
-@Path(ServiceConstants.REST_API_PROJECT)
+@Controller
+@RequestMapping(value = ServiceConstants.REST_API_PROJECT)
 public class ProjectService extends DbService {
 	private static final String ZIP = ".zip";
-	private static final SplunkLogger LOGGER = SplunkLogger.getSplunkLogger(ProjectService.class.getName());
+	private static final SplunkLogger LOGGER = SplunkLogger.getSplunkLogger("SplunkLogger");
 	private static Boolean isDebugEnabled = LOGGER.isDebugEnabled();
 	private DbManager dbManager;
 	
@@ -74,17 +86,20 @@ public class ProjectService extends DbService {
 		dbManager = PhrescoServerFactory.getDbManager();
     }
 	
-	@POST
-	@Path(ServiceConstants.REST_API_PROJECT_CREATE)
-	@Produces(ServiceConstants.MEDIATYPE_ZIP)
-	@Consumes(MediaType.APPLICATION_JSON)
-	public StreamingOutput createProject(@Context HttpServletRequest request, ProjectInfo projectInfo) throws PhrescoException, IOException {
+	@ApiOperation(value = " Create Project ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Unable To Create")})
+    @RequestMapping(value= ServiceConstants.REST_API_PROJECT_CREATE, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = ServiceConstants.MEDIATYPE_ZIP, method = RequestMethod.POST)
+	public @ResponseBody byte[] createProject(HttpServletRequest request, 
+			@ApiParam(value = "Projectinfo to create",	name = "projectInfo")@RequestBody ProjectInfo projectInfo) 
+		throws PhrescoException, IOException {
 		LOGGER.debug("ProjectService.createProject : Entry");
 		if(projectInfo == null) {
 			LOGGER.warn("ProjectService.createProject" , "status=\"Bad Request\"" , "remoteAddress=" + request.getRemoteAddr(),
 					"user=" + request.getParameter("userId"));
 			return null;
 		}
+		FileInputStream fis  = null;
 		String tempFolderPath = "";
 		try {
 			tempFolderPath = ServerUtil.getTempFolderPath();
@@ -96,15 +111,18 @@ public class ProjectService extends DbService {
 			createParentPom(tempFolderPath, projectInfo);
 			createDependency(tempFolderPath, projectInfo);
 			ArchiveUtil.createArchive(tempFolderPath, tempFolderPath + ZIP, ArchiveType.ZIP);
-			ServiceOutput serviceOutput = new ServiceOutput(tempFolderPath);
+//			ServiceOutput serviceOutput = new ServiceOutput(tempFolderPath);
 			dbManager.storeCreatedProjects(projectInfo);
 			dbManager.updateUsedObjects(projectInfo);
 			LOGGER.debug("ProjectService.createProject() : Exit");
-			return serviceOutput;
+			fis = new FileInputStream(new File(tempFolderPath + ZIP));
+			return IOUtils.toByteArray(fis);
 		} catch (Exception pe) {
 			LOGGER.error("ProjectService.createProject", "remoteAddress=" + request.getRemoteAddr(),
 					"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + pe.getLocalizedMessage() + "\"");
 			throw new PhrescoException(pe);
+		} finally {
+			Utility.closeStream(fis);
 		}
 	}
 	
@@ -267,11 +285,12 @@ public class ProjectService extends DbService {
 		return clonedProjectInfo;
 	}
 
-    @POST
-	@Path(ServiceConstants.REST_API_PROJECT_UPDATE)
-	@Produces(ServiceConstants.MEDIATYPE_ZIP)
-	@Consumes(MediaType.APPLICATION_JSON)
-	public StreamingOutput updateProject(@Context HttpServletRequest request, ProjectInfo projectInfo) throws PhrescoException {
+	@ApiOperation(value = "Update Project ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Unable To update")})
+    @RequestMapping(value= ServiceConstants.REST_API_PROJECT_UPDATE, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = ServiceConstants.MEDIATYPE_ZIP, method = RequestMethod.POST)
+	public @ResponseBody byte[] updateProject(HttpServletRequest request, 
+			@ApiParam(value = "ProjectInfo to update",	name = "projectInfo")@RequestBody ProjectInfo projectInfo) throws PhrescoException, IOException {
     	if (isDebugEnabled) {
 			LOGGER.debug("ProjectService.updateProject : Entry");
 		}
@@ -282,44 +301,22 @@ public class ProjectService extends DbService {
 			}
 			return null;
 		}
-    	buildUpdateLogMessage(request, projectInfo);
-		String projectPathStr = Utility.getPhrescoTemp() + UUID.randomUUID().toString();
-		try {
-			ProjectServiceManager projectService = PhrescoServerFactory.getProjectService();
-			projectService.updateProject(projectInfo, projectPathStr);
-			
-			ArchiveUtil.createArchive(projectPathStr, projectPathStr + ZIP, ArchiveType.ZIP);
-		} catch (Exception pe) {
-			LOGGER.error("ProjectService.updateProject", "remoteAddress=" + request.getRemoteAddr(),
-					"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + pe.getLocalizedMessage() + "\"");
-			throw new PhrescoException(pe);
+    	FileInputStream fis = null;
+    	try {
+    		buildUpdateLogMessage(request, projectInfo);
+    		String projectPathStr = Utility.getPhrescoTemp() + UUID.randomUUID().toString();
+    		ProjectServiceManager projectService = PhrescoServerFactory.getProjectService();
+    		projectService.updateProject(projectInfo, projectPathStr);
+    		ArchiveUtil.createArchive(projectPathStr, projectPathStr + ZIP, ArchiveType.ZIP);
+    		fis = new FileInputStream(new File(projectPathStr + ZIP));
+    		return IOUtils.toByteArray(fis);
+    	} catch (Exception e) {
+    		LOGGER.error("ProjectService.updateProject", "remoteAddress=" + request.getRemoteAddr(),
+					"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			throw new PhrescoException(e);
+		} finally {
+			Utility.closeStream(fis);
 		}
-		if (isDebugEnabled) {
-			LOGGER.debug("ProjectService.updateProject : Exit");
-		}
-		return new ServiceOutput(projectPathStr);
-	}
-	
-	@POST
-	@Path(ServiceConstants.REST_APP_UPDATEDOCS)
-	@Produces(ServiceConstants.MEDIATYPE_ZIP)
-	@Consumes(MediaType.APPLICATION_JSON)
-	public StreamingOutput updateDoc(ApplicationInfo appInfo) throws PhrescoException {
-		if (isDebugEnabled) {
-			LOGGER.debug("Entering Method PhrescoService.updateDoc(ProjectInfo projectInfo)");
-			LOGGER.debug("updateProject() ProjectInfo=" + appInfo.getCode());
-		}
-		String projectPathStr = "";
-		try {
-			ProjectServiceManager projectService = PhrescoServerFactory.getProjectService();
-			File projectPath = projectService.updateDocumentProject(appInfo);
-			projectPathStr = projectPath.getPath();
-			ArchiveUtil.createArchive(projectPathStr, projectPathStr + ZIP, ArchiveType.ZIP);
-		} catch (Exception pe) {
-			LOGGER.error("Error During updateProject(projectInfo)" + pe);
-			throw new PhrescoException(pe);
-		}
-		return new ServiceOutput(projectPathStr);
 	}
 	
 	class ServiceOutput implements StreamingOutput {

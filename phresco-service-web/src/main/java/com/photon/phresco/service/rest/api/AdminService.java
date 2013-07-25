@@ -19,30 +19,47 @@ package com.photon.phresco.service.rest.api;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
-import org.springframework.stereotype.Component;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.HandlerMapping;
 
+import com.google.gson.Gson;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactGroup.Type;
 import com.photon.phresco.commons.model.Customer;
@@ -80,12 +97,16 @@ import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.MultiPart;
 import com.sun.jersey.multipart.MultiPartMediaTypes;
+import com.wordnik.swagger.annotations.ApiError;
+import com.wordnik.swagger.annotations.ApiErrors;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 
-@Component
-@Path(ServiceConstants.REST_API_ADMIN)
+@Controller
+@RequestMapping(value = ServiceConstants.REST_API_ADMIN)
 public class AdminService extends DbService {
 	
-	private static final Logger S_LOGGER = Logger.getLogger(AdminService.class);
+	private static final Logger S_LOGGER = Logger.getLogger("SplunkLogger");
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	private RepositoryManager repositoryManager = null;
 	private static String exceptionString = "PhrescoException Is";
@@ -97,143 +118,166 @@ public class AdminService extends DbService {
     }
     
     /**
-     * Returns the list of customers
+     * Returns the list of customers and customer by name
      * @return
      */
-    @GET
-    @Path (REST_API_CUSTOMERS)
-    @Produces (MediaType.APPLICATION_JSON)
-    public Response findCustomer(@QueryParam("customerName") String customerName) {
+    @ApiOperation(value = " Lists all customers and returns single customer if customer name is present")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to retrive"), @ApiError(code=204, reason = "Customers not found")})
+    @RequestMapping(value= ServiceConstants.REST_API_CUSTOMERS, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+    public @ResponseBody List<Customer> findCustomer(HttpServletResponse response) {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.findCustomer()");
         }
-        try {
-			if(StringUtils.isNotEmpty(customerName)) {
-				CustomerDAO customer = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME, 
-				        new Query(Criteria.where("name").is(customerName)), CustomerDAO.class);
-				if (customer != null) {
-					Converter<CustomerDAO, Customer> customerConverter = 
-						(Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
-					Customer customerInfo = customerConverter.convertDAOToObject(customer, DbService.getMongoOperation());
-					return Response.status(Response.Status.OK).entity(customerInfo).build();
-				}
-			}
-			List<Customer> customers = findCustomersFromDB();
-			return Response.status(Response.Status.OK).entity(customers).build();
-		} catch (PhrescoException e) {
-			throw new PhrescoWebServiceException(e, EX_PHEX00005, CUSTOMERS_COLLECTION_NAME);
+		List<Customer> customers = findCustomersFromDB();
+		if(CollectionUtils.isEmpty(customers)) {
+			response.setStatus(204);
+			return customers;
 		}
+		response.setStatus(200);
+		return customers;
     }
     
-    /**
-     * Returns the icon as stream
-     * @return
-     * @throws PhrescoException 
-     */
-    @GET
-    @Path (REST_API_ICON)
-    @Produces (MediaType.MULTIPART_FORM_DATA)
-    public Response getIcon(@QueryParam(REST_QUERY_ID) String id) throws PhrescoException {
+    @ApiOperation(value = "Get customer icon by given customerid")
+    @ApiErrors(value = {@ApiError(code=204, reason = "Icon not found")})
+    @RequestMapping(value= REST_API_ICON, produces = MediaType.MULTIPART_FORM_DATA_VALUE, method = RequestMethod.GET)
+    public @ResponseBody byte[] getIcon(HttpServletResponse response, 
+    		@ApiParam(value = "The Id of the customer to get icon", name = REST_QUERY_CUSTOMERID) @QueryParam(REST_QUERY_CUSTOMERID) 
+    		String customerId) throws PhrescoException {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.getIcon(String id)");
         }
-        InputStream inputStream = getFileFromDB(id);
-    	return Response.status(Response.Status.OK).entity(inputStream).build();
+        InputStream inputStream = getFileFromDB(customerId);
+        if(inputStream == null) {
+        	response.setStatus(204);
+        }
+        byte[] byteArray = null;
+		try {
+			byteArray = IOUtils.toByteArray(inputStream);
+		} catch (IOException e) {
+			throw new PhrescoException(e);
+		}
+    	return byteArray;
     }
     
-    /**
-     * Returns the customer theme and icon for a particular customer
-     * @return
-     * @throws PhrescoException 
-     */
-    @GET
-    @Path(REST_CUSTOMER_PROPERTIES)
-    @Produces (MultiPartMediaTypes.MULTIPART_MIXED)
-    public Response getCustomerProperties(@QueryParam("context") String context) throws PhrescoException {
-    	
-    	Customer customerInfo=null;
-    	InputStream inputStream=null;
-    	
-    	 if (isDebugEnabled) {
-             S_LOGGER.debug("Entered into AdminService.getCustomerProperties()");
-         }
-         try {
-			if(StringUtils.isNotEmpty(context)) {
-				
-				CustomerDAO customer = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME, 
-				        new Query(Criteria.where("context").is(context)), CustomerDAO.class);
-				
-				if (customer != null) {
-					
-					Converter<CustomerDAO, Customer> customerConverter = 
-						(Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
-					customerInfo = customerConverter.convertDAOToObject(customer, DbService.getMongoOperation());
-					
-					inputStream = getFileFromDB(customerInfo.getId());
-					
-					if(inputStream != null) {
-	
-		 			MultiPart multiPart = new MultiPart().
-	 		    	      bodyPart(new BodyPart(customerInfo, MediaType.APPLICATION_JSON_TYPE)).
-	 		    	      bodyPart(new BodyPart(inputStream, MediaType.MULTIPART_FORM_DATA_TYPE));
-		 			
-		 			return Response.ok(multiPart, MultiPartMediaTypes.MULTIPART_MIXED_TYPE).header("status", Response.Status.OK).build();
-
-					}
-					return Response.ok(getErrorResponse(), MultiPartMediaTypes.MULTIPART_MIXED_TYPE).header("status", Response.Status.NO_CONTENT).build();
-				}
-				return Response.ok(getErrorResponse(), MultiPartMediaTypes.MULTIPART_MIXED_TYPE).header("status", Response.Status.NOT_FOUND).build();
-			}
-			return Response.ok(getErrorResponse(), MultiPartMediaTypes.MULTIPART_MIXED_TYPE).header("status", Response.Status.PRECONDITION_FAILED).build();
- 			
- 		} catch (PhrescoException e) {
- 			throw new PhrescoWebServiceException(e, EX_PHEX00005, CUSTOMERS_COLLECTION_NAME);
- 		}
-         
- 			
-    }
+//    @ApiOperation(value = "Get customer properties by given customer context")
+//    @ApiErrors(value = {@ApiError(code=204, reason = "Icon not found"), @ApiError(code=500, reason = "Failed to retrive")})
+//    @RequestMapping(value= "/customerproperties", produces = MultiPartMediaTypes.MULTIPART_MIXED, method = RequestMethod.GET)
+//    public @ResponseBody MultiPart getCustomerProperties(HttpServletResponse response, 
+//    		@ApiParam(value = "The context of the customer to get properties", name = "context") @QueryParam(REST_QUERY_CONTEXT) String context)
+//    		throws PhrescoException {
+//    	Customer customerInfo=null;
+//    	InputStream inputStream=null;
+//    	 if (isDebugEnabled) {
+//             S_LOGGER.debug("Entered into AdminService.getCustomerProperties()");
+//         }
+//    	 MultiPart multiPart = null;
+//         try {
+//			if(StringUtils.isNotEmpty(context)) {
+//				CustomerDAO customer = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME, 
+//				        new Query(Criteria.where("context").is(context)), CustomerDAO.class);
+//				if (customer != null) {
+//					Converter<CustomerDAO, Customer> customerConverter = 
+//						(Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
+//					customerInfo = customerConverter.convertDAOToObject(customer, DbService.getMongoOperation());
+//					inputStream = getFileFromDB(customerInfo.getId());
+//					if(inputStream != null) {
+//		 			multiPart = new MultiPart().
+//	 		    	      bodyPart(new BodyPart(customerInfo, javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE)).
+//	 		    	      bodyPart(new BodyPart(inputStream, javax.ws.rs.core.MediaType.MULTIPART_FORM_DATA_TYPE));
+//		 			response.setStatus(200);
+//		 			return multiPart;
+//					}
+//					response.setStatus(204);
+//		 			return multiPart;
+//				}
+//				response.setStatus(204);
+//	 			return multiPart;
+//			}
+//			response.setStatus(412);
+// 			return multiPart;
+// 		} catch (PhrescoException e) {
+// 			response.setStatus(500);
+// 			throw new PhrescoWebServiceException(e, EX_PHEX00005, CUSTOMERS_COLLECTION_NAME);
+// 		}
+//    }
     
-    private MultiPart getErrorResponse()
-    {
+    private MultiPart getErrorResponse() {
     	String str = "null";
 		InputStream is = new ByteArrayInputStream(str.getBytes());
 		MultiPart multiPart = new MultiPart().
-		    	      bodyPart(new BodyPart("", MediaType.APPLICATION_JSON_TYPE)).
-		    	      bodyPart(new BodyPart(is, MediaType.MULTIPART_FORM_DATA_TYPE));
+		    	      bodyPart(new BodyPart("", javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE)).
+		    	      bodyPart(new BodyPart(is, javax.ws.rs.core.MediaType.MULTIPART_FORM_DATA_TYPE));
 		return multiPart;
     }
     
-    
+    @ApiOperation(value = "Get customer properties by given customer context")
+    @ApiErrors(value = {@ApiError(code=204, reason = "Icon not found"), @ApiError(code=500, reason = "Failed to retrive")})
+    @RequestMapping(value= "/customerproperties", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+    public @ResponseBody Customer getCustomerProperties(HttpServletResponse response, HttpServletRequest request, 
+    		@ApiParam(value = "The context of the customer to get properties", name = "context") @QueryParam(REST_QUERY_CONTEXT) String context)
+    		throws PhrescoException, IOException {
+    	Customer customerInfo=null;
+    	InputStream inputStream=null;
+    	 if (isDebugEnabled) {
+             S_LOGGER.debug("Entered into AdminService.getCustomerProperties()");
+         }
+    	 if(StringUtils.isNotEmpty(context)) {
+				CustomerDAO customer = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME, 
+				        new Query(Criteria.where("context").is(context)), CustomerDAO.class);
+				if (customer != null) {
+					Converter<CustomerDAO, Customer> customerConverter = 
+						(Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
+					customerInfo = customerConverter.convertDAOToObject(customer, DbService.getMongoOperation());
+					inputStream = getFileFromDB(customerInfo.getId());
+				}
+		}
+//    	 Set<MediaType> mediaTypes = new HashSet<MediaType>();
+//    	 mediaTypes.add(MediaType.MULTIPART_FORM_DATA);
+////    	 mediaTypes.add(MediaType.APPLICATION_JSON);
+//    	 request.setAttribute(HandlerMapping.PRODUCIBLE_MEDIA_TYPES_ATTRIBUTE,
+//    	      mediaTypes);
+//    	 MultiValueMap<String, Object> parts = new LinkedMultiValueMap<String, Object>();
+//    	 HttpHeaders fileHeaders = new HttpHeaders();
+//    	 fileHeaders.add("Content-type",
+//    	      MediaType.APPLICATION_OCTET_STREAM_VALUE);
+//    	 
+//    	 ByteArrayResource r = new ByteArrayResource(IOUtils.toByteArray(inputStream));
+//    	 HttpEntity<ByteArrayResource> file = new HttpEntity<ByteArrayResource>(
+//    	      r, fileHeaders);
+//    	 parts.add("icon", file);
+//    	 parts.add("customer", customerInfo);
+//    	 HttpHeaders respHeaders = new HttpHeaders();
+//    	 respHeaders.add("Custom-Header1", "custom-value");
+//    	 respHeaders.add("Content-type", MediaType.MULTIPART_FORM_DATA_VALUE);
+//    	 ResponseEntity<MultiValueMap<String, Object>> eresp = new ResponseEntity<MultiValueMap<String, Object>>(
+//    	      parts, respHeaders, HttpStatus.CREATED);
+    	 
+		return customerInfo;
+    }
     
     /**
      * Creates the list of customers
      * @param customer
      * @return 
+     * @throws IOException 
      */
-    @POST
-    @Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
-    @Path (REST_API_CUSTOMERS)
-    public Response createCustomer(MultiPart multiPart) {
+    @ApiOperation(value = " Creates a new customer ")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to create")})
+    @RequestMapping(value= REST_API_CUSTOMERS, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, 
+    		MediaType.APPLICATION_JSON_VALUE,"multipart/mixed"}, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    public @ResponseBody void createCustomer(HttpServletResponse response, @RequestPart("icon") ByteArrayResource iconFile,
+    		@RequestParam(value = "customer", required = false) byte[] customerData) throws IOException {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.createCustomer(List<Customer> customer)");
         }
-        saveCustomer(multiPart);
-    	return Response.status(Response.Status.OK).build();
+        InputStream inputStream = iconFile.getInputStream();
+        Customer customer = new Gson().fromJson(new String(customerData), Customer.class);
+        saveCustomer(response, inputStream, customer);
     }
 
-    private Customer saveCustomer(MultiPart multiPart) {
-    	Customer customer = new Customer();
-        InputStream iconStream = null;
+    private Customer saveCustomer(HttpServletResponse response, InputStream iconStream, Customer customer) {
     	try {
-    		List<BodyPart> bodyParts = multiPart.getBodyParts();
-    		for (BodyPart bodyPart : bodyParts) {
-    			if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
-    				customer = bodyPart.getEntityAs(Customer.class);
-    	        } else {
-    	        	BodyPartEntity bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
-    	        	iconStream = bodyPartEntity.getInputStream();
-    	        }
-			}
     		if(validate(customer)) {
 				RepoInfo repoInfo = customer.getRepoInfo();
     			String repoName = repoInfo.getRepoName();
@@ -275,25 +319,31 @@ public class AdminService extends DbService {
 		        }
 			}	
     	} catch (Exception e) {
+    		response.setStatus(500);
     		throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
 		}
 		return customer;
     }
+    
     /**
      * Updates the list of customers
      * @param customers
      * @return
+     * @throws IOException 
      */
-    @PUT
-    @Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
-    @Produces (MediaType.APPLICATION_JSON)
-    @Path (REST_API_CUSTOMERS)
-    public Response updateCustomer(MultiPart multiPart) {
+    @ApiOperation(value = " Creates a new customer ")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to update")})
+    @RequestMapping(value= REST_API_CUSTOMERS, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, 
+    		MediaType.APPLICATION_JSON_VALUE,"multipart/mixed"}, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
+    public @ResponseBody void updateCustomer(HttpServletResponse response, @RequestPart("icon") ByteArrayResource iconFile,
+    		@RequestParam(value = "customer", required = false) byte[] customerData) throws IOException {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.updateCustomer(List<Customer> customers)");
         }
-    	Customer customer = saveCustomer(multiPart);
-    	return Response.status(Response.Status.OK).entity(customer).build();
+        InputStream inputStream = iconFile.getInputStream();
+        Customer customer = new Gson().fromJson(new String(customerData), Customer.class);
+        saveCustomer(response, inputStream, customer);
     }
 
     /**
@@ -301,13 +351,16 @@ public class AdminService extends DbService {
      * @param deleteCustomers
      * @throws PhrescoException 
      */
-    @DELETE
-    @Path (REST_API_CUSTOMERS)
-    public void deleteCustomer(List<Customer> deleteCustomers) throws PhrescoException {
+    @ApiOperation(value = " Deletes the customer ")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Unsupported operation")})
+    @RequestMapping(value= REST_API_CUSTOMERS, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
+    public @ResponseBody void deleteCustomer(HttpServletResponse response, @ApiParam(required = true, name = "customers", 
+    		value = "The customer to delete")@RequestBody List<Customer> customers) throws PhrescoException {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.deleteCustomer(List<Customer> deleteCustomers)");
         }
-        
+        response.setStatus(500);
     	PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
     	S_LOGGER.error(exceptionString + phrescoException.getErrorMessage());
     	throw phrescoException;
@@ -318,79 +371,81 @@ public class AdminService extends DbService {
      * @param id
      * @return
      */
-    @GET
-    @Produces (MediaType.APPLICATION_JSON)
-    @Path (REST_API_CUSTOMERS + REST_API_PATH_ID)
-    public Response getCustomer(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+    @ApiOperation(value = " Retrieves a customer based on their id ")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to retrive"),@ApiError(code=505, reason = "Customer not found")})
+    @RequestMapping(value= REST_API_CUSTOMERS + REST_API_PATH_ID, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+    public @ResponseBody Customer getCustomer(HttpServletResponse response, @ApiParam(name = REST_API_PATH_PARAM_ID , required = true, 
+    		value = "The id of the customer that needs to be retrieved")@PathVariable(REST_API_PATH_PARAM_ID) String id) {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.getCustomer(String id)" + id);
         }
-    	
+        Customer customer = null;
     	try {
-    		CustomerDAO customer = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME, 
+    		CustomerDAO customerDAO= DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME, 
     		        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), CustomerDAO.class);
-    		if (customer != null) {
-    			Converter<CustomerDAO, Customer> customerConverter = 
-        			(Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
-    			Customer foundcustomer = customerConverter.convertDAOToObject(customer, DbService.getMongoOperation());
-    			return Response.status(Response.Status.OK).entity(foundcustomer).build();
+    		if(customerDAO == null) {
+    			response.setStatus(204);
+    			return customer;
     		}
+			Converter<CustomerDAO, Customer> customerConverter = 
+    			(Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
+			customer = customerConverter.convertDAOToObject(customerDAO, DbService.getMongoOperation());
+			response.setStatus(200);
+			return customer;
     	} catch (Exception e) {
+    		response.setStatus(500);
     		throw new PhrescoWebServiceException(e, EX_PHEX00005, CUSTOMERS_COLLECTION_NAME);
     	}
-    	
-    	return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
     }
     
     /**
      * Updates the list of customers by Id
-     * @param updateCustomers
+     * @param customer
      * @return
      */
-    @PUT
-    @Consumes (MediaType.APPLICATION_JSON)
-    @Produces (MediaType.APPLICATION_JSON)
-    @Path (REST_API_CUSTOMERS + REST_API_PATH_ID)
-    public Response updateCustomer(@PathParam(REST_API_PATH_PARAM_ID) String id , Customer updateCustomers) {
+    @ApiOperation(value = " Updates a customer based on their id ")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to update")})
+    @RequestMapping(value= REST_API_CUSTOMERS + REST_API_PATH_ID, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
+    public @ResponseBody void updateCustomer(HttpServletResponse  response, @ApiParam(name = REST_API_PATH_PARAM_ID , required = true, 
+    		value = "The id of the customer that needs to be retrieved")@PathVariable(REST_API_PATH_PARAM_ID) String id, 
+    		@ApiParam(required = true, name = "customer", value = "The customer data to be update")@RequestBody Customer customer) {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.updateCustomer(String id , Customer updateCustomers)" + id);
         }
-    	
     	try {
-    		if (id.equals(updateCustomers.getId())) {
-    			Converter<CustomerDAO, Customer> customerConverter = 
-        			(Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
-    			CustomerDAO customerDao = customerConverter.convertObjectToDAO(updateCustomers);
-        		DbService.getMongoOperation().save(CUSTOMERS_COLLECTION_NAME, customerDao);
-        		return Response.status(Response.Status.OK).entity(updateCustomers).build();
-         	} 
+			Converter<CustomerDAO, Customer> customerConverter = 
+    			(Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
+			CustomerDAO customerDao = customerConverter.convertObjectToDAO(customer);
+    		DbService.getMongoOperation().save(CUSTOMERS_COLLECTION_NAME, customerDao);
+    		response.setStatus(200);
     	} catch (Exception e) {
+    		response.setStatus(500);
     		throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
 		}
-    	
-    	return Response.status(Response.Status.BAD_REQUEST).entity(ERROR_MSG_ID_NOT_EQUAL).build();
     }
-
     
     /**
      * Deletes the customer by id for the given parameter
      * @param id
      * @return 
      */
-    @DELETE
-    @Path (REST_API_CUSTOMERS + REST_API_PATH_ID)
-    public Response deleteCustomer(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+    @ApiOperation(value = " Deletes a customer based on their id ")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to delete")})
+    @RequestMapping(value= REST_API_CUSTOMERS + REST_API_PATH_ID, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
+    public @ResponseBody void deleteCustomer(HttpServletResponse response, @ApiParam(name = REST_API_PATH_PARAM_ID , required = true, 
+    		value = "The id of the customer that needs to delete")@PathVariable(REST_API_PATH_PARAM_ID) String id) {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.deleteCustomer(String id)" + id);
         }
-    	
     	try {
-    		DbService.getMongoOperation().remove(CUSTOMERS_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), CustomerDAO.class);
+    		DbService.getMongoOperation().remove(CUSTOMERS_COLLECTION_NAME, 
+    				new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), CustomerDAO.class);
+    		response.setStatus(200);
     	} catch (Exception e) {
+    		response.setStatus(500);
     		throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
     	}
-    	
-    	return Response.status(Response.Status.OK).build();
     }
 
 	
@@ -398,10 +453,10 @@ public class AdminService extends DbService {
 	 * Returns the list of videos
 	 * @return
 	 */
-	@GET
-	@Path (REST_API_VIDEOS)
-	@Produces (MediaType.APPLICATION_JSON)
-	public Response findVideos() {
+    @ApiOperation(value = " Lists all the videos ")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to retrive"), @ApiError(code=205, reason = "Videos not found")})
+    @RequestMapping(value= REST_API_VIDEOS, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody List<VideoInfo> findVideos(HttpServletResponse response) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.findVideos()");
 	    }
@@ -414,13 +469,17 @@ public class AdminService extends DbService {
 					VideoInfo videoInfo = videoInfoConverter.convertDAOToObject(videoInfoDAO, DbService.getMongoOperation());
 					videoInfos.add(videoInfo);
 				}
-				return Response.status(Response.Status.OK).entity(videoInfos).build(); 
 			}
+			if(CollectionUtils.isEmpty(videoInfos)) {
+				response.setStatus(204);
+				return videoInfos;
+			}
+			response.setStatus(200);
+			return videoInfos;
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, VIDEOS_COLLECTION_NAME);
 		}
-		
-		return Response.status(Response.Status.OK).entity(ERROR_MSG_NOT_FOUND).build(); 
 	}
 
 	/**
@@ -429,17 +488,19 @@ public class AdminService extends DbService {
 	 * @return 
 	 * @throws PhrescoException 
 	 */
-	@POST
-	@Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
-	@Path (REST_API_VIDEOS)
-	public Response createVideo(MultiPart videosinfo) throws PhrescoException {
+    @ApiOperation(value = " Creates a new video ")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to create")})
+    @RequestMapping(value= REST_API_VIDEOS, consumes = MultiPartMediaTypes.MULTIPART_MIXED, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+	public @ResponseBody void createVideo(@ApiParam(required = true, name = "videos", 
+    		value = "The multipart value of video to create")@RequestBody MultiPart videos) throws PhrescoException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.createVideo(List<VideoInfo> videos)");
 	    }
-	    return createOrUpdateVideo(videosinfo);
+	    createOrUpdateVideo(videos);
 	}
 
-	private Response createOrUpdateVideo(MultiPart videosinfo)
+	private void createOrUpdateVideo(MultiPart videosinfo)
 			throws PhrescoException {
 		VideoInfo video = null;
 		BodyPartEntity videoBodyPartEntity = null;
@@ -450,7 +511,7 @@ public class AdminService extends DbService {
 		
 		if (CollectionUtils.isNotEmpty(bodyParts)) {
 			for (BodyPart bodyPart : bodyParts) {
-				if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
+				if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_VALUE)) {
 					video = bodyPart.getEntityAs(VideoInfo.class);
 					video.setCustomerIds(Arrays.asList(DEFAULT_CUSTOMER_NAME));
 				} else {
@@ -509,8 +570,6 @@ public class AdminService extends DbService {
 				saveVideos(video);
 			}
 		}
-		
-		return Response.status(Response.Status.OK).entity(video).build();
 	}
 	
 	private boolean uploadIcon(ArtifactGroup artifactGroup, File iconFile) throws PhrescoException {
@@ -544,7 +603,6 @@ public class AdminService extends DbService {
         Converter<ArtifactGroupDAO, ArtifactGroup> converter = 
             (Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
         ArtifactGroupDAO moduleGroupDAO = converter.convertObjectToDAO(moduleGroup);
-        
 //        List<com.photon.phresco.commons.model.ArtifactInfo> moduleGroupVersions = moduleGroup.getVersions();
         List<String> versionIds = new ArrayList<String>();
         
@@ -594,15 +652,16 @@ public class AdminService extends DbService {
 	 * @return
 	 * @throws PhrescoException 
 	 */
-	@PUT
-	@Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_VIDEOS)
-	public Response updateVideos(MultiPart videos) throws PhrescoException {
+	@ApiOperation(value = " Update a video ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to update")})
+    @RequestMapping(value= REST_API_VIDEOS, consumes = MultiPartMediaTypes.MULTIPART_MIXED, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
+	public @ResponseBody void updateVideos(@ApiParam(required = true, name = "videos", 
+    		value = "The multipart value of video to be update")@RequestBody MultiPart videos) throws PhrescoException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.updateVideos(List<VideoInfo> videos)");
 	    }
-		return createOrUpdateVideo(videos);
+		createOrUpdateVideo(videos);
 	}
 
 	/**
@@ -610,13 +669,16 @@ public class AdminService extends DbService {
 	 * @param videos
 	 * @throws PhrescoException 
 	 */
-	@DELETE
-	@Path(REST_API_VIDEOS)
-	public void deleteVideos(List<VideoInfo> videos) throws PhrescoException {
+	@ApiOperation(value = " Deletes a list of videos ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Unsupported operation")})
+    @RequestMapping(value= REST_API_VIDEOS, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
+	public @ResponseBody void deleteVideos(HttpServletResponse response, @ApiParam(required = true, name = "videos", 
+    		value = "Videos to be delete")@RequestBody List<VideoInfo> videos) throws PhrescoException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.deleteVideos(List<VideoInfo> videos)");
 	    }
-		
+	    response.setStatus(500);
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
 		S_LOGGER.error(exceptionString + phrescoException.getErrorMessage());
 		throw phrescoException;
@@ -627,45 +689,53 @@ public class AdminService extends DbService {
 	 * @param id
 	 * @return
 	 */
-	@GET
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_VIDEOS + REST_API_PATH_ID)
-	public Response getVideo(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	@ApiOperation(value = " Retrieves a video based on their id ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to retrive"),@ApiError(code=205, reason = "Video not found")})
+    @RequestMapping(value= REST_API_VIDEOS + REST_API_PATH_ID, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody VideoInfo getVideo(HttpServletResponse response, @ApiParam(name = REST_API_PATH_PARAM_ID , required = true, 
+    		value = "The id of the video that needs to retrived")@PathVariable(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.getVideo(String id)" + id);
 	    }
-		
+	    VideoInfo videoInfo = null;
 		try {
-			VideoInfoDAO videoInfo = DbService.getMongoOperation().findOne(VIDEODAO_COLLECTION_NAME, 
+			VideoInfoDAO videoInfoDAO = DbService.getMongoOperation().findOne(VIDEODAO_COLLECTION_NAME, 
 			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), VideoInfoDAO.class);
-			if (videoInfo != null) {
+			if (videoInfoDAO != null) {
 				Converter<VideoInfoDAO, VideoInfo> videoInfoConverter = 
 						(Converter<VideoInfoDAO, VideoInfo>) ConvertersFactory.getConverter(VideoInfoDAO.class);
-					VideoInfo videoInfos = videoInfoConverter.convertDAOToObject(videoInfo, DbService.getMongoOperation());
-				return Response.status(Response.Status.OK).entity(videoInfos).build(); 
+				videoInfo = videoInfoConverter.convertDAOToObject(videoInfoDAO, DbService.getMongoOperation());
 			}
+			if(videoInfo == null) {
+				response.setStatus(204);
+				return videoInfo;
+			}
+			response.setStatus(200);
+			return videoInfo;
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, VIDEODAO_COLLECTION_NAME);
 		}
-		
-		return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
 	}
 	
 	/**
 	 * Updates the list of video bu Id
-	 * @param videoInfo
+	 * @param multipartVideo
 	 * @return
 	 * @throws PhrescoException 
 	 */
-	@PUT
-	@Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_VIDEOS + REST_API_PATH_ID)
-	public Response updateVideo(@PathParam(REST_API_PATH_PARAM_ID) String id , MultiPart videoInfo) throws PhrescoException {
+	@ApiOperation(value = " Updates a video based on their id ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to update")})
+    @RequestMapping(value= REST_API_VIDEOS + REST_API_PATH_ID, consumes = MultiPartMediaTypes.MULTIPART_MIXED ,
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
+	public @ResponseBody void updateVideo(HttpServletResponse response, @ApiParam(name = REST_API_PATH_PARAM_ID , required = true, 
+    		value = "The id of the video that needs to update")@PathVariable(REST_API_PATH_PARAM_ID) String id , 
+    		@ApiParam(required = true, name = "multipartVideo", value = "The multipart value of video")@RequestBody MultiPart multipartVideo) 
+			throws PhrescoException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.updateVideo(String id , VideoInfo videoInfo)" + id);
 	    }
-				return createOrUpdateVideo(videoInfo);
+		createOrUpdateVideo(multipartVideo);
 	}
 
 	
@@ -674,9 +744,12 @@ public class AdminService extends DbService {
 	 * @param id
 	 * @return 
 	 */
-	@DELETE
-	@Path(REST_API_VIDEOS + REST_API_PATH_ID)
-	public Response deleteVideo(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	@ApiOperation(value = " Deletes a video based on their id ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to delete")})
+    @RequestMapping(value= REST_API_VIDEOS + REST_API_PATH_ID, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
+	public @ResponseBody void deleteVideo(HttpServletResponse response,
+			@ApiParam(name = REST_API_PATH_PARAM_ID , required = true, value = "The id of the video that needs to delete")
+			@PathVariable(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.deleteVideo(String id)" + id);
 	    }
@@ -702,33 +775,34 @@ public class AdminService extends DbService {
 							new Query(Criteria.whereId().in(videoInfoDAO.getVideoListId().toArray())), VideoTypeDAO.class);
 				}
 			}
+			response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
 		}
-		
-		return Response.status(Response.Status.OK).build();
 	}
 	
 	/**
 	 * Returns the list of users
 	 * @return
 	 */
-	@GET
-	@Path (REST_API_USERS)
-	@Produces (MediaType.APPLICATION_JSON)
-	public Response findUsers() {
+	@ApiOperation(value = " Lists all the Users ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to retrive"), @ApiError(code=204, reason = "Users not found")})
+    @RequestMapping(value= REST_API_USERS, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody List<User> findUsers(HttpServletResponse response) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.findUsers()");
 	    }
-		
 		try {
 			List<User> userList = DbService.getMongoOperation().getCollection(USERS_COLLECTION_NAME, User.class);
 			if (userList.isEmpty()) {
-				return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
+				response.setStatus(204);
+				return userList;
 			}
-			
-			return Response.status(Response.Status.OK).entity(userList).build();
+			response.setStatus(200);
+			return userList;
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, USERS_COLLECTION_NAME);
 		}
 	}
@@ -738,14 +812,15 @@ public class AdminService extends DbService {
 	 * @param users
 	 * @return 
 	 */
-	@POST
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Path (REST_API_USERS)
-	public Response createUser(List<User> users) {
+	@ApiOperation(value = " Create a new User ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to create")})
+    @RequestMapping(value= REST_API_USERS, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+	public @ResponseBody void createUser(HttpServletResponse response, @ApiParam(required = true, name = "users", 
+			value = "List of users to create")@RequestBody List<User> users) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.createUser(List<User> users)");
 	    }
-		
 		try {
 			for (User user : users) {
 				if(validate(user)) {
@@ -755,12 +830,11 @@ public class AdminService extends DbService {
 					DbService.getMongoOperation().save(USERS_COLLECTION_NAME, user);
 				}
 			}
-			
+		response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
 		}
-		
-		return Response.status(Response.Status.OK).build();
 	}
 	
 	/**
@@ -769,26 +843,32 @@ public class AdminService extends DbService {
 	 * @return 
 	 * @throws PhrescoException 
 	 */
-	@POST
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_USERS_IMPORT)
-	public Response importUsers(User user) throws PhrescoException {
+	@ApiOperation(value = " Sync all the users from LDAP to database ")
+	@ApiErrors(value = {@ApiError(code=204, reason = "Users not found")})
+    @RequestMapping(value= REST_API_USERS_IMPORT, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+	public @ResponseBody List<User> importUsers(HttpServletResponse response, @ApiParam(required = true, name = "user", 
+			value = "The Logged User Data")@RequestBody User user) throws PhrescoException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.createUser(List<User> users)");
 	    }
+	    
 	    PhrescoServerFactory.initialize();
         RepositoryManager repoMgr = PhrescoServerFactory.getRepositoryManager();
     	Client client = ClientHelper.createClient();
         WebResource resource = client.resource(repoMgr.getAuthServiceURL() + "/ldap/import");
-        resource.accept(MediaType.APPLICATION_JSON);
-        ClientResponse response = resource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, user);
+        resource.accept(MediaType.APPLICATION_JSON_VALUE);
+        ClientResponse clientResponse = resource.type(MediaType.APPLICATION_JSON_VALUE).post(ClientResponse.class, user);
         GenericType<List<User>> genericType = new GenericType<List<User>>() {};
-        List<User> users = response.getEntity(genericType);
-        
+        List<User> users = clientResponse.getEntity(genericType);
         //To save the users into user table
+        if(CollectionUtils.isEmpty(users)) {
+        	response.setStatus(204);
+        	return users;
+        }
         DbService.getMongoOperation().insertList(USERS_COLLECTION_NAME, users);
-		return Response.status(Response.Status.OK).entity(users).build();
+        response.setStatus(200);
+        return users;
 	}
 
 	
@@ -797,15 +877,15 @@ public class AdminService extends DbService {
 	 * @param users
 	 * @return
 	 */
-	@PUT
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_USERS)
-	public Response updateUsers(List<User> users) {
+	@ApiOperation(value = "Update user ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to update")})
+    @RequestMapping(value= REST_API_USERS, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
+	public @ResponseBody void updateUsers(HttpServletResponse response, @ApiParam(required = true, name = "users", 
+			value = "The user data to update ")@RequestBody List<User> users) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.updateUsers(List<User> users)");
 	    }
-		
 		try {
 			for (User user : users) {
 				User userInfo = DbService.getMongoOperation().findOne(USERS_COLLECTION_NAME , 
@@ -814,11 +894,11 @@ public class AdminService extends DbService {
 					DbService.getMongoOperation().save(USERS_COLLECTION_NAME, user);
 				}
 			}
+			response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
 		}
-		
-		return Response.status(Response.Status.OK).entity(users).build();
 	}
 
 	/**
@@ -826,13 +906,15 @@ public class AdminService extends DbService {
 	 * @param users
 	 * @throws PhrescoException 
 	 */
-	@DELETE
-	@Path (REST_API_USERS)
-	public void deleteUsers(List<User> users) throws PhrescoException {
+	@ApiOperation(value = "Delete list of users")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Unsupportd operation")})
+    @RequestMapping(value= REST_API_USERS, method = RequestMethod.DELETE)
+	public void deleteUsers(HttpServletResponse response, @ApiParam(required = true, name = "users", 
+			value = "The list of users to delete ")@RequestBody List<User> users) throws PhrescoException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.deleteUsers(List<User> users)");
 	    }
-		
+	    response.setStatus(500);
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
 		S_LOGGER.error(exceptionString + phrescoException.getErrorMessage());
 		throw phrescoException;
@@ -843,25 +925,27 @@ public class AdminService extends DbService {
 	 * @param id
 	 * @return
 	 */
-	@GET
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_USERS + REST_API_PATH_ID)
-	public Response getUser(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	@ApiOperation(value = "Retrieves a user based on their id")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to retrive"), @ApiError(code=204, reason = "User not found")})
+    @RequestMapping(value= REST_API_USERS + REST_API_PATH_ID, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody User getUser(HttpServletResponse response, @ApiParam(name = REST_API_PATH_PARAM_ID , required = true, 
+			value = "The id of the user that needs to be retrieved")@PathVariable(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.getUser(String id)" + id);
 	    }
-		
 		try {
 			User userInfo = DbService.getMongoOperation().findOne(USERS_COLLECTION_NAME, 
 			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), User.class);
-			if (userInfo != null) {
-				return Response.status(Response.Status.OK).entity(userInfo).build(); 
+			if (userInfo == null) {
+				response.setStatus(204);
+				return userInfo;
 			} 
+			response.setStatus(200);
+			return userInfo;
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, USERS_COLLECTION_NAME);
 		}
-		
-		return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
 	}
 	
 	/**
@@ -869,25 +953,25 @@ public class AdminService extends DbService {
 	 * @param users
 	 * @return
 	 */
-	@PUT
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_USERS + REST_API_PATH_ID)
-	public Response updateUser(@PathParam(REST_API_PATH_PARAM_ID) String id , User user) {
+	@ApiOperation(value = "Updates a user based on their id")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to update")})
+    @RequestMapping(value= REST_API_USERS + REST_API_PATH_ID, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
+	public @ResponseBody void updateUser(HttpServletResponse response, @ApiParam(name = "Id" , required = true, 
+			value = "The id of the user that needs to be update")@PathVariable(REST_API_PATH_PARAM_ID) String id , 
+			@ApiParam(name = "user" , required = true, value = "The user that needs to be update") @RequestBody User user) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.updateUser(String id , User user)" + id);
 	    }
-		
 		try {
 			if (id.equals(user.getId())) {
 				DbService.getMongoOperation().save(USERS_COLLECTION_NAME, user);
-				return Response.status(Response.Status.OK).entity(user).build();
 			} 
+			response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
 		}
-		
-		return Response.status(Response.Status.BAD_REQUEST).entity(ERROR_MSG_ID_NOT_EQUAL).build(); 
 	}
 	
 	/**
@@ -895,48 +979,56 @@ public class AdminService extends DbService {
 	 * @param id
 	 * @return 
 	 */
-	@DELETE
-	@Path (REST_API_USERS + REST_API_PATH_ID)
-	public Response deleteUser(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	@ApiOperation(value = "Deletes a user based on their id")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to delete")})
+    @RequestMapping(value= REST_API_USERS + REST_API_PATH_ID, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
+	public @ResponseBody void deleteUser(HttpServletResponse response,
+			@ApiParam(name = REST_API_PATH_PARAM_ID , required = true, 
+			value = "The id of the user that needs to be delete")@PathVariable(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.deleteUser(String id)" + id);
 	    }
-		
 		try {
 			DbService.getMongoOperation().remove(USERS_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), User.class);
+			response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
 		}
-		
-		return Response.status(Response.Status.OK).build();
 	}
 	
 	/**
 	 * Returns the Roles
 	 * @return
 	 */
-	@GET
-	@Path (REST_API_ROLES)
-	@Produces (MediaType.APPLICATION_JSON)
-	public Response findRoles(@QueryParam(REST_QUERY_APPLIESTO) String applyTo) {
+	@ApiOperation(value = "Retrives all roles and roles by appliesto")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to retrive"), @ApiError(code=204, reason = "Roles not found")})
+    @RequestMapping(value= REST_API_ROLES, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody List<Role> findRoles(HttpServletResponse response, @ApiParam(name = "applyTo" , 
+			value = "Applies to framework or server") @QueryParam(REST_QUERY_APPLIESTO) String applyTo) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.findRoles()");
 	    }
 		List<Role> roles = new ArrayList<Role>();
 		try {
 			if(StringUtils.isNotEmpty(applyTo)) {
-				roles = DbService.getMongoOperation().find(ROLES_COLLECTION_NAME, new Query(Criteria.where("appliesTo").is(applyTo)), Role.class);
-				return Response.status(Response.Status.OK).entity(roles).build();
+				roles = DbService.getMongoOperation().find(ROLES_COLLECTION_NAME, 
+						new Query(Criteria.where("appliesTo").is(applyTo)), Role.class);
+				if(CollectionUtils.isEmpty(roles)) {
+					response.setStatus(204);
+				}
+				return roles;
 			}
 			roles = DbService.getMongoOperation().getCollection(ROLES_COLLECTION_NAME , Role.class);
-			if (roles != null) {
-				return Response.status(Response.Status.OK).entity(roles).build();
+			if (CollectionUtils.isEmpty(roles)) {
+				response.setStatus(204);
+				return roles;
 			} 
+			return roles;
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, ROLES_COLLECTION_NAME);
 		}
-		
-		return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
 	}
 
 	/**
@@ -944,25 +1036,26 @@ public class AdminService extends DbService {
 	 * @param roles
 	 * @return 
 	 */
-	@POST
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Path (REST_API_ROLES)
-	public Response createRoles(List<Role> roles) {
+	@ApiOperation(value = "Create a list of roles")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to create")})
+    @RequestMapping(value= REST_API_ROLES, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+	public @ResponseBody void createRoles(HttpServletResponse response, @ApiParam(name = "roles" , required = true, 
+			value = "List of roles to create") @RequestBody List<Role> roles) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.createRoles(List<Role> roles)");
 	    }
-		
 		try {
 			for (Role role : roles) {
 				if(validate(role)) {
 					DbService.getMongoOperation().save(ROLES_COLLECTION_NAME , role);
 				}
 			}
+			response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
 		}
-		
-		return Response.status(Response.Status.OK).build();
 	}
 
 	/**
@@ -970,15 +1063,15 @@ public class AdminService extends DbService {
 	 * @param roles
 	 * @return
 	 */
-	@PUT
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_ROLES)
-	public Response updateRoles(List<Role> roles) {
+	@ApiOperation(value = "Update a list of roles")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to update")})
+    @RequestMapping(value= REST_API_ROLES, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
+	public @ResponseBody void updateRoles(HttpServletResponse response, @ApiParam(name = "roles" , required = true, 
+			value = "List of roles to update") @RequestBody List<Role> roles) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.updateRoles(List<Role> roles)");
 	    }
-		
 		try {
 			for (Role role : roles) {
 				Role roleInfo = DbService.getMongoOperation().findOne(ROLES_COLLECTION_NAME , 
@@ -987,11 +1080,11 @@ public class AdminService extends DbService {
 					DbService.getMongoOperation().save(ROLES_COLLECTION_NAME, role);
 				}
 			}
+			response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
 		}
-		
-		return Response.status(Response.Status.OK).entity(roles).build();
 	}
 
 	/**
@@ -999,13 +1092,15 @@ public class AdminService extends DbService {
 	 * @param roles
 	 * @throws PhrescoException 
 	 */
-	@DELETE
-	@Path (REST_API_ROLES)
-	public void deleteRoles(List<Role> roles) throws PhrescoException {
+	@ApiOperation(value = "Delete a list of roles")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Unsupported operation")})
+    @RequestMapping(value= REST_API_ROLES, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
+	public void deleteRoles(HttpServletResponse response, @ApiParam(name = "roles" , required = true, 
+			value = "List of roles to delete") @RequestBody List<Role> roles) throws PhrescoException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.deleteRoles(List<Role> roles)");
 	    }
-		
+	    response.setStatus(500);
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
 		S_LOGGER.error(exceptionString  + phrescoException.getErrorMessage());
 		throw phrescoException;
@@ -1016,25 +1111,27 @@ public class AdminService extends DbService {
 	 * @param id
 	 * @return
 	 */
-	@GET
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_ROLES + REST_API_PATH_ID)
-	public Response getRole(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	@ApiOperation(value = "Retrives a role by their id ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to retrive"), @ApiError(code=204, reason = "Roles not found")})
+    @RequestMapping(value= REST_API_ROLES + REST_API_PATH_ID, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody Role getRole(HttpServletResponse response, @ApiParam(name = REST_API_PATH_PARAM_ID , required = true, 
+			value = "The id of the role that needs to be retrieved")@PathVariable(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.Response getRole(String id)" + id);
 	    }
-		
 		try {
 			Role role = DbService.getMongoOperation().findOne(ROLES_COLLECTION_NAME, 
 			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), Role.class);
-			if (role != null) {
-				return Response.status(Response.Status.OK).entity(role).build();
+			if (role == null) {
+				response.setStatus(204);
+				return role;
 			} 
+			response.setStatus(200);
+			return role;
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, ROLES_COLLECTION_NAME);
 		}
-		
-		return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
 	}
 	
 	/**
@@ -1042,25 +1139,25 @@ public class AdminService extends DbService {
 	 * @param role
 	 * @return
 	 */
-	@PUT
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_ROLES + REST_API_PATH_ID)
-	public Response updateRole(@PathParam(REST_API_PATH_PARAM_ID) String id , Role role) {
+	@ApiOperation(value = "Updates a role by their id ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to update")})
+    @RequestMapping(value= REST_API_ROLES + REST_API_PATH_ID, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
+	public @ResponseBody void updateRole(HttpServletResponse response, @ApiParam(name = REST_API_PATH_PARAM_ID , required = true, 
+			value = "The id of the role that needs to be update")@PathVariable(REST_API_PATH_PARAM_ID) String id ,
+			@ApiParam(name = "role" , required = true, value = "The role to be update")@RequestBody Role role) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.updateRole(String id , Role role)" + id);
 	    }
-		
 		try {
 			if (id.equals(role.getId())) {
 				DbService.getMongoOperation().save(ROLES_COLLECTION_NAME, role);
-				return Response.status(Response.Status.OK).entity(role).build();
 			} 
+			response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
 		}
-		
-		return Response.status(Response.Status.BAD_REQUEST).entity(ERROR_MSG_ID_NOT_EQUAL).build();
 	}
 	
 	/**
@@ -1068,20 +1165,22 @@ public class AdminService extends DbService {
 	 * @param id
 	 * @return 
 	 */
-	@DELETE
-	@Path (REST_API_ROLES + REST_API_PATH_ID)
-	public Response deleteRole(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	@ApiOperation(value = "Deletes a role by their id ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to delete")})
+    @RequestMapping(value= REST_API_ROLES + REST_API_PATH_ID, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
+	public @ResponseBody void deleteRole(HttpServletResponse response, @ApiParam(name = REST_API_PATH_PARAM_ID , required = true, 
+			value = "The id of the role that needs to be update")@PathVariable(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.deleteRole(String id)" + id);
 	    }
 		
 		try {
 			DbService.getMongoOperation().remove(ROLES_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), Role.class);
+			response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
 		}
-		
-		return Response.status(Response.Status.OK).build();
 	}
 	
 
@@ -1089,10 +1188,11 @@ public class AdminService extends DbService {
 	 * Returns the Permisions
 	 * @return
 	 */
-	@GET
-	@Path (REST_API_PERMISSIONS)
-	@Produces (MediaType.APPLICATION_JSON)
-	public Response findPermissions(@QueryParam(REST_QUERY_APPLIESTO) String applyTo) {
+	@ApiOperation(value = "Retrives all permissions and permissions by appliesto")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to retrive"), @ApiError(code=204, reason = "Permissions not found")})
+    @RequestMapping(value= REST_API_PERMISSIONS, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody List<Permission> findPermissions(HttpServletResponse response, @ApiParam(name = "applyTo" , 
+			value = "Appliesto framework or service")@QueryParam(REST_QUERY_APPLIESTO) String applyTo) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.findPermissions()");
 	    }
@@ -1100,17 +1200,20 @@ public class AdminService extends DbService {
 		try {
 			if(StringUtils.isNotBlank(applyTo)) {
 				permissions = DbService.getMongoOperation().find(PERMISSION_COLLECTION_NAME, new Query(Criteria.where("appliesTo").is(applyTo)), Permission.class);
-				return Response.status(Response.Status.OK).entity(permissions).build();
+				if(CollectionUtils.isEmpty(permissions)) {
+					response.setStatus(204);
+				}
+				return permissions;
 			}
 			permissions = DbService.getMongoOperation().getCollection(PERMISSION_COLLECTION_NAME , Permission.class);
-			if (permissions != null) {
-				return Response.status(Response.Status.OK).entity(permissions).build();
+			if (permissions == null) {
+				response.setStatus(204);
 			} 
+			return permissions;
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, PERMISSION_COLLECTION_NAME);
 		}
-		
-		return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
 	}
 
 	/**
@@ -1118,25 +1221,27 @@ public class AdminService extends DbService {
 	 * @param permission
 	 * @return 
 	 */
-	@POST
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Path (REST_API_PERMISSIONS)
-	public Response createPermission(List<Permission> permissions) {
+	@ApiOperation(value = "Creates a list of permissions")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to create")})
+    @RequestMapping(value= REST_API_PERMISSIONS, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+	public @ResponseBody void createPermission(HttpServletResponse response, @ApiParam(name = "permissions" , required = true, 
+			value = "List of permissions to create")@RequestBody List<Permission> permissions) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.createPermission(List<Permission> permissions)");
 	    }
-		
 		try {
 			for (Permission permission : permissions) {
 				if(validate(permission)) {
 					DbService.getMongoOperation().save(PERMISSION_COLLECTION_NAME , permission);
 				}
 			}
+			response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
 		}
 		
-		return Response.status(Response.Status.OK).build();
 	}
 
 	/**
@@ -1144,11 +1249,12 @@ public class AdminService extends DbService {
 	 * @param permission
 	 * @return
 	 */
-	@PUT
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_PERMISSIONS)
-	public Response updatePermissions(List<Permission> permissions) {
+	@ApiOperation(value = "Updates a list of permissions")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to update")})
+    @RequestMapping(value= REST_API_PERMISSIONS, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
+	public @ResponseBody Response updatePermissions(HttpServletResponse response, @ApiParam(name = "permissions" , required = true, 
+			value = "List of permissions to update")@RequestBody List<Permission> permissions) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.updatePermissions(List<Permission> permissions)");
 	    }
@@ -1161,7 +1267,9 @@ public class AdminService extends DbService {
 					DbService.getMongoOperation().save(PERMISSION_COLLECTION_NAME, permission);
 				}
 			}
+			response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
 		}
 		
@@ -1173,13 +1281,15 @@ public class AdminService extends DbService {
 	 * @param permission
 	 * @throws PhrescoException 
 	 */
-	@DELETE
-	@Path (REST_API_PERMISSIONS)
-	public void deletePermissions(List<Permission> permissions) throws PhrescoException {
+	@ApiOperation(value = "Deletes a list of permissions")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Unsupported operation")})
+    @RequestMapping(value= REST_API_PERMISSIONS, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
+	public void deletePermissions(HttpServletResponse response, @ApiParam(name = "permissions" , required = true, 
+			value = "List of permissions to delete")@RequestBody List<Permission> permissions) throws PhrescoException {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.deletePermissions(List<Permission> permissions)");
 	    }
-		
+	    response.setStatus(500);
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
 		S_LOGGER.error(exceptionString  + phrescoException.getErrorMessage());
 		throw phrescoException;
@@ -1188,27 +1298,30 @@ public class AdminService extends DbService {
 	/**
 	 * Get the Role by id for the given parameter
 	 * @param id
+	 * @return 
 	 * @return
 	 */
-	@GET
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_PERMISSIONS + REST_API_PATH_ID)
-	public Response getPermission(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	@ApiOperation(value = "Retrives a permission by their id ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to retrive"), @ApiError(code=204, reason = "Permission not found")})
+    @RequestMapping(value= REST_API_PERMISSIONS + REST_API_PATH_ID, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody Permission getPermission(HttpServletResponse response, @ApiParam(name = REST_API_PATH_PARAM_ID , required = true, 
+			value = "The id of the permission that needs to be retrieved")@PathVariable(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.Response getPermission(String id)" + id);
 	    }
-		
 		try {
 			Permission permission = DbService.getMongoOperation().findOne(PERMISSION_COLLECTION_NAME, 
 			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), Permission.class);
-			if (permission != null) {
-				return Response.status(Response.Status.OK).entity(permission).build();
-			} 
+			if (permission == null) {
+				response.setStatus(204);
+				return permission;
+			}
+			response.setStatus(200);
+			return permission;
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, PERMISSION_COLLECTION_NAME);
 		}
-		
-		return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
 	}
 	
 	/**
@@ -1216,25 +1329,25 @@ public class AdminService extends DbService {
 	 * @param permission
 	 * @return
 	 */
-	@PUT
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_PERMISSIONS + REST_API_PATH_ID)
-	public Response updatePermission(@PathParam(REST_API_PATH_PARAM_ID) String id , Permission permission) {
+	@ApiOperation(value = "Updates a permission by their id ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to update")})
+    @RequestMapping(value= REST_API_PERMISSIONS + REST_API_PATH_ID, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
+	public @ResponseBody void updatePermission(HttpServletResponse response, @ApiParam(name = REST_API_PATH_PARAM_ID , required = true, 
+			value = "The id of the permission that needs to be update")@PathVariable(REST_API_PATH_PARAM_ID) String id , 
+			@ApiParam(name = "Permission" , required = true, value = "The permission that needs to be update")Permission permission) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.updatePermission(String id , Permission permission)" + id);
 	    }
-		
 		try {
 			if (id.equals(permission.getId())) {
 				DbService.getMongoOperation().save(PERMISSION_COLLECTION_NAME, permission);
-				return Response.status(Response.Status.OK).entity(permission).build();
 			} 
+			response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
 		}
-		
-		return Response.status(Response.Status.BAD_REQUEST).entity(ERROR_MSG_ID_NOT_EQUAL).build();
 	}
 	
 	/**
@@ -1242,20 +1355,23 @@ public class AdminService extends DbService {
 	 * @param id
 	 * @return 
 	 */
-	@DELETE
-	@Path (REST_API_PERMISSIONS + REST_API_PATH_ID)
-	public Response deletePermission(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+	@ApiOperation(value = "Deletes a permission by their id ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to delete")})
+    @RequestMapping(value= REST_API_PERMISSIONS + REST_API_PATH_ID, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
+	public @ResponseBody void deletePermission(HttpServletResponse response, @ApiParam(name = REST_API_PATH_PARAM_ID , required = true, 
+			value = "The permission that needs to be delete")@PathVariable(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.deletePermission(String id)" + id);
 	    }
 		
 		try {
-			DbService.getMongoOperation().remove(PERMISSION_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), Permission.class);
+			DbService.getMongoOperation().remove(PERMISSION_COLLECTION_NAME, 
+					new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), Permission.class);
+			response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
 		}
-		
-		return Response.status(Response.Status.OK).build();
 	}
 	
 	/**
@@ -1263,25 +1379,26 @@ public class AdminService extends DbService {
      * @param id
      * @return
      */
-	@POST
-	@Consumes (MediaType.APPLICATION_JSON)
-    @Path (REST_API_FORUMS)
-    public Response createForum(List<Property> adminConfigInfo) {
+	@ApiOperation(value = "Create a list if properties")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to create")})
+    @RequestMapping(value= REST_API_FORUMS, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    public @ResponseBody void createForum(HttpServletResponse response, @ApiParam(name = "properties" , required = true, 
+			value = "The list of properties that needs to be create")@RequestBody List<Property> properties) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.createForum(List<AdminConfigInfo> adminConfigInfo)");
 	    }
-		
 		try {
-			for (Property property : adminConfigInfo) {
+			for (Property property : properties) {
 				if(validate(property)) {
 					DbService.getMongoOperation().save(FORUM_COLLECTION_NAME , property);
 				}
 			}
+			response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
 		}
-		
-		return Response.status(Response.Status.OK).build();
 	}
 	
 	 /**
@@ -1289,25 +1406,27 @@ public class AdminService extends DbService {
      * @param id
      * @return
      */
-    @GET
-    @Produces (MediaType.APPLICATION_JSON)
-    @Path (REST_API_FORUMS)
-    public Response getForum(@QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
+	@ApiOperation(value = "Retrives the properties by customerId")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to retrive"), @ApiError(code=204, reason = "Property not found")})
+    @RequestMapping(value= REST_API_FORUMS, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+    public @ResponseBody Property getForum(HttpServletResponse response, @ApiParam(name = REST_QUERY_CUSTOMERID , required = true, 
+			value = "The customerId to retrive properties") @QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.getForum(String id)");
         }
-    	
     	try {
     		Property adminConfig = DbService.getMongoOperation().findOne(FORUM_COLLECTION_NAME, 
     		        new Query(Criteria.where(REST_QUERY_CUSTOMERID).is(customerId)), Property.class);
-    		if (adminConfig != null) {
-    			return Response.status(Response.Status.OK).entity(adminConfig).build();
+    		if (adminConfig == null) {
+    			response.setStatus(204);
+    			return adminConfig;
     		}
+    		response.setStatus(200);
+			return adminConfig;
     	} catch (Exception e) {
+    		response.setStatus(500);
     		throw new PhrescoWebServiceException(e, EX_PHEX00005, FORUM_COLLECTION_NAME);
     	}
-    	
-    	return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
     }
     
     /**
@@ -1315,24 +1434,25 @@ public class AdminService extends DbService {
 	 * @param logInfo
 	 * @return 
 	 */
-	@POST
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Path (REST_API_LOG)
-	public Response createLog(List<LogInfo> logInfos) {
+	@ApiOperation(value = "Creates the list of logs")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to create")})
+    @RequestMapping(value= REST_API_LOG, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+	public @ResponseBody void createLog(HttpServletResponse response, @ApiParam(name = "logs" , required = true, 
+			value = "The list of loginfos to create")@RequestBody List<LogInfo> logs) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.createLog(List<LogInfo> logInfos)");
 	    }
 		
 		try {
-			for (LogInfo logInfo : logInfos) {
+			for (LogInfo logInfo : logs) {
 				DbService.getMongoOperation().save(LOG_COLLECTION_NAME, logInfo);
 			}
-			
+			response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
 		}
-		
-		return Response.status(Response.Status.OK).build();
 	}
 	
  }

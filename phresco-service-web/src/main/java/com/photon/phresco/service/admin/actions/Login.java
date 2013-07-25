@@ -34,7 +34,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -94,6 +93,11 @@ public class Login extends ServiceBaseAction {
 		return LOGIN_FAILURE;
 	}
 
+	public String swaggerLogin() throws PhrescoException, IOException, ParseException {
+		setReqAttribute(REQ_FROM_PAGE, "swagger");
+		return login();
+	}
+	
 	public String logout() {
 		if (isDebugEnabled) {
 			LOGGER.debug("Login.logout : Entry");
@@ -289,12 +293,15 @@ public class Login extends ServiceBaseAction {
 				LOGGER.error("ErrorReport.sendReport", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
 			}
 			return LOGIN_FAILURE;
-		} 
+		}
+		
+		if ("swagger".equals(getReqParameter(REQ_FROM_PAGE))) {
+			return "swagger";
+		}
 
 		if (isDebugEnabled) {
 			LOGGER.debug("Login.authenticate : Exit");
 		}
-
 		return SUCCESS;
 	}
 

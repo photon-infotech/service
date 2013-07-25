@@ -42,15 +42,23 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
+
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.util.ServiceConstants;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 
-@Path("/repo")
+@Controller
+@RequestMapping(value = "/repo")
 public class RepositoryService {
     
     private static RepositoryManager repoMgr = null;
@@ -62,7 +70,7 @@ public class RepositoryService {
     
 	@GET
 	@Path("/ci/config")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.TEXT_PLAIN_VALUE)
 	public String getCiConfigPath(@QueryParam(ServiceConstants.REST_QUERY_CUSTOMERID) String customerId) throws PhrescoException {
 		PhrescoServerFactory.initialize();
 		DbManager dbMgr = PhrescoServerFactory.getDbManager();
@@ -72,7 +80,7 @@ public class RepositoryService {
 
 	@GET
 	@Path("/ci/svn")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.TEXT_PLAIN_VALUE)
 	public String getCiSvnPath(@QueryParam(ServiceConstants.REST_QUERY_CUSTOMERID) String customerId) throws PhrescoException {
 		PhrescoServerFactory.initialize();
 		DbManager dbMgr = PhrescoServerFactory.getDbManager();
@@ -82,7 +90,7 @@ public class RepositoryService {
 
 	@GET
 	@Path("/ci/credentialsxml")
-	@Produces(MediaType.APPLICATION_XML)
+	@Produces(MediaType.APPLICATION_XML_VALUE)
 	public InputStream getCredentialXmlFile(@QueryParam(ServiceConstants.REST_QUERY_CUSTOMERID) String customerId) throws PhrescoException {
 		PhrescoServerFactory.initialize();
 		repoMgr.getCiCredentialXmlFilePath();
@@ -91,7 +99,7 @@ public class RepositoryService {
 	
 	@GET
 	@Path("/ci/javahomexml")
-	@Produces(MediaType.APPLICATION_XML)
+	@Produces(MediaType.APPLICATION_XML_VALUE)
 	public InputStream getJavaHomeXmlFile(@QueryParam(ServiceConstants.REST_QUERY_CUSTOMERID) String customerId) throws PhrescoException {
 		repoMgr.getJavaHomeConfigPath();
 		return repoMgr.getArtifactAsStream(repoMgr.getJavaHomeConfigPath(), customerId);
@@ -99,7 +107,7 @@ public class RepositoryService {
 	
 	@GET
 	@Path("/ci/mavenhomexml")
-	@Produces(MediaType.APPLICATION_XML)
+	@Produces(MediaType.APPLICATION_XML_VALUE)
 	public InputStream getMavenHomeXmlFile(@QueryParam(ServiceConstants.REST_QUERY_CUSTOMERID) String customerId) throws PhrescoException {
 		repoMgr.getMavenHomeConfigPath();
 		return repoMgr.getArtifactAsStream(repoMgr.getMavenHomeConfigPath(), customerId);
@@ -107,7 +115,7 @@ public class RepositoryService {
 	
 	@GET
 	@Path("/ci/mailxml")
-	@Produces({ MediaType.APPLICATION_XML })
+	@Produces({ MediaType.APPLICATION_XML_VALUE })
 	public InputStream getProducts(@QueryParam(ServiceConstants.REST_QUERY_CUSTOMERID) String customerId) throws PhrescoException {
 		try {
 	        return repoMgr.getArtifactAsStream(repoMgr.getCredentialFile(), customerId);
@@ -118,7 +126,7 @@ public class RepositoryService {
 	
 	@GET
 	@Path("/ci/emailext")
-	@Produces({ MediaType.APPLICATION_OCTET_STREAM })
+	@Produces({ MediaType.APPLICATION_OCTET_STREAM_VALUE })
 	public InputStream getEmailExtFile(@QueryParam(ServiceConstants.REST_QUERY_CUSTOMERID) String customerId) throws PhrescoException {
 	    try {
 	        return repoMgr.getArtifactAsStream(repoMgr.getEmailExtFile(), customerId);
@@ -127,10 +135,11 @@ public class RepositoryService {
         }
 	}
 	
-	@GET
-	@Path("/update")
-	@Produces({ MediaType.APPLICATION_OCTET_STREAM })
-	public InputStream getLatestPom(@QueryParam(ServiceConstants.REST_QUERY_CUSTOMERID) String customerId) throws PhrescoException {
+	@ApiOperation(value = " Get Latest Version content to update")
+    @RequestMapping(value= "/update", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody InputStream getLatestPom(@ApiParam(value = "Customerid", 
+			name = ServiceConstants.REST_QUERY_CUSTOMERID)@QueryParam(ServiceConstants.REST_QUERY_CUSTOMERID) String customerId) 
+			throws PhrescoException {
 	    try {
 	        return repoMgr.getArtifactAsStream(repoMgr.getFrameWorkLatestFile(), customerId);
 	    } catch (Exception e) {

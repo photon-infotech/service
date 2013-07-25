@@ -17,20 +17,23 @@
  */
 package com.photon.phresco.service.rest.api;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.photon.phresco.configuration.Environment;
 import com.photon.phresco.service.util.ServerConstants;
+import com.wordnik.swagger.annotations.ApiOperation;
 
-@Path("/settings/env")
+@Controller
+@RequestMapping(value = "/settings")
 public class EnvironmentService implements ServerConstants {
-
-    @GET
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Environment getEnvInfos() {
+	
+	@ApiOperation(value = " Get default environment")
+	@RequestMapping(value = "/env", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+    public @ResponseBody Environment getEnvInfos() {
         return new Environment("Production", "Production Environment is used for Development purpose only", true, null);
     }
 }

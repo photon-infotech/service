@@ -44,6 +44,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Element;
 
 import com.photon.phresco.commons.model.ArtifactGroup;
@@ -414,8 +415,10 @@ public final class ServerUtil {
 			fileOutStream = new FileOutputStream(pomFile);
             byte buf[] = new byte[MAGICNUMBER.BYTESIZE];
             int len;
-            while ((len = pomStream.read(buf)) > 0) {
-                fileOutStream.write(buf, 0, len);
+            if(pomStream != null) {
+            	while ((len = pomStream.read(buf)) > 0) {
+                    fileOutStream.write(buf, 0, len);
+                }
             }
 		} catch (PhrescoException e) {			
 			throw new PhrescoException(e);
@@ -464,5 +467,20 @@ public final class ServerUtil {
 		}
 		
 		return fileExt;
+	}
+	
+	public static boolean convertByteArrayToFile(File file, byte[] bytes) throws PhrescoException {
+		FileOutputStream fos = null;
+		try {
+			fos = new FileOutputStream(file);
+			IOUtils.write(bytes, fos);
+		} catch (IOException e) {
+			return false;
+		} finally {
+			if(fos != null) {
+				Utility.closeStream(fos);
+			}
+		}
+		return true;
 	}
 }

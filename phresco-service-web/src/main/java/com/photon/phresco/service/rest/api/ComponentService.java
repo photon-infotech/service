@@ -18,7 +18,6 @@
 package com.photon.phresco.service.rest.api;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,31 +28,34 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
-import org.springframework.stereotype.Component;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.google.gson.Gson;
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactElement;
 import com.photon.phresco.commons.model.ArtifactGroup;
+import com.photon.phresco.commons.model.ArtifactGroup.Type;
 import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.DownloadInfo;
 import com.photon.phresco.commons.model.Element;
@@ -75,7 +77,6 @@ import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
-import com.photon.phresco.service.client.api.Content.Type;
 import com.photon.phresco.service.converters.ConvertersFactory;
 import com.photon.phresco.service.dao.ApplicationInfoDAO;
 import com.photon.phresco.service.dao.ApplicationTypeDAO;
@@ -86,20 +87,22 @@ import com.photon.phresco.service.dao.ProjectInfoDAO;
 import com.photon.phresco.service.dao.TechnologyDAO;
 import com.photon.phresco.service.impl.DbService;
 import com.photon.phresco.service.util.ServerUtil;
-import com.photon.phresco.util.Constants;
 import com.photon.phresco.util.FileUtil;
 import com.photon.phresco.util.ServiceConstants;
 import com.phresco.pom.site.Reports;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.MultiPart;
-import com.sun.jersey.multipart.MultiPartMediaTypes;
+import com.wordnik.swagger.annotations.ApiError;
+import com.wordnik.swagger.annotations.ApiErrors;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 
-@Component
-@Path(ServiceConstants.REST_API_COMPONENT)
+@Controller
+@RequestMapping(value = ServiceConstants.REST_API_COMPONENT)
 public class ComponentService extends DbService {
 	
-	private static final SplunkLogger LOGGER = SplunkLogger.getSplunkLogger(LoginService.class.getName());
+	private static final SplunkLogger LOGGER = SplunkLogger.getSplunkLogger("SplunkLogger");
 	private static Boolean isDebugEnabled = LOGGER.isDebugEnabled();
 	private static RepositoryManager repositoryManager;
 	
@@ -116,11 +119,12 @@ public class ComponentService extends DbService {
 	 * @return
 	 * @throws PhrescoException 
 	 */
-	@GET
-	@Path (REST_API_APPTYPES)
-	@Produces (MediaType.APPLICATION_JSON)
-	public Response findAppTypes(@Context HttpServletRequest request, @QueryParam(REST_QUERY_CUSTOMERID) String customerId) 
-		throws PhrescoException {
+	@ApiOperation(value = " Retrives application types based on customerId")
+	@ApiErrors(value = {@ApiError(code=204, reason = "Applicationtype Not Found"), @ApiError(code=500, reason = "Failed")})
+    @RequestMapping(value= REST_API_APPTYPES, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody List<ApplicationType> findAppTypes(@Context HttpServletRequest request, HttpServletResponse response, 
+			@ApiParam(value = "CustomerId to retrive apptypes",name = "customerId")@QueryParam(REST_QUERY_CUSTOMERID) String customerId) 
+			throws PhrescoException {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.findAppTypes : Entry");
 	        LOGGER.debug("ComponentService.findAppTypes ", "remoteAddress=" + request.getRemoteAddr() , "customer" + getCustomerNameById(customerId),
@@ -148,17 +152,18 @@ public class ComponentService extends DbService {
 				applicationTypes.add(applicationType);
 			}
 			if(CollectionUtils.isEmpty(applicationTypes)) {
-				if (isDebugEnabled) {
-			        LOGGER.debug("ComponentService.findAppTypes", "status=\"Not Found\"", "remoteAddress=" + request.getRemoteAddr() , 
+				if (isDebugEnabled) {			        LOGGER.debug("ComponentService.findAppTypes", "status=\"Not Found\"", "remoteAddress=" + request.getRemoteAddr() , 
 			        		"customer" + getCustomerNameById(customerId), "endpoint=" + request.getRequestURI() , "user=" + request.getParameter("userId"));
 			    }
-				return Response.status(Response.Status.NO_CONTENT).build();
+				response.setStatus(204);
+				return applicationTypes;
 			}
 			if (isDebugEnabled) {
 		        LOGGER.debug("ComponentService.findAppTypes : Exit");
 		    }
-	        return Response.status(Response.Status.OK).entity(applicationTypes).build();
+	        return applicationTypes;
 		} catch (Exception e) {
+			response.setStatus(500);
 			if (isDebugEnabled) {
 		        LOGGER.error("ComponentService.findAppTypes", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
 		    }
@@ -172,10 +177,13 @@ public class ComponentService extends DbService {
 	 * @return 
 	 * @throws PhrescoException 
 	 */
-	@POST
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Path (REST_API_APPTYPES)
-	public Response createAppTypes(@Context HttpServletRequest request, List<ApplicationType> appTypes) throws PhrescoException {
+	@ApiOperation(value = " Creates list of apptypes")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Unable To Create")})
+    @RequestMapping(value= REST_API_APPTYPES, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+	public @ResponseBody void createAppTypes(@Context HttpServletRequest request, HttpServletResponse response, 
+			@ApiParam(value = "List of apptypes to create",	name = "appTypes")@RequestBody List<ApplicationType> appTypes) 
+			throws PhrescoException {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.createAppTypes : Entry");
 	        LOGGER.debug("ComponentService.createAppTypes" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() + 
@@ -187,7 +195,9 @@ public class ComponentService extends DbService {
 					DbService.getMongoOperation().save(APPTYPES_COLLECTION_NAME , applicationType);
 				}
 			}
+			response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			if (isDebugEnabled) {
 		        LOGGER.error("ComponentService.createAppTypes" , "status=\"Failure\"", "remoteAddress=" + request.getRemoteAddr() , 
 		        		"endpoint=" + request.getRequestURI(), "user=" + request.getParameter("userId"), "message=\"" + e.getLocalizedMessage() + "\"");
@@ -197,7 +207,6 @@ public class ComponentService extends DbService {
 		if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.createAppTypes : Exit");
         }
-		return Response.status(Response.Status.CREATED).build();
 	}
 	
 	/**
@@ -205,22 +214,24 @@ public class ComponentService extends DbService {
 	 * @param appTypes
 	 * @return
 	 */
-	@PUT
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_APPTYPES)
-	public Response updateAppTypes(@Context HttpServletRequest request, List<ApplicationType> appTypes) {
+	@ApiOperation(value = " Updates list of apptypes")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Unable To Update")})
+    @RequestMapping(value= REST_API_APPTYPES, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
+	public @ResponseBody void updateAppTypes(@Context HttpServletRequest request, HttpServletResponse response, 
+			@ApiParam(value = "List of apptypes to update", name = "appTypes")@RequestBody List<ApplicationType> appTypes) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.updateAppTypes : Entry");
 	        LOGGER.debug("ComponentService.updateAppTypes" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 	        		"user=" + request.getParameter("userId") , "appType=" + appTypes.get(0).getId());
 	    }
-		
 	    try {
 	        for (ApplicationType applicationType : appTypes) {
 	            DbService.getMongoOperation().save(APPTYPES_COLLECTION_NAME , applicationType);
             }
+	        response.setStatus(200);
         } catch (Exception e) {
+        	response.setStatus(500);
         	LOGGER.error("ComponentService.createAppTypes" , "status=\"Failure\"", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 	        		"user=" + request.getParameter("userId"), "message=\"" + e.getLocalizedMessage() + "\"");
             throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
@@ -228,7 +239,6 @@ public class ComponentService extends DbService {
         if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.updateAppTypes : Exit");
 	    }
-		return Response.status(Response.Status.OK).entity(appTypes).build();
 	}
 	
 	/**
@@ -236,16 +246,18 @@ public class ComponentService extends DbService {
 	 * @param appTypes
 	 * @throws PhrescoException 
 	 */
-	@DELETE
-	@Path (REST_API_APPTYPES)
-	@Produces (MediaType.TEXT_PLAIN)
-	public void deleteAppTypes(@Context HttpServletRequest request, List<ApplicationType> appTypes) throws PhrescoException {
+	@ApiOperation(value = " Deletes list of apptypes")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Operation Not Supported")})
+    @RequestMapping(value= REST_API_APPTYPES, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
+	public void deleteAppTypes(@Context HttpServletRequest request, HttpServletResponse response, 
+			@ApiParam(value = "List of apptypes to delete", name = "appTypes")@RequestBody List<ApplicationType> appTypes) 
+			throws PhrescoException {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.deleteAppTypes : Entry");
 	        LOGGER.debug("ComponentService.deleteAppTypes" , "remoteAddress=" + request.getRemoteAddr() ,"endpoint=" + request.getRequestURI() , 
     		"user=" + request.getParameter("userId"));
         }
-		
+		response.setStatus(500);
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
 		LOGGER.error("ComponentService.deleteAppTypes" , "status=\"Failure\"", "message=\"" + phrescoException.getLocalizedMessage() + "\"");
 		throw phrescoException;
@@ -256,26 +268,31 @@ public class ComponentService extends DbService {
 	 * @param id
 	 * @return
 	 */
-	@GET
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_APPTYPES + REST_API_PATH_ID)
-	public Response getApptype(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id) {
+	@ApiOperation(value = " Retrive apptype based on their id ")
+	@ApiErrors(value = {@ApiError(code=204, reason = "Applicationtype Not Found")})
+    @RequestMapping(value= REST_API_APPTYPES + REST_API_PATH_ID, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody ApplicationType getApptype(@Context HttpServletRequest request,HttpServletResponse response, 
+			@ApiParam(name = "id" , required = true, value = "The id of the apptype that needs to be retrieved") 
+			@PathVariable(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.getApptype : Entry");
 	        LOGGER.debug("ComponentService.getApptype", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 	        		"user=" + request.getParameter("userId"), "id=" + id);
 	    }
+	    ApplicationType appType = null;
 		try {
-			ApplicationType appType = DbService.getMongoOperation().findOne(APPTYPES_COLLECTION_NAME, 
+			appType = DbService.getMongoOperation().findOne(APPTYPES_COLLECTION_NAME, 
 			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ApplicationType.class);
 			if(appType != null) {
-				return Response.status(Response.Status.OK).entity(appType).build();
+				response.setStatus(200);
+				return appType;
 			} else {
 				if (isDebugEnabled) {
 			        LOGGER.warn("ComponentService.getApptype", "status=\"Bad Request\"" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 			        		"user=" + request.getParameter("userId"), "id=" + id);
 			    }
 			}
+			response.setStatus(204);
 		} catch (Exception e) {
 			if (isDebugEnabled) {
 				LOGGER.error("ComponentService.getApptype" , "status=\"Failure\"", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
@@ -286,7 +303,7 @@ public class ComponentService extends DbService {
 		if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.getApptype : Exit");
 	    }
-		return Response.status(Response.Status.NO_CONTENT).build();
+		return appType;
 	}
 	
 	/**
@@ -294,11 +311,14 @@ public class ComponentService extends DbService {
 	 * @param appTypes
 	 * @return
 	 */
-	@PUT
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_APPTYPES + REST_API_PATH_ID)
-	public Response updateAppType(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id , ApplicationType appType) throws PhrescoException {
+	@ApiOperation(value = " Update apptype based on their id ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Unable to update")})
+    @RequestMapping(value= REST_API_APPTYPES + REST_API_PATH_ID, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
+	public @ResponseBody void updateAppType(@Context HttpServletRequest request, HttpServletResponse response, 
+			@ApiParam(name = "id" ,	required = true, value = "The id of the apptype that needs to be update")@PathVariable(REST_API_PATH_PARAM_ID) String id , 
+			@ApiParam(name = "appType" ,required = true, value = "The apptype that needs to be update")@RequestBody ApplicationType appType) 
+	throws PhrescoException {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.updateAppType : Entry");
 	        LOGGER.debug("ComponentService.updateAppType" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
@@ -306,7 +326,9 @@ public class ComponentService extends DbService {
 	    }
 		try {
 	        DbService.getMongoOperation().save(APPTYPES_COLLECTION_NAME, appType);
+	        response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			if (isDebugEnabled) {
 				LOGGER.error("ComponentService.updateAppType" , "status=\"Failure\"", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 		        		"user=" + request.getParameter("userId"), "message=\"" + e.getLocalizedMessage() + "\"");
@@ -316,7 +338,6 @@ public class ComponentService extends DbService {
 		if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.updateAppType : Exit");
 	    }
-		return Response.status(Response.Status.OK).entity(appType).build();
 	}
 	
 	/**
@@ -324,9 +345,12 @@ public class ComponentService extends DbService {
 	 * @param id
 	 * @return 
 	 */
-	@DELETE
-	@Path (REST_API_APPTYPES + REST_API_PATH_ID)
-	public Response deleteAppType(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id) {
+	@ApiOperation(value = " Delete apptype based on their id ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Unable to delete")})
+    @RequestMapping(value= REST_API_APPTYPES + REST_API_PATH_ID, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
+	public @ResponseBody void deleteAppType(@Context HttpServletRequest request, HttpServletResponse response, 
+			@ApiParam(name = "id" , required = true, value = "The id of the apptype that needs to be delete")
+			@PathVariable(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.deleteAppType : Entry");
 	        LOGGER.debug("ComponentService.deleteAppType", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
@@ -339,11 +363,12 @@ public class ComponentService extends DbService {
 				List<String> techGroups = appType.getTechGroupIds();
 				if(CollectionUtils.isNotEmpty(techGroups)) {
 					for (String techGroupId : techGroups) {
-						deleteTechGroup(techGroupId);
+						deleteTechGroup(techGroupId, response);
 					}
 				}
 				DbService.getMongoOperation().remove(APPTYPES_COLLECTION_NAME, 
 				        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ApplicationTypeDAO.class);
+				response.setStatus(200);
 			} else {
 				if (isDebugEnabled) {
 			        LOGGER.warn("ComponentService.deleteAppType", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
@@ -351,6 +376,7 @@ public class ComponentService extends DbService {
 			    }
 			}
 		} catch (Exception e) {
+			response.setStatus(500);
 			if (isDebugEnabled) {
 				LOGGER.error("ComponentService.updateAppType" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 		        		"user=" + request.getParameter("userId") ,"status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
@@ -360,20 +386,19 @@ public class ComponentService extends DbService {
 		if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.deleteAppType : Exit");
 	    }
-		return Response.status(Response.Status.OK).build();
 	}
 	
-	private void deleteTechGroup(String id) {
+	private void deleteTechGroup(String id, HttpServletResponse response) {
 		TechnologyGroup techGroup = DbService.getMongoOperation().findOne(TECH_GROUP_COLLECTION_NAME, 
 				new Query(Criteria.whereId().is(id)), TechnologyGroup.class);
 		List<TechnologyInfo> techInfos = techGroup.getTechInfos();
 		for (TechnologyInfo technologyInfo : techInfos) {
-			deleteTechnologyObject(technologyInfo.getId());
+			deleteTechnologyObject(technologyInfo.getId(), response);
 		}
 		DbService.getMongoOperation().remove(TECH_GROUP_COLLECTION_NAME, new Query(Criteria.whereId().is(id)), TechnologyGroup.class);
 	}
 	
-	private void deleteTechnologyObject(String id) {
+	private void deleteTechnologyObject(String id, HttpServletResponse response) {
 		Query query = new Query(Criteria.whereId().is(id));
 		TechnologyDAO technologyDAO = DbService.getMongoOperation().findOne(TECHNOLOGIES_COLLECTION_NAME, query, TechnologyDAO.class);
 		if(isDebugEnabled) {
@@ -382,11 +407,11 @@ public class ComponentService extends DbService {
 		}
 		if(technologyDAO != null) {
 			String archetypeGroupDAOId = technologyDAO.getArchetypeGroupDAOId();
-			deleteAttifact(archetypeGroupDAOId);
+			deleteAttifact(archetypeGroupDAOId, response);
 			List<String> pluginIds = technologyDAO.getPluginIds();
 			if (CollectionUtils.isNotEmpty(pluginIds)) {
 				for (String pluginId : pluginIds) {
-					deleteAttifact(pluginId);
+					deleteAttifact(pluginId, response);
 				}
 			}
 			DbService.getMongoOperation().remove(TECHNOLOGIES_COLLECTION_NAME, query, TechnologyDAO.class);
@@ -397,10 +422,12 @@ public class ComponentService extends DbService {
 	 * Returns the list of technologies
 	 * @return
 	 */
-	@GET
-	@Path (REST_API_TECHNOLOGIES)
-	@Produces (MediaType.APPLICATION_JSON)
-	public Response findTechnologies(@Context HttpServletRequest request, @QueryParam(REST_QUERY_CUSTOMERID) String customerId, 
+	@ApiOperation(value = " Retrives technologies ")
+	@ApiErrors(value = {@ApiError(code=204, reason = "Technology not found"), @ApiError(code=500, reason = "Failed error caused")})
+    @RequestMapping(value= REST_API_TECHNOLOGIES, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody List<Technology> findTechnologies(@Context HttpServletRequest request,  HttpServletResponse response, 
+			@ApiParam(name = "customerId" ,	required = true, value = "The customerid to retrive technologies")@QueryParam(REST_QUERY_CUSTOMERID) String customerId, 
+			@ApiParam(name = "appTypeId" ,required = true, value = "The apptypeid to retrive technologies")
 			@QueryParam(REST_QUERY_APPTYPEID) String appTypeId) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.findTechnologies : Entry");
@@ -440,21 +467,20 @@ public class ComponentService extends DbService {
 		        		"user=" + request.getParameter("userId"), "query=" + query.getQueryObject().toString());
 		    }
 			if (CollectionUtils.isEmpty(techList)) {
+				response.setStatus(204);
 				if (isDebugEnabled) {
 			        LOGGER.warn("ComponentService.findTechnologies", "remoteAddress=" + request.getRemoteAddr() , 
 			        		"endpoint=" + request.getRequestURI() , "user=" + request.getParameter("userId"), "status=\"Not Found\"");
 			    }
-				return Response.status(Response.Status.NO_CONTENT).build();	
 			}
 			
-			ResponseBuilder response = Response.status(Response.Status.OK);
-			
-			response.header(Constants.ARTIFACT_COUNT_RESULT, count(TECHNOLOGIES_COLLECTION_NAME, query));
 			if (isDebugEnabled) {
 		        LOGGER.debug("ComponentService.findTechnologies : Exit");
 		    }
-			return response.entity(techList).build();
+			return techList;
 		} catch (Exception e) {
+			e.printStackTrace();
+			response.setStatus(500);
 			if (isDebugEnabled) {
 		        LOGGER.debug("ComponentService.findTechnologies ", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 		        		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
@@ -470,19 +496,66 @@ public class ComponentService extends DbService {
 	 * @throws IOException 
 	 * @throws PhrescoException 
 	 */
-	@POST
-	@Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
-	@Path (REST_API_TECHNOLOGIES)
-	public Response createTechnologies(@Context HttpServletRequest request, MultiPart multiPart) throws PhrescoException, IOException {
+	@ApiOperation(value = " Creates technology ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Unable to create technology")})
+    @RequestMapping(value= REST_API_TECHNOLOGIES, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, 
+    		MediaType.APPLICATION_JSON_VALUE,"multipart/mixed"}, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+	public @ResponseBody void createTechnologies(MultipartHttpServletRequest request,HttpServletResponse response,
+			@RequestParam("technology")byte[] techJson) throws PhrescoException, IOException {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.createTechnologies");
 	        LOGGER.debug("ComponentService.createTechnologies" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 	        		"user=" + request.getParameter("userId"));
 	    }
-	   return saveOrUpdateTechnology(multiPart);
+	    createOrUpdateTechnology(request, techJson);
+	}
+
+	private void createOrUpdateTechnology(MultipartHttpServletRequest request,
+			byte[] techJson) throws IOException, PhrescoException {
+		byte[] archetypeJar = null;
+	    Map<String, byte[]> pluginMap = new HashMap<String, byte[]>();
+	    Map<String, ArtifactGroup> pluginInfoMap = new HashMap<String, ArtifactGroup>();
+	    
+	    Technology technology = new Gson().fromJson(new String(techJson), Technology.class);
+	    List<ArtifactGroup> pluginsInfo = technology.getPlugins();
+	    Map<String, MultipartFile> fileMap = request.getFileMap();
+	    Set<String> keySet = fileMap.keySet();
+	    for (String key : keySet) {
+	    	if(key.equals(technology.getName())) {
+	    		archetypeJar = fileMap.get(key).getBytes();
+	    	} else {
+	    		for (ArtifactGroup plugin : pluginsInfo) {
+					if(plugin.getName().equals(key)) {
+						pluginMap.put(plugin.getName(), fileMap.get(key).getBytes());
+						pluginInfoMap.put(plugin.getName(), plugin);
+						break;
+					}
+				}
+	    	}
+		}
+	    // Save archetype jar
+	    if(archetypeJar != null) {
+	    	boolean saveArchetype = saveArtifactFile(technology.getArchetypeInfo(), archetypeJar);
+	    	if(!saveArchetype) {
+	    		throw new PhrescoException("Archetype Creation Failed...");
+	    	}
+	    }
+	    //To save plugin jars
+	    if(pluginMap != null) {
+	    	Set<String> pluginNames = pluginMap.keySet();
+	    	for (String name : pluginNames) {
+	    		boolean savePlugin = saveArtifactFile(pluginInfoMap.get(name), pluginMap.get(name));
+	    		if(!savePlugin) {
+	    			throw new PhrescoException("Plugin Creation Failed...");
+	    		}
+			}
+	    }
+	    saveTechnology(technology);
 	}
 	
-	private Response saveOrUpdateTechnology(MultiPart multiPart) throws PhrescoException {
+	
+	private void saveOrUpdateTechnology(MultiPart multiPart, HttpServletResponse response) throws PhrescoException {
 		Technology technology = null;
 		List<BodyPart> entities = new ArrayList<BodyPart>();
 		Map<ArtifactGroup, BodyPart> archetypeMap = new HashMap<ArtifactGroup, BodyPart>();
@@ -491,7 +564,7 @@ public class ComponentService extends DbService {
 		// To separete the object and binary file
 		List<BodyPart> bodyParts = multiPart.getBodyParts();
 		for (BodyPart bodyPart : bodyParts) {
-			if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
+			if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_VALUE)) {
 				technology = bodyPart.getEntityAs(Technology.class);
 			} else {
 				entities.add(bodyPart);
@@ -502,7 +575,7 @@ public class ComponentService extends DbService {
 			if(isDebugEnabled) {
 				LOGGER.debug("ComponentService.saveOrUpdateTechnology", "status=\"Bad Request\"" ,"message=" + "Technology Is Null");
 			}
-			return null;
+			response.setStatus(500);
 		}
 		if(isDebugEnabled) {
 			LOGGER.debug("ComponentService.saveOrUpdateTechnology", "customer" + getCustomerNameById(technology.getCustomerIds().get(0)), 
@@ -536,7 +609,6 @@ public class ComponentService extends DbService {
 		if(isDebugEnabled) {
 			LOGGER.debug("ComponentService.saveOrUpdateTechnology : Exit");
 		} 
-	   return Response.status(Response.Status.OK).entity(technology).build();
 	}
 
 	private void createArtifacts(ArtifactGroup artifactGroup, BodyPart bodyPart) throws PhrescoException {
@@ -668,18 +740,21 @@ public class ComponentService extends DbService {
 	 * @param technologies
 	 * @return
      * @throws PhrescoException 
+	 * @throws IOException 
 	 */
-	@PUT
-	@Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_TECHNOLOGIES)
-	public Response updateTechnologies(@Context HttpServletRequest request, MultiPart multipart) throws PhrescoException {
+	@ApiOperation(value = " Updates technology ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Unable to update technology")})
+    @RequestMapping(value= REST_API_TECHNOLOGIES, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, 
+    		MediaType.APPLICATION_JSON_VALUE,"multipart/mixed"}, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
+	public void updateTechnologies(MultipartHttpServletRequest request,HttpServletResponse response,
+			@RequestParam("technology")byte[] techJson) throws PhrescoException, IOException {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.updateTechnologies : Entry");
 	        LOGGER.debug("ComponentService.createTechnologies" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 	        		"user=" + request.getParameter("userId"));
 	    }
-		return saveOrUpdateTechnology(multipart);
+		createOrUpdateTechnology(request, techJson);
 	}
 	
 	/**
@@ -687,14 +762,18 @@ public class ComponentService extends DbService {
 	 * @param technologies
 	 * @throws PhrescoException 
 	 */
-	@DELETE
-	@Path (REST_API_TECHNOLOGIES)
-	public void deleteTechnologies(@Context HttpServletRequest request, List<Technology> technologies) throws PhrescoException {
+	@ApiOperation(value = " Deletes list of technologies ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Operation not supported")})
+    @RequestMapping(value= REST_API_TECHNOLOGIES, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
+	public void deleteTechnologies(@Context HttpServletRequest request, HttpServletResponse response , 
+			@ApiParam(name = "technologies" , required = true, value = "List of technologies ")@RequestBody List<Technology> technologies) 
+			throws PhrescoException {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.deleteTechnologies : Entry");
 	        LOGGER.debug("ComponentService.deleteTechnologies", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 	        		"user=" + request.getParameter("userId"));
 	    }
+	    response.setStatus(500);
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
 		LOGGER.error("ComponentService.deleteTechnologies", "status=\"Failure\"", "message=\"" + phrescoException.getLocalizedMessage() + "\"");
 		throw phrescoException;
@@ -707,10 +786,13 @@ public class ComponentService extends DbService {
 	 * @return
 	 * @throws PhrescoException 
 	 */
-	@GET
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_TECHNOLOGIES + REST_API_PATH_ID)
-	public Response getTechnology(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id) throws PhrescoException {
+	@ApiOperation(value = " Retrives technology base on their id ")
+	@ApiErrors(value = {@ApiError(code=204, reason = "Technology not found")})
+    @RequestMapping(value= REST_API_TECHNOLOGIES + REST_API_PATH_ID, produces = MediaType.APPLICATION_JSON_VALUE, 
+    		method = RequestMethod.GET)
+	public @ResponseBody Technology getTechnology(@Context HttpServletRequest request, HttpServletResponse response, 
+			@ApiParam(name = "id" , required = true, value = "The id of the technology that needs to be retrieved")
+			@PathVariable(REST_API_PATH_PARAM_ID) String id) throws PhrescoException {
 	    if (isDebugEnabled) {
 	    	LOGGER.debug("ComponentService.getTechnology : Entry");
 	    	LOGGER.debug("ComponentService.deleteTechnologies", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
@@ -718,13 +800,15 @@ public class ComponentService extends DbService {
 	    }
 		Technology technology = getTechnologyById(id);
 		if(technology == null) {
+			response.setStatus(204);
 			LOGGER.warn("ComponentService.deleteTechnologies", "remoteAddress=" + request.getRemoteAddr() , 
 	        		"user=" + request.getParameter("userId"), "id=" + id , "status=\"Not Found\"");
 		}
+		response.setStatus(200);
 		if (isDebugEnabled) {
 	    	LOGGER.debug("ComponentService.getTechnology : Exit");
 	    }
-		return Response.status(Response.Status.OK).entity(technology).build();
+		return technology;
 	}
 	
 	/**
@@ -733,11 +817,14 @@ public class ComponentService extends DbService {
 	 * @param technology
 	 * @return
 	 */
-	@PUT
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_TECHNOLOGIES + REST_API_PATH_ID)
-	public Response updateTechnology(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id , Technology technology) {
+	@ApiOperation(value = " Updates technology based on their id ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Unable to update technology")})
+    @RequestMapping(value= REST_API_TECHNOLOGIES + REST_API_PATH_ID, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
+	public @ResponseBody void updateTechnology(@Context HttpServletRequest request, HttpServletResponse response, 
+			@ApiParam(name = "id" , required = true, value = "The id of the technology that needs to be update")
+			@PathVariable(REST_API_PATH_PARAM_ID) String id , @ApiParam(name = "technology" , required = true, 
+					value = "The technology that needs to be update")Technology technology) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.updateTechnology");
 	        LOGGER.debug("ComponentService.updateTechnology" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
@@ -746,9 +833,10 @@ public class ComponentService extends DbService {
 		try {
 			if (id.equals(technology.getId())) {
 				DbService.getMongoOperation().save(TECHNOLOGIES_COLLECTION_NAME, technology);
-				return Response.status(Response.Status.OK).entity(technology).build();
+				response.setStatus(200);
 			} 
 		} catch (Exception e) {
+			response.setStatus(500);
 			if (isDebugEnabled) {
 		        LOGGER.error("ComponentService.updateTechnology" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 		        		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
@@ -758,7 +846,6 @@ public class ComponentService extends DbService {
 		if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.updateTechnology : Exit");
 	    }
-		return Response.status(Response.Status.BAD_REQUEST).entity(ERROR_MSG_ID_NOT_EQUAL).build();
 	}
 	
 	/**
@@ -766,32 +853,39 @@ public class ComponentService extends DbService {
 	 * @param id
 	 * @return 
 	 */
-	@DELETE
-	@Path (REST_API_TECHNOLOGIES + REST_API_PATH_ID)
-	public Response deleteTechnology(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id) {
+	@ApiOperation(value = " Deletes technology based on their id ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Unable to update technology")})
+    @RequestMapping(value= REST_API_TECHNOLOGIES + REST_API_PATH_ID, produces = MediaType.APPLICATION_JSON_VALUE, 
+    		method = RequestMethod.DELETE)
+	public @ResponseBody void deleteTechnology(@Context HttpServletRequest request, HttpServletResponse response,
+			@ApiParam(name = "id" , required = true, value = "The id of the technology that needs to be delete")
+			@PathVariable(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.deleteTechnology : Entry");
 	        LOGGER.debug("ComponentService.deleteTechnology" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 	        		"user=" + request.getParameter("userId"), "id=" + id);
 	    }
-		
 		try {
-			deleteTechnologyObject(id);
+			deleteTechnologyObject(id, response);
+			response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
 		}
 		LOGGER.debug("ComponentService.deleteTechnology : Exit");
-		return Response.status(Response.Status.OK).build();
 	}
     
 	/**
 	 * Returns the list of settings
 	 * @return
 	 */
-	@GET
-	@Path (REST_API_SETTINGS)
-	@Produces (MediaType.APPLICATION_JSON)
-	public Response findSettings(@Context HttpServletRequest request, @QueryParam(REST_QUERY_CUSTOMERID) String customerId, @QueryParam(REST_QUERY_TECHID) String techId, @QueryParam(REST_QUERY_TYPE) String type) {
+	@ApiOperation(value = " Retrives settings ")
+	@ApiErrors(value = {@ApiError(code=204, reason = "Settings not found"), @ApiError(code=204, reason = "Failed")})
+    @RequestMapping(value= REST_API_SETTINGS, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody List<SettingsTemplate> findSettings(@Context HttpServletRequest request, HttpServletResponse response, 
+			@ApiParam(name = "customerId" , value = "Customerid to retrive settings")@QueryParam(REST_QUERY_CUSTOMERID) String customerId, 
+			@ApiParam(name = "techId" , value = "Techid to retrive settings")@QueryParam(REST_QUERY_TECHID) String techId, 
+			@ApiParam(name = "type" , value = "Type to retrive settings")@QueryParam(REST_QUERY_TYPE) String type) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.findSettings : Entry");
 	        LOGGER.debug("ComponentService.findSettings" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
@@ -825,7 +919,8 @@ public class ComponentService extends DbService {
 				query.addCriteria(Criteria.where(REST_API_NAME).is(type));
 				SettingsTemplate setting = DbService.getMongoOperation().findOne(SETTINGS_COLLECTION_NAME, 
 						query, SettingsTemplate.class);
-				return Response.status(Response.Status.OK).entity(setting).build();
+				response.setStatus(200);
+				return settings;
 			}
 			List<SettingsTemplate> settingsList = DbService.getMongoOperation().find(SETTINGS_COLLECTION_NAME, query, SettingsTemplate.class);
 			for (SettingsTemplate settingsTemplate : settingsList) {
@@ -838,15 +933,17 @@ public class ComponentService extends DbService {
 					LOGGER.debug("ComponentService.findSettings", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 	        		"user=" + request.getParameter("userId"), "status=\"Not Found\"", "message=\"" + "Settings Not Found" + "\"");
 				}
-				return Response.status(Response.Status.NO_CONTENT).build();
+				response.setStatus(204);
+				return settings;
 			}
 			if(isDebugEnabled) {
 				LOGGER.debug("ComponentService.findSettings", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
         		"user=" + request.getParameter("userId"), "query=" + query.getQueryObject().toString());
 				LOGGER.debug("ComponentService.findSettings : Exit");
 			}
-			return Response.status(Response.Status.OK).entity(settings).build();
+			return settings;
 		} catch (Exception e) {
+			response.setStatus(500);
 			if(isDebugEnabled) {
 				LOGGER.error("ComponentService.findSettings", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
         		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
@@ -875,10 +972,12 @@ public class ComponentService extends DbService {
 	 * @param settings
 	 * @return 
 	 */
-	@POST
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Path (REST_API_SETTINGS)
-	public Response createSettings(@Context HttpServletRequest request, List<SettingsTemplate> settings) {
+	@ApiOperation(value = " Create list of settings ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Unable to create setting")})
+    @RequestMapping(value= REST_API_SETTINGS, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+	public @ResponseBody void createSettings(@Context HttpServletRequest request, HttpServletResponse response,
+			@ApiParam(name = "settings" , value = "List of settings to create ")@RequestBody List<SettingsTemplate> settings) {
 		if (isDebugEnabled) {
 		    LOGGER.debug("ComponentService.createSettings : Entry");
 		    LOGGER.debug("ComponentService.createSettings" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
@@ -891,6 +990,7 @@ public class ComponentService extends DbService {
 				}
 			}
 		} catch (Exception e) {
+			response.setStatus(500);
 			if(isDebugEnabled) {
 				LOGGER.error("ComponentService.createSettings", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
         		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
@@ -900,7 +1000,6 @@ public class ComponentService extends DbService {
 		if (isDebugEnabled) {
 		    LOGGER.debug("ComponentService.createSettings : Exit");
 		}
-		return Response.status(Response.Status.CREATED).build();
 	}
 	
 	/**
@@ -908,11 +1007,12 @@ public class ComponentService extends DbService {
 	 * @param settings
 	 * @return
 	 */
-	@PUT
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_SETTINGS)
-	public Response updateSettings(@Context HttpServletRequest request, List<SettingsTemplate> settings) {
+	@ApiOperation(value = " Updates list of settings ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Unable to update setting")})
+    @RequestMapping(value= REST_API_SETTINGS, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
+	public @ResponseBody void updateSettings(@Context HttpServletRequest request, HttpServletResponse response,
+			@ApiParam(name = "settings" , value = "List of settings to update ")@RequestBody List<SettingsTemplate> settings) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.updateSettings : Entry");
 	        LOGGER.debug("ComponentService.updateSettings" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
@@ -927,7 +1027,9 @@ public class ComponentService extends DbService {
 					DbService.getMongoOperation().save(SETTINGS_COLLECTION_NAME, settingTemplate);
 				}
 			}
+			response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			if(isDebugEnabled) {
 				LOGGER.error("ComponentService.createSettings", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
         		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
@@ -937,7 +1039,6 @@ public class ComponentService extends DbService {
 		if (isDebugEnabled) {
 		    LOGGER.debug("ComponentService.updateSettings : Exit");
 		}
-		return Response.status(Response.Status.OK).entity(settings).build();
 	}
 	
 	/**
@@ -945,13 +1046,15 @@ public class ComponentService extends DbService {
 	 * @param settings
 	 * @throws PhrescoException 
 	 */
-	@DELETE
-	@Path (REST_API_SETTINGS)
-	public void deleteSettings(List<SettingsTemplate> settings) throws PhrescoException {
+	@ApiOperation(value = " Deletes list of settings ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Operation not supported")})
+    @RequestMapping(value= REST_API_SETTINGS, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
+	public void deleteSettings(HttpServletResponse response, @ApiParam(name = "settings" , 
+			value = "List of settings to Delete ")@RequestBody List<SettingsTemplate> settings) throws PhrescoException {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.deleteSettings : Entry");
 	    }
-		
+		response.setStatus(500);
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
 		if(isDebugEnabled) {
 			LOGGER.error("ComponentService.deleteSettings", "status=\"Failure\"", "message=\"" + phrescoException.getLocalizedMessage() + "\"");
@@ -965,22 +1068,27 @@ public class ComponentService extends DbService {
 	 * @param id
 	 * @return
 	 */
-	@GET
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_SETTINGS + REST_API_PATH_ID)
-	public Response getSettingsTemplate(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id) {
+	@ApiOperation(value = " Retrive setting based on their id ")
+	@ApiErrors(value = {@ApiError(code=204, reason = "Setting not found"),@ApiError(code=500, reason = "Failed")})
+    @RequestMapping(value= REST_API_SETTINGS + REST_API_PATH_ID, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody SettingsTemplate getSettingsTemplate(@Context HttpServletRequest request, HttpServletResponse response,
+			@ApiParam(name = "id" , value = "Id of settings to retrive")@PathVariable(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.getSettingsTemplate : Entry");
 	        LOGGER.debug("ComponentService.getSettingsTemplate" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 	        		"user=" + request.getParameter("userId"), "id=" + id);
 	    }
+	    SettingsTemplate settingTemplate = null;
 		try {
-			SettingsTemplate settingTemplate = DbService.getMongoOperation().findOne(SETTINGS_COLLECTION_NAME, 
+			settingTemplate = DbService.getMongoOperation().findOne(SETTINGS_COLLECTION_NAME, 
 			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), SettingsTemplate.class); 
-			if (settingTemplate != null) {
-				return Response.status(Response.Status.OK).entity(settingTemplate).build();
+			if (settingTemplate == null) {
+				response.setStatus(204);
+				return settingTemplate;
 			}
+			response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			if(isDebugEnabled) {
 				LOGGER.error("ComponentService.getSettingsTemplate", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
         		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
@@ -990,47 +1098,49 @@ public class ComponentService extends DbService {
 		if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.getSettingsTemplate : Exit");
 	    }
-		return Response.status(Response.Status.OK).build();
+		return settingTemplate;
 	}
 	
 	/**
 	 * Updates the list of setting
-	 * @param settings
+	 * @param setting
 	 * @return
 	 */
-	@PUT
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_SETTINGS + REST_API_PATH_ID)
-	public Response updateSetting(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id , 
-			SettingsTemplate settingsTemplate) {
+	@ApiOperation(value = " Update setting based on their id ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Unable to update setting")})
+    @RequestMapping(value= REST_API_SETTINGS + REST_API_PATH_ID, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
+	public @ResponseBody void updateSetting(@Context HttpServletRequest request, HttpServletResponse response,
+			@ApiParam(name = "id" , value = "Id of settings to update")@PathVariable(REST_API_PATH_PARAM_ID) String id , 
+			@ApiParam(name = "setting" , value = "Setting data thats needs to update")@RequestBody SettingsTemplate setting) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.updateAppType : Entry");
 	        LOGGER.debug("ComponentService.getSettingsTemplate" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
-	        		"user=" + request.getParameter("userId"), "id=" + id , "customer" + getCustomerNameById(settingsTemplate.getCustomerIds().get(0)));
+	        		"user=" + request.getParameter("userId"), "id=" + id , "customer" + getCustomerNameById(setting.getCustomerIds().get(0)));
 	    }
 		try {
 			SettingsTemplate fromDb = DbService.getMongoOperation().findOne(SETTINGS_COLLECTION_NAME, 
 			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), SettingsTemplate.class);
 			List<String> customerIds = fromDb.getCustomerIds();
-			if(!customerIds.contains(settingsTemplate.getCustomerIds().get(0))) {
-				customerIds.add(settingsTemplate.getCustomerIds().get(0));
+			if(!customerIds.contains(setting.getCustomerIds().get(0))) {
+				customerIds.add(setting.getCustomerIds().get(0));
 			}
 			List<Element> appliesToTechs = fromDb.getAppliesToTechs();
-			List<Element> newAppliesToTechs = settingsTemplate.getAppliesToTechs();
+			List<Element> newAppliesToTechs = setting.getAppliesToTechs();
 			for (Element element : newAppliesToTechs) {
 				if(! checkPreviouslyAvail(appliesToTechs, element)) {
 					appliesToTechs.add(element);
 				}
 			}
-			settingsTemplate.setAppliesToTechs(appliesToTechs);
-			settingsTemplate.setCustomerIds(customerIds);
-			DbService.getMongoOperation().save(SETTINGS_COLLECTION_NAME, settingsTemplate);
+			setting.setAppliesToTechs(appliesToTechs);
+			setting.setCustomerIds(customerIds);
+			DbService.getMongoOperation().save(SETTINGS_COLLECTION_NAME, setting);
+			response.setStatus(200);
 			if (isDebugEnabled) {
 		        LOGGER.debug("ComponentService.updateAppType : Exit");
 		    }
-			return Response.status(Response.Status.OK).entity(settingsTemplate).build();
 		} catch (Exception e) {
+			response.setStatus(500);
 			if(isDebugEnabled) {
 				LOGGER.error("ComponentService.updateAppType", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
         		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
@@ -1053,9 +1163,11 @@ public class ComponentService extends DbService {
 	 * @param id
 	 * @return 
 	 */
-	@DELETE
-	@Path (REST_API_SETTINGS + REST_API_PATH_ID)
-	public Response deleteSettingsTemplate(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id) {
+	@ApiOperation(value = " Delete settings based on their id ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Unable to delete setting")})
+    @RequestMapping(value= REST_API_SETTINGS + REST_API_PATH_ID, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
+	public @ResponseBody void deleteSettingsTemplate(@Context HttpServletRequest request, HttpServletResponse response,
+			@ApiParam(name = "id" , value = "Id of settings to delete")@PathVariable(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.deleteSettingsTemplate : Entry");
 	        LOGGER.debug("ComponentService.deleteSettingsTemplate" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
@@ -1064,7 +1176,9 @@ public class ComponentService extends DbService {
 		try {
 			DbService.getMongoOperation().remove(SETTINGS_COLLECTION_NAME, 
 			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), SettingsTemplate.class);
+			response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			if(isDebugEnabled) {
 				LOGGER.error("ComponentService.deleteSettingsTemplate", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
         		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
@@ -1074,24 +1188,27 @@ public class ComponentService extends DbService {
 		if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.deleteSettingsTemplate : Exit");
 	    }
-		return Response.status(Response.Status.OK).build();
 	}
 	
 	/**
 	 * Returns the list of modules
 	 * @return
 	 */
-	@GET
-	@Path (REST_API_MODULES)
-	@Produces (MediaType.APPLICATION_JSON)
-	public Response findModules(@Context HttpServletRequest request, @QueryParam(REST_QUERY_TYPE) String type, @QueryParam(REST_QUERY_CUSTOMERID) String customerId,
-			@QueryParam(REST_QUERY_TECHID) String techId, @QueryParam(REST_LIMIT_VALUE) String count,
-			@QueryParam(REST_SKIP_VALUE) String start) {
+	@ApiOperation(value = " Retrives features ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed"), @ApiError(code=204, reason = "Features not found")})
+    @RequestMapping(value= REST_API_MODULES, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody List<ArtifactGroup> findModules(@Context HttpServletRequest request, HttpServletResponse response,
+			@ApiParam(name = "type" , value = "Feature type to retrive")@QueryParam(REST_QUERY_TYPE) String type, 
+			@ApiParam(name = "customerId" , value = "Customerid to retrive")@QueryParam(REST_QUERY_CUSTOMERID) String customerId,
+			@ApiParam(name = "techId" , value = "Techid to retrive")@QueryParam(REST_QUERY_TECHID) String techId, 
+			@ApiParam(name = "count" , value = "Limit value")@QueryParam(REST_LIMIT_VALUE) String count,
+			@ApiParam(name = "start" , value = "Start value")@QueryParam(REST_SKIP_VALUE) String start) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.findModules : Entry");
 	        LOGGER.debug("ComponentService.findModules" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 	        		"user=" + request.getParameter("userId"), "customer" + getCustomerNameById(customerId), "techId=" + techId);
 	    }
+	    List<ArtifactGroup> modules = null;
 		try {
 			Query query = new Query();
 			if(StringUtils.isNotEmpty(customerId)) {
@@ -1131,21 +1248,21 @@ public class ComponentService extends DbService {
 					LOGGER.warn("ComponentService.findModules" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 			        		"user=" + request.getParameter("userId"), "status=\"Not Found\"", "message=" + "Not Found");
 				}
-		    	return Response.status(Response.Status.NO_CONTENT).build();
+				response.setStatus(204);
+		    	return modules;
 		    }
 			if(isDebugEnabled) {
 				LOGGER.info("ComponentService.findModules" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 		        		"user=" + request.getParameter("userId"), "query=" + query.getQueryObject().toString());
 			}
-		    List<ArtifactGroup> modules = convertDAOToModule(artifactGroupDAOs);
-		    ResponseBuilder response = Response.status(Response.Status.OK);
-		    response.header(Constants.ARTIFACT_COUNT_RESULT, count(ARTIFACT_GROUP_COLLECTION_NAME, query));
+		    modules = convertDAOToModule(artifactGroupDAOs);
 		    if (isDebugEnabled) {
 		        LOGGER.debug("ComponentService.findModules : Exit");
 		    }
-			return response.entity(modules).build();
+			return modules;
 		    
 		} catch(Exception e) {
+			response.setStatus(500);
 			if(isDebugEnabled) {
 				LOGGER.error("ComponentService.deleteSettingsTemplate", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
         		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
@@ -1183,23 +1300,67 @@ public class ComponentService extends DbService {
      * Creates the list of modules
      * @param modules
      * @return 
+     * @return 
      * @throws PhrescoException 
+     * @throws IOException 
      */
-    @POST
-    @Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
-    @Produces (MediaType.APPLICATION_JSON)
-    @Path (REST_API_MODULES)
-    public Response createModules(@Context HttpServletRequest request, MultiPart moduleInfo) throws PhrescoException {
+    @ApiOperation(value = " Creates new features ")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Feature creation failed")})
+    @RequestMapping(value= REST_API_MODULES, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, 
+    		MediaType.APPLICATION_JSON_VALUE,"multipart/mixed"}, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    public @ResponseBody ArtifactGroup createModules(HttpServletResponse response, MultipartHttpServletRequest request, 
+    		@RequestPart(value = "feature", required = false) ByteArrayResource moduleFile, 
+    		@RequestPart(value = "icon", required = false) ByteArrayResource iconFile,
+    		@RequestParam("moduleGroup") byte[] artifactGroupData)
+    		throws PhrescoException, IOException {
         if (isDebugEnabled) {
         	LOGGER.debug("ComponentService.createModules : Entry");
         	LOGGER.debug("ComponentService.findModules" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 	        		"user=" + request.getParameter("userId"));
         }
-        return createOrUpdateFeatures(moduleInfo);
+        String string = new String(artifactGroupData);
+        ArtifactGroup artifactGroup = new Gson().fromJson(string, ArtifactGroup.class);
+        if(moduleFile != null) {
+        	boolean saveArtifactFile = saveArtifactFile(artifactGroup, moduleFile.getByteArray());
+        	if(!saveArtifactFile) {
+        		throw new PhrescoException("Unable to create artifact");
+        	}
+        }
+        if(iconFile != null) {
+        	artifactGroup.setPackaging(ICON_EXT);
+        	boolean saveArtifactFile = saveArtifactFile(artifactGroup, iconFile.getByteArray());
+        	if(!saveArtifactFile) {
+        		throw new PhrescoException("Unable to create artifact");
+        	}
+        }
+        saveModuleGroup(artifactGroup);
+        return artifactGroup;
     }
     
+    private boolean saveArtifactFile(ArtifactGroup artifactGroup, byte[] artifactFile) throws PhrescoException {
+    	File artifcatFile = new File(ServerUtil.getTempFolderPath() + "/"
+                + artifactGroup.getName() + "." + artifactGroup.getPackaging());
+		boolean createIcon = false;
+		if(ServerUtil.convertByteArrayToFile(artifcatFile, artifactFile)) {
+			createIcon = uploadBinary(artifactGroup, artifcatFile);
+			FileUtil.delete(artifcatFile);
+		}
+		return createIcon;
+    }
+    
+	private boolean saveArtifactIcon(ArtifactGroup artifactGroup, byte[] iconByte) throws PhrescoException {
+		File iconFile = new File(ServerUtil.getTempFolderPath() + "/"
+                + artifactGroup.getName() + "." + ICON_EXT);
+		artifactGroup.setPackaging(ICON_EXT);
+		boolean createIcon = false;
+		if(ServerUtil.convertByteArrayToFile(iconFile, iconByte)) {
+			createIcon = uploadBinary(artifactGroup, iconFile);
+			FileUtil.delete(iconFile);
+		}
+		return createIcon;
+	}
 	
-    private Response createOrUpdateFeatures(MultiPart moduleInfo) throws PhrescoException {
+    private ArtifactGroup createOrUpdateFeatures(MultiPart moduleInfo, HttpServletResponse response) throws PhrescoException {
     	ArtifactGroup moduleGroup = null;
         File moduleFile = null;
         List<BodyPart> bodyParts = moduleInfo.getBodyParts();
@@ -1238,18 +1399,19 @@ public class ComponentService extends DbService {
         		}
         	}
         }
+        response.setStatus(200);
         bodyPartEntityMap.clear();
         if (isDebugEnabled) {
         	LOGGER.debug("ComponentService.createOrUpdateFeatures : Exit");
         }
-        return Response.status(Response.Status.CREATED).entity(moduleGroup).build();
+        return moduleGroup;
 	}
 
 	public ArtifactGroup createBodyPart(ArtifactGroup moduleGroup, List<BodyPart> bodyParts,
 			Map<String, BodyPartEntity> bodyPartEntityMap) {
 		if (CollectionUtils.isNotEmpty(bodyParts)) {
             for (BodyPart bodyPart : bodyParts) {
-                if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
+                if (bodyPart.getMediaType().equals(javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE)) {
                     moduleGroup = bodyPart.getEntityAs(ArtifactGroup.class);
                 } else {
                 	bodyPartEntityMap.put(bodyPart.getContentDisposition().getFileName(), (BodyPartEntity) bodyPart.getEntity());
@@ -1334,34 +1496,58 @@ public class ComponentService extends DbService {
 	/**
 	 * Updates the list of modules
 	 * @param modules
+	 * @return 
 	 * @return
 	 * @throws PhrescoException 
 	 */
-	@PUT
-	@Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_MODULES)
-	public Response updateModules(@Context HttpServletRequest request, MultiPart multiPart) throws PhrescoException {
+	@ApiOperation(value = " Updates features ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Feature updation failed")})
+    @RequestMapping(value= REST_API_MODULES, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, 
+    		MediaType.APPLICATION_JSON_VALUE,"multipart/mixed"}, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
+	public @ResponseBody ArtifactGroup updateModules(HttpServletResponse response, MultipartHttpServletRequest request, 
+    		@RequestPart(value = "feature", required = false ) ByteArrayResource moduleFile, 
+    		@RequestPart(value = "icon", required = false) ByteArrayResource iconFile,
+    		@RequestParam("data") byte[] artifactGroupData) throws PhrescoException {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.updateModules :  Entry");
 	        LOGGER.debug("ComponentService.findModules" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 	        		"user=" + request.getParameter("userId"));
 	    }
-		return createOrUpdateFeatures(multiPart);
+	    String string = new String(artifactGroupData);
+        ArtifactGroup artifactGroup = new Gson().fromJson(string, ArtifactGroup.class);
+        if(moduleFile != null) {
+        	boolean saveArtifactFile = saveArtifactFile(artifactGroup, moduleFile.getByteArray());
+        	if(!saveArtifactFile) {
+        		throw new PhrescoException("Unable to create artifact");
+        	}
+        }
+        if(iconFile != null) {
+        	artifactGroup.setPackaging(ICON_EXT);
+        	boolean saveArtifactFile = saveArtifactFile(artifactGroup, iconFile.getByteArray());
+        	if(!saveArtifactFile) {
+        		throw new PhrescoException("Unable to create artifact");
+        	}
+        }
+        saveModuleGroup(artifactGroup);
+        return artifactGroup;
 	}
 	
 	/**
 	 * Deletes the list of modules
-	 * @param modules
+	 * @param features
 	 * @throws PhrescoException 
 	 */
-	@DELETE
-	@Path (REST_API_MODULES)
-	public void deleteModules(List<ArtifactGroup> modules) throws PhrescoException {
+	@ApiOperation(value = " Delete list of features ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Operation not supported")})
+    @RequestMapping(value= REST_API_MODULES, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
+	public void deleteModules(HttpServletResponse response, 
+		@ApiParam(name = "features" , value = "List of features") @RequestBody List<ArtifactGroup> features) 
+		throws PhrescoException {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.deleteModules : Entry");
 	    }
-		
+		response.setStatus(500);
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
 		if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.deleteModules" ,"status=\"Failure\"", "message=\"" + phrescoException.getLocalizedMessage() + "\"");
@@ -1374,10 +1560,11 @@ public class ComponentService extends DbService {
 	 * @param id
 	 * @return
 	 */
-	@GET
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_MODULES + REST_API_PATH_ID)
-	public Response getModule(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id) {
+	@ApiOperation(value = " Retrives feature based on their id ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed"), @ApiError(code=204, reason = "Feature not found")})
+    @RequestMapping(value= REST_API_MODULES + REST_API_PATH_ID, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody ArtifactGroup getModule(@Context HttpServletRequest request, HttpServletResponse response,
+			@ApiParam(name = "id" , value = "Id of feature that needs to be retrive") @PathVariable(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.getModule : Entry");
 	        LOGGER.debug("ComponentService.getModule" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
@@ -1401,8 +1588,10 @@ public class ComponentService extends DbService {
 			    	moduleGroup.setCreationDate(artifactElement.getCreationDate());
 			    } 
 			}
-			return  Response.status(Response.Status.OK).entity(moduleGroup).build();
+			response.setStatus(200);
+			return  moduleGroup;
 		} catch (Exception e) {
+			response.setStatus(500);
 			if(isDebugEnabled) {
 				LOGGER.error("ComponentService.getModule", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
         		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
@@ -1414,36 +1603,37 @@ public class ComponentService extends DbService {
 	/**
 	 * Updates the module given by the parameter
 	 * @param id
-	 * @param module
+	 * @param feature
 	 * @return
 	 */
-	@PUT
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_MODULES + REST_API_PATH_ID)
-	public Response updatemodule(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id, ArtifactGroup module) {
+	@ApiOperation(value = " Updates feature based on their id ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to update")})
+    @RequestMapping(value= REST_API_MODULES + REST_API_PATH_ID, produces = MediaType.APPLICATION_JSON_VALUE, 
+    		consumes = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
+	public @ResponseBody void updatemodule(@Context HttpServletRequest request, HttpServletResponse response,
+			@ApiParam(name = "id" , value = "Id of feature that needs to be update") @PathVariable(REST_API_PATH_PARAM_ID) String id, 
+			@ApiParam(name = "feature" , value = "Feature that needs to be update") @RequestBody ArtifactGroup feature) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.updatemodule : Entry");
 	        LOGGER.debug("ComponentService.updatemodule" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
-	        		"user=" + request.getParameter("userId") , "id=" + id , "customer" + getCustomerNameById(module.getCustomerIds().get(0)));
+	        		"user=" + request.getParameter("userId") , "id=" + id , "customer" + getCustomerNameById(feature.getCustomerIds().get(0)));
 	    }
 		try {
-			if (id.equals(module.getId())) {
-				saveModuleGroup(module);
+			if (id.equals(feature.getId())) {
+				response.setStatus(200);
+				saveModuleGroup(feature);
 				if (isDebugEnabled) {
 			        LOGGER.debug("ComponentService.updatemodule : Exit");
 			    }
-				return  Response.status(Response.Status.OK).entity(module).build();
 			}
 		} catch (Exception e) {
+			response.setStatus(500);
 			if(isDebugEnabled) {
 				LOGGER.error("ComponentService.updatemodule", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
         		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
 			}
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
 		}
-		
-		return Response.status(Response.Status.NO_CONTENT).entity(module).build();
 	}
 	
 	/**
@@ -1451,18 +1641,20 @@ public class ComponentService extends DbService {
 	 * @param id
 	 * @return 
 	 */
-	@DELETE
-	@Path (REST_API_MODULES + REST_API_PATH_ID)
-	public Response deleteModules(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id) {
+	@ApiOperation(value = " Deletes feature based on their id ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to delete")})
+    @RequestMapping(value= REST_API_MODULES + REST_API_PATH_ID, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
+	public @ResponseBody void deleteModules(@Context HttpServletRequest request, HttpServletResponse response,
+			@ApiParam(name = "id" , value = "Id of feature that needs to be delete") @PathVariable(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.deleteModules : Entry");
 	        LOGGER.debug("ComponentService.deleteModules" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 	        		"user=" + request.getParameter("userId") , "id=" + id);
 	    }
-		return deleteAttifact(id);
+		deleteAttifact(id, response);
 	}
 	
-	private Response deleteAttifact(String id) {
+	private void deleteAttifact(String id, HttpServletResponse response) {
 		try {
 			Query query = new Query(Criteria.whereId().is(id));
 			ArtifactGroupDAO artifactGroupDAO = DbService.getMongoOperation().findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
@@ -1496,17 +1688,17 @@ public class ComponentService extends DbService {
 		if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.deleteModules : Exit");
 	    }
-		return Response.status(Response.Status.OK).build();
 	}
 	
 	/**
 	 * Returns the artifactInfo
 	 * @return
 	 */
-	@GET
-	@Path (REST_API_ARTIFACTINFO)
-	@Produces (MediaType.APPLICATION_JSON)
-	public Response getArtifactInfo(@Context HttpServletRequest request, @QueryParam(REST_QUERY_ID) String id) {
+	@ApiOperation(value = " Retrives feature version based on their id ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to retrive"),@ApiError(code=204, reason = "Artifact not found")})
+    @RequestMapping(value= REST_API_ARTIFACTINFO, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody ArtifactInfo getArtifactInfo(@Context HttpServletRequest request, HttpServletResponse response,
+			@ApiParam(name = "id" , value = "Id of feature that needs to be retrive") @QueryParam(REST_QUERY_ID) String id) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.getArtifactInfo : Entry");
 	        LOGGER.debug("ComponentService.getArtifactInfo" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
@@ -1518,8 +1710,14 @@ public class ComponentService extends DbService {
 			if (isDebugEnabled) {
 		        LOGGER.debug("ComponentService.getArtifactInfo : Exit");
 			}
-			return  Response.status(Response.Status.OK).entity(info).build();
+			if(info == null) {
+				response.setStatus(204);
+				return info;
+			}
+			response.setStatus(200);
+			return  info;
 		} catch (Exception e) {
+			response.setStatus(500);
 			if(isDebugEnabled) {
 				LOGGER.error("ComponentService.getArtifactInfo", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
         		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
@@ -1532,10 +1730,12 @@ public class ComponentService extends DbService {
 	 * Returns the list of pilots
 	 * @return
 	 */
-	@GET
-	@Path (REST_API_PILOTS)
-	@Produces (MediaType.APPLICATION_JSON)
-	public Response findPilots(@Context HttpServletRequest request, @QueryParam(REST_QUERY_CUSTOMERID) String customerId, @QueryParam(REST_QUERY_TECHID) String techId) {
+	@ApiOperation(value = " Retrives pilots ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to retrive"),@ApiError(code=204, reason = "Pilots not found")})
+    @RequestMapping(value= REST_API_PILOTS, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody List<ApplicationInfo> findPilots(@Context HttpServletRequest request, HttpServletResponse response,
+			@ApiParam(name = "customerId" , value = "Customerid to retrive") @QueryParam(REST_QUERY_CUSTOMERID) String customerId, 
+			@ApiParam(name = "techId" , value = "Customerid to retrive") @QueryParam(REST_QUERY_TECHID) String techId) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.findPilots : Entry");
 	        LOGGER.debug("ComponentService.findPilots" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
@@ -1577,18 +1777,19 @@ public class ComponentService extends DbService {
 			        LOGGER.info("ComponentService.findPilots" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 			        		"user=" + request.getParameter("userId") , "status=\"Not Found\"");
 			    }
-				return Response.status(Response.Status.NO_CONTENT).build();
+				response.setStatus(204);
+				return applicationInfos;
 			}
 			if (isDebugEnabled) {
 		        LOGGER.info("ComponentService.findPilots" , "query=" + query.getQueryObject().toString());
 		    }
-			ResponseBuilder response = Response.status(Response.Status.OK);
-			response.header(Constants.ARTIFACT_COUNT_RESULT, count(APPLICATION_INFO_COLLECTION_NAME, query));
 			if (isDebugEnabled) {
 		        LOGGER.debug("ComponentService.findPilots : Exit");
 		    }
-			return response.entity(applicationInfos).build();
+			response.setStatus(200);
+			return applicationInfos;
 		} catch (Exception e) {
+			response.setStatus(500);
 			if(isDebugEnabled) {
 				LOGGER.error("ComponentService.findPilots", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
         		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
@@ -1603,21 +1804,35 @@ public class ComponentService extends DbService {
      * @return 
      * @throws PhrescoException 
      */
-    @POST
-    @Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
-    @Produces (MediaType.APPLICATION_JSON)
-    @Path (REST_API_PILOTS)
-    public Response createPilots(@Context HttpServletRequest request, MultiPart pilotInfo) throws PhrescoException {
+	@ApiOperation(value = " Creates new pilots ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Pilot creation failed")})
+    @RequestMapping(value= REST_API_PILOTS, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, 
+    		MediaType.APPLICATION_JSON_VALUE,"multipart/mixed"}, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    public @ResponseBody void createPilots(HttpServletResponse response, MultipartHttpServletRequest request, 
+    		@RequestPart(value = "pilot", required = false) ByteArrayResource pilotFile, 
+    		@RequestParam("pilotInfo") byte[] pilotData) throws PhrescoException {
         if (isDebugEnabled) {
             LOGGER.debug("ComponentService.createPilots : Entry");
             LOGGER.debug("ComponentService.findPilots" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 	        		"user=" + request.getParameter("userId"));
         }
-
-        return createOrUpdatePilots(pilotInfo);
+        saveOrUpdatePilot(pilotFile, pilotData);
     }
+
+	private void saveOrUpdatePilot(ByteArrayResource pilotFile, byte[] pilotData)
+			throws PhrescoException {
+		ApplicationInfo applicationInfo = new Gson().fromJson(new String(pilotData), ApplicationInfo.class);
+        if(pilotFile != null) {
+        	boolean saveArtifactFile = saveArtifactFile(applicationInfo.getPilotContent(), pilotFile.getByteArray());
+        	if(!saveArtifactFile) {
+        		throw new PhrescoException("Unable to create pilot...");
+        	}
+        }
+        saveApplicationInfo(applicationInfo);
+	}
     
-	private Response createOrUpdatePilots(MultiPart pilotInfo) throws PhrescoException {
+	private void createOrUpdatePilots(MultiPart pilotInfo, HttpServletResponse response) throws PhrescoException {
 		ApplicationInfo applicationInfo = null;
         BodyPartEntity bodyPartEntity = null;
         File pilotFile = null;
@@ -1625,7 +1840,7 @@ public class ComponentService extends DbService {
         List<BodyPart> bodyParts = pilotInfo.getBodyParts();
         if(CollectionUtils.isNotEmpty(bodyParts)) {
             for (BodyPart bodyPart : bodyParts) {
-                if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
+                if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_VALUE)) {
                     applicationInfo = bodyPart.getEntityAs(ApplicationInfo.class);
                 } else {
                     bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
@@ -1647,7 +1862,7 @@ public class ComponentService extends DbService {
         if(bodyPartEntity == null && applicationInfo != null) {
         	saveApplicationInfo(applicationInfo);
         }
-        return Response.status(Response.Status.CREATED).entity(applicationInfo).build();
+        response.setStatus(200);
 	}
 	
 	private void saveApplicationInfo(ApplicationInfo applicationInfo) throws PhrescoException {
@@ -1668,18 +1883,20 @@ public class ComponentService extends DbService {
 	 * @return
 	 * @throws PhrescoException 
 	 */
-	@PUT
-	@Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
-    @Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_PILOTS)
-	public Response updatePilots(@Context HttpServletRequest request, MultiPart pilotInfo) throws PhrescoException {
+	@ApiOperation(value = " Update pilots ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Pilot update failed")})
+    @RequestMapping(value= REST_API_PILOTS, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, 
+    		MediaType.APPLICATION_JSON_VALUE,"multipart/mixed"}, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
+	public @ResponseBody void updatePilots(HttpServletResponse response, MultipartHttpServletRequest request, 
+    		@RequestPart(value = "pilot", required = false) ByteArrayResource pilotFile, 
+    		@RequestParam("pilotInfo") byte[] pilotData) throws PhrescoException {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.updatePilots : Entry");
 	        LOGGER.debug("ComponentService.findPilots" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 	        		"user=" + request.getParameter("userId"));
 	    }
-	    
-		return createOrUpdatePilots(pilotInfo);
+	    saveOrUpdatePilot(pilotFile, pilotData);
 	}
 	
 	/**
@@ -1687,13 +1904,16 @@ public class ComponentService extends DbService {
 	 * @param pilots
 	 * @throws PhrescoException 
 	 */
-	@DELETE
-	@Path (REST_API_PILOTS)
-	public void deletePilots(List<ApplicationInfo> pilots) throws PhrescoException {
+	@ApiOperation(value = " Deletes list of pilots ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Unsupported operation")})
+    @RequestMapping(value= REST_API_PILOTS, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
+	public void deletePilots(HttpServletResponse response, 
+			@ApiParam(name = "pilots" ,	value = "List of pilots to delete") @RequestBody List<ApplicationInfo> pilots) 
+			throws PhrescoException {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.deletePilots : Entry");
 	    }
-		
+		response.setStatus(500);
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
 		if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.deletePilots" , "status=\"Failure\"", "message=\"" + phrescoException.getLocalizedMessage() + "\"");
@@ -1706,10 +1926,11 @@ public class ComponentService extends DbService {
 	 * @param id
 	 * @return
 	 */
-	@GET
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_PILOTS + REST_API_PATH_ID)
-	public Response getPilot(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id) {
+	@ApiOperation(value = " Retrive pilot based on their id ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to retrive"), @ApiError(code=204, reason = "Pilot not found")})
+    @RequestMapping(value= REST_API_PILOTS + REST_API_PATH_ID, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody ApplicationInfo getPilot(@Context HttpServletRequest request, HttpServletResponse response,
+			@ApiParam(name = "id" , value = "Id of the pilot that needs to be retrive")@PathVariable(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.getPilot : Entry ");
 	        LOGGER.debug("ComponentService.getPilot" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
@@ -1719,18 +1940,20 @@ public class ComponentService extends DbService {
 			ApplicationInfo appInfo = DbService.getMongoOperation().findOne(APPLICATION_INFO_COLLECTION_NAME, 
 			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), ApplicationInfo.class);
 			
-			if (appInfo != null) {
-				return Response.status(Response.Status.OK).entity(appInfo).build();
+			if (appInfo == null) {
+				response.setStatus(204);
+				return appInfo;
 			}
+			response.setStatus(200);
+			return appInfo;
 		} catch (Exception e) {
+			response.setStatus(500);
 			if(isDebugEnabled) {
 				LOGGER.error("ComponentService.getPilot", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
         		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
 			}
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, APPLICATION_INFO_COLLECTION_NAME);
 		}
-		
-		return Response.status(Response.Status.OK).build();
 	}
 	
 	/**
@@ -1739,11 +1962,13 @@ public class ComponentService extends DbService {
 	 * @param pilot
 	 * @return
 	 */
-	@PUT
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_PILOTS + REST_API_PATH_ID)
-	public Response updatePilot(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id , ApplicationInfo pilot) {
+	@ApiOperation(value = " Update pilot based on their id ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to update")})
+    @RequestMapping(value= REST_API_PILOTS + REST_API_PATH_ID, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
+	public @ResponseBody void updatePilot(@Context HttpServletRequest request, HttpServletResponse response,
+			@ApiParam(name = "id" , value = "Id of the pilot that needs to be update")@PathVariable(REST_API_PATH_PARAM_ID) String id , 
+			@ApiParam(name = "pilot" , value = "Pilot that needs to be update")@RequestBody ApplicationInfo pilot) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.updatePilot : Entry"); 
 	        LOGGER.debug("ComponentService.updatePilot" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
@@ -1755,17 +1980,16 @@ public class ComponentService extends DbService {
 				if (isDebugEnabled) {
 			        LOGGER.debug("ComponentService.updatePilot : Exit"); 
 			    }
-				return  Response.status(Response.Status.OK).entity(pilot).build();
+				response.setStatus(200);
 			}
 		} catch (Exception e) {
+			response.setStatus(500);
 			if(isDebugEnabled) {
 				LOGGER.error("ComponentService.updatePilot", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
         		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
 			}
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
 		}
-		
-		return Response.status(Response.Status.NO_CONTENT).entity(pilot).build();
 	}
 	
 	/**
@@ -1773,9 +1997,11 @@ public class ComponentService extends DbService {
 	 * @param id
 	 * @return 
 	 */
-	@DELETE
-	@Path (REST_API_PILOTS + REST_API_PATH_ID)
-	public Response deletePilot(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id) {
+	@ApiOperation(value = " Deletes pilot based on their id ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to delete")})
+    @RequestMapping(value= REST_API_PILOTS + REST_API_PATH_ID, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
+	public @ResponseBody void deletePilot(@Context HttpServletRequest request, HttpServletResponse response,
+			@ApiParam(name = "id" , value = "Id of the pilot that needs to be delete")@PathVariable(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.deletePilot : Entry ");
 	        LOGGER.debug("ComponentService.deletePilot" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
@@ -1784,7 +2010,7 @@ public class ComponentService extends DbService {
 	    Query query = new Query(Criteria.whereId().is(id));
 	    ApplicationInfoDAO applicationInfoDAO = DbService.getMongoOperation().findOne(APPLICATION_INFO_COLLECTION_NAME, query, ApplicationInfoDAO.class);
 	    if(applicationInfoDAO != null) {
-	    	deleteAttifact(applicationInfoDAO.getArtifactGroupId());
+	    	deleteAttifact(applicationInfoDAO.getArtifactGroupId(), response);
 	    	DbService.getMongoOperation().remove(APPLICATION_INFO_COLLECTION_NAME, query, ApplicationInfoDAO.class);
 	    } else {
 	    	if (isDebugEnabled) {
@@ -1796,17 +2022,17 @@ public class ComponentService extends DbService {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.deletePilot : Exit ");
 	    }
-		return Response.status(Response.Status.OK).build(); 
 	}
 
 	/**
 	 * Returns the list of webservices
 	 * @return
 	 */
-	@GET
-	@Path (REST_API_WEBSERVICES)
-	@Produces (MediaType.APPLICATION_JSON)
-	public Response findWebServices(@Context HttpServletRequest request, @QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
+	@ApiOperation(value = " Retrives webservices ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to retrive"), @ApiError(code=204, reason = "Webservices not found")})
+    @RequestMapping(value= REST_API_WEBSERVICES, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody List<WebService> findWebServices(@Context HttpServletRequest request, HttpServletResponse response, 
+			@ApiParam(name = "customerId" , value = "Customerid to retrive") @QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.findWebServices : Entry ");
 	        LOGGER.debug("ComponentService.findWebServices" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
@@ -1819,13 +2045,16 @@ public class ComponentService extends DbService {
 			        LOGGER.debug("ComponentService.findWebServices", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 			        		"user=" + request.getParameter("userId"), "status=\"Not Found\"");
 			    }
-				return  Response.status(Response.Status.NO_CONTENT).build();
+				response.setStatus(204);
+				return  webServiceList;
 			}
 			if (isDebugEnabled) {
 		        LOGGER.debug("ComponentService.findWebServices : Exit ");
 		    }
-			return  Response.status(Response.Status.OK).entity(webServiceList).build();
+			response.setStatus(204);
+			return  webServiceList;
 		} catch (Exception e) {
+			response.setStatus(500);
 			if(isDebugEnabled) {
 				LOGGER.error("ComponentService.findWebServices", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
         		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
@@ -1839,23 +2068,26 @@ public class ComponentService extends DbService {
 	 * @param webServices
 	 * @return 
 	 */
-	@POST
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Path (REST_API_WEBSERVICES)
-	public Response createWebServices(@Context HttpServletRequest request, List<WebService> webServices) {
+	@ApiOperation(value = " Creates list of webservices ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to create webservice")})
+    @RequestMapping(value= REST_API_WEBSERVICES, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+	public @ResponseBody Response createWebServices(@Context HttpServletRequest request, HttpServletResponse response, 
+			@ApiParam(name = "webServices" , value = "List of webservices") @RequestBody List<WebService> webServices) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.createWebServices : Entry");
 	        LOGGER.debug("ComponentService.createWebServices" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 	        		"user=" + request.getParameter("userId"), "id=" + webServices.get(0).getId());
 	    }
-		
 		try {
 			for (WebService webService : webServices) {
 				if(validate(webService)) {
 					DbService.getMongoOperation().save(WEBSERVICES_COLLECTION_NAME , webService);
 				}
 			}
+			response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			if(isDebugEnabled) {
 				LOGGER.error("ComponentService.createWebServices", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
         		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
@@ -1873,11 +2105,12 @@ public class ComponentService extends DbService {
 	 * @param webServices
 	 * @return
 	 */
-	@PUT
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_WEBSERVICES)
-	public Response updateWebServices(@Context HttpServletRequest request, List<WebService> webServices) {
+	@ApiOperation(value = " Updates list of webservices ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to update webservice")})
+    @RequestMapping(value= REST_API_WEBSERVICES, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
+	public @ResponseBody void updateWebServices(@Context HttpServletRequest request, HttpServletResponse response,
+			@ApiParam(name = "webServices" , value = "List of webservices") @RequestBody List<WebService> webServices) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.updateWebServices : Entry");
 	        LOGGER.debug("ComponentService.updateWebServices" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
@@ -1891,7 +2124,9 @@ public class ComponentService extends DbService {
 					DbService.getMongoOperation().save(WEBSERVICES_COLLECTION_NAME , webService);
 				}
 			}
+			response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			if(isDebugEnabled) {
 				LOGGER.error("ComponentService.updateWebServices", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
         		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
@@ -1901,7 +2136,6 @@ public class ComponentService extends DbService {
 		if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.updateWebServices : Exit");
 	    }
-		return Response.status(Response.Status.OK).entity(webServices).build();
 	}
 	
 	/**
@@ -1909,12 +2143,15 @@ public class ComponentService extends DbService {
 	 * @param webServices
 	 * @throws PhrescoException 
 	 */
-	@DELETE
-	@Path (REST_API_WEBSERVICES)
-	public void deleteWebServices(@Context HttpServletRequest request, List<WebService> webServices) throws PhrescoException {
+	@ApiOperation(value = " Deletes list of webservices ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Unsupported operation")})
+    @RequestMapping(value= REST_API_WEBSERVICES, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
+	public void deleteWebServices(@Context HttpServletRequest request, HttpServletResponse response,
+			@ApiParam(name = "webServices" , value = "List of webservices") @RequestBody List<WebService> webServices) throws PhrescoException {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.deleteWebServices : Entry");
 	    }
+	    response.setStatus(500);
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
 		if(isDebugEnabled) {
 			LOGGER.error("ComponentService.deleteWebServices", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
@@ -1928,10 +2165,12 @@ public class ComponentService extends DbService {
 	 * @param id
 	 * @return
 	 */
-	@GET
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_WEBSERVICES + REST_API_PATH_ID)
-	public Response getWebService(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id) {
+	@ApiOperation(value = " Retrive webservice based on their id ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failure to find webservice"), @ApiError(code=500, reason = "Webservice not found")})
+    @RequestMapping(value= REST_API_WEBSERVICES + REST_API_PATH_ID, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody WebService getWebService(@Context HttpServletRequest request, HttpServletResponse response,
+			@ApiParam(name = "id" , value = "Id of webservice that needs to be retrive") @PathVariable(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.getWebService : Entry");
 	        LOGGER.debug("ComponentService.getWebService" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
@@ -1940,20 +2179,20 @@ public class ComponentService extends DbService {
 		try {
 			WebService webService = DbService.getMongoOperation().findOne(WEBSERVICES_COLLECTION_NAME, 
 					new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), WebService.class);
-			if (webService != null) {
-				return Response.status(Response.Status.OK).entity(webService).build();
+			if (webService == null) {
+				response.setStatus(204);
+				return webService;
 			} 
+			response.setStatus(200);
+			return webService;
 		} catch (Exception e) {
+			response.setStatus(500);
 			if(isDebugEnabled) {
 				LOGGER.error("ComponentService.getWebService", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
         		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
 			}
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, WEBSERVICES_COLLECTION_NAME);
 		}
-		if (isDebugEnabled) {
-	        LOGGER.debug("ComponentService.getWebService : Exit");
-	    }
-		return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
 	}
 	
 	/**
@@ -1962,23 +2201,25 @@ public class ComponentService extends DbService {
 	 * @param webService
 	 * @return
 	 */
-	@PUT
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_WEBSERVICES + REST_API_PATH_ID)
-	public Response updateWebService(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id , WebService webService) {
+	@ApiOperation(value = " Updates webservice based on their id ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failure to update")})
+    @RequestMapping(value= REST_API_WEBSERVICES + REST_API_PATH_ID, consumes = MediaType.APPLICATION_JSON_VALUE,
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
+	public @ResponseBody void updateWebService(@Context HttpServletRequest request, HttpServletResponse response,
+			@ApiParam(name = "id" , value = "Id of webservice that needs to be update") @PathVariable(REST_API_PATH_PARAM_ID) String id , 
+			@ApiParam(name = "webService" , value = "Webservice that needs to be update") @RequestBody WebService webService) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.updateWebService : Entry");
 	        LOGGER.debug("ComponentService.updateWebService" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 	        		"user=" + request.getParameter("userId"), "id=" + id);
 	    }
-		
 		try {
 			if (id.equals(webService.getId())) {
 				DbService.getMongoOperation().save(WEBSERVICES_COLLECTION_NAME, webService);
-				return Response.status(Response.Status.OK).entity(webService).build();
+				response.setStatus(200);
 			} 
 		} catch (Exception e) {
+			response.setStatus(500);
 			if(isDebugEnabled) {
 				LOGGER.error("ComponentService.updateWebService", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
         		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
@@ -1988,7 +2229,6 @@ public class ComponentService extends DbService {
 		if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.updateWebService : Exit");
 	    }
-		return Response.status(Response.Status.BAD_REQUEST).entity(ERROR_MSG_ID_NOT_EQUAL).build();
 	}
 	
 	/**
@@ -1996,9 +2236,11 @@ public class ComponentService extends DbService {
 	 * @param id
 	 * @return 
 	 */
-	@DELETE
-	@Path (REST_API_WEBSERVICES + REST_API_PATH_ID)
-	public Response deleteWebService(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id) {
+	@ApiOperation(value = " Deletes webservice based on their id ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failure to update")})
+    @RequestMapping(value= REST_API_WEBSERVICES + REST_API_PATH_ID, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
+	public @ResponseBody void deleteWebService(@Context HttpServletRequest request, HttpServletResponse response,
+			@ApiParam(name = "id" , value = "Id of webservice that needs to be delete") @PathVariable(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.deleteWebService : Entry ");
 	        LOGGER.debug("ComponentService.updateWebService" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
@@ -2007,7 +2249,9 @@ public class ComponentService extends DbService {
 		try {
 			DbService.getMongoOperation().remove(WEBSERVICES_COLLECTION_NAME, 
 			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), WebService.class);
+			response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			if(isDebugEnabled) {
 				LOGGER.error("ComponentService.updateWebService", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
         		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
@@ -2017,19 +2261,20 @@ public class ComponentService extends DbService {
 		if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.deleteWebService : Exit ");
 	    }
-		return Response.status(Response.Status.OK).build();
 	}
 
 	/**
      * Returns the list of downloadInfo
      * @return
      */
-    @GET
-    @Path (REST_API_DOWNLOADS)
-    @Produces (MediaType.APPLICATION_JSON)
-    public Response findDownloadInfo(@Context HttpServletRequest request, @QueryParam(REST_QUERY_CUSTOMERID) String customerId, 
-    		@QueryParam(REST_QUERY_TECHID) String techId, @QueryParam(REST_QUERY_TYPE) String type, 
-    		@QueryParam(REST_QUERY_PLATFORM) String platform) {
+	@ApiOperation(value = " Retrives downloads ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failure to retrive"), @ApiError(code=204, reason = "Downloads not found")})
+    @RequestMapping(value= REST_API_DOWNLOADS, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+    public @ResponseBody List<DownloadInfo> findDownloadInfo(@Context HttpServletRequest request, HttpServletResponse response,
+    		@ApiParam(name = REST_QUERY_CUSTOMERID , value = "Customerid to retrive") @QueryParam(REST_QUERY_CUSTOMERID) String customerId, 
+    		@ApiParam(name = REST_QUERY_TECHID , value = "Techid to retrive") @QueryParam(REST_QUERY_TECHID) String techId, 
+    		@ApiParam(name = REST_QUERY_TYPE , value = "Type to retrive") @QueryParam(REST_QUERY_TYPE) String type, 
+    		@ApiParam(name = REST_QUERY_PLATFORM , value = "Platform to retrive") @QueryParam(REST_QUERY_PLATFORM) String platform) {
         if (isDebugEnabled) {
             LOGGER.debug("ComponentService.findDownloadInfo : Entry");
             LOGGER.debug("ComponentService.findDownloadInfo" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
@@ -2072,7 +2317,8 @@ public class ComponentService extends DbService {
         	if(CollectionUtils.isEmpty(downloadList)) {
         		LOGGER.debug("ComponentService.findDownloadInfo" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
     	        		"user=" + request.getParameter("userId"), "status=\"Bad Request\"", "message=" + "Not Found");
-            	return  Response.status(Response.Status.NO_CONTENT).build();
+        		response.setStatus(204);
+            	return  downloads;
             }
         	Converter<DownloadsDAO, DownloadInfo> downloadConverter = 
         		(Converter<DownloadsDAO, DownloadInfo>) ConvertersFactory.getConverter(DownloadsDAO.class);
@@ -2082,18 +2328,17 @@ public class ComponentService extends DbService {
 			}
         	LOGGER.debug("ComponentService.findDownloadInfo" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 	        		"user=" + request.getParameter("userId"), "query=" + query.getQueryObject().toString());
+        	response.setStatus(200);
+        	return downloads;
         } catch (Exception e) {
+        	response.setStatus(00);
         	if(isDebugEnabled) {
 				LOGGER.error("ComponentService.updateWebService", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
         		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
 			}
             throw new PhrescoWebServiceException(e, EX_PHEX00006, DOWNLOAD_COLLECTION_NAME);
         }
-        ResponseBuilder response = Response.status(Response.Status.OK);
-        response.header(Constants.ARTIFACT_COUNT_RESULT, count(DOWNLOAD_COLLECTION_NAME, query));
-		return response.entity(downloads).build();
     }
-    
 
     /**
      * Creates the list of downloads
@@ -2101,20 +2346,45 @@ public class ComponentService extends DbService {
      * @return 
      * @throws PhrescoException 
      */
-    @POST
-    @Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
-    @Produces (MediaType.APPLICATION_JSON)
-    @Path (REST_API_DOWNLOADS)
-    public Response createDownloads(@Context HttpServletRequest request, MultiPart downloadPart) throws PhrescoException {
+	@ApiOperation(value = " Creates new downloads ")
+	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to create")})
+    @RequestMapping(value= REST_API_DOWNLOADS, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, 
+    		MediaType.APPLICATION_JSON_VALUE,"multipart/mixed"}, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    public @ResponseBody void createDownloads(HttpServletResponse response, MultipartHttpServletRequest request, 
+    		@RequestPart(value = "download", required = false) ByteArrayResource downloadFile, 
+    		@RequestPart(value = "icon", required = false) ByteArrayResource iconFile,
+    		@RequestParam("downloads") byte[] downloadData) 
+			throws PhrescoException {
         if (isDebugEnabled) {
             LOGGER.debug("ComponentService.createDownloads : Entry");
             LOGGER.debug("ComponentService.createDownloads" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 	        		"user=" + request.getParameter("userId"));
         }
-        return createOrUpdateDownloads(downloadPart);
+        saveOrUpdateDownloads(downloadFile, iconFile, downloadData);
     }
+
+	private void saveOrUpdateDownloads(ByteArrayResource downloadFile,
+			ByteArrayResource iconFile, byte[] downloadData)
+			throws PhrescoException {
+		DownloadInfo downloadInfo = new Gson().fromJson(new String(downloadData), DownloadInfo.class);
+        if(downloadFile != null) {
+        	boolean saveArtifactFile = saveArtifactFile(downloadInfo.getArtifactGroup(), downloadFile.getByteArray());
+        	if(!saveArtifactFile) {
+        		throw new PhrescoException("Unable to create download... ");
+        	}
+        }
+        if(iconFile != null) {
+        	boolean saveArtifactIcon = saveArtifactIcon(downloadInfo.getArtifactGroup(), iconFile.getByteArray());
+        	if(!saveArtifactIcon) {
+        		throw new PhrescoException("Unable to create download icon... ");
+        	}
+        }
+        saveDownloads(downloadInfo);
+	}
     
-    private Response createOrUpdateDownloads(MultiPart downloadPart) throws PhrescoException {
+	
+    private void createOrUpdateDownloads(MultiPart downloadPart) throws PhrescoException {
     	DownloadInfo downloadInfo = null;
         BodyPartEntity bodyPartEntity = null;
         File downloadFile = null;
@@ -2122,9 +2392,9 @@ public class ComponentService extends DbService {
         List<BodyPart> bodyParts = downloadPart.getBodyParts();
         if(CollectionUtils.isNotEmpty(bodyParts)) {
             for (BodyPart bodyPart : bodyParts) {
-                if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
+                if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_VALUE)) {
                     downloadInfo = bodyPart.getEntityAs(DownloadInfo.class);
-                } else if(bodyPart.getMediaType().equals(MediaType.APPLICATION_OCTET_STREAM_TYPE)){
+                } else if(bodyPart.getMediaType().equals(MediaType.APPLICATION_OCTET_STREAM_VALUE)){
                     bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
                 }
             }
@@ -2149,8 +2419,6 @@ public class ComponentService extends DbService {
         if (isDebugEnabled) {
             LOGGER.debug("ComponentService.createDownloads : Exit");
         }
-        return Response.status(Response.Status.CREATED).entity(downloadInfo).build();
-		
 	}
 
     private void saveDownloads(DownloadInfo info) throws PhrescoException {
@@ -2187,35 +2455,42 @@ public class ComponentService extends DbService {
      * @return
      * @throws PhrescoException 
      */
-    @PUT
-    @Consumes (MultiPartMediaTypes.MULTIPART_MIXED)
-    @Produces (MediaType.APPLICATION_JSON)
-    @Path (REST_API_DOWNLOADS)
-    public Response updateDownloadInfo(@Context HttpServletRequest request, MultiPart multiPart) throws PhrescoException {
+    @ApiOperation(value = " Updates new downloads ")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to update")})
+    @RequestMapping(value= REST_API_DOWNLOADS, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, 
+    		MediaType.APPLICATION_JSON_VALUE,"multipart/mixed"}, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
+    public @ResponseBody void updateDownloadInfo(HttpServletResponse response, MultipartHttpServletRequest request, 
+    		@RequestPart(value = "download", required = false) ByteArrayResource downloadFile, 
+    		@RequestPart(value = "icon", required = false) ByteArrayResource iconFile,
+    		@RequestParam("downloads") byte[] downloadData)
+    		throws PhrescoException {
     	if (isDebugEnabled) {
             LOGGER.debug("ComponentService.updateDownloadInfo : Entry");
             LOGGER.debug("ComponentService.createDownloads" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 	        		"user=" + request.getParameter("userId"));
         }
-        
-        return createOrUpdateDownloads(multiPart);
+        saveOrUpdateDownloads(downloadFile, iconFile, downloadData);
     }
 
     /**
      * Deletes the list of DownloadInfo
-     * @param downloadInfos
+     * @param downloads
      * @throws PhrescoException 
      */
-    @DELETE
-    @Path (REST_API_DOWNLOADS)
-    public void deleteDownloadInfo(List<DownloadInfo> downloadInfos) throws PhrescoException {
+    @ApiOperation(value = " Deletes list of downloads ")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Unsupported operation")})
+    @RequestMapping(value= REST_API_DOWNLOADS, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
+    public void deleteDownloadInfo(HttpServletResponse response, @ApiParam(name = "downloads" , 
+    		value = "List of downloads") @RequestBody List<DownloadInfo> downloads) throws PhrescoException {
         if (isDebugEnabled) {
             LOGGER.debug("ComponentService.deleteDownloadInfo : Entry");
         }
-        
+        response.setStatus(500);
         PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
         if (isDebugEnabled) {
-			LOGGER.error("ComponentService.deleteDownloadInfo", "status=\"Failure\"", "message=\"" + phrescoException.getLocalizedMessage() + "\"");
+			LOGGER.error("ComponentService.deleteDownloadInfo", "status=\"Failure\"", "message=\"" + 
+					phrescoException.getLocalizedMessage() + "\"");
         }
         throw phrescoException;
     }
@@ -2225,27 +2500,32 @@ public class ComponentService extends DbService {
      * @param id
      * @return
      */
-    @GET
-    @Produces (MediaType.APPLICATION_JSON)
-    @Path (REST_API_DOWNLOADS + REST_API_PATH_ID)
-    public Response getDownloadInfo(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id) {
+    @ApiOperation(value = " Retrives downloads based on their id ")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to retrive"), @ApiError(code=204, reason = "Download not found")})
+    @RequestMapping(value= REST_API_DOWNLOADS + REST_API_PATH_ID, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+    public @ResponseBody DownloadInfo getDownloadInfo(@Context HttpServletRequest request, HttpServletResponse response,
+    		@ApiParam(name = REST_API_PATH_PARAM_ID , value = "Id of download that needs to retrive")
+    		@PathVariable (REST_API_PATH_PARAM_ID) String id) {
         if (isDebugEnabled) {
             LOGGER.debug("ComponentService.getDownloadInfo : Entry ");
             LOGGER.debug("ComponentService.getDownloadInfo" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 	        		"user=" + request.getParameter("userId"), "id=" + id);
         }
-        
+        DownloadInfo downloadInfo = null;
         try {
         	DownloadsDAO downloadDAO = DbService.getMongoOperation().findOne(DOWNLOAD_COLLECTION_NAME, 
                     new Query(Criteria.whereId().is(id)), DownloadsDAO.class);
-        	if(downloadDAO != null) {
-    			Converter<DownloadsDAO, DownloadInfo> downlodConverter = 
-    					(Converter<DownloadsDAO, DownloadInfo>) ConvertersFactory.getConverter(DownloadsDAO.class);
-    			DownloadInfo downloadInfo = downlodConverter.convertDAOToObject(downloadDAO, DbService.getMongoOperation());
-    			return Response.status(Response.Status.OK).entity(downloadInfo).build();
+        	if(downloadDAO == null) {
+        		response.setStatus(204);
+        		return downloadInfo;
         	}
-        	
+			Converter<DownloadsDAO, DownloadInfo> downlodConverter = 
+					(Converter<DownloadsDAO, DownloadInfo>) ConvertersFactory.getConverter(DownloadsDAO.class);
+			downloadInfo = downlodConverter.convertDAOToObject(downloadDAO, DbService.getMongoOperation());
+			response.setStatus(200);
+			return downloadInfo;
         } catch (Exception e) {
+        	response.setStatus(500);
         	if(isDebugEnabled) {
 				LOGGER.error("ComponentService.getDownloadInfo", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
         		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
@@ -2253,7 +2533,6 @@ public class ComponentService extends DbService {
             throw new PhrescoWebServiceException(e, EX_PHEX00005, DOWNLOAD_COLLECTION_NAME);
         }
         
-        return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
     }
     
     /**
@@ -2261,22 +2540,26 @@ public class ComponentService extends DbService {
      * @param downloadInfos
      * @return
      */
-    @PUT
-    @Consumes (MediaType.APPLICATION_JSON)
-    @Produces (MediaType.APPLICATION_JSON)
-    @Path (REST_API_DOWNLOADS + REST_API_PATH_ID)
-    public Response updateDownloadInfo(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id , DownloadInfo downloadInfo) {
+    @ApiOperation(value = " Updates downloads based on their id ")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to update")})
+    @RequestMapping(value= REST_API_DOWNLOADS + REST_API_PATH_ID, consumes = MediaType.APPLICATION_JSON_VALUE,
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
+    public @ResponseBody void updateDownloadInfo(@Context HttpServletRequest request, HttpServletResponse response,
+    		@ApiParam(name = REST_API_PATH_PARAM_ID , value = "Id of download that need to be update" )
+    		@PathVariable(REST_API_PATH_PARAM_ID) String id , @ApiParam(name = "download" , value = "Id of download that need to be update" )
+    		@RequestBody DownloadInfo download) {
         if (isDebugEnabled) {
             LOGGER.debug("ComponentService.updateDownloadInfo : Entry ");
             LOGGER.debug("ComponentService.updateDownloadInfo" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 	        		"user=" + request.getParameter("userId"), "id=" + id);
         }
         try {
-            if (id.equals(downloadInfo.getId())) {
-            	DbService.getMongoOperation().save(DOWNLOAD_COLLECTION_NAME, downloadInfo);
-                return Response.status(Response.Status.OK).entity(downloadInfo).build();
+            if (id.equals(download.getId())) {
+            	DbService.getMongoOperation().save(DOWNLOAD_COLLECTION_NAME, download);
+            	response.setStatus(200);
             } 
         } catch (Exception e) {
+        	response.setStatus(500);
         	if(isDebugEnabled) {
 				LOGGER.error("ComponentService.updateDownloadInfo", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
         		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
@@ -2284,7 +2567,6 @@ public class ComponentService extends DbService {
             throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
         }
         LOGGER.debug("ComponentService.updateDownloadInfo : Exit ");
-        return Response.status(Response.Status.BAD_REQUEST).entity(ERROR_MSG_ID_NOT_EQUAL).build();
     }
     
     /**
@@ -2292,9 +2574,12 @@ public class ComponentService extends DbService {
      * @param id
      * @return 
      */
-    @DELETE
-    @Path (REST_API_DOWNLOADS + REST_API_PATH_ID)
-    public Response deleteDownloadInfo(@Context HttpServletRequest request, @PathParam(REST_API_PATH_PARAM_ID) String id) {
+    @ApiOperation(value = " Deletes downloads based on their id ")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to delete")})
+    @RequestMapping(value= REST_API_DOWNLOADS + REST_API_PATH_ID, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
+    public @ResponseBody void deleteDownloadInfo(@Context HttpServletRequest request, HttpServletResponse response,
+    		@ApiParam(name = REST_API_PATH_PARAM_ID , value = "Id of download that need to be delete")
+    		@PathVariable(REST_API_PATH_PARAM_ID) String id) {
         if (isDebugEnabled) {
             LOGGER.debug("ComponentService.deleteDownloadInfo : Entry");
             LOGGER.debug("ComponentService.deleteDownloadInfo" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
@@ -2305,35 +2590,38 @@ public class ComponentService extends DbService {
         		"user=" + request.getParameter("userId"), "query=" + query.getQueryObject().toString());
 	    DownloadsDAO downloadsDAO = DbService.getMongoOperation().findOne(DOWNLOAD_COLLECTION_NAME, query, DownloadsDAO.class);
 	    if(downloadsDAO != null) {
-	    	deleteAttifact(downloadsDAO.getArtifactGroupId());
+	    	deleteAttifact(downloadsDAO.getArtifactGroupId(), response);
 	    	DbService.getMongoOperation().remove(DOWNLOAD_COLLECTION_NAME, query, DownloadsDAO.class);
+	    	response.setStatus(200);
 	    }
 	    LOGGER.debug("ComponentService.deleteDownloadInfo : Exit");
-		return Response.status(Response.Status.OK).build(); 
     }
     
     /**
 	 * Returns the list of platforms available
 	 * @return
 	 */
-	@GET
-	@Path (REST_API_PLATFORMS)
-	@Produces (MediaType.APPLICATION_JSON)
-	public Response findPlatforms(@Context HttpServletRequest request) {
+    @ApiOperation(value = " Retrives platforms from db ")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to retrive"), @ApiError(code=204, reason = "Platforms not found")})
+    @RequestMapping(value= REST_API_PLATFORMS, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody List<PlatformType> findPlatforms(@Context HttpServletRequest request, HttpServletResponse response) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.findPlatforms : Entry ");
 	        LOGGER.debug("ComponentService.findPlatforms" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 	        		"user=" + request.getParameter("userId"));
 	    }
-		
+	    List<PlatformType> platformList = null;
 		try {
-			List<PlatformType> platformList = DbService.getMongoOperation().getCollection(PLATFORMS_COLLECTION_NAME, PlatformType.class);
+			platformList = DbService.getMongoOperation().getCollection(PLATFORMS_COLLECTION_NAME, PlatformType.class);
 			if(CollectionUtils.isEmpty(platformList)) {
-				return Response.status(Response.Status.NO_CONTENT).build();
+				response.setStatus(204);
+				return platformList;
 			}
+			response.setStatus(200);
 			LOGGER.debug("ComponentService.findPlatforms : Exit ");
-			return Response.status(Response.Status.OK).entity(platformList).build();
+			return platformList;
 		} catch (Exception e) {
+			response.setStatus(500);
 			if(isDebugEnabled) {
 				LOGGER.error("ComponentService.findPlatforms", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
         		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
@@ -2346,10 +2634,11 @@ public class ComponentService extends DbService {
 	 * Returns the list of Reports
 	 * @return
 	 */
-	@GET
-	@Path (REST_API_REPORTS)
-	@Produces (MediaType.APPLICATION_JSON)
-	public Response findReports(@Context HttpServletRequest request ,@QueryParam(REST_QUERY_TECHID) String techId) {
+    @ApiOperation(value = " Retrives reports")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to retrive"), @ApiError(code=204, reason = "Reports not found")})
+    @RequestMapping(value= REST_API_REPORTS, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody List<Reports> findReports(@Context HttpServletRequest request , HttpServletResponse response,
+			@ApiParam(name = REST_QUERY_TECHID , value = "Techid to retrive") @QueryParam(REST_QUERY_TECHID) String techId) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.findReports : Entry ");
 	        LOGGER.debug("ComponentService.findReports" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
@@ -2371,11 +2660,14 @@ public class ComponentService extends DbService {
 				}
 			}
 			if(CollectionUtils.isEmpty(reports)) {
-				return  Response.status(Response.Status.NO_CONTENT).build();
+				response.setStatus(204);
+				return  reports;
 			}
 			LOGGER.debug("ComponentService.findReports : Exit ");
-			return  Response.status(Response.Status.OK).entity(reports).build();
+			response.setStatus(200);
+			return  reports;
 		} catch (Exception e) {
+			response.setStatus(500);
 			if(isDebugEnabled) {
 				LOGGER.error("ComponentService.findReports", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
         		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
@@ -2389,10 +2681,12 @@ public class ComponentService extends DbService {
 	 * @param reports
 	 * @return 
 	 */
-	@POST
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Path (REST_API_REPORTS)
-	public Response createReports(List<Reports> reports) {
+    @ApiOperation(value = " Creates list of  reports")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to create")})
+    @RequestMapping(value= REST_API_REPORTS, consumes =MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+	public @ResponseBody void createReports(HttpServletResponse response, @ApiParam(name = "reports" , 
+			value = "List of reports") @RequestBody List<Reports> reports) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("Entered into ComponentService.createReports(List<Reports> reports)");
 	    }
@@ -2403,11 +2697,11 @@ public class ComponentService extends DbService {
 					DbService.getMongoOperation().save(REPORTS_COLLECTION_NAME , report);
 				}
 			}
+			response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
 		}
-		
-		return Response.status(Response.Status.OK).build();
 	}
 	
 	/**
@@ -2415,24 +2709,25 @@ public class ComponentService extends DbService {
 	 * @param reports
 	 * @return
 	 */
-	@PUT
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_REPORTS)
-	public Response updateReports(List<Reports> reports) {
+    @ApiOperation(value = " Updates list of  reports")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to update")})
+    @RequestMapping(value= REST_API_REPORTS, consumes =MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
+	public @ResponseBody void updateReports(HttpServletResponse response, @ApiParam(name = "reports" , 
+			value = "List of reports") @RequestBody List<Reports> reports) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("Entered into ComponentService.updateReports(List<Reports> reports)");
 	    }
-		
 		try {
 			for (Reports report : reports) {
 				DbService.getMongoOperation().save(REPORTS_COLLECTION_NAME, report);
 			}
+			response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
 		}
 		
-		return Response.status(Response.Status.OK).entity(reports).build();
 	}
 	
 	/**
@@ -2440,13 +2735,15 @@ public class ComponentService extends DbService {
 	 * @param webServices
 	 * @throws PhrescoException 
 	 */
-	@DELETE
-	@Path (REST_API_REPORTS)
-	public void deleteReports(List<Reports> reports) throws PhrescoException {
+    @ApiOperation(value = " Deletes list of  reports")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Unsupportd ooperation")})
+    @RequestMapping(value= REST_API_REPORTS, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
+	public void deleteReports(HttpServletResponse response, @ApiParam(name = "reports" , 
+			value = "List of reports") @RequestBody List<Reports> reports) throws PhrescoException {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("Entered into ComponentService.deleteReports(List<Reports> reports)");
 	    }
-		
+	    response.setStatus(500);
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
 		LOGGER.error(exceptionString + phrescoException.getErrorMessage());
 		throw phrescoException;
@@ -2457,48 +2754,53 @@ public class ComponentService extends DbService {
 	 * @param id
 	 * @return
 	 */
-	@GET
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_REPORTS + REST_API_PATH_ID)
-	public Response getReports(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+    @ApiOperation(value = " Retrives reports based on their id")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to retrive"), @ApiError(code=204, reason = "Report not found")})
+    @RequestMapping(value= REST_API_REPORTS + REST_API_PATH_ID, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody Reports getReports(HttpServletResponse response, @ApiParam(name = REST_API_PATH_PARAM_ID , 
+			value = "Id of the report that needs to be retrive")@PathVariable(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("Entered into ComponentService.getReports(String id)" + id);
 	    }
-		
+	    Reports reports = null;
 		try {
-			Reports reports = DbService.getMongoOperation().findOne(REPORTS_COLLECTION_NAME, new Query(Criteria.whereId().is(id)), Reports.class);
-			if(reports != null) {
-				return Response.status(Response.Status.OK).entity(reports).build();
+			reports = DbService.getMongoOperation().findOne(REPORTS_COLLECTION_NAME, new Query(Criteria.whereId().is(id)), Reports.class);
+			if(reports == null) {
+				response.setStatus(204);
+				return reports;
 			}
+			response.setStatus(200);
+			return reports;
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, WEBSERVICES_COLLECTION_NAME);
 		}
-		
-		return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
 	}
 	
 	/**
 	 * Updates the reports given by the parameter
 	 * @param id
-	 * @param reports
+	 * @param report
 	 * @return
 	 */
-	@PUT
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_REPORTS + REST_API_PATH_ID)
-	public Response updateReports(@PathParam(REST_API_PATH_PARAM_ID) String id , Reports reports) {
+    @ApiOperation(value = " Updates reports based on their id")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to update")})
+    @RequestMapping(value= REST_API_REPORTS + REST_API_PATH_ID, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
+	public @ResponseBody void updateReports(HttpServletResponse response, @ApiParam(name = REST_API_PATH_PARAM_ID , 
+			value = "Id of the report that needs to be update")@PathVariable(REST_API_PATH_PARAM_ID) String id , 
+			@ApiParam(name = "report" , value = "Report that need to be update")Reports report) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("Entered into ComponentService.updateReports(String id, Reports reports)" + id);
 	    }
 		
 		try {
-			DbService.getMongoOperation().save(REPORTS_COLLECTION_NAME, reports);
+			DbService.getMongoOperation().save(REPORTS_COLLECTION_NAME, report);
+			response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
 		}
-		
-		return Response.status(Response.Status.BAD_REQUEST).entity(reports).build();
 	}
 	
 	/**
@@ -2506,17 +2808,20 @@ public class ComponentService extends DbService {
 	 * @param id
 	 * @return 
 	 */
-	@DELETE
-	@Path (REST_API_REPORTS + REST_API_PATH_ID)
-	public Response deleteReports(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+    @ApiOperation(value = " Deletes reports based on their id")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to delete")})
+    @RequestMapping(value= REST_API_REPORTS + REST_API_PATH_ID, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
+	public @ResponseBody Response deleteReports(HttpServletResponse response, @ApiParam(name = REST_API_PATH_PARAM_ID , 
+			value = "Id of the report that needs to be delete")@PathVariable(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("Entered into ComponentService.deleteReportse(String id)" + id);
 	    }
-		
 		try {
 			DbService.getMongoOperation().remove(REPORTS_COLLECTION_NAME, 
 			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), Reports.class);
+			response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
 		}
 		
@@ -2527,20 +2832,24 @@ public class ComponentService extends DbService {
 	 * Returns the list of Properties
 	 * @return
 	 */
-	@GET
-	@Path (REST_API_PROPERTY)
-	@Produces (MediaType.APPLICATION_JSON)
-	public Response findProperties() {
+    @ApiOperation(value = " Retrives property from db")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to retrive"), @ApiError(code=204, reason = "Properties not found")})
+    @RequestMapping(value= REST_API_PROPERTY, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody List<Property> findProperties(HttpServletResponse response) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("Entered into ComponentService.findProperties()");
 	    }
+	    List<Property> properties = null;
 		try {
-			List<Property> properties = DbService.getMongoOperation().getCollection(PROPERTIES_COLLECTION_NAME, Property.class);
+			properties = DbService.getMongoOperation().getCollection(PROPERTIES_COLLECTION_NAME, Property.class);
 			if(CollectionUtils.isEmpty(properties)) {
-				return  Response.status(Response.Status.NO_CONTENT).build();
+				response.setStatus(204);
+				return properties;
 			}
-			return  Response.status(Response.Status.OK).entity(properties).build();
+			response.setStatus(200);
+			return properties;
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, WEBSERVICES_COLLECTION_NAME);
 		}
 	}
@@ -2550,25 +2859,26 @@ public class ComponentService extends DbService {
 	 * @param properties
 	 * @return 
 	 */
-	@POST
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Path (REST_API_PROPERTY)
-	public Response createProperties(List<Property> properties) {
+    @ApiOperation(value = " Create list of properties")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to create")})
+    @RequestMapping(value= REST_API_PROPERTY, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+	public @ResponseBody void createProperties(HttpServletResponse response, @ApiParam(name = "properties" , 
+			value = "List of property")@RequestBody List<Property> properties) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("Entered into ComponentService.createProperties(List<Property> properties)");
 	    }
-		
 		try {
 			for (Property property : properties) {
 				if(validate(property)) {
 					DbService.getMongoOperation().save(PROPERTIES_COLLECTION_NAME , property);
 				}
 			}
+			response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
 		}
-		
-		return Response.status(Response.Status.OK).build();
 	}
 	
 	/**
@@ -2576,11 +2886,12 @@ public class ComponentService extends DbService {
 	 * @param reports
 	 * @return
 	 */
-	@PUT
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_PROPERTY)
-	public Response updateProperties(List<Property> properties) {
+    @ApiOperation(value = " Updates list of properties")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to update")})
+    @RequestMapping(value= REST_API_PROPERTY, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
+	public @ResponseBody void updateProperties(HttpServletResponse response , @ApiParam(name = "properties" , 
+			value = "List of property")@RequestBody List<Property> properties) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("Entered into ComponentService.updateProperties(List<Property> properties)");
 	    }
@@ -2589,11 +2900,11 @@ public class ComponentService extends DbService {
 			for (Property property : properties) {
 				DbService.getMongoOperation().save(PROPERTIES_COLLECTION_NAME, property);
 			}
+			response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
 		}
-		
-		return Response.status(Response.Status.OK).entity(properties).build();
 	}
 	
 	/**
@@ -2601,13 +2912,15 @@ public class ComponentService extends DbService {
 	 * @param properties
 	 * @throws PhrescoException 
 	 */
-	@DELETE
-	@Path (REST_API_PROPERTY)
-	public void deleteProperties(List<Property> properties) throws PhrescoException {
+    @ApiOperation(value = " Deletes list of properties")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Unsupported operation")})
+    @RequestMapping(value= REST_API_PROPERTY, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
+	public void deleteProperties(HttpServletResponse response,@ApiParam(name = "properties" , 
+			value = "List of property")@RequestBody List<Property> properties) throws PhrescoException {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("Entered into ComponentService.deleteProperties(List<Property> properties)");
 	    }
-		
+	    response.setStatus(500);
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
 		LOGGER.error(exceptionString + phrescoException.getErrorMessage());
 		throw phrescoException;
@@ -2618,24 +2931,27 @@ public class ComponentService extends DbService {
 	 * @param id
 	 * @return
 	 */
-	@GET
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_PROPERTY + REST_API_PATH_ID)
-	public Response getProperty(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+    @ApiOperation(value = " Retrive property based on their id")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to retrive"), @ApiError(code=204, reason = "Property not found")})
+    @RequestMapping(value= REST_API_PROPERTY + REST_API_PATH_ID, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody Property getProperty(HttpServletResponse response, @ApiParam(name = REST_API_PATH_PARAM_ID , 
+			value = "Id of property that needs to be retrive")@PathVariable(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("Entered into ComponentService.getProperty(String id)" + id);
 	    }
-		
+	    Property property = null;
 		try {
-			Property property = DbService.getMongoOperation().findOne(PROPERTIES_COLLECTION_NAME, new Query(Criteria.whereId().is(id)), Property.class);
-			if(property != null) {
-				return Response.status(Response.Status.OK).entity(property).build();
+			property = DbService.getMongoOperation().findOne(PROPERTIES_COLLECTION_NAME, new Query(Criteria.whereId().is(id)), Property.class);
+			if(property == null) {
+				response.setStatus(204);
+				return property;
 			}
+			response.setStatus(200);
+			return property;
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, WEBSERVICES_COLLECTION_NAME);
 		}
-		
-		return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
 	}
 	
 	/**
@@ -2644,21 +2960,24 @@ public class ComponentService extends DbService {
 	 * @param property
 	 * @return
 	 */
-	@PUT
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_PROPERTY + REST_API_PATH_ID)
-	public Response updateProperty(@PathParam(REST_API_PATH_PARAM_ID) String id , Property property) {
+    @ApiOperation(value = " Updates property based on their id")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to update")})
+    @RequestMapping(value= REST_API_PROPERTY + REST_API_PATH_ID, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
+	public @ResponseBody void updateProperty(HttpServletResponse response, @ApiParam(name = REST_API_PATH_PARAM_ID , 
+			value = "Id of property that needs to be update")@PathVariable(REST_API_PATH_PARAM_ID) String id , @ApiParam(name = "property" , 
+					value = "Property that needs to be update") @RequestBody Property property) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("Entered into ComponentService.updateProperty(String id, Property property)" + id);
 	    }
 	   	try {
 	   		DbService.getMongoOperation().save(PROPERTIES_COLLECTION_NAME, property);
+	   		response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
 		}
 		
-		return Response.status(Response.Status.OK).entity(property).build();
 	}
 	
 	/**
@@ -2666,41 +2985,46 @@ public class ComponentService extends DbService {
 	 * @param id
 	 * @return 
 	 */
-	@DELETE
-	@Path (REST_API_PROPERTY + REST_API_PATH_ID)
-	public Response deleteProperty(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+    @ApiOperation(value = " Deletes property based on their id")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to delete")})
+    @RequestMapping(value= REST_API_PROPERTY + REST_API_PATH_ID, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
+	public @ResponseBody void deleteProperty(HttpServletResponse response, @ApiParam(name = REST_API_PATH_PARAM_ID , 
+			value = "Id of property that needs to be delete")@PathVariable(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("Entered into ComponentService.deleteProperty(String id)" + id);
 	    }
-		
 		try {
 	   		DbService.getMongoOperation().remove(PROPERTIES_COLLECTION_NAME, 
 			        new Query(Criteria.whereId().is(id)), Property.class);
+	   		response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
 		}
-		
-		return Response.status(Response.Status.OK).build();
 	}
 	
 	/**
 	 * Returns the list of Technologyoptions
 	 * @return
 	 */
-	@GET
-	@Path (REST_API_OPTIONS)
-	@Produces (MediaType.APPLICATION_JSON)
-	public Response findOptions() {
+    @ApiOperation(value = " Retrives technology options")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to delete"), @ApiError(code=204, reason = "Options not found")})
+    @RequestMapping(value= REST_API_OPTIONS, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody List<TechnologyOptions> findOptions(HttpServletResponse response) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("Entered into ComponentService.findOptions()");
 	    }
+	    List<TechnologyOptions> techOptions = null;
 		try {
-			List<TechnologyOptions> techOptions = DbService.getMongoOperation().getCollection(OPTIONS_COLLECTION_NAME, TechnologyOptions.class);
+			techOptions = DbService.getMongoOperation().getCollection(OPTIONS_COLLECTION_NAME, TechnologyOptions.class);
 			if(CollectionUtils.isEmpty(techOptions)) {
-				return  Response.status(Response.Status.NO_CONTENT).build();
+				response.setStatus(204);
+				return techOptions;
 			}
-			return  Response.status(Response.Status.OK).entity(techOptions).build();
+			response.setStatus(200);
+			return techOptions;
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, OPTIONS_COLLECTION_NAME);
 		}
 	}
@@ -2709,17 +3033,46 @@ public class ComponentService extends DbService {
 	 * Returns the list of Functional test frameworks
 	 * @return
 	 */
-	@GET
-	@Path (REST_API_OPTIONS_FUNCTIONAL)
-	@Produces (MediaType.APPLICATION_JSON)
-	public Response findFunctionalTestFrameworks(@QueryParam(REST_QUERY_TECHID) String techId, @QueryParam("name") String name) {
+    @ApiOperation(value = " Retrives all functional frameworks ")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to fetch"), @ApiError(code=204, reason = "Functional not found")})
+    @RequestMapping(value= REST_API_OPTIONS_FUNCTIONAL, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody List<FunctionalFramework> findFunctionalTestFrameworks(HttpServletResponse response) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("Entered into ComponentService.findFunctionalTestFrameworks()");
 	    }
+	    List<FunctionalFramework> options = null;
+		try {
+			options = DbService.getMongoOperation().
+				getCollection(FUNCTIONAL_FRAMEWORK_COLLECTION_NAME, FunctionalFramework.class);
+			if(CollectionUtils.isEmpty(options)) {
+				response.setStatus(200);
+			}
+			response.setStatus(200);
+			return options;
+		} catch (Exception e) {
+			response.setStatus(500);
+			throw new PhrescoWebServiceException(e, EX_PHEX00005, FUNCTIONAL_FRAMEWORK_COLLECTION_NAME);
+		}
+	}
+	
+    /**
+	 * Returns the list of Functional test frameworks
+	 * @return
+	 */
+    @ApiOperation(value = " Retrives functional frameworks with tech id and name")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to fetch"), @ApiError(code=204, reason = "Functional not found")})
+    @RequestMapping(value= "/functionalframeworks/functional", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody FunctionalFramework findFunctionalTestFrameworks(HttpServletResponse response,
+			@ApiParam(name = REST_QUERY_TECHID , value = "Techid to retrive")@QueryParam(REST_QUERY_TECHID) String techId, 
+			@ApiParam(name = REST_API_NAME , value = "Name to retrive")@QueryParam(REST_API_NAME) String name) {
+	    if (isDebugEnabled) {
+	        LOGGER.debug("Entered into ComponentService.findFunctionalTestFrameworks()");
+	    }
+	    FunctionalFramework functionalFramework = null;
 		try {
 			if (StringUtils.isNotEmpty(techId) && StringUtils.isNotEmpty(name)) {
-				FunctionalFramework functionalFramework = DbService.getMongoOperation().findOne(FUNCTIONAL_FRAMEWORK_COLLECTION_NAME, 
-						new Query(Criteria.where("name").is(name)), FunctionalFramework.class);
+				functionalFramework = DbService.getMongoOperation().findOne(FUNCTIONAL_FRAMEWORK_COLLECTION_NAME, 
+						new Query(Criteria.where(REST_API_NAME).is(name)), FunctionalFramework.class);
 				List<FunctionalFrameworkProperties> funcFrameworkProperties = functionalFramework.getFuncFrameworkProperties();
 				if (CollectionUtils.isNotEmpty(funcFrameworkProperties)) {
 					for (FunctionalFrameworkProperties functionalFrameworkProperties : funcFrameworkProperties) {
@@ -2729,36 +3082,37 @@ public class ComponentService extends DbService {
 						}
 					}
 				}
-				return  Response.status(Response.Status.OK).entity(functionalFramework).build();
 			}
-			List<FunctionalFramework> options = DbService.getMongoOperation().getCollection(FUNCTIONAL_FRAMEWORK_COLLECTION_NAME, FunctionalFramework.class);
-			if (CollectionUtils.isEmpty(options)) {
-				return  Response.status(Response.Status.NO_CONTENT).build();
-			}
-			return  Response.status(Response.Status.OK).entity(options).build();
+			response.setStatus(200);
+			return functionalFramework;
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, FUNCTIONAL_FRAMEWORK_COLLECTION_NAME);
 		}
 	}
-	
+    
 	/**
      * Returns the list of Technologyoptions
      * @return
      */
-    @GET
-    @Path (REST_API_OPTIONS_CUSTOMER)
-    @Produces (MediaType.APPLICATION_JSON)
-    public Response findCustomerOptions() {
+    @ApiOperation(value = " Retrives customer options ")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to delete"), @ApiError(code=204, reason = "Customeroptions not found")})
+    @RequestMapping(value= REST_API_OPTIONS_CUSTOMER, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+    public @ResponseBody List<TechnologyOptions> findCustomerOptions(HttpServletResponse response) {
         if (isDebugEnabled) {
             LOGGER.debug("Entered into ComponentService.findCustomerOptions()");
         }
+        List<TechnologyOptions> techOptions = null;
         try {
-            List<TechnologyOptions> techOptions = DbService.getMongoOperation().getCollection(CUSTOMER_OPTIONS_COLLECTION_NAME, TechnologyOptions.class);
+        	techOptions = DbService.getMongoOperation().getCollection(CUSTOMER_OPTIONS_COLLECTION_NAME, TechnologyOptions.class);
             if(CollectionUtils.isEmpty(techOptions)) {
-                return  Response.status(Response.Status.NO_CONTENT).build();
+            	response.setStatus(204);
+            	return techOptions;
             }
-            return  Response.status(Response.Status.OK).entity(techOptions).build();
+            response.setStatus(200);
+        	return techOptions;
         } catch (Exception e) {
+        	response.setStatus(500);
             throw new PhrescoWebServiceException(e, EX_PHEX00005, CUSTOMER_OPTIONS_COLLECTION_NAME);
         }
     }
@@ -2767,58 +3121,65 @@ public class ComponentService extends DbService {
 	 * Returns the list of Licenses
 	 * @return
 	 */
-	@GET
-	@Path (REST_API_LICENSE)
-	@Produces (MediaType.APPLICATION_JSON)
-	public Response findLicenses() {
+    @ApiOperation(value = " Retrives licenses options ")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to delete"), @ApiError(code=204, reason = "Licenses not found")})
+    @RequestMapping(value= REST_API_LICENSE, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody List<License> findLicenses(HttpServletResponse response) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("Entered into ComponentService.findLicenses()");
 	    }
+	    List<License> licenses = null;
 		try {
-			List<License> licenses = DbService.getMongoOperation().getCollection(LICENSE_COLLECTION_NAME, License.class);
+			licenses = DbService.getMongoOperation().getCollection(LICENSE_COLLECTION_NAME, License.class);
 			if(CollectionUtils.isEmpty(licenses)) {
-				return  Response.status(Response.Status.NO_CONTENT).build();
+				response.setStatus(204);
+				return licenses;
 			}
-			return  Response.status(Response.Status.OK).entity(licenses).build();
+			response.setStatus(200);
+			return licenses;
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, OPTIONS_COLLECTION_NAME);
 		}
 	}
 	
 	/**
-	 * Creates the list of Properties
-	 * @param properties
+	 * Creates the list of Licenses
+	 * @param licenses
 	 * @return 
 	 */
-	@POST
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Path (REST_API_LICENSE)
-	public Response createLicenses(List<License> licenses) {
+    @ApiOperation(value = " Creates list of licenses ")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to create")})
+    @RequestMapping(value= REST_API_LICENSE, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+	public @ResponseBody void createLicenses(HttpServletResponse response, @ApiParam(name = "licenses" , value = "List of license")
+			@RequestBody List<License> licenses) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("Entered into ComponentService.createLicenses(List<License> licenses)");
 	    }
-		
 		try {
 			for (License license : licenses) {
 				if(validate(license)) {
 					DbService.getMongoOperation().save(LICENSE_COLLECTION_NAME , license);
 				}
 			}
+			response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
 		}
-		
-		return Response.status(Response.Status.OK).build();
 	}
 	
 	/**
 	 * Returns the list of Technology Options
 	 * @return
 	 */
-	@GET
-	@Path (REST_API_TECHGROUPS)
-	@Produces (MediaType.APPLICATION_JSON)
-	public Response findTechnologyGroups(@QueryParam(REST_QUERY_CUSTOMERID) String customerId, @QueryParam(REST_QUERY_APPTYPEID) String appTypeId) {
+    @ApiOperation(value = " Retrive technology groups ")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to retrive"), @ApiError(code=204, reason = "TechGroup not found")})
+    @RequestMapping(value= REST_API_TECHGROUPS, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody List<TechnologyGroup> findTechnologyGroups(HttpServletResponse response,
+			@ApiParam(name = REST_QUERY_CUSTOMERID , value = "Customerid to retrive")@QueryParam(REST_QUERY_CUSTOMERID) String customerId, 
+			@ApiParam(name = REST_QUERY_APPTYPEID , value = "Apptypeid to retrive")@QueryParam(REST_QUERY_APPTYPEID) String appTypeId) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("Entered into ComponentService.findTechnologyGroups()");
 	    }
@@ -2826,13 +3187,15 @@ public class ComponentService extends DbService {
 		try {
 			if(StringUtils.isNotEmpty(customerId) && StringUtils.isNotEmpty(appTypeId)) {
 				technologyGroups = getTechGroupByCustomer(customerId, appTypeId);
-				return  Response.status(Response.Status.OK).entity(technologyGroups).build();
 			}
 			if(CollectionUtils.isEmpty(technologyGroups)) {
-				return  Response.status(Response.Status.NO_CONTENT).build();
+				response.setStatus(204);
+				return technologyGroups;
 			}
-			return  Response.status(Response.Status.OK).entity(technologyGroups).build();
+			response.setStatus(200);
+			return technologyGroups;
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, TECH_GROUP_COLLECTION_NAME);
 		}
 	}
@@ -2842,14 +3205,15 @@ public class ComponentService extends DbService {
 	 * @param techGroups
 	 * @return 
 	 */
-	@POST
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Path (REST_API_TECHGROUPS)
-	public Response createTechnologyGroups(List<TechnologyGroup> techGroups) {
+    @ApiOperation(value = " Create list of technology groups ")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to create")})
+    @RequestMapping(value= REST_API_TECHGROUPS, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+	public @ResponseBody void createTechnologyGroups(HttpServletResponse response , 
+			@ApiParam(name = "techGroups" , value = "List of technology group")	@RequestBody List<TechnologyGroup> techGroups) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("Entered into ComponentService.createTechnologyGroups(List<TechnologyGroup> techGroups)");
 	    }
-		
 		try {
 			for (TechnologyGroup technologyGroup : techGroups) {
 				if(validate(technologyGroup)) {
@@ -2864,11 +3228,11 @@ public class ComponentService extends DbService {
 					DbService.getMongoOperation().save(APPTYPES_COLLECTION_NAME , type);
 				}
 			}
+			response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
 		}
-		
-		return Response.status(Response.Status.OK).build();
 	}
 	
 	/**
@@ -2876,11 +3240,12 @@ public class ComponentService extends DbService {
 	 * @param techGroups
 	 * @return
 	 */
-	@PUT
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_TECHGROUPS)
-	public Response updateTechnologyGroups(List<TechnologyGroup> techGroups) {
+    @ApiOperation(value = " Updates list of technology groups ")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to update")})
+    @RequestMapping(value= REST_API_TECHGROUPS, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
+	public @ResponseBody Response updateTechnologyGroups(HttpServletResponse response, 
+			@ApiParam(name = "techGroups" , value = "List of technology group")	@RequestBody List<TechnologyGroup> techGroups) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("Entered into ComponentService.updateTechnologyGroups(List<TechnologyGroup> techGroups)");
 	    }
@@ -2889,7 +3254,9 @@ public class ComponentService extends DbService {
 			for (TechnologyGroup techGroup : techGroups) {
 				DbService.getMongoOperation().save(TECH_GROUP_COLLECTION_NAME, techGroup);
 			}
+			response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
 		}
 		
@@ -2901,13 +3268,16 @@ public class ComponentService extends DbService {
 	 * @param properties
 	 * @throws PhrescoException 
 	 */
-	@DELETE
-	@Path (REST_API_TECHGROUPS)
-	public void deleteTechnologyGroups(List<TechnologyGroup> techGroups) throws PhrescoException {
+    @ApiOperation(value = " Deletes list of technology groups ")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Unsupported operation")})
+    @RequestMapping(value= REST_API_TECHGROUPS, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
+	public void deleteTechnologyGroups(HttpServletResponse response, 
+			@ApiParam(name = "techGroups" , value = "List of technology group") @RequestBody List<TechnologyGroup> techGroups) 
+    		throws PhrescoException {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("Entered into ComponentService.deleteTechnologyGroups(List<TechnologyGroup> techGroups)");
 	    }
-		
+		response.setStatus(500);
 		PhrescoException phrescoException = new PhrescoException(EX_PHEX00001);
 		LOGGER.error(exceptionString + phrescoException.getErrorMessage());
 		throw phrescoException;
@@ -2918,25 +3288,28 @@ public class ComponentService extends DbService {
 	 * @param id
 	 * @return
 	 */
-	@GET
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_TECHGROUPS + REST_API_PATH_ID)
-	public Response getTechnologyGroup(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+    @ApiOperation(value = " Retrives technology group based on their id ")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to retrive"), @ApiError(code=204, reason = "Techgroup operation")})
+    @RequestMapping(value= REST_API_TECHGROUPS + REST_API_PATH_ID, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody TechnologyGroup getTechnologyGroup(HttpServletResponse response, 
+			@ApiParam(name = "id" , value = "Id of techgroup that needs to retrive") @PathVariable(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("Entered into ComponentService.getTechnologyGroup(String id)" + id);
 	    }
-		
+	    TechnologyGroup techGroup = null;
 		try {
-			TechnologyGroup techGroup = DbService.getMongoOperation().findOne(TECH_GROUP_COLLECTION_NAME, 
+			techGroup = DbService.getMongoOperation().findOne(TECH_GROUP_COLLECTION_NAME, 
 					new Query(Criteria.whereId().is(id)), TechnologyGroup.class);
-			if(techGroup != null) {
-				return Response.status(Response.Status.OK).entity(techGroup).build();
+			if(techGroup == null) {
+				response.setStatus(204);
+				return techGroup;
 			}
+			response.setStatus(200);
+			return techGroup;
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, TECH_GROUP_COLLECTION_NAME);
 		}
-		
-		return Response.status(Response.Status.NO_CONTENT).entity(ERROR_MSG_NOT_FOUND).build();
 	}
 	
 	/**
@@ -2945,22 +3318,24 @@ public class ComponentService extends DbService {
 	 * @param techGroup
 	 * @return
 	 */
-	@PUT
-	@Consumes (MediaType.APPLICATION_JSON)
-	@Produces (MediaType.APPLICATION_JSON)
-	@Path (REST_API_TECHGROUPS + REST_API_PATH_ID)
-	public Response updateTechnologyGroup(@PathParam(REST_API_PATH_PARAM_ID) String id , TechnologyGroup techGroup) {
+    @ApiOperation(value = " Updates technology group based on their id ")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to update")})
+    @RequestMapping(value= REST_API_TECHGROUPS + REST_API_PATH_ID, consumes = MediaType.APPLICATION_JSON_VALUE,
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
+	public @ResponseBody void updateTechnologyGroup(HttpServletResponse response, 
+			@ApiParam(name = "id" , value = "Id of techgroup that needs to retrive") @PathVariable(REST_API_PATH_PARAM_ID) String id, 
+			@ApiParam(name = "techGroup" , value = "TechGroup that needs to update") @RequestBody TechnologyGroup techGroup) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("Entered into ComponentService.updateTechnologyGroup(String id, TechnologyGroup techGroup)" + id);
 	    }
 		
 		try {
 			DbService.getMongoOperation().save(TECH_GROUP_COLLECTION_NAME, techGroup);
+			response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, UPDATE);
 		}
-		
-		return Response.status(Response.Status.BAD_REQUEST).entity(techGroup).build();
 	}
 	
 	/**
@@ -2968,9 +3343,11 @@ public class ComponentService extends DbService {
 	 * @param id
 	 * @return 
 	 */
-	@DELETE
-	@Path (REST_API_TECHGROUPS + REST_API_PATH_ID)
-	public Response deleteTechnologyGroup(@PathParam(REST_API_PATH_PARAM_ID) String id) {
+    @ApiOperation(value = " Deletes technology group based on their id ")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to delete")})
+    @RequestMapping(value= REST_API_TECHGROUPS + REST_API_PATH_ID, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
+	public @ResponseBody Response deleteTechnologyGroup(HttpServletResponse response, 
+			@ApiParam(name = "id" , value = "Id of techgroup that needs to delete")	@PathVariable(REST_API_PATH_PARAM_ID) String id) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("Entered into ComponentService.deleteTechnologyGroup((String id)" + id);
 	    }
@@ -2985,7 +3362,9 @@ public class ComponentService extends DbService {
 			type.setTechGroupIds(techGroupIds);
 			
 			DbService.getMongoOperation().save(APPTYPES_COLLECTION_NAME , type);
+			response.setStatus(200);
 		} catch (Exception e) {
+			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
 		}
 		
@@ -2996,10 +3375,11 @@ public class ComponentService extends DbService {
 	 * Returns the list of Prebuilt Projects
 	 * @return
 	 */
-	@GET
-	@Path (REST_API_PREBUILT)
-	@Produces (MediaType.APPLICATION_JSON)
-	public Response findPreBuiltProjects(@Context HttpServletRequest request, @QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
+    @ApiOperation(value = " Retrives prebuilt projects ")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to retrive"), @ApiError(code=204, reason = "Prebuilt projects not found")})
+    @RequestMapping(value= REST_API_PREBUILT, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody List<ProjectInfo> findPreBuiltProjects(@Context HttpServletRequest request, HttpServletResponse response,
+			@ApiParam(name = REST_QUERY_CUSTOMERID , value = "Customerid to retrive") @QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.findPreBuiltProjects : Entry ");
 	        LOGGER.debug("ComponentService.findPreBuiltProjects ", "remoteAddress=" + request.getRemoteAddr() , "customer" + getCustomerNameById(customerId),
@@ -3020,8 +3400,14 @@ public class ComponentService extends DbService {
 			if (isDebugEnabled) {
 		        LOGGER.debug("ComponentService.findPreBuiltProjects : Exit ");
 		    }
-			return Response.status(Response.Status.OK).entity(projectInfos).build();
+			if(CollectionUtils.isEmpty(projectInfos)) {
+				response.setStatus(204);
+				return projectInfos;
+			}
+			response.setStatus(200);
+			return projectInfos;
 		} catch (Exception e) {
+			response.setStatus(500);
 			if (isDebugEnabled) {
 		        LOGGER.error("ComponentService.findPreBuiltProjects", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
 		    }

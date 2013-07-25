@@ -24,16 +24,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
 import org.sonatype.aether.resolution.VersionRangeResolutionException;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.commons.model.VersionInfo;
@@ -42,8 +43,11 @@ import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.util.ServerConstants;
 import com.photon.phresco.util.ServiceConstants;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 
-@Path(ServiceConstants.REST_API_VERSION)
+@Controller
+@RequestMapping(value = ServiceConstants.REST_API_VERSION)
 public class VersionService implements ServerConstants {
 	
 	private static final String UPDATE_ZIP = "/update.zip";
@@ -56,33 +60,36 @@ public class VersionService implements ServerConstants {
 	private static final String BETA = "beta";	
 	private static final String SNAPSHOT = "SNAPSHOT";
 	private static final String UPDATE_FILE_PATH = "/com/photon/phresco/framework/release/";
-	private static final Logger S_LOGGER = Logger.getLogger(VersionService.class);
+	private static final Logger S_LOGGER = Logger.getLogger("SplunkLogger");
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
-
-	@GET
-	@Path(VERSION_PATH)
-	@Produces({MediaType.APPLICATION_JSON})
-	public VersionInfo getVersionJSON(@PathParam(VERSION) String currentVersion) throws VersionRangeResolutionException, PhrescoException {
+	
+	@ApiOperation(value = " Get latest version ")
+	@RequestMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+	public @ResponseBody VersionInfo getVersionInfo(
+		@ApiParam(value = "Current version of framework", name = "version") @QueryParam(VERSION) String version) 
+		throws VersionRangeResolutionException, PhrescoException {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Entering Method VersionServic.getVersionJSON(@PathParam(version) String currentVersion)");
+		}
+		return getVersion(version);
+	}
+	
+	@ApiOperation(value = " Get latest version ")
+    @RequestMapping(value= VERSION_PATH, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody VersionInfo getVersionJSON(@ApiParam(value = "Current version of framework", name = "version") 
+			@PathVariable(VERSION) String version) throws VersionRangeResolutionException, PhrescoException {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method VersionServic.getVersionJSON(@PathParam(version) String currentVersion)");
 		}
 		
-		return getVersion(currentVersion);
-	}
-
-	@GET
-	@Produces({ MediaType.APPLICATION_JSON })
-	public VersionInfo getVersionInfo(@QueryParam(VERSION) String currentVersion) throws VersionRangeResolutionException, PhrescoException {
-		if (isDebugEnabled) {
-			S_LOGGER.debug("Entering Method VersionServic.getVersionJSON(@PathParam(version) String currentVersion)");
-		}
-		return getVersion(currentVersion);
+		return getVersion(version);
 	}
 	
-	@GET
-	@Produces({ MediaType.MULTIPART_FORM_DATA })
-	@Path (UPDATE)
-	public Response getLatestVersionContent(@QueryParam(ServiceConstants.REST_QUERY_CUSTOMERID) String customerId) throws PhrescoException, IOException  {
+	@ApiOperation(value = " Get update content ")
+    @RequestMapping(value= UPDATE, produces = MediaType.MULTIPART_FORM_DATA_VALUE, method = RequestMethod.GET)
+	public @ResponseBody Response getLatestVersionContent(
+			@ApiParam(value = "Customerid", name = ServiceConstants.REST_QUERY_CUSTOMERID) 
+			@QueryParam(ServiceConstants.REST_QUERY_CUSTOMERID) String customerId) throws PhrescoException, IOException  {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Entering Method VersionServic.getVersionJSON(@PathParam(version) String currentVersion)");
 		}
