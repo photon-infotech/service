@@ -205,8 +205,6 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 		String version = artifactInfo.getVersion();
 		RepoInfo repoInfo = dbManager.getRepoInfo(customerId);
 		
-		System.out.println("***************************************");
-		System.out.println(version);
 		StringBuffer commandStr = new StringBuffer();
 		commandStr.append(Constants.MVN_COMMAND)
 				.append(Constants.STR_BLANK_SPACE)
