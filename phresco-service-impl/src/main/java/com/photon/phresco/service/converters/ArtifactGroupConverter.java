@@ -48,9 +48,9 @@ public class ArtifactGroupConverter implements Converter<ArtifactGroupDAO, Artif
         artifactGroup.setArtifactId(artifactGroupDAO.getArtifactId());
         artifactGroup.setClassifier(artifactGroupDAO.getClassifier());
         artifactGroup.setCustomerIds(artifactGroupDAO.getCustomerIds());
-        artifactGroup.setDescription(artifactGroupDAO.getDescription());
+//        artifactGroup.setDescription(artifactGroupDAO.getDescription());
         artifactGroup.setGroupId(artifactGroupDAO.getGroupId());
-        artifactGroup.setHelpText(artifactGroupDAO.getHelpText());
+//        artifactGroup.setHelpText(artifactGroupDAO.getHelpText());
         artifactGroup.setId(artifactGroupDAO.getId());
         artifactGroup.setImageURL(artifactGroupDAO.getImageURL());
         artifactGroup.setName(artifactGroupDAO.getName());
@@ -78,7 +78,7 @@ public class ArtifactGroupConverter implements Converter<ArtifactGroupDAO, Artif
         artifactGroupDAO.setArtifactId(artifactGroup.getArtifactId());
         artifactGroupDAO.setClassifier(artifactGroup.getClassifier());
         artifactGroupDAO.setCustomerIds(artifactGroup.getCustomerIds());
-        artifactGroupDAO.setDescription(artifactGroup.getDescription());
+//        artifactGroupDAO.setDescription(artifactGroup.getDescription());
         artifactGroupDAO.setGroupId(artifactGroup.getGroupId());
         artifactGroupDAO.setImageURL(artifactGroup.getImageURL());
         artifactGroupDAO.setName(artifactGroup.getName());
@@ -87,7 +87,7 @@ public class ArtifactGroupConverter implements Converter<ArtifactGroupDAO, Artif
         artifactGroupDAO.setType(artifactGroup.getType());
         artifactGroupDAO.setUsed(artifactGroup.isUsed());
         artifactGroupDAO.setAppliesTo(artifactGroup.getAppliesTo());
-        artifactGroupDAO.setHelpText(artifactGroup.getHelpText());
+//        artifactGroupDAO.setHelpText(artifactGroup.getHelpText());
         artifactGroupDAO.setLicenseId(artifactGroup.getLicenseId());
         artifactGroupDAO.setDisplayName(artifactGroup.getDisplayName());
         return artifactGroupDAO;

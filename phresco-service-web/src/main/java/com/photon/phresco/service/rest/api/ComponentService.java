@@ -49,6 +49,7 @@ import org.springframework.stereotype.Component;
 
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ApplicationType;
+import com.photon.phresco.commons.model.ArtifactElement;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.DownloadInfo;
@@ -938,6 +939,20 @@ public class ComponentService extends DbService {
 		}
         return modules;
     }
+	
+	/**
+	 * Returns the list of modules
+	 * @return
+	 */
+	@GET
+	@Path (REST_API_MODULES + "/desc")
+	@Produces (MediaType.APPLICATION_JSON)
+	public Response getFeatureDescription(@QueryParam(REST_API_PATH_PARAM_ID) String id) {
+		ArtifactElement artifactElement = mongoOperation.findOne("artifactElement", 
+				new Query(Criteria.where("artifactGroupId").is(id)), ArtifactElement.class);
+		return Response.status(Response.Status.OK).entity(artifactElement).build();
+		
+	}
 
     /**
      * Creates the list of modules
@@ -1057,9 +1072,19 @@ public class ComponentService extends DbService {
                 mongoOperation.save(ARTIFACT_INFO_COLLECTION_NAME, newVersion);
         }
         moduleGroupDAO.setVersionIds(versionIds);
+        ArtifactElement artifactElement = createArtifactElement(moduleGroup);
+        mongoOperation.save("artifactElement", artifactElement);
         mongoOperation.save(ARTIFACT_GROUP_COLLECTION_NAME, moduleGroupDAO);
     }
-
+	
+	private ArtifactElement createArtifactElement(ArtifactGroup group) {
+		ArtifactElement element = new ArtifactElement();
+		element.setDescription(group.getDescription());
+		element.setHelpText(group.getHelpText());
+		element.setArtifactGroupId(group.getId());
+		return element;
+	}
+	
 	private String checkVersionAvailable(List<com.photon.phresco.commons.model.ArtifactInfo> info, String version) {
 		for (com.photon.phresco.commons.model.ArtifactInfo artifactInfo : info) {
 			if(artifactInfo.getVersion().equals(version)) {
