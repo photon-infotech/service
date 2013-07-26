@@ -72,7 +72,7 @@
         </dependency>
         
 		<!-- Jersey + Spring -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.sun.jersey.contribs</groupId>
 			<artifactId>jersey-spring</artifactId>
 			<version>${jersey-spring.version}</version>
@@ -98,7 +98,7 @@
 					<artifactId>spring-context</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
+		</dependency> -->
 		
         <dependency>
             <groupId>com.photon.phresco.commons</groupId>
