@@ -917,10 +917,7 @@ public class ComponentService extends DbService {
 			}
 			if(StringUtils.isNotEmpty(type)) {
 				query.addCriteria(Criteria.where(REST_API_NAME).is(type));
-				SettingsTemplate setting = DbService.getMongoOperation().findOne(SETTINGS_COLLECTION_NAME, 
-						query, SettingsTemplate.class);
-				response.setStatus(200);
-				return settings;
+				
 			}
 			List<SettingsTemplate> settingsList = DbService.getMongoOperation().find(SETTINGS_COLLECTION_NAME, query, SettingsTemplate.class);
 			for (SettingsTemplate settingsTemplate : settingsList) {
