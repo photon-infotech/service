@@ -98,7 +98,7 @@
 		<port>27017</port>
 		<username></username>
 		<password/>
-		<dbname>testing-3-0</dbname>
+		<dbname>testing-3</dbname>
 		<type>mongodb</type>
 		<version>2.0.4</version>
 	</Database>
