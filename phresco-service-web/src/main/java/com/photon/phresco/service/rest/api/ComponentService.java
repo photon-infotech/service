@@ -2048,7 +2048,7 @@ public class ComponentService extends DbService {
 			if (isDebugEnabled) {
 		        LOGGER.debug("ComponentService.findWebServices : Exit ");
 		    }
-			response.setStatus(204);
+			response.setStatus(200);
 			return  webServiceList;
 		} catch (Exception e) {
 			response.setStatus(500);
