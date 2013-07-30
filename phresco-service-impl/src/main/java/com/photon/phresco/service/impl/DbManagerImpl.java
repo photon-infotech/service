@@ -156,14 +156,10 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
 			LOGGER.info("DbManagerImpl.storeCreatedProjects", CUSTOMER_ID_EQUALS_SLASH + projectInfo.getCustomerIds().get(0) + "\"", "creationDate=\"" + projectInfo.getCreationDate() + "\"",
 					"projectCode=\"" + projectInfo.getProjectCode() + "\"");
 		}
-    	if(projectInfo.isPreBuilt()) {
-    		return;
-    	}
         if(projectInfo != null) {
 			Converter<ProjectInfoDAO, ProjectInfo> projectConverter = 
         		(Converter<ProjectInfoDAO, ProjectInfo>) ConvertersFactory.getConverter(ProjectInfoDAO.class);
         	ProjectInfoDAO projectInfoDAO = projectConverter.convertObjectToDAO(projectInfo);
-        	
         	ProjectInfoDAO pDAO = DbService.getMongoOperation().findOne("projectInfo", 
         			new Query(Criteria.whereId().is(projectInfo.getId())), ProjectInfoDAO.class);
         	if (pDAO != null) {
@@ -176,7 +172,11 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
     			}
             	projectInfoDAO.setApplicationInfoIds(applicationInfoIdsFromDB);
         	} 
+        	
         	DbService.getMongoOperation().save("projectInfo", projectInfoDAO);
+        	if(projectInfo.isPreBuilt()) {
+        		return;
+        	}
         	List<ApplicationInfo> appInfos = projectInfo.getAppInfos();
         	Converter<ApplicationInfoDAO, ApplicationInfo> appConverter = 
         		(Converter<ApplicationInfoDAO, ApplicationInfo>) ConvertersFactory.getConverter(ApplicationInfoDAO.class);
