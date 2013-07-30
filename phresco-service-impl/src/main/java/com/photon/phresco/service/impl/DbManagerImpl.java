@@ -156,6 +156,9 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
 			LOGGER.info("DbManagerImpl.storeCreatedProjects", CUSTOMER_ID_EQUALS_SLASH + projectInfo.getCustomerIds().get(0) + "\"", "creationDate=\"" + projectInfo.getCreationDate() + "\"",
 					"projectCode=\"" + projectInfo.getProjectCode() + "\"");
 		}
+    	if(projectInfo.isPreBuilt()) {
+    		return;
+    	}
         if(projectInfo != null) {
 			Converter<ProjectInfoDAO, ProjectInfo> projectConverter = 
         		(Converter<ProjectInfoDAO, ProjectInfo>) ConvertersFactory.getConverter(ProjectInfoDAO.class);
