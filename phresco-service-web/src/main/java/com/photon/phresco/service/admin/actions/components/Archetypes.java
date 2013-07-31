@@ -42,6 +42,7 @@ import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.FunctionalFramework;
+import com.photon.phresco.commons.model.FunctionalFrameworkGroup;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.commons.model.TechnologyGroup;
 import com.photon.phresco.commons.model.TechnologyOptions;
@@ -385,9 +386,9 @@ public class Archetypes extends ServiceBaseAction {
 			technology.setOptions(options);
 
 			List<FunctionalFramework> functionalFrameworks = new ArrayList<FunctionalFramework>();
-			List<FunctionalFramework> functionalTestFramework = serviceManager.getFunctionalTestFramework();
+			List<FunctionalFrameworkGroup> functionalTestFramework = serviceManager.getFunctionalTestFramework();
 			for (String funcFramework : getFunctionalFramework()) {
-				for (FunctionalFramework functionalFramework : functionalTestFramework) {
+				for (FunctionalFrameworkGroup functionalFramework : functionalTestFramework) {
 					if(functionalFramework.getName().equals(funcFramework)) {
 						FunctionalFramework e = new FunctionalFramework();
 						e.setId(functionalFramework.getId());
