@@ -206,7 +206,7 @@ public class Archetypes extends ServiceBaseAction {
 				S_LOGGER.info("Archetypes.edit", "customerId=" + "\"" + getCustomerId() + "\"", "techId=" + "\"" + getTechId() + "\"");
 			}
 			Technology technology = serviceManager.getArcheType(getTechId(), getCustomerId());
-			List<FunctionalFramework> functionalFrameworks = technology.getFunctionalFrameworks();
+			List<FunctionalFramework> functionalFrameworks = null;
 			if (CollectionUtils.isNotEmpty(functionalFrameworks)) {
 				List<String> selectedFrameworkIds = new ArrayList<String>();
 				for (FunctionalFramework functionalFramework : functionalFrameworks) {
@@ -395,7 +395,7 @@ public class Archetypes extends ServiceBaseAction {
 					}
 				}
 			}
-			technology.setFunctionalFrameworks(functionalFrameworks);
+			technology.setFunctionalFrameworks(null);
 
 			//To create the ArtifactGroup with groupId, artifactId and version for archetype jar
 			if ((StringUtils.isEmpty(artifactId) && StringUtils.isEmpty(groupId) && StringUtils.isEmpty(version))) {

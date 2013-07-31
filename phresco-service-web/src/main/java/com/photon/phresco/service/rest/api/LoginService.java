@@ -20,6 +20,7 @@ package com.photon.phresco.service.rest.api;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -68,7 +69,7 @@ public class LoginService extends DbService {
 	
 	@ApiOperation(value = " Login service ")
     @RequestMapping(method = RequestMethod.POST)
-    public @ResponseBody User login(HttpServletRequest request, 
+    public @ResponseBody User login(HttpServletRequest request, HttpServletResponse response,
     		@ApiParam(value = "user credentials to login", name = "credentials")@RequestBody Credentials credentials) throws PhrescoException {
 		if(isDebugEnabled) {
 			LOGGER.debug("LoginService.login : Entry");
@@ -87,14 +88,14 @@ public class LoginService extends DbService {
             user.setCustomers(findCustomersFromDB());
         	return user;
         }
-        user = loginUsingAuth(credentials);
+        user = loginUsingAuth(credentials, response);
         if(isDebugEnabled) {
         	LOGGER.debug("LoginService.createProject : Exit");
 		}
 		return user;
     }
 	
-	private User loginUsingAuth(Credentials credentials) throws PhrescoException {
+	private User loginUsingAuth(Credentials credentials, HttpServletResponse response) throws PhrescoException {
 		ServerConfiguration serverConfig = PhrescoServerFactory.getServerConfig();
 		Client client = Client.create();
 		PhrescoServerFactory.initialize();
@@ -102,13 +103,14 @@ public class LoginService extends DbService {
 		WebResource resource = client.resource(repoMgr.getAuthServiceURL() + ServerConstants.AUTHENTICATE);
 		
         resource.accept(MediaType.APPLICATION_JSON_VALUE);
-        ClientResponse response = resource.type(MediaType.APPLICATION_JSON_VALUE).post(ClientResponse.class, credentials);
-        if(response.getStatus() == 204) {
+        ClientResponse clientResponse = resource.type(MediaType.APPLICATION_JSON_VALUE).post(ClientResponse.class, credentials);
+        if(clientResponse.getStatus() == 204) {
+        	response.setStatus(204);
         	LOGGER.info("LoginService.loginUsingAuth", "authUrl=" + repoMgr.getAuthServiceURL(), "userName=" + credentials.getUsername());
-        	throw new PhrescoWebServiceException(Response.status(Status.NO_CONTENT).build());
+        	return null;
         }
         GenericType<User> genericType = new GenericType<User>() {};
-        User user = response.getEntity(genericType);
+        User user = clientResponse.getEntity(genericType);
         user.setToken(createAuthToken(credentials.getUsername()));
         user.setPhrescoEnabled(true);
         user.setValidLogin(true);

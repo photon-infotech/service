@@ -60,11 +60,13 @@ import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.DownloadInfo;
 import com.photon.phresco.commons.model.Element;
 import com.photon.phresco.commons.model.FunctionalFramework;
+import com.photon.phresco.commons.model.FunctionalFrameworkGroup;
 import com.photon.phresco.commons.model.FunctionalFrameworkProperties;
 import com.photon.phresco.commons.model.License;
 import com.photon.phresco.commons.model.PlatformType;
 import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.commons.model.Property;
+import com.photon.phresco.commons.model.PropertyTemplate;
 import com.photon.phresco.commons.model.SettingsTemplate;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.commons.model.TechnologyGroup;
@@ -911,18 +913,26 @@ public class ComponentService extends DbService {
         	}
 			if(StringUtils.isNotEmpty(techId)) {
 			    query.addCriteria(Criteria.where("appliesToTechs._id").is(techId));
-			} else {
-				Criteria customerCri = Criteria.where(DB_COLUMN_CUSTOMERIDS).in(Arrays.asList(DEFAULT_CUSTOMER_NAME, customerId).toArray());
-				query.addCriteria(customerCri);
-			}
+			} 
 			if(StringUtils.isNotEmpty(type)) {
 				query.addCriteria(Criteria.where(REST_API_NAME).is(type));
-				
 			}
 			List<SettingsTemplate> settingsList = DbService.getMongoOperation().find(SETTINGS_COLLECTION_NAME, query, SettingsTemplate.class);
 			for (SettingsTemplate settingsTemplate : settingsList) {
 				List<Element> types = getTypes(settingsTemplate.getName(), customerId);
 				settingsTemplate.setPossibleTypes(types);
+				Query propQuery = new Query();
+				Criteria idCriteria = Criteria.where("settingsTemplateId").is(settingsTemplate.getId());
+				propQuery.addCriteria(idCriteria);
+				System.out.println("settingsTemplate.getId()" + settingsTemplate.getId());
+				if(StringUtils.isNotEmpty(techId)) {
+					Criteria techCriteria = Criteria.where("appliesTo").in(Arrays.asList(techId).toArray());
+					propQuery.addCriteria(techCriteria);
+				}
+				List<PropertyTemplate> properties = DbService.getMongoOperation().find("configTemplates", 
+						propQuery, PropertyTemplate.class);
+				settingsTemplate.setProperties(properties);
+				System.out.println("Property Templates ate   " + properties);
 				settings.add(settingsTemplate);
 			}
 			if(CollectionUtils.isEmpty(settings)) {
@@ -938,6 +948,7 @@ public class ComponentService extends DbService {
         		"user=" + request.getParameter("userId"), "query=" + query.getQueryObject().toString());
 				LOGGER.debug("ComponentService.findSettings : Exit");
 			}
+			response.setStatus(200);
 			return settings;
 		} catch (Exception e) {
 			response.setStatus(500);
@@ -984,6 +995,11 @@ public class ComponentService extends DbService {
 			for (SettingsTemplate settingsTemplate : settings) {
 				if(validate(settingsTemplate)) {
 					DbService.getMongoOperation().save(SETTINGS_COLLECTION_NAME, settingsTemplate);
+					List<PropertyTemplate> properties = settingsTemplate.getProperties();
+					for (PropertyTemplate propertyTemplate : properties) {
+						propertyTemplate.setSettingsTemplateId(settingsTemplate.getId());
+						DbService.getMongoOperation().save(PROPERTY_TEMPLATE_COLLECTION_NAME, propertyTemplate);
+					}
 				}
 			}
 		} catch (Exception e) {
@@ -1022,6 +1038,11 @@ public class ComponentService extends DbService {
 				        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(settingTemplate.getId())), SettingsTemplate.class);
 				if (settingTemplateInfo != null) {
 					DbService.getMongoOperation().save(SETTINGS_COLLECTION_NAME, settingTemplate);
+					List<PropertyTemplate> properties = settingTemplate.getProperties();
+					for (PropertyTemplate propertyTemplate : properties) {
+						propertyTemplate.setSettingsTemplateId(settingTemplate.getId());
+						DbService.getMongoOperation().save(PROPERTY_TEMPLATE_COLLECTION_NAME, propertyTemplate);
+					}
 				}
 			}
 			response.setStatus(200);
@@ -1083,6 +1104,14 @@ public class ComponentService extends DbService {
 				response.setStatus(204);
 				return settingTemplate;
 			}
+			List<Element> types = getTypes(settingTemplate.getName(), settingTemplate.getCustomerIds().get(0));
+			settingTemplate.setAppliesToTechs(types);
+			Query propQuery = new Query();
+			Criteria idCriteria = Criteria.where("settingsTemplateId").is(settingTemplate.getId());
+			propQuery.addCriteria(idCriteria);
+			List<PropertyTemplate> properties = DbService.getMongoOperation().find(PROPERTY_TEMPLATE_COLLECTION_NAME, 
+					propQuery, PropertyTemplate.class);
+			settingTemplate.setProperties(properties);
 			response.setStatus(200);
 		} catch (Exception e) {
 			response.setStatus(500);
@@ -3032,20 +3061,23 @@ public class ComponentService extends DbService {
 	 */
     @ApiOperation(value = " Retrives all functional frameworks ")
     @ApiErrors(value = {@ApiError(code=500, reason = "Failed to fetch"), @ApiError(code=204, reason = "Functional not found")})
-    @RequestMapping(value= REST_API_OPTIONS_FUNCTIONAL, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
-	public @ResponseBody List<FunctionalFramework> findFunctionalTestFrameworks(HttpServletResponse response) {
+    @RequestMapping(value= REST_API_OPTIONS_FUNCTIONAL_GRP, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody List<FunctionalFrameworkGroup> findFunctionalTestFrameworks(HttpServletResponse response) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("Entered into ComponentService.findFunctionalTestFrameworks()");
 	    }
-	    List<FunctionalFramework> options = null;
+	    List<FunctionalFrameworkGroup> functionalFrameworkGroups = new ArrayList<FunctionalFrameworkGroup>();
 		try {
-			options = DbService.getMongoOperation().
-				getCollection(FUNCTIONAL_FRAMEWORK_COLLECTION_NAME, FunctionalFramework.class);
-			if(CollectionUtils.isEmpty(options)) {
-				response.setStatus(200);
+			List<FunctionalFrameworkGroup> ffgS = DbService.getMongoOperation().getCollection("functionalFrameworkGroup", 
+					FunctionalFrameworkGroup.class);
+			for (FunctionalFrameworkGroup functionalFrameworkGroup : ffgS) {
+				List<FunctionalFramework> ffs = DbService.getMongoOperation().find(FUNCTIONAL_FRAMEWORK_COLLECTION_NAME, 
+						new Query(Criteria.where("groupIds").in(functionalFrameworkGroup.getId())), FunctionalFramework.class);
+				functionalFrameworkGroup.setFunctionalFrameworks(ffs);
+				functionalFrameworkGroups.add(functionalFrameworkGroup);
 			}
 			response.setStatus(200);
-			return options;
+			return functionalFrameworkGroups;
 		} catch (Exception e) {
 			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, FUNCTIONAL_FRAMEWORK_COLLECTION_NAME);
@@ -3058,30 +3090,42 @@ public class ComponentService extends DbService {
 	 */
     @ApiOperation(value = " Retrives functional frameworks with tech id and name")
     @ApiErrors(value = {@ApiError(code=500, reason = "Failed to fetch"), @ApiError(code=204, reason = "Functional not found")})
-    @RequestMapping(value= "/functionalframeworks/functional", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
-	public @ResponseBody FunctionalFramework findFunctionalTestFrameworks(HttpServletResponse response,
-			@ApiParam(name = REST_QUERY_TECHID , value = "Techid to retrive")@QueryParam(REST_QUERY_TECHID) String techId, 
-			@ApiParam(name = REST_API_NAME , value = "Name to retrive")@QueryParam(REST_API_NAME) String name) {
+    @RequestMapping(value= REST_API_OPTIONS_FUNCTIONAL, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody List<FunctionalFrameworkGroup> findFunctionalTestFrameworks(HttpServletResponse response,
+			@ApiParam(name = REST_QUERY_TECHID , value = "Techid to retrive")@QueryParam(REST_QUERY_TECHID) String techId) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("Entered into ComponentService.findFunctionalTestFrameworks()");
 	    }
-	    FunctionalFramework functionalFramework = null;
-		try {
-			if (StringUtils.isNotEmpty(techId) && StringUtils.isNotEmpty(name)) {
-				functionalFramework = DbService.getMongoOperation().findOne(FUNCTIONAL_FRAMEWORK_COLLECTION_NAME, 
-						new Query(Criteria.where(REST_API_NAME).is(name)), FunctionalFramework.class);
-				List<FunctionalFrameworkProperties> funcFrameworkProperties = functionalFramework.getFuncFrameworkProperties();
-				if (CollectionUtils.isNotEmpty(funcFrameworkProperties)) {
-					for (FunctionalFrameworkProperties functionalFrameworkProperties : funcFrameworkProperties) {
-						if (functionalFrameworkProperties.getTechId().equals(techId)) {
-							functionalFramework.setFuncFrameworkProperties(Collections.singletonList(functionalFrameworkProperties));
-							break;
+	    List<FunctionalFrameworkGroup> functionalFrameworkGroups = new ArrayList<FunctionalFrameworkGroup>();
+	    List<FunctionalFramework> functionalFrameworks = new ArrayList<FunctionalFramework>();
+	    try{
+	    	List<FunctionalFrameworkGroup> ffgs = DbService.getMongoOperation().find(FUNCTIONAL_FRAMEWORK_GRP_COLLECTION_NAME, 
+	    			new Query(Criteria.where("techIds").in(techId)), FunctionalFrameworkGroup.class);
+	    	for (FunctionalFrameworkGroup functionalFrameworkGroup : ffgs) {
+	    		List<FunctionalFramework> ffs = DbService.getMongoOperation().find(FUNCTIONAL_FRAMEWORK_COLLECTION_NAME, 
+	    				new Query(Criteria.where("groupIds").in(functionalFrameworkGroup.getId())), FunctionalFramework.class);
+	    		functionalFrameworks = new ArrayList<FunctionalFramework>();
+	    		for (FunctionalFramework functionalFramework : ffs) {
+	    			List<FunctionalFrameworkProperties> funcFrameworkProperties = functionalFramework.getFuncFrameworkProperties();
+					if (CollectionUtils.isNotEmpty(funcFrameworkProperties)) {
+						for (FunctionalFrameworkProperties functionalFrameworkProperties : funcFrameworkProperties) {
+							if (functionalFrameworkProperties.getTechId().equals(techId)) {
+								functionalFramework.setFuncFrameworkProperties(Collections.singletonList(functionalFrameworkProperties));
+								functionalFrameworks.add(functionalFramework);
+								break;
+							}
 						}
 					}
 				}
+	    		functionalFrameworkGroup.setFunctionalFrameworks(functionalFrameworks);
+	    		functionalFrameworkGroups.add(functionalFrameworkGroup);
 			}
-			response.setStatus(200);
-			return functionalFramework;
+	    	if(CollectionUtils.isEmpty(functionalFrameworkGroups)) {
+	    		response.setStatus(204);
+	    		return functionalFrameworkGroups;
+	    	}
+	    	response.setStatus(200);
+	    	return functionalFrameworkGroups;
 		} catch (Exception e) {
 			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, FUNCTIONAL_FRAMEWORK_COLLECTION_NAME);

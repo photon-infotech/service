@@ -142,9 +142,18 @@ public class AdminService extends DbService {
     @RequestMapping(value= REST_API_ICON, produces = MediaType.MULTIPART_FORM_DATA_VALUE, method = RequestMethod.GET)
     public @ResponseBody byte[] getIcon(HttpServletResponse response, 
     		@ApiParam(value = "The Id of the customer to get icon", name = REST_QUERY_CUSTOMERID) @QueryParam(REST_QUERY_CUSTOMERID) 
-    		String customerId) throws PhrescoException {
+    		String customerId, @ApiParam(value = "The context of the customer to get icon", name = "Context") 
+    		@QueryParam("context") String context) throws PhrescoException {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.getIcon(String id)");
+        }
+        
+        if(StringUtils.isNotEmpty(context)) {
+			CustomerDAO customer = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME, 
+			        new Query(Criteria.where("context").is(context)), CustomerDAO.class);
+			if (customer != null) {
+				customerId = customer.getId();
+			}
         }
         InputStream inputStream = getFileFromDB(customerId);
         if(inputStream == null) {
@@ -201,26 +210,17 @@ public class AdminService extends DbService {
 // 		}
 //    }
     
-    private MultiPart getErrorResponse() {
-    	String str = "null";
-		InputStream is = new ByteArrayInputStream(str.getBytes());
-		MultiPart multiPart = new MultiPart().
-		    	      bodyPart(new BodyPart("", javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE)).
-		    	      bodyPart(new BodyPart(is, javax.ws.rs.core.MediaType.MULTIPART_FORM_DATA_TYPE));
-		return multiPart;
-    }
     
     @ApiOperation(value = "Get customer properties by given customer context")
     @ApiErrors(value = {@ApiError(code=204, reason = "Icon not found"), @ApiError(code=500, reason = "Failed to retrive")})
-    @RequestMapping(value= "/customerproperties", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+    @RequestMapping(value= "/customers/properties", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
     public @ResponseBody Customer getCustomerProperties(HttpServletResponse response, HttpServletRequest request, 
     		@ApiParam(value = "The context of the customer to get properties", name = "context") @QueryParam(REST_QUERY_CONTEXT) String context)
     		throws PhrescoException, IOException {
-    	Customer customerInfo=null;
-    	InputStream inputStream=null;
     	 if (isDebugEnabled) {
              S_LOGGER.debug("Entered into AdminService.getCustomerProperties()");
          }
+    	 Customer customerInfo = null;
     	 if(StringUtils.isNotEmpty(context)) {
 				CustomerDAO customer = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME, 
 				        new Query(Criteria.where("context").is(context)), CustomerDAO.class);
@@ -228,30 +228,8 @@ public class AdminService extends DbService {
 					Converter<CustomerDAO, Customer> customerConverter = 
 						(Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
 					customerInfo = customerConverter.convertDAOToObject(customer, DbService.getMongoOperation());
-					inputStream = getFileFromDB(customerInfo.getId());
 				}
 		}
-//    	 Set<MediaType> mediaTypes = new HashSet<MediaType>();
-//    	 mediaTypes.add(MediaType.MULTIPART_FORM_DATA);
-////    	 mediaTypes.add(MediaType.APPLICATION_JSON);
-//    	 request.setAttribute(HandlerMapping.PRODUCIBLE_MEDIA_TYPES_ATTRIBUTE,
-//    	      mediaTypes);
-//    	 MultiValueMap<String, Object> parts = new LinkedMultiValueMap<String, Object>();
-//    	 HttpHeaders fileHeaders = new HttpHeaders();
-//    	 fileHeaders.add("Content-type",
-//    	      MediaType.APPLICATION_OCTET_STREAM_VALUE);
-//    	 
-//    	 ByteArrayResource r = new ByteArrayResource(IOUtils.toByteArray(inputStream));
-//    	 HttpEntity<ByteArrayResource> file = new HttpEntity<ByteArrayResource>(
-//    	      r, fileHeaders);
-//    	 parts.add("icon", file);
-//    	 parts.add("customer", customerInfo);
-//    	 HttpHeaders respHeaders = new HttpHeaders();
-//    	 respHeaders.add("Custom-Header1", "custom-value");
-//    	 respHeaders.add("Content-type", MediaType.MULTIPART_FORM_DATA_VALUE);
-//    	 ResponseEntity<MultiValueMap<String, Object>> eresp = new ResponseEntity<MultiValueMap<String, Object>>(
-//    	      parts, respHeaders, HttpStatus.CREATED);
-    	 
 		return customerInfo;
     }
     

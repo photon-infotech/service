@@ -82,7 +82,7 @@ public class TechnologyConverter implements Converter<TechnologyDAO, Technology>
         if(CollectionUtils.isNotEmpty(technologyDAO.getFunctionalFrameworks())) {
         	List<FunctionalFramework> functionalFrameworks = mongoOperation.find("functionalFrameworks", 
         			new Query(Criteria.whereId().in(technologyDAO.getFunctionalFrameworks().toArray())), FunctionalFramework.class);
-        	technology.setFunctionalFrameworks(functionalFrameworks);
+//        	technology.setFunctionalFrameworks(functionalFrameworks);
         }
         if (isDebugEnabled) {
 			LOGGER.debug("ArtifactGroupConverter.convertDAOToObject:Exit");
@@ -128,9 +128,9 @@ public class TechnologyConverter implements Converter<TechnologyDAO, Technology>
         techDAO.setTechGroupId(technology.getTechGroupId());
         techDAO.setReports(technology.getReports());
         techDAO.setArchetypeFeatures(technology.getArchetypeFeatures());
-        if(CollectionUtils.isNotEmpty(technology.getFunctionalFrameworks())) {
-        	techDAO.setFunctionalFrameworks(getFrameworkIds(technology.getFunctionalFrameworks()));
-        }
+//        if(CollectionUtils.isNotEmpty(technology.getFunctionalFrameworks())) {
+//        	techDAO.setFunctionalFrameworks(getFrameworkIds(technology.getFunctionalFrameworks()));
+//        }
         if (isDebugEnabled) {
 			LOGGER.debug("ArtifactGroupConverter.convertObjectToDAO:Exit");
 		}
