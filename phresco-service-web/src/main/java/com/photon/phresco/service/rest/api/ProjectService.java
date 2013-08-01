@@ -88,8 +88,8 @@ public class ProjectService {
 			
 			ArchiveUtil.createArchive(tempFolderPath, tempFolderPath + ZIP, ArchiveType.ZIP);
 			ServiceOutput serviceOutput = new ServiceOutput(tempFolderPath);
-			dbManager.storeCreatedProjects(projectInfo);
-			dbManager.updateUsedObjects(projectInfo);
+//			dbManager.storeCreatedProjects(projectInfo);
+//			dbManager.updateUsedObjects(projectInfo);
 			return serviceOutput;
 		} catch (Exception pe) {
 			S_LOGGER.error("Error During createProject(projectInfo)", pe);
