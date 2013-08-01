@@ -924,15 +924,13 @@ public class ComponentService extends DbService {
 				Query propQuery = new Query();
 				Criteria idCriteria = Criteria.where("settingsTemplateId").is(settingsTemplate.getId());
 				propQuery.addCriteria(idCriteria);
-				System.out.println("settingsTemplate.getId()" + settingsTemplate.getId());
 				if(StringUtils.isNotEmpty(techId)) {
 					Criteria techCriteria = Criteria.where("appliesTo").in(Arrays.asList(techId).toArray());
 					propQuery.addCriteria(techCriteria);
 				}
-				List<PropertyTemplate> properties = DbService.getMongoOperation().find("configTemplates", 
-						propQuery, PropertyTemplate.class);
-				settingsTemplate.setProperties(properties);
-				System.out.println("Property Templates ate   " + properties);
+//				List<PropertyTemplate> properties = DbService.getMongoOperation().find("configTemplates", 
+//						propQuery, PropertyTemplate.class);
+//				settingsTemplate.setProperties(properties);
 				settings.add(settingsTemplate);
 			}
 			if(CollectionUtils.isEmpty(settings)) {
