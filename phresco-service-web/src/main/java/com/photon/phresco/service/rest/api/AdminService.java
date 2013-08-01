@@ -158,10 +158,12 @@ public class AdminService extends DbService {
         InputStream inputStream = getFileFromDB(customerId);
         if(inputStream == null) {
         	response.setStatus(204);
+        	return null;
         }
         byte[] byteArray = null;
 		try {
 			byteArray = IOUtils.toByteArray(inputStream);
+			response.setStatus(200);
 		} catch (IOException e) {
 			throw new PhrescoException(e);
 		}
@@ -224,12 +226,17 @@ public class AdminService extends DbService {
     	 if(StringUtils.isNotEmpty(context)) {
 				CustomerDAO customer = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME, 
 				        new Query(Criteria.where("context").is(context)), CustomerDAO.class);
-				if (customer != null) {
-					Converter<CustomerDAO, Customer> customerConverter = 
-						(Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
-					customerInfo = customerConverter.convertDAOToObject(customer, DbService.getMongoOperation());
-				}
+			if (customer != null) {
+				Converter<CustomerDAO, Customer> customerConverter = 
+					(Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
+				customerInfo = customerConverter.convertDAOToObject(customer, DbService.getMongoOperation());
+			}
 		}
+    	if(customerInfo == null ) {
+    		 response.setStatus(204);
+    		 return customerInfo;
+    	}
+    	response.setStatus(200);
 		return customerInfo;
     }
     
