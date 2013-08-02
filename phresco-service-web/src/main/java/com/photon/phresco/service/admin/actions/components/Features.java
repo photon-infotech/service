@@ -339,7 +339,13 @@ public class Features extends ServiceBaseAction {
                 artifactGroup.setArtifactId(artifactId);
             }
             artifactGroup.setType(type);
-            artifactGroup.setPackaging(ServerUtil.getFileExtension(featureJarFileName));
+            
+            if(StringUtils.isNotEmpty(featureJarFileName) || StringUtils.isEmpty(getPackaging())) {
+            	artifactGroup.setPackaging(ServerUtil.getFileExtension(featureJarFileName));
+            } else {
+            	artifactGroup.setPackaging(getPackaging());
+            }
+            
             // To set appliesto tech and core
             List<CoreOption> appliesTo = new ArrayList<CoreOption>();
             CoreOption moduleCoreOption = null;

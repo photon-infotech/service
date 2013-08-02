@@ -18,7 +18,10 @@
 package com.photon.phresco.service.rest.api;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -59,6 +62,7 @@ import com.photon.phresco.commons.model.FunctionalFrameworkProperties;
 import com.photon.phresco.commons.model.License;
 import com.photon.phresco.commons.model.PlatformType;
 import com.photon.phresco.commons.model.Property;
+import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.commons.model.SettingsTemplate;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.commons.model.TechnologyGroup;
@@ -943,17 +947,47 @@ public class ComponentService extends DbService {
 	/**
 	 * Returns the list of modules
 	 * @return
+	 * @throws PhrescoException 
 	 */
 	@GET
 	@Path (REST_API_MODULES + "/desc")
 	@Produces (MediaType.APPLICATION_JSON)
-	public Response getFeatureDescription(@QueryParam(REST_API_PATH_PARAM_ID) String id) {
+	public Response getFeatureDescription(@QueryParam(REST_API_PATH_PARAM_ID) String id) throws PhrescoException {
 		ArtifactElement artifactElement = mongoOperation.findOne("artifactElement", 
 				new Query(Criteria.where("artifactGroupId").is(id)), ArtifactElement.class);
 		return Response.status(Response.Status.OK).entity(artifactElement).build();
 		
 	}
-
+	
+	@GET
+	@Path (REST_API_MODULES + "/icon")
+	@Produces (MediaType.APPLICATION_OCTET_STREAM)
+	public Response getFeatureIcon(@QueryParam(REST_API_PATH_PARAM_ID) String id, @QueryParam(REST_QUERY_CUSTOMERID) String customerId, 
+			@QueryParam("version") String version)	throws PhrescoException {
+		ArtifactGroupDAO artifactGroupDAO = mongoOperation.findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
+				new Query(Criteria.whereId().is(id)), ArtifactGroupDAO.class);
+		CustomerDAO customer = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME, new Query(Criteria.whereId().is(customerId)), 
+				CustomerDAO.class);
+		RepoInfo repoInfo = customer.getRepoInfo();
+		String repoURL = "";
+		if(repoInfo != null) {
+			repoURL = repoInfo.getReleaseRepoURL();
+		}
+		String contenrURL = repoURL + ServerUtil.createContentURL(artifactGroupDAO.getGroupId(), 
+				artifactGroupDAO.getArtifactId(), version, "png"); 
+		InputStream iconStream = null;
+		try {
+			URL url = new URL(contenrURL);
+			iconStream = url.openStream();
+		} catch (FileNotFoundException e) {
+			iconStream = getFileFromDB(customerId);
+		} catch (IOException e) {
+			throw new PhrescoException(e);
+		}
+		return Response.status(Response.Status.OK).entity(iconStream).build();
+		
+	}
+	
     /**
      * Creates the list of modules
      * @param modules
