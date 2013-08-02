@@ -928,9 +928,9 @@ public class ComponentService extends DbService {
 					Criteria techCriteria = Criteria.where("appliesTo").in(Arrays.asList(techId).toArray());
 					propQuery.addCriteria(techCriteria);
 				}
-//				List<PropertyTemplate> properties = DbService.getMongoOperation().find("configTemplates", 
-//						propQuery, PropertyTemplate.class);
-//				settingsTemplate.setProperties(properties);
+				List<PropertyTemplate> properties = DbService.getMongoOperation().find(PROPERTY_TEMPLATE_COLLECTION_NAME, 
+						propQuery, PropertyTemplate.class);
+				settingsTemplate.setProperties(properties);
 				settings.add(settingsTemplate);
 			}
 			if(CollectionUtils.isEmpty(settings)) {
