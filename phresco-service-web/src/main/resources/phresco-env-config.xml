@@ -70,6 +70,21 @@
 		<version>2.0.4</version>
 	</Database>
 	
+        <Server appliesTo="" desc="" name="server">
+            <protocol>http</protocol>
+            <host>172.16.17.226</host>
+            <port>8080</port>
+            <admin_username>admin</admin_username>
+            <admin_password>ZGV2cmVwbzI=</admin_password>
+            <remoteDeployment>No</remoteDeployment>
+            <type>Apache Tomcat</type>
+            <version>7.0.x</version>
+            <deploy_dir>c:/</deploy_dir>
+            <context>repository</context>
+            <additional_context>/</additional_context>
+        </Server>
+	</environment>
+
 	<environment default="false" name="Development">
         <WebService name="webservice">
             <port>8080</port>
