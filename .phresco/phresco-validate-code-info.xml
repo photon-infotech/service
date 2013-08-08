@@ -68,7 +68,7 @@
                         <value key="web">jsp/jsf</value>
                     </possibleValues>
                     <multiple>false</multiple>
-                    <value>html</value>
+                    <value>java</value>
                     <sort>false</sort>
                     <show>false</show>
                 </parameter>
