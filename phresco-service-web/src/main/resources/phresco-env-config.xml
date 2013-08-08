@@ -1,57 +1,5 @@
-<!--
-
-    Service Web Archive
-
-    Copyright (C) 1999-2013 Photon Infotech Inc.
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-            http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-
--->
 <environments>
-    <environment default="false" name="Production">
-        <WebService name="webservice">
-            <port>8080</port>
-            <password/>
-            <context>auth-2.0</context>
-            <host>115.111.233.107</host>
-            <protocol>http</protocol>
-            <username/>
-        </WebService>	
-	<Database  desc="" name="database">
-		<host>localhost</host>
-		<port>27017</port>
-		<username></username>
-		<password/>
-		<dbname>database-dump</dbname>
-		<type>mongodb</type>
-		<version>2.0.4</version>
-	</Database>
-	<Server appliesTo="" desc="" name="server">
-            <protocol>http</protocol>
-            <host>172.16.17.226</host>
-            <port>8080</port>
-            <admin_username>admin</admin_username>
-            <admin_password>ZGV2cmVwbzI=</admin_password>
-            <remoteDeployment>No</remoteDeployment>
-            <type>Apache Tomcat</type>
-            <version>7.0.x</version>
-            <deploy_dir>c:/</deploy_dir>
-            <context>repository</context>
-            <additional_context>/</additional_context>
-        </Server>
-	</environment>
-    
-	<environment default="true" name="Development">
+    <environment default="true" name="Testing">
         <WebService name="webservice">
             <port>8080</port>
             <password/>
@@ -59,61 +7,28 @@
             <host>172.16.8.250</host>
             <protocol>http</protocol>
             <username/>
-        </WebService>	
-	<Database  desc="" name="database">
-		<host>172.16.8.250</host>
-		<port>27017</port>
-		<username></username>
-		<password/>
-		<dbname>testing-3</dbname>
-		<type>mongodb</type>
-		<version>2.0.4</version>
-	</Database>
-	<Server appliesTo="" desc="" name="server">
-            <protocol>http</protocol>
-            <host>172.16.17.226</host>
-            <port>8080</port>
-            <admin_username>admin</admin_username>
-            <admin_password>ZGV2cmVwbzI=</admin_password>
-            <remoteDeployment>No</remoteDeployment>
-            <type>Apache Tomcat</type>
-            <version>7.0.x</version>
-            <deploy_dir>c:/</deploy_dir>
-            <context>repository</context>
-            <additional_context>/</additional_context>
-        </Server>
-	</environment>
-	
-    <environment default="false" name="Testing">
-        <WebService name="webservice">
-            <port>8080</port>
+        </WebService>
+        <Database name="database">
+            <version>2.0.4</version>
+            <port>27017</port>
             <password/>
-            <context>auth-2.0</context>
-            <host>172.16.8.250</host>
-            <protocol>http</protocol>
+            <type>mongodb</type>
+            <host>172.16.17.227</host>
+            <dbname>phresco-dev3-0</dbname>
             <username/>
-        </WebService>	
-	<Database  desc="" name="database">
-		<host>localhost</host>
-		<port>27017</port>
-		<username></username>
-		<password/>
-		<dbname>testing-3</dbname>
-		<type>mongodb</type>
-		<version>2.0.4</version>
-	</Database>
-	<Server appliesTo="" desc="" name="server">
-            <protocol>http</protocol>
-            <host>172.16.17.226</host>
-            <port>8080</port>
+        </Database>
+        <Server name="server">
+            <context>service</context>
             <admin_username>admin</admin_username>
-            <admin_password>ZGV2cmVwbzI=</admin_password>
-            <remoteDeployment>No</remoteDeployment>
-            <type>Apache Tomcat</type>
-            <version>7.0.x</version>
-            <deploy_dir>c:/</deploy_dir>
-            <context>repository</context>
+            <deploy_dir>D:/Softwares/apache-tomcat-7.0.14/webapps/</deploy_dir>
             <additional_context>/</additional_context>
+            <port>3030</port>
+            <admin_password>ZGV2cmVwbzI=</admin_password>
+            <version>7.0.x</version>
+            <type>Apache Tomcat</type>
+            <remoteDeployment>false</remoteDeployment>
+            <host>localhost</host>
+            <protocol>http</protocol>
         </Server>
-	</environment>
+    </environment>
 </environments>

@@ -14,7 +14,7 @@
                <groupId>com.photon.phresco.plugins</groupId>
                <artifactId>report-phresco-plugin</artifactId>
                <type>jar</type>
-               <version>2.2.1.1000</version>
+               <version>2.3.1.6000</version>
                <class>com.photon.phresco.plugins.ReportPlugin</class>
            </dependency>
        </implementation>
@@ -37,6 +37,20 @@
                         <value key="crisp">Overall</value>
                         <value key="detail">Detailed</value>
                     </possibleValues>
+                    <multiple>false</multiple>
+                    <value></value>
+                    <sort>false</sort>
+                    <show>true</show>
+                </parameter>
+				<parameter>
+                    <name>
+                        <value lang="en">Pdf Report Name</value>
+                    </name>
+                    <type>String</type>
+                    <required>true</required>
+                    <editable>true</editable>
+                    <description></description>
+                    <key>reportName</key>
                     <multiple>false</multiple>
                     <value></value>
                     <sort>false</sort>
@@ -93,6 +107,20 @@
                     <editable>true</editable>
                     <description></description>
                     <key>theme</key>
+                    <multiple>false</multiple>
+                    <value></value>
+                    <sort>false</sort>
+                    <show>false</show>
+                </parameter>
+				<parameter>
+                    <name>
+                        <value lang="en">Technology Name</value>
+                    </name>
+                    <type>Hidden</type>
+                    <required>false</required>
+                    <editable>true</editable>
+                    <description></description>
+                    <key>technologyName</key>
                     <multiple>false</multiple>
                     <value></value>
                     <sort>false</sort>

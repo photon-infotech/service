@@ -17,6 +17,24 @@
             <parameters>
                 <parameter>
                     <name>
+                        <value lang="en">JMX Type</value>
+                    </name>
+                    <type>List</type>
+                    <required>false</required>
+                    <editable>true</editable>
+                    <description></description>
+                    <key>testBasis</key>
+                    <possibleValues>
+                        <value key="parameters" dependency="testAgainst,showSettings,environmentName,configurations,testName,rampUpPeriod,authManager,contextUrls,dbContextUrls">Parameters</value>
+                        <value key="customise" dependency="customTestAgainst,uploadJMX,availableJmx">Custom</value>
+                    </possibleValues>
+                    <multiple>false</multiple>
+                    <value></value>
+                    <sort>false</sort>
+                    <show>true</show>
+                </parameter>
+                <parameter>
+                    <name>
                         <value lang="en">Test Against</value>
                     </name>
                     <type>List</type>
@@ -32,8 +50,28 @@
                     <multiple>false</multiple>
                     <value></value>
                     <sort>false</sort>
-                    <show>true</show>
+                    <show>false</show>
                     <dependency>configurations,testName</dependency>
+                </parameter>
+                <parameter>
+                    <name>
+                        <value lang="en">Test Against</value>
+                    </name>
+                    <type>List</type>
+                    <required>false</required>
+                    <editable>true</editable>
+                    <description></description>
+                    <key>customTestAgainst</key>
+                    <possibleValues>
+                        <value key="server">Server</value>
+                        <value key="webservice">Web Services</value>
+                        <value key="database">Database</value>
+                    </possibleValues>
+                    <multiple>false</multiple>
+                    <value></value>
+                    <sort>false</sort>
+                    <show>false</show>
+                    <dependency>availableJmx</dependency>
                 </parameter>
                 <parameter>
                     <name>
@@ -59,10 +97,10 @@
                         <class>com.photon.phresco.impl.EnvironmentsParameterImpl</class>
                         <dependencies>
                             <dependency>
-								<groupId>com.photon.phresco.commons</groupId>
-								<artifactId>phresco-commons</artifactId>
-								<type>jar</type>
-								<version>2.2.1.1000</version>
+<groupId>com.photon.phresco.commons</groupId>
+<artifactId>phresco-commons</artifactId>
+<type>jar</type>
+<version>2.3.1.6000</version>
                             </dependency>
                         </dependencies>
                     </dynamicParameter>
@@ -84,10 +122,10 @@
                         <class>com.photon.phresco.framework.param.impl.PerformanceConfigurationsImpl</class>
                         <dependencies>
                             <dependency>
-								<groupId>com.photon.phresco.framework</groupId>
-								<artifactId>phresco-framework-impl</artifactId>
-								<type>jar</type>
-								<version>2.2.1.1000</version>
+<groupId>com.photon.phresco.framework</groupId>
+<artifactId>phresco-framework-impl</artifactId>
+<type>jar</type>
+<version>2.3.1.6000</version>
                             </dependency>
                         </dependencies>
                     </dynamicParameter>
@@ -109,10 +147,10 @@
                         <class>com.photon.phresco.framework.param.impl.PerformanceTestResultNamesImpl</class>
                         <dependencies>
                             <dependency>
-								<groupId>com.photon.phresco.framework</groupId>
-								<artifactId>phresco-framework-impl</artifactId>
-								<type>jar</type>
-								<version>2.2.1.1000</version>
+<groupId>com.photon.phresco.framework</groupId>
+<artifactId>phresco-framework-impl</artifactId>
+<type>jar</type>
+<version>2.3.1.6000</version>
                             </dependency>
                         </dependencies>
                     </dynamicParameter>
@@ -123,21 +161,7 @@
                     <multiple>false</multiple>
                     <value></value>
                     <sort>false</sort>
-                    <show>true</show>
-                </parameter>
-                <parameter>
-                    <name>
-                        <value lang="en">No of Users</value>
-                    </name>
-                    <type>Number</type>
-                    <required>true</required>
-                    <editable>true</editable>
-                    <description></description>
-                    <key>noOfUsers</key>
-                    <multiple>false</multiple>
-                    <value></value>
-                    <sort>false</sort>
-                    <show>true</show>
+                    <show>false</show>
                 </parameter>
                 <parameter>
                     <name>
@@ -149,23 +173,94 @@
                     <description></description>
                     <key>rampUpPeriod</key>
                     <multiple>false</multiple>
-                    <value></value>
+                    <value>10</value>
                     <sort>false</sort>
                     <show>true</show>
                 </parameter>
                 <parameter>
                     <name>
-                        <value lang="en">Loop Count</value>
+                        <value lang="en">Auth Manager</value>
                     </name>
-                    <type>Number</type>
+                    <type>Boolean</type>
+                    <required>false</required>
+                    <editable>true</editable>
+                    <description></description>
+                    <key>authManager</key>
+                    <multiple>false</multiple>
+                    <value>false</value>
+                    <sort>false</sort>
+                    <show>true</show>
+                    <dependency>authorizationUrl,authorizationUserName,authorizationPassword,authorizationDomain,authorizationRealm</dependency>
+                </parameter>
+                <parameter>
+                    <name>
+                        <value lang="en">Url</value>
+                    </name>
+                    <type>String</type>
                     <required>true</required>
                     <editable>true</editable>
                     <description></description>
-                    <key>loopCount</key>
+                    <key>authorizationUrl</key>
                     <multiple>false</multiple>
                     <value></value>
                     <sort>false</sort>
-                    <show>true</show>
+                    <show>false</show>
+                </parameter>
+                <parameter>
+                    <name>
+                        <value lang="en">Username</value>
+                    </name>
+                    <type>String</type>
+                    <required>true</required>
+                    <editable>true</editable>
+                    <description></description>
+                    <key>authorizationUserName</key>
+                    <multiple>false</multiple>
+                    <value></value>
+                    <sort>false</sort>
+                    <show>false</show>
+                </parameter>
+                <parameter>
+                    <name>
+                        <value lang="en">Password</value>
+                    </name>
+                    <type>Password</type>
+                    <required>true</required>
+                    <editable>true</editable>
+                    <description></description>
+                    <key>authorizationPassword</key>
+                    <multiple>false</multiple>
+                    <value></value>
+                    <sort>false</sort>
+                    <show>false</show>
+                </parameter>
+                <parameter>
+                    <name>
+                        <value lang="en">Domain</value>
+                    </name>
+                    <type>String</type>
+                    <required>false</required>
+                    <editable>true</editable>
+                    <description></description>
+                    <key>authorizationDomain</key>
+                    <multiple>false</multiple>
+                    <value></value>
+                    <sort>false</sort>
+                    <show>false</show>
+                </parameter>
+                <parameter>
+                    <name>
+                        <value lang="en">Realm</value>
+                    </name>
+                    <type>String</type>
+                    <required>false</required>
+                    <editable>true</editable>
+                    <description></description>
+                    <key>authorizationRealm</key>
+                    <multiple>false</multiple>
+                    <value></value>
+                    <sort>false</sort>
+                    <show>false</show>
                 </parameter>
                 <parameter>
                     <name>
@@ -176,10 +271,10 @@
                         <class>com.photon.phresco.framework.param.impl.PerformanceTestDetailsImpl</class>
                         <dependencies>
                             <dependency>
-								<groupId>com.photon.phresco.framework</groupId>
-								<artifactId>phresco-framework-impl</artifactId>
-								<type>jar</type>
-								<version>2.2.1.1000</version>
+<groupId>com.photon.phresco.framework</groupId>
+<artifactId>phresco-framework-impl</artifactId>
+<type>jar</type>
+<version>2.3.1.6000</version>
                             </dependency>
                         </dependencies>
                     </dynamicParameter>
@@ -201,10 +296,10 @@
                         <class>com.photon.phresco.framework.param.impl.PerformanceTestDetailsImpl</class>
                         <dependencies>
                             <dependency>
-								<groupId>com.photon.phresco.framework</groupId>
-								<artifactId>phresco-framework-impl</artifactId>
-								<type>jar</type>
-								<version>2.2.1.1000</version>
+<groupId>com.photon.phresco.framework</groupId>
+<artifactId>phresco-framework-impl</artifactId>
+<type>jar</type>
+<version>2.3.1.6000</version>
                             </dependency>
                         </dependencies>
                     </dynamicParameter>
@@ -212,6 +307,46 @@
                     <editable>true</editable>
                     <description></description>
                     <key>dbContextUrls</key>
+                    <multiple>false</multiple>
+                    <value></value>
+                    <sort>false</sort>
+                    <show>false</show>
+                </parameter>
+                <parameter>
+                    <name>
+                        <value lang="en">Upload JMX</value>
+                    </name>
+                    <type>FileType</type>
+                    <required>true</required>
+                    <editable>true</editable>
+                    <description></description>
+                    <key>uploadJMX</key>
+                    <multiple>false</multiple>
+                    <value></value>
+                    <sort>false</sort>
+                    <show>false</show>
+                    <dependency>availableJmx</dependency>
+                    <fileType>zip</fileType>
+                </parameter>
+                <parameter>
+                    <name>
+                        <value lang="en">JMX</value>
+                    </name>
+                    <type>DynamicParameter</type>
+                    <dynamicParameter>
+                        <class>com.photon.phresco.impl.JmxFilesImpl</class>
+                        <dependencies>
+                            <dependency>
+<groupId>com.photon.phresco.commons</groupId>
+<artifactId>phresco-commons</artifactId>
+<type>jar</type>
+<version>2.3.1.6000</version>
+                            </dependency>
+                        </dependencies>
+                    </dynamicParameter>
+                    <required>true</required>
+                    <editable>true</editable>
+                    <key>availableJmx</key>
                     <multiple>false</multiple>
                     <value></value>
                     <sort>false</sort>

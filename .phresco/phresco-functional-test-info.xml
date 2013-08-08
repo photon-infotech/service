@@ -59,7 +59,7 @@
 						<groupId>com.photon.phresco.commons</groupId>
 						<artifactId>phresco-commons</artifactId>
 						<type>jar</type>
-						<version>2.2.1.1000</version>
+						<version>2.3.1.6000</version>
 					</dependency>
 				</dependencies>
 				</dynamicParameter>
@@ -86,6 +86,8 @@
 					<value key="opera">Opera</value>
 					<value key="internetExplorer">Internet Explorer</value>
 					<value key="chrome">Chrome</value>
+					<value key="android">Android Webdriver</value>
+                    <value key="iPhone">iPhone Webdriver</value>
 				</possibleValues>
 				<multiple>false</multiple>
 				<value></value>
@@ -133,7 +135,7 @@
                <groupId>com.photon.phresco.plugins</groupId>
                <artifactId>java-phresco-plugin</artifactId>
                <type>jar</type>
-               <version>2.2.1.1000</version>
+               <version>2.3.1.6000</version>
                <class>com.photon.phresco.plugins.java.JavaPlugin</class>
            </dependency>
        </implementation>
@@ -187,7 +189,7 @@
 								<groupId>com.photon.phresco.commons</groupId>
 								<artifactId>phresco-commons</artifactId>
 								<type>jar</type>
-								<version>2.2.1.1000</version>
+								<version>2.3.1.6000</version>
                             </dependency>
                         </dependencies>
                     </dynamicParameter>
@@ -285,7 +287,7 @@
 <groupId>com.photon.phresco.commons</groupId>
 <artifactId>phresco-commons</artifactId>
 <type>jar</type>
-<version>2.3.0.2001-SNAPSHOT</version>
+<version>2.3.1.6000</version>
                             </dependency>
                         </dependencies>
                     </dynamicParameter>
@@ -380,7 +382,7 @@
 <groupId>com.photon.phresco.commons</groupId>
 <artifactId>phresco-commons</artifactId>
 <type>jar</type>
-<version>2.3.0.2001-SNAPSHOT</version>
+<version>2.3.1.6000</version>
                             </dependency>
                         </dependencies>
                     </dynamicParameter>

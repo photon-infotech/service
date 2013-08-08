@@ -374,7 +374,7 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
+          <configuration>
                     <injectString>&lt;!-- [INSERT FRAGMENT HERE] --&gt;</injectString>
                     <source>1.5</source>
                     <target>1.5</target>
