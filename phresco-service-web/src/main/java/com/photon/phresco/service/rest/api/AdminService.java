@@ -18,9 +18,13 @@
 package com.photon.phresco.service.rest.api;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -44,6 +48,7 @@ import org.springframework.stereotype.Component;
 
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactGroup.Type;
+import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.LogInfo;
 import com.photon.phresco.commons.model.Permission;
@@ -119,8 +124,25 @@ public class AdminService extends DbService {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.getIcon(String id)");
         }
-        InputStream inputStream = getFileFromDB(id);
-    	return Response.status(Response.Status.OK).entity(inputStream).build();
+        InputStream iconStream = null;
+        CustomerDAO customerDAO = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME, new Query(Criteria.whereId().is(id)), CustomerDAO.class);
+        String repourl = customerDAO.getRepoInfo().getGroupRepoURL();
+        String artifactId = customerDAO.getName().replace(" ", "-").replace("'", "").toLowerCase();
+        String contentURL = ServerUtil.createContentURL("customers", artifactId, "1.0", "png");
+        if(! id.equals(DEFAULT_CUSTOMER_NAME)) {
+        	CustomerDAO defCustomer = mongoOperation.findOne(CUSTOMERS_COLLECTION_NAME, 
+        			new Query(Criteria.whereId().is(DEFAULT_CUSTOMER_NAME)), CustomerDAO.class);
+        	repourl = defCustomer.getRepoInfo().getGroupRepoURL();
+        }
+        try {
+			URL url = new URL(repourl + "/" + contentURL);
+			iconStream = url.openStream();
+		} catch (MalformedURLException e) {
+			throw new PhrescoException(e);
+		} catch (IOException e) {
+			throw new PhrescoException(e);
+		}
+    	return Response.status(Response.Status.OK).entity(iconStream).build();
     }
     
     /**
@@ -160,7 +182,10 @@ public class AdminService extends DbService {
     				customer.setRepoInfo(repoInfo);
     			}
     			if(iconStream != null) {
-    				saveFileToDB(customer.getId(), iconStream);
+    				File artifactFile = ServerUtil.writeFileFromStream(iconStream, null, 
+    						"png", customer.getName());
+    				ArtifactGroup artifactGroup = createArtifactForIcon(customer.getName());
+    				uploadBinary(artifactGroup, artifactFile);
     			}
     			Converter<CustomerDAO, Customer> customerConverter = 
         			(Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
@@ -172,7 +197,19 @@ public class AdminService extends DbService {
 		}
 		return customer;
     }
-    /**
+    private ArtifactGroup createArtifactForIcon(String name) {
+    	ArtifactGroup artifactGroup = new ArtifactGroup();
+    	artifactGroup.setGroupId("customers");
+    	artifactGroup.setArtifactId(name.replace(" ", "-").replace("'", "").toLowerCase());
+    	artifactGroup.setPackaging("png");
+    	artifactGroup.setCustomerIds(Collections.singletonList("photon"));
+    	ArtifactInfo artifactInfo = new ArtifactInfo();
+    	artifactInfo.setVersion("1.0");
+    	artifactGroup.setVersions(Collections.singletonList(artifactInfo));
+    	return artifactGroup;
+	}
+
+	/**
      * Updates the list of customers
      * @param customers
      * @return
