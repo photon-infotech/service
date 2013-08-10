@@ -13,8 +13,8 @@
             <port>27017</port>
             <password/>
             <type>mongodb</type>
-            <host>172.16.17.227</host>
-            <dbname>phresco-dev3-0</dbname>
+            <host>172.16.8.250</host>
+            <dbname>testing-3</dbname>
             <username/>
         </Database>
         <Server name="server">
