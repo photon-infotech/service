@@ -21,6 +21,8 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -63,6 +65,7 @@ import com.google.gson.Gson;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactGroup.Type;
 import com.photon.phresco.commons.model.Customer;
+import com.photon.phresco.commons.model.Element;
 import com.photon.phresco.commons.model.LogInfo;
 import com.photon.phresco.commons.model.Permission;
 import com.photon.phresco.commons.model.Property;
@@ -82,6 +85,7 @@ import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.client.impl.ClientHelper;
 import com.photon.phresco.service.converters.ConvertersFactory;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
+import com.photon.phresco.service.dao.BaseDAO;
 import com.photon.phresco.service.dao.CustomerDAO;
 import com.photon.phresco.service.dao.TechnologyDAO;
 import com.photon.phresco.service.dao.VideoInfoDAO;
@@ -147,26 +151,47 @@ public class AdminService extends DbService {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.getIcon(String id)");
         }
-        
-        if(StringUtils.isNotEmpty(context)) {
-			CustomerDAO customer = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME, 
-			        new Query(Criteria.where("context").is(context)), CustomerDAO.class);
-			if (customer != null) {
-				customerId = customer.getId();
-			}
-        }
-        InputStream inputStream = getFileFromDB(customerId);
-        if(inputStream == null) {
-        	response.setStatus(204);
-        	return null;
-        }
         byte[] byteArray = null;
-		try {
-			byteArray = IOUtils.toByteArray(inputStream);
+        InputStream iconStream = null;
+		CustomerDAO customerDAO =  null;
+		System.out.println("Context us  " + context);
+		System.out.println("Id  " + customerId);
+		if(StringUtils.isEmpty(context) && StringUtils.isEmpty(customerId)) {
+			return byteArray;
+		}
+		if(StringUtils.isNotEmpty(context)) {
+			customerDAO = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME, 
+					 new Query(Criteria.where("context").is(context)), CustomerDAO.class);
+		} else {
+			customerDAO = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME, 
+					 new Query(Criteria.whereId().is(context)), CustomerDAO.class);
+		}
+		String id = customerDAO.getId();
+		Converter<CustomerDAO, Customer> converter = (Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
+		Customer customer = converter.convertDAOToObject(customerDAO, DbService.getMongoOperation());
+        String repourl = customer.getRepoInfo().getGroupRepoURL();
+        String artifactId = customer.getName().replace(" ", "-").replace("'", "").toLowerCase();
+        String contentURL = ServerUtil.createContentURL("customers", artifactId, "1.0", "png");
+        if(! id.equals(DEFAULT_CUSTOMER_NAME)) {
+        	CustomerDAO defCustomer = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME, 
+        			new Query(Criteria.whereId().is(DEFAULT_CUSTOMER_NAME)), CustomerDAO.class);
+        	repourl = converter.convertDAOToObject(defCustomer, DbService.getMongoOperation()).getRepoInfo().getGroupRepoURL();
+        }
+        try {
+			URL url = new URL(repourl + "/" + contentURL);
+			iconStream = url.openStream();
+			if(iconStream == null) {
+	        	response.setStatus(204);
+	        	return null;
+	        }
+			byteArray = IOUtils.toByteArray(iconStream);
 			response.setStatus(200);
+		} catch (MalformedURLException e) {
+			throw new PhrescoException(e);
 		} catch (IOException e) {
 			throw new PhrescoException(e);
 		}
+        
     	return byteArray;
     }
     
