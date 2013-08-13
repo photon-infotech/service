@@ -1,5 +1,69 @@
 <environments>
-    <environment default="true" name="Testing">
+    <environment appliesTo="" default="false" desc="" name="Production">
+        <WebService name="webservice">
+            <port>8080</port>
+            <password/>
+            <context>auth-2.0</context>
+            <host>115.111.233.107</host>
+            <protocol>http</protocol>
+            <username/>
+        </WebService>
+        <Database name="database">
+            <version>2.0.4</version>
+            <port>27017</port>
+            <password/>
+            <type>mongodb</type>
+            <host>localhost</host>
+            <dbname>database-dump</dbname>
+            <username/>
+        </Database>
+        <Server name="server">
+            <context>repository</context>
+            <admin_username>admin</admin_username>
+            <deploy_dir>c:/</deploy_dir>
+            <additional_context>/</additional_context>
+            <port>8080</port>
+            <admin_password>ZGV2cmVwbzI=</admin_password>
+            <version>7.0.x</version>
+            <type>Apache Tomcat</type>
+            <remoteDeployment>No</remoteDeployment>
+            <protocol>http</protocol>
+            <host>172.16.17.226</host>
+        </Server>
+    </environment>
+    <environment appliesTo="" default="true" desc="" name="Development">
+        <WebService name="webservice">
+            <port>8080</port>
+            <password/>
+            <context>auth-2.0</context>
+            <host>172.16.8.250</host>
+            <protocol>http</protocol>
+            <username/>
+        </WebService>
+        <Database desc="" name="database">
+            <version>2.2.0</version>
+            <port>27017</port>
+            <password/>
+            <type>MongoDB</type>
+            <host>172.16.8.250</host>
+            <dbname>testing-3</dbname>
+            <username>admin</username>
+        </Database>
+        <Server desc="" name="server">
+            <context>service</context>
+            <deploy_dir/>
+            <admin_username>admin</admin_username>
+            <additional_context>/</additional_context>
+            <port>8080</port>
+            <admin_password>admin</admin_password>
+            <version>7.0.x</version>
+            <type>Apache Tomcat</type>
+            <remoteDeployment>true</remoteDeployment>
+            <protocol>http</protocol>
+            <host>172.16.17.227</host>
+        </Server>
+    </environment>
+    <environment default="false" name="Testing">
         <WebService name="webservice">
             <port>8080</port>
             <password/>
