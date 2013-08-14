@@ -31,7 +31,7 @@
             <host>172.16.17.226</host>
         </Server>
     </environment>
-    <environment appliesTo="" default="true" desc="" name="Development">
+    <environment appliesTo="" default="false" desc="" name="Development">
         <WebService name="webservice">
             <port>8080</port>
             <password/>
@@ -79,6 +79,38 @@
             <type>mongodb</type>
             <host>172.16.8.250</host>
             <dbname>testing-3</dbname>
+            <username/>
+        </Database>
+        <Server name="server">
+            <context>service</context>
+            <admin_username>admin</admin_username>
+            <deploy_dir>D:/Softwares/apache-tomcat-7.0.14/webapps/</deploy_dir>
+            <additional_context>/</additional_context>
+            <port>3030</port>
+            <admin_password>ZGV2cmVwbzI=</admin_password>
+            <version>7.0.x</version>
+            <type>Apache Tomcat</type>
+            <remoteDeployment>false</remoteDeployment>
+            <host>localhost</host>
+            <protocol>http</protocol>
+        </Server>
+    </environment>
+    <environment default="true" name="phresco-setup">
+        <WebService name="webservice">
+            <port>8080</port>
+            <password/>
+            <context>auth</context>
+            <host>localhost</host>
+            <protocol>http</protocol>
+            <username/>
+        </WebService>
+        <Database name="database">
+            <version>2.0.4</version>
+            <port>27017</port>
+            <password/>
+            <type>mongodb</type>
+            <host>localhost</host>
+            <dbname>testing-2-3</dbname>
             <username/>
         </Database>
         <Server name="server">
