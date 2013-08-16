@@ -430,7 +430,8 @@ public class ComponentService extends DbService {
 	public @ResponseBody List<Technology> findTechnologies(@Context HttpServletRequest request,  HttpServletResponse response, 
 			@ApiParam(name = "customerId" ,	required = true, value = "The customerid to retrive technologies")@QueryParam(REST_QUERY_CUSTOMERID) String customerId, 
 			@ApiParam(name = "appTypeId" ,required = true, value = "The apptypeid to retrive technologies")
-			@QueryParam(REST_QUERY_APPTYPEID) String appTypeId) {
+			@QueryParam(REST_QUERY_APPTYPEID) String appTypeId, @ApiParam(name = "name" ,required = true, value = "The name of technology to retrive")
+			@QueryParam(REST_QUERY_NAME) String name) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.findTechnologies : Entry");
 	        LOGGER.debug("ComponentService.findTechnologies", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
@@ -438,14 +439,23 @@ public class ComponentService extends DbService {
 	    }
 	    List<TechnologyDAO> techDAOList = new ArrayList<TechnologyDAO>();
 	    try {
-			Query query = createCustomerIdQuery(customerId);
-		   
+	    	Query query = new Query();
+	    	if(StringUtils.isNotEmpty(customerId)) {
+	    		List<String> customerIds = new ArrayList<String>();
+	    		customerIds.add(customerId);
+	    		Criteria criteria = Criteria.where(DB_COLUMN_CUSTOMERIDS).in(customerIds.toArray());
+	    		query.addCriteria(criteria);
+	    	}
 			if(StringUtils.isNotEmpty(appTypeId)) {
 			    query.addCriteria(Criteria.where(REST_QUERY_APPTYPEID).is(appTypeId));
 		    } 
 			
+			if(StringUtils.isNotEmpty(name)) {
+			    query.addCriteria(Criteria.where(REST_QUERY_NAME).is(name));
+		    } 
+			
 			techDAOList = DbService.getMongoOperation().find(TECHNOLOGIES_COLLECTION_NAME, query, TechnologyDAO.class);
-			if(StringUtils.isEmpty(appTypeId) && !StringUtils.equals(customerId, DEFAULT_CUSTOMER_NAME)) {
+			if(StringUtils.isEmpty(appTypeId) && StringUtils.isNotEmpty(customerId) && !StringUtils.equals(customerId, DEFAULT_CUSTOMER_NAME)) {
 				CustomerDAO customerDAO = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME, 
 						new Query(Criteria.whereId().is(customerId)), CustomerDAO.class);
 				List<String> applicableTechnologies = customerDAO.getApplicableTechnologies();
@@ -3053,16 +3063,20 @@ public class ComponentService extends DbService {
 		}
 	}
 	
-	/**
+    /**
 	 * Returns the list of Functional test frameworks
 	 * @return
 	 */
     @ApiOperation(value = " Retrives all functional frameworks ")
     @ApiErrors(value = {@ApiError(code=500, reason = "Failed to fetch"), @ApiError(code=204, reason = "Functional not found")})
     @RequestMapping(value= REST_API_OPTIONS_FUNCTIONAL_GRP, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
-	public @ResponseBody List<FunctionalFrameworkGroup> findFunctionalTestFrameworks(HttpServletResponse response) {
+	public @ResponseBody List<FunctionalFrameworkGroup> findFunctionalTestFrameworks(HttpServletResponse response,
+			@ApiParam(name = REST_QUERY_TECHID , value = "Techid to retrive")@QueryParam(REST_QUERY_TECHID) String techId) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("Entered into ComponentService.findFunctionalTestFrameworks()");
+	    }
+	    if(StringUtils.isNotEmpty(techId)) {
+	    	return getFunctionalGroups(techId, response);
 	    }
 	    List<FunctionalFrameworkGroup> functionalFrameworkGroups = new ArrayList<FunctionalFrameworkGroup>();
 		try {
@@ -3082,19 +3096,8 @@ public class ComponentService extends DbService {
 		}
 	}
 	
-    /**
-	 * Returns the list of Functional test frameworks
-	 * @return
-	 */
-    @ApiOperation(value = " Retrives functional frameworks with tech id and name")
-    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to fetch"), @ApiError(code=204, reason = "Functional not found")})
-    @RequestMapping(value= REST_API_OPTIONS_FUNCTIONAL, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
-	public @ResponseBody List<FunctionalFrameworkGroup> findFunctionalTestFrameworks(HttpServletResponse response,
-			@ApiParam(name = REST_QUERY_TECHID , value = "Techid to retrive")@QueryParam(REST_QUERY_TECHID) String techId) {
-	    if (isDebugEnabled) {
-	        LOGGER.debug("Entered into ComponentService.findFunctionalTestFrameworks()");
-	    }
-	    List<FunctionalFrameworkGroup> functionalFrameworkGroups = new ArrayList<FunctionalFrameworkGroup>();
+    private List<FunctionalFrameworkGroup> getFunctionalGroups(String techId, HttpServletResponse response) {
+    	List<FunctionalFrameworkGroup> functionalFrameworkGroups = new ArrayList<FunctionalFrameworkGroup>();
 	    List<FunctionalFramework> functionalFrameworks = new ArrayList<FunctionalFramework>();
 	    try{
 	    	List<FunctionalFrameworkGroup> ffgs = DbService.getMongoOperation().find(FUNCTIONAL_FRAMEWORK_GRP_COLLECTION_NAME, 
@@ -3128,6 +3131,38 @@ public class ComponentService extends DbService {
 			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, FUNCTIONAL_FRAMEWORK_COLLECTION_NAME);
 		}
+    }
+    
+    /**
+	 * Returns the list of Functional test frameworks
+	 * @return
+	 */
+    @ApiOperation(value = " Retrives functional frameworks with tech id and name")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to fetch"), @ApiError(code=204, reason = "Functional not found")})
+    @RequestMapping(value= REST_API_FUNCTIONAL_FRAMEWORK, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody FunctionalFramework findFunctionalTestFrameworks(HttpServletResponse response,
+			@ApiParam(name = "functionalFrameworkId" , value = "FunctionalFrameworkId to retrivd")@QueryParam("functionalFrameworkId") String functionalFrameworkId,
+			@ApiParam(name = REST_QUERY_TECHID , value = "Techid to retrive")@QueryParam(REST_QUERY_TECHID) String techId ) {
+	    if (isDebugEnabled) {
+	        LOGGER.debug("Entered into ComponentService.findFunctionalTestFrameworks()");
+	    }
+	    List<FunctionalFrameworkProperties> properties = new ArrayList<FunctionalFrameworkProperties>();
+	    FunctionalFramework functionalFramework = DbService.getMongoOperation().findOne(FUNCTIONAL_FRAMEWORK_COLLECTION_NAME, 
+	    		new Query(Criteria.whereId().is(functionalFrameworkId)), FunctionalFramework.class);
+	    if(functionalFramework == null) {
+	    	response.setStatus(204);
+	    	return functionalFramework;
+	    }
+	    List<FunctionalFrameworkProperties> funcFrameworkProperties = functionalFramework.getFuncFrameworkProperties();
+	    for (FunctionalFrameworkProperties functionalFrameworkProperties : funcFrameworkProperties) {
+			if(functionalFrameworkProperties.getTechId().equals(techId)) {
+				properties.add(functionalFrameworkProperties);
+				break;
+			}
+		}
+	    functionalFramework.setFuncFrameworkProperties(properties);
+	    response.setStatus(200);
+	    return functionalFramework;
 	}
     
 	/**
