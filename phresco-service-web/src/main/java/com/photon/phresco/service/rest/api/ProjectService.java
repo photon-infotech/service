@@ -112,8 +112,8 @@ public class ProjectService extends DbService {
 			createDependency(tempFolderPath, projectInfo);
 			ArchiveUtil.createArchive(tempFolderPath, tempFolderPath + ZIP, ArchiveType.ZIP);
 //			ServiceOutput serviceOutput = new ServiceOutput(tempFolderPath);
-			dbManager.storeCreatedProjects(projectInfo);
-			dbManager.updateUsedObjects(projectInfo);
+//			dbManager.storeCreatedProjects(projectInfo);
+//			dbManager.updateUsedObjects(projectInfo);
 			LOGGER.debug("ProjectService.createProject() : Exit");
 			fis = new FileInputStream(new File(tempFolderPath + ZIP));
 			return IOUtils.toByteArray(fis);

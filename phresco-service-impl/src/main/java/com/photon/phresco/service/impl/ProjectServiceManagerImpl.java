@@ -88,30 +88,17 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 		}
 		File projectPath = new File(tempFolderPath);
 		projectPath.mkdirs();
-		String customerId = projectInfo.getCustomerIds().get(0);
-		Map<String, String> appInfoMap = new HashMap<String, String>();
 		PhrescoServerFactory.initialize();
-		DbManager dBManager = PhrescoServerFactory.getDbManager();
-		ProjectInfo projectInfoInDB = dBManager.getProjectInfo(projectInfo.getId());
 		
-		List<ApplicationInfo> appInfosInDB = projectInfoInDB.getAppInfos();
-		List<ApplicationInfo> appInfos = projectInfo.getAppInfos();
-		List<ApplicationInfo> createdAppInfos = new ArrayList<ApplicationInfo>();
-		
-		findNewlyAddedProject(appInfoMap, appInfosInDB, appInfos, createdAppInfos);
 		ProjectInfo projectInfoClone = projectInfo.clone();
-		if(CollectionUtils.isNotEmpty(createdAppInfos)) {
-			for (int i = 0; i < createdAppInfos.size(); i++) {
-				projectInfoClone.setAppInfos(Arrays.asList(createdAppInfos.get(i)));
-				createProject(projectInfoClone, tempFolderPath);
-				if (isDebugEnabled) {
-					LOGGER.debug("ProjectServiceManagerImpl.updateProject", "technology=" + projectInfo.getAppInfos().get(0).getTechInfo().getName(),
-							"customerId=" + projectInfo.getCustomerIds().get(0), "action=" + "UPDATE", "projectCode=" + projectInfo.getProjectCode());
+		if(CollectionUtils.isNotEmpty(projectInfo.getAppInfos())) {
+			for (int i = 0; i < projectInfo.getAppInfos().size(); i++) {
+				if(!projectInfo.getAppInfos().get(i).isCreated()) {
+					projectInfoClone.setAppInfos(Arrays.asList(projectInfo.getAppInfos().get(i)));
+					createProject(projectInfoClone, tempFolderPath);
 				}
 			}
 		}
-		pilotCreationFromAppInfos(tempFolderPath, customerId, dBManager, appInfos);
-		dBManager.storeCreatedProjects(projectInfo);
 		if (isDebugEnabled) {
 			LOGGER.debug("ProjectServiceManagerImpl.updateProject:Exit");
 		}
