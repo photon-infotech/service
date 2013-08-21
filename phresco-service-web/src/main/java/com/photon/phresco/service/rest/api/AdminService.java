@@ -25,6 +25,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -64,6 +65,7 @@ import org.springframework.web.servlet.HandlerMapping;
 import com.google.gson.Gson;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactGroup.Type;
+import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.Element;
 import com.photon.phresco.commons.model.LogInfo;
@@ -124,15 +126,29 @@ public class AdminService extends DbService {
     /**
      * Returns the list of customers and customer by name
      * @return
+     * @throws PhrescoException 
      */
     @ApiOperation(value = " Lists all customers and returns single customer if customer name is present")
     @ApiErrors(value = {@ApiError(code=500, reason = "Failed to retrive"), @ApiError(code=204, reason = "Customers not found")})
     @RequestMapping(value= ServiceConstants.REST_API_CUSTOMERS, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
-    public @ResponseBody List<Customer> findCustomer(HttpServletResponse response) {
+    public @ResponseBody List<Customer> findCustomer(HttpServletResponse response, 
+    		@ApiParam(value = "The name of the customer to fetch", name = REST_QUERY_NAME) @QueryParam(REST_QUERY_NAME) 
+    		String name) throws PhrescoException {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.findCustomer()");
         }
-		List<Customer> customers = findCustomersFromDB();
+        List<Customer> customers = new ArrayList<Customer>();
+        if(StringUtils.isNotEmpty(name)) {
+        	Converter<CustomerDAO, Customer> converter = (Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
+        	List<CustomerDAO> customerDAOs = DbService.getMongoOperation().
+        		find(CUSTOMERS_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_NAME).is(name)), CustomerDAO.class);
+        	for (CustomerDAO customerDAO : customerDAOs) {
+				Customer convertDAOToObject = converter.convertDAOToObject(customerDAO, DbService.getMongoOperation());
+				customers.add(convertDAOToObject);
+			}
+        	return customers;
+        }
+		customers = findCustomersFromDB();
 		if(CollectionUtils.isEmpty(customers)) {
 			response.setStatus(204);
 			return customers;
@@ -154,8 +170,6 @@ public class AdminService extends DbService {
         byte[] byteArray = null;
         InputStream iconStream = null;
 		CustomerDAO customerDAO =  null;
-		System.out.println("Context us  " + context);
-		System.out.println("Id  " + customerId);
 		if(StringUtils.isEmpty(context) && StringUtils.isEmpty(customerId)) {
 			return byteArray;
 		}
@@ -170,7 +184,7 @@ public class AdminService extends DbService {
 		Converter<CustomerDAO, Customer> converter = (Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
 		Customer customer = converter.convertDAOToObject(customerDAO, DbService.getMongoOperation());
         String repourl = customer.getRepoInfo().getGroupRepoURL();
-        String artifactId = customer.getName().replace(" ", "-").replace("'", "").toLowerCase();
+        String artifactId = filterString(customer.getName());
         String contentURL = ServerUtil.createContentURL("customers", artifactId, "1.0", "png");
         if(! id.equals(DEFAULT_CUSTOMER_NAME)) {
         	CustomerDAO defCustomer = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME, 
@@ -195,48 +209,10 @@ public class AdminService extends DbService {
     	return byteArray;
     }
     
-//    @ApiOperation(value = "Get customer properties by given customer context")
-//    @ApiErrors(value = {@ApiError(code=204, reason = "Icon not found"), @ApiError(code=500, reason = "Failed to retrive")})
-//    @RequestMapping(value= "/customerproperties", produces = MultiPartMediaTypes.MULTIPART_MIXED, method = RequestMethod.GET)
-//    public @ResponseBody MultiPart getCustomerProperties(HttpServletResponse response, 
-//    		@ApiParam(value = "The context of the customer to get properties", name = "context") @QueryParam(REST_QUERY_CONTEXT) String context)
-//    		throws PhrescoException {
-//    	Customer customerInfo=null;
-//    	InputStream inputStream=null;
-//    	 if (isDebugEnabled) {
-//             S_LOGGER.debug("Entered into AdminService.getCustomerProperties()");
-//         }
-//    	 MultiPart multiPart = null;
-//         try {
-//			if(StringUtils.isNotEmpty(context)) {
-//				CustomerDAO customer = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME, 
-//				        new Query(Criteria.where("context").is(context)), CustomerDAO.class);
-//				if (customer != null) {
-//					Converter<CustomerDAO, Customer> customerConverter = 
-//						(Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
-//					customerInfo = customerConverter.convertDAOToObject(customer, DbService.getMongoOperation());
-//					inputStream = getFileFromDB(customerInfo.getId());
-//					if(inputStream != null) {
-//		 			multiPart = new MultiPart().
-//	 		    	      bodyPart(new BodyPart(customerInfo, javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE)).
-//	 		    	      bodyPart(new BodyPart(inputStream, javax.ws.rs.core.MediaType.MULTIPART_FORM_DATA_TYPE));
-//		 			response.setStatus(200);
-//		 			return multiPart;
-//					}
-//					response.setStatus(204);
-//		 			return multiPart;
-//				}
-//				response.setStatus(204);
-//	 			return multiPart;
-//			}
-//			response.setStatus(412);
-// 			return multiPart;
-// 		} catch (PhrescoException e) {
-// 			response.setStatus(500);
-// 			throw new PhrescoWebServiceException(e, EX_PHEX00005, CUSTOMERS_COLLECTION_NAME);
-// 		}
-//    }
-    
+    private String filterString(String inputString) {
+    	return StringUtils.replaceEach(inputString, 
+        		new String[]{" ","'","&","(",")","{","}"}, new String[]{"-","","","","","",""}).toLowerCase();
+    }
     
     @ApiOperation(value = "Get customer properties by given customer context")
     @ApiErrors(value = {@ApiError(code=204, reason = "Icon not found"), @ApiError(code=500, reason = "Failed to retrive")})
@@ -276,17 +252,17 @@ public class AdminService extends DbService {
     @RequestMapping(value= REST_API_CUSTOMERS, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, 
     		MediaType.APPLICATION_JSON_VALUE,"multipart/mixed"}, 
     		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
-    public @ResponseBody void createCustomer(HttpServletResponse response, @RequestPart("icon") ByteArrayResource iconFile,
+    public @ResponseBody void createCustomer(HttpServletRequest request, HttpServletResponse response, 
+    		@RequestPart("icon") ByteArrayResource iconFile,
     		@RequestParam(value = "customer", required = false) byte[] customerData) throws IOException {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.createCustomer(List<Customer> customer)");
         }
-        InputStream inputStream = iconFile.getInputStream();
         Customer customer = new Gson().fromJson(new String(customerData), Customer.class);
-        saveCustomer(response, inputStream, customer);
+        saveCustomer(request, response, customerData, customer);
     }
 
-    private Customer saveCustomer(HttpServletResponse response, InputStream iconStream, Customer customer) {
+    private Customer saveCustomer(HttpServletRequest request, HttpServletResponse response, byte[] iconStream, Customer customer) {
     	try {
     		if(validate(customer)) {
 				RepoInfo repoInfo = customer.getRepoInfo();
@@ -296,7 +272,16 @@ public class AdminService extends DbService {
     				customer.setRepoInfo(repoInfo);
     			}
     			if(iconStream != null) {
-    				saveFileToDB(customer.getId(), iconStream);
+    				ArtifactGroup artifactGroup = new ArtifactGroup();
+    				artifactGroup.setGroupId("customers");
+    				artifactGroup.setArtifactId(filterString(customer.getName()));
+    				artifactGroup.setPackaging("png");
+    				artifactGroup.setCustomerIds(Collections.singletonList(DEFAULT_CUSTOMER_NAME));
+    				ArtifactInfo info = new ArtifactInfo();
+    				info.setVersion("1.0");
+    				artifactGroup.setVersions(Collections.singletonList(info));
+    				File artifcatFile = new File(request.getHeader("iconFile"));
+    				uploadIcon(artifactGroup, artifcatFile);
     			}
     			Converter<CustomerDAO, Customer> customerConverter = 
         			(Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
@@ -329,6 +314,7 @@ public class AdminService extends DbService {
 		        }
 			}	
     	} catch (Exception e) {
+    		e.printStackTrace();
     		response.setStatus(500);
     		throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
 		}
@@ -346,14 +332,14 @@ public class AdminService extends DbService {
     @RequestMapping(value= REST_API_CUSTOMERS, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, 
     		MediaType.APPLICATION_JSON_VALUE,"multipart/mixed"}, 
     		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
-    public @ResponseBody void updateCustomer(HttpServletResponse response, @RequestPart("icon") ByteArrayResource iconFile,
+    public @ResponseBody void updateCustomer(HttpServletRequest request, HttpServletResponse response, 
+    		@RequestPart("icon") ByteArrayResource iconFile,
     		@RequestParam(value = "customer", required = false) byte[] customerData) throws IOException {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.updateCustomer(List<Customer> customers)");
         }
-        InputStream inputStream = iconFile.getInputStream();
         Customer customer = new Gson().fromJson(new String(customerData), Customer.class);
-        saveCustomer(response, inputStream, customer);
+        saveCustomer(request, response, customerData, customer);
     }
 
     /**
