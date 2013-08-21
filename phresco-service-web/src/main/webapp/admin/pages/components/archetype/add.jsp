@@ -42,7 +42,7 @@
 	List<ApplicationType> appTypes = (List<ApplicationType>) request.getAttribute(ServiceUIConstants.REQ_APP_TYPES);
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
 	List<TechnologyOptions> options = (List<TechnologyOptions>) request.getAttribute(ServiceUIConstants.REQ_TECHNOLOGY_OPTION);
-	List<FunctionalFramework> functionalFrameworks = (List<FunctionalFramework>) request.getAttribute(ServiceUIConstants.REQ_FUNCTIONAL_FRAMEWORKS);
+	//List<FunctionalFramework> functionalFrameworks = (List<FunctionalFramework>) request.getAttribute(ServiceUIConstants.REQ_FUNCTIONAL_FRAMEWORKS);
 	List<Reports> reports = (List<Reports>)request.getAttribute(ServiceUIConstants.REQ_TECHNOLOGY_REPORTS);
 	List<Technology> technologies = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
 	String title = ServiceActionUtil.getTitle(ServiceUIConstants.ARCHETYPES, fromPage);
@@ -376,7 +376,7 @@
 			}	
 		%>
 		
-		<div class="control-group" id="funcFrameworksControl">
+		<%-- <div class="control-group" id="funcFrameworksControl">
 			<label class="control-label labelbold">
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.func.test.frameworks'/>
 			</label>
@@ -414,7 +414,7 @@
 				<span class="help-inline applyerror" id="funcFrameworksError"></span>
 			</div>
 		</div>
-	</div>
+	</div> --%>
 	
 	<div class="bottom_button">
 		<%

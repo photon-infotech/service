@@ -173,8 +173,9 @@ public class Archetypes extends ServiceBaseAction {
 			setReqAttribute(REQ_FROM_PAGE, ADD);
 			setReqAttribute(REQ_TECHNOLOGY_REPORTS, reports);
 			setReqAttribute(REQ_ARCHE_TYPES, serviceManager.getTechnologyByCustomer(getCustomerId()));
-			setReqAttribute(REQ_FUNCTIONAL_FRAMEWORKS, serviceManager.getFunctionalTestFramework());
+//			setReqAttribute(REQ_FUNCTIONAL_FRAMEWORKS, serviceManager.getFunctionalTestFramework());
 		} catch (PhrescoException e) {
+			e.printStackTrace();
 			if (isDebugEnabled) {
 		        S_LOGGER.error("Archetypes.add", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
 		    }
@@ -385,18 +386,18 @@ public class Archetypes extends ServiceBaseAction {
 			}
 			technology.setOptions(options);
 
-			List<FunctionalFramework> functionalFrameworks = new ArrayList<FunctionalFramework>();
-			List<FunctionalFrameworkGroup> functionalTestFramework = serviceManager.getFunctionalTestFramework();
-			for (String funcFramework : getFunctionalFramework()) {
-				for (FunctionalFrameworkGroup functionalFramework : functionalTestFramework) {
-					if(functionalFramework.getName().equals(funcFramework)) {
-						FunctionalFramework e = new FunctionalFramework();
-						e.setId(functionalFramework.getId());
-						functionalFrameworks.add(e);
-					}
-				}
-			}
-			technology.setFunctionalFrameworks(null);
+//			List<FunctionalFramework> functionalFrameworks = new ArrayList<FunctionalFramework>();
+//			List<FunctionalFrameworkGroup> functionalTestFramework = serviceManager.getFunctionalTestFramework();
+//			for (String funcFramework : getFunctionalFramework()) {
+//				for (FunctionalFrameworkGroup functionalFramework : functionalTestFramework) {
+//					if(functionalFramework.getName().equals(funcFramework)) {
+//						FunctionalFramework e = new FunctionalFramework();
+//						e.setId(functionalFramework.getId());
+//						functionalFrameworks.add(e);
+//					}
+//				}
+//			}
+//			technology.setFunctionalFrameworks(null);
 
 			//To create the ArtifactGroup with groupId, artifactId and version for archetype jar
 			if ((StringUtils.isEmpty(artifactId) && StringUtils.isEmpty(groupId) && StringUtils.isEmpty(version))) {
@@ -656,7 +657,7 @@ public class Archetypes extends ServiceBaseAction {
 		//Empty validation for applicable features
 		isError = featureValidation(isError);
 		
-		isError = functioanlFrameworkValidation(isError);
+//		isError = functioanlFrameworkValidation(isError);
 		
 		if (isError) {
             setErrorFound(true);
