@@ -78,23 +78,32 @@
 	String validFrom = null;
 	String validUpto = null;
 	String icon = "";
-	String brandingColor = "" ;
-	String bodyBackGroundColor = "";
-	String accordionBackGroundColor = "";
-	String menuBackGround = "";
-	String subMenuBackGround = "";
-	String menufontColor = "";
-	String buttonColor = "";
-	String pageHeaderColor = "";
-	String labelColor = "";
-	String disabledLabelColor = "";
-	String copyRightColor = "";
-	String copyRight = "";
-	String loginlogo = "";
-	String logopadding = "";
-	String gradientTop = "";
-	String gradientBottom = "";
+	String loginLogoMargin = "";
+	String pageLogoPadding = "";
+	String headerLinkColor = "";
+	String headerActiveLinkColor = ""; 
+	String editNavigationLink = "";
+	String tableHeaderLabelColor = "";
+	String buttonBackGroundColor = "";
+	String consoleHeaderColor = "";
+	String copyrightLabelColor = "";
+	String headerBackGroundcolorTop = "";
+	String headerBackGroundcolorBottom = "";
+	String footerBackGroundcolorTop = "";
+	String footerBackGroundcolorBottom = "";
+	String pageTitleBackGroundTop = "";
+	String pageTitleBackGroundBottom = "";
+	String editNavigationActiveBackGroundTop = "";
+	String editNavigationActiveBackGroundBottom = "";
+	String tableheaderBackGroundcolorTop = "";
+	String tableheaderBackGroundcolorBottom = "";
+	String projectTitleBackGroundColorTop = "";
+	String projectTitleBackGroundColorBottom = "";
+	String bottomButtonPanelTop = "";
+	String bottomButtonPanelBottom = "";
+	String welcomeUserIcon = "";
 	String context = "";
+	String customerBaseColor = "";
 	
 	List<String> applicableTechnologies = new ArrayList();
 	List<ApplicationType> applicableAppTypes = null;
@@ -174,22 +183,32 @@
 		frameworkTheme = customer.getFrameworkTheme();
 		selectedOptions = customer.getOptions();
 		if (MapUtils.isNotEmpty(frameworkTheme)) {
-			brandingColor = frameworkTheme.get("brandingColor");
-			bodyBackGroundColor = frameworkTheme.get("bodyBackGroundColor");
-			accordionBackGroundColor = frameworkTheme.get("accordionBackGroundColor");
-			menuBackGround = frameworkTheme.get("MenuBackGround");
-			subMenuBackGround = frameworkTheme.get("SubMenuBackGround");
-			menufontColor = frameworkTheme.get("MenufontColor");
-			buttonColor = frameworkTheme.get("ButtonColor");
-			pageHeaderColor = frameworkTheme.get("PageHeaderColor");
-			labelColor = frameworkTheme.get("LabelColor");
-			disabledLabelColor = frameworkTheme.get("DisabledLabelColor");
-			copyRightColor = frameworkTheme.get("CopyRightColor");
-			copyRight = frameworkTheme.get("CopyRight");
-			loginlogo = frameworkTheme.get("loginlogo");
-			logopadding = frameworkTheme.get("logopadding");
-			gradientTop = frameworkTheme.get("gradientTop");
-			gradientBottom = frameworkTheme.get("gradientBottom");
+			loginLogoMargin = frameworkTheme.get("loginLogoMargin");
+			pageLogoPadding = frameworkTheme.get("pageLogoPadding");
+			headerLinkColor = frameworkTheme.get("headerLinkColor");
+			headerActiveLinkColor = frameworkTheme.get("headerActiveLinkColor");
+			editNavigationLink = frameworkTheme.get("editNavigationLink");
+			tableHeaderLabelColor = frameworkTheme.get("tableHeaderLabelColor");
+			buttonBackGroundColor = frameworkTheme.get("buttonBackGroundColor");
+			consoleHeaderColor = frameworkTheme.get("consoleHeaderColor");
+			copyrightLabelColor = frameworkTheme.get("copyrightLabelColor");
+			headerBackGroundcolorTop = frameworkTheme.get("headerBackGroundcolorTop");
+			headerBackGroundcolorBottom = frameworkTheme.get("headerBackGroundcolorBottom");
+			footerBackGroundcolorTop = frameworkTheme.get("footerBackGroundcolorTop");
+			footerBackGroundcolorBottom = frameworkTheme.get("footerBackGroundcolorBottom");
+			pageTitleBackGroundTop = frameworkTheme.get("pageTitleBackGroundTop");
+			pageTitleBackGroundBottom = frameworkTheme.get("pageTitleBackGroundBottom");
+			editNavigationActiveBackGroundTop = frameworkTheme.get("editNavigationActiveBackGroundTop");
+			editNavigationActiveBackGroundBottom = frameworkTheme.get("editNavigationActiveBackGroundBottom");
+			tableheaderBackGroundcolorTop = frameworkTheme.get("tableheaderBackGroundcolorTop");
+			tableheaderBackGroundcolorBottom = frameworkTheme.get("tableheaderBackGroundcolorBottom");
+			projectTitleBackGroundColorTop = frameworkTheme.get("projectTitleBackGroundColorTop");
+			projectTitleBackGroundColorBottom = frameworkTheme.get("projectTitleBackGroundColorBottom");
+			bottomButtonPanelTop = frameworkTheme.get("bottomButtonPanelTop");
+			bottomButtonPanelBottom = frameworkTheme.get("bottomButtonPanelBottom");
+			customerBaseColor = frameworkTheme.get("bottomButtonPanelBottom");
+			welcomeUserIcon = frameworkTheme.get("welcomeUserIcon");
+			context = frameworkTheme.get("context");
 		}
 		
 		if (StringUtils.isNotEmpty(customer.getRepoInfo().getRepoName())) {
@@ -745,182 +764,217 @@
           		<span class="help-inline applyerror" id="optionsError"></span>
 			</div>
 		</div>
-	
-	<section class="lft_menus_container adminaddtheme">
-               <span class="siteaccordion openreg">
-						<span><s:text name='place.hldr.cust.add.frameworktheme' /></span>
-               </span>
-               <div class="mfbox siteinnertooltiptxt hideContent" style="display: none;">
-                   <div class="scrollpanel">
-   					<section class="scrollpanel_inner">
-						<div class="control-group">
-							<label class="control-label labelbold"> <s:text
-									name='lbl.hdr.adm.cust.brandingcolor' /> </label>
-							<div class="controls">
-								<input id="brandcolor" placeholder="<s:text name='place.hldr.cust.add.brandingcolor'/>"class="input-xlarge" type="text" name="brandingColor"
-									value="<%= brandingColor %>" maxlength="50" title="Color Hashcode eg: #FFFFFF">
-							</div>
-						</div>
+
+		<section class="lft_menus_container adminaddtheme">
+			 <span	class="siteaccordion openreg"> 
+			 	<span>
+			 		<s:text	name='place.hldr.cust.add.frameworktheme' />
+				</span>
+		    </span>
+			<div class="mfbox siteinnertooltiptxt hideContent" style="display: none;">
+				<div class="scrollpanel">
+					<section class="scrollpanel_inner"> 
+
 						<div class="control-group">
 							<label class="control-label labelbold">
-								<s:text name='lbl.hdr.adm.cust.backgroudcolor'/>
+								 <s:text name='lbl.hdr.adm.cust.customerBasedColor' /> 
 							</label>
 							<div class="controls">
-								<input id="backgroundcolor" placeholder="<s:text name='place.hldr.cust.add.backgroundcolor'/>" class="input-xlarge" type="text" name="bodyBackGroundColor"
-								   value="<%=bodyBackGroundColor%>"  maxlength="50" title="Color Hashcode eg: #FFFFFF">
+								<input id="cusomerBasecolor" placeholder="<s:text name='place.hldr.cust.customerBaseColor'/>"class="input-xlarge" type="text" name="cusomerBasecolor"
+									value="<%= customerBaseColor %>" maxlength="50" title="Color Hashcode eg: FFFFFF">
+							</div>
+						</div>
+
+						<div class="control-group">
+							<label class="control-label labelbold">
+								 <s:text name='lbl.hdr.adm.cust.loginLogoMargin' /> 
+							</label>
+							<div class="controls">
+								<input id="loginLogoMargin" placeholder="<s:text name='place.hldr.cust.loginLogoMargin'/>"class="input-xlarge" type="text" name="loginLogoMargin"
+									value="<%= loginLogoMargin %>" maxlength="50" title="Color Hashcode eg: FFFFFF">
+							</div>
+						</div>
+						
+						<div class="control-group">
+							<label class="control-label labelbold"> 
+								<s:text	name='lbl.hdr.adm.cust.pageLogoPadding'/>
+							 </label>
+							<div class="controls">
+								<input id="pageLogoPadding" placeholder="<s:text name='place.hldr.cust.pageLogoPadding'/>"class="input-xlarge" type="text" name="pageLogoPadding"
+									value="<%= pageLogoPadding %>" maxlength="50" title="Color Hashcode eg: FFFFFF">
 							</div>
 						</div>
 						
 						<div class="control-group">
 							<label class="control-label labelbold">
-								<s:text name='lbl.hdr.adm.cust.accordionbackgroundcolor'/>
+								 <s:text name='lbl.hdr.adm.cust.headerLinkColor' /> 
 							</label>
 							<div class="controls">
-								<input id="accordionbackcolor" placeholder="<s:text name='place.hldr.cust.add.accordionbackgroundcolor'/>" class="input-xlarge" type="text" name="accordionBackGroundColor"
-								   value="<%=accordionBackGroundColor%>"  maxlength="50" title="Color Hashcode eg: #FFFFFF">
+								<input id="headerLinkColor" placeholder="<s:text name='place.hldr.cust.headerLinkColor'/>"class="input-xlarge" type="text" name="headerLinkColor"
+									value="<%= headerLinkColor %>" maxlength="50" title="Color Hashcode eg: FFFFFF">
 							</div>
 						</div>
 						
 						<div class="control-group">
 							<label class="control-label labelbold">
-								<s:text name='lbl.hdr.adm.cust.menubackground'/>
+								 <s:text name='lbl.hdr.adm.cust.headerActiveLinkColor' /> 
 							</label>
 							<div class="controls">
-								<input id="labelcolor" placeholder="<s:text name='place.hldr.cust.add.menubackgroundcolor'/>" class="input-xlarge" type="text" name="MenuBackGround"
-								   value="<%=menuBackGround%>"  maxlength="50" title="Color Hashcode eg: #FFFFFF">
-							</div>
-						</div>
-						
-						
-						<div class="control-group">
-							<label class="control-label labelbold">
-								<s:text name='lbl.hdr.adm.cust.menufontcolor'/>
-							</label>
-							<div class="controls">
-								<input id="menufontcolor" placeholder="<s:text name='place.hldr.cust.add.menufontcolor'/>" class="input-xlarge" type="text" name="MenufontColor"
-								   value="<%=menufontColor%>"  maxlength="50" title="Color Hashcode eg: #FFFFFF">
+								<input id="headerActiveLinkColor" placeholder="<s:text name='place.hldr.cust.headerActiveLinkColor'/>"class="input-xlarge" type="text" name="headerActiveLinkColor"
+									value="<%= headerActiveLinkColor %>" maxlength="50" title="Color Hashcode eg: FFFFFF">
 							</div>
 						</div>
 						
 						<div class="control-group">
 							<label class="control-label labelbold">
-								<s:text name='lbl.hdr.adm.cust.buttoncolor'/>
-							</label>
+								 <s:text name='lbl.hdr.adm.cust.editNavigationLink' />
+							 </label>
 							<div class="controls">
-								<input id="buttoncolor" placeholder="<s:text name='place.hldr.cust.add.buttoncolor'/>" class="input-xlarge" type="text" name="ButtonColor"
-								   value="<%=buttonColor%>"  maxlength="50" title="Color Hashcode eg: #FFFFFF">
+								<input id="editNavigationLink" placeholder="<s:text name='place.hldr.cust.editNavigationLink'/>"class="input-xlarge" type="text" name="editNavigationLink"
+									value="<%= editNavigationLink %>" maxlength="50" title="Color Hashcode eg: FFFFFF">
+							</div>
+						</div>
+				
+						<div class="control-group">
+							<label class="control-label labelbold">
+								 <s:text name='lbl.hdr.adm.cust.tableHeaderLabelColor' />
+							 </label>
+							<div class="controls">
+								<input id="tableHeaderLabelColor" placeholder="<s:text name='place.hldr.cust.tableHeaderLabelColor'/>"class="input-xlarge" type="text" name="tableHeaderLabelColor"
+									value="<%= tableHeaderLabelColor %>" maxlength="50" title="Color Hashcode eg: FFFFFF">
 							</div>
 						</div>
 						
 						<div class="control-group">
 							<label class="control-label labelbold">
-								<s:text name='lbl.hdr.adm.cust.pageheadercolor'/>
-							</label>
+								 <s:text name='lbl.hdr.adm.cust.buttonBackGroundColor' />
+							 </label>
 							<div class="controls">
-								<input id="pageheadercolor" placeholder="<s:text name='place.hldr.cust.add.pageHeadercolor'/>" class="input-xlarge" type="text" name="PageHeaderColor"
-								   value="<%= pageHeaderColor%>"  maxlength="50" title="Color Hashcode eg: #FFFFFF">
+								<input id="buttonBackGroundColor" placeholder="<s:text name='place.hldr.cust.buttonBackGroundColor'/>"class="input-xlarge" type="text" name="buttonBackGroundColor"
+									value="<%= buttonBackGroundColor %>" maxlength="50" title="Color Hashcode eg: FFFFFF">
 							</div>
 						</div>
 						
 						<div class="control-group">
 							<label class="control-label labelbold">
-								<s:text name='lbl.hdr.adm.cust.labelcolor'/>
-							</label>
+								 <s:text name='lbl.hdr.adm.cust.consoleHeaderColor' />
+							 </label>
 							<div class="controls">
-								<input id="labelcolor" placeholder="<s:text name='place.hldr.cust.add.labelcolor'/>" class="input-xlarge" type="text" name="LabelColor"
-								   value="<%=labelColor%>"  maxlength="50" title="Color Hashcode eg: #FFFFFF">
+								<input id="consoleHeaderColor" placeholder="<s:text name='place.hldr.cust.consoleHeaderColor'/>"class="input-xlarge" type="text" name="consoleHeaderColor"
+									value="<%= consoleHeaderColor %>" maxlength="50" title="Color Hashcode eg: FFFFFF">
 							</div>
 						</div>
 						
 						<div class="control-group">
 							<label class="control-label labelbold">
-								<s:text name='lbl.hdr.adm.cust.disablelabelcolor'/>
-							</label>
+								 <s:text name='lbl.hdr.adm.cust.copyrightLabelColor' />
+							 </label>
 							<div class="controls">
-								<input id="labelcolor" placeholder="<s:text name='place.hldr.cust.add.disabledlabelcolor'/>" class="input-xlarge" type="text" name="DisabledLabelColor"
-								   value="<%=disabledLabelColor%>"  maxlength="50" title="Color Hashcode eg: #FFFFFF">
+								<input id="copyrightLabelColor" placeholder="<s:text name='place.hldr.cust.copyrightLabelColor'/>"class="input-xlarge" type="text" name="copyrightLabelColor"
+									value="<%= copyrightLabelColor %>" maxlength="50" title="Color Hashcode eg: FFFFFF">
 							</div>
 						</div>
 						
 						<div class="control-group">
 							<label class="control-label labelbold">
-								<s:text name='lbl.hdr.adm.cust.submenu.background'/>
-							</label>
+								 <s:text name='lbl.hdr.adm.cust.welcomeUserIcon' />
+							 </label>
 							<div class="controls">
-								<input id="labelcolor" placeholder="<s:text name='place.hldr.cust.add.submenu.backgroundcolor'/>" class="input-xlarge" type="text" name="SubMenuBackGround"
-								   value="<%= subMenuBackGround %>"  maxlength="50" title="Color Hashcode eg: #FFFFFF">
+								<input id="welcomeUserIcon" placeholder="<s:text name='place.hldr.cust.welcomeusericon'/>"class="input-xlarge" type="text" name="welcomeUserIcon"
+									value="<%= welcomeUserIcon %>" maxlength="50" title="Color Hashcode eg: FFFFFF">
 							</div>
 						</div>
 						
 						<div class="control-group">
 							<label class="control-label labelbold">
-								<s:text name='lbl.hdr.adm.cust.copyrightcolor'/>
+								<s:text name='lbl.hdr.adm.cust.headerBackGroundcolor'/>
 							</label>
 							<div class="controls">
-								<input id="copyrightcolor" placeholder="<s:text name='place.hldr.cust.add.copyrightcolor'/>" class="input-xlarge" type="text" name="CopyRightColor"
-								   value="<%=copyRightColor%>"  maxlength="50" title="Color Hashcode eg: #FFFFFF">
-							</div>
-						</div>
-						
-							
-						<div class="control-group">
-							<label class="control-label labelbold">
-								<s:text name='lbl.hdr.adm.cust.copyright'/>
-							</label>
-							<div class="controls">
-								<%-- <input id="copyright" placeholder="<s:text name='place.hldr.cust.add.copyright'/>" class="input-xlarge" type="text" name="CopyRight"
-								   value="<%=copyRight%>"  maxlength="50" title="50 Characters only"> --%>
-								<textarea id="copyright" placeholder="<s:text name='place.hldr.cust.add.copyright'/>" class="input-xlarge" name="CopyRight"><%= copyRight %></textarea>
-							</div>
-						</div>
-												
-						<div class="control-group">
-							<label class="control-label labelbold">
-								<s:text name='lbl.hdr.adm.cust.gradientTop'/>
-							</label>
-							<div class="controls">
-								<input id="gradientTop" placeholder="<s:text name='place.hldr.cust.add.gradienttop'/>" class="input-xlarge" type="text" name="gradientTop"
-								   value="<%=gradientTop%>"  maxlength="50" title="In pixels eg: 10px">
+								<input id="headerBackGroundcolorTop" placeholder="<s:text name='place.hldr.cust.headerBackGroundTopColor'/>" class="input-xlarge" type="text" name="headerBackGroundcolorTop"
+								   value="<%= headerBackGroundcolorTop%>"  maxlength="25" title="Color Hashcode eg: FFFFFF">
+								 <input id="headerBackGroundcolorBottom" placeholder="<s:text name='place.hldr.cust.headerBackGroundBottomColor'/>" class="input-xlarge" type="text" name="headerBackGroundcolorBottom"
+								   value="<%= headerBackGroundcolorBottom%>"  maxlength="25" title="Color Hashcode eg: FFFFFF">
 							</div>
 						</div>
 						
 						<div class="control-group">
 							<label class="control-label labelbold">
-								<s:text name='lbl.hdr.adm.cust.gradientBottom'/>
+								<s:text name='lbl.hdr.adm.cust.footerBackGroundcolor'/>
 							</label>
 							<div class="controls">
-								<input id="gradientBottom" placeholder="<s:text name='lbl.hdr.adm.cust.gradientBottom'/>" class="input-xlarge" type="text" name="gradientBottom"
-								   value="<%=gradientBottom%>"  maxlength="50" title="In pixels eg: 10px">
+								<input id="footerBackGroundcolorTop" placeholder="<s:text name='place.hldr.cust.footerBackGroundTopColor'/>" class="input-xlarge" type="text" name="footerBackGroundcolorTop"
+								   value="<%= footerBackGroundcolorTop%>"  maxlength="25" title="Color Hashcode eg: FFFFFF">
+								 <input id="footerBackGroundcolorBottom" placeholder="<s:text name='place.hldr.cust.footerBackGroundBottomColor'/>" class="input-xlarge" type="text" name="footerBackGroundcolorBottom"
+								   value="<%= footerBackGroundcolorBottom%>"  maxlength="25" title="Color Hashcode eg: FFFFFF">
 							</div>
 						</div>
 						
 						<div class="control-group">
 							<label class="control-label labelbold">
-								<s:text name='lbl.hdr.adm.cust.margintop'/>
+								<s:text name='lbl.hdr.adm.cust.pageTitleBackGroundcolor'/>
 							</label>
 							<div class="controls">
-								<input id="copyright" placeholder="<s:text name='place.hldr.cust.add.loginlogo'/>" class="input-xlarge" type="text" name="loginlogo"
-								   value="<%=loginlogo%>"  maxlength="50" title="In pixels eg: 10px">
+								<input id="pageTitleBackGroundTop" placeholder="<s:text name='place.hldr.cust.pageTitleBackGroundTopColor'/>" class="input-xlarge" type="text" name="pageTitleBackGroundTop"
+								   value="<%= pageTitleBackGroundTop%>"  maxlength="25" title="Color Hashcode eg: FFFFFF">
+								 <input id="pageTitleBackGroundBottom" placeholder="<s:text name='place.hldr.cust.pageTitleBackGroundBottomColor'/>" class="input-xlarge" type="text" name="pageTitleBackGroundBottom"
+								   value="<%= pageTitleBackGroundBottom%>"  maxlength="25" title="Color Hashcode eg: FFFFFF">
 							</div>
 						</div>
 						
 						<div class="control-group">
 							<label class="control-label labelbold">
-								<s:text name='lbl.hdr.adm.cust.paddingtop'/>
+								<s:text name='lbl.hdr.adm.cust.editNavigationActiveBackGroundcolor'/>
 							</label>
 							<div class="controls">
-								<input id="copyright" placeholder="<s:text name='place.hldr.cust.add.logopadding'/>" class="input-xlarge" type="text" name="logopadding"
-								   value="<%=logopadding%>"  maxlength="50" title="In pixels eg: 10px">
+								<input id="editNavigationActiveBackGroundTop" placeholder="<s:text name='place.hldr.cust.editNavigationActiveBackGroundTopColor'/>" class="input-xlarge" type="text" name="editNavigationActiveBackGroundTop"
+								   value="<%= editNavigationActiveBackGroundTop%>"  maxlength="25" title="Color Hashcode eg: FFFFFF">
+								 <input id="editNavigationActiveBackGroundBottom" placeholder="<s:text name='place.hldr.cust.editNavigationActiveBackGroundBottomColor'/>" class="input-xlarge" type="text" name="editNavigationActiveBackGroundBottom"
+								   value="<%= editNavigationActiveBackGroundBottom%>"  maxlength="25" title="Color Hashcode eg: FFFFFF">
 							</div>
 						</div>
 						
+						<div class="control-group">
+							<label class="control-label labelbold">
+								<s:text name='lbl.hdr.adm.cust.tableHeaderBackGroundColor'/>
+							</label>
+							<div class="controls">
+								<input id="tableheaderBackGroundcolorTop" placeholder="<s:text name='place.hldr.cust.tableHeaderBackGroundTopColor'/>" class="input-xlarge" type="text" name="tableheaderBackGroundcolorTop"
+								   value="<%= tableheaderBackGroundcolorTop%>"  maxlength="25" title="Color Hashcode eg: FFFFFF">
+								 <input id="tableheaderBackGroundcolorBottom" placeholder="<s:text name='place.hldr.cust.TableHeaderBackGroundBottomColor'/>" class="input-xlarge" type="text" name="tableheaderBackGroundcolorBottom"
+								   value="<%= tableheaderBackGroundcolorBottom %>"  maxlength="25" title="Color Hashcode eg: FFFFFF">
+							</div>
+						</div>
+						
+						<div class="control-group">
+							<label class="control-label labelbold">
+								<s:text name='lbl.hdr.adm.cust.projectTitleBackGroundColor'/>
+							</label>
+							<div class="controls">
+								<input id="projectTitleBackGroundColorTop" placeholder="<s:text name='place.hldr.cust.projectTitleBackGroundtopColor'/>" class="input-xlarge" type="text" name="projectTitleBackGroundColorTop"
+								   value="<%= projectTitleBackGroundColorTop%>"  maxlength="25" title="Color Hashcode eg: FFFFFF">
+								<input id="projectTitleBackGroundColorBottom" placeholder="<s:text name='place.hldr.cust.projectTitleBackGroundBottomColor'/>" class="input-xlarge" type="text" name="projectTitleBackGroundColorBottom"
+								   value="<%= projectTitleBackGroundColorBottom%>"  maxlength="25" title="Color Hashcode eg: FFFFFF">   
+							</div>
+						</div>
+						
+						<div class="control-group">
+							<label class="control-label labelbold">
+								<s:text name='lbl.hdr.adm.cust.bottomButtonPanelcolor'/>
+							</label>
+							<div class="controls">
+								<input id="bottomButtonPanelTop" placeholder="<s:text name='place.hldr.cust.bottomButtonPanelTopcolor'/>" class="input-xlarge" type="text" name="bottomButtonPanelTop"
+								   value="<%= bottomButtonPanelTop %>"  maxlength="25" title="Color Hashcode eg: FFFFFF">
+								<input id="bottomButtonPanelBottom" placeholder="<s:text name='place.hldr.cust.bottomButtonPanelBottomcolor'/>" class="input-xlarge" type="text" name="bottomButtonPanelBottom"
+								   value="<%= bottomButtonPanelBottom %>"  maxlength="25" title="Color Hashcode eg: FFFFFF">
+							</div>
+						</div>
 						
 						<div class="control-group" id="iconControl">
 							<label class="control-label labelbold"> 
-							 	<s:text name='lbl.hdr.adm.upload.logo' />
+							 	<s:text name='LoginLogoImage' />
 							</label>
 							<div class="controls" style="float: left; margin-left: 3%;">
-								<div id="image-file-uploader" class="file-uploader" title ="<s:text name='title.icon.size'/>">
+								<div id="login-image-file-uploader" class="file-uploader" title ="<s:text name='title.icon.size'/>">
 									<noscript>
 										<p>Please enable JavaScript to use file uploader.</p>s
 										<!-- or put a simple form for upload here -->
@@ -929,14 +983,14 @@
 							</div>
 							<span class="help-inline fileError" id="iconError"></span>
 						</div>
-				</section>
-              </div>
-            </div>
-	</section>
-	
+					</section>
+				</div>
+			</div>
+		</section>
+
 	</div>
 	<div class="bottom_button">
-		<input type="button" id="" class="btn <%= disabledClass %> <%= per_disabledClass %>" <%= per_disabledStr %> <%= disabled %> value="<%= buttonLbl %>" 
+		<input type="button" id="" class="btn <%=disabledClass%> <%= per_disabledClass %>" <%= per_disabledStr %> <%= disabled %> value="<%= buttonLbl %>" 
 			 onclick="validate('<%= pageUrl %>', $('#formCustomerAdd'), $('#subcontainer'), '<%= progressTxt %>', $('.content_adder :input'));" />
 		<input type="button" id="customerCancel" class="btn btn-primary" value="<s:text name='lbl.btn.cancel'/>" onclick="getCustomersList();" />
 	</div>
@@ -962,7 +1016,7 @@
 	$(document).ready(function() {
 		hideLoadingIcon();
 		setLicenseType();
-		createUploader();
+		createLoginLogoUploader();
 		checkboxEvent($('#checkAllAuto'),'applsChk');
 		checkboxEvent($('#checkAllOptions'), 'optionsChk');
 		 // for edit - to show selected country while page loads 
@@ -1049,15 +1103,15 @@
 		loadContent('customerList', $('#formCustomerAdd'), $('#subcontainer'));
 	}
 	
-	function createUploader() {
-		var imgUploader = new qq.FileUploader ({
-            element: document.getElementById('image-file-uploader'),
-            action: 'uploadCustomerIcon',
+	function createLoginLogoUploader() {
+		var loginLogoImgUploader = new qq.FileUploader ({
+            element: document.getElementById('login-image-file-uploader'),
+            action: 'uploadLoginLogoIcon',
             multiple: false,
             allowedExtensions : ["png"],
             uploadId: 'customerUploadId',
             type: 'customerImageFile',
-            buttonLabel: '<s:label key="lbl.hdr.adm.upload.logo" />',
+            buttonLabel: '<s:label key="lbl.hdr.adm.upload.login.logo" />',
             typeError : '<s:text name="err.invalid.img.file" />',
             params: {type: 'customerImageFile'}, 
             debug: true

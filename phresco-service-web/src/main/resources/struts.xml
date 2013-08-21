@@ -475,7 +475,7 @@
 			<result name="customerList">/admin/pages/admin/customer/list.jsp</result>
         </action>
         
-        <action name="uploadCustomerIcon" class="com.photon.phresco.service.admin.actions.admin.Customers" method="uploadImage">
+        <action name="uploadLoginLogoIcon" class="com.photon.phresco.service.admin.actions.admin.Customers" method="uploadLoginLogoImage">
 			<result type="json" />
         </action>
         

@@ -91,29 +91,39 @@ public class Customers extends ServiceBaseAction  {
 	private boolean errorFound = false;
 	private boolean tempError = false;
 	private static String uploadIconName = "";
-	private static byte[] iconByteArray = null;
+	private static byte[] loginIconByteArray = null;
 	private String icon = "";
-	private String brandingColor = "" ;
-	private String bodyBackGroundColor = "";
-	private String accordionBackGroundColor = "";
-	private String menuBackGround = "";
-	private String subMenuBackGround = "";
-	private String menufontColor = "";
-	private String buttonColor = "";
-	private String pageHeaderColor = "";
-	private String labelColor = "";
-	private String disabledLabelColor = "";
-	private String copyRightColor = "";
-	private String copyRight = "";
 	private String snapshotRepoUrl = "";
 	private String groupRepoUrl = "";
 	private String baseRepoUrl = "";
-	private String gradientTop = "";
-	private String gradientBottom = "";
-	private String loginlogo = "";
-	private String logopadding = "";
 	private List<String> appliesTo = new ArrayList<String>();
 	List<ApplicationType> applicableAppTypes = new ArrayList<ApplicationType>();
+	
+	private String loginLogoMargin = "";
+	private String pageLogoPadding = "";
+	private String headerLinkColor = "";
+	private String headerActiveLinkColor = ""; 
+	private String editNavigationLink = "";
+	private String tableHeaderLabelColor = "";
+	private String buttonBackGroundColor = "";
+	private String consoleHeaderColor = "";
+	private String copyrightLabelColor = "";
+	private String headerBackGroundcolorTop = "";
+	private String headerBackGroundcolorBottom = "";
+	private String footerBackGroundcolorTop = "";
+	private String footerBackGroundcolorBottom = "";
+	private String pageTitleBackGroundTop = "";
+	private String pageTitleBackGroundBottom = "";
+	private String editNavigationActiveBackGroundTop = "";
+	private String editNavigationActiveBackGroundBottom = "";
+	private String tableheaderBackGroundcolorTop = "";
+	private String tableheaderBackGroundcolorBottom = "";
+	private String projectTitleBackGroundColorTop = "";
+	private String projectTitleBackGroundColorBottom = "";
+	private String bottomButtonPanelTop = "";
+	private String bottomButtonPanelBottom = "";
+	private String customerBaseColor = "";
+	private String welcomeUserIcon = "";
 	private String context = "";
 
 	private String fromPage = "";
@@ -226,8 +236,8 @@ public class Customers extends ServiceBaseAction  {
 		}
 		try {
 			Customer customer = createCustomer();
-			if (iconByteArray != null) {
-				inputStreamMap.put(getCustomerId(), new ByteArrayInputStream(iconByteArray));
+			if (loginIconByteArray != null) {
+				inputStreamMap.put(getCustomerId(), new ByteArrayInputStream(loginIconByteArray));
 			}
 			getServiceManager().createCustomers(customer, inputStreamMap);
 			addActionMessage(getText(CUSTOMER_ADDED, Collections.singletonList(getName())));
@@ -248,14 +258,14 @@ public class Customers extends ServiceBaseAction  {
 	 * @param cutomerId
 	 * @throws PhrescoException
 	 */
-	public String uploadImage() throws PhrescoException {
+	public String uploadLoginLogoImage() throws PhrescoException {
 		if (isDebugEnabled) {
 			LOGGER.debug("Customers.uploadImage : Entry");
 		}
 		PrintWriter writer = null;
 		try {
 			writer = getHttpResponse().getWriter();
-			iconByteArray = getByteArray();
+			loginIconByteArray = getByteArray();
 			writer.print(SUCCESS_TRUE);
 			writer.flush();
 			writer.close();
@@ -273,7 +283,6 @@ public class Customers extends ServiceBaseAction  {
 		return SUCCESS;
 	}
 
-
 	/**
 	 * remove the icon image from byteArray and Map 
 	 * @return
@@ -284,7 +293,7 @@ public class Customers extends ServiceBaseAction  {
 			LOGGER.debug("Customers.removeImage : Entry");
 		}
 		inputStreamMap.clear();
-		iconByteArray = null;
+		loginIconByteArray = null;
 
 		if (isDebugEnabled) {
 			LOGGER.debug("Customers.removeImage : Exit");
@@ -306,8 +315,8 @@ public class Customers extends ServiceBaseAction  {
 		}
 		try {
 			Customer customer = createCustomer();
-			if (iconByteArray != null) {
-				inputStreamMap.put(getCustomerId(), new ByteArrayInputStream(iconByteArray));
+			if (loginIconByteArray != null) {
+				inputStreamMap.put(getCustomerId(), new ByteArrayInputStream(loginIconByteArray));
 			}
 			getServiceManager().updateCustomer(customer, inputStreamMap);
 			addActionMessage(getText(CUSTOMER_UPDATED, Collections.singletonList(getName())));
@@ -371,26 +380,36 @@ public class Customers extends ServiceBaseAction  {
 			List<String> appliesTo = getAppliesTo();
 			customer.setApplicableTechnologies(appliesTo);
 			Map<String, String> frameworkTheme = new HashMap<String, String>();
-			frameworkTheme.put(BRANDING_COLOR , getBrandingColor());
-			frameworkTheme.put(ACCORDION_BACKGROUND_COLOR, getAccordionBackGroundColor());
-			frameworkTheme.put(BODYBACKGROUND_COLOR, getBodyBackGroundColor());
-			frameworkTheme.put(BUTTON_COLOR, getButtonColor());
-			frameworkTheme.put(PAGEHEADER_COLOR, getPageHeaderColor());
-			frameworkTheme.put(COPYRIGHT_COLOR, getCopyRightColor());
-			frameworkTheme.put(LABEL_COLOR, getLabelColor());
-			frameworkTheme.put(MENU_FONT_COLOR, getMenufontColor());
-			frameworkTheme.put(MENU_BACKGROUND_COLOR, getMenuBackGround());
-			frameworkTheme.put(SUB_MENU_BACKGROUND_COLOR, getSubMenuBackGround());
-			frameworkTheme.put(DISABLED_LABEL_COLOR, getDisabledLabelColor());
-			frameworkTheme.put(COPYRIGHT, getCopyRight());
-			frameworkTheme.put(LOGIN_LOGO, getLoginlogo());
-			frameworkTheme.put(LOGO_PADDING, getLogopadding());
-			frameworkTheme.put(GRADIENT_TOP, getGradientTop());
-			frameworkTheme.put(GRADIENT_BOTTOM, getGradientBottom());
+			frameworkTheme.put("loginLogoMargin" , getLoginLogoMargin());
+			frameworkTheme.put("pageLogoPadding", getPageLogoPadding());
+			frameworkTheme.put("headerLinkColor", getHeaderLinkColor());
+			frameworkTheme.put("headerActiveLinkColor", getHeaderActiveLinkColor());
+			frameworkTheme.put("editNavigationLink", getEditNavigationLink());
+			frameworkTheme.put("tableHeaderLabelColor", getTableheaderBackGroundcolorTop());
+			frameworkTheme.put("buttonBackGroundColor", getButtonBackGroundColor());
+			frameworkTheme.put("consoleHeaderColor", getConsoleHeaderColor());
+			frameworkTheme.put("copyrightLabelColor", getCopyrightLabelColor());
+			frameworkTheme.put("headerBackGroundcolorTop", getHeaderBackGroundcolorTop());
+			frameworkTheme.put("headerBackGroundcolorBottom", getHeaderBackGroundcolorBottom());
+			frameworkTheme.put("footerBackGroundcolorTop", getFooterBackGroundcolorTop());
+			frameworkTheme.put("footerBackGroundcolorBottom", getFooterBackGroundcolorBottom());
+			frameworkTheme.put("pageTitleBackGroundTop", getPageTitleBackGroundTop());
+			frameworkTheme.put("pageTitleBackGroundBottom", getPageTitleBackGroundBottom());
+			frameworkTheme.put("editNavigationActiveBackGroundTop", getEditNavigationActiveBackGroundTop());
+			frameworkTheme.put("editNavigationActiveBackGroundBottom", getEditNavigationActiveBackGroundBottom());
+			frameworkTheme.put("tableheaderBackGroundcolorTop", getTableheaderBackGroundcolorTop());
+			frameworkTheme.put("tableheaderBackGroundcolorBottom",getTableheaderBackGroundcolorBottom());
+			frameworkTheme.put("projectTitleBackGroundColorTop", getProjectTitleBackGroundColorTop());
+			frameworkTheme.put("projectTitleBackGroundColorBottom", getProjectTitleBackGroundColorBottom());
+			frameworkTheme.put("bottomButtonPanelTop", getBottomButtonPanelTop());
+			frameworkTheme.put("bottomButtonPanelBottom", getBottomButtonPanelBottom());
+			frameworkTheme.put("customerBaseColor", getBottomButtonPanelBottom());
+			frameworkTheme.put("welcomeUserIcon", getWelcomeUserIcon());
+			System.out.println("FrameworkTheme = " + frameworkTheme.toString());
 			customer.setFrameworkTheme(frameworkTheme);
 			customer.setContext(context);
 		} catch (Exception e) {
-			throw new PhrescoException(e);
+			e.printStackTrace();
 		}
 
 		return customer;
@@ -650,20 +669,13 @@ public class Customers extends ServiceBaseAction  {
 		return nameError;
 	}
 
-	public String getLoginlogo() {
-		return loginlogo;
+	
+	public String getCustomerBaseColor() {
+		return customerBaseColor;
 	}
 
-	public void setLoginlogo(String loginlogo) {
-		this.loginlogo = loginlogo;
-	}
-
-	public String getLogopadding() {
-		return logopadding;
-	}
-
-	public void setLogopadding(String logopadding) {
-		this.logopadding = logopadding;
+	public void setCustomerBaseColor(String customerBaseColor) {
+		this.customerBaseColor = customerBaseColor;
 	}
 
 	public void setNameError(String nameError) {
@@ -922,20 +934,12 @@ public class Customers extends ServiceBaseAction  {
 		return icon;
 	}
 
-	public String getBrandingColor() {
-		return brandingColor;
-	}
-
 	public List<ApplicationType> getApplicableAppTypes() {
 		return applicableAppTypes;
 	}
 
 	public void setIcon(String icon) {
 		this.icon = icon;
-	}
-
-	public void setBrandingColor(String brandingColor) {
-		this.brandingColor = brandingColor;
 	}
 
 	public void setApplicableAppTypes(List<ApplicationType> applicableAppTypes) {
@@ -950,77 +954,6 @@ public class Customers extends ServiceBaseAction  {
 		this.appliesTo = appliesTo;
 	}
 
-	public String getBodyBackGroundColor() {
-		return bodyBackGroundColor;
-	}
-
-	public String getAccordionBackGroundColor() {
-		return accordionBackGroundColor;
-	}
-
-	public String getMenuBackGround() {
-		return menuBackGround;
-	}
-
-	public String getMenufontColor() {
-		return menufontColor;
-	}
-
-	public String getButtonColor() {
-		return buttonColor;
-	}
-
-	public String getLabelColor() {
-		return labelColor;
-	}
-
-	public String getCopyRightColor() {
-		return copyRightColor;
-	}
-
-	public void setBodyBackGroundColor(String bodyBackGroundColor) {
-		this.bodyBackGroundColor = bodyBackGroundColor;
-	}
-
-	public void setAccordionBackGroundColor(String accordionBackGroundColor) {
-		this.accordionBackGroundColor = accordionBackGroundColor;
-	}
-
-	public void setMenuBackGround(String menuBackGround) {
-		this.menuBackGround = menuBackGround;
-	}
-
-	public String getSubMenuBackGround() {
-		return subMenuBackGround;
-	}
-
-	public void setSubMenuBackGround(String subMenuBackGround) {
-		this.subMenuBackGround = subMenuBackGround;
-	}
-
-	public void setMenufontColor(String menufontColor) {
-		this.menufontColor = menufontColor;
-	}
-
-	public void setButtonColor(String buttonColor) {
-		this.buttonColor = buttonColor;
-	}
-
-	public void setLabelColor(String labelColor) {
-		this.labelColor = labelColor;
-	}
-
-	public String getPageHeaderColor() {
-		return pageHeaderColor;
-	}
-
-	public void setPageHeaderColor(String pageHeaderColor) {
-		this.pageHeaderColor = pageHeaderColor;
-	}
-
-	public void setCopyRightColor(String copyRightColor) {
-		this.copyRightColor = copyRightColor;
-	}
 
 	public String getSnapshotRepoUrl() {
 		return snapshotRepoUrl;
@@ -1044,22 +977,6 @@ public class Customers extends ServiceBaseAction  {
 
 	public void setBaseRepoUrl(String baseRepoUrl) {
 		this.baseRepoUrl = baseRepoUrl;
-	}
-
-	public String getDisabledLabelColor() {
-		return disabledLabelColor;
-	}
-
-	public void setDisabledLabelColor(String disabledLabelColor) {
-		this.disabledLabelColor = disabledLabelColor;
-	}
-
-	public String getCopyRight() {
-		return copyRight;
-	}
-
-	public void setCopyRight(String copyRight) {
-		this.copyRight = copyRight;
 	}
 
 	public void setOptions(List<String> options) {
@@ -1094,19 +1011,209 @@ public class Customers extends ServiceBaseAction  {
 		return oldContext;
 	}
 
-	public String getGradientTop() {
-		return gradientTop;
+	public static String getUploadIconName() {
+		return uploadIconName;
 	}
 
-	public void setGradientTop(String gradientTop) {
-		this.gradientTop = gradientTop;
+	public static void setUploadIconName(String uploadIconName) {
+		Customers.uploadIconName = uploadIconName;
 	}
 
-	public String getGradientBottom() {
-		return gradientBottom;
+	public String getLoginLogoMargin() {
+		return loginLogoMargin;
 	}
 
-	public void setGradientBottom(String gradientBottom) {
-		this.gradientBottom = gradientBottom;
+	public void setLoginLogoMargin(String loginLogoMargin) {
+		this.loginLogoMargin = loginLogoMargin;
+	}
+
+	public String getPageLogoPadding() {
+		return pageLogoPadding;
+	}
+
+	public void setPageLogoPadding(String pageLogoPadding) {
+		this.pageLogoPadding = pageLogoPadding;
+	}
+
+	public String getHeaderLinkColor() {
+		return headerLinkColor;
+	}
+
+	public void setHeaderLinkColor(String headerLinkColor) {
+		this.headerLinkColor = headerLinkColor;
+	}
+
+	public String getHeaderActiveLinkColor() {
+		return headerActiveLinkColor;
+	}
+
+	public void setHeaderActiveLinkColor(String headerActiveLinkColor) {
+		this.headerActiveLinkColor = headerActiveLinkColor;
+	}
+
+	public String getEditNavigationLink() {
+		return editNavigationLink;
+	}
+
+	public void setEditNavigationLink(String editNavigationLink) {
+		this.editNavigationLink = editNavigationLink;
+	}
+
+	public String getTableHeaderLabelColor() {
+		return tableHeaderLabelColor;
+	}
+
+	public void setTableHeaderLabelColor(String tableHeaderLabelColor) {
+		this.tableHeaderLabelColor = tableHeaderLabelColor;
+	}
+
+	public String getButtonBackGroundColor() {
+		return buttonBackGroundColor;
+	}
+
+	public void setButtonBackGroundColor(String buttonBackGroundColor) {
+		this.buttonBackGroundColor = buttonBackGroundColor;
+	}
+
+	public String getConsoleHeaderColor() {
+		return consoleHeaderColor;
+	}
+
+	public void setConsoleHeaderColor(String consoleHeaderColor) {
+		this.consoleHeaderColor = consoleHeaderColor;
+	}
+
+	public String getCopyrightLabelColor() {
+		return copyrightLabelColor;
+	}
+
+	public void setCopyrightLabelColor(String copyrightLabelColor) {
+		this.copyrightLabelColor = copyrightLabelColor;
+	}
+
+	public String getHeaderBackGroundcolorTop() {
+		return headerBackGroundcolorTop;
+	}
+
+	public void setHeaderBackGroundcolorTop(String headerBackGroundcolorTop) {
+		this.headerBackGroundcolorTop = headerBackGroundcolorTop;
+	}
+
+	public String getHeaderBackGroundcolorBottom() {
+		return headerBackGroundcolorBottom;
+	}
+
+	public void setHeaderBackGroundcolorBottom(String headerBackGroundcolorBottom) {
+		this.headerBackGroundcolorBottom = headerBackGroundcolorBottom;
+	}
+
+	public String getFooterBackGroundcolorTop() {
+		return footerBackGroundcolorTop;
+	}
+
+	public void setFooterBackGroundcolorTop(String footerBackGroundcolorTop) {
+		this.footerBackGroundcolorTop = footerBackGroundcolorTop;
+	}
+
+	public String getFooterBackGroundcolorBottom() {
+		return footerBackGroundcolorBottom;
+	}
+
+	public void setFooterBackGroundcolorBottom(String footerBackGroundcolorBottom) {
+		this.footerBackGroundcolorBottom = footerBackGroundcolorBottom;
+	}
+
+	public String getPageTitleBackGroundTop() {
+		return pageTitleBackGroundTop;
+	}
+
+	public void setPageTitleBackGroundTop(String pageTitleBackGroundTop) {
+		this.pageTitleBackGroundTop = pageTitleBackGroundTop;
+	}
+
+	public String getPageTitleBackGroundBottom() {
+		return pageTitleBackGroundBottom;
+	}
+
+	public void setPageTitleBackGroundBottom(String pageTitleBackGroundBottom) {
+		this.pageTitleBackGroundBottom = pageTitleBackGroundBottom;
+	}
+
+	public String getEditNavigationActiveBackGroundTop() {
+		return editNavigationActiveBackGroundTop;
+	}
+
+	public void setEditNavigationActiveBackGroundTop(
+			String editNavigationActiveBackGroundTop) {
+		this.editNavigationActiveBackGroundTop = editNavigationActiveBackGroundTop;
+	}
+
+	public String getEditNavigationActiveBackGroundBottom() {
+		return editNavigationActiveBackGroundBottom;
+	}
+
+	public void setEditNavigationActiveBackGroundBottom(
+			String editNavigationActiveBackGroundBottom) {
+		this.editNavigationActiveBackGroundBottom = editNavigationActiveBackGroundBottom;
+	}
+
+	public String getProjectTitleBackGroundColorTop() {
+		return projectTitleBackGroundColorTop;
+	}
+
+	public void setProjectTitleBackGroundColorTop(
+			String projectTitleBackGroundColorTop) {
+		this.projectTitleBackGroundColorTop = projectTitleBackGroundColorTop;
+	}
+
+	public String getProjectTitleBackGroundColorBottom() {
+		return projectTitleBackGroundColorBottom;
+	}
+
+	public void setProjectTitleBackGroundColorBottom(
+			String projectTitleBackGroundColorBottom) {
+		this.projectTitleBackGroundColorBottom = projectTitleBackGroundColorBottom;
+	}
+
+	public String getBottomButtonPanelTop() {
+		return bottomButtonPanelTop;
+	}
+
+	public void setBottomButtonPanelTop(String bottomButtonPanelTop) {
+		this.bottomButtonPanelTop = bottomButtonPanelTop;
+	}
+
+	public String getBottomButtonPanelBottom() {
+		return bottomButtonPanelBottom;
+	}
+
+	public void setBottomButtonPanelBottom(String bottomButtonPanelBottom) {
+		this.bottomButtonPanelBottom = bottomButtonPanelBottom;
+	}
+
+	public String getTableheaderBackGroundcolorBottom() {
+		return tableheaderBackGroundcolorBottom;
+	}
+
+	public void setTableheaderBackGroundcolorBottom(
+			String tableheaderBackGroundcolorBottom) {
+		this.tableheaderBackGroundcolorBottom = tableheaderBackGroundcolorBottom;
+	}
+
+	public String getTableheaderBackGroundcolorTop() {
+		return tableheaderBackGroundcolorTop;
+	}
+
+	public void setTableheaderBackGroundcolorTop(
+			String tableheaderBackGroundcolorTop) {
+		this.tableheaderBackGroundcolorTop = tableheaderBackGroundcolorTop;
+	}
+
+	public String getWelcomeUserIcon() {
+		return welcomeUserIcon;
+	}
+
+	public void setWelcomeUserIcon(String welcomeUserIcon) {
+		this.welcomeUserIcon = welcomeUserIcon;
 	}
 }
