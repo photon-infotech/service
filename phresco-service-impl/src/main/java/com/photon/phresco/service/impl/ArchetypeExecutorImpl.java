@@ -20,16 +20,24 @@ package com.photon.phresco.service.impl;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
+import com.google.gson.Gson;
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.commons.model.RepoInfo;
+import com.photon.phresco.commons.model.RequiredOption;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.logger.SplunkLogger;
+import com.photon.phresco.plugins.model.Mojos.ApplicationHandler;
+import com.photon.phresco.plugins.util.MojoProcessor;
 import com.photon.phresco.service.api.ArchetypeExecutor;
 import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.PhrescoServerFactory;
@@ -42,7 +50,7 @@ import com.phresco.pom.exception.PhrescoPomException;
 import com.phresco.pom.util.PomProcessor;
 
 public class ArchetypeExecutorImpl implements ArchetypeExecutor,
-		ServerConstants, Constants {
+		ServerConstants, Constants, ServiceConstants {
 	private static final SplunkLogger LOGGER = SplunkLogger
 			.getSplunkLogger(ArchetypeExecutorImpl.class.getName());
 	private static Boolean isDebugEnabled = LOGGER.isDebugEnabled();
@@ -100,6 +108,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 					new File(tempFolderPath));
 			updateRepository(customerId, applicationInfo, new File(
 					tempFolderPath));
+			updateDefaultFeatures(projectInfo, tempFolderPath, customerId);
 			if (isDebugEnabled) {
 				LOGGER.debug("ArchetypeExecutorImpl.execute:Exit");
 			}
@@ -148,6 +157,140 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 					"status=\"Failure\"",
 					"message=\"" + e.getLocalizedMessage() + "\"");
 			throw new PhrescoException(e);
+		}
+	}
+	
+	private void updateDefaultFeatures(ProjectInfo projectInfo,String tempFolderPath,String customerId) throws PhrescoException {
+		List<String> selectedFeatures = new ArrayList<String>();
+		List<String> selectedJsLibs = new ArrayList<String>();
+		List<String> selectedComponentids = new ArrayList<String>();
+		List<ArtifactGroup> listArtifactGroup = new ArrayList<ArtifactGroup>();
+		ApplicationInfo appInfo = projectInfo.getAppInfos().get(0);
+		
+		//To add default feature
+		List<ArtifactGroup> modulesList = dbManager.findDefaultFeatures(appInfo.getTechInfo().getId(), "FEATURE", customerId);
+		if(CollectionUtils.isNotEmpty(modulesList)) {
+		for (ArtifactGroup artifactGroup : modulesList) {
+			List<ArtifactInfo> versions = artifactGroup.getVersions();
+			for (ArtifactInfo artifactInfo : versions) {
+				List<RequiredOption> appliesTo = artifactInfo.getAppliesTo();
+				for (RequiredOption requiredOption : appliesTo) {
+					if (requiredOption.isRequired()) {
+						ArtifactGroup selectedartifactGroup = dbManager.getArtifactGroup(artifactInfo.getArtifactGroupId());
+						listArtifactGroup.add(selectedartifactGroup);
+						selectedFeatures.add(artifactInfo.getId());
+						break;
+					}
+				}
+			}
+		}
+	}
+
+		//To add default javascript
+		List<ArtifactGroup> jsLibsList = dbManager.findDefaultFeatures(appInfo.getTechInfo().getId(), "JAVASCRIPT", customerId);
+		if(CollectionUtils.isNotEmpty(jsLibsList)) {
+		for (ArtifactGroup artifactGroup : jsLibsList) {
+			List<ArtifactInfo> versions = artifactGroup.getVersions();
+			for (ArtifactInfo artifactInfo : versions) {
+				List<RequiredOption> appliesTo = artifactInfo.getAppliesTo();
+				for (RequiredOption requiredOption : appliesTo) {
+					if (requiredOption.isRequired()) {
+						ArtifactGroup selectedartifactGroup = dbManager.getArtifactGroup(artifactInfo.getArtifactGroupId());
+						listArtifactGroup.add(selectedartifactGroup);
+						selectedJsLibs.add(artifactInfo.getId());
+						break;
+					}
+				}
+			}
+		}
+	}	
+		
+		//To add default components
+		List<ArtifactGroup> componentsList = dbManager.findDefaultFeatures(appInfo.getTechInfo().getId(), "COMPONENT", customerId);
+		for (ArtifactGroup artifactGroup : componentsList) {
+			List<ArtifactInfo> versions = artifactGroup.getVersions();
+			for (ArtifactInfo artifactInfo : versions) {
+				List<RequiredOption> appliesTo = artifactInfo.getAppliesTo();
+				for (RequiredOption requiredOption : appliesTo) {
+					if (requiredOption.isRequired()) {
+						ArtifactGroup selectedartifactGroup = dbManager.getArtifactGroup(artifactInfo.getArtifactGroupId());
+						listArtifactGroup.add(selectedartifactGroup);
+						selectedComponentids.add(artifactInfo.getId());
+						break;
+					}
+				}
+			}
+		}
+		
+		//To  write default prebuilt modules to its default location
+		List<String> selectedModules = appInfo.getSelectedModules();
+		pilotDefaultFeaturesToAdd(appInfo, listArtifactGroup, selectedModules);
+
+		//To  write default prebuilt jslibraries to its default location
+		List<String> selectedJSLibs = appInfo.getSelectedJSLibs();
+		pilotDefaultFeaturesToAdd(appInfo, listArtifactGroup, selectedJSLibs);
+		
+		//To  write default prebuilt components to its default location
+		List<String> selectedComponents = appInfo.getSelectedComponents();
+		pilotDefaultFeaturesToAdd(appInfo, listArtifactGroup, selectedComponents);
+		
+		Gson gson = new Gson();
+		if(CollectionUtils.isNotEmpty(listArtifactGroup)) {
+			ProjectUtils projectUtils = new ProjectUtils();
+			StringBuilder stringbuilder = new StringBuilder(tempFolderPath).append(File.separator).append(appInfo.getAppDirName())
+			.append(File.separator).append(Constants.POM_NAME);
+			File projectPomPath = new File(stringbuilder.toString());
+			projectUtils .updatePOMWithPluginArtifact(projectPomPath, listArtifactGroup);
+		}
+		StringBuilder sb = new StringBuilder(tempFolderPath).append(File.separator).append(appInfo.getAppDirName())
+		.append(File.separator).append(Constants.DOT_PHRESCO_FOLDER).append(File.separator).append(
+				Constants.APPLICATION_HANDLER_INFO_FILE);
+		File filePath = new File(sb.toString());
+		MojoProcessor mojo = new MojoProcessor(filePath);
+		ApplicationHandler handler = mojo.getApplicationHandler();
+		// To write selected Features into phresco-application-Handler-info.xml
+		String artifactGroup = gson.toJson(listArtifactGroup);
+		handler.setSelectedFeatures(artifactGroup);
+		mojo.save();
+		List<String> appinfoModules = appInfo.getSelectedModules();
+		if(CollectionUtils.isNotEmpty(appinfoModules)) {
+		appinfoModules.addAll(selectedFeatures);
+		appInfo.setSelectedModules(appinfoModules);
+		} else {
+			appInfo.setSelectedModules(selectedFeatures);
+		}
+		
+		List<String> appinfoJSLibs = appInfo.getSelectedJSLibs();
+		if(CollectionUtils.isNotEmpty(appinfoJSLibs)) {
+		appinfoJSLibs.addAll(selectedJsLibs);
+		appInfo.setSelectedJSLibs(appinfoJSLibs);
+		} else {
+			appInfo.setSelectedJSLibs(selectedJsLibs);
+		}
+		
+		List<String> appinfoComponents = appInfo.getSelectedComponents();
+		if(CollectionUtils.isNotEmpty(appinfoComponents)) {
+		appinfoComponents.addAll(selectedComponentids);
+		appInfo.setSelectedComponents(appinfoComponents);
+		} else {
+			appInfo.setSelectedComponents(selectedComponentids);
+		}
+		
+		projectInfo.setAppInfos(Collections.singletonList(appInfo));
+		StringBuilder sbuilder = new StringBuilder(tempFolderPath).append(File.separator).append(appInfo.getAppDirName())
+		.append(File.separator).append(Constants.DOT_PHRESCO_FOLDER).append(File.separator).append(
+				Constants.PROJECT_INFO_FILE);
+		File projectInfoPath = new File(sbuilder.toString());
+		ProjectUtils.updateProjectInfo(projectInfo, projectInfoPath);
+	}
+	
+	private void pilotDefaultFeaturesToAdd(ApplicationInfo appInfo,
+			List<ArtifactGroup> listArtifactGroup, List<String> selectedFeatures) throws PhrescoException {
+		if(CollectionUtils.isNotEmpty(selectedFeatures)) {
+			List<ArtifactGroup> findSelectedArtifacts = dbManager.findSelectedArtifacts(selectedFeatures);
+			if(CollectionUtils.isNotEmpty(findSelectedArtifacts)) {
+				listArtifactGroup.addAll(findSelectedArtifacts);
+			}
 		}
 	}
 

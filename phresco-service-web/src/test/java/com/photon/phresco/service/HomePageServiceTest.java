@@ -34,7 +34,7 @@ import com.photon.phresco.util.ServiceConstants;
 
 public class HomePageServiceTest {
 
-	@Test
+//	@Test
 	public void testGetHomePageVideo() throws PhrescoException {
 		PhrescoServerFactory.initialize();
 		Gson gson = new Gson();

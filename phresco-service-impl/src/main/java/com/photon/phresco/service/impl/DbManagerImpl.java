@@ -503,4 +503,52 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
 	public RepoInfo getRepoInfoById(String id) throws PhrescoException {
 		return DbService.getMongoOperation().findOne(REPOINFO_COLLECTION_NAME, new Query(Criteria.whereId().is(id)), RepoInfo.class);
 	}
+
+	@Override
+	public List<ArtifactGroup> findDefaultFeatures(String techId, String type, String customerId)
+			throws PhrescoException {
+		List<ArtifactGroup> artifactGroups = new ArrayList<ArtifactGroup>();
+		Query query = createCustomerIdQuery(customerId);
+		Criteria appLiesToCriteria = Criteria.where("appliesTo.techId").in(new String[] {techId});
+		Criteria typeCriteria = Criteria.where(REST_QUERY_TYPE).is(type);
+		query.addCriteria(appLiesToCriteria);
+		query.addCriteria(typeCriteria);
+		List<ArtifactGroupDAO> daos = DbService.getMongoOperation().find(ARTIFACT_GROUP_COLLECTION_NAME, query, ArtifactGroupDAO.class);
+		Converter<ArtifactGroupDAO, ArtifactGroup> converter = 
+			(Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getFrameworkConverter(ArtifactGroupDAO.class);
+		for (ArtifactGroupDAO artifactGroupDAO : daos) {
+			artifactGroups.add(converter.convertDAOToObject(artifactGroupDAO, DbService.getMongoOperation()));
+		}
+		return artifactGroups;
+	}
+
+	@Override
+	public List<ArtifactGroup> findSelectedArtifacts(List<String> ids) throws PhrescoException {
+		List<ArtifactGroup> selected = new ArrayList<ArtifactGroup>();
+		for (String id : ids) {
+			ArtifactGroup artifactGroupVersionId = getArtifactGroupVersionId(id);
+			selected.add(artifactGroupVersionId);
+		}
+		return selected;
+	}
+	
+	private ArtifactGroup getArtifactGroupVersionId(String versionId) throws PhrescoException {
+		com.photon.phresco.commons.model.ArtifactInfo artifactInfo = DbService.getMongoOperation().findOne(ARTIFACT_INFO_COLLECTION_NAME, 
+				new Query(Criteria.whereId().is(versionId)), com.photon.phresco.commons.model.ArtifactInfo.class);
+		String artifactGroupId = artifactInfo.getArtifactGroupId();
+		Criteria artifactGroupCriteria = Criteria.whereId().is(artifactGroupId);
+		ArtifactGroupDAO artifactGroupDAO = DbService.getMongoOperation().findOne(ARTIFACT_GROUP_COLLECTION_NAME, new Query(artifactGroupCriteria), ArtifactGroupDAO.class);
+		Converter<ArtifactGroupDAO, ArtifactGroup> converter = 
+			(Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
+		return converter.convertDAOToObject(artifactGroupDAO, DbService.getMongoOperation());
+	}
+	
+	@Override
+	public ArtifactGroup getArtifactGroup(String artifactInfoId) throws PhrescoException {
+		ArtifactGroupDAO artifactGroupDAO = DbService.getMongoOperation().findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
+				new Query(Criteria.whereId().is(artifactInfoId)), ArtifactGroupDAO.class);
+		Converter<ArtifactGroupDAO, ArtifactGroup> converter = 
+			(Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
+		return converter.convertDAOToObject(artifactGroupDAO, DbService.getMongoOperation());
+	}
 }

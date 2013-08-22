@@ -35,7 +35,7 @@ import com.photon.phresco.util.ServiceConstants;
 
 public class VideoDownloaderTest {
  
-	@Test
+//	@Test
 	public void testVideoDownloader() throws PhrescoException {
 		PhrescoServerFactory.initialize();
 		Gson gson = new Gson();

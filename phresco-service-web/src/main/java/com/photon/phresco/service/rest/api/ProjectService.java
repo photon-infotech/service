@@ -108,8 +108,8 @@ public class ProjectService extends DbService {
 			for (int i=0; i < projectInfo.getNoOfApps(); i++) {
 				projectService.createProject(cloneProjectInfo(projectInfo, i), tempFolderPath);
 			}
-			createParentPom(tempFolderPath, projectInfo);
-			createDependency(tempFolderPath, projectInfo);
+//			createParentPom(tempFolderPath, projectInfo);
+//			createDependency(tempFolderPath, projectInfo);
 			ArchiveUtil.createArchive(tempFolderPath, tempFolderPath + ZIP, ArchiveType.ZIP);
 //			ServiceOutput serviceOutput = new ServiceOutput(tempFolderPath);
 //			dbManager.storeCreatedProjects(projectInfo);
@@ -126,7 +126,7 @@ public class ProjectService extends DbService {
 		}
 	}
 	
-	private void createParentPom(String tempFolderPath,
+/*	private void createParentPom(String tempFolderPath,
 			ProjectInfo projectInfo) throws PhrescoException {
 		if(!projectInfo.isMultiModule()) {
 			return;
@@ -148,10 +148,9 @@ public class ProjectService extends DbService {
 		} catch (PhrescoPomException e) {
 			throw new PhrescoException(e);
 		}
-		
-	}
+	}*/
 	
-	private void createDependency(String tempFolderPath, ProjectInfo projectInfo) {
+	/*private void createDependency(String tempFolderPath, ProjectInfo projectInfo) {
 		if(!projectInfo.isMultiModule()) {
 			return;
 		}
@@ -173,16 +172,16 @@ public class ProjectService extends DbService {
 				}
 			}
 		}
-	}
+	}*/
 	
-	private ApplicationInfo getAppInfo(String appCode, List<ApplicationInfo> applicationInfos) {
+	/*private ApplicationInfo getAppInfo(String appCode, List<ApplicationInfo> applicationInfos) {
 		for (ApplicationInfo applicationInfo : applicationInfos) {
 			if(applicationInfo.getCode().equals(appCode)) {
 				return applicationInfo;
 			}
 		}
 		return null;
-	}
+	}*/
 	
 	private void buildCreateLogMessage(HttpServletRequest request, ProjectInfo projectInfo) throws PhrescoException {
 		try {
@@ -319,7 +318,7 @@ public class ProjectService extends DbService {
 		}
 	}
 	
-	class ServiceOutput implements StreamingOutput {
+/*	class ServiceOutput implements StreamingOutput {
         private String projectPath = "";
 
 		public ServiceOutput(String projectPath) {
@@ -349,6 +348,6 @@ public class ProjectService extends DbService {
 				}
 			}
 		}
-	}
+	}*/
 	
 }

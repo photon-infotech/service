@@ -97,4 +97,10 @@ public interface DbManager {
     String getLatestFrameWorkVersion() throws PhrescoException;
     
     RepoInfo getRepoInfoById(String id) throws PhrescoException;
+    
+    List<ArtifactGroup> findDefaultFeatures(String techId, String type, String customerId) throws PhrescoException;
+    
+    List<ArtifactGroup> findSelectedArtifacts(List<String> ids) throws PhrescoException;
+    
+    ArtifactGroup getArtifactGroup(String artifactInfoId) throws PhrescoException;
 }

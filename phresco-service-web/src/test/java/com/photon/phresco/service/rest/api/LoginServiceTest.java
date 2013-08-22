@@ -39,7 +39,7 @@ import com.sun.jersey.api.client.WebResource;
 
 public class LoginServiceTest {
 
-	@Test
+//	@Test
 	public void testLogin() throws PhrescoException {
 		String userName = "kumar_s";
         String password = "Phresco@123";
