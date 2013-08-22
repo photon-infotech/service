@@ -63,7 +63,7 @@
             <host>172.16.17.227</host>
         </Server>
     </environment>
-    <environment default="false" name="Testing">
+    <environment default="true" name="Testing">
         <WebService name="webservice">
             <port>8080</port>
             <password/>
@@ -78,7 +78,7 @@
             <password/>
             <type>mongodb</type>
             <host>172.16.8.250</host>
-            <dbname>testing-3</dbname>
+            <dbname>phresco-dev3-0</dbname>
             <username/>
         </Database>
         <Server name="server">
