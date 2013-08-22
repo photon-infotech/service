@@ -104,7 +104,6 @@ public class Customers extends ServiceBaseAction  {
 	private String headerLinkColor = "";
 	private String headerActiveLinkColor = ""; 
 	private String editNavigationLink = "";
-	private String tableHeaderLabelColor = "";
 	private String buttonBackGroundColor = "";
 	private String consoleHeaderColor = "";
 	private String copyrightLabelColor = "";
@@ -116,10 +115,6 @@ public class Customers extends ServiceBaseAction  {
 	private String pageTitleBackGroundBottom = "";
 	private String editNavigationActiveBackGroundTop = "";
 	private String editNavigationActiveBackGroundBottom = "";
-	private String tableheaderBackGroundcolorTop = "";
-	private String tableheaderBackGroundcolorBottom = "";
-	private String projectTitleBackGroundColorTop = "";
-	private String projectTitleBackGroundColorBottom = "";
 	private String bottomButtonPanelTop = "";
 	private String bottomButtonPanelBottom = "";
 	private String customerBaseColor = "";
@@ -257,7 +252,7 @@ public class Customers extends ServiceBaseAction  {
 	 * To update image Icon  selected customer
 	 * @param cutomerId
 	 * @throws PhrescoException
-	 */
+	 */	
 	public String uploadLoginLogoImage() throws PhrescoException {
 		if (isDebugEnabled) {
 			LOGGER.debug("Customers.uploadImage : Entry");
@@ -385,7 +380,6 @@ public class Customers extends ServiceBaseAction  {
 			frameworkTheme.put("headerLinkColor", getHeaderLinkColor());
 			frameworkTheme.put("headerActiveLinkColor", getHeaderActiveLinkColor());
 			frameworkTheme.put("editNavigationLink", getEditNavigationLink());
-			frameworkTheme.put("tableHeaderLabelColor", getTableheaderBackGroundcolorTop());
 			frameworkTheme.put("buttonBackGroundColor", getButtonBackGroundColor());
 			frameworkTheme.put("consoleHeaderColor", getConsoleHeaderColor());
 			frameworkTheme.put("copyrightLabelColor", getCopyrightLabelColor());
@@ -397,10 +391,6 @@ public class Customers extends ServiceBaseAction  {
 			frameworkTheme.put("pageTitleBackGroundBottom", getPageTitleBackGroundBottom());
 			frameworkTheme.put("editNavigationActiveBackGroundTop", getEditNavigationActiveBackGroundTop());
 			frameworkTheme.put("editNavigationActiveBackGroundBottom", getEditNavigationActiveBackGroundBottom());
-			frameworkTheme.put("tableheaderBackGroundcolorTop", getTableheaderBackGroundcolorTop());
-			frameworkTheme.put("tableheaderBackGroundcolorBottom",getTableheaderBackGroundcolorBottom());
-			frameworkTheme.put("projectTitleBackGroundColorTop", getProjectTitleBackGroundColorTop());
-			frameworkTheme.put("projectTitleBackGroundColorBottom", getProjectTitleBackGroundColorBottom());
 			frameworkTheme.put("bottomButtonPanelTop", getBottomButtonPanelTop());
 			frameworkTheme.put("bottomButtonPanelBottom", getBottomButtonPanelBottom());
 			frameworkTheme.put("customerBaseColor", getBottomButtonPanelBottom());
@@ -1059,14 +1049,6 @@ public class Customers extends ServiceBaseAction  {
 		this.editNavigationLink = editNavigationLink;
 	}
 
-	public String getTableHeaderLabelColor() {
-		return tableHeaderLabelColor;
-	}
-
-	public void setTableHeaderLabelColor(String tableHeaderLabelColor) {
-		this.tableHeaderLabelColor = tableHeaderLabelColor;
-	}
-
 	public String getButtonBackGroundColor() {
 		return buttonBackGroundColor;
 	}
@@ -1156,25 +1138,7 @@ public class Customers extends ServiceBaseAction  {
 			String editNavigationActiveBackGroundBottom) {
 		this.editNavigationActiveBackGroundBottom = editNavigationActiveBackGroundBottom;
 	}
-
-	public String getProjectTitleBackGroundColorTop() {
-		return projectTitleBackGroundColorTop;
-	}
-
-	public void setProjectTitleBackGroundColorTop(
-			String projectTitleBackGroundColorTop) {
-		this.projectTitleBackGroundColorTop = projectTitleBackGroundColorTop;
-	}
-
-	public String getProjectTitleBackGroundColorBottom() {
-		return projectTitleBackGroundColorBottom;
-	}
-
-	public void setProjectTitleBackGroundColorBottom(
-			String projectTitleBackGroundColorBottom) {
-		this.projectTitleBackGroundColorBottom = projectTitleBackGroundColorBottom;
-	}
-
+	
 	public String getBottomButtonPanelTop() {
 		return bottomButtonPanelTop;
 	}
@@ -1191,23 +1155,6 @@ public class Customers extends ServiceBaseAction  {
 		this.bottomButtonPanelBottom = bottomButtonPanelBottom;
 	}
 
-	public String getTableheaderBackGroundcolorBottom() {
-		return tableheaderBackGroundcolorBottom;
-	}
-
-	public void setTableheaderBackGroundcolorBottom(
-			String tableheaderBackGroundcolorBottom) {
-		this.tableheaderBackGroundcolorBottom = tableheaderBackGroundcolorBottom;
-	}
-
-	public String getTableheaderBackGroundcolorTop() {
-		return tableheaderBackGroundcolorTop;
-	}
-
-	public void setTableheaderBackGroundcolorTop(
-			String tableheaderBackGroundcolorTop) {
-		this.tableheaderBackGroundcolorTop = tableheaderBackGroundcolorTop;
-	}
 
 	public String getWelcomeUserIcon() {
 		return welcomeUserIcon;

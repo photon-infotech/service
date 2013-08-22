@@ -83,7 +83,6 @@
 	String headerLinkColor = "";
 	String headerActiveLinkColor = ""; 
 	String editNavigationLink = "";
-	String tableHeaderLabelColor = "";
 	String buttonBackGroundColor = "";
 	String consoleHeaderColor = "";
 	String copyrightLabelColor = "";
@@ -95,10 +94,6 @@
 	String pageTitleBackGroundBottom = "";
 	String editNavigationActiveBackGroundTop = "";
 	String editNavigationActiveBackGroundBottom = "";
-	String tableheaderBackGroundcolorTop = "";
-	String tableheaderBackGroundcolorBottom = "";
-	String projectTitleBackGroundColorTop = "";
-	String projectTitleBackGroundColorBottom = "";
 	String bottomButtonPanelTop = "";
 	String bottomButtonPanelBottom = "";
 	String welcomeUserIcon = "";
@@ -188,7 +183,6 @@
 			headerLinkColor = frameworkTheme.get("headerLinkColor");
 			headerActiveLinkColor = frameworkTheme.get("headerActiveLinkColor");
 			editNavigationLink = frameworkTheme.get("editNavigationLink");
-			tableHeaderLabelColor = frameworkTheme.get("tableHeaderLabelColor");
 			buttonBackGroundColor = frameworkTheme.get("buttonBackGroundColor");
 			consoleHeaderColor = frameworkTheme.get("consoleHeaderColor");
 			copyrightLabelColor = frameworkTheme.get("copyrightLabelColor");
@@ -200,10 +194,6 @@
 			pageTitleBackGroundBottom = frameworkTheme.get("pageTitleBackGroundBottom");
 			editNavigationActiveBackGroundTop = frameworkTheme.get("editNavigationActiveBackGroundTop");
 			editNavigationActiveBackGroundBottom = frameworkTheme.get("editNavigationActiveBackGroundBottom");
-			tableheaderBackGroundcolorTop = frameworkTheme.get("tableheaderBackGroundcolorTop");
-			tableheaderBackGroundcolorBottom = frameworkTheme.get("tableheaderBackGroundcolorBottom");
-			projectTitleBackGroundColorTop = frameworkTheme.get("projectTitleBackGroundColorTop");
-			projectTitleBackGroundColorBottom = frameworkTheme.get("projectTitleBackGroundColorBottom");
 			bottomButtonPanelTop = frameworkTheme.get("bottomButtonPanelTop");
 			bottomButtonPanelBottom = frameworkTheme.get("bottomButtonPanelBottom");
 			customerBaseColor = frameworkTheme.get("bottomButtonPanelBottom");
@@ -834,16 +824,6 @@
 									value="<%= editNavigationLink %>" maxlength="50" title="Color Hashcode eg: FFFFFF">
 							</div>
 						</div>
-				
-						<div class="control-group">
-							<label class="control-label labelbold">
-								 <s:text name='lbl.hdr.adm.cust.tableHeaderLabelColor' />
-							 </label>
-							<div class="controls">
-								<input id="tableHeaderLabelColor" placeholder="<s:text name='place.hldr.cust.tableHeaderLabelColor'/>"class="input-xlarge" type="text" name="tableHeaderLabelColor"
-									value="<%= tableHeaderLabelColor %>" maxlength="50" title="Color Hashcode eg: FFFFFF">
-							</div>
-						</div>
 						
 						<div class="control-group">
 							<label class="control-label labelbold">
@@ -930,30 +910,6 @@
 								   value="<%= editNavigationActiveBackGroundTop%>"  maxlength="25" title="Color Hashcode eg: FFFFFF">
 								 <input id="editNavigationActiveBackGroundBottom" placeholder="<s:text name='place.hldr.cust.editNavigationActiveBackGroundBottomColor'/>" class="input-xlarge" type="text" name="editNavigationActiveBackGroundBottom"
 								   value="<%= editNavigationActiveBackGroundBottom%>"  maxlength="25" title="Color Hashcode eg: FFFFFF">
-							</div>
-						</div>
-						
-						<div class="control-group">
-							<label class="control-label labelbold">
-								<s:text name='lbl.hdr.adm.cust.tableHeaderBackGroundColor'/>
-							</label>
-							<div class="controls">
-								<input id="tableheaderBackGroundcolorTop" placeholder="<s:text name='place.hldr.cust.tableHeaderBackGroundTopColor'/>" class="input-xlarge" type="text" name="tableheaderBackGroundcolorTop"
-								   value="<%= tableheaderBackGroundcolorTop%>"  maxlength="25" title="Color Hashcode eg: FFFFFF">
-								 <input id="tableheaderBackGroundcolorBottom" placeholder="<s:text name='place.hldr.cust.TableHeaderBackGroundBottomColor'/>" class="input-xlarge" type="text" name="tableheaderBackGroundcolorBottom"
-								   value="<%= tableheaderBackGroundcolorBottom %>"  maxlength="25" title="Color Hashcode eg: FFFFFF">
-							</div>
-						</div>
-						
-						<div class="control-group">
-							<label class="control-label labelbold">
-								<s:text name='lbl.hdr.adm.cust.projectTitleBackGroundColor'/>
-							</label>
-							<div class="controls">
-								<input id="projectTitleBackGroundColorTop" placeholder="<s:text name='place.hldr.cust.projectTitleBackGroundtopColor'/>" class="input-xlarge" type="text" name="projectTitleBackGroundColorTop"
-								   value="<%= projectTitleBackGroundColorTop%>"  maxlength="25" title="Color Hashcode eg: FFFFFF">
-								<input id="projectTitleBackGroundColorBottom" placeholder="<s:text name='place.hldr.cust.projectTitleBackGroundBottomColor'/>" class="input-xlarge" type="text" name="projectTitleBackGroundColorBottom"
-								   value="<%= projectTitleBackGroundColorBottom%>"  maxlength="25" title="Color Hashcode eg: FFFFFF">   
 							</div>
 						</div>
 						
