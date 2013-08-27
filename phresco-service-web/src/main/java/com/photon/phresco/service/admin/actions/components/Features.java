@@ -441,7 +441,7 @@ public class Features extends ServiceBaseAction {
             /*if(featureByteArray != null){
 				inputStreamMap.put(moduleGroup.getName(),  new ByteArrayInputStream(featureByteArray));
 			}*/ 
-            getServiceManager().updateFeature(moduleGroup, inputStreamMap, getCustomerId());
+            getServiceManager().createFeatures(moduleGroup, inputStreamMap, getCustomerId());
             addActionMessage(getText(FEATURE_UPDATED, Collections.singletonList(getName())));
             setTechnologiesInRequest();
         } catch (PhrescoException e) {

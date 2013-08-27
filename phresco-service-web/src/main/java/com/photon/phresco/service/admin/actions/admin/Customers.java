@@ -313,7 +313,7 @@ public class Customers extends ServiceBaseAction  {
 			if (loginIconByteArray != null) {
 				inputStreamMap.put(getCustomerId(), new ByteArrayInputStream(loginIconByteArray));
 			}
-			getServiceManager().updateCustomer(customer, inputStreamMap);
+			getServiceManager().createCustomers(customer, inputStreamMap);
 			addActionMessage(getText(CUSTOMER_UPDATED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
 			if(isDebugEnabled) {

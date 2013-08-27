@@ -660,8 +660,15 @@ public class ComponentService extends DbService {
 				saveModuleGroup(plugin);
 			}
     	}
-    	
-    	addTechnologyToGroup(technologyDAO);
+    	TechnologyDAO oldInfo = DbService.getMongoOperation().findOne(TECHNOLOGIES_COLLECTION_NAME, 
+    			new Query(Criteria.whereId().is(technologyDAO.getId())), TechnologyDAO.class);
+    	if(oldInfo != null) {
+    		List<String> customerIds = oldInfo.getCustomerIds();
+    		if(!customerIds.contains(technologyDAO.getCustomerIds().get(0))) {
+    			customerIds.add(technologyDAO.getCustomerIds().get(0));
+    		}
+    		technologyDAO.setCustomerIds(customerIds);
+    	}
     	DbService.getMongoOperation().save(TECHNOLOGIES_COLLECTION_NAME, technologyDAO);
     	DbService.getMongoOperation().save("techInfos", createTechInfo(technologyDAO));
 	}
@@ -673,30 +680,10 @@ public class ComponentService extends DbService {
 		info.setName(dao.getName());
 		info.setCustomerIds(dao.getCustomerIds());
 		info.setTechGroupId(dao.getTechGroupId());
+		info.setTechVersions(dao.getTechVersions());
 		return info;
 	}
 	
-	private void addTechnologyToGroup(TechnologyDAO technologyDAO) {
-		TechnologyGroup technologyGroup = DbService.getMongoOperation().findOne(TECH_GROUP_COLLECTION_NAME, 
-				new Query(Criteria.whereId().is(technologyDAO.getTechGroupId())), TechnologyGroup.class);
-		if(technologyGroup != null) {
-			List<TechnologyInfo> foundTechInfos = technologyGroup.getTechInfos();
-			TechnologyInfo info = new TechnologyInfo();
-			info.setId(technologyDAO.getId());
-			info.setAppTypeId(technologyDAO.getAppTypeId());
-			info.setName(technologyDAO.getName());
-			info.setCreationDate(technologyDAO.getCreationDate());			
-			if(CollectionUtils.isEmpty(foundTechInfos)) {
-				foundTechInfos = new ArrayList<TechnologyInfo>();
-				foundTechInfos.add(info);
-			} else {
-				foundTechInfos.add(info);    
-			}
-			technologyGroup.setTechInfos(foundTechInfos);
-			DbService.getMongoOperation().save(TECH_GROUP_COLLECTION_NAME, technologyGroup);
-		}
-	}
-
 	private List<String> createPluginIds(Technology technology) {
 		List<String> pluginIds = new ArrayList<String>();
 		TechnologyDAO techDAO = DbService.getMongoOperation().findOne(TECHNOLOGIES_COLLECTION_NAME, 

@@ -278,7 +278,7 @@ public class Downloads extends ServiceBaseAction {
 //			if(imgByteArray != null){
 //				inputStreamMap.put(downloadInfo.getName(),  new ByteArrayInputStream(imgByteArray));
 //			} 
-			getServiceManager().updateDownload(getDownloadInfo(), inputStreamMap, getCustomerId());
+			getServiceManager().createDownloads(getDownloadInfo(), inputStreamMap, getCustomerId());
 			addActionMessage(getText(DOWNLOAD_UPDATED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
 			if (isDebugEnabled) {

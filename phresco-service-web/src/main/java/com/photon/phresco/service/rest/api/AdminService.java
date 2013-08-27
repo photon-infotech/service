@@ -253,16 +253,16 @@ public class AdminService extends DbService {
     		MediaType.APPLICATION_JSON_VALUE,"multipart/mixed"}, 
     		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     public @ResponseBody void createCustomer(HttpServletRequest request, HttpServletResponse response, 
-    		@RequestPart("icon") ByteArrayResource iconFile,
+    		@RequestPart(value = "icon", required = false) ByteArrayResource moduleFile,
     		@RequestParam(value = "customer", required = false) byte[] customerData) throws IOException {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.createCustomer(List<Customer> customer)");
         }
         Customer customer = new Gson().fromJson(new String(customerData), Customer.class);
-        saveCustomer(request, response, customerData, customer);
+        saveCustomer(response, moduleFile.getByteArray(), customer);
     }
 
-    private Customer saveCustomer(HttpServletRequest request, HttpServletResponse response, byte[] iconStream, Customer customer) {
+    private Customer saveCustomer(HttpServletResponse response, byte[] iconStream, Customer customer) {
     	try {
     		if(validate(customer)) {
 				RepoInfo repoInfo = customer.getRepoInfo();
@@ -280,7 +280,9 @@ public class AdminService extends DbService {
     				ArtifactInfo info = new ArtifactInfo();
     				info.setVersion("1.0");
     				artifactGroup.setVersions(Collections.singletonList(info));
-    				File artifcatFile = new File(request.getHeader("iconFile"));
+    				File artifcatFile = new File(ServerUtil.getTempFolderPath() + "/"
+    		                + customer.getName() + "." + "png");
+    				ServerUtil.convertByteArrayToFile(artifcatFile, iconStream);
     				uploadIcon(artifactGroup, artifcatFile);
     			}
     			Converter<CustomerDAO, Customer> customerConverter = 
@@ -332,14 +334,14 @@ public class AdminService extends DbService {
     @RequestMapping(value= REST_API_CUSTOMERS, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, 
     		MediaType.APPLICATION_JSON_VALUE,"multipart/mixed"}, 
     		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
-    public @ResponseBody void updateCustomer(HttpServletRequest request, HttpServletResponse response, 
-    		@RequestPart("icon") ByteArrayResource iconFile,
+    public @ResponseBody void updateCustomer(HttpServletResponse response, @RequestPart(value = "icon", required = false) ByteArrayResource moduleFile,
     		@RequestParam(value = "customer", required = false) byte[] customerData) throws IOException {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.updateCustomer(List<Customer> customers)");
         }
+        System.out.println("Entyerd To Service ........ ");
         Customer customer = new Gson().fromJson(new String(customerData), Customer.class);
-        saveCustomer(request, response, customerData, customer);
+        saveCustomer(response, moduleFile.getByteArray(), customer);
     }
 
     /**

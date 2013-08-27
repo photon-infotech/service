@@ -283,7 +283,7 @@ public class PilotProjects extends ServiceBaseAction {
     		if (pilotProByteArray != null) {
     			inputStreamMap.put(pilotProInfo.getName(),  new ByteArrayInputStream(pilotProByteArray));
     		} 
-    		getServiceManager().updatePilotProject(createPilotProj(), inputStreamMap, getProjectId(), getCustomerId());
+    		getServiceManager().createPilotProjects(createPilotProj(), inputStreamMap, getCustomerId());
     		addActionMessage(getText(PLTPROJ_UPDATED, Collections.singletonList(getName())));
     	} catch (PhrescoException e) {
     		if (isDebugEnabled) {

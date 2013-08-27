@@ -342,7 +342,7 @@ public class Archetypes extends ServiceBaseAction {
 			if (archetypeJarByteArray != null) {
 				inputStreamMap.put(technology.getName(),  new ByteArrayInputStream(archetypeJarByteArray));
 			} 
-			getServiceManager().updateArcheType(technology, inputStreamMap, getCustomerId());
+			getServiceManager().createArcheTypes(technology, inputStreamMap, getCustomerId());
 			addActionMessage(getText(ARCHETYPE_UPDATED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
 			if (isDebugEnabled) {
