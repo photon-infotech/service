@@ -174,12 +174,14 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 			List<ArtifactInfo> versions = artifactGroup.getVersions();
 			for (ArtifactInfo artifactInfo : versions) {
 				List<RequiredOption> appliesTo = artifactInfo.getAppliesTo();
-				for (RequiredOption requiredOption : appliesTo) {
-					if (requiredOption.isRequired()) {
-						ArtifactGroup selectedartifactGroup = dbManager.getArtifactGroup(artifactInfo.getArtifactGroupId());
-						listArtifactGroup.add(selectedartifactGroup);
-						selectedFeatures.add(artifactInfo.getId());
-						break;
+				if(CollectionUtils.isNotEmpty(appliesTo)) {
+					for (RequiredOption requiredOption : appliesTo) {
+						if (requiredOption.isRequired()) {
+							ArtifactGroup selectedartifactGroup = dbManager.getArtifactGroup(artifactInfo.getArtifactGroupId());
+							listArtifactGroup.add(selectedartifactGroup);
+							selectedFeatures.add(artifactInfo.getId());
+							break;
+						}
 					}
 				}
 			}
@@ -193,12 +195,14 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 			List<ArtifactInfo> versions = artifactGroup.getVersions();
 			for (ArtifactInfo artifactInfo : versions) {
 				List<RequiredOption> appliesTo = artifactInfo.getAppliesTo();
-				for (RequiredOption requiredOption : appliesTo) {
-					if (requiredOption.isRequired()) {
-						ArtifactGroup selectedartifactGroup = dbManager.getArtifactGroup(artifactInfo.getArtifactGroupId());
-						listArtifactGroup.add(selectedartifactGroup);
-						selectedJsLibs.add(artifactInfo.getId());
-						break;
+				if(CollectionUtils.isNotEmpty(appliesTo)) {
+					for (RequiredOption requiredOption : appliesTo) {
+						if (requiredOption.isRequired()) {
+							ArtifactGroup selectedartifactGroup = dbManager.getArtifactGroup(artifactInfo.getArtifactGroupId());
+							listArtifactGroup.add(selectedartifactGroup);
+							selectedJsLibs.add(artifactInfo.getId());
+							break;
+						}
 					}
 				}
 			}
@@ -211,12 +215,14 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 			List<ArtifactInfo> versions = artifactGroup.getVersions();
 			for (ArtifactInfo artifactInfo : versions) {
 				List<RequiredOption> appliesTo = artifactInfo.getAppliesTo();
-				for (RequiredOption requiredOption : appliesTo) {
-					if (requiredOption.isRequired()) {
-						ArtifactGroup selectedartifactGroup = dbManager.getArtifactGroup(artifactInfo.getArtifactGroupId());
-						listArtifactGroup.add(selectedartifactGroup);
-						selectedComponentids.add(artifactInfo.getId());
-						break;
+				if(CollectionUtils.isNotEmpty(appliesTo)) {
+					for (RequiredOption requiredOption : appliesTo) {
+						if (requiredOption.isRequired()) {
+							ArtifactGroup selectedartifactGroup = dbManager.getArtifactGroup(artifactInfo.getArtifactGroupId());
+							listArtifactGroup.add(selectedartifactGroup);
+							selectedComponentids.add(artifactInfo.getId());
+							break;
+						}
 					}
 				}
 			}
