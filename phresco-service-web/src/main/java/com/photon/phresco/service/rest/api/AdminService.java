@@ -178,7 +178,7 @@ public class AdminService extends DbService {
 					 new Query(Criteria.where("context").is(context)), CustomerDAO.class);
 		} else {
 			customerDAO = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME, 
-					 new Query(Criteria.whereId().is(context)), CustomerDAO.class);
+					 new Query(Criteria.whereId().is(customerId)), CustomerDAO.class);
 		}
 		String id = customerDAO.getId();
 		Converter<CustomerDAO, Customer> converter = (Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
