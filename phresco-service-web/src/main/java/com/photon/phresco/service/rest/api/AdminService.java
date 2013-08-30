@@ -186,11 +186,11 @@ public class AdminService extends DbService {
         String repourl = customer.getRepoInfo().getGroupRepoURL();
         String artifactId = filterString(customer.getName());
         String contentURL = ServerUtil.createContentURL("customers", artifactId, "1.0", "png");
-        if(! id.equals(DEFAULT_CUSTOMER_NAME)) {
-        	CustomerDAO defCustomer = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME, 
-        			new Query(Criteria.whereId().is(DEFAULT_CUSTOMER_NAME)), CustomerDAO.class);
-        	repourl = converter.convertDAOToObject(defCustomer, DbService.getMongoOperation()).getRepoInfo().getGroupRepoURL();
-        }
+//        if(! id.equals(DEFAULT_CUSTOMER_NAME)) {
+//        	CustomerDAO defCustomer = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME, 
+//        			new Query(Criteria.whereId().is(DEFAULT_CUSTOMER_NAME)), CustomerDAO.class);
+//        	repourl = converter.convertDAOToObject(defCustomer, DbService.getMongoOperation()).getRepoInfo().getGroupRepoURL();
+//        }
         try {
 			URL url = new URL(repourl + "/" + contentURL);
 			iconStream = url.openStream();

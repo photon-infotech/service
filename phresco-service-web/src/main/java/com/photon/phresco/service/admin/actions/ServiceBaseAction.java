@@ -50,6 +50,7 @@ import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.exception.PhrescoWebServiceException;
 import com.photon.phresco.service.admin.commons.ServiceActions;
 import com.photon.phresco.service.admin.commons.ServiceUIConstants;
+import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.client.api.ServiceClientConstant;
 import com.photon.phresco.service.client.api.ServiceContext;
 import com.photon.phresco.service.client.api.ServiceManager;
@@ -80,23 +81,28 @@ public class ServiceBaseAction extends ActionSupport implements ServiceActions, 
 
 	protected User doLogin(String userName, String password)  {
 		try {
+		String adminServiceURL = PhrescoServerFactory.getServerConfig().getAdminServiceURL();
 		StringBuilder serverURL = new StringBuilder();
 		serverURL.append(getHttpRequest().getScheme());
 		serverURL.append(COLON_DOUBLE_SLASH);
-		serverURL.append(getHttpRequest().getServerName());
+		serverURL.append("localhost");
 		serverURL.append(COLON);
 		serverURL.append(getHttpRequest().getServerPort());
 		serverURL.append(getHttpRequest().getContextPath());
 		serverURL.append(SLASH_REST_SLASH_API);
     	ServiceContext context = new ServiceContext();
-		context.put(SERVICE_URL, serverURL.toString());
+		context.put(SERVICE_URL, adminServiceURL);
 		context.put(SERVICE_USERNAME, userName);
 		context.put(SERVICE_PASSWORD, password);
 		serviceManager = ServiceClientFactory.getServiceManager(context);
 		} catch (PhrescoWebServiceException ex) {
-            S_LOGGER.error(ex.getLocalizedMessage());
+			ex.printStackTrace();
+            S_LOGGER.error(ex.getMessage());
             throw new PhrescoWebServiceException(ex.getResponse());
-        }
+        } catch (PhrescoException e) {
+        	S_LOGGER.error(e.getMessage());
+            throw new PhrescoWebServiceException(e);
+		}
 		return serviceManager.getUserInfo();
     }
 	

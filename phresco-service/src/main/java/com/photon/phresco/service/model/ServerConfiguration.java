@@ -23,6 +23,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.photon.phresco.configuration.ConfigReader;
 import com.photon.phresco.configuration.Configuration;
 import com.photon.phresco.exception.PhrescoException;
@@ -165,7 +167,9 @@ public class ServerConfiguration {
 	public String getLatestServiceVersion(){
 		return dependencyConfig.getProperty(SERVICE_LATEST_VERSION);
 	}
+	
 	public String getServiceUrl() {
+		
 		return serviceURL;
 	}
 
@@ -174,16 +178,41 @@ public class ServerConfiguration {
 	}
 
 	public String getAuthServiceURL() throws PhrescoException {
-		String authenticateurl = "";
+		StringBuilder sb = new StringBuilder();
 		List<Configuration> configurations = configurationList("WebService");
 		for (Configuration configuration : configurations) {
-			String protocol = configuration.getProperties().getProperty("protocol");
-			String host = configuration.getProperties().getProperty("host");
-			String port = configuration.getProperties().getProperty("port");
-			String context = configuration.getProperties().getProperty("context");
-			authenticateurl = protocol + "://" + host + ":" +  port + "/" + context;
+			if(configuration.getName().equalsIgnoreCase("AuthService")) {
+				String protocol = configuration.getProperties().getProperty("protocol");
+				String host = configuration.getProperties().getProperty("host");
+				String port = configuration.getProperties().getProperty("port");
+				String context = configuration.getProperties().getProperty("context");
+				sb.append(protocol).append("://").append(host).append(":").append(port).append("/").append(context);
+				String additionalPath = configuration.getProperties().getProperty("additional_context");
+				if(StringUtils.isNotEmpty(additionalPath)) {
+					sb.append(additionalPath);
+				}
+			}
 		}
-		return authenticateurl;
+		return sb.toString();
+	}
+	
+	public String getAdminServiceURL() throws PhrescoException {
+		StringBuilder sb = new StringBuilder();
+		List<Configuration> configurations = configurationList("WebService");
+		for (Configuration configuration : configurations) {
+			if(configuration.getName().equalsIgnoreCase("AdminService")) {
+				String protocol = configuration.getProperties().getProperty("protocol");
+				String host = configuration.getProperties().getProperty("host");
+				String port = configuration.getProperties().getProperty("port");
+				String context = configuration.getProperties().getProperty("context");
+				sb.append(protocol).append("://").append(host).append(":").append(port).append("/").append(context);
+				String additionalPath = configuration.getProperties().getProperty("additional_context");
+				if(StringUtils.isNotEmpty(additionalPath)) {
+					sb.append(additionalPath);
+				}
+			}
+		}
+		return sb.toString();
 	}
 	
 	public String getRepoBaseURL() throws PhrescoException {
