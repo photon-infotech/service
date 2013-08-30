@@ -64,7 +64,7 @@ public class VersionService implements ServerConstants {
 	private static Boolean isDebugEnabled = S_LOGGER.isDebugEnabled();
 	
 	@ApiOperation(value = " Get latest version ")
-	@RequestMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+	@RequestMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
 	public @ResponseBody VersionInfo getVersionInfo(
 		@ApiParam(value = "Current version of framework", name = "version") @QueryParam(VERSION) String version) 
 		throws VersionRangeResolutionException, PhrescoException {
