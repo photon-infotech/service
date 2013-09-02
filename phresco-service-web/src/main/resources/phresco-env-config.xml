@@ -1,12 +1,21 @@
 <environments>
     <environment appliesTo="" default="false" desc="" name="Production">
-        <WebService name="webservice">
+        <WebService name="AuthService">
             <port>8080</port>
             <password/>
             <context>auth-2.0</context>
             <host>115.111.233.107</host>
             <protocol>http</protocol>
             <username/>
+        </WebService>
+         <WebService name="AdminService">
+            <port>7070</port>
+            <password/>
+            <context>service-testing</context>
+            <host>localhost</host>
+            <protocol>http</protocol>
+            <username/>
+            <additional_context>/rest/api</additional_context>
         </WebService>
         <Database name="database">
             <version>2.0.4</version>
@@ -32,13 +41,22 @@
         </Server>
     </environment>
     <environment appliesTo="" default="false" desc="" name="Development">
-        <WebService name="webservice">
+        <WebService name="AuthService">
             <port>8080</port>
             <password/>
             <context>auth-2.0</context>
             <host>172.16.8.250</host>
             <protocol>http</protocol>
             <username/>
+        </WebService>
+        <WebService name="AdminService">
+            <port>7070</port>
+            <password/>
+            <context>service-testing</context>
+            <host>localhost</host>
+            <protocol>http</protocol>
+            <username/>
+            <additional_context>/rest/api</additional_context>
         </WebService>
         <Database desc="" name="database">
             <version>2.2.0</version>
@@ -64,7 +82,7 @@
         </Server>
     </environment>
     <environment default="true" name="Testing">
-        <WebService name="webservice">
+        <WebService name="AuthService">
             <port>8080</port>
             <password/>
             <context>auth-2.0</context>
@@ -72,12 +90,21 @@
             <protocol>http</protocol>
             <username/>
         </WebService>
+        <WebService name="AdminService">
+            <port>7070</port>
+            <password/>
+            <context>service-testing</context>
+            <host>localhost</host>
+            <protocol>http</protocol>
+            <username/>
+            <additional_context>/rest/api</additional_context>
+        </WebService>
         <Database name="database">
             <version>2.0.4</version>
             <port>27017</port>
             <password/>
             <type>mongodb</type>
-            <host>172.16.8.250</host>
+            <host>172.16.17.227</host>
             <dbname>phresco-dev3-0</dbname>
             <username/>
         </Database>
@@ -96,13 +123,22 @@
         </Server>
     </environment>
     <environment default="false" name="phresco-setup">
-        <WebService name="webservice">
+        <WebService name="AuthService">
             <port>8080</port>
             <password/>
             <context>auth</context>
             <host>localhost</host>
             <protocol>http</protocol>
             <username/>
+        </WebService>
+        <WebService name="AdminService">
+            <port>7070</port>
+            <password/>
+            <context>service-testing</context>
+            <host>localhost</host>
+            <protocol>http</protocol>
+            <username/>
+            <additional_context>/rest/api</additional_context>
         </WebService>
         <Database name="database">
             <version>2.0.4</version>
