@@ -21,11 +21,11 @@
 
 <div id="versionInfo">
 	 <div class="abt_logo">
-		<img src="images/phresco.png" alt="logo" class="abt_logo_img">
+		<img src="images/about_logo.png" alt="logo" class="abt_logo_img">
 	</div>	
 
 	<div class="abt_content">
-		HeliOS is a platform for creating next generation web, mobile, and multi channel presences leveraging your existing investments combined with accepted industry best practices.		
+		Phresco is a platform for creating next generation web, mobile, and multi channel presences leveraging your existing investments combined with accepted industry best practices.		
 	</div>
 </div>
 
