@@ -104,8 +104,8 @@
             <port>27017</port>
             <password/>
             <type>mongodb</type>
-            <host>172.16.17.227</host>
-            <dbname>phresco-dev3-0</dbname>
+            <host>localhost</host>
+            <dbname>database-dump</dbname>
             <username/>
         </Database>
         <Server name="server">
