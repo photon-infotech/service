@@ -106,7 +106,7 @@
             <type>mongodb</type>
             <host>localhost</host>
             <dbname>database-dump</dbname>
-            <username/>
+           <username/>
         </Database>
         <Server name="server">
             <context>service</context>
