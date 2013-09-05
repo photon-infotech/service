@@ -93,7 +93,7 @@
         <WebService name="AdminService">
             <port>7070</port>
             <password/>
-            <context>service-testing</context>
+            <context>service</context>
             <host>localhost</host>
             <protocol>http</protocol>
             <username/>
