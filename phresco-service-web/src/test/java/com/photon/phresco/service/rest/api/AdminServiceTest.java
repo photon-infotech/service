@@ -17,6 +17,17 @@
  */
 package com.photon.phresco.service.rest.api;
 
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
+
+import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.service.impl.DbService;
 import com.photon.phresco.util.ServiceConstants;
@@ -26,17 +37,47 @@ public class AdminServiceTest extends DbService implements ServiceConstants{
 	public AdminServiceTest() throws PhrescoException {
 		super();
 	}
-	// TODO:Arun
-	/*@Test
-	public void testCreateCustomer() {
-		List<Customer> customers = new ArrayList<Customer>();
-		Customer customer = new Customer("phresco", "From Phresco");
-		customer.setId("testCustomer");
-		customers.add(customer);
-		mongoOperation.insertList(CUSTOMERS_COLLECTION_NAME , customers);
+	@Test
+	public void testGetIconNull() throws PhrescoException {
+		AdminService admin = new AdminService();
+		MockHttpServletResponse response = new MockHttpServletResponse();
+		HttpServletResponse httpServletResponse = (HttpServletResponse)response;
+		byte[] icon = admin.getIcon(httpServletResponse, null, null);
+		Assert.assertNull(icon);
+	}
+	
+	@Test
+	public void testGetIcon() throws PhrescoException {
+		AdminService admin = new AdminService();
+		MockHttpServletResponse response = new MockHttpServletResponse();
+		HttpServletResponse httpServletResponse = (HttpServletResponse)response;
+		byte[] icon = admin.getIcon(httpServletResponse, null, "wu");
+		Assert.assertNotNull(icon);
+	}
+	
+	@Test
+	public void testGetCustomerProperties() throws PhrescoException, IOException {
+		AdminService admin = new AdminService();
+		MockHttpServletResponse response = new MockHttpServletResponse();
+		HttpServletResponse httpServletResponse = (HttpServletResponse)response;
+		MockHttpServletRequest request = new MockHttpServletRequest();
+		HttpServletRequest httpServletRequest = (HttpServletRequest)request;
+		Customer customer = admin.getCustomerProperties(httpServletResponse, httpServletRequest, "wu");
+		Assert.assertNotNull(customer);
+	}
+	
+	@Test
+	public void testGetCustomerPropertiesNone() throws PhrescoException, IOException {
+		AdminService admin = new AdminService();
+		MockHttpServletResponse response = new MockHttpServletResponse();
+		HttpServletResponse httpServletResponse = (HttpServletResponse)response;
+		MockHttpServletRequest request = new MockHttpServletRequest();
+		HttpServletRequest httpServletRequest = (HttpServletRequest)request;
+		Customer customer = admin.getCustomerProperties(httpServletResponse, httpServletRequest, null);
+		Assert.assertNull(customer);
 	}
 
-	@Test
+/*	@Test
 	public void testFindCustomer() {
 		List<Customer> customers = mongoOperation.getCollection(CUSTOMERS_COLLECTION_NAME , Customer.class);
 		assertNotNull(customers);

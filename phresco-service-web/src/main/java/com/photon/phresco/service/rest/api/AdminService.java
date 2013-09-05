@@ -17,7 +17,6 @@
  */
 package com.photon.phresco.service.rest.api;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,13 +25,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.HttpMethod;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
@@ -43,31 +39,21 @@ import org.apache.log4j.Logger;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.HandlerMapping;
 
 import com.google.gson.Gson;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactGroup.Type;
 import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.Customer;
-import com.photon.phresco.commons.model.Element;
 import com.photon.phresco.commons.model.LogInfo;
 import com.photon.phresco.commons.model.Permission;
 import com.photon.phresco.commons.model.Property;
@@ -87,7 +73,6 @@ import com.photon.phresco.service.api.RepositoryManager;
 import com.photon.phresco.service.client.impl.ClientHelper;
 import com.photon.phresco.service.converters.ConvertersFactory;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
-import com.photon.phresco.service.dao.BaseDAO;
 import com.photon.phresco.service.dao.CustomerDAO;
 import com.photon.phresco.service.dao.TechnologyDAO;
 import com.photon.phresco.service.dao.VideoInfoDAO;
@@ -170,27 +155,27 @@ public class AdminService extends DbService {
         byte[] byteArray = null;
         InputStream iconStream = null;
 		CustomerDAO customerDAO =  null;
-		if(StringUtils.isEmpty(context) && StringUtils.isEmpty(customerId)) {
+		List<Customer> customers = new ArrayList<Customer>();
+		
+		customers = findCustomersFromDB();
+		if (StringUtils.isNotEmpty(context)) {
+			customerDAO = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME,
+					new Query(Criteria.where("context").is(context)), CustomerDAO.class);
+		} else if (customers.size() == 2) {
+			for (Customer customer : customers) {
+				if (!customer.getName().equals("Photon")) {
+					customerDAO = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME,
+							new Query(Criteria.whereId().is(customer.getId())), CustomerDAO.class);
+				}
+			}
+		} else {
 			return byteArray;
 		}
-		if(StringUtils.isNotEmpty(context)) {
-			customerDAO = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME, 
-					 new Query(Criteria.where("context").is(context)), CustomerDAO.class);
-		} else {
-			customerDAO = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME, 
-					 new Query(Criteria.whereId().is(customerId)), CustomerDAO.class);
-		}
-		String id = customerDAO.getId();
 		Converter<CustomerDAO, Customer> converter = (Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
 		Customer customer = converter.convertDAOToObject(customerDAO, DbService.getMongoOperation());
         String repourl = customer.getRepoInfo().getGroupRepoURL();
         String artifactId = filterString(customer.getName());
         String contentURL = ServerUtil.createContentURL("customers", artifactId, "1.0", "png");
-//        if(! id.equals(DEFAULT_CUSTOMER_NAME)) {
-//        	CustomerDAO defCustomer = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME, 
-//        			new Query(Criteria.whereId().is(DEFAULT_CUSTOMER_NAME)), CustomerDAO.class);
-//        	repourl = converter.convertDAOToObject(defCustomer, DbService.getMongoOperation()).getRepoInfo().getGroupRepoURL();
-//        }
         try {
 			URL url = new URL(repourl + "/" + contentURL);
 			iconStream = url.openStream();
@@ -224,15 +209,25 @@ public class AdminService extends DbService {
              S_LOGGER.debug("Entered into AdminService.getCustomerProperties()");
          }
     	 Customer customerInfo = null;
+    	 CustomerDAO customerDAO = null;
+    	 List<Customer> customers = new ArrayList<Customer>();
+    	 customers = findCustomersFromDB();
     	 if(StringUtils.isNotEmpty(context)) {
-				CustomerDAO customer = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME, 
+    		 customerDAO = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME, 
 				        new Query(Criteria.where("context").is(context)), CustomerDAO.class);
-			if (customer != null) {
-				Converter<CustomerDAO, Customer> customerConverter = 
-					(Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
-				customerInfo = customerConverter.convertDAOToObject(customer, DbService.getMongoOperation());
+    	 } else if (customers.size() == 2) {
+			for (Customer customer : customers) {
+				if (!customer.getName().equals("Photon")) {
+					customerDAO = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME,
+							new Query(Criteria.whereId().is(customer.getId())), CustomerDAO.class);
+				}
 			}
 		}
+			if (customerDAO != null) {
+				Converter<CustomerDAO, Customer> customerConverter = 
+					(Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
+				customerInfo = customerConverter.convertDAOToObject(customerDAO, DbService.getMongoOperation());
+			}
     	if(customerInfo == null ) {
     		 response.setStatus(204);
     		 return customerInfo;
@@ -276,7 +271,7 @@ public class AdminService extends DbService {
     				artifactGroup.setGroupId("customers");
     				artifactGroup.setArtifactId(filterString(customer.getName()));
     				artifactGroup.setPackaging("png");
-    				artifactGroup.setCustomerIds(Collections.singletonList(DEFAULT_CUSTOMER_NAME));
+    				artifactGroup.setCustomerIds(Collections.singletonList(customer.getId()));
     				ArtifactInfo info = new ArtifactInfo();
     				info.setVersion("1.0");
     				artifactGroup.setVersions(Collections.singletonList(info));
