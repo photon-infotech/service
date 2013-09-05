@@ -198,7 +198,7 @@
 			bottomButtonPanelBottom = frameworkTheme.get("bottomButtonPanelBottom");
 			customerBaseColor = frameworkTheme.get("bottomButtonPanelBottom");
 			welcomeUserIcon = frameworkTheme.get("welcomeUserIcon");
-			context = frameworkTheme.get("context");
+			context = customer.getContext();
 		}
 		
 		if (StringUtils.isNotEmpty(customer.getRepoInfo().getRepoName())) {
