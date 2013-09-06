@@ -120,6 +120,9 @@ public class Customers extends ServiceBaseAction  {
 	private String customerBaseColor = "";
 	private String welcomeUserIcon = "";
 	private String context = "";
+	private String PageTitleColor = "";
+	private String CopyrightText = "";
+	private String CustomerTitle = "";
 
 	private String fromPage = "";
 
@@ -395,7 +398,9 @@ public class Customers extends ServiceBaseAction  {
 			frameworkTheme.put("bottomButtonPanelBottom", getBottomButtonPanelBottom());
 			frameworkTheme.put("customerBaseColor", getBottomButtonPanelBottom());
 			frameworkTheme.put("welcomeUserIcon", getWelcomeUserIcon());
-			System.out.println("FrameworkTheme = " + frameworkTheme.toString());
+			frameworkTheme.put("pageTitleColor", getPageTitleColor());
+			frameworkTheme.put("copyRightLabel", getCopyrightText());
+			frameworkTheme.put("customerTitle", getCustomerTitle());
 			customer.setFrameworkTheme(frameworkTheme);
 			customer.setContext(context);
 		} catch (Exception e) {
@@ -1162,5 +1167,29 @@ public class Customers extends ServiceBaseAction  {
 
 	public void setWelcomeUserIcon(String welcomeUserIcon) {
 		this.welcomeUserIcon = welcomeUserIcon;
+	}
+
+	public String getPageTitleColor() {
+		return PageTitleColor;
+	}
+
+	public void setPageTitleColor(String pageTitleColor) {
+		PageTitleColor = pageTitleColor;
+	}
+
+	public String getCopyrightText() {
+		return CopyrightText;
+	}
+
+	public void setCopyrightText(String copyrightText) {
+		CopyrightText = copyrightText;
+	}
+
+	public String getCustomerTitle() {
+		return CustomerTitle;
+	}
+
+	public void setCustomerTitle(String customerTitle) {
+		CustomerTitle = customerTitle;
 	}
 }

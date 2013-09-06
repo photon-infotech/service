@@ -99,6 +99,9 @@
 	String welcomeUserIcon = "";
 	String context = "";
 	String customerBaseColor = "";
+	String PageTitleColor = "";
+	String CopyrightText = "";
+	String CustomerTitle = "";
 	
 	List<String> applicableTechnologies = new ArrayList();
 	List<ApplicationType> applicableAppTypes = null;
@@ -198,6 +201,9 @@
 			bottomButtonPanelBottom = frameworkTheme.get("bottomButtonPanelBottom");
 			customerBaseColor = frameworkTheme.get("bottomButtonPanelBottom");
 			welcomeUserIcon = frameworkTheme.get("welcomeUserIcon");
+			PageTitleColor = frameworkTheme.get("pageTitleColor");
+			CopyrightText = frameworkTheme.get("copyRightLabel");
+			CustomerTitle = frameworkTheme.get("customerTitle");
 			context = customer.getContext();
 		}
 		
@@ -862,6 +868,36 @@
 							<div class="controls">
 								<input id="welcomeUserIcon" placeholder="<s:text name='place.hldr.cust.welcomeusericon'/>"class="input-xlarge" type="text" name="welcomeUserIcon"
 									value="<%= welcomeUserIcon %>" maxlength="50" title="Color Hashcode eg: FFFFFF">
+							</div>
+						</div>
+						
+						<div class="control-group">
+							<label class="control-label labelbold">
+								 <s:text name='lbl.hdr.adm.cust.PageTitleColor' />
+							 </label>
+							<div class="controls">
+								<input id="welcomeUserIcon" placeholder="<s:text name='place.hldr.cust.PageTitleColor'/>"class="input-xlarge" type="text" name="welcomeUserIcon"
+									value="<%= PageTitleColor %>" maxlength="50" title="Color Hashcode eg: FFFFFF">
+							</div>
+						</div>
+						
+						<div class="control-group">
+							<label class="control-label labelbold">
+								 <s:text name='lbl.hdr.adm.cust.CopyrightText' />
+							 </label>
+							<div class="controls">
+								<input id="CopyrightText" placeholder="<s:text name='place.hldr.cust.CopyrightText'/>"class="input-xlarge" type="text" name="CopyrightText"
+									value="<%= CopyrightText %>" maxlength="50" title="Color Hashcode eg: FFFFFF">
+							</div>
+						</div>
+						
+						<div class="control-group">
+							<label class="control-label labelbold">
+								 <s:text name='lbl.hdr.adm.cust.CustomerTitle' />
+							 </label>
+							<div class="controls">
+								<input id="CustomerTitle" placeholder="<s:text name='place.hldr.cust.CustomerTitle'/>"class="input-xlarge" type="text" name="CustomerTitle"
+									value="<%= CustomerTitle %>" maxlength="50" title="Color Hashcode eg: FFFFFF">
 							</div>
 						</div>
 						
