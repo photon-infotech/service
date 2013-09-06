@@ -27,6 +27,7 @@ import java.util.StringTokenizer;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.sonatype.aether.resolution.VersionRangeResolutionException;
 import org.springframework.http.MediaType;
@@ -87,7 +88,7 @@ public class VersionService implements ServerConstants {
 	
 	@ApiOperation(value = " Get update content ")
     @RequestMapping(value= UPDATE, produces = MediaType.MULTIPART_FORM_DATA_VALUE, method = RequestMethod.GET)
-	public @ResponseBody Response getLatestVersionContent(
+	public @ResponseBody byte[] getLatestVersionContent(
 			@ApiParam(value = "Customerid", name = ServiceConstants.REST_QUERY_CUSTOMERID) 
 			@QueryParam(ServiceConstants.REST_QUERY_CUSTOMERID) String customerId) throws PhrescoException, IOException  {
 		if (isDebugEnabled) {
@@ -109,7 +110,7 @@ public class VersionService implements ServerConstants {
 		} catch (MalformedURLException e) {
 			throw new PhrescoException(e);
 		}
-		return Response.status(Response.Status.OK).entity(url.openStream()).build();
+		return IOUtils.toByteArray(url.openStream());
 	}
 	
 	private VersionInfo getVersion(String currentVersion) throws PhrescoException {
