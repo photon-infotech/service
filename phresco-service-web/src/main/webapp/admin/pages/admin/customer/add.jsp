@@ -777,7 +777,7 @@
 							</label>
 							<div class="controls">
 								<input id="cusomerBasecolor" placeholder="<s:text name='place.hldr.cust.customerBaseColor'/>"class="input-xlarge" type="text" name="cusomerBasecolor"
-									value="<%= customerBaseColor %>" maxlength="50" title="Color Hashcode eg: FFFFFF">
+									value="<%= customerBaseColor %>" maxlength="50" title="Color Hashcode eg: #FFFFFF">
 							</div>
 						</div>
 
@@ -787,7 +787,7 @@
 							</label>
 							<div class="controls">
 								<input id="loginLogoMargin" placeholder="<s:text name='place.hldr.cust.loginLogoMargin'/>"class="input-xlarge" type="text" name="loginLogoMargin"
-									value="<%= loginLogoMargin %>" maxlength="50" title="Color Hashcode eg: FFFFFF">
+									value="<%= loginLogoMargin %>" maxlength="50" title="Margin in pixel eg: 10px">
 							</div>
 						</div>
 						
@@ -797,7 +797,7 @@
 							 </label>
 							<div class="controls">
 								<input id="pageLogoPadding" placeholder="<s:text name='place.hldr.cust.pageLogoPadding'/>"class="input-xlarge" type="text" name="pageLogoPadding"
-									value="<%= pageLogoPadding %>" maxlength="50" title="Color Hashcode eg: FFFFFF">
+									value="<%= pageLogoPadding %>" maxlength="50" title="padding in pixed eg: 10px">
 							</div>
 						</div>
 						
@@ -807,7 +807,7 @@
 							</label>
 							<div class="controls">
 								<input id="headerLinkColor" placeholder="<s:text name='place.hldr.cust.headerLinkColor'/>"class="input-xlarge" type="text" name="headerLinkColor"
-									value="<%= headerLinkColor %>" maxlength="50" title="Color Hashcode eg: FFFFFF">
+									value="<%= headerLinkColor %>" maxlength="50" title="Color Hashcode eg: #FFFFFF">
 							</div>
 						</div>
 						
@@ -817,7 +817,7 @@
 							</label>
 							<div class="controls">
 								<input id="headerActiveLinkColor" placeholder="<s:text name='place.hldr.cust.headerActiveLinkColor'/>"class="input-xlarge" type="text" name="headerActiveLinkColor"
-									value="<%= headerActiveLinkColor %>" maxlength="50" title="Color Hashcode eg: FFFFFF">
+									value="<%= headerActiveLinkColor %>" maxlength="50" title="Color Hashcode eg: #FFFFFF">
 							</div>
 						</div>
 						
@@ -827,7 +827,7 @@
 							 </label>
 							<div class="controls">
 								<input id="editNavigationLink" placeholder="<s:text name='place.hldr.cust.editNavigationLink'/>"class="input-xlarge" type="text" name="editNavigationLink"
-									value="<%= editNavigationLink %>" maxlength="50" title="Color Hashcode eg: FFFFFF">
+									value="<%= editNavigationLink %>" maxlength="50" title="Color Hashcode eg: #FFFFFF">
 							</div>
 						</div>
 						
@@ -837,7 +837,7 @@
 							 </label>
 							<div class="controls">
 								<input id="buttonBackGroundColor" placeholder="<s:text name='place.hldr.cust.buttonBackGroundColor'/>"class="input-xlarge" type="text" name="buttonBackGroundColor"
-									value="<%= buttonBackGroundColor %>" maxlength="50" title="Color Hashcode eg: FFFFFF">
+									value="<%= buttonBackGroundColor %>" maxlength="50" title="Color Hashcode eg: #FFFFFF">
 							</div>
 						</div>
 						
@@ -847,7 +847,7 @@
 							 </label>
 							<div class="controls">
 								<input id="consoleHeaderColor" placeholder="<s:text name='place.hldr.cust.consoleHeaderColor'/>"class="input-xlarge" type="text" name="consoleHeaderColor"
-									value="<%= consoleHeaderColor %>" maxlength="50" title="Color Hashcode eg: FFFFFF">
+									value="<%= consoleHeaderColor %>" maxlength="50" title="Color Hashcode eg: #FFFFFF">
 							</div>
 						</div>
 						
@@ -857,7 +857,7 @@
 							 </label>
 							<div class="controls">
 								<input id="copyrightLabelColor" placeholder="<s:text name='place.hldr.cust.copyrightLabelColor'/>"class="input-xlarge" type="text" name="copyrightLabelColor"
-									value="<%= copyrightLabelColor %>" maxlength="50" title="Color Hashcode eg: FFFFFF">
+									value="<%= copyrightLabelColor %>" maxlength="50" title="Color Hashcode eg: #FFFFFF">
 							</div>
 						</div>
 						
@@ -867,7 +867,7 @@
 							 </label>
 							<div class="controls">
 								<input id="welcomeUserIcon" placeholder="<s:text name='place.hldr.cust.welcomeusericon'/>"class="input-xlarge" type="text" name="welcomeUserIcon"
-									value="<%= welcomeUserIcon %>" maxlength="50" title="Color Hashcode eg: FFFFFF">
+									value="<%= welcomeUserIcon %>" maxlength="50" title="Color Hashcode eg: #FFFFFF">
 							</div>
 						</div>
 						
@@ -877,7 +877,7 @@
 							 </label>
 							<div class="controls">
 								<input id="welcomeUserIcon" placeholder="<s:text name='place.hldr.cust.PageTitleColor'/>"class="input-xlarge" type="text" name="welcomeUserIcon"
-									value="<%= PageTitleColor %>" maxlength="50" title="Color Hashcode eg: FFFFFF">
+									value="<%= PageTitleColor %>" maxlength="50" title="Color Hashcode eg: #FFFFFF">
 							</div>
 						</div>
 						
@@ -886,8 +886,8 @@
 								 <s:text name='lbl.hdr.adm.cust.CopyrightText' />
 							 </label>
 							<div class="controls">
-								<input id="CopyrightText" placeholder="<s:text name='place.hldr.cust.CopyrightText'/>"class="input-xlarge" type="text" name="CopyrightText"
-									value="<%= CopyrightText %>" maxlength="50" title="Color Hashcode eg: FFFFFF">
+								<textarea id="CopyrightText" placeholder="<s:text name='place.hldr.cust.CopyrightText'/>" class="input-xlarge" rows="3" 
+				 			   		name="copyrightText" maxlength="150" title="web address link with anchor tag "><%= CopyrightText %></textarea>
 							</div>
 						</div>
 						
@@ -897,7 +897,7 @@
 							 </label>
 							<div class="controls">
 								<input id="CustomerTitle" placeholder="<s:text name='place.hldr.cust.CustomerTitle'/>"class="input-xlarge" type="text" name="CustomerTitle"
-									value="<%= CustomerTitle %>" maxlength="50" title="Color Hashcode eg: FFFFFF">
+									value="<%= CustomerTitle %>" maxlength="50" title="Color Hashcode eg: #FFFFFF">
 							</div>
 						</div>
 						
@@ -907,9 +907,9 @@
 							</label>
 							<div class="controls">
 								<input id="headerBackGroundcolorTop" placeholder="<s:text name='place.hldr.cust.headerBackGroundTopColor'/>" class="input-xlarge" type="text" name="headerBackGroundcolorTop"
-								   value="<%= headerBackGroundcolorTop%>"  maxlength="25" title="Color Hashcode eg: FFFFFF">
+								   value="<%= headerBackGroundcolorTop%>"  maxlength="25" title="Color Hashcode eg: #FFFFFF">
 								 <input id="headerBackGroundcolorBottom" placeholder="<s:text name='place.hldr.cust.headerBackGroundBottomColor'/>" class="input-xlarge" type="text" name="headerBackGroundcolorBottom"
-								   value="<%= headerBackGroundcolorBottom%>"  maxlength="25" title="Color Hashcode eg: FFFFFF">
+								   value="<%= headerBackGroundcolorBottom%>"  maxlength="25" title="Color Hashcode eg: #FFFFFF">
 							</div>
 						</div>
 						
@@ -919,9 +919,9 @@
 							</label>
 							<div class="controls">
 								<input id="footerBackGroundcolorTop" placeholder="<s:text name='place.hldr.cust.footerBackGroundTopColor'/>" class="input-xlarge" type="text" name="footerBackGroundcolorTop"
-								   value="<%= footerBackGroundcolorTop%>"  maxlength="25" title="Color Hashcode eg: FFFFFF">
+								   value="<%= footerBackGroundcolorTop%>"  maxlength="25" title="Color Hashcode eg: #FFFFFF">
 								 <input id="footerBackGroundcolorBottom" placeholder="<s:text name='place.hldr.cust.footerBackGroundBottomColor'/>" class="input-xlarge" type="text" name="footerBackGroundcolorBottom"
-								   value="<%= footerBackGroundcolorBottom%>"  maxlength="25" title="Color Hashcode eg: FFFFFF">
+								   value="<%= footerBackGroundcolorBottom%>"  maxlength="25" title="Color Hashcode eg: #FFFFFF">
 							</div>
 						</div>
 						
@@ -931,9 +931,9 @@
 							</label>
 							<div class="controls">
 								<input id="pageTitleBackGroundTop" placeholder="<s:text name='place.hldr.cust.pageTitleBackGroundTopColor'/>" class="input-xlarge" type="text" name="pageTitleBackGroundTop"
-								   value="<%= pageTitleBackGroundTop%>"  maxlength="25" title="Color Hashcode eg: FFFFFF">
+								   value="<%= pageTitleBackGroundTop%>"  maxlength="25" title="Color Hashcode eg: #FFFFFF">
 								 <input id="pageTitleBackGroundBottom" placeholder="<s:text name='place.hldr.cust.pageTitleBackGroundBottomColor'/>" class="input-xlarge" type="text" name="pageTitleBackGroundBottom"
-								   value="<%= pageTitleBackGroundBottom%>"  maxlength="25" title="Color Hashcode eg: FFFFFF">
+								   value="<%= pageTitleBackGroundBottom%>"  maxlength="25" title="Color Hashcode eg: #FFFFFF">
 							</div>
 						</div>
 						
@@ -943,9 +943,9 @@
 							</label>
 							<div class="controls">
 								<input id="editNavigationActiveBackGroundTop" placeholder="<s:text name='place.hldr.cust.editNavigationActiveBackGroundTopColor'/>" class="input-xlarge" type="text" name="editNavigationActiveBackGroundTop"
-								   value="<%= editNavigationActiveBackGroundTop%>"  maxlength="25" title="Color Hashcode eg: FFFFFF">
+								   value="<%= editNavigationActiveBackGroundTop%>"  maxlength="25" title="Color Hashcode eg: #FFFFFF">
 								 <input id="editNavigationActiveBackGroundBottom" placeholder="<s:text name='place.hldr.cust.editNavigationActiveBackGroundBottomColor'/>" class="input-xlarge" type="text" name="editNavigationActiveBackGroundBottom"
-								   value="<%= editNavigationActiveBackGroundBottom%>"  maxlength="25" title="Color Hashcode eg: FFFFFF">
+								   value="<%= editNavigationActiveBackGroundBottom%>"  maxlength="25" title="Color Hashcode eg: #FFFFFF">
 							</div>
 						</div>
 						
@@ -955,9 +955,9 @@
 							</label>
 							<div class="controls">
 								<input id="bottomButtonPanelTop" placeholder="<s:text name='place.hldr.cust.bottomButtonPanelTopcolor'/>" class="input-xlarge" type="text" name="bottomButtonPanelTop"
-								   value="<%= bottomButtonPanelTop %>"  maxlength="25" title="Color Hashcode eg: FFFFFF">
+								   value="<%= bottomButtonPanelTop %>"  maxlength="25" title="Color Hashcode eg: #FFFFFF">
 								<input id="bottomButtonPanelBottom" placeholder="<s:text name='place.hldr.cust.bottomButtonPanelBottomcolor'/>" class="input-xlarge" type="text" name="bottomButtonPanelBottom"
-								   value="<%= bottomButtonPanelBottom %>"  maxlength="25" title="Color Hashcode eg: FFFFFF">
+								   value="<%= bottomButtonPanelBottom %>"  maxlength="25" title="Color Hashcode eg: #FFFFFF">
 							</div>
 						</div>
 						
