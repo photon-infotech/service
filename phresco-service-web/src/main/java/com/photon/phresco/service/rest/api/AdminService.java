@@ -264,29 +264,29 @@ public class AdminService extends DbService {
     			String repoName = repoInfo.getRepoName();
     			if(StringUtils.isEmpty(repoInfo.getReleaseRepoURL())) {
     				repoInfo = repositoryManager.createCustomerRepository(customer.getId(), repoName);
-    				customer.setRepoInfo(repoInfo);
-    			}
-    			if(iconStream != null) {
-    				ArtifactGroup artifactGroup = new ArtifactGroup();
-    				artifactGroup.setGroupId("customers");
-    				artifactGroup.setArtifactId(filterString(customer.getName()));
-    				artifactGroup.setPackaging("png");
-    				artifactGroup.setCustomerIds(Collections.singletonList(customer.getId()));
-    				ArtifactInfo info = new ArtifactInfo();
-    				info.setVersion("1.0");
-    				artifactGroup.setVersions(Collections.singletonList(info));
-    				File artifcatFile = new File(ServerUtil.getTempFolderPath() + "/"
-    		                + customer.getName() + "." + "png");
-    				ServerUtil.convertByteArrayToFile(artifcatFile, iconStream);
-    				uploadIcon(artifactGroup, artifcatFile);
+                    customer.setRepoInfo(repoInfo);
     			}
     			Converter<CustomerDAO, Customer> customerConverter = 
         			(Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
     			CustomerDAO customerDAO = customerConverter.convertObjectToDAO(customer);
 		        DbService.getMongoOperation().save(CUSTOMERDAO_COLLECTION_NAME, customerDAO);
-		        DbService.getMongoOperation().save(REPOINFO_COLLECTION_NAME, customer.getRepoInfo());
+                DbService.getMongoOperation().save(REPOINFO_COLLECTION_NAME, customer.getRepoInfo());
 		        List<TechnologyDAO> techDAOs = DbService.getMongoOperation().find(TECHNOLOGIES_COLLECTION_NAME, 
 		        		new Query(Criteria.whereId().in(customerDAO.getApplicableTechnologies().toArray())), TechnologyDAO.class);
+                if(iconStream != null) {
+                    ArtifactGroup artifactGroup = new ArtifactGroup();
+                    artifactGroup.setGroupId("customers");
+                    artifactGroup.setArtifactId(filterString(customer.getName()));
+                    artifactGroup.setPackaging("png");
+                    artifactGroup.setCustomerIds(Collections.singletonList(customer.getId()));
+                    ArtifactInfo info = new ArtifactInfo();
+                    info.setVersion("1.0");
+                    artifactGroup.setVersions(Collections.singletonList(info));
+                    File artifcatFile = new File(ServerUtil.getTempFolderPath() + "/"
+                            + customer.getName() + "." + "png");
+                    ServerUtil.convertByteArrayToFile(artifcatFile, iconStream);
+                    uploadIcon(artifactGroup, artifcatFile);
+                }
 		        if(CollectionUtils.isNotEmpty(techDAOs)) {
 		        	for (TechnologyDAO technologyDAO : techDAOs) {
 						List<String> customerIds = technologyDAO.getCustomerIds();
