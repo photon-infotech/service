@@ -384,6 +384,7 @@ public interface ServiceUIConstants {
     String KEY_I18N_ERR_APPTYPE_EMPTY = "err.msg.apptye.empty";
     String KEY_I18N_ERR_APPLIES_EMPTY = "err.msg.applies.empty";
     String KEY_I18N_ERR_APPLICABLE_EMPTY = "err.msg.applicable.empty";
+    String KEY_I18N_ERR_EMBED_EMPTY = "err.msg.embed.empty";
     String KEY_I18N_ERR_APPLNJAR_EMPTY = "err.msg.applnjar.empty";
 	String KEY_I18N_ERR_FUNCTIONAL_FRAMEWORK_EMPTY = "err.msg.functional.framework.empty";
     String KEY_I18N_ERR_ARCHETYPEJAR_EMPTY = "err.msg.archetypejar.empty";

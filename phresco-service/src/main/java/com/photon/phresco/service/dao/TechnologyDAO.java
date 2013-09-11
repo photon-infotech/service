@@ -35,6 +35,7 @@ public class TechnologyDAO extends CustomerBaseDAO {
 	private String techGroupId;
 	private List<String> reports;
 	private List<String> archetypeFeatures; 
+	private List<String> applicableEmbedTechnology;
 	private List<String> functionalFrameworks;
 	
 	public TechnologyDAO() {
@@ -119,5 +120,14 @@ public class TechnologyDAO extends CustomerBaseDAO {
 
 	public List<String> getFunctionalFrameworks() {
 		return this.functionalFrameworks;
+	}
+
+	public void setApplicableEmbedTechnology(
+			List<String> applicableEmbedTechnology) {
+		this.applicableEmbedTechnology = applicableEmbedTechnology;
+	}
+
+	public List<String> getApplicableEmbedTechnology() {
+		return applicableEmbedTechnology;
 	}
 }
