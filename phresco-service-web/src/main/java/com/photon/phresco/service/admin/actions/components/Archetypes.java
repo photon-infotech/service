@@ -83,6 +83,7 @@ public class Archetypes extends ServiceBaseAction {
 	private String appError = "";
 	private String fileError = "";
 	private String applicableErr = "";
+	private String techErr = "";
 	private String funcFrameworksError = "";
 	private boolean errorFound = false;
 	private String oldName = "";
@@ -118,6 +119,7 @@ public class Archetypes extends ServiceBaseAction {
 	private String removeTechGroup = "";
 	private List<TechnologyGroup> appTypeTechGroups = new ArrayList<TechnologyGroup>();
 	private static String versionFile= "";
+	private List<String> applicableEmbedTechnology = new ArrayList<String>();
 	
 	private byte[] newtempApplnByteArray = null;
 	
@@ -385,6 +387,7 @@ public class Archetypes extends ServiceBaseAction {
 				options.add(selectedOption);
 			}
 			technology.setOptions(options);
+			technology.setApplicableEmbedTechnology(getApplicableEmbedTechnology());
 
 //			List<FunctionalFramework> functionalFrameworks = new ArrayList<FunctionalFramework>();
 //			List<FunctionalFrameworkGroup> functionalTestFramework = serviceManager.getFunctionalTestFramework();
@@ -657,6 +660,8 @@ public class Archetypes extends ServiceBaseAction {
 		//Empty validation for applicable features
 		isError = featureValidation(isError);
 		
+		isError = embedValidation(isError);
+		
 //		isError = functioanlFrameworkValidation(isError);
 		
 		if (isError) {
@@ -760,6 +765,15 @@ public class Archetypes extends ServiceBaseAction {
 	private boolean featureValidation(boolean isError) {
 		if (CollectionUtils.isEmpty(getApplicable())) {
 			setApplicableErr(getText(KEY_I18N_ERR_APPLICABLE_EMPTY ));
+			tempError = true;
+		}
+		
+		return tempError;
+	}
+	
+	private boolean embedValidation(boolean isError) {
+		if (CollectionUtils.isNotEmpty(getApplicable()) && getApplicable().contains("Embed_Application") && CollectionUtils.isEmpty(getApplicableEmbedTechnology())) {
+			setTechErr(getText(KEY_I18N_ERR_EMBED_EMPTY ));
 			tempError = true;
 		}
 		
@@ -1143,5 +1157,22 @@ public class Archetypes extends ServiceBaseAction {
 
 	public void setFuncFrameworksError(String funcFrameworksError) {
 		this.funcFrameworksError = funcFrameworksError;
+	}
+
+	public void setApplicableEmbedTechnology(
+			List<String> applicableEmbedTechnology) {
+		this.applicableEmbedTechnology = applicableEmbedTechnology;
+	}
+
+	public List<String> getApplicableEmbedTechnology() {
+		return applicableEmbedTechnology;
+	}
+
+	public void setTechErr(String techErr) {
+		this.techErr = techErr;
+	}
+
+	public String getTechErr() {
+		return techErr;
 	}
 }

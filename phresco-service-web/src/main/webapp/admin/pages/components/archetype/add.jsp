@@ -291,6 +291,60 @@
           		 <span class="help-inline applyerror" id="applicableError"></span>
 			</div>
 		</div>
+	
+		<!--  embed Technology  starts-->
+		<div id="embed_tech">
+		<%
+			if (CollectionUtils.isNotEmpty(technologies)) {
+		%>						
+			<div class="control-group" id="techControl">
+				<label class="control-label labelbold">
+					<s:text name='lbl.hdr.comp.tchngy'/>
+				</label>
+				<div class="controls">
+						<div class="typeFields" id="typefield">
+						<div class="multilist-scroller multiselct" id="applicableToTech">
+							<ul>
+								<li>
+									<input type="checkbox" value="" id="checkAllTechnology" name="" onclick="checkAllEvent(this,$('.applicableTechnology'), false);"
+										style="margin: 3px 8px 6px 0;" <%= disabledVer %> ><s:text name='lbl.all'/>
+								</li>
+								<%
+								if (CollectionUtils.isNotEmpty(technologies)) {
+									String checkedStr = "";
+									for (Technology tech : technologies) {
+										List<String> selectedOptions = new ArrayList<String>();
+										if (technology != null) {
+											if (CollectionUtils.isNotEmpty(technology.getApplicableEmbedTechnology())) {
+												for (String embedTechId : technology.getApplicableEmbedTechnology()) {
+													selectedOptions.add(embedTechId);
+												}
+											}
+											if (selectedOptions.contains(tech.getId())) {
+												checkedStr = "checked";
+											} else {
+												checkedStr = "";
+											}
+										}
+								%>
+											<li> <input type="checkbox" id="applicableTechnology" <%= disabledVer %> name="applicableEmbedTechnology" value='<%= tech.getId() %>'
+												onclick="checkboxEvent($('#checkAllTechnology'), 'applicableTechnology')"	class="check applicableTechnology" <%= checkedStr %> ><%= tech.getName() %>
+											</li>
+								<%		}	
+									}
+								%>
+							</ul>
+						</div>
+					</div>
+					<span class="help-inline applyerror" id="techError"></span>
+				</div>
+				
+			</div>
+		<%
+			}	
+		%>
+		</div>
+		<!--  embed Technology  ends-->
 		<div class="control-group" id="reportsControl">
 			<label class="control-label labelbold">
 				<s:text name='lbl.hdr.comp.reports'/>
@@ -455,8 +509,10 @@
     	hideLoadingIcon();
         createUploader();
         getTechGroup();
+        hideShowTechs();
         checkboxEvent($('#checkAllFeatures'), 'applsChk');
         checkboxEvent($('#checkAllReports'), 'reportsChk');
+        checkboxEvent($('#checkAllTechnology'), 'applicableTechnology');
         $("#funcFrameworksControl").hide();
     	var functionalStatus = $("input[value='Functional_Test']").attr("checked");
     	if (functionalStatus === "checked") {
@@ -487,6 +543,11 @@
 			getTechGroup();
         });  
         
+        $('.applsChk[value=Embed_Application]').change(function() {
+        	console.info("checked value ", $('.applsChk[value=Embed_Application]').is(':checked'));
+        	hideShowTechs();
+        });
+        
        	$("input[value='Functional_Test']").change(function() {
         	var status = $(this).attr("checked");
         	showOrHideFunctionalFramework(status);
@@ -506,6 +567,18 @@
     		$("#progressBar").hide();
     	} 
     });
+	
+	function hideShowTechs() {
+		if($('.applsChk[value=Embed_Application]').is(':checked')) {
+    		console.info("checked");
+    		$("#embed_tech :input").attr("disabled", false);
+    		$("#embed_tech").show();
+    	} else {
+    		console.info("not checked");
+    		$("#embed_tech :input").attr("disabled", true);
+    		$("#embed_tech").hide();
+    	}
+	}
 	
 	function showOrHideFunctionalFramework(status){
 		if (status === "checked") {
@@ -583,6 +656,12 @@
 			showError($("#funcFrameworksControl"), $("#funcFrameworksError"), data.funcFrameworksError);
 		} else {
 			hideError($("#funcFrameworksControl"), $("#funcFrameworksError"));
+		}
+		
+		if (!isBlank(data.techErr)) {
+			showError($("#techControl"), $("#techError"), data.techErr);
+		} else {
+			hideError($("#techControl"), $("#techError"));
 		}
 	}
 

@@ -121,7 +121,7 @@ public class Customers extends ServiceBaseAction  {
 	private String welcomeUserIcon = "";
 	private String context = "";
 	private String PageTitleColor = "";
-	private String CopyrightText = "";
+	private String copyrightText = "";
 	private String CustomerTitle = "";
 
 	private String fromPage = "";
@@ -1177,19 +1177,19 @@ public class Customers extends ServiceBaseAction  {
 		PageTitleColor = pageTitleColor;
 	}
 
-	public String getCopyrightText() {
-		return CopyrightText;
-	}
-
-	public void setCopyrightText(String copyrightText) {
-		CopyrightText = copyrightText;
-	}
-
 	public String getCustomerTitle() {
 		return CustomerTitle;
 	}
 
 	public void setCustomerTitle(String customerTitle) {
 		CustomerTitle = customerTitle;
+	}
+
+	public void setCopyrightText(String copyrightText) {
+		this.copyrightText = copyrightText;
+	}
+
+	public String getCopyrightText() {
+		return copyrightText;
 	}
 }
