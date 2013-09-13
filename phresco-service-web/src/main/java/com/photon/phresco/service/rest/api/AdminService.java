@@ -161,6 +161,9 @@ public class AdminService extends DbService {
 		if (StringUtils.isNotEmpty(context)) {
 			customerDAO = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME,
 					new Query(Criteria.where("context").is(context)), CustomerDAO.class);
+		} else if (StringUtils.isNotEmpty(customerId)) {
+			customerDAO = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME, 
+					 new Query(Criteria.whereId().is(customerId)), CustomerDAO.class);
 		} else if (customers.size() == 2) {
 			for (Customer customer : customers) {
 				if (!customer.getName().equals("Photon")) {
@@ -168,8 +171,6 @@ public class AdminService extends DbService {
 							new Query(Criteria.whereId().is(customer.getId())), CustomerDAO.class);
 				}
 			}
-		} else {
-			return byteArray;
 		}
 		Converter<CustomerDAO, Customer> converter = (Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
 		Customer customer = converter.convertDAOToObject(customerDAO, DbService.getMongoOperation());
