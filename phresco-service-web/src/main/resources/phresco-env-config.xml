@@ -109,17 +109,17 @@
            <username/>
         </Database>
         <Server name="server">
-            <context>service</context>
+            <context>repository</context>
             <admin_username>admin</admin_username>
-            <deploy_dir>D:/Softwares/apache-tomcat-7.0.14/webapps/</deploy_dir>
+            <deploy_dir>c:/</deploy_dir>
             <additional_context>/</additional_context>
-            <port>3030</port>
-            <admin_password>ZGV2cmVwbzI=</admin_password>
+            <port>8080</port>
+            <admin_password>cGhyZXNjb3NlcnZlcg==</admin_password>
             <version>7.0.x</version>
             <type>Apache Tomcat</type>
-            <remoteDeployment>false</remoteDeployment>
-            <host>localhost</host>
+            <remoteDeployment>No</remoteDeployment>
             <protocol>http</protocol>
+            <host>172.16.17.226</host>
         </Server>
     </environment>
     <environment default="false" name="phresco-setup">
