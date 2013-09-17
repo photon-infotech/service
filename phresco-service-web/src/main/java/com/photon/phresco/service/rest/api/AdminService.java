@@ -173,6 +173,9 @@ public class AdminService extends DbService {
 			}
 		}
 		Converter<CustomerDAO, Customer> converter = (Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
+		if (customerDAO == null) {
+			return byteArray;
+		}
 		Customer customer = converter.convertDAOToObject(customerDAO, DbService.getMongoOperation());
         String repourl = customer.getRepoInfo().getGroupRepoURL();
         String artifactId = filterString(customer.getName());
