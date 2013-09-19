@@ -183,18 +183,25 @@ public class AdminService extends DbService {
         try {
 			URL url = new URL(repourl + "/" + contentURL);
 			iconStream = url.openStream();
-			if(iconStream == null) {
-	        	response.setStatus(204);
-	        	return null;
-	        }
-			byteArray = IOUtils.toByteArray(iconStream);
-			response.setStatus(200);
 		} catch (MalformedURLException e) {
 			throw new PhrescoException(e);
 		} catch (IOException e) {
-			throw new PhrescoException(e);
+			iconStream = null;
 		}
-        
+		if(iconStream == null) {
+        	byte[] icon = getIcon(response, "photon", "photon");
+        	if (icon != null) {
+        		return icon;
+        	} else {
+        		response.setStatus(204);
+        		return null;
+        	}
+        }
+		try {
+			byteArray = IOUtils.toByteArray(iconStream);
+		} catch (IOException e) {
+		}
+		response.setStatus(200);
     	return byteArray;
     }
     

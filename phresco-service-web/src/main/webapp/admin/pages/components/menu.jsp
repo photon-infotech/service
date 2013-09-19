@@ -80,12 +80,13 @@
 		$(".tabs li:first-child .submenu ").show();
 		$(".tabs li:first-child .submenu li:first-child a").addClass("active");
 		activateMenu($("#module"));
-        loadContent("fetchCustomerId", $('#formCustomerId'), '', '', false, true, '');
+        loadContent("fetchCustomerId", $('#formCustomerId'), '', '', false, false, '');
 	}
 	
 	function changeLogo(data) {
-		showLoadingIcon();
-		$('#logoImg').attr("src",  "data:image/png;base64," + data.logoImgUrl);
+		if (!isBlank(data.logoImgUrl)) {
+			$('#logoImg').attr("src",  "data:image/png;base64," + data.logoImgUrl);			
+		}
 		var copyright = data.copyRight;
 		if (!isBlank(copyright)) {
 			$(".copyrit").html(copyright);

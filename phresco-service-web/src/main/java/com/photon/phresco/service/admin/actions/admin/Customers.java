@@ -144,6 +144,7 @@ public class Customers extends ServiceBaseAction  {
 				Collections.sort(customers, sortCustomerInAlphaOrder());
 			}
 			setReqAttribute(REQ_CUST_CUSTOMERS, customers);
+			setSessionAttribute(REQ_CUST_CUSTOMERS, customers);
 		} catch (PhrescoException e) {
 			if(isDebugEnabled) {
 				LOGGER.error("Customers.list", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");

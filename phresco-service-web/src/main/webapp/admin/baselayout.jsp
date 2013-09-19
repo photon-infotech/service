@@ -144,7 +144,9 @@
 		    	});
 		    	
 		    	var logoImgUrl = '<%= request.getAttribute("enCodedLogo") %>';
-				$('#logoImg').attr("src",  "data:image/png;base64," + logoImgUrl);
+		    	if (!isBlank(logoImgUrl) && logoImgUrl !== "null") { 
+					$('#logoImg').attr("src",  "data:image/png;base64," + logoImgUrl);
+		    	}	
 			});
 		</script>
 	</head>

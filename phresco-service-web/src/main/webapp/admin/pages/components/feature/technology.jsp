@@ -63,7 +63,7 @@
 			<s:text name='alert.msg.archetype.not.available'/>
 		</div>
 		
-		<script language="JavaScript" type="text/javascript">
+		<script type="text/javascript">
 			$(document).ready(function() {
 				hideLoadingIcon();
 			});
