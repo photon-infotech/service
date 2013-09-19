@@ -21,6 +21,8 @@ import java.util.List;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
+import com.photon.phresco.commons.model.FunctionalFrameworkInfo;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TechnologyDAO extends CustomerBaseDAO {
 	
@@ -37,6 +39,7 @@ public class TechnologyDAO extends CustomerBaseDAO {
 	private List<String> archetypeFeatures; 
 	private List<String> applicableEmbedTechnology;
 	private List<String> functionalFrameworks;
+	private List<FunctionalFrameworkInfo> functionalFrameworkInfo;
 	
 	public TechnologyDAO() {
 		super();
@@ -129,5 +132,13 @@ public class TechnologyDAO extends CustomerBaseDAO {
 
 	public List<String> getApplicableEmbedTechnology() {
 		return applicableEmbedTechnology;
+	}
+
+	public void setFunctionalFrameworkInfo(List<FunctionalFrameworkInfo> functionalFrameworkInfo) {
+		this.functionalFrameworkInfo = functionalFrameworkInfo;
+	}
+
+	public List<FunctionalFrameworkInfo> getFunctionalFrameworkInfo() {
+		return functionalFrameworkInfo;
 	}
 }
