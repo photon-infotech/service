@@ -258,10 +258,10 @@ public class AdminService extends DbService {
             S_LOGGER.debug("Entered into AdminService.createCustomer(List<Customer> customer)");
         }
         Customer customer = new Gson().fromJson(new String(customerData), Customer.class);
-        saveCustomer(response, moduleFile.getByteArray(), customer);
+        saveCustomer(response, moduleFile, customer);
     }
 
-    private Customer saveCustomer(HttpServletResponse response, byte[] iconStream, Customer customer) {
+    private Customer saveCustomer(HttpServletResponse response, ByteArrayResource moduleFile, Customer customer) {
     	try {
     		if(validate(customer)) {
 				RepoInfo repoInfo = customer.getRepoInfo();
@@ -277,7 +277,8 @@ public class AdminService extends DbService {
                 DbService.getMongoOperation().save(REPOINFO_COLLECTION_NAME, customer.getRepoInfo());
 		        List<TechnologyDAO> techDAOs = DbService.getMongoOperation().find(TECHNOLOGIES_COLLECTION_NAME, 
 		        		new Query(Criteria.whereId().in(customerDAO.getApplicableTechnologies().toArray())), TechnologyDAO.class);
-                if(iconStream != null) {
+                if(moduleFile!= null && moduleFile.getByteArray() != null) {
+                	byte[] iconStream = moduleFile.getByteArray();
                     ArtifactGroup artifactGroup = new ArtifactGroup();
                     artifactGroup.setGroupId("customers");
                     artifactGroup.setArtifactId(filterString(customer.getName()));
@@ -338,9 +339,8 @@ public class AdminService extends DbService {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.updateCustomer(List<Customer> customers)");
         }
-        System.out.println("Entyerd To Service ........ ");
         Customer customer = new Gson().fromJson(new String(customerData), Customer.class);
-        saveCustomer(response, moduleFile.getByteArray(), customer);
+        saveCustomer(response, moduleFile, customer);
     }
 
     /**
