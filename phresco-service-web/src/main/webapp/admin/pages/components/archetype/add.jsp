@@ -34,7 +34,11 @@
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
 <%@ page import="com.photon.phresco.service.admin.actions.util.ServiceActionUtil"%>
 <%@ page import="com.photon.phresco.commons.model.TechnologyGroup"%>
+<%@ page import="com.photon.phresco.commons.model.FunctionalFrameworkGroup"%>
 <%@ page import="com.photon.phresco.commons.model.FunctionalFramework"%>
+<%@ page import="com.photon.phresco.commons.model.FunctionalFrameworkInfo"%>
+
+
 
 <%
 	Technology technology = (Technology) request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPE);
@@ -42,7 +46,7 @@
 	List<ApplicationType> appTypes = (List<ApplicationType>) request.getAttribute(ServiceUIConstants.REQ_APP_TYPES);
 	String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
 	List<TechnologyOptions> options = (List<TechnologyOptions>) request.getAttribute(ServiceUIConstants.REQ_TECHNOLOGY_OPTION);
-	//List<FunctionalFramework> functionalFrameworks = (List<FunctionalFramework>) request.getAttribute(ServiceUIConstants.REQ_FUNCTIONAL_FRAMEWORKS);
+	List<FunctionalFrameworkGroup> functionalFrameworksGroups = (List<FunctionalFrameworkGroup>) request.getAttribute(ServiceUIConstants.REQ_FUNCTIONAL_FRAMEWORKS);
 	List<Reports> reports = (List<Reports>)request.getAttribute(ServiceUIConstants.REQ_TECHNOLOGY_REPORTS);
 	List<Technology> technologies = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
 	String title = ServiceActionUtil.getTitle(ServiceUIConstants.ARCHETYPES, fromPage);
@@ -63,6 +67,23 @@
 		per_disabledClass = "btn-disabled";
 	}
 	
+	
+	List<String> ffIds = new ArrayList<String>();
+	if (technology != null) {
+		List<FunctionalFrameworkInfo> ffis = technology
+				.getFunctionalFrameworksInfo();
+		if (CollectionUtils.isNotEmpty(ffis)) {
+			for (FunctionalFrameworkInfo ffi : ffis) {
+				List<String> ffids = ffi.getFunctionalFrameworkIds();
+				String grpId = ffi.getFrameworkGroupId();
+				for (String ffid : ffids) {
+					String addedString = grpId + "#" + ffid;
+					ffIds.add(addedString);
+				}
+			}
+		}
+	}
+
 	//For edit
 	String name = "";
 	String desc = "";
@@ -76,11 +97,11 @@
 	String appTypeId = "";
 	String techId = "";
 	String techVer = "";
-	String selectedTech= "";
+	String selectedTech = "";
 	List<String> selectedReports = null;
 	List<String> selectedFunctionalFrameworks = null;
 	if (technology != null) {
-		name = technology.getName();		
+		name = technology.getName();
 		desc = technology.getDescription();
 		archArchetypeId = technology.getArchetypeInfo().getArtifactId();		
 		archGroupId = technology.getArchetypeInfo().getGroupId();		
@@ -291,7 +312,62 @@
           		 <span class="help-inline applyerror" id="applicableError"></span>
 			</div>
 		</div>
-	
+		<!-- functional framework starts -->
+		<div id="func_frmwrk">
+			<%
+			if (CollectionUtils.isNotEmpty(functionalFrameworksGroups)) {
+		%>						
+			<div class="control-group" id="ffControl">
+				<label class="control-label labelbold">
+					<s:text name='lbl.hdr.comp.ff'/>
+				</label>
+				<div class="controls">
+						<div class="ffFields" id="fffield">
+						<div class="multilist-scroller multiselct" id="applicableToFF">
+							<ul>
+								<%
+									for (FunctionalFrameworkGroup functionalFrameworksGroup : functionalFrameworksGroups) {
+										if (functionalFrameworksGroup != null) {
+								%>
+											<li style="font-weight:900;"> <%= functionalFrameworksGroup.getName() %></li>
+								<%		
+											List<FunctionalFramework> functionalFrameworks = functionalFrameworksGroup.getFunctionalFrameworks();
+											String checked = "";
+											if (CollectionUtils.isNotEmpty(functionalFrameworks)) {
+												for (FunctionalFramework functionalFramework : functionalFrameworks) {
+													if (CollectionUtils.isNotEmpty(ffIds)) {
+														checked = "";
+														for (String ffId : ffIds) {
+															String[] appended = ffId.split("#");
+															if (appended != null) {
+																if (appended[0].equals(functionalFrameworksGroup.getId()) && appended[1].equals(functionalFramework.getId())) {
+																	checked = "checked";
+																} 
+															}
+														}
+													}
+								%>
+													<li> <input type="checkbox" id="applicableFF" <%= disabledVer %> name="functionalFrameworkInfo" value='<%= functionalFrameworksGroup.getId() %>#<%= functionalFramework.getId() %>'
+															 class="check applicableFF"  <%= checked %>><%= functionalFramework.getName() %>
+													</li>
+								<%
+												}
+											}
+										}	
+									}
+								%>
+							</ul>
+						</div>
+					</div>
+					<span class="help-inline applyerror" id="ffError"></span>
+				</div>
+				
+			</div>
+		<%
+			}	
+		%>
+		</div>
+		<!--  functional framework ends -->
 		<!--  embed Technology  starts-->
 		<div id="embed_tech">
 		<%
@@ -302,37 +378,37 @@
 					<s:text name='lbl.hdr.comp.tchngy'/>
 				</label>
 				<div class="controls">
-						<div class="typeFields" id="typefield">
+						<div class="techFields" id="techfield">
 						<div class="multilist-scroller multiselct" id="applicableToTech">
 							<ul>
 								<li>
 									<input type="checkbox" value="" id="checkAllTechnology" name="" onclick="checkAllEvent(this,$('.applicableTechnology'), false);"
 										style="margin: 3px 8px 6px 0;" <%= disabledVer %> ><s:text name='lbl.all'/>
 								</li>
-								<%
-								if (CollectionUtils.isNotEmpty(technologies)) {
-									String checkedStr = "";
-									for (Technology tech : technologies) {
-										List<String> selectedOptions = new ArrayList<String>();
-										if (technology != null) {
-											if (CollectionUtils.isNotEmpty(technology.getApplicableEmbedTechnology())) {
-												for (String embedTechId : technology.getApplicableEmbedTechnology()) {
-													selectedOptions.add(embedTechId);
+							<%
+									if (CollectionUtils.isNotEmpty(technologies)) {
+										String checkedStr = "";
+										for (Technology tech : technologies) {
+											List<String> selectedOptions = new ArrayList<String>();
+											if (technology != null) {
+												if (CollectionUtils.isNotEmpty(technology.getApplicableEmbedTechnology())) {
+													for (String embedTechId : technology.getApplicableEmbedTechnology()) {
+														selectedOptions.add(embedTechId);
+													}
+												}
+												if (selectedOptions.contains(tech.getId())) {
+													checkedStr = "checked";
+												} else {
+													checkedStr = "";
 												}
 											}
-											if (selectedOptions.contains(tech.getId())) {
-												checkedStr = "checked";
-											} else {
-												checkedStr = "";
-											}
-										}
-								%>
-											<li> <input type="checkbox" id="applicableTechnology" <%= disabledVer %> name="applicableEmbedTechnology" value='<%= tech.getId() %>'
-												onclick="checkboxEvent($('#checkAllTechnology'), 'applicableTechnology')"	class="check applicableTechnology" <%= checkedStr %> ><%= tech.getName() %>
-											</li>
-								<%		}	
+							%>
+												<li> <input type="checkbox" id="applicableTechnology" <%= disabledVer %> name="applicableEmbedTechnology" value='<%= tech.getId() %>'
+													onclick="checkboxEvent($('#checkAllTechnology'), 'applicableTechnology')"	class="check applicableTechnology" <%= checkedStr %> ><%= tech.getName() %>
+												</li>
+			 			   <%			}	
 									}
-								%>
+							%>
 							</ul>
 						</div>
 					</div>
@@ -524,6 +600,10 @@
         if (<%= isSystem %>) { 
         	disableUploadButton($("#appln-file-uploader"));
         }
+        
+        $('#checkAllFeatures').click(function() {
+        	hideShowTechs();
+        });
 
         // To check for the special character in name
         $('#archename').bind('input propertychange', function (e) {
@@ -544,7 +624,10 @@
         });  
         
         $('.applsChk[value=Embed_Application]').change(function() {
-        	console.info("checked value ", $('.applsChk[value=Embed_Application]').is(':checked'));
+        	hideShowTechs();
+        });
+        
+        $('.applsChk[value=Functional_Test]').change(function() {
         	hideShowTechs();
         });
         
@@ -570,13 +653,19 @@
 	
 	function hideShowTechs() {
 		if($('.applsChk[value=Embed_Application]').is(':checked')) {
-    		console.info("checked");
     		$("#embed_tech :input").attr("disabled", false);
     		$("#embed_tech").show();
     	} else {
-    		console.info("not checked");
     		$("#embed_tech :input").attr("disabled", true);
     		$("#embed_tech").hide();
+    	}
+		
+		if($('.applsChk[value=Functional_Test]').is(':checked')) {
+    		$("#func_frmwrk :input").attr("disabled", false);
+    		$("#func_frmwrk").show();
+    	} else {
+    		$("#func_frmwrk :input").attr("disabled", true);
+    		$("#func_frmwrk").hide();
     	}
 	}
 	
@@ -662,6 +751,12 @@
 			showError($("#techControl"), $("#techError"), data.techErr);
 		} else {
 			hideError($("#techControl"), $("#techError"));
+		}
+		
+		if (!isBlank(data.funcFrameworksError)) {
+			showError($("#ffControl"), $("#ffError"), data.funcFrameworksError);
+		} else {
+			hideError($("#ffControl"), $("#ffError"));
 		}
 	}
 

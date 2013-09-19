@@ -42,7 +42,7 @@ import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.FunctionalFramework;
-import com.photon.phresco.commons.model.FunctionalFrameworkGroup;
+import com.photon.phresco.commons.model.FunctionalFrameworkInfo;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.commons.model.TechnologyGroup;
 import com.photon.phresco.commons.model.TechnologyOptions;
@@ -120,6 +120,7 @@ public class Archetypes extends ServiceBaseAction {
 	private List<TechnologyGroup> appTypeTechGroups = new ArrayList<TechnologyGroup>();
 	private static String versionFile= "";
 	private List<String> applicableEmbedTechnology = new ArrayList<String>();
+	private List<String> functionalFrameworkInfo = new ArrayList<String>();
 	
 	private byte[] newtempApplnByteArray = null;
 	
@@ -175,7 +176,7 @@ public class Archetypes extends ServiceBaseAction {
 			setReqAttribute(REQ_FROM_PAGE, ADD);
 			setReqAttribute(REQ_TECHNOLOGY_REPORTS, reports);
 			setReqAttribute(REQ_ARCHE_TYPES, serviceManager.getTechnologyByCustomer(getCustomerId()));
-//			setReqAttribute(REQ_FUNCTIONAL_FRAMEWORKS, serviceManager.getFunctionalTestFramework());
+			setReqAttribute(REQ_FUNCTIONAL_FRAMEWORKS, serviceManager.getFunctionalTestFramework());
 		} catch (PhrescoException e) {
 			e.printStackTrace();
 			if (isDebugEnabled) {
@@ -388,20 +389,37 @@ public class Archetypes extends ServiceBaseAction {
 			}
 			technology.setOptions(options);
 			technology.setApplicableEmbedTechnology(getApplicableEmbedTechnology());
-
-//			List<FunctionalFramework> functionalFrameworks = new ArrayList<FunctionalFramework>();
-//			List<FunctionalFrameworkGroup> functionalTestFramework = serviceManager.getFunctionalTestFramework();
-//			for (String funcFramework : getFunctionalFramework()) {
-//				for (FunctionalFrameworkGroup functionalFramework : functionalTestFramework) {
-//					if(functionalFramework.getName().equals(funcFramework)) {
-//						FunctionalFramework e = new FunctionalFramework();
-//						e.setId(functionalFramework.getId());
-//						functionalFrameworks.add(e);
-//					}
-//				}
-//			}
-//			technology.setFunctionalFrameworks(null);
-
+			
+			List<String> functionalFrameworkList = getFunctionalFrameworkInfo();
+			if (CollectionUtils.isNotEmpty(functionalFrameworkList)) {
+				List<FunctionalFrameworkInfo> ffi =  new ArrayList<FunctionalFrameworkInfo>();
+				List<String> ids = new ArrayList<String>();
+				
+				for (String functional : functionalFrameworkList) {
+					String[] split = functional.split("#");
+					if (!ids.contains(split[0])) {
+						ids.add(split[0]);
+					}
+				}
+				
+				for (String id : ids) {
+					FunctionalFrameworkInfo ffInfo = new FunctionalFrameworkInfo();
+					List<String> functionalFrameworkIds = new ArrayList<String>();
+					ffInfo.setFrameworkGroupId(id);
+					for (String functional : functionalFrameworkList) {
+						if(functional.startsWith(id)) {
+							String[] split = functional.split("#");
+							functionalFrameworkIds.add(split[1]);
+						}
+					}
+					ffInfo.setFunctionalFrameworkIds(functionalFrameworkIds);
+					ffi.add(ffInfo);
+				}
+				if (CollectionUtils.isNotEmpty(ffi)) {
+					technology.setFunctionalFrameworksInfo(ffi);
+				}
+			}
+			
 			//To create the ArtifactGroup with groupId, artifactId and version for archetype jar
 			if ((StringUtils.isEmpty(artifactId) && StringUtils.isEmpty(groupId) && StringUtils.isEmpty(version))) {
 				artifactId = getArchArchetypeId();
@@ -662,7 +680,7 @@ public class Archetypes extends ServiceBaseAction {
 		
 		isError = embedValidation(isError);
 		
-//		isError = functioanlFrameworkValidation(isError);
+		isError = functioanlFrameworkValidation(isError);
 		
 		if (isError) {
             setErrorFound(true);
@@ -781,7 +799,7 @@ public class Archetypes extends ServiceBaseAction {
 	}
 
 	private boolean functioanlFrameworkValidation(boolean isError) {
-		if (CollectionUtils.isNotEmpty(getApplicable()) && getApplicable().contains("Functional_Test") && CollectionUtils.isEmpty(getFunctionalFramework())) {
+		if (CollectionUtils.isNotEmpty(getApplicable()) && getApplicable().contains("Functional_Test") && CollectionUtils.isEmpty(getFunctionalFrameworkInfo())) {
 			setFuncFrameworksError(getText(KEY_I18N_ERR_FUNCTIONAL_FRAMEWORK_EMPTY));
 			tempError = true;
 		}
@@ -1174,5 +1192,13 @@ public class Archetypes extends ServiceBaseAction {
 
 	public String getTechErr() {
 		return techErr;
+	}
+
+	public void setFunctionalFrameworkInfo(List<String> functionalFrameworkInfo) {
+		this.functionalFrameworkInfo = functionalFrameworkInfo;
+	}
+
+	public List<String> getFunctionalFrameworkInfo() {
+		return functionalFrameworkInfo;
 	}
 }
