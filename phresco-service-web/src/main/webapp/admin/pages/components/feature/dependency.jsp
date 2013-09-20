@@ -116,6 +116,7 @@
 	}
 	
 	$(document).ready(function() {
+		$('.popupOk').attr("onClick", "popupOnOk(this);");
 		//Check box click function to check the first radio button and show the selected version
 		$('input[name="dependentModGroupId"]').change(function() {
 			var modGrpId = $(this).val();

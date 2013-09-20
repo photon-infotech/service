@@ -54,7 +54,7 @@
 				<tbody>
 					<tr>
 						<td>
-							<input type="checkbox" class=checkAll id="checkAllAuto" name="moduleGroup" value="Call2Functions"
+							<input type="checkbox" class=checkAll id="checkAllAuto" value="Call2Functions"
 								onclick="checkAllArchEvent(this, $('.technology'), false); checkAllArchEvent($('.technology'), $('.subtechnology'), false);">
 						</td>
 						<td class="labelbold"><s:text name='lbl.hdr.comp.name'/></td>

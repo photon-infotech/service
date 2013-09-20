@@ -425,6 +425,7 @@ public interface ServiceUIConstants {
     String FEATURE_ADDED = "succ.feature.add";
     String FEATURE_UPDATED = "succ.feature.update";
     String FEATURE_DELETED = "succ.feature.delete";
+    String FEATURE_DEPDNT_NOT_DELETED = "fail.feature.depdnt.delete";
     
     String COMPONENT_ADDED = "succ.component.add";
     String COMPONENT_NOT_ADDED = "fail.component.add";

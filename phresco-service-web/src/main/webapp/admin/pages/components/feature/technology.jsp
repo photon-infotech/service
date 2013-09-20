@@ -104,7 +104,7 @@
 				</s:if>
 				
 				<s:if test="hasActionErrors()">
-					<div class="alert alert-error"  id="errormsg">
+					<div class="alert alert-error lert-message alert_messagelist"  id="errormsg">
 						<s:actionerror />
 					</div>
 				</s:if>

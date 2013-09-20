@@ -1247,7 +1247,10 @@ public class ComponentService extends DbService {
         		Criteria customerCriteria = Criteria.where(DB_COLUMN_CUSTOMERIDS).in(customers.toArray());
         		query.addCriteria(customerCriteria);
         	}
-			Criteria typeQuery = Criteria.where(DB_COLUMN_ARTIFACT_GROUP_TYPE).is(type);
+			if(StringUtils.isNotEmpty(type)) {
+				Criteria typeQuery = Criteria.where(DB_COLUMN_ARTIFACT_GROUP_TYPE).is(type);
+				query = query.addCriteria(typeQuery);
+			}
 			List<String> technologies = new ArrayList<String>();
 			technologies.add(techId);
 			if(StringUtils.isNotEmpty(techId)) {
@@ -1257,7 +1260,6 @@ public class ComponentService extends DbService {
 				}
 			}
 			Criteria techIdQuery = Criteria.where(DB_COLUMN_APPLIESTOTECHID).in(technologies.toArray());
-			query = query.addCriteria(typeQuery);
 			query = query.addCriteria(techIdQuery);
 			if(StringUtils.isNotEmpty(count)){
 				query.skip(Integer.parseInt(start)).limit(Integer.parseInt(count));

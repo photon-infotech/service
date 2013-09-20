@@ -138,7 +138,7 @@ public class Features extends ServiceBaseAction {
 	    
 	    try {
             setReqAttribute(REQ_FEATURES_TYPE, getType()); //for handle in feature sub menu
-    	    setTechnologiesInRequest();    	    
+    	    setTechnologiesInRequest();    
     	    setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
     	    //To remove the selected dependent moduleIds from the session
     	    removeSessionAttribute(SESSION_FEATURES_DEPENDENT_MOD_IDS);
@@ -362,7 +362,7 @@ public class Features extends ServiceBaseAction {
     		S_LOGGER.debug("Features.save : Exit");
     	}
         
-        return listFeatures();
+        return technologies();
     }
 	
 	public String edit() {
@@ -438,9 +438,6 @@ public class Features extends ServiceBaseAction {
     					"technology=" + "\"" + getTechnology() + "\"", "moduleGroupIdId=" + "\"" + getModuleGroupId() + "\"");
         	}
             ArtifactGroup moduleGroup = createModuleGroup(Type.valueOf(getType()));
-            /*if(featureByteArray != null){
-				inputStreamMap.put(moduleGroup.getName(),  new ByteArrayInputStream(featureByteArray));
-			}*/ 
             getServiceManager().createFeatures(moduleGroup, inputStreamMap, getCustomerId());
             addActionMessage(getText(FEATURE_UPDATED, Collections.singletonList(getName())));
             setTechnologiesInRequest();
@@ -454,7 +451,7 @@ public class Features extends ServiceBaseAction {
 			S_LOGGER.debug("Features.update : Exit");
 		}
         
-        return listFeatures();
+        return technologies();
     }
 	
 	private ArtifactGroup createModuleGroup(Type type) throws PhrescoException {
@@ -564,7 +561,14 @@ public class Features extends ServiceBaseAction {
         try {
             String[] moduleGroupIds = getReqParameterValues(REQ_FEATURES_MOD_GRP);
             String[] moduleIds = getReqParameterValues(REQ_FEATURES_SELECTED_MODULEID);
-            ServiceManager serviceManager = getServiceManager(); 
+            ServiceManager serviceManager = getServiceManager();
+            
+            boolean dependent = isDependent(serviceManager, moduleGroupIds, moduleIds);
+            
+            if (dependent) {
+            	return technologies();
+            }
+            
 			if (ArrayUtils.isNotEmpty(moduleIds)) {
                 for (String moduleId : moduleIds) {
                 	serviceManager.deleteFeature(moduleId);
@@ -596,8 +600,64 @@ public class Features extends ServiceBaseAction {
 			S_LOGGER.debug("Features.delete : Exit");
 		}
         
-        return listFeatures();
+        return technologies();
     }
+
+	private boolean isDependent(ServiceManager serviceManager, String[] moduleGroupIds, String[] moduleIds) throws PhrescoException {
+		try {
+			if (ArrayUtils.isNotEmpty(moduleIds)) {
+                for (String moduleId : moduleIds) {
+                	ArtifactInfo artifactInfo = serviceManager.getArtifactInfo(moduleId);
+                	ArtifactGroup artifactGroup = serviceManager.getArtifactGroupInfo(artifactInfo.getArtifactGroupId());
+                	List<RequiredOption> appliesTo = artifactInfo.getAppliesTo();
+                	for (RequiredOption requiredOption : appliesTo) {
+                		List<ArtifactGroup> featuresByTechId = serviceManager.getFeaturesByTechId(requiredOption.getTechId());
+		        		if (CollectionUtils.isNotEmpty(featuresByTechId)) {
+		        			for (ArtifactGroup featureByTechId : featuresByTechId) {
+		        				List<ArtifactInfo> featuresByTechIdVersions = featureByTechId.getVersions();
+		        				for (ArtifactInfo featuresByTechIdVersion : featuresByTechIdVersions) {
+		        					List<String> dependencyIds = featuresByTechIdVersion.getDependencyIds();
+		        					if (CollectionUtils.isNotEmpty(dependencyIds) && dependencyIds.contains(moduleId)) {
+		        						addActionError(getText(FEATURE_DEPDNT_NOT_DELETED, Collections.singletonList(artifactGroup.getName())));
+		        						return true;
+		        					}
+								}
+							}
+		        		}
+					}
+                }
+            }
+			
+			if (ArrayUtils.isNotEmpty(moduleGroupIds)) {
+			    for (String moduleGroupid : moduleGroupIds) {
+			    	ArtifactGroup artifactGroup = serviceManager.getFeatureById(moduleGroupid);
+			    	List<ArtifactInfo> versions = artifactGroup.getVersions();
+			    	for (ArtifactInfo artifactInfo : versions) {
+			    		List<CoreOption> appliesTo = artifactGroup.getAppliesTo();
+			        	for (CoreOption coreOption : appliesTo) {
+			        		List<ArtifactGroup> featuresByTechId = serviceManager.getFeaturesByTechId(coreOption.getTechId());
+			        		if (CollectionUtils.isNotEmpty(featuresByTechId)) {
+			        			for (ArtifactGroup featureByTechId : featuresByTechId) {
+			        				List<ArtifactInfo> featuresByTechIdVersions = featureByTechId.getVersions();
+			        				for (ArtifactInfo featuresByTechIdVersion : featuresByTechIdVersions) {
+			        					List<String> dependencyIds = featuresByTechIdVersion.getDependencyIds();
+			        					if (CollectionUtils.isNotEmpty(dependencyIds) && dependencyIds.contains(artifactInfo.getId())) {
+			        						addActionError(getText(FEATURE_DEPDNT_NOT_DELETED, Collections.singletonList(artifactGroup.getName())));
+			        						return true;
+			        					}
+									}
+								}
+			        		}
+						}
+					}
+			    }
+			}
+		} catch (PhrescoException e) {
+			throw e;
+		}
+		
+		return false;
+	}
 	
 	public String uploadFile() throws PhrescoException {
 		if (isDebugEnabled) {
