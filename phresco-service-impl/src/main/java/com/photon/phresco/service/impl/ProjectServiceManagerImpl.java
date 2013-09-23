@@ -18,15 +18,15 @@
 package com.photon.phresco.service.impl;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.Element;
@@ -39,6 +39,8 @@ import com.photon.phresco.service.api.ProjectServiceManager;
 import com.photon.phresco.service.util.DependencyUtils;
 import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.Constants;
+import com.photon.phresco.util.ProjectUtils;
+import com.photon.phresco.util.ServiceConstants;
 import com.photon.phresco.util.Utility;
 
 public class ProjectServiceManagerImpl implements ProjectServiceManager, Constants {
@@ -71,11 +73,44 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 		if(projectInfo.isPreBuilt()) {
 			createPilots(projectInfo.getAppInfos().get(0), tempFolderPath, projectInfo.getCustomerIds().get(0));
 		}
+		createProjectFolders(projectInfo, projectInfo.getAppInfos().get(0).getAppDirName(),
+				new File(tempFolderPath));
 		if(isDebugEnabled) {
 			LOGGER.debug("ProjectServiceManagerImpl.createProject:Exit");
 		}
 	}
-
+	
+	private void createProjectFolders(ProjectInfo info, String appDirName,
+			File file) throws PhrescoException {
+		if (isDebugEnabled) {
+			LOGGER.debug("ArchetypeExecutorImpl.createProjectFolders:Entry");
+			if (info == null) {
+				LOGGER.warn("ArchetypeExecutorImpl.createProjectFolders",
+						ServiceConstants.STATUS_BAD_REQUEST,
+						"message=\"ProjectInfo is empty\"");
+				throw new PhrescoException("ProjectInfo is empty");
+			}
+			LOGGER.info("ArchetypeExecutorImpl.createProjectFolders",
+					"customerId=\"" + info.getCustomerIds().get(0) + "\"",
+					"creationDate=\"" + info.getCreationDate() + "\"",
+					"projectCode=\"" + info.getProjectCode() + "\"");
+		}
+		// create .phresco folder inside the project
+		File phrescoFolder = new File(file.getPath() + File.separator
+				+ appDirName + File.separator + DOT_PHRESCO_FOLDER);
+		phrescoFolder.mkdirs();
+		if (isDebugEnabled) {
+			LOGGER.info("create .phresco folder inside the project");
+		}
+		ApplicationInfo applicationInfo = info.getAppInfos().get(0);
+		applicationInfo.setId(new Element().getId());
+		info.setAppInfos(Collections.singletonList(applicationInfo));
+		ProjectUtils.writeProjectInfo(info, phrescoFolder);
+		if (isDebugEnabled) {
+			LOGGER.debug("ArchetypeExecutorImpl.createProjectFolders:Exit");
+		}
+	}
+	
 	public void updateProject(ProjectInfo projectInfo, String tempFolderPath) throws PhrescoException {
 		if (isDebugEnabled) {
 			LOGGER.debug("ProjectServiceManagerImpl.updateProject:Entry");

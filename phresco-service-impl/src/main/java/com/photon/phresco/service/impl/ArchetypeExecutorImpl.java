@@ -104,8 +104,6 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 					LOGGER.debug(line);
 				}
 			}
-			createProjectFolders(projectInfo, applicationInfo.getAppDirName(),
-					new File(tempFolderPath));
 			updateRepository(customerId, applicationInfo, new File(
 					tempFolderPath));
 			updateDefaultFeatures(projectInfo, tempFolderPath, customerId);
@@ -297,34 +295,6 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 			if(CollectionUtils.isNotEmpty(findSelectedArtifacts)) {
 				listArtifactGroup.addAll(findSelectedArtifacts);
 			}
-		}
-	}
-
-	private void createProjectFolders(ProjectInfo info, String appDirName,
-			File file) throws PhrescoException {
-		if (isDebugEnabled) {
-			LOGGER.debug("ArchetypeExecutorImpl.createProjectFolders:Entry");
-			if (info == null) {
-				LOGGER.warn("ArchetypeExecutorImpl.createProjectFolders",
-						ServiceConstants.STATUS_BAD_REQUEST,
-						"message=\"ProjectInfo is empty\"");
-				throw new PhrescoException("ProjectInfo is empty");
-			}
-			LOGGER.info("ArchetypeExecutorImpl.createProjectFolders",
-					"customerId=\"" + info.getCustomerIds().get(0) + "\"",
-					"creationDate=\"" + info.getCreationDate() + "\"",
-					"projectCode=\"" + info.getProjectCode() + "\"");
-		}
-		// create .phresco folder inside the project
-		File phrescoFolder = new File(file.getPath() + File.separator
-				+ appDirName + File.separator + DOT_PHRESCO_FOLDER);
-		phrescoFolder.mkdirs();
-		if (isDebugEnabled) {
-			LOGGER.info("create .phresco folder inside the project");
-		}
-		ProjectUtils.writeProjectInfo(info, phrescoFolder);
-		if (isDebugEnabled) {
-			LOGGER.debug("ArchetypeExecutorImpl.createProjectFolders:Exit");
 		}
 	}
 
