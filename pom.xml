@@ -5,7 +5,7 @@
     <artifactId>phresco-service-root</artifactId>
     <packaging>pom</packaging>
     <name>Phresco Service</name>
-    <version>3.0.0.27002-SNAPSHOT</version>
+    <version>3.0.0.27003-SNAPSHOT</version>
     <url>http://www.phresco.org</url>
     <scm>
         <connection>https://github.com/photon-infotech/service.git</connection>
@@ -174,7 +174,7 @@
             <plugin>
                 <groupId>net.awired.jstest</groupId>
                 <artifactId>jstest-maven-plugin</artifactId>
-                <version>3.0.0.20001</version>
+                <version>3.0.0.27000</version>
                 <executions>
                     <execution>
                         <goals>
