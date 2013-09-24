@@ -25,7 +25,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Helios</title>
+		<title>Phresco</title>
 		<link rel="icon" type="image/png" href="images/favicon.png">
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
@@ -104,8 +104,8 @@
 				});
 
 				clickMenu($("a[name='headerMenu']"), $("#container"));
-				loadContent("dashboard", '', $("#container"));
-				activateMenu($("#dashboard"));
+				loadContent("components", '', $("#container"));
+				activateMenu($("#components"));
 				showWelcomeImage();
 				
 				$('#clipboard').click(function(){
@@ -185,7 +185,7 @@
 					<div class="nav_slider">
 						<nav class="headerInnerTop">
 							<ul>
-								<li class="wid_home"><a href="#" class="inactive" name="headerMenu" id="dashboard">
+								<li class="wid_home hideContent"><a href="#" class="inactive" name="headerMenu" id="dashboard">
 								    <s:label key="lbl.hdr.dash"  theme="simple"/></a>
                                 </li>
 								<li class="wid_app"><a href="#" class="inactive" name="headerMenu" id="components">

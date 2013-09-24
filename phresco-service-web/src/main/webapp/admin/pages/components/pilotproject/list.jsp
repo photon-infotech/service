@@ -119,6 +119,7 @@
 									<td class="descwidth"><%= StringUtils.isNotEmpty(proInfo.getDescription()) ? proInfo.getDescription() : ""%></td>
 									<%  
 										TechnologyInfo techId = proInfo.getTechInfo();
+									     if(StringUtils.isNotEmpty(techId.getVersion())) {
 									        for (Technology technology : technologies ){ 
 									    	   if(techId.getVersion().equalsIgnoreCase(technology.getId())) {
 									%> 
@@ -130,7 +131,8 @@
 									</td>
 								</tr>
 						<%			
-							      }
+							       	}
+						 		  }
 								}
 							  }
 							}

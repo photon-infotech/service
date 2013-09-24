@@ -68,19 +68,17 @@
 		localStorage["selectedCustomerId"] = selectedId;
 		var selectedMenu = $("a[name='compTab'][class='active']").prop("id");
 		loadContent("fetchLogoImgUrl", $('#formCustomerId'), '', '', true, 'changeLogo');
+		loadContent(selectedMenu, $('#formCustomerId'), $("#subcontainer"), "");
 		
-		//Handles the click event of the sub tabs
-		clickMenu($("a[name='featureTab']"), $("#subcontainer"), $('#formCustomerId'));
-		
-		//To load the page by default
-		loadContent("technologies", $('#formCustomerId'), $("#subcontainer"), "type=<%= Type.FEATURE.name() %>");
+		if (selectedMenu === "featuresMenu" || selectedMenu === "undefined" ) {
+			$(".tabs li a").removeClass("active").addClass("inactive");
+ 			$(".tabs li:first-child .submenu ").show();
+ 			$(".tabs li:first-child .submenu li:first-child a").addClass("active");
+ 			activateMenu($("#module"));
+ 		}
 		
 		//To activate the module menu by default
-		$(".tabs li a").removeClass("active").addClass("inactive");
-		$(".tabs li:first-child .submenu ").show();
-		$(".tabs li:first-child .submenu li:first-child a").addClass("active");
-		activateMenu($("#module"));
-        loadContent("fetchCustomerId", $('#formCustomerId'), '', '', false, false, '');
+        loadContent("fetchCustomerId", $('#formCustomerId'), '', '', false, true, '');
 	}
 	
 	function changeLogo(data) {
