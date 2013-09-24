@@ -174,27 +174,11 @@
 		
 		<div class="control-group">
 			<label class="control-label labelbold">
-				<s:text name="lbl.hdr.comp.cnfigtmplt.favourite" />
-			</label>
-			<div class="controls">
-				<%
-					String checkedStr = "";
-					if (isFavourite) {
-					    checkedStr = "checked";
-					} else {
-						checkedStr = "";	
-					}
-				%>
-				<input type="checkbox" name="favourite" id="favourite" value="false" <%= checkedStr %> <%= disabledStr %>>
-			</div>
-		</div>
-		
-		<div class="control-group">
-			<label class="control-label labelbold">
 				<s:text name="lbl.hdr.comp.cnfigtmplt.env.specific" />
 			</label>
 			<div class="controls">
 				<%
+					String checkedStr = "";
 					if (isEnvSpecific) {
 					    checkedStr = "checked";
 					} else {
@@ -204,7 +188,33 @@
 				<input type="checkbox" name="envSpecific" id="envSpecific" value="false" <%= checkedStr %> <%= disabledStr %>>
 			</div>
 		</div>
-
+		
+		<div class="control-group">
+			<label class="control-label labelbold">
+				<s:text name="lbl.hdr.comp.cnfigtmplt.favourite" />
+			</label>
+			<div class="controls">
+				<%
+					String disabled = "";
+					if (isFavourite) {
+					    checkedStr = "checked";
+					} else {
+						if (!ServiceUIConstants.EDIT.equals(fromPage)) {
+							checkedStr = "checked";
+							disabled = "disabled";
+						} else {
+							checkedStr = "";
+						}
+					}
+					
+					if (!isEnvSpecific) {
+						disabled = "disabled";
+					}
+				%>
+				<input type="checkbox" name="favourite" id="favourite" value="false" <%= checkedStr %> <%= disabledStr %> <%= disabled %>>
+			</div>
+		</div>
+		
 		<div class="control-group">
 			<label class="control-label labelbold">
 				<s:text name="lbl.hdr.comp.system.properties" />
@@ -301,6 +311,7 @@
 	<input type="hidden" name="oldName" value="<%= name %>"/>
 	<input type="hidden" name="customerId" value="<%= customerId %>">
 	<input type="hidden" name="configId" value="<%= id %>">
+	<input type="hidden" id="csvAppliesTo" value="">
 </form>
 
 <script language="javascript">
@@ -320,7 +331,9 @@
 				for (PropertyTemplate prop : properties) {
  		%>	
 		 			var values = [];
+		 			var appliesTo = [];
 					var json = {};
+					json.id = '<%= prop.getId() %>';
 					json.name = '<%= prop.getName() %>';
 					json.key = '<%= prop.getKey() %>';
 					json.type = '<%= prop.getType() %>';
@@ -337,21 +350,40 @@
 		<%	
 						}
 					}
+					
+					List<String> appliesTo = prop.getAppliesTo();
+					if (CollectionUtils.isNotEmpty(appliesTo)) {
+						for (String applyTo : appliesTo) {
+		%>
+							appliesTo.push('<%= applyTo %>');				
+		<%
+						}
+					}
 		%>
 					json.possibleValues = values;
-					json.multiple =  '<%= prop.isMultiple() %>';
-					json.required =  '<%= prop.isRequired() %>';
+					json.appliesTo = appliesTo;
+					json.multiple =  <%= prop.isMultiple() %>;
+					json.required =  <%= prop.isRequired() %>;
 					constructDiv(json);
 		<%		
 				}
 		 	}
 		%>
 		trimValues();
+		
+		$('#envSpecific').click(function() {
+			if ($(this).is(":checked")) {
+				$("#favourite").attr("disabled", false).attr("checked", false);				
+			} else {
+				$("#favourite").attr("disabled", true).attr("checked", true);
+			}
+			
+		});
 	});
 	
 	var customer = $('input[name=customerId]').val();
 	var fromPage = '<%= fromPage %>';
-	var system = '<%= isSystem %>';
+	var system = <%= isSystem %>;
 	
 	function getConfigTemplates() {
 		showLoadingIcon();
@@ -360,25 +392,53 @@
 	
 	//Add propTemp
 	function openConfigTempPopup() {
-		var params = 'fromPage=';
-		params = params.concat("Add");
-		if ((fromPage == 'add') || (fromPage == 'edit' && system == 'false')) {
-			yesnoPopup('showPropTempPopup', "Add Property Templates", 'saveTemplate', 'OK', '', params);
-		} else if (fromPage == 'edit' && system == 'true' && customer == 'photon') {
-			yesnoPopup('showPropTempPopup', "Add Property Templates", 'saveTemplate', 'OK', '', params);
+		var appliesTo = [];
+		$("input[name=appliesTo]:checked").each(function() {
+			var techId = $(this).val();
+			var techName = $(this).parent().text().trim();
+			var selected = techId + "#" + techName;
+			appliesTo.push(selected);
+		});
+		var csvAppliesTo = appliesTo.join(",");
+		$("#csvAppliesTo").val(csvAppliesTo);
+		if (appliesTo.length <= 0) {
+			showError($("#applyControl"), $("#applyError"), 'Select atleast one technology');
+		} else {
+			var params = 'fromPage=';
+			params = params.concat("Add");
+			if ((fromPage == 'add') || (fromPage == 'edit' && !system)) {
+				yesnoPopup('showPropTempPopup', "Add Property Templates", 'saveTemplate', 'OK', '', params);
+			} else if (fromPage == 'edit' && system && customer == 'photon') {
+				yesnoPopup('showPropTempPopup', "Add Property Templates", 'saveTemplate', 'OK', '', params);
+			}
 		}
 	}
 	
 	//edit propTemp
 	function editPopup(key) {
-		var params = "propTempKey=";
-		params = params.concat(key);
-		params = params.concat("&fromPage=");
-		params = params.concat("Edit");
-		if (fromPage == 'add' || (fromPage == 'edit'&& system == 'false')) {
-			yesnoPopup('showPropTempPopup', "Edit Property Templates", 'saveTemplate', 'Update','', params);
-		} else if (fromPage == 'edit' && system == 'true' && customer == 'photon') {
-			yesnoPopup('showPropTempPopup', "Edit Property Templates", 'saveTemplate', 'Update','', params);
+		var appliesTo = [];
+		$("input[name=appliesTo]:checked").each(function() {
+			var techId = $(this).val();
+			var techName = $(this).parent().text().trim();
+			var selected = techId + "#" + techName;
+			console.info("selected::::", selected);
+			appliesTo.push(selected);
+		});
+		var csvAppliesTo = appliesTo.join(",");
+		$("#csvAppliesTo").val(csvAppliesTo);
+		
+		if (appliesTo.length <= 0) {
+			showError($("#applyControl"), $("#applyError"), 'Select atleast one technology');
+		} else {
+			var params = "propTempKey=";
+			params = params.concat(key);
+			params = params.concat("&fromPage=");
+			params = params.concat("Edit");
+			if (fromPage == 'add' || (fromPage == 'edit'&& !system)) {
+				yesnoPopup('showPropTempPopup', "Edit Property Templates", 'saveTemplate', 'Update','', params);
+			} else if (fromPage == 'edit' && system && customer == 'photon') {
+				yesnoPopup('showPropTempPopup', "Edit Property Templates", 'saveTemplate', 'Update','', params);
+			}
 		}
 	}
 	
@@ -429,7 +489,7 @@
 		jsonObj.configId = "<%= id %>";
 		jsonObj.oldName = "<%= name %>";
 		jsonObj.fromPage = "<%= fromPage %>";
-		jsonObj.system = "<%= isSystem %>";
+		jsonObj.system = <%= isSystem %>;
 		var jsonParam = JSON.stringify(jsonObj);
 		
 		var tableStat = tableHide();
@@ -441,7 +501,7 @@
 		
 		if (tableStat && nameStat && techStat) {
 			validateJson(pageUrl, $('#formConfigTempAdd'), $('#subcontainer'), jsonParam, progressText, $('#appliesToDiv :input'));
-		} 
+		}
 	}
 	
 	// To check for the special character in configname
@@ -488,15 +548,15 @@
 	  	tr.appendChild (mandatory);
 	  	
 	  	var customerId = $('input[name=customerId]').val();
-	  	if (fromPage == 'add' || (fromPage == 'edit'&& system == 'false')) {
+	  	if (fromPage == 'add' || (fromPage == 'edit'&& !system)) {
 	  		var icon = document.createElement('td');
 		  	icon.innerHTML = "<img class = 'del imagealign' id='deleteIcon' src='images/minus_icon.png' onclick='removeRow(this);' value='"+JSON.stringify(jsonObj)+"'>";
 		  	tr.appendChild (icon);
-		} else if (fromPage == 'edit' && system == 'true' && customerId == 'photon') {
+		} else if (fromPage == 'edit' && system && customerId == 'photon') {
 			var icon = document.createElement('td');
 		  	icon.innerHTML = "<img class = 'del imagealign' id='deleteIcon' src='images/minus_icon.png' onclick='removeRow(this);' value='"+JSON.stringify(jsonObj)+"'>";
 		  	tr.appendChild (icon);
-		} else if (fromPage == 'edit' && system == 'false' && customerId != 'photon') {
+		} else if (fromPage == 'edit' && !system && customerId != 'photon') {
 			var icon = document.createElement('td');
 		  	icon.innerHTML = "<img class = 'del imagealign' id='deleteIcon' src='images/minus_icon.png' onclick='removeRow(this);' value='"+JSON.stringify(jsonObj)+"'>";
 		  	tr.appendChild (icon);
@@ -593,20 +653,25 @@
 			$('#posblVal option').each( function() {
 				array.push($(this).val());
 			});
+			
+			var appliesTo = [];
+			$("input[name=propAppliesTo]:checked").each( function() {
+				appliesTo.push($(this).val());
+			});
+			
+			var id = $('#id').val();
 			var key = $('#key').val();
 			var name = $('#name').val();
 			var type = $('.propType').val();
 			var helpText = $('#helpText').val();
 			var defaultValue = $('#defaultValue').val();
-			var multiple = "false";
-			if ($('#multiple').is(':checked')) {
-				multiple = "true"; 
-			} 
-			var mandatory = "false";
-			if ($('#mandatory').is(':checked')) {
-				mandatory = "true";
-			}
+			var multiple = $('#multiple').is(':checked');
+			var mandatory = $('#mandatory').is(':checked');
+			
 			var value = {};
+			if (!isBlank(id)) {
+				value.id = id;				
+			}
 			value.key = key;
 			value.name = name;
 			value.type = type;
@@ -615,6 +680,7 @@
 			value.multiple = multiple;
 			value.required = mandatory;
 			value.defaultValue = defaultValue;
+			value.appliesTo = appliesTo;
 			hideError($("#propTempControl"), $("#propTempError"));
 			if (!duplicateFinder(key, name, oldkey, oldname)) {
 				$('#popupPage').modal('hide');

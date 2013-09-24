@@ -171,7 +171,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 				S_LOGGER.info("ConfigTemplates.edit", "customerId=" + "\"" + getCustomerId() + "\"", "configId=" + "\"" + getConfigId() + "\"");
 			}
 		    ServiceManager serviceManager = getServiceManager();
-			SettingsTemplate configTemp = serviceManager.getConfigTemplate(getConfigId(), getCustomerId());
+			SettingsTemplate configTemp = serviceManager.getConfigTemplate(getConfigId());
 			List<Technology> technologies = serviceManager.getArcheTypes(getCustomerId());
 			setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 		    setReqAttribute(REQ_CONFIG_TEMP, configTemp);
@@ -247,7 +247,7 @@ public class ConfigTemplates extends ServiceBaseAction {
 				}
 				S_LOGGER.info("ConfigTemplates.update", "customerId=" + "\"" + getCustomerId() + "\"", "configId=" + "\"" + getConfigId() + "\"");
 			}
-    		getServiceManager().updateConfigTemp(createSettingsTemplateInstance(), getConfigId(), getCustomerId());
+    		getServiceManager().createConfigTemplates(Collections.singletonList(createSettingsTemplateInstance()), getCustomerId());
     		addActionMessage(getText(CONFIGTEMPLATE_UPDATED, Collections.singletonList(getName())));
     	} catch (PhrescoException e) {
     		if (isDebugEnabled) {
@@ -331,8 +331,9 @@ public class ConfigTemplates extends ServiceBaseAction {
 		if (isDebugEnabled) {
 	    	S_LOGGER.debug("ConfigTemplates.showPropTempPopup : Entry");
 	    }
-		setReqAttribute("propTempKey", getPropTempKey());
-		setReqAttribute(REQ_FROM_PAGE, fromPage);
+		
+		setReqAttribute(REQ_CONFIG_KEY, getPropTempKey());
+		setReqAttribute(REQ_FROM_PAGE, getFromPage());
 		if (isDebugEnabled) {
 	    	S_LOGGER.debug("ConfigTemplates.showPropTempPopup : Exit");
 	    }

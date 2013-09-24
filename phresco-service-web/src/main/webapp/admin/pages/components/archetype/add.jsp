@@ -187,15 +187,15 @@
 			</div>
 		</div>
 		
-		 <div class="control-group apptype" id="appControl">
+		 <div class="control-group apptype" id="techGroupControl">
 			<label class="control-label labelbold"> <span
-				class="mandatory"></span>&nbsp;<s:text name='lbl.hdr.archetype.techgroup' />
+				class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.archetype.techgroup' />
 			</label>
 			<div class="controls">
 				<select id="techGroup" name="techGroup" <%= disabledVer %>>
 					
 				</select> 
-				<span class="help-inline" id="appError"></span>
+				<span class="help-inline" id="techGroupError"></span>
 			</div>
 		</div> 
 		
@@ -505,47 +505,6 @@
 		<%
 			}	
 		%>
-		
-		<%-- <div class="control-group" id="funcFrameworksControl">
-			<label class="control-label labelbold">
-				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.func.test.frameworks'/>
-			</label>
-			<div class="controls">
-				<div class="typeFields" id="typefield">
-					<div class="multilist-scroller multiselct" id="funcFrameworksDiv">
-						<ul>
-							<li>
-								<input type="checkbox" value="" id="checkAllFuncFrameworks" name="" onclick="checkAllEvent(this,$('.funcFrameworkChk'), false);"
-									style="margin: 3px 8px 6px 0;"><s:text name='lbl.all'/>
-							</li>
-							<%
-								if (CollectionUtils.isNotEmpty(functionalFrameworks)) {
-									String checkedStr = "";
-									for (FunctionalFramework functionalFramework : functionalFrameworks) {
-										if (CollectionUtils.isNotEmpty(selectedFunctionalFrameworks)) {
-											if (selectedFunctionalFrameworks.contains(functionalFramework.getId())) {
-												checkedStr = "checked";
-											} else {
-												checkedStr = "";
-											}
-										}
-							%>
-										<li>
-											<input type="checkbox" id="funcFrameworkCheckbox" name="functionalFramework" value="<%= functionalFramework.getName() %>" class="check funcFrameworkChk" 
-												<%= checkedStr %> onclick="checkboxEvent($('#checkAllFuncFrameworks'), 'funcFrameworkChk')"><%= functionalFramework.getDisplayName() %> 
-										</li>
-							<%
-									}	
-								}
-							%>
-						</ul>
-					</div>
-				</div>
-				<span class="help-inline applyerror" id="funcFrameworksError"></span>
-			</div>
-		</div>
-	</div> --%>
-	
 	<div class="bottom_button">
 		<%
 			String disabledClass = "btn-primary";
@@ -724,6 +683,12 @@
 			showError($("#appControl"), $("#appError"), data.appError);
 		} else {
 			hideError($("#appControl"), $("#appError"));
+		}
+		
+		if (!isBlank(data.techGroupError)) {
+			showError($("#techGroupControl"), $("#techGroupError"), data.techGroupError);
+		} else {
+			hideError($("#techGroupControl"), $("#techGroupError"));
 		}
 
 		if (!isBlank(data.fileError)) {

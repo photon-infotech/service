@@ -85,6 +85,7 @@ public class Archetypes extends ServiceBaseAction {
 	private String applicableErr = "";
 	private String techErr = "";
 	private String funcFrameworksError = "";
+	private String techGroupError = "";
 	private boolean errorFound = false;
 	private String oldName = "";
 
@@ -670,6 +671,8 @@ public class Archetypes extends ServiceBaseAction {
 		isError = nameValidation(isError);
 
 		isError = versionValidation(isError);
+		
+		isError = techGroupValidation();
 
 		isError = appTypeValidation(isError);
 		
@@ -823,6 +826,15 @@ public class Archetypes extends ServiceBaseAction {
 					}
 				}
 			}
+		}
+		
+		return tempError;
+	}
+	
+	private boolean techGroupValidation() {
+		if (StringUtils.isEmpty(getTechGroup())) {
+			setTechGroupError(getText(KEY_I18N_ERR_TECHGROUP_EMPTY ));
+			tempError = true;
 		}
 		
 		return tempError;
@@ -1200,5 +1212,13 @@ public class Archetypes extends ServiceBaseAction {
 
 	public List<String> getFunctionalFrameworkInfo() {
 		return functionalFrameworkInfo;
+	}
+
+	public void setTechGroupError(String techGroupError) {
+		this.techGroupError = techGroupError;
+	}
+
+	public String getTechGroupError() {
+		return techGroupError;
 	}
 }

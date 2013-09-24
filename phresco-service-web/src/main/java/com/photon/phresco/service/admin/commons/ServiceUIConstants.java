@@ -328,6 +328,7 @@ public interface ServiceUIConstants {
 	String EXCEPTION_CONFIG_TEMP_EDIT = "excep.hdr.comp.configtemp.edit";
 	String EXCEPTION_CONFIG_TEMP_ADD = "excep.hdr.comp.configtemp.add";
 	String EXCEPTION_CONFIG_TEMP_LIST = "excep.hdr.comp.configtemp.list";
+	String EXCEPTION_CONFIG_TEMP_ADD_PROP_TEMP = "excep.hdr.comp.configtemp.add.prop.temp";
 	
 	String EXCEPTION_PILOT_PROJECTS_DELETE = "excep.hdr.comp.pilotpro.delete";
 	String EXCEPTION_PILOT_PROJECTS_UPDATE = "excep.hdr.comp.pilotpro.update";
@@ -380,6 +381,7 @@ public interface ServiceUIConstants {
     String KEY_I18N_NAME_CHANGE_NOT_APPLICABLE = "err.msg.name.chnge.not.appl";
 	String KEY_I18N_SINGLE_TECH_EMPTY = "err.msg.singletech.empty";
 	String KEY_I18N_ERR_CONTEXT_EMPTY = "err.msg.context.empty";
+	String KEY_I18N_ERR_TECHGROUP_EMPTY = "err.msg.techgroup.empty";
     
     String KEY_I18N_ERR_APPTYPE_EMPTY = "err.msg.apptye.empty";
     String KEY_I18N_ERR_APPLIES_EMPTY = "err.msg.applies.empty";

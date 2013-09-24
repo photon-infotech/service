@@ -29,7 +29,6 @@
 <%
  	String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
 	String propTempKey = (String) request.getAttribute("propTempKey"); 
-	System.out.println("KEY "+propTempKey);
 %>
  
  <form id="addPropTemp" name="addPropTempForm" class="form-horizontal customer_list">
@@ -150,8 +149,26 @@
 			<input type="checkbox" class="multiple_chkBox_config" id='mandatory' value="false">
 		</div>
 	</div>
+	
+	<div class="control-group" id="applyControl">
+			<label class="control-label labelbold">
+				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.appliesto'/>
+			</label>
+			<div class="controls">
+					<div class="typeFields" id="typefield">
+					<div class="multilist-scroller multiselct" id="propAppliesToDiv">
+						<ul class="propAppliesToUL">
+							
+						</ul>
+					</div>
+				</div>
+          		 <span class="help-inline applyerror" id="applyError"></span>
+			</div>
+		</div>
+	
 	<!-- Hidden Fields -->
 	<input type="hidden" name="popupFromPage" value="<%= StringUtils.isNotEmpty(fromPage) ? fromPage : "" %>"/>
+	<input type="hidden" name="id" id="id"/>
 </form>
 
 <script language="javascript">
@@ -160,6 +177,18 @@
 	var oldKey = "";
 	var oldName = "";
 	$(document).ready(function() {
+		//To construct the appliesTo control
+		var csvAppliesTo = $("#csvAppliesTo").val();
+		var appliesTo = csvAppliesTo.split(",");
+		var li = "";
+		$.each(appliesTo, function(index, value) {
+			var split = value.split("#");
+			var techId = split[0];
+			var techName = split[1];
+			li = li.concat('<li><input type="checkbox" name="propAppliesTo" value="'+techId+'" class="check applsChk">' + techName);
+		});
+		$(".propAppliesToUL").append(li);
+		
 		$('#clipboard').hide();
 		var popupFromPage = '<%= fromPage %>';
 		hidePopuploadingIcon();
@@ -168,6 +197,7 @@
 		if (value != null) {
 			var jsonObj = JSON.parse(value);
 			if (jsonObj != null) {
+				$('#id').val(jsonObj.id);
 				$('#key').val(jsonObj.key);
 				$('#name').val(jsonObj.name);
 				$('.propType').val(jsonObj.type);
@@ -180,16 +210,18 @@
 						text : psblValues[i]
 					}));
 				}
-				if (jsonObj.multiple == "true") {
-					$('#multiple').prop('checked', true);
-				} else {
-					$('#multiple').prop('checked', false);
+				$('#multiple').prop('checked', jsonObj.multiple);
+				$('#mandatory').prop('checked', jsonObj.required);
+				
+				var appliesTo = jsonObj.appliesTo;
+				for (var i = 0; i < appliesTo.length; i++) {
+					$("input[name=propAppliesTo]").each( function() {
+						if ($(this).val() === appliesTo[i]) {
+							$(this).attr("checked", true);
+						}
+					});
 				}
-				if (jsonObj.required == "true") {
-					$('#mandatory').prop('checked', true);
-				} else {
-					$('#mandatory').prop('checked', false);
-				}
+			
 				oldKey = jsonObj.key;
 				oldName = jsonObj.name;
 			}
@@ -284,7 +316,6 @@
 	function showHideMultiple() {
 		var type = $('#type').val();
 		var size = $('#posblVal option').size();
-		console.info("type::" + type);
 		if (size > 1) {
 			$('#multipleControl').show();
 		} else {
@@ -360,6 +391,9 @@
 		var name = $('#name').val();
 		if (name === "") {
 			$('.errMsg').html('<s:text name='err.msg.name.empty'/>');
+			return false;
+		} else if ($("input[name=propAppliesTo]:checked").length <= 0) {
+			$('.errMsg').html('Select atleast one technology');
 			return false;
 		}
 

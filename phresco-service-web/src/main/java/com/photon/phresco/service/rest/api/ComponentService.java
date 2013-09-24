@@ -1100,7 +1100,7 @@ public class ComponentService extends DbService {
 				return settingTemplate;
 			}
 			List<Element> types = getTypes(settingTemplate.getName(), settingTemplate.getCustomerIds().get(0));
-			settingTemplate.setAppliesToTechs(types);
+			settingTemplate.setPossibleTypes(types);
 			Query propQuery = new Query();
 			Criteria idCriteria = Criteria.where("settingsTemplateId").is(settingTemplate.getId());
 			propQuery.addCriteria(idCriteria);

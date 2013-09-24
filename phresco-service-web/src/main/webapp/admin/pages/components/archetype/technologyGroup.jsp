@@ -156,12 +156,12 @@
 						$("#reportMsg").html("<s:text name='technology.name.already.exists'/>");
 						returnValue = false;
 						return false;
-					} 
-					$('#techGroupOk').attr("disabled", false);
-					$("#techGroupOk").addClass("btn-primary");
+					}
 				});
 			}
 			if (returnValue) {
+				$('#techGroupOk').attr("disabled", false);
+				$("#techGroupOk").addClass("btn-primary");
 				addRow();
 				$("#techGroupName").val("");
 				$("#techGroDesc").val("");
