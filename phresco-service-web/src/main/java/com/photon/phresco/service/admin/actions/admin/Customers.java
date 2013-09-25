@@ -238,7 +238,7 @@ public class Customers extends ServiceBaseAction  {
 			if (loginIconByteArray != null) {
 				inputStreamMap.put(getCustomerId(), new ByteArrayInputStream(loginIconByteArray));
 			}
-			getServiceManager().createCustomers(customer, inputStreamMap);
+			getServiceManager().createCustomers(customer, getFromPage(), inputStreamMap);
 			addActionMessage(getText(CUSTOMER_ADDED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
 			if(isDebugEnabled) {
@@ -317,7 +317,7 @@ public class Customers extends ServiceBaseAction  {
 			if (loginIconByteArray != null) {
 				inputStreamMap.put(getCustomerId(), new ByteArrayInputStream(loginIconByteArray));
 			}
-			getServiceManager().createCustomers(customer, inputStreamMap);
+			getServiceManager().createCustomers(customer, getFromPage(), inputStreamMap);
 			addActionMessage(getText(CUSTOMER_UPDATED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
 			if(isDebugEnabled) {
