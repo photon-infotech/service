@@ -173,6 +173,11 @@ public class AdminService extends DbService {
 			}
 		}
 		Converter<CustomerDAO, Customer> converter = (Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
+		for (Customer customer : customers) {
+			if (StringUtils.isNotEmpty(context) && !customer.getContext().equalsIgnoreCase(context)) {
+				response.setStatus(204);
+			}
+		}
 		if (customerDAO == null) {
 			return byteArray;
 		}
