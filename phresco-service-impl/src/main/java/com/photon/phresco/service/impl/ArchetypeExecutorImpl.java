@@ -349,7 +349,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 				.append(Constants.STR_BLANK_SPACE)
 				.append(ARCHETYPE_ARCHETYPEVERSION)
 				.append(Constants.STR_EQUALS)
-				.append("3.0.0.27005-SNAPSHOT")
+				.append(version)
 				.append(Constants.STR_BLANK_SPACE)
 				.append(ARCHETYPE_GROUPID)
 				.append(Constants.STR_EQUALS)
