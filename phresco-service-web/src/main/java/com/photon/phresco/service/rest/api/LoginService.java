@@ -17,12 +17,12 @@
  */
 package com.photon.phresco.service.rest.api;
 
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -34,7 +34,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.photon.phresco.commons.model.User;
 import com.photon.phresco.commons.model.User.AuthType;
 import com.photon.phresco.exception.PhrescoException;
-import com.photon.phresco.exception.PhrescoWebServiceException;
 import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.PhrescoServerFactory;
@@ -99,9 +98,14 @@ public class LoginService extends DbService {
 		ServerConfiguration serverConfig = PhrescoServerFactory.getServerConfig();
 		Client client = Client.create();
 		PhrescoServerFactory.initialize();
+		User user = null; 
 		RepositoryManager repoMgr = PhrescoServerFactory.getRepositoryManager();
+		boolean checkLDAPAvailable = checkLDAPAvailable(repoMgr);
+		if(!checkLDAPAvailable) {
+			response.setStatus(204);
+			return user;
+		}
 		WebResource resource = client.resource(repoMgr.getAuthServiceURL() + ServerConstants.AUTHENTICATE);
-		
         resource.accept(MediaType.APPLICATION_JSON_VALUE);
         ClientResponse clientResponse = resource.type(MediaType.APPLICATION_JSON_VALUE).post(ClientResponse.class, credentials);
         if(clientResponse.getStatus() == 204) {
@@ -110,7 +114,7 @@ public class LoginService extends DbService {
         	return null;
         }
         GenericType<User> genericType = new GenericType<User>() {};
-        User user = clientResponse.getEntity(genericType);
+        user = clientResponse.getEntity(genericType);
         user.setToken(createAuthToken(credentials.getUsername()));
         user.setPhrescoEnabled(true);
         user.setValidLogin(true);
@@ -124,6 +128,18 @@ public class LoginService extends DbService {
         }
         user.setCustomers(findCustomersFromDB());
         return user;
+	}
+
+	private boolean checkLDAPAvailable(RepositoryManager repoMgr) {
+		boolean isAlive = true;
+		try {
+			URL url = new URL(repoMgr.getAuthServiceURL());
+			URLConnection connection = url.openConnection();
+			connection.connect();
+		} catch (Exception e) {
+			isAlive = false;
+		}
+		return isAlive;
 	}
 	
 	private String createAuthToken(String userName) throws PhrescoException {
