@@ -45,6 +45,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ArtifactInfo;
@@ -280,6 +281,7 @@ public class ProjectService extends DbService {
 	private ProjectInfo cloneProjectInfo(ProjectInfo projectInfo, int i) {
 		ProjectInfo clonedProjectInfo = projectInfo.clone();
 		ApplicationInfo applicationInfo = clonedProjectInfo.getAppInfos().get(i);
+		applicationInfo.setPomFile("pom.xml");
 		clonedProjectInfo.setAppInfos(Collections.singletonList(applicationInfo));
 		return clonedProjectInfo;
 	}

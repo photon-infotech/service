@@ -241,10 +241,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 		Gson gson = new Gson();
 		if(CollectionUtils.isNotEmpty(listArtifactGroup)) {
 			ProjectUtils projectUtils = new ProjectUtils();
-			StringBuilder stringbuilder = new StringBuilder(tempFolderPath).append(File.separator).append(appInfo.getAppDirName())
-			.append(File.separator).append(Constants.POM_NAME);
-			File projectPomPath = new File(stringbuilder.toString());
-			projectUtils .updatePOMWithPluginArtifact(projectPomPath, listArtifactGroup);
+			projectUtils .updatePOMWithPluginArtifact(getPomFile(tempFolderPath, appInfo), listArtifactGroup);
 		}
 		StringBuilder sb = new StringBuilder(tempFolderPath).append(File.separator).append(appInfo.getAppDirName())
 		.append(File.separator).append(Constants.DOT_PHRESCO_FOLDER).append(File.separator).append(
@@ -285,7 +282,18 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 		.append(File.separator).append(Constants.DOT_PHRESCO_FOLDER).append(File.separator).append(
 				Constants.PROJECT_INFO_FILE);
 		File projectInfoPath = new File(sbuilder.toString());
+		projectInfo.setAppInfos(Collections.singletonList(appInfo));
 		ProjectUtils.updateProjectInfo(projectInfo, projectInfoPath);
+	}
+	
+	private File getPomFile(String tempPath, ApplicationInfo appInfo) {
+		String projectPath = tempPath + File.separator + appInfo.getAppDirName();
+		File file = new File(projectPath, "phresco-pom.xml");
+		if(file.exists()) {
+			appInfo.setPhrescoPomFile("phresco-pom.xml");
+			return file;
+		}
+		return new File(projectPath, "pom.xml");
 	}
 	
 	private void pilotDefaultFeaturesToAdd(ApplicationInfo appInfo,
@@ -341,7 +349,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 				.append(Constants.STR_BLANK_SPACE)
 				.append(ARCHETYPE_ARCHETYPEVERSION)
 				.append(Constants.STR_EQUALS)
-				.append(version)
+				.append("3.0.0.27005-SNAPSHOT")
 				.append(Constants.STR_BLANK_SPACE)
 				.append(ARCHETYPE_GROUPID)
 				.append(Constants.STR_EQUALS)

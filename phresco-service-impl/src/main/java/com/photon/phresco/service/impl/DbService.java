@@ -36,7 +36,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.data.document.mongodb.MongoOperations;
 import org.springframework.data.document.mongodb.query.Criteria;
+import org.springframework.data.document.mongodb.query.Order;
 import org.springframework.data.document.mongodb.query.Query;
+import org.springframework.data.document.mongodb.query.Sort;
 
 import com.mongodb.DB;
 import com.mongodb.Mongo;
@@ -384,7 +386,9 @@ public class DbService implements ServiceConstants {
 			LOGGER.debug("DbService.findCustomersFromDB:Entry");
 		}
     	try {
-    		List<CustomerDAO> customersDAOs = mongoOperation.getCollection(CUSTOMERDAO_COLLECTION_NAME, CustomerDAO.class);
+    		Query query = new Query();
+    		query.sort().on("name", Order.ASCENDING);
+    		List<CustomerDAO> customersDAOs = mongoOperation.find(CUSTOMERDAO_COLLECTION_NAME, query, CustomerDAO.class);
     		List<Customer> customersInDb = new ArrayList<Customer>();
     		Converter<CustomerDAO, Customer> customerConverter = 
     			(Converter<CustomerDAO, Customer>) ConvertersFactory.getFrameworkConverter(CustomerDAO.class);
