@@ -87,6 +87,7 @@ public class Archetypes extends ServiceBaseAction {
 	private String funcFrameworksError = "";
 	private String techGroupError = "";
 	private boolean errorFound = false;
+	private boolean system = false;
 	private String oldName = "";
 
 	private String description = "";
@@ -382,7 +383,7 @@ public class Archetypes extends ServiceBaseAction {
 			technology.setDescription(getDescription());
 			technology.setAppTypeId(getApptype());
 			technology.setTechGroupId(getTechGroup());
-
+			technology.setSystem(isSystem());
 			//To set the applicable features
 			List<String> options = new ArrayList<String>();
 			for (String selectedOption : getApplicable()) {
@@ -1220,5 +1221,13 @@ public class Archetypes extends ServiceBaseAction {
 
 	public String getTechGroupError() {
 		return techGroupError;
+	}
+
+	public void setSystem(boolean system) {
+		this.system = system;
+	}
+
+	public boolean isSystem() {
+		return system;
 	}
 }

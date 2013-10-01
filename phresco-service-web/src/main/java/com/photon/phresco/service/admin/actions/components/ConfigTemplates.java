@@ -239,11 +239,11 @@ public class ConfigTemplates extends ServiceBaseAction {
     		if (isDebugEnabled) {
 				if (StringUtils.isEmpty(getCustomerId())) {
 					S_LOGGER.warn("ConfigTemplates.update", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
-					return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_CONFIG_TEMP_SAVE));
+					return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_CONFIG_TEMP_UPDATE));
 				}
-				if (StringUtils.isEmpty(getCustomerId())) {
+				if (StringUtils.isEmpty(getConfigId())) {
 					S_LOGGER.warn("ConfigTemplates.update", "status=\"Bad Request\"", "message=\"Config template Id is empty\"");
-					return showErrorPopup(new PhrescoException("Config template Id is empty"), getText(EXCEPTION_CONFIG_TEMP_SAVE));
+					return showErrorPopup(new PhrescoException("Config template Id is empty"), getText(EXCEPTION_CONFIG_TEMP_UPDATE));
 				}
 				S_LOGGER.info("ConfigTemplates.update", "customerId=" + "\"" + getCustomerId() + "\"", "configId=" + "\"" + getConfigId() + "\"");
 			}
@@ -271,7 +271,6 @@ public class ConfigTemplates extends ServiceBaseAction {
 		if (isDebugEnabled) {
 	    	S_LOGGER.debug("ConfigTemplates.createSettingsTemplateInstance : Entry");
 	    }
-		
 		SettingsTemplate settingTemplate = null;
 		try {
 			List<String> techIds = getAppliesTo();
@@ -309,8 +308,8 @@ public class ConfigTemplates extends ServiceBaseAction {
 					element.setName(techName);
 					appliesTos.add(element);
 				}
-				
 				settingTemplate.setAppliesToTechs(appliesTos);
+				settingTemplate.setSystem(isSystem());
 				settingTemplate.setProperties(getPropTemps());
 			}
 			

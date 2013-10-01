@@ -78,7 +78,6 @@ public class Downloads extends ServiceBaseAction {
 	private String downloadGroupId = "";
 	private String downloadVersions = "";
 	private boolean errorFound = false;
-	
 	private String fromPage = "";
 	private String system = "";
 	private String customerId = "";
@@ -239,7 +238,7 @@ public class Downloads extends ServiceBaseAction {
 //				inputStreamMap.put(downloadInfo.getName(),  new ByteArrayInputStream(imgByteArray));
 //			} 
 		    
-			getServiceManager().createDownloads(getDownloadInfo(), inputStreamMap, getCustomerId());
+			getServiceManager().createDownloads(downloadInfo, inputStreamMap, getCustomerId());
 			addActionMessage(getText(DOWNLOAD_ADDED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
 			if (isDebugEnabled) {
@@ -278,7 +277,7 @@ public class Downloads extends ServiceBaseAction {
 //			if(imgByteArray != null){
 //				inputStreamMap.put(downloadInfo.getName(),  new ByteArrayInputStream(imgByteArray));
 //			} 
-			getServiceManager().createDownloads(getDownloadInfo(), inputStreamMap, getCustomerId());
+			getServiceManager().createDownloads(downloadInfo, inputStreamMap, getCustomerId());
 			addActionMessage(getText(DOWNLOAD_UPDATED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
 			if (isDebugEnabled) {
@@ -316,7 +315,7 @@ public class Downloads extends ServiceBaseAction {
 		downloadInfo.setDescription(getDescription());
 		downloadInfo.setCustomerIds(Arrays.asList(getCustomerId()));
 		downloadInfo.setAppliesToTechIds(getTechnology()); //To set applies to technology
-
+		downloadInfo.setSystem(Boolean.parseBoolean(getSystem()));
 		//To set applies to platform types
 		List<String> platformTypeIds = new ArrayList<String>(getPlatform().size());
 		if (CollectionUtils.isNotEmpty(getPlatform())) {

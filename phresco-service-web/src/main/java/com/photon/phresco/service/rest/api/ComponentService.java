@@ -51,6 +51,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.google.gson.Gson;
+import com.mongodb.DBCollection;
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactElement;
@@ -987,16 +988,33 @@ public class ComponentService extends DbService {
 	        		"user=" + request.getParameter("userId"), "customer" + getCustomerNameById(settings.get(0).getCustomerIds().get(0)));
 		}
 		try {
+			List<String> selectedPropTempIds = new ArrayList<String>();
 			for (SettingsTemplate settingsTemplate : settings) {
 				if(validate(settingsTemplate)) {
 					DbService.getMongoOperation().save(SETTINGS_COLLECTION_NAME, settingsTemplate);
 					List<PropertyTemplate> properties = settingsTemplate.getProperties();
 					for (PropertyTemplate propertyTemplate : properties) {
+						selectedPropTempIds.add(propertyTemplate.getId());
 						propertyTemplate.setSettingsTemplateId(settingsTemplate.getId());
 						DbService.getMongoOperation().save(PROPERTY_TEMPLATE_COLLECTION_NAME, propertyTemplate);
 					}
 				}
+				
+				//To delete removed property template from db
+				List<PropertyTemplate> allPropTemps = DbService.getMongoOperation().
+					find(PROPERTY_TEMPLATE_COLLECTION_NAME, new Query(Criteria.where("settingsTemplateId").is(settingsTemplate.getId())), PropertyTemplate.class);
+				for (PropertyTemplate propertyTemplate : allPropTemps) {
+					if (propertyTemplate.getSettingsTemplateId().equals(settingsTemplate.getId()) && CollectionUtils.isNotEmpty(selectedPropTempIds) 
+							&& !selectedPropTempIds.contains(propertyTemplate.getId())) {
+						DbService.getMongoOperation().remove(PROPERTY_TEMPLATE_COLLECTION_NAME, 
+						        new Query(Criteria.whereId().is(propertyTemplate.getId())), PropertyTemplate.class);
+					}
+				}
+				
 			}
+			
+			
+			
 		} catch (Exception e) {
 			response.setStatus(500);
 			if(isDebugEnabled) {
@@ -1197,6 +1215,9 @@ public class ComponentService extends DbService {
 		try {
 			DbService.getMongoOperation().remove(SETTINGS_COLLECTION_NAME, 
 			        new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), SettingsTemplate.class);
+			
+			DbService.getMongoOperation().remove(PROPERTY_TEMPLATE_COLLECTION_NAME, 
+			        new Query(Criteria.where("settingsTemplateId").is(id)), PropertyTemplate.class);
 			response.setStatus(200);
 		} catch (Exception e) {
 			response.setStatus(500);

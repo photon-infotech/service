@@ -72,7 +72,7 @@ public class PilotProjects extends ServiceBaseAction {
 
 	private String fileError = "";
 	private boolean errorFound = false;
-	
+	private boolean system = false;
 	private String projectId = "";
 	private String fromPage = "";
 	
@@ -242,7 +242,7 @@ public class PilotProjects extends ServiceBaseAction {
 				inputStreamMap.put(pilotProInfo.getName(),  new ByteArrayInputStream(pilotProByteArray));
 			} 
     		
-    		getServiceManager().createPilotProjects(createPilotProj(), inputStreamMap, getCustomerId());
+    		getServiceManager().createPilotProjects(pilotProInfo, inputStreamMap, getCustomerId());
 			addActionMessage(getText(PLTPROJ_ADDED, Collections.singletonList(getName())));
     	} catch (PhrescoException e) {
     		if (isDebugEnabled) {
@@ -283,7 +283,7 @@ public class PilotProjects extends ServiceBaseAction {
     		if (pilotProByteArray != null) {
     			inputStreamMap.put(pilotProInfo.getName(),  new ByteArrayInputStream(pilotProByteArray));
     		} 
-    		getServiceManager().createPilotProjects(createPilotProj(), inputStreamMap, getCustomerId());
+    		getServiceManager().createPilotProjects(pilotProInfo, inputStreamMap, getCustomerId());
     		addActionMessage(getText(PLTPROJ_UPDATED, Collections.singletonList(getName())));
     	} catch (PhrescoException e) {
     		if (isDebugEnabled) {
@@ -304,6 +304,7 @@ public class PilotProjects extends ServiceBaseAction {
         if (StringUtils.isNotEmpty(getProjectId())) { 
         	pilotProInfo.setId(getProjectId());
         }
+        pilotProInfo.setSystem(isSystem());
         List<String> customerIds = new ArrayList<String>();
         customerIds.add(getCustomerId());
         pilotProInfo.setName(getName());
@@ -604,6 +605,14 @@ public class PilotProjects extends ServiceBaseAction {
 		this.projectId = projectId;
 	}
 	
+	public boolean isSystem() {
+		return system;
+	}
+
+	public void setSystem(boolean system) {
+		this.system = system;
+	}
+
 	public String getFromPage() {
 		return fromPage;
 	}

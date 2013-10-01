@@ -491,9 +491,10 @@ function showDeleteConfirmation(confirmMsg) {
 	$('.modal-body').css("height","50px");
 	$('#popupPage').css({"width":"649px","position":"relative","left":"48%"});
 	$('.popupOk').removeAttr("onclick");
-	$('.popupOk').text("Ok");
+	$('.popupOk').attr("value", "Ok");
 	$('.popupOk').attr("onclick","continueDeletion()");
 	$('#popupClose').hide();
+	
 	$('#popupPage').modal("show");
 }
 

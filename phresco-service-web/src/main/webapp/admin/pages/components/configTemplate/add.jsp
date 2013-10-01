@@ -42,7 +42,6 @@
 	String buttonLbl = ServiceActionUtil.getButtonLabel(fromPage);
 	String pageUrl = ServiceActionUtil.getPageUrl(ServiceUIConstants.CONFIG_TEMPLATES, fromPage);
 	String progressTxt = ServiceActionUtil.getProgressTxt(ServiceUIConstants.CONFIG_TEMPLATES, fromPage);
-	
 	List<String> permissionIds = (List<String>) session.getAttribute(ServiceUIConstants.SESSION_PERMISSION_IDS);
 	String per_disabledStr = "";
 	String per_disabledClass = "btn-primary";
@@ -320,7 +319,9 @@
 		$(".content_adder").scrollbars();  
 		$(".multilist-scroller").scrollbars();
 	}
-	
+	var customer = $('input[name=customerId]').val();
+	var fromPage = '<%= fromPage %>';
+	var system = <%= isSystem %>;
 	$(document).ready(function() {
 		hideLoadingIcon();
 		checkboxEvent($('#checkAllAuto'), 'applsChk');
@@ -381,10 +382,6 @@
 		});
 	});
 	
-	var customer = $('input[name=customerId]').val();
-	var fromPage = '<%= fromPage %>';
-	var system = <%= isSystem %>;
-	
 	function getConfigTemplates() {
 		showLoadingIcon();
 		loadContent('configtempList', $('#formCustomerId'), $('#subcontainer'));
@@ -421,7 +418,6 @@
 			var techId = $(this).val();
 			var techName = $(this).parent().text().trim();
 			var selected = techId + "#" + techName;
-			console.info("selected::::", selected);
 			appliesTo.push(selected);
 		});
 		var csvAppliesTo = appliesTo.join(",");
@@ -517,7 +513,7 @@
 		var table = document.getElementById('dataTable');
 	  	var body = table.getElementsByTagName('tbody')[0];
 	  	var tr = document.createElement('tr');
-	  	tr.id = "tr-"+jsonObj.key;
+	  	tr.id = "tr-"+jsonObj.key.replace(/\./g, '-');
 	  
 	 	var key = document.createElement('td');
 	  	key.innerHTML = "<a href='#' onclick='editPopup("+JSON.stringify(jsonObj.key)+");'>"+jsonObj.key+"</a>";
@@ -538,11 +534,7 @@
 	  
 	  	var status = jsonObj.required;
 	  	var img = "";
-	  	if (status == "true") {
-			img = "<img src='images/success.png' title='Applicable'>"; 
-	  	} else if (status == "false") {
- 			img = "<img src='images/smalldelete.png' title='NotApplicable'>";
-		}
+	  	status ? img = "<img src='images/success.png' title=''>" : img = "<img src='images/smalldelete.png' title=''>";
 	  	var mandatory = document.createElement('td');
 	  	mandatory.innerHTML = img;
 	  	tr.appendChild (mandatory);
@@ -569,7 +561,7 @@
 	  	var hiddenField = document.createElement("input");
 	  	hiddenField.type = "hidden";
 	  	hiddenField.name = "propTemps";
-	  	hiddenField.id = jsonObj.key;
+	  	hiddenField.id = jsonObj.key.replace(/\./g, '-');
 	  	hiddenField.value = JSON.stringify(jsonObj);
 	  	tr.appendChild(hiddenField);
 	  
@@ -581,7 +573,7 @@
 	function modifyDiv(jsonObj, fieldId) {
 		var table = document.getElementById('dataTable');
 		var body = table.getElementsByTagName('tbody')[0];
-		var trId = $('#' + fieldId).parent().attr("id");
+		var trId = $('#' + fieldId.replace(/\./g, '-')).parent().attr("id");
 		$('#'+trId).find("td").remove();
 		$('#'+trId).find("input").remove();
 		
@@ -591,14 +583,10 @@
 		$('#'+trId).append("<td id='posbl-td'>"+jsonObj.possibleValues+"</td>");
 		var status = jsonObj.required;
 		var img = "";
-		if (status == "true") {
-			img = "<img src='images/success.png' title='Applicable'>"; 
-	  	} else if (status == "false") {
-			img = "<img src='images/smalldelete.png' title='NotApplicable'>";
-	  	}
+		status ? img = "<img src='images/success.png' title=''>" : img = "<img src='images/smalldelete.png' title=''>";
 		$('#'+trId).append("<td>"+img+"</td>");
 		$('#'+trId).append("<td><img class = 'del imagealign' id='deleteIcon' src='images/minus_icon.png' onclick='removeRow(this);' value="+JSON.stringify(jsonObj)+"></td>");
-		$('#'+trId).append("<input type='hidden' name='propTemps' id='"+jsonObj.key+"' value='"+JSON.stringify(jsonObj)+"'>");
+		$('#'+trId).append("<input type='hidden' name='propTemps' id='"+jsonObj.key.replace(/\./g, '-')+"' value='"+JSON.stringify(jsonObj)+"'>");
 	}
 	
 	//Hide table if no propTemp is available

@@ -173,10 +173,12 @@
 
 <script language="javascript">
 	var fieldId = '<%= propTempKey %>';
+	fieldId = fieldId.replace(/\./g, '-');
 	var value = $('#' + fieldId).val();
 	var oldKey = "";
 	var oldName = "";
 	$(document).ready(function() {
+		$('#saveTemplate').attr('onclick', 'popupOnOk(this)');
 		//To construct the appliesTo control
 		var csvAppliesTo = $("#csvAppliesTo").val();
 		var appliesTo = csvAppliesTo.split(",");
@@ -193,7 +195,6 @@
 		var popupFromPage = '<%= fromPage %>';
 		hidePopuploadingIcon();
 		$('.errMsg').html("");
-		
 		if (value != null) {
 			var jsonObj = JSON.parse(value);
 			if (jsonObj != null) {
