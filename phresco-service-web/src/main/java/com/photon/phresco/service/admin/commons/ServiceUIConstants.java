@@ -187,6 +187,7 @@ public interface ServiceUIConstants {
     String REQ_FEATURES_LICENSE = "licenses";
     String REQ_FEATURES_UPLOADTYPE = "featureJar";
     String REQ_FEATURE_JS = "js";
+    String REQ_SELECTED_DEPEDENCY_IDS= "dependencyIds";
     /*****************************
      * Features Common Constants
      * String FEATURES_XXX

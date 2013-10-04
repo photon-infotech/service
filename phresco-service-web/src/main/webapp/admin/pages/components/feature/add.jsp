@@ -674,7 +674,13 @@
 	
 	//To get the features to add the dependencies
 	function getFeatures() {
-		yesnoPopup("fetchFeaturesForDependency", '<s:text name="lbl.hdr.comp.featr.popup.title"/>', 'saveDependentFeatures', '<s:text name="lbl.btn.ok"/>', $('#formFeatureAdd'));
+		var length = $('input[name=multiTechnology]:checked').length;	
+		if (length > 0) {
+			hideError($("#applyControl"), $("#techError"));
+	 		yesnoPopup("fetchFeaturesForDependency", '<s:text name="lbl.hdr.comp.featr.popup.title"/>', 'saveDependentFeatures', '<s:text name="lbl.btn.ok"/>', $('#formFeatureAdd'));
+		} else {
+		 	showError($("#applyControl"), $("#techError"), "Select atleast one technology");
+		}
 	}
 	
 	function downloadFile() {

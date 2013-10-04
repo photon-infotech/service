@@ -282,10 +282,28 @@ public class Features extends ServiceBaseAction {
     				S_LOGGER.info("Features.fetchFeaturesForDependency", "getMultiTechnology()=" + "\"" + getMultiTechnology() + "\"");
     			}
     			for (String technologyList : getMultiTechnology()) {
-    				List<ArtifactGroup>  moduleGroups = getServiceManager().getFeatures(getCustomerId(), technologyList, Type.valueOf(getType()).name());
-    				setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroups); 
+    				if (Type.valueOf(getType()).name().equals(Type.COMPONENT.name())) {
+    					List<ArtifactGroup>  feature = getServiceManager().getFeatures(getCustomerId(), technologyList, Type.FEATURE.name());
+        				setReqAttribute(REQ_FEATURES_TYPE_MODULE, feature);
+        				List<ArtifactGroup>  javascript = getServiceManager().getFeatures(getCustomerId(), technologyList, Type.JAVASCRIPT.name());
+        				setReqAttribute(REQ_FEATURES_TYPE_JS, javascript);
+    				} 
+    				List<ArtifactGroup>  moduleGroupsList = getServiceManager().getFeatures(getCustomerId(), technologyList, Type.valueOf(getType()).name());
+    				setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroupsList);
     			}
     		}
+    		ArtifactGroup moduleGroups = getServiceManager().getFeature(getModuleGroupId(), getCustomerId(), getTechnology(), Type.valueOf(getType()).name());
+    		if (moduleGroups != null) {
+	    		List<ArtifactInfo> versions = moduleGroups.getVersions();
+	    		if (CollectionUtils.isNotEmpty(versions)) {
+	    		for (ArtifactInfo version : versions) {
+	    			if (version.getVersion().equals(getFeatureVersions())) {
+	    				setReqAttribute(REQ_SELECTED_DEPEDENCY_IDS, version.getDependencyIds());
+	        		} 
+	    		}
+    		}
+    		} 
+    		 
     	} catch (PhrescoException e) {
     		if (isDebugEnabled) {
 		        S_LOGGER.error("Features.fetchFeaturesForDependency", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
