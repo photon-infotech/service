@@ -25,6 +25,7 @@
 <%@ page import="org.apache.commons.lang.StringUtils"%>
 
 <%@ page import="com.photon.phresco.commons.model.User" %> 
+<%@	page import="com.photon.phresco.commons.model.User.AuthType"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
 
 <%
@@ -34,9 +35,17 @@
    	List<String> permissionIds = (List<String>) session.getAttribute(ServiceUIConstants.SESSION_PERMISSION_IDS);
 	String per_disabledStr = "";
 	String per_disabledClass = "";
+	String disableChk = "";
+	String chkBxClass = "userChk";
 %>
 
 <form class="form-horizontal customer_list" id="userListForm">
+   <div class="operation">
+      <input type="button" class="btn btn-primary" name="user_add" id="userAdd" onclick="addUser(); " 
+         	value="<s:text name='lbl.hdr.comp.pltprjt.add'/>" /> 
+      <input type="button"  id="del"  class="btn del" class="btn btn-primary" disabled value="<s:text name='lbl.btn.del'/>" 
+		      onclick="showDeleteConfirmation('<s:text name='del.confirm.users'/>');"/>   	
+   </div>
 	<%
 		if (CollectionUtils.isEmpty(userList)) {
 	%>
@@ -53,17 +62,22 @@
 				<table cellspacing="0" class="zebra-striped">
 						<thead>
 							<tr>
+							    <th class="first">
+									<div class="th-inner">
+										<input <%= per_disabledStr %> type="checkbox" id="checkAllAuto" name="checkAllAuto" onclick="checkAllEvent(this, $('.userChk'), false);">
+									</div>
+								</th> 
 								<th class="second">
-									<div class="th-inner tablehead" style="top: 121px;"><s:label key="lbl.name" theme="simple"/></div>
+									<div class="th-inner tablehead" style="top: 153px;"><s:label key="lbl.name" theme="simple"/></div>
 								</th>
 								<th class="third">
-									<div class="th-inner tablehead" style="top: 121px;"><s:label key="lbl.hdr.adm.usrlst.mail" theme="simple"/></div>
+									<div class="th-inner tablehead" style="top: 153px;"><s:label key="lbl.hdr.adm.usrlst.mail" theme="simple"/></div>
 								</th>
 								<th class="third">
-									<div class="th-inner tablehead" style="top: 121px;"><s:label key="lbl.hdr.adm.usrlst.status" theme="simple"/></div>
+									<div class="th-inner tablehead" style="top: 153px;"><s:label key="lbl.hdr.adm.usrlst.status" theme="simple"/></div>
 								</th>
 								<th class="third">
-									<div class="th-inner tablehead" style="top: 121px;"><s:label key="lbl.hdr.adm.usrlst.asignrole" theme="simple"/></div>
+									<div class="th-inner tablehead" style="top: 153px;"><s:label key="lbl.hdr.adm.usrlst.asignrole" theme="simple"/></div>
 								</th>
 							</tr>
 						</thead>
@@ -81,12 +95,28 @@
 											per_disabledClass = "btn-primary";
 										}
 			            			}
+			            			
+									if (!user.getAuthType().equals(AuthType.LOCAL)) {
+										disableChk = "disabled";
+										chkBxClass = "";
+			            		  	} 
 			            %>
 						
 						<tr>
-							<td>
-								<%= StringUtils.isNotEmpty(user.getDisplayName()) ? user.getDisplayName() :"" %>
+						    <td class="checkboxwidth">
+						    <input type="checkbox" <%= per_disabledStr %>  class="check <%= chkBxClass %>" name="userId" value="<%= user.getId() %>" 
+									   onclick="checkboxEvent($('#checkAllAuto'),'<%= chkBxClass %>');"  <%= disableChk %>/>
+						    </td>			   
+						
+						    <% if (StringUtils.isNotEmpty(user.getDisplayName())) { %>
+						    <td>
+								<a href="#" onclick="editUser('<%= user.getId() %>');"><%= StringUtils.isNotEmpty(user.getDisplayName()) ? user.getDisplayName() :"" %></a>
 							</td>
+						    <% } else {%>
+							<td>
+								<a href="#" onclick="editUser('<%= user.getId() %>');"><%= StringUtils.isNotEmpty(user.getFirstName()+ user.getLastName()) ? user.getFirstName()+user.getLastName() :"" %></a>
+							</td>
+							<% } %>
 							<td class="emailalign"><%= StringUtils.isNotEmpty(user.getEmail()) ? user.getEmail() : "" %></td>
 							<td class="userwidth"><%= user.getStatus()!= null ? user.getStatus() : "" %></td>
 							<td  class = "tablealign">
@@ -115,7 +145,7 @@
 	
 	$(document).ready(function() {
 		hideLoadingIcon();
-		toDisableCheckAll($('#checkAllAuto'),'check');
+		toDisableCheckAll($('#checkAllAuto'), '<%= chkBxClass %>');
 		
 		$("#addValues").click(function() {
 			var val = $("#txtCombo").val();
@@ -184,6 +214,20 @@
 		yesnoPopup("showAssignRoles", '<s:text name="lbl.hdr.adm.usrlst.role.popup.title"/>', 'assignRoles' , '<s:text name="lbl.btn.ok"/>', '', params);
 	}
 	
+	function addUser() {
+		 showLoadingIcon();
+		loadContent('userAdd', $('#userListForm'), $('#subcontainer'));
+	}
+	
+	function editUser(id) {
+		showLoadingIcon();
+		var params = "id=";
+		params = params.concat(id);
+		params = params.concat("&fromPage=");
+		params = params.concat("edit");
+		loadContent("userEdit", '', $('#subcontainer'), params);
+	}
+	
 	function successEvent(pageUrl, data) {
 		if (pageUrl === "roleListToAssign") {
 // 			$("#rolesSelected").empty()
@@ -218,4 +262,10 @@
 			}
 		}
 	}
+	
+	function continueDeletion() {
+    	hidePopup();
+    	loadContent('userDelete', $('#userListForm'), $('#subcontainer'), "", "", "", "<s:text name='lbl.prog.txt.user.delete'/>");
+    }
+	
 </script>

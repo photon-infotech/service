@@ -57,6 +57,7 @@ public interface ServiceUIConstants {
 	String DOWNLOADS = "download";
 	String FEATURES = "features";
 	String CUSTOMERS = "customer";
+	String USERS = "user";
 	String GLOBALURLS = "globalurl";
 	String JSLIBS = "jslibs";
 	String COMPONENT = "component";
@@ -263,6 +264,7 @@ public interface ServiceUIConstants {
 	String EXCEPTION_CUSTOMERS_VALIDATE = "excep.hdr.admin.cust.validate";
 	
 	String EXCEPTION_USERS_LIST = "excep.hdr.admin.user.list";
+	String EXCEPTION_USERS_VALIDATE = "excep.hdr.admin.user.validate";
     
 	String EXCEPTION_ROLE_DELETE = "excep.hdr.admin.role.delete";
 	String EXCEPTION_ROLE_VALIDATE = "excep.hdr.admin.role.validate";
@@ -361,6 +363,12 @@ public interface ServiceUIConstants {
     String KEY_I18N_SERVER_DOWN = "err.login.server.down";
     
     String KEY_I18N_ERR_NAME_EMPTY = "err.msg.name.empty";
+    String KEY_I18N_ERR_FIRST_NAME_EMPTY = "err.msg.first.name.empty";
+    String KEY_I18N_ERR_LAST_NAME_EMPTY = "err.msg.last.name.empty";
+    String KEY_I18N_ERR_LOGINID_EMPTY = "err.msg.loginid.empty";
+    String KEY_I18N_ERR_PWD_EMPTY = "err.msg.pwd.empty";
+    String KEY_I18N_ERR_REPWD_EMPTY ="err.msg.repwd.empty";
+    String KEY_I18N_ERR_PWD_MISMATCH ="err.msg.pwd.mismatch";
     String KEY_I18N_ERR_URL_EMPTY = "err.msg.url.empty";
     String KEY_I18N_ERR_URL_NOT_VALID = "err.msg.url.notvalid";
     String KEY_I18N_ERR_GROUPID_EMPTY = "err.msg.groupid.empty";
@@ -464,6 +472,10 @@ public interface ServiceUIConstants {
     
     String PERMISSION_DELETED = "succ.permission.delete";
     String PERMISSION_NOT_DELETED = "fail.permission.delete";
+    
+    String USER_ADDED = "succ.user.add";
+    String USER_UPDATED = "succ.user.update";
+    String USER_DELETED = "succ.user.delete";
     
     String ROLE_ADDED = "succ.role.add";
     String ROLE_UPDATED = "succ.role.update";

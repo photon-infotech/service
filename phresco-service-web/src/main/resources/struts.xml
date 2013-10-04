@@ -490,10 +490,42 @@
         
 		<!--- ADMIN CUSTOMER ENDS-->
 		
+		<!--- ADMIN USER STARTS-->
+		
 		<action name="userList" class="com.photon.phresco.service.admin.actions.admin.Users" method="fetchUsersFromDB">
 			<result name="userList">/admin/pages/admin/user/sync.jsp</result>
         </action>
-
+        
+        <action name="userAdd" class="com.photon.phresco.service.admin.actions.admin.Users" method="add">
+            <result name="userAdd">/admin/pages/admin/user/add.jsp</result>
+        </action>
+        
+        <action name="userSave" class="com.photon.phresco.service.admin.actions.admin.Users" method="save">
+			<result name="userList">/admin/pages/admin/user/sync.jsp</result>
+			<result type="json" />
+        </action>
+        
+        <action name="userEdit" class="com.photon.phresco.service.admin.actions.admin.Users" method="edit">
+            <result name="userAdd">/admin/pages/admin/user/add.jsp</result>
+        </action>
+        
+        <action name="userUpdate" class="com.photon.phresco.service.admin.actions.admin.Users" method="update">
+			<result name="userList">/admin/pages/admin/user/sync.jsp</result>
+			<result type="json" />
+        </action>
+        
+         <action name="userSaveValidate" class="com.photon.phresco.service.admin.actions.admin.Users" method="validateForm">
+            <result type="json" />
+        </action>
+        
+        <action name="userUpdateValidate" class="com.photon.phresco.service.admin.actions.admin.Users" method="validateForm">
+            <result type="json" />
+        </action>
+        
+         <action name="userDelete" class="com.photon.phresco.service.admin.actions.admin.Users" method="delete">
+            <result name="userList">/admin/pages/admin/user/sync.jsp</result>
+        </action>
+        
 		<action name="showAssignRoles" class="com.photon.phresco.service.admin.actions.admin.Users" method="showAssignRolesPopup">
 			<result name="user">/admin/pages/admin/user/assignRolesPopup.jsp</result>
         </action>
@@ -513,6 +545,8 @@
         <action name="fetchUsersFromDB" class="com.photon.phresco.service.admin.actions.admin.Users" method="fetchUsersFromDB">
 			<result name="userList">/admin/pages/admin/user/list.jsp</result>
         </action>
+        
+        <!--- ADMIN USER ENDS-->
         
 		<!--- ADMIN ROLE STARTS-->
 		<action name="roleList" class="com.photon.phresco.service.admin.actions.admin.Roles" method="list">

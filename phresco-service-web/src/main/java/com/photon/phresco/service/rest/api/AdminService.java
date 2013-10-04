@@ -835,7 +835,6 @@ public class AdminService extends DbService {
 				if(validate(user)) {
 					user.setPhrescoEnabled(true);
 					user.setAuthType(AuthType.LOCAL);
-					user.setPassword(ServerUtil.encodeUsingHash(user.getName(),user.getPassword()));
 					DbService.getMongoOperation().save(USERS_COLLECTION_NAME, user);
 				}
 			}

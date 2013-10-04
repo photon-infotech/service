@@ -88,6 +88,7 @@ public interface ServiceActions {
 	
 	String ADMIN_USER_LIST  	 	= "userList";
 	String ADMIN_USER		  	 	= "user";
+	String ADMIN_USER_ADD           = "userAdd"; 
 	
 	String ADMIN_ROLE_LIST  	 	= "roleList";
 	String ADMIN_ROLE_ADD	  	 	= "roleAdd";
