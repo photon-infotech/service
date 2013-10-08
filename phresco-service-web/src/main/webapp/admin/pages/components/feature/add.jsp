@@ -34,7 +34,7 @@
 <%@ page import="com.photon.phresco.commons.model.RequiredOption"%>
 
 <%
-    ArtifactGroup moduleGroup = (ArtifactGroup) request.getAttribute(ServiceUIConstants.REQ_FEATURES_MOD_GRP); 
+    ArtifactGroup moduleGroup = (ArtifactGroup) request.getAttribute(ServiceUIConstants.REQ_FEATURES_MOD_GRP);
     List<Technology> technologies = (List<Technology>) request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
     List<License> licenses = (List<License>) request.getAttribute(ServiceUIConstants.REQ_FEATURES_LICENSE);
     String customerId = (String) request.getAttribute(ServiceUIConstants.REQ_CUST_CUSTOMER_ID);
@@ -451,7 +451,8 @@
     <input type="hidden" name="featureVersions" value="<%= moduleGroup != null ? featureVersions : "" %>"/>
     <input type="hidden" name="moduleId" value="<%= StringUtils.isNotEmpty(selectedModuleId) ? selectedModuleId : "" %>">    
    	<input type="hidden" name="packaging" value="<%= packaging %>">
-    
+   	<input type="hidden" name="versioning" value="<%= versioning %>">
+   	
 </form>
 
 <script type="text/javascript">

@@ -412,7 +412,7 @@ public class Features extends ServiceBaseAction {
 		    setTechnologiesInRequest();
 		    versionFile = getVersioning();
 		    ArtifactGroup moduleGroup = getServiceManager().getFeature(getModuleGroupId(), getCustomerId(), technology, Type.valueOf(getType()).name());
-	        setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
+		    setReqAttribute(REQ_FEATURES_MOD_GRP, moduleGroup);
 	        setReqAttribute(REQ_FEATURES_TYPE, getType());
             setReqAttribute(FEATURES_SELECTED_TECHNOLOGY, getTechnology());
 	        setReqAttribute(REQ_FEATURES_SELECTED_MODULEID, getModuleId());
@@ -498,6 +498,7 @@ public class Features extends ServiceBaseAction {
             } else {
             	artifactGroup.setDisplayName(getName());
             }
+            
             if (StringUtils.isNotEmpty(getModuleGroupId())) {
                 artifactGroup.setId(getModuleGroupId());
             }
@@ -524,7 +525,7 @@ public class Features extends ServiceBaseAction {
             artifactGroup.setLicenseId(getLicense());
             //To set the details of the version
             ArtifactInfo artifactInfo = new ArtifactInfo();
-            if (StringUtils.isNotEmpty(getModuleId()) && !"null".equals(getModuleId())) {
+            if (StringUtils.isNotEmpty(getModuleId()) && !"null".equals(getModuleId()) && StringUtils.isEmpty(getVersioning())) {
             	artifactInfo.setId(getModuleId());
             }
             artifactInfo.setFileSize(size);
