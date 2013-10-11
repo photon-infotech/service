@@ -117,6 +117,13 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 						"message=\"" + e.getLocalizedMessage() + "\"");
 			}
 			throw new PhrescoException(e);
+		}  catch (PhrescoPomException e) {
+			if (isDebugEnabled) {
+				LOGGER.error("ArchetypeExecutorImpl.execute",
+						"status=\"Failure\"",
+						"message=\"" + e.getLocalizedMessage() + "\"");
+			}
+			throw new PhrescoException(e);
 		}
 	}
 
@@ -158,7 +165,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 		}
 	}
 	
-	private void updateDefaultFeatures(ProjectInfo projectInfo,String tempFolderPath,String customerId) throws PhrescoException {
+	private void updateDefaultFeatures(ProjectInfo projectInfo,String tempFolderPath,String customerId) throws PhrescoException, PhrescoPomException {
 		List<String> selectedFeatures = new ArrayList<String>();
 		List<String> selectedJsLibs = new ArrayList<String>();
 		List<String> selectedComponentids = new ArrayList<String>();
@@ -240,9 +247,21 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 		
 		Gson gson = new Gson();
 		if(CollectionUtils.isNotEmpty(listArtifactGroup)) {
-			ProjectUtils projectUtils = new ProjectUtils();
-			projectUtils .updatePOMWithPluginArtifact(getPomFile(tempFolderPath, appInfo), listArtifactGroup);
-		}
+            ProjectUtils projectUtils = new ProjectUtils();
+            File rootPomFile = new File(tempFolderPath + File.separator + appInfo.getAppDirName() + File.separator + "pom.xml");
+            PomProcessor pomprocessor = new PomProcessor(rootPomFile);
+            String sourceDir = pomprocessor.getProperty("phresco.source.dir");
+             if (StringUtils.isNotEmpty(sourceDir)) {
+            	     File sourcePomFile = new File(tempFolderPath + File.separator + appInfo.getAppDirName() + sourceDir + File.separator + "pom.xml");
+                    if (sourcePomFile.exists()) {
+                    	  projectUtils.updatePOMWithPluginArtifact(sourcePomFile, listArtifactGroup);
+                   
+                     } else {
+                    	  projectUtils.updatePOMWithPluginArtifact(getPomFile(tempFolderPath, appInfo), listArtifactGroup);
+                     }
+              }
+         }
+		
 		StringBuilder sb = new StringBuilder(tempFolderPath).append(File.separator).append(appInfo.getAppDirName())
 		.append(File.separator).append(Constants.DOT_PHRESCO_FOLDER).append(File.separator).append(
 				Constants.APPLICATION_HANDLER_INFO_FILE);
