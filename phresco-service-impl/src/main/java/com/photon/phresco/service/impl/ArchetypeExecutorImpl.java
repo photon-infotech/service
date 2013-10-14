@@ -181,7 +181,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 				List<RequiredOption> appliesTo = artifactInfo.getAppliesTo();
 				if(CollectionUtils.isNotEmpty(appliesTo)) {
 					for (RequiredOption requiredOption : appliesTo) {
-						if (requiredOption.isRequired()) {
+						if (requiredOption.isRequired() && requiredOption.getTechId().equals(appInfo.getTechInfo().getId())) {
 							ArtifactGroup selectedartifactGroup = dbManager.getArtifactGroup(artifactInfo.getArtifactGroupId());
 							listArtifactGroup.add(selectedartifactGroup);
 							selectedFeatures.add(artifactInfo.getId());
@@ -202,7 +202,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 				List<RequiredOption> appliesTo = artifactInfo.getAppliesTo();
 				if(CollectionUtils.isNotEmpty(appliesTo)) {
 					for (RequiredOption requiredOption : appliesTo) {
-						if (requiredOption.isRequired()) {
+						if (requiredOption.isRequired() && requiredOption.getTechId().equals(appInfo.getTechInfo().getId())) {
 							ArtifactGroup selectedartifactGroup = dbManager.getArtifactGroup(artifactInfo.getArtifactGroupId());
 							listArtifactGroup.add(selectedartifactGroup);
 							selectedJsLibs.add(artifactInfo.getId());
@@ -222,7 +222,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 				List<RequiredOption> appliesTo = artifactInfo.getAppliesTo();
 				if(CollectionUtils.isNotEmpty(appliesTo)) {
 					for (RequiredOption requiredOption : appliesTo) {
-						if (requiredOption.isRequired()) {
+						if (requiredOption.isRequired() && requiredOption.getTechId().equals(appInfo.getTechInfo().getId())) {
 							ArtifactGroup selectedartifactGroup = dbManager.getArtifactGroup(artifactInfo.getArtifactGroupId());
 							listArtifactGroup.add(selectedartifactGroup);
 							selectedComponentids.add(artifactInfo.getId());
@@ -256,9 +256,9 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
                     if (sourcePomFile.exists()) {
                     	  projectUtils.updatePOMWithPluginArtifact(sourcePomFile, listArtifactGroup);
                    
-                     } else {
+                     } 
+              } else {
                     	  projectUtils.updatePOMWithPluginArtifact(getPomFile(tempFolderPath, appInfo), listArtifactGroup);
-                     }
               }
          }
 		
