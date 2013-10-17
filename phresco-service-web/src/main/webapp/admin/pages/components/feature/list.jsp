@@ -120,13 +120,13 @@
 												<% } %> 
 												</td>
 												<td class="zero_padding">
-													<a href="#" name="ModuleDesc" onclick="editFeature('<%= moduleGroup.getId() %>', '<%= module.getId() %>');" >
+													<a href="#" name="ModuleDesc" onclick="editFeature('<%= moduleGroup.getId() %>', '<%= module.getId() %>', '<%= moduleGroup.getVersions().get(0).getVersion() %>');" >
 														<%= moduleGroup.getName() %>
 													</a>
 												</td>
 												<td><%= module.getVersion() %></td>
 												<td class="psblevalue" id="1_psblSinglDiv" title="Versioning">
-									                <a href="#" onclick="versioningFeatu('<%= moduleGroup.getId() %>', '<%= module.getId() %>');" name="edit" id=""><img class="addiconAlign imagealign" temp="1" 
+									                <a href="#" onclick="versioningFeatu('<%= moduleGroup.getId() %>', '<%= module.getId() %>', '<%= moduleGroup.getVersions().get(0).getVersion() %>');" name="edit" id=""><img class="addiconAlign imagealign" temp="1" 
 													src="images/versioning.png"/></a>
 									           </td>
 											</tr>
@@ -161,21 +161,25 @@
 		hideProgressBar();
 	});
 	
-	function versioningFeatu(moduleGroupId, moduleId) {
-		var params = "moduleGroupId=";
+	function versioningFeatu(moduleGroupId, moduleId, featureVersions) {
+	 	var params = "moduleGroupId=";
 	    params = params.concat(moduleGroupId);
 	    params = params.concat("&moduleId=");
 	    params = params.concat(moduleId);
+	    params = params.concat("&featureVersions=");
+	    params = params.concat(featureVersions);
 	    params = params.concat("&versioning=")
 	    params = params.concat("versioning");
 	    loadCont(params);
 	}
 
-    function editFeature(moduleGroupId, moduleId) {
-		var params = "moduleGroupId=";
-	    params = params.concat(moduleGroupId);
-	    params = params.concat("&moduleId=");
-	    params = params.concat(moduleId);
+    function editFeature(moduleGroupId, moduleId, featureVersions) {
+	    var params = "moduleGroupId=";
+	    params 	   = params.concat(moduleGroupId);
+	    var params = params.concat("&moduleId=");
+	    params 	   = params.concat(moduleId);
+	    params     = params.concat("&featureVersions=");
+	    params 	   = params.concat(featureVersions);
 	    loadCont(params);
 	}
 	

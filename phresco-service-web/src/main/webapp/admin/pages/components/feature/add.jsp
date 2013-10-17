@@ -17,9 +17,11 @@
     limitations under the License.
 
 --%>
+
 <%@ taglib uri="/struts-tags" prefix="s" %>
 
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.Arrays" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.apache.commons.collections.CollectionUtils"%>
@@ -46,6 +48,8 @@
 	String pageUrl = ServiceActionUtil.getPageUrl(ServiceUIConstants.FEATURES, fromPage);
 	String progressTxt = ServiceActionUtil.getProgressTxt(ServiceUIConstants.FEATURES, fromPage);
 	String versioning = (String) request.getAttribute(ServiceUIConstants.REQ_VERSIONING);
+	List<String> dependencyIds = (List<String>) request.getAttribute(ServiceUIConstants.REQ_SELECTED_DEPEDENCY_IDS);
+	
 	
 	String disabledVer ="";
 	if(StringUtils.isNotEmpty(versioning)) {
@@ -479,6 +483,16 @@
 		createUploader(allowedFiles,fileErr);
 		enableScreen();
 		hideLoadingIcon();
+		
+		 <%
+		   if(CollectionUtils.isNotEmpty(dependencyIds)) {
+		%>
+		   $('#totalSize').html("Added Dependencies : " +'<%= dependencyIds %>');
+		<% } %> 
+		
+		$("#totalSize").text(function(index) {
+	        return depenTrim($(this));
+	    }); 
 	
 		// To check for the special character in name
         $('#featureName').bind('input propertychange', function (e) {
@@ -536,6 +550,7 @@
 				return false;
 			}
 		});
+		
 	});
 	
 	function loadTechnologies() {
@@ -677,8 +692,12 @@
 	function getFeatures() {
 		var length = $('input[name=multiTechnology]:checked').length;	
 		if (length > 0) {
+			enableDivCtrls($('#applicableToDiv :input'));
 			hideError($("#applyControl"), $("#techError"));
 	 		yesnoPopup("fetchFeaturesForDependency", '<s:text name="lbl.hdr.comp.featr.popup.title"/>', 'saveDependentFeatures', '<s:text name="lbl.btn.ok"/>', $('#formFeatureAdd'));
+	 		if ('<%= versioning%>' === 'versioning') {
+				$('#applicableToDiv :input').attr("disabled", true);
+			}
 		} else {
 		 	showError($("#applyControl"), $("#techError"), "Select atleast one technology");
 		}
@@ -687,4 +706,5 @@
 	function downloadFile() {
 		window.location.href="admin/featureUrl?" + $('#formFeatureAdd').serialize();
 	}
+	
 </script>

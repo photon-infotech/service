@@ -685,14 +685,14 @@
 		%>
 		<div class="control-group" id="applyControl">
 			<label class="control-label labelbold">
-				<s:text name='lbl.hdr.comp.appliesto'/>
+				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.appliesto'/>
 			</label>
 			<div class="controls">
 					<div class="typeFields" id="typefield">
 					<div class="multilist-scroller multiselct" id="appliesToDiv">
 					<ul>
 						<li>
-							<input type="checkbox" value="" id="checkAllAuto" name="" onclick="checkAllEvent(this,$('.applsChk'), false);" style="margin: 3px 8px 6px 0;">All
+							<input type="checkbox" value="" id="checkAllAuto"  onclick="checkAllEvent(this,$('.applsChk'), false);" style="margin: 3px 8px 6px 0;">All
 						</li>
 						<%
 							for (Technology technology : technologies) {
@@ -1239,6 +1239,12 @@
 			showError($("#contextControl"), $("#contextError"), data.contextError);
 		} else {
 			hideError($("#contextControl"), $("#contextError"));
+		}
+		
+		if (!isBlank(data.applyError)) {
+			showError($("#applyControl"), $("#applyError"), data.applyError);
+		} else {
+			hideError($("#applyControl"), $("#applyError"));
 		}
 	}
 </script>

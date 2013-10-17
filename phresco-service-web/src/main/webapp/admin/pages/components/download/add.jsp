@@ -270,7 +270,7 @@
 					<ul>
 						<li>
 							<input type="checkbox" <%= disabledVer %> id="checkAllPlatform" value="" onclick="checkAllEvent(this, $('.platFormCheck'), false);" 
-								style="margin: 3px 8px 6px 0;" <%= disabled %>>All
+								style="margin: 3px 12px 6px 0;" <%= disabled %>>All
 						</li>
 						<%
 							if (CollectionUtils.isNotEmpty(platforms)) {

@@ -77,6 +77,9 @@
  			activateMenu($("#module"));
  		}
 		
+		//Handles the click event of the sub tabs
+		clickMenu($("a[name='featureTab']"), $("#subcontainer"), $('#formCustomerId'));
+		
 		//To activate the module menu by default
         loadContent("fetchCustomerId", $('#formCustomerId'), '', '', false, true, '');
 	}

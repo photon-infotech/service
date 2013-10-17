@@ -88,6 +88,7 @@ public class Customers extends ServiceBaseAction  {
 	private String repoPasswordError = "";
 	private String repoURLError = "";
 	private String contextError = "";
+	private String applyError = "";
 	private boolean errorFound = false;
 	private boolean tempError = false;
 	private static String uploadIconName = "";
@@ -494,6 +495,8 @@ public class Customers extends ServiceBaseAction  {
 
 			//Empty vaildation for context
 			isError = contextValidation();
+			
+			isError = appToTechValidation(isError);
 
 			if (StringUtils.isNotEmpty(getRepoURL())) {
 				//Empty validation for repo username
@@ -611,6 +614,15 @@ public class Customers extends ServiceBaseAction  {
 			setMailError(getText(KEY_I18N_ERR_EMAIL_EMPTY));
 			tempError = true;
 		}
+		return tempError;
+	}
+	
+	public boolean appToTechValidation(boolean isError) {
+		if (CollectionUtils.isEmpty(getAppliesTo())) {
+			setApplyError(getText(KEY_I18N_MULTI_TECH_EMPTY));
+			tempError = true;
+		}
+		
 		return tempError;
 	}
 
@@ -1192,5 +1204,13 @@ public class Customers extends ServiceBaseAction  {
 
 	public String getCopyrightText() {
 		return copyrightText;
+	}
+
+	public String getApplyError() {
+		return applyError;
+	}
+
+	public void setApplyError(String applyError) {
+		this.applyError = applyError;
 	}
 }

@@ -129,7 +129,10 @@ Width >= 1025 and <= 1152
 		width: 79%;
 	}
 	.syncTable .fixed-table-container {
-		height: 250px !important;	
+		height: 345px !important;	
+	}
+	.syncTable .fixed-table-container-inner {
+		height: 87% !important;	
 	}
 	@-moz-document url-prefix() {
 		.accordion_panel_inner {
@@ -163,6 +166,9 @@ Width >= 1152 and < 1280
 	}
 	.syncTable .fixed-table-container {
 		height: 425px !important;	
+	}
+	.syncTable .fixed-table-container-inner {
+		height: 91% !important;	
 	}
 	#subTabcontent {
 		width: 79%;
@@ -326,7 +332,7 @@ Width >= 1280 and height > 800 and height <= 960
 		width: 64%;
 	}
 	.syncTable .fixed-table-container {
-		height: 450px !important;	
+		height: 520px !important;	
 	}
 	@-moz-document url-prefix() {
 		.accordion_panel_inner {
@@ -356,8 +362,8 @@ Width >= 1280 and height >= 961 and heigth <=1024
 	.psbltextwidth{
 		width: 64%;
 	}
-	.syncTable .fixed-table-container {
-		height: 480px !important;	
+	.syncTable .fixed-table-container-inner {
+		height: 91% !important;	
 	}
 	@-moz-document url-prefix() {
 		.accordion_panel_inner {

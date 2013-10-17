@@ -96,9 +96,9 @@
 								<tr>
 									<td class="checkboxwidth">
 										<% if (roleList.isSystem()) { %>
-											<input type="checkbox" name="roleId" value="<%= roleList.getId() %>" disabled/>
+											<input type="checkbox" name="roleId" value="<%= roleList.getId() %>"  disabled/>
 										<% } else { %>
-											<input type="checkbox" class="check roles" name="roleId"  value="<%= roleList.getId() %>" onclick="checkboxEvent($('#checkAllAuto'),'roles');">
+											<input type="checkbox" class="check roles" name="roleId"  <%=per_disabledStr%> value="<%= roleList.getId() %>" onclick="checkboxEvent($('#checkAllAuto'),'roles');">
 										<% } %>
 									</td>
 									<td  class="namelabel-width">

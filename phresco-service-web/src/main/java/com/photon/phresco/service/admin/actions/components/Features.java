@@ -420,6 +420,26 @@ public class Features extends ServiceBaseAction {
 	        setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
 	        setReqAttribute(REQ_FEATURES_LICENSE, getLicences());
 	        setReqAttribute(REQ_VERSIONING, getVersioning());
+	        
+	        List<String> dependentName = new ArrayList<String>();		
+	        if (moduleGroup != null) {
+	        	List<ArtifactInfo> versions = moduleGroup.getVersions();
+	        	if (CollectionUtils.isNotEmpty(versions)) {
+	        		for (ArtifactInfo version : versions) {
+	        			if (version.getVersion().equals(getFeatureVersions())) {
+	        				if (CollectionUtils.isNotEmpty(version.getDependencyIds())) {
+	        					for (String dependecyId : version.getDependencyIds() ) {
+	        						ArtifactInfo artiInfo = getServiceManager().getArtifactInfo(dependecyId);
+	        						String moduleId = artiInfo.getArtifactGroupId();
+	        						ArtifactGroup artiGrp = getServiceManager().getFeatureById(moduleId);
+	        						dependentName.add(artiGrp.getName());
+	        					}
+	        				}
+	        				setReqAttribute(REQ_SELECTED_DEPEDENCY_IDS, dependentName );
+	        			}
+	        		}
+	        	}
+	        }
 		} catch (PhrescoException e) {
 			if (isDebugEnabled) {
 		        S_LOGGER.error("Features.edit", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");

@@ -142,9 +142,9 @@ function clickSave(pageUrl, params, tag, progressText) {
 
 function validate(pageUrl, form, tag, progressText, disabledDiv) {
 	showLoadingIcon();
-	if (pageUrl == 'downloadSave') {
+	/*if (pageUrl == 'downloadSave') {
 		showLoadingIcon();
-	}
+	}*/
 	if (disabledDiv != undefined && disabledDiv != "") {
 		enableDivCtrls(disabledDiv);
 	}
@@ -521,6 +521,17 @@ function textTrim(obj) {
     var len = val.length;
     if(len > 50) {
         val = val.substr(0, 50) + "...";
+        return val;
+    }
+    return val;
+}
+
+function depenTrim(obj) {
+    var val = $(obj).text();
+    $(obj).attr("title", $.trim(val));
+    var len = val.length;
+    if(len > 50) {
+        val = val.substr(0, 50) + "..." +"]";
         return val;
     }
     return val;
