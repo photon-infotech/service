@@ -123,6 +123,7 @@ public class Customers extends ServiceBaseAction  {
 	private String context = "";
 	private String PageTitleColor = "";
 	private String copyrightText = "";
+	private String CopyrightLabel = "";
 	private String CustomerTitle = "";
 
 	private String fromPage = "";
@@ -401,7 +402,8 @@ public class Customers extends ServiceBaseAction  {
 			frameworkTheme.put("customerBaseColor", getBottomButtonPanelBottom());
 			frameworkTheme.put("welcomeUserIcon", getWelcomeUserIcon());
 			frameworkTheme.put("pageTitleColor", getPageTitleColor());
-			frameworkTheme.put("copyRightLabel", getCopyrightText());
+			frameworkTheme.put("copyRightText", getCopyrightText());
+			frameworkTheme.put("copyRightLabel", getCopyrightLabel());
 			frameworkTheme.put("customerTitle", getCustomerTitle());
 			customer.setFrameworkTheme(frameworkTheme);
 			customer.setContext(context);
@@ -1200,6 +1202,14 @@ public class Customers extends ServiceBaseAction  {
 
 	public void setCopyrightText(String copyrightText) {
 		this.copyrightText = copyrightText;
+	}
+
+	public String getCopyrightLabel() {
+		return CopyrightLabel;
+	}
+
+	public void setCopyrightLabel(String copyrightLabel) {
+		CopyrightLabel = copyrightLabel;
 	}
 
 	public String getCopyrightText() {

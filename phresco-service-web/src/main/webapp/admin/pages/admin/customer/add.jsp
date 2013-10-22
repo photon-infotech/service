@@ -102,6 +102,7 @@
 	String PageTitleColor = "";
 	String CopyrightText = "";
 	String CustomerTitle = "";
+	String CopyrightLabel = "";
 	
 	List<String> applicableTechnologies = new ArrayList();
 	List<ApplicationType> applicableAppTypes = null;
@@ -202,7 +203,8 @@
 			customerBaseColor = frameworkTheme.get("bottomButtonPanelBottom");
 			welcomeUserIcon = frameworkTheme.get("welcomeUserIcon");
 			PageTitleColor = frameworkTheme.get("pageTitleColor");
-			CopyrightText = frameworkTheme.get("copyRightLabel");
+			CopyrightText = frameworkTheme.get("copyRightText");
+			CopyrightLabel = frameworkTheme.get("copyRightLabel");
 			CustomerTitle = frameworkTheme.get("customerTitle");
 			context = customer.getContext();
 		}
@@ -886,10 +888,21 @@
 								 <s:text name='lbl.hdr.adm.cust.CopyrightText' />
 							 </label>
 							<div class="controls">
-								<textarea id="CopyrightText" placeholder="<s:text name='place.hldr.cust.CopyrightText'/>" class="input-xlarge" rows="3" 
-				 			   		name="copyrightText" maxlength="150" title="web address link with anchor tag "><%= CopyrightText %></textarea>
+				 			   <input id="CopyrightText" placeholder="<s:text name='place.hldr.cust.CopyrightText'/>"class="input-xlarge" type="text" name="copyrightText"
+									value="<%= CopyrightText %>" maxlength="50" title="Copy right Text">		
 							</div>
 						</div>
+						
+						<div class="control-group">
+							<label class="control-label labelbold">
+								 <s:text name='lbl.hdr.adm.cust.CopyrightLabel' />
+							 </label>
+							<div class="controls">
+								<textarea id="CopyrightText" placeholder="<s:text name='place.hldr.cust.CopyrightLable'/>" class="input-xlarge" rows="3" 
+				 			   		name="CopyrightLabel" maxlength="150" title="web address link with anchor tag "><%= CopyrightLabel %></textarea>
+							</div>
+						</div>
+						
 						
 						<div class="control-group">
 							<label class="control-label labelbold">
