@@ -337,6 +337,7 @@
 			</div>
 			<div class="modal-footer">
 				<div class="errMsg" id="reportMsg"></div>
+				<div class="popuploadingIcon" id="popuploadingIcon"></div>
 				<div id="updateMsg" class="updateMsg"></div>
 				<input type="button" class="btn btn-primary" data-dismiss="modal" id="popupCancel" value="<s:text name='lbl.btn.cancel'/>"/>
 				<input type="button" class="btn btn-primary popupOk" onClick="popupOnOk(this);" value="<s:text name='lbl.btn.ok'/>"/>

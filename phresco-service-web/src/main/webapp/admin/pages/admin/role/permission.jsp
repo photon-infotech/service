@@ -32,11 +32,12 @@
 	List<Permission> permissions = (List<Permission>) request.getAttribute(ServiceUIConstants.REQ_PERMISSIONS_LIST);
 	List<String> permissionIds = (List<String>) request.getAttribute(ServiceUIConstants.REQ_SELECTED_PERMISSION_IDS);
 	boolean isEditable = (Boolean) request.getAttribute(ServiceUIConstants.REQ_ROLE_EDITABLE);
+	List<String> permIds = (List<String>) session.getAttribute(ServiceUIConstants.SESSION_PERMISSION_IDS);
 %>
 
 <form id="formAssignPermission">
 	<div class="popupbody">
-		<div class="popupusr"><s:label key="lbl.hdr.adm.rolename" cssClass="popuplabel" theme="simple"/></div> 
+		<div class="popupusr"><s:label key="lbl.hdr.adm.rolename" cssClass="popuplabel" theme="simple"/></div>
 		<div class="popupusr-name"><%= roleName %></div>
 	</div>
 	<div class="pouproles">
@@ -97,10 +98,15 @@
 <script type="text/javascript">
 	$(document).ready(function () {
 		//To restrict the user in updating the systems roles
-		<% if (isEditable) { %>
+	 	<% if (isEditable) { %>
 			$("#assignPermission").attr("disabled", true).removeClass("btn-primary").addClass("btn-disabled");
 		<% } else { %>
 			$("#assignPermission").attr("disabled", false).removeClass("btn-disabled").addClass("btn-primary");
 		<% } %>
+		
+		<% if (CollectionUtils.isNotEmpty(permIds) && !permIds.contains(ServiceUIConstants.PER_MANAGE_ROLES)) { %>
+			$("#assignPermission").attr("disabled", true).removeClass("btn-primary").addClass("btn-disabled");
+		<% } %>
+		
 	});
 </script>

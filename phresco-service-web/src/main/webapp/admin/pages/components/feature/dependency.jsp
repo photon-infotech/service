@@ -281,6 +281,7 @@
 	}
 	
 	$(document).ready(function() {
+		hidePopuploadingIcon();
 		accordion();
 		$('.popupOk').attr("onClick", "popupOnOk(this);");
 		//Check box click function to check the first radio button and show the selected version
@@ -328,4 +329,5 @@
 	function successEvent(url, data) {
 		showParentPage();
 	}
+	
 </script>

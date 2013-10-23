@@ -294,16 +294,15 @@ public class Features extends ServiceBaseAction {
     		}
     		ArtifactGroup moduleGroups = getServiceManager().getFeature(getModuleGroupId(), getCustomerId(), getTechnology(), Type.valueOf(getType()).name());
     		if (moduleGroups != null) {
-	    		List<ArtifactInfo> versions = moduleGroups.getVersions();
-	    		if (CollectionUtils.isNotEmpty(versions)) {
-	    		for (ArtifactInfo version : versions) {
-	    			if (version.getVersion().equals(getFeatureVersions())) {
-	    				setReqAttribute(REQ_SELECTED_DEPEDENCY_IDS, version.getDependencyIds());
-	        		} 
-	    		}
-    		}
+    			List<ArtifactInfo> versions = moduleGroups.getVersions();
+    			if (CollectionUtils.isNotEmpty(versions)) {
+    				for (ArtifactInfo version : versions) {
+    					if (version.getVersion().equals(getFeatureVersions())) {
+    						setReqAttribute(REQ_SELECTED_DEPEDENCY_IDS, version.getDependencyIds());
+    					} 
+    				}
+    			}
     		} 
-    		 
     	} catch (PhrescoException e) {
     		if (isDebugEnabled) {
 		        S_LOGGER.error("Features.fetchFeaturesForDependency", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
@@ -523,9 +522,9 @@ public class Features extends ServiceBaseAction {
                 artifactGroup.setId(getModuleGroupId());
             }
             artifactGroup.setDescription(getDescription());
-            if(!type.toString().equals(ServiceConstants.FEATURE_TYPE_JS) && StringUtils.isEmpty(artifactId) && StringUtils.isEmpty(groupId)) {
+            if(StringUtils.isEmpty(artifactId) && StringUtils.isEmpty(groupId)) {
             	throw new PhrescoException(getText(EXCEPTION_ARTIFACTINFO_MISSING));
-            } else if (!type.equals(ServiceConstants.FEATURE_TYPE_JS)) {
+            } else {
                 artifactGroup.setGroupId(groupId);
                 artifactGroup.setArtifactId(artifactId);
             }
@@ -910,11 +909,9 @@ public class Features extends ServiceBaseAction {
         //Validate whether file is selected during add
         isError = fileValidation();
         
-        if(getType().equals(REQ_FEATURES_TYPE_JS)) {        	
-        	isError = jsValidation();	
-        } else {        	
-        	isError = featureValidation();	
-        }             
+      	//Empty validation for GroupId,ArtifactId and Version
+        isError = featureValidation();	
+                   
                 
         if (isError) {
             setErrorFound(true);
@@ -939,14 +936,6 @@ public class Features extends ServiceBaseAction {
         	setLicenseError(getText(KEY_I18N_ERR_LICEN_EMPTY));
         	tempError = true;
         }
-		return tempError;
-	}
-
-	private boolean jsValidation() {
-		if (featureByteArray != null && StringUtils.isEmpty(getVersion())) {
-			setVerError(getText(KEY_I18N_ERR_VER_EMPTY));
-			tempError = true;
-		}
 		return tempError;
 	}
 

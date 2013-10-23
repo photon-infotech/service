@@ -599,6 +599,10 @@ function yesnoPopup(url, title, okUrl, okLabel, form, additionalParams) {
 		$('#' + okUrl).val(okLabel); // label for the ok button
 	}
 	
+	if (url === "fetchFeaturesForDependency") {
+		$('.popuploadingIcon').activity({segments: 10, color: '#3c3c3c', speed: 1.8});
+	}
+	
 	var params = "";
 	if (form != undefined && form != "" && !isBlank(form.serialize())) {
 		params = form.serialize();

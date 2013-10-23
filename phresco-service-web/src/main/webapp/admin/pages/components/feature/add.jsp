@@ -345,7 +345,6 @@
 		<!-- POM details starts -->
 		<div id="jarDetailsDiv" class="hideContent">
 		
-		<% if (features || component ) { %>
 			<div class="control-group" id="groupIdControl">
 				<label class="control-label labelbold">
 					<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.groupid'/>
@@ -367,8 +366,6 @@
 					<span class="help-inline" id="artifactIdError"></span>
 				</div>
 			</div>
-			
-			<% } %>
 			
 			<div class="control-group" id="verControl">
 				<label class="control-label labelbold">
@@ -692,6 +689,7 @@
 	function getFeatures() {
 		var length = $('input[name=multiTechnology]:checked').length;	
 		if (length > 0) {
+			$(".popuploadingIcon").show();
 			enableDivCtrls($('#applicableToDiv :input'));
 			hideError($("#applyControl"), $("#techError"));
 	 		yesnoPopup("fetchFeaturesForDependency", '<s:text name="lbl.hdr.comp.featr.popup.title"/>', 'saveDependentFeatures', '<s:text name="lbl.btn.ok"/>', $('#formFeatureAdd'));
