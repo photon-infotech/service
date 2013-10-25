@@ -50,10 +50,6 @@
 	List<String> permissionIds = (List<String>) session.getAttribute(ServiceUIConstants.SESSION_PERMISSION_IDS);
 	String per_disabledStr = "";
 	String per_disabledClass = "btn-primary";
-	if (CollectionUtils.isNotEmpty(permissionIds) && !permissionIds.contains(ServiceUIConstants.PER_MANAGE_PILOT_PROJECTS)) {
-		per_disabledStr = "disabled";
-		per_disabledClass = "btn-disabled";
-	}
 	
 	//For edit
     String name = "";
@@ -75,6 +71,11 @@
     	isSystem = pilotProjectInfo.isSystem();
     	pilotContent = pilotProjectInfo.getPilotContent();
     }
+    
+    if (CollectionUtils.isNotEmpty(permissionIds) && !permissionIds.contains(ServiceUIConstants.PER_MANAGE_PILOT_PROJECTS) || isSystem) {
+		per_disabledStr = "disabled";
+		per_disabledClass = "btn-disabled";
+	}
 %>
 
 <form id="formPilotProAdd" class="form-horizontal customer_list">
@@ -111,9 +112,9 @@
 				 	<%
 				 	String techId = "";
 				 	if(ServiceUIConstants.EDIT.equals(fromPage)) { 
-				 		techId = pilotProjectInfo.getTechInfo().getVersion();
+				 		techId = pilotProjectInfo.getTechInfo().getId();
 				   	}
-				 	if (technologies != null) {
+				 	if (CollectionUtils.isNotEmpty(technologies)) {
 				 		String selectedStr = "";
 						for (Technology technology : technologies) { 
 							if (techId.equals(technology.getId())) {
@@ -198,15 +199,7 @@
 	</div>
 	
 	<div class="bottom_button">
-		<%
-			String disabledClass = "btn-primary";
-			String disabled = "";
-			if (isSystem) {
-				disabledClass = "btn-disabled";
-				disabled = "disabled";
-			} 
-		%>	
-		<input type="button" id="" class="btn <%= disabledClass %> <%= per_disabledClass %>" <%= per_disabledStr %> <%= disabled %> value='<%= buttonLbl %>'
+		<input type="button" id="" class="btn <%= per_disabledClass %>" <%= per_disabledStr %>  value='<%= buttonLbl %>'
 			onclick="validate('<%= pageUrl %>', $('#formPilotProAdd'), $('#subcontainer'), '<%= progressTxt %>',$('.content_adder: input'));"/>
 		<input type="button" id="pilotprojCancel" class="btn btn-primary" onclick="getPilotProjects();" value="<s:text name='lbl.btn.cancel'/>"/>
 	</div>

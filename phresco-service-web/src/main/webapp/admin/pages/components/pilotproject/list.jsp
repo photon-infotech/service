@@ -89,7 +89,7 @@
 								</th>
 								<th class="third">
 									<div class="th-inner tablehead">
-										<s:label key="lbl.hdr.comp.tchngy" theme="simple" />
+										<s:label key="lbl.comp.featr.technology" theme="simple" />
 									</div>
 								</th>
 								<th class="third">
@@ -113,22 +113,23 @@
 											<input type="checkbox" <%= per_disabledStr %> class="check pilotprojt" name="projectId" value="<%=proInfo.getId() %>" onclick="checkboxEvent($('#checkAllAuto'),'pilotprojt');" />
 										<% } %>
 									</td>
-									<td>
+									<td class="namelabel-width">
 										<a href="#" onclick="editPilotProject('<%=proInfo.getId() %>');" name="edit" id=""><%= proInfo.getName()%></a>
 									</td>
-									<td class="descwidth"><%= StringUtils.isNotEmpty(proInfo.getDescription()) ? proInfo.getDescription() : ""%></td>
+									<td class="desclabel-width"><%= StringUtils.isNotEmpty(proInfo.getDescription()) ? proInfo.getDescription() : ""%></td>
 									<%  
 										TechnologyInfo techId = proInfo.getTechInfo();
-									     if(StringUtils.isNotEmpty(techId.getVersion())) {
+									      if(StringUtils.isNotEmpty(techId.getId())) {
 									        for (Technology technology : technologies ){ 
-									    	   if(techId.getVersion().equalsIgnoreCase(technology.getId())) {
+									    	   if(techId.getId().equalsIgnoreCase(technology.getId())) { 
 									%> 
-									   	<td><%= technology.getName() %></td> 
+									   	<td class="namelabel-width"><%= techId.getName() %></td> 
 										<td class="psblevalue" id="1_psblSinglDiv">
-										<a href="#" onclick="versioningPilotPro('<%=proInfo.getId() %>');" name="edit" id="">
-											<img class="addiconAlign imagealign" temp="1" src="images/versioning.png"/>
-										</a>
-									</td>
+										<a href="#" onclick="versioningPilotPro('<%=proInfo.getId() %>');" name="edit" id=""><img class="addiconAlign imagealign" temp="1" 
+													src="images/versioning.png
+													"/></a>
+										
+									  </td>
 								</tr>
 						<%			
 							       	}
