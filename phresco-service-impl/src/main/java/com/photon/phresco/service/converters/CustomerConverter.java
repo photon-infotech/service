@@ -65,6 +65,7 @@ public class CustomerConverter implements Converter<CustomerDAO, Customer> {
 		customer.setSystem(dao.isSystem());
 		customer.setOptions(dao.getOptions());
 		customer.setContext(dao.getContext());
+		customer.setUiType(dao.getUiType());
 		if (isDebugEnabled) {
 			LOGGER.debug("ArtifactGroupConverter.convertDAOToObject:Exit");
 		}
@@ -100,6 +101,7 @@ public class CustomerConverter implements Converter<CustomerDAO, Customer> {
 		customerDAO.setSystem(customer.isSystem());
 		customerDAO.setOptions(customer.getOptions());
 		customerDAO.setContext(customer.getContext());
+		customerDAO.setUiType(customer.getUiType());
 		if (isDebugEnabled) {
 			LOGGER.debug("ArtifactGroupConverter.convertObjectToDAO:Exit");
 		}

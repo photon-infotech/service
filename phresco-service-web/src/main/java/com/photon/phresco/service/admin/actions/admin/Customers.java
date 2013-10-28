@@ -37,6 +37,7 @@ import org.apache.commons.lang.StringUtils;
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.Customer.LicenseType;
+import com.photon.phresco.commons.model.Customer.UIType;
 import com.photon.phresco.commons.model.RepoInfo;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.commons.model.TechnologyOptions;
@@ -74,6 +75,7 @@ public class Customers extends ServiceBaseAction  {
 	private String repoPassword = "";
 	private String repoURL = "";
 	private List<String> options = null;
+	private String uiType = "";
 
 	private String nameError = "";
 	private String mailError = "";
@@ -359,6 +361,8 @@ public class Customers extends ServiceBaseAction  {
 			customer.setValidFrom(getValidFrom());
 			customer.setValidUpto(getValidUpTo());
 			customer.setOptions(getOptions());
+			UIType uiType = UIType.valueOf(getUiType());
+			customer.setUiType(uiType);
 			RepoInfo repoInfo = new RepoInfo();
 			if (StringUtils.isNotEmpty(getCustomerId())) {
 				Customer custo = getServiceManager().getCustomer(getCustomerId());
@@ -1224,5 +1228,13 @@ public class Customers extends ServiceBaseAction  {
 
 	public void setApplyError(String applyError) {
 		this.applyError = applyError;
+	}
+
+	public void setUiType(String uiType) {
+		this.uiType = uiType;
+	}
+
+	public String getUiType() {
+		return uiType;
 	}
 }

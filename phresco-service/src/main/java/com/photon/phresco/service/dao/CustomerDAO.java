@@ -25,6 +25,7 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.Customer.LicenseType;
+import com.photon.phresco.commons.model.Customer.UIType;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CustomerDAO extends BaseDAO {
@@ -115,6 +116,11 @@ public class CustomerDAO extends BaseDAO {
 	 * 
 	 */
 	private String context;
+	
+	/**
+	 * 
+	 */
+	private UIType uiType;
 
 	/**
 	 * @return the emailId
@@ -352,5 +358,19 @@ public class CustomerDAO extends BaseDAO {
 	 */
 	public void setContext(String context) {
 		this.context = context;
+	}
+
+	/**
+	 * @param uiType
+	 */
+	public void setUiType(UIType uiType) {
+		this.uiType = uiType;
+	}
+
+	/**
+	 * @return
+	 */
+	public UIType getUiType() {
+		return uiType;
 	}
 }

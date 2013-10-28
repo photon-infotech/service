@@ -33,6 +33,7 @@
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
 <%@ page import="com.photon.phresco.service.admin.actions.util.ServiceActionUtil" %>
 <%@ page import="com.photon.phresco.commons.model.Customer.LicenseType" %>
+<%@ page import="com.photon.phresco.commons.model.Customer.UIType" %>
 <%@ page import="com.photon.phresco.commons.model.ApplicationType" %>
 <%@ page import="com.photon.phresco.commons.model.Technology" %>
 <%@ page import="com.photon.phresco.commons.model.TechnologyOptions"%>
@@ -103,6 +104,7 @@
 	String CopyrightText = "";
 	String CustomerTitle = "";
 	String CopyrightLabel = "";
+	UIType uiType = null;
 	
 	List<String> applicableTechnologies = new ArrayList();
 	List<ApplicationType> applicableAppTypes = null;
@@ -166,6 +168,11 @@
 		if (customer.getType() != null) {
 			licenseType = customer.getType();
 		}
+		
+		if (customer.getUiType() != null) {
+			uiType = customer.getUiType();
+		}
+		
 		if (customer.getContext() != null) {
 			context = customer.getContext();
 		}
@@ -682,6 +689,19 @@
 			</div>
 		</div>
 		
+		<div class="control-group" id="UIControl">
+			<label class="control-label labelbold">
+				<s:text name='lbl.hdr.adm.cust.UItype'/>
+			</label>
+			<div class="controls">
+				<select id="uiType" name="uiType">
+					<option value="<%= UIType.ADVANCED_UI %>"><%= UIType.ADVANCED_UI %></option>
+					<option value="<%= UIType.SIMPLE_UI %>"><%=  UIType.SIMPLE_UI %></option>
+				</select>
+				<span class="help-inline" id="UIError"></span>
+			</div>
+		</div>
+		
 		<%
 			if(CollectionUtils.isNotEmpty(technologies)) {
 		%>
@@ -1021,6 +1041,7 @@
 	$(document).ready(function() {
 		hideLoadingIcon();
 		setLicenseType();
+		setUIType();
 		createLoginLogoUploader();
 		checkboxEvent($('#checkAllAuto'),'applsChk');
 		checkboxEvent($('#checkAllOptions'), 'optionsChk');
@@ -1174,6 +1195,13 @@
 		     return $(this).text() == license; 
 		 }).attr('selected', true); 
 	} 
+	
+	function setUIType() {
+		var uiType = '<%= uiType %>';
+		  $("select#uiType option").filter(function() {
+		     return $(this).val() == uiType; 
+		 }).attr('selected', true); 
+	}
 	 
 	function findError(data) {
 		if (!isBlank(data.nameError)) {
