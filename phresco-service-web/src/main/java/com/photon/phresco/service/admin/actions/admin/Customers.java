@@ -359,9 +359,9 @@ public class Customers extends ServiceBaseAction  {
 			customer.setValidFrom(getValidFrom());
 			customer.setValidUpto(getValidUpTo());
 			customer.setOptions(getOptions());
-			Customer custo = getServiceManager().getCustomer(getCustomerId());
 			RepoInfo repoInfo = new RepoInfo();
 			if (StringUtils.isNotEmpty(getCustomerId())) {
+				Customer custo = getServiceManager().getCustomer(getCustomerId());
 				customer.setId(getCustomerId());
 				repoInfo.setId(custo.getRepoInfo().getId());
 				repoInfo.setCustomerId(getCustomerId());
