@@ -46,7 +46,7 @@
 	function successEvent(pageUrl, data) {
 		if (pageUrl == "versionInfo") {
 			$('#CurrentVersion').html(data.currentVersion);
-  		 	$("#popupTitle").html("Helios Service " + data.currentVersion);
+  		 	$("#popupTitle").html("Phresco Service " + data.currentVersion);
 		}
 	}
 	

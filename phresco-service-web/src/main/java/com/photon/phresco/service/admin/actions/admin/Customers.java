@@ -365,9 +365,9 @@ public class Customers extends ServiceBaseAction  {
 			customer.setUiType(uiType);
 			RepoInfo repoInfo = new RepoInfo();
 			if (StringUtils.isNotEmpty(getCustomerId())) {
-				Customer custo = getServiceManager().getCustomer(getCustomerId());
+				Customer custRepo = getServiceManager().getCustomer(getCustomerId());
 				customer.setId(getCustomerId());
-				repoInfo.setId(custo.getRepoInfo().getId());
+				repoInfo.setId(custRepo.getRepoInfo().getId());
 				repoInfo.setCustomerId(getCustomerId());
 			}
 			repoInfo.setReleaseRepoURL(getRepoURL());
@@ -384,8 +384,11 @@ public class Customers extends ServiceBaseAction  {
 				repoInfo.setBaseRepoURL(getBaseRepoUrl());
 			}
 			customer.setRepoInfo(repoInfo);
+			
 			List<String> appliesTo = getAppliesTo();
 			customer.setApplicableTechnologies(appliesTo);
+			
+			
 			Map<String, String> frameworkTheme = new HashMap<String, String>();
 			frameworkTheme.put("loginLogoMargin" , getLoginLogoMargin());
 			frameworkTheme.put("pageLogoPadding", getPageLogoPadding());

@@ -75,19 +75,25 @@
 		<div  class="popupselect">
 			<select name="" class="sample" id="rolesSelected" multiple="multiple">
 				<%
-					String disableStr = "";
+					if (CollectionUtils.isNotEmpty(roles)) {
+						for (Role role : roles) {
+							if (role.getName().equals("View Framework") || role.getName().equals("View Service")) {
+				%>
+								<option disabled value="<%= role.getId() %>"><%=  role.getName() %></option>
+				<%				
+							}
+						}
+					}
 					if (MapUtils.isNotEmpty(availableRoleMap)) { 
 						Set<String> keys = availableRoleMap.keySet();
 	    				for (String key : keys) {
-	    				  if (availableRoleMap.get(key).equalsIgnoreCase("View Framework") || availableRoleMap.get(key).equalsIgnoreCase("View Service") ) {
-	    						disableStr = "disabled";  
-	    				 } else {
-	    					 disableStr = "";
-	    				 }
+	    					if (availableRoleMap.get(key).equalsIgnoreCase("View Framework") || availableRoleMap.get(key).equalsIgnoreCase("View Service") ) {
 				%>
-							<option  <%= disableStr %> value="<%= key %>"><%=  availableRoleMap.get(key) %></option>
-				<% 		}
-	    			  }
+								<option  value="<%= key %>"><%=  availableRoleMap.get(key) %></option>
+				<%
+	    					}
+						}
+	    			 }
 				%>	
 			</select> 
 		</div>

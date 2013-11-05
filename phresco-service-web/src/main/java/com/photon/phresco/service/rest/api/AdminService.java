@@ -307,22 +307,35 @@ public class AdminService extends DbService {
 		        if(CollectionUtils.isNotEmpty(techDAOs)) {
 		        	for (TechnologyDAO technologyDAO : techDAOs) {
 						List<String> customerIds = technologyDAO.getCustomerIds();
-						customerIds.add(customerDAO.getId());
+						
+						if(!customerIds.contains(customerDAO.getId())){
+							customerIds.add(customerDAO.getId());
+						} 
 						technologyDAO.setCustomerIds(customerIds);
-						DbService.getMongoOperation().save(TECHNOLOGIES_COLLECTION_NAME, technologyDAO);
+						
+					    DbService.getMongoOperation().save(TECHNOLOGIES_COLLECTION_NAME, technologyDAO);
 						
 						TechnologyGroup tg = DbService.getMongoOperation().findOne(TECH_GROUP_COLLECTION_NAME, 
 								new Query(Criteria.whereId().is(technologyDAO.getTechGroupId())), TechnologyGroup.class);
 						customerIds = tg.getCustomerIds();
-						customerIds.add(customerDAO.getId());
+						
+						if(!customerIds.contains(customerDAO.getId())){
+							customerIds.add(customerDAO.getId());
+						} 
 						tg.setCustomerIds(customerIds);
+						
+						
 						DbService.getMongoOperation().save(TECH_GROUP_COLLECTION_NAME, tg);
 						
 						TechnologyInfo techInfo = DbService.getMongoOperation().findOne("techInfos", 
 								new Query(Criteria.whereId().is(technologyDAO.getId())), TechnologyInfo.class);
 						customerIds = techInfo.getCustomerIds();
-						customerIds.add(customerDAO.getId());
+						
+						if(!customerIds.contains(customerDAO.getId())){
+							customerIds.add(customerDAO.getId());
+						} 
 						techInfo.setCustomerIds(customerIds);
+						
 						DbService.getMongoOperation().save("techInfos", techInfo);
 					}
 		        }
