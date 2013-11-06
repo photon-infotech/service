@@ -1026,15 +1026,16 @@ public class AdminService extends DbService {
 	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to retrive"), @ApiError(code=204, reason = "Roles not found")})
     @RequestMapping(value= REST_API_ROLES, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
 	public @ResponseBody List<Role> findRoles(HttpServletResponse response, @ApiParam(name = "applyTo" , 
-			value = "Applies to framework or server") @QueryParam(REST_QUERY_APPLIESTO) String applyTo) {
+			value = "Applies to framework or server") @QueryParam(REST_QUERY_APPLIESTO) String appliesTo) {
 	    if (isDebugEnabled) {
 	        S_LOGGER.debug("Entered into AdminService.findRoles()");
 	    }
+	    
 		List<Role> roles = new ArrayList<Role>();
 		try {
-			if(StringUtils.isNotEmpty(applyTo)) {
+			if(StringUtils.isNotEmpty(appliesTo)) {
 				roles = DbService.getMongoOperation().find(ROLES_COLLECTION_NAME, 
-						new Query(Criteria.where("appliesTo").is(applyTo)), Role.class);
+						new Query(Criteria.where("appliesTo").is(appliesTo)), Role.class);
 				if(CollectionUtils.isEmpty(roles)) {
 					response.setStatus(204);
 				}
