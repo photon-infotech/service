@@ -618,7 +618,15 @@ function yesnoPopup(url, title, okUrl, okLabel, form, additionalParams) {
 	$('#successMsg').empty();
 	$('#popupPage_modal-body').empty();
 	$('#popupPage_modal-body').css("height", "300px");
-	$('#popupPage_modal-body').load(url, params); //url to render the body content for the popup
+	
+	$.ajax({
+		url : url,
+		data : params,
+		type : "POST",
+		success : function(data) {
+			loadData(data, $('#popupPage_modal-body'));
+		}
+	});
 }
 
 //To enable the given button object
