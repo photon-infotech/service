@@ -87,7 +87,7 @@
 					if (MapUtils.isNotEmpty(availableRoleMap)) { 
 						Set<String> keys = availableRoleMap.keySet();
 	    				for (String key : keys) {
-	    					if (availableRoleMap.get(key).equalsIgnoreCase("View Framework") || availableRoleMap.get(key).equalsIgnoreCase("View Service") ) {
+	    					if (!availableRoleMap.get(key).contains("View Framework") && !availableRoleMap.get(key).contains("View Service") ) {
 				%>
 								<option  value="<%= key %>"><%=  availableRoleMap.get(key) %></option>
 				<%
