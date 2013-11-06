@@ -149,7 +149,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 		RepoInfo repoInfo = dbManager.getRepoInfo(customerId);
 		
 		try {
-			PomProcessor processor = new PomProcessor(getPomFile(tempFolderPath, appInfo));
+			PomProcessor processor = new PomProcessor(getPhrescoPomFile(tempFolderPath, appInfo));
 			processor.setName(appInfo.getName());
 			processor.addRepositories(customerId, repoInfo.getGroupRepoURL());
 			processor.save();
@@ -164,7 +164,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 		}
 	}
 	
-	private File getPomFile(File tempPath, ApplicationInfo appInfo) {
+	private File getPhrescoPomFile(File tempPath, ApplicationInfo appInfo) {
 		File appDir = new File(tempPath, appInfo.getAppDirName());
 		File file = new File(appDir, "phresco-pom.xml");
 		if(file.exists()) {
@@ -256,7 +256,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 		Gson gson = new Gson();
 		if(CollectionUtils.isNotEmpty(listArtifactGroup)) {
             ProjectUtils projectUtils = new ProjectUtils();
-            File rootPomFile = getPomFile(new File(tempFolderPath), appInfo);
+            File rootPomFile = getPhrescoPomFile(new File(tempFolderPath), appInfo);
             PomProcessor pomprocessor = new PomProcessor(rootPomFile);
             String sourceDir = pomprocessor.getProperty("phresco.source.dir");
              if (StringUtils.isNotEmpty(sourceDir)) {
@@ -270,7 +270,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
                     	 projectUtils.updatePOMWithPluginArtifact(sourcePomFile, listArtifactGroup);
                      }
               } else {
-                    	projectUtils.updatePOMWithPluginArtifact(getPomFile(new File(tempFolderPath), appInfo), listArtifactGroup);
+                    	projectUtils.updatePOMWithPluginArtifact(new File(tempFolderPath + File.separator + appInfo.getAppDirName(), "pom.xml"), listArtifactGroup);
               }
          }
 		
