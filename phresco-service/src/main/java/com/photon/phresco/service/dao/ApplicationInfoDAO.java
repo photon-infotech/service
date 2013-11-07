@@ -24,6 +24,7 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactGroupInfo;
 import com.photon.phresco.commons.model.Element;
+import com.photon.phresco.commons.model.FunctionalFrameworkInfo;
 import com.photon.phresco.commons.model.TechnologyInfo;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -114,6 +115,8 @@ public class ApplicationInfoDAO extends CustomerBaseDAO {
      * 
      */
     private String functionalFramework;
+    
+    private FunctionalFrameworkInfo functionalFrameworkInfo;
 
 	/**
 	 * @return the code
@@ -351,6 +354,14 @@ public class ApplicationInfoDAO extends CustomerBaseDAO {
 	 */
 	public void setFunctionalFramework(String functionalFramework) {
 		this.functionalFramework = functionalFramework;
+	}
+	
+	public void setFunctionalFrameworkInfo(FunctionalFrameworkInfo functionalFrameworkInfo) {
+		this.functionalFrameworkInfo = functionalFrameworkInfo;
+	}
+
+	public FunctionalFrameworkInfo getFunctionalFrameworkInfo() {
+		return functionalFrameworkInfo;
 	}
 
 	/**
