@@ -269,11 +269,34 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
                 	    		 sourceDir + File.separator + "pom.xml"); 
                     	 projectUtils.updatePOMWithPluginArtifact(sourcePomFile, listArtifactGroup);
                      }
-              } else {
-                    	projectUtils.updatePOMWithPluginArtifact(new File(tempFolderPath + File.separator + appInfo.getAppDirName(), "pom.xml"), listArtifactGroup);
-              }
-         }
-		
+			} else {
+				File pomFile = new File(tempFolderPath + File.separator + appInfo.getAppDirName(), "pom.xml");
+				File phrescoPomFile = new File(tempFolderPath + File.separator + appInfo.getAppDirName(),
+						"phresco-pom.xml");
+				List<ArtifactGroup> dependencies = new ArrayList<ArtifactGroup>();
+				List<ArtifactGroup> artifacts = new ArrayList<ArtifactGroup>();
+				for (ArtifactGroup artifactGroup : listArtifactGroup) {
+					if (artifactGroup.getPackaging().equals("zip") || artifactGroup.getPackaging().equals("war")) {
+						artifacts.add(artifactGroup);
+					} else {
+						dependencies.add(artifactGroup);
+					}
+				}
+
+				if (CollectionUtils.isNotEmpty(dependencies)) {
+					projectUtils.updatePOMWithModules(pomFile, dependencies);
+				}
+
+				if (CollectionUtils.isNotEmpty(artifacts)) {
+					if (phrescoPomFile.exists()) {
+						projectUtils.updateToDependencyPlugin(phrescoPomFile, artifacts);
+					} else {
+						projectUtils.updateToDependencyPlugin(pomFile, artifacts);
+					}
+				}
+			}
+		}
+
 		StringBuilder sb = new StringBuilder(tempFolderPath).append(File.separator).append(appInfo.getAppDirName())
 		.append(File.separator).append(Constants.DOT_PHRESCO_FOLDER).append(File.separator).append(
 				Constants.APPLICATION_HANDLER_INFO_FILE);
