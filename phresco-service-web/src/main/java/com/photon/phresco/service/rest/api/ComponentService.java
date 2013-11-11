@@ -682,6 +682,7 @@ public class ComponentService extends DbService {
 		info.setCustomerIds(dao.getCustomerIds());
 		info.setTechGroupId(dao.getTechGroupId());
 		info.setTechVersions(dao.getTechVersions());
+		info.setMultiModule(dao.isMultiModule());
 		return info;
 	}
 	
@@ -873,6 +874,42 @@ public class ComponentService extends DbService {
 			throw new PhrescoWebServiceException(e, EX_PHEX00006, DELETE);
 		}
 		LOGGER.debug("ComponentService.deleteTechnology : Exit");
+	}
+	
+	/**
+	 * Returns the list of technologies
+	 * @return
+	 */
+	@ApiOperation(value = " Retrives TechnologyInfos ")
+	@ApiErrors(value = {@ApiError(code=204, reason = "TechnologyInfo not found"), @ApiError(code=500, reason = "Failed error caused")})
+    @RequestMapping(value= "/techInfo", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody List<TechnologyInfo> findTechnologyInfos(@Context HttpServletRequest request,  HttpServletResponse response, 
+			@ApiParam(name = "techId" ,required = true, value = "TechId to retrive technology infos")
+			@QueryParam(REST_QUERY_TECHID) String techId) {
+	    if (isDebugEnabled) {
+	        LOGGER.debug("ComponentService.findTechnologyInfos : Entry");
+	        LOGGER.debug("ComponentService.findTechnologyInfos", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+	        		"user=" + request.getParameter("userId"), "techId=" + techId);
+	    }
+	    try {
+	    	Technology technology = getTechnologyById(techId);
+	    	List<String> subModules = new ArrayList<String>();
+	    	subModules.add(techId);
+	    	subModules.addAll(technology.getSubModules());
+	    	List<TechnologyInfo> techInfos = DbService.getMongoOperation().find("techInfos", new Query(Criteria.whereId().in(subModules.toArray())), TechnologyInfo.class);
+			if (isDebugEnabled) {
+		        LOGGER.debug("ComponentService.findTechnologyInfos : Exit");
+		    }
+			response.setStatus(200);
+			return techInfos;
+		} catch (Exception e) {
+			response.setStatus(500);
+			if (isDebugEnabled) {
+		        LOGGER.debug("ComponentService.findTechnologyInfos ", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
+		        		"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
+			throw new PhrescoWebServiceException(e, EX_PHEX00005, TECHNOLOGIES_COLLECTION_NAME);
+		}
 	}
     
 	/**

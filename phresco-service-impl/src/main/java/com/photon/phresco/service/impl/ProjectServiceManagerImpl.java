@@ -30,6 +30,7 @@ import org.apache.commons.lang.StringUtils;
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.Element;
+import com.photon.phresco.commons.model.ModuleInfo;
 import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.logger.SplunkLogger;
@@ -42,6 +43,8 @@ import com.photon.phresco.util.Constants;
 import com.photon.phresco.util.ProjectUtils;
 import com.photon.phresco.util.ServiceConstants;
 import com.photon.phresco.util.Utility;
+import com.phresco.pom.exception.PhrescoPomException;
+import com.phresco.pom.util.PomProcessor;
 
 public class ProjectServiceManagerImpl implements ProjectServiceManager, Constants {
 	
@@ -66,15 +69,13 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 					"projectCode=\"" + projectInfo.getProjectCode() + "\"");
 		}
 		PhrescoServerFactory.initialize();
-		if(projectInfo.isMultiModule()) {
-			tempFolderPath = tempFolderPath + "/" + projectInfo.getName();
-		}
 		PhrescoServerFactory.getArchetypeExecutor().execute(projectInfo, tempFolderPath);
 		if(projectInfo.isPreBuilt()) {
 			createPilots(projectInfo.getAppInfos().get(0), tempFolderPath, projectInfo.getCustomerIds().get(0));
 		}
-		createProjectFolders(projectInfo, projectInfo.getAppInfos().get(0).getAppDirName(),
-				new File(tempFolderPath));
+		if(projectInfo.isMultiModule() && !projectInfo.getAppInfos().get(0).isCreated()) {
+			createProjectFolders(projectInfo, projectInfo.getAppInfos().get(0).getAppDirName(), new File(tempFolderPath));
+		}
 		if(isDebugEnabled) {
 			LOGGER.debug("ProjectServiceManagerImpl.createProject:Exit");
 		}
@@ -95,9 +96,12 @@ public class ProjectServiceManagerImpl implements ProjectServiceManager, Constan
 					"creationDate=\"" + info.getCreationDate() + "\"",
 					"projectCode=\"" + info.getProjectCode() + "\"");
 		}
-		// create .phresco folder inside the project
-		File phrescoFolder = new File(file.getPath() + File.separator
-				+ appDirName + File.separator + DOT_PHRESCO_FOLDER);
+		StringBuilder builder = new StringBuilder(file.getPath());
+		builder.append(File.separator);
+		builder.append(appDirName);
+		builder.append(File.separator);
+		builder.append(DOT_PHRESCO_FOLDER);
+		File phrescoFolder = new File(builder.toString());
 		phrescoFolder.mkdirs();
 		if (isDebugEnabled) {
 			LOGGER.info("create .phresco folder inside the project");

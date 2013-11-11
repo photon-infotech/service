@@ -87,6 +87,8 @@ public class TechnologyConverter implements Converter<TechnologyDAO, Technology>
         			new Query(Criteria.whereId().in(technologyDAO.getFunctionalFrameworks().toArray())), FunctionalFramework.class);
 //        	technology.setFunctionalFrameworks(functionalFrameworks);
         }
+        technology.setMultiModule(technologyDAO.isMultiModule());
+    	technology.setSubModules(technologyDAO.getSubModules());
         if (isDebugEnabled) {
 			LOGGER.debug("ArtifactGroupConverter.convertDAOToObject:Exit");
 		}
@@ -136,6 +138,8 @@ public class TechnologyConverter implements Converter<TechnologyDAO, Technology>
 //        if(CollectionUtils.isNotEmpty(technology.getFunctionalFrameworks())) {
 //        	techDAO.setFunctionalFrameworks(getFrameworkIds(technology.getFunctionalFrameworks()));
 //        }
+		techDAO.setMultiModule(technology.isMultiModule());
+        techDAO.setSubModules(technology.getSubModules());
         if (isDebugEnabled) {
 			LOGGER.debug("ArtifactGroupConverter.convertObjectToDAO:Exit");
 		}
