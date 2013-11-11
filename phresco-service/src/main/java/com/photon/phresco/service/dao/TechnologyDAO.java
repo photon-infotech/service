@@ -40,6 +40,8 @@ public class TechnologyDAO extends CustomerBaseDAO {
 	private List<String> applicableEmbedTechnology;
 	private List<String> functionalFrameworks;
 	private List<FunctionalFrameworkInfo> functionalFrameworkInfo;
+	private boolean multiModule;
+	private List<String> subModules;
 	
 	public TechnologyDAO() {
 		super();
@@ -123,6 +125,22 @@ public class TechnologyDAO extends CustomerBaseDAO {
 
 	public List<String> getFunctionalFrameworks() {
 		return this.functionalFrameworks;
+	}
+	
+	public boolean isMultiModule() {
+		return multiModule;
+	}
+
+	public void setMultiModule(boolean multiModule) {
+		this.multiModule = multiModule;
+	}
+
+	public List<String> getSubModules() {
+		return subModules;
+	}
+
+	public void setSubModules(List<String> subModules) {
+		this.subModules = subModules;
 	}
 
 	public void setApplicableEmbedTechnology(

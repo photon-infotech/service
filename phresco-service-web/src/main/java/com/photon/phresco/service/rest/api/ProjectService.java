@@ -39,6 +39,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ArtifactInfo;
+import com.photon.phresco.commons.model.ModuleInfo;
 import com.photon.phresco.commons.model.ProjectInfo;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.logger.SplunkLogger;
@@ -52,6 +53,8 @@ import com.photon.phresco.util.ArchiveUtil;
 import com.photon.phresco.util.ArchiveUtil.ArchiveType;
 import com.photon.phresco.util.ServiceConstants;
 import com.photon.phresco.util.Utility;
+import com.phresco.pom.exception.PhrescoPomException;
+import com.phresco.pom.util.PomProcessor;
 import com.wordnik.swagger.annotations.ApiError;
 import com.wordnik.swagger.annotations.ApiErrors;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -96,12 +99,9 @@ public class ProjectService extends DbService {
 			for (int i=0; i < projectInfo.getNoOfApps(); i++) {
 				projectService.createProject(cloneProjectInfo(projectInfo, i), tempFolderPath);
 			}
-//			createParentPom(tempFolderPath, projectInfo);
-//			createDependency(tempFolderPath, projectInfo);
+			createParentPom(tempFolderPath, projectInfo);
+			handleDependencies(tempFolderPath, projectInfo);
 			ArchiveUtil.createArchive(tempFolderPath, tempFolderPath + ZIP, ArchiveType.ZIP);
-//			ServiceOutput serviceOutput = new ServiceOutput(tempFolderPath);
-//			dbManager.storeCreatedProjects(projectInfo);
-//			dbManager.updateUsedObjects(projectInfo);
 			LOGGER.debug("ProjectService.createProject() : Exit");
 			fis = new FileInputStream(new File(tempFolderPath + ZIP));
 			return IOUtils.toByteArray(fis);
@@ -114,62 +114,121 @@ public class ProjectService extends DbService {
 		}
 	}
 	
-/*	private void createParentPom(String tempFolderPath,
-			ProjectInfo projectInfo) throws PhrescoException {
-		if(!projectInfo.isMultiModule()) {
+	private void createParentPom(String tempFolderPath, ProjectInfo projectInfo) throws PhrescoException {
+		if(! projectInfo.isMultiModule()) {
 			return;
 		}
-		tempFolderPath = tempFolderPath + "/" + projectInfo.getName();
 		List<ApplicationInfo> appInfos = projectInfo.getAppInfos();
-		File pomFile = new File(tempFolderPath, "pom.xml");
-		PomProcessor processor;
-		try {
-			processor = new PomProcessor(pomFile);
-			processor.setGroupId("com.photon.phresco");
-			processor.setArtifactId(projectInfo.getName());
-			processor.setVersion(projectInfo.getVersion());
-			processor.setPackaging("pom");
-			for (ApplicationInfo applicationInfo : appInfos) {
-				processor.addModule(applicationInfo.getCode());
-				processor.save();
+		for (ApplicationInfo applicationInfo : appInfos) {
+			if(applicationInfo.isCreated()) {
+				continue;
 			}
-		} catch (PhrescoPomException e) {
-			throw new PhrescoException(e);
+			List<ModuleInfo> modules = applicationInfo.getModules();
+			File pomFile = new File(tempFolderPath + File.separator + applicationInfo.getAppDirName(), "pom.xml");
+			try {
+				PomProcessor processor = new PomProcessor(pomFile);
+				processor.setGroupId("com.photon.phresco");
+				processor.setArtifactId(applicationInfo.getCode());
+				processor.setVersion(applicationInfo.getVersion());
+				processor.setPackaging("pom");
+				if(CollectionUtils.isNotEmpty(modules)) {
+					for (ModuleInfo moduleInfo : modules) {
+						processor.addModule(moduleInfo.getCode());
+					}
+				}
+				processor.save();
+			} catch (PhrescoPomException e) {
+				throw new PhrescoException(e);
+			}
 		}
-	}*/
+		
+	}
 	
-	/*private void createDependency(String tempFolderPath, ProjectInfo projectInfo) {
-		if(!projectInfo.isMultiModule()) {
+	private void handleDependencies(String tempFolderPath, ProjectInfo projectInfo) throws PhrescoException {
+		if(! projectInfo.isMultiModule()) {
 			return;
 		}
-		tempFolderPath = tempFolderPath + "/" + projectInfo.getName();
 		List<ApplicationInfo> appInfos = projectInfo.getAppInfos();
 		for (ApplicationInfo applicationInfo : appInfos) {
 			List<String> dependentModules = applicationInfo.getDependentModules();
 			if(CollectionUtils.isNotEmpty(dependentModules)) {
-				File projectPom = new File(tempFolderPath + File.separator + applicationInfo.getCode() + File.separator + "pom.xml");
-				try {
-					PomProcessor processor = new PomProcessor(projectPom);
-					for (String appCode : dependentModules) {
-						ApplicationInfo appInfo = getAppInfo(appCode, appInfos);
-						processor.addDependency("com.photon.phresco", appInfo.getCode(), projectInfo.getVersion());
-						processor.save();
+				for (String appCode : dependentModules) {
+					ApplicationInfo depApp = getApplicationInfo(appCode, projectInfo.getAppInfos());
+					File file = new File(tempFolderPath + File.separator + applicationInfo.getCode() + File.separator + "pom.xml");
+					addDependency(depApp, file,	projectInfo.getVersion());
+				}
+			}
+			if(CollectionUtils.isNotEmpty(applicationInfo.getModules())) {
+				createModuleDependencies(applicationInfo.getModules(), tempFolderPath, projectInfo, applicationInfo.getCode());
+			}
+		}
+	}
+	
+	private void createModuleDependencies(List<ModuleInfo> modules, String tempFolderPath, 
+			ProjectInfo projectInfo, String appCode) throws PhrescoException {
+		for (ModuleInfo moduleInfo : modules) {
+			List<String> dependentApps = moduleInfo.getDependentApps();
+			List<String> dependentModules = moduleInfo.getDependentModules();
+			if(CollectionUtils.isNotEmpty(dependentApps)) {
+				for (String depAppCode : dependentApps) {
+					ApplicationInfo applicationInfo = getApplicationInfo(depAppCode, projectInfo.getAppInfos());
+					if(applicationInfo != null) {
+						File file = new File(tempFolderPath + File.separator + appCode + 
+							File.separator + moduleInfo.getCode() + File.separator + "pom.xml");
+						addDependency(applicationInfo, file, projectInfo.getVersion());
 					}
-				} catch (PhrescoPomException e) {
-					e.printStackTrace();
+				}
+			}
+			if(CollectionUtils.isNotEmpty(dependentModules)) {
+				for (String module : dependentModules) {
+					ModuleInfo depModule = getModuleInfo(modules, module);
+					if(depModule != null) {
+						File file = new File(tempFolderPath + File.separator + appCode + File.separator + 
+								moduleInfo.getCode() + File.separator + "pom.xml");
+						addModuleInfoDependency(depModule, file, projectInfo.getVersion());
+					}
 				}
 			}
 		}
-	}*/
+	}
 	
-	/*private ApplicationInfo getAppInfo(String appCode, List<ApplicationInfo> applicationInfos) {
-		for (ApplicationInfo applicationInfo : applicationInfos) {
+	private ModuleInfo getModuleInfo(List<ModuleInfo> moduleInfos, String moduleName) {
+		for (ModuleInfo moduleInfo : moduleInfos) {
+			if(moduleInfo.getCode().equals(moduleName)) {
+				return moduleInfo;
+			}
+		}
+		return null;
+	}
+	
+	private void addModuleInfoDependency(ModuleInfo moduleInfo, File pomFile, String version) throws PhrescoException {
+		try {
+			PomProcessor processor = new PomProcessor(pomFile);
+			processor.addDependency("com.photon.phresco", moduleInfo.getCode(), version);
+			processor.save();
+		} catch (PhrescoPomException e) {
+			throw new PhrescoException(e);
+		}
+	}
+	
+	private void addDependency(ApplicationInfo applicationInfo, File pomFile, String version) throws PhrescoException {
+		try {
+			PomProcessor processor = new PomProcessor(pomFile);
+			processor.addDependency("com.photon.phresco", applicationInfo.getCode(), version);
+			processor.save();
+		} catch (PhrescoPomException e) {
+			throw new PhrescoException(e);
+		}
+	}
+	
+	private ApplicationInfo getApplicationInfo(String appCode, List<ApplicationInfo> appInfos) {
+		for (ApplicationInfo applicationInfo : appInfos) {
 			if(applicationInfo.getCode().equals(appCode)) {
 				return applicationInfo;
 			}
 		}
 		return null;
-	}*/
+	}
 	
 	private void buildCreateLogMessage(HttpServletRequest request, ProjectInfo projectInfo) throws PhrescoException {
 		try {
@@ -292,7 +351,7 @@ public class ProjectService extends DbService {
     	FileInputStream fis = null;
     	try {
     		buildUpdateLogMessage(request, projectInfo);
-    		String projectPathStr = Utility.getPhrescoTemp() + UUID.randomUUID().toString();
+    		String projectPathStr = ServerUtil.getTempFolderPath();
     		ProjectServiceManager projectService = PhrescoServerFactory.getProjectService();
     		projectService.updateProject(projectInfo, projectPathStr);
     		ArchiveUtil.createArchive(projectPathStr, projectPathStr + ZIP, ArchiveType.ZIP);
