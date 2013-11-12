@@ -86,6 +86,7 @@ public class Archetypes extends ServiceBaseAction {
 	private String techErr = "";
 	private String funcFrameworksError = "";
 	private String techGroupError = "";
+	private String subModulesError = "";
 	private boolean errorFound = false;
 	private boolean system = false;
 	private String oldName = "";
@@ -98,6 +99,7 @@ public class Archetypes extends ServiceBaseAction {
 	private String versionComment = "";
 	private String techVersion = "";
 	private String techGroup = "";
+	private List<String> subModules = null;
 	
 	private String jarVersion = "";
 	private String groupId = "";
@@ -110,6 +112,7 @@ public class Archetypes extends ServiceBaseAction {
 	private List<String> functionalFramework = null;
 	private List<String> applicableReports = null;
 	private List<String> applicableAtchetypeFeatures = null;
+	private String multiModule = "";
 	private boolean archType = false;
 	private String versioning = "";
 	private boolean tempError = false;
@@ -384,6 +387,11 @@ public class Archetypes extends ServiceBaseAction {
 			technology.setAppTypeId(getApptype());
 			technology.setTechGroupId(getTechGroup());
 			technology.setSystem(isSystem());
+			boolean multiModule = Boolean.parseBoolean(getMultiModule());
+			technology.setMultiModule(multiModule);
+			if (multiModule) {
+				technology.setSubModules(getSubModules());
+			}
 			//To set the applicable features
 			List<String> options = new ArrayList<String>();
 			for (String selectedOption : getApplicable()) {
@@ -686,6 +694,8 @@ public class Archetypes extends ServiceBaseAction {
 		
 		isError = functioanlFrameworkValidation(isError);
 		
+		isError = subModulesValidation(isError);
+		
 		if (isError) {
             setErrorFound(true);
         }
@@ -805,6 +815,15 @@ public class Archetypes extends ServiceBaseAction {
 	private boolean functioanlFrameworkValidation(boolean isError) {
 		if (CollectionUtils.isNotEmpty(getApplicable()) && getApplicable().contains("Functional_Test") && CollectionUtils.isEmpty(getFunctionalFrameworkInfo())) {
 			setFuncFrameworksError(getText(KEY_I18N_ERR_FUNCTIONAL_FRAMEWORK_EMPTY));
+			tempError = true;
+		}
+		
+		return tempError;
+	}
+	
+	private boolean subModulesValidation(boolean isError) {
+		if (Boolean.parseBoolean(getMultiModule()) && CollectionUtils.isEmpty(getSubModules())) {
+			setSubModulesError(getText(KEY_I18N_ERR_SUB_MODULES_EMPTY));
 			tempError = true;
 		}
 		
@@ -1229,5 +1248,29 @@ public class Archetypes extends ServiceBaseAction {
 
 	public boolean isSystem() {
 		return system;
+	}
+
+	public void setMultiModule(String multiModule) {
+		this.multiModule = multiModule;
+	}
+
+	public String getMultiModule() {
+		return multiModule;
+	}
+
+	public void setSubModules(List<String> subModules) {
+		this.subModules = subModules;
+	}
+
+	public List<String> getSubModules() {
+		return subModules;
+	}
+
+	public void setSubModulesError(String subModulesError) {
+		this.subModulesError = subModulesError;
+	}
+
+	public String getSubModulesError() {
+		return subModulesError;
 	}
 }

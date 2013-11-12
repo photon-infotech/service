@@ -398,6 +398,7 @@ public interface ServiceUIConstants {
     String KEY_I18N_ERR_EMBED_EMPTY = "err.msg.embed.empty";
     String KEY_I18N_ERR_APPLNJAR_EMPTY = "err.msg.applnjar.empty";
 	String KEY_I18N_ERR_FUNCTIONAL_FRAMEWORK_EMPTY = "err.msg.functional.framework.empty";
+	String KEY_I18N_ERR_SUB_MODULES_EMPTY = "err.msg.sub.modules.empty";
     String KEY_I18N_ERR_ARCHETYPEJAR_EMPTY = "err.msg.archetypejar.empty";
     String KEY_I18N_ERR_PLTPROJ_EMPTY = "err.msg.pltproj.empty";
     String KEY_I18N_ERR_PLUGINJAR_INVALID = "err.msg.plugin.invalid";

@@ -54,6 +54,7 @@
 	String pageUrl = ServiceActionUtil.getPageUrl(ServiceUIConstants.ARCHETYPES, fromPage);
 	String progressTxt = ServiceActionUtil.getProgressTxt(ServiceUIConstants.ARCHETYPES, fromPage);
 	String versioning = (String)request.getAttribute(ServiceUIConstants.REQ_VERSIONING);
+	String checkedStr = "";
 	String disabledVer ="";
 	if (StringUtils.isNotEmpty(versioning)) {
 		disabledVer = "disabled";
@@ -100,11 +101,14 @@
 	String selectedTech = "";
 	List<String> selectedReports = null;
 	List<String> selectedFunctionalFrameworks = null;
+	List<String> subModules = null;
+	boolean isMultiModule = false;
 	if (technology != null) {
 		name = technology.getName();
 		desc = technology.getDescription();
 		archArchetypeId = technology.getArchetypeInfo().getArtifactId();		
-		archGroupId = technology.getArchetypeInfo().getGroupId();		
+		archGroupId = technology.getArchetypeInfo().getGroupId();
+		isMultiModule = technology.isMultiModule();
 		archVersions = technology.getArchetypeInfo().getVersions().get(0).getVersion();
 		techVersions = technology.getTechVersions();
 		if (CollectionUtils.isNotEmpty(techVersions)) {
@@ -115,6 +119,7 @@
 		techId = technology.getTechGroupId();
 		selectedReports = technology.getReports();
 		selectedFunctionalFrameworks = (List<String>) request.getAttribute(ServiceUIConstants.REQ_SELECTED_FUNCTIONAL_FRAMEWORKS);
+		subModules = technology.getSubModules();
 	}
 %>
 
@@ -269,6 +274,58 @@
 			</div>
 		</div>
 		
+		<% if (CollectionUtils.isNotEmpty(technologies)) { %>
+			<div class="control-group" >
+				<label class="control-label labelbold">
+					<s:text name='lbl.hdr.comp.multi.module'/></label>
+				<div class="controls">
+					<%
+						if (isMultiModule) {
+							checkedStr = "checked";
+						}
+					%>
+					<input name="multiModule" type="checkbox" value="true" <%= checkedStr %>/>
+				</div>
+			</div>
+			
+			<div class="control-group hideContent" id="subModulesControl">
+				<label class="control-label labelbold">
+					<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.sub.modules'/>
+				</label>
+				<div class="controls">
+						<div class="typeFields" id="typefield">
+						<div class="multilist-scroller multiselct" id="subModulesDiv">
+							<ul>
+								<li>
+									<input type="checkbox" value="" <%= disabledVer %> id="checkAllSubModules" onclick="checkAllEvent(this,$('.subModules'), false);"
+										style="margin: 3px 8px 6px 0;"><s:text name='lbl.all'/>
+								</li>
+								<%
+									if (CollectionUtils.isNotEmpty(technologies)) {
+										checkedStr = "";
+										for (Technology tech : technologies) {
+											if (CollectionUtils.isNotEmpty(subModules)) {
+												if (subModules.contains(tech.getId())) {
+													checkedStr = "checked";
+												} else {
+													checkedStr = "";
+												}
+											}
+								%>
+											<li> <input type="checkbox" id="subModules" name="subModules" value='<%= tech.getId() %>'
+												onclick="checkboxEvent($('#checkAllSubModules'), 'subModules')"	class="check subModules" <%= checkedStr %> ><%= tech.getName() %>
+											</li>
+								<%		}	
+									}
+								%>
+							</ul>
+						</div>
+					</div>
+	          		 <span class="help-inline applyerror" id="subModulesError"></span>
+				</div>
+			</div>
+		<% } %>
+		
 		<div class="control-group" id="applicableControl">
 			<label class="control-label labelbold">
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.applicable'/>
@@ -283,7 +340,7 @@
 							</li>
 							<%
 								if (CollectionUtils.isNotEmpty(options)) {
-									String checkedStr = "";
+									checkedStr = "";
 									for (TechnologyOptions option : options) {
 										List<String> selectedOptions = new ArrayList<String>();
 										if (technology != null) {
@@ -368,6 +425,7 @@
 		%>
 		</div>
 		<!--  functional framework ends -->
+		
 		<!--  embed Technology  starts-->
 		<div id="embed_tech">
 		<%
@@ -387,7 +445,7 @@
 								</li>
 							<%
 									if (CollectionUtils.isNotEmpty(technologies)) {
-										String checkedStr = "";
+										checkedStr = "";
 										for (Technology tech : technologies) {
 											List<String> selectedOptions = new ArrayList<String>();
 											if (technology != null) {
@@ -435,7 +493,7 @@
 							</li>
 							<%
 								if (CollectionUtils.isNotEmpty(reports)) {
-									String checkedStr = "";
+									checkedStr = "";
 									for (Reports report : reports) {
 										if (CollectionUtils.isNotEmpty(selectedReports)) {
 											if (selectedReports.contains(report.getId())) {
@@ -475,7 +533,7 @@
 								</li>
 								<%
 								if (CollectionUtils.isNotEmpty(technologies)) {
-									String checkedStr = "";
+									checkedStr = "";
 									for (Technology tech : technologies) {
 										List<String> selectedOptions = new ArrayList<String>();
 										if (technology != null) {
@@ -510,8 +568,8 @@
 			String disabledClass = "btn-primary";
 			String disabled = "";
 			if (isSystem) {
-				disabledClass = "btn-disabled";
-				disabled = "disabled";
+// 				disabledClass = "btn-disabled";
+// 				disabled = "disabled";
 			}
 		%>
 		<input type="button" id="" class="btn <%= disabledClass %> <%= per_disabledClass %>" <%= disabled %> <%= per_disabledStr %> value='<%= buttonLbl %>'
@@ -548,6 +606,7 @@
         checkboxEvent($('#checkAllFeatures'), 'applsChk');
         checkboxEvent($('#checkAllReports'), 'reportsChk');
         checkboxEvent($('#checkAllTechnology'), 'applicableTechnology');
+        checkboxEvent($('#checkAllSubModules'), 'subModules');
         $("#funcFrameworksControl").hide();
     	var functionalStatus = $("input[value='Functional_Test']").attr("checked");
     	if (functionalStatus === "checked") {
@@ -558,6 +617,12 @@
         
         if (<%= isSystem %>) { 
         	disableUploadButton($("#appln-file-uploader"));
+        }
+        
+        if (<%= isMultiModule %>) {
+       		$('#subModulesControl').show();        		
+        } else {
+        	$('#subModulesControl').hide();
         }
         
         $('#checkAllFeatures').click(function() {
@@ -602,6 +667,14 @@
         if ( '<%= versioning %>' != "versioning" ){
 			$("#versionComment").hide();
 		}
+        
+        $('input[name=multiModule]').click(function() {
+        	if ($('input[name=multiModule]').is(':checked')) {
+        		$('#subModulesControl').show();        		
+        	} else {
+        		$('#subModulesControl').hide();
+        	}
+        });
     });
 
 	$(document).keyup(function(e) {
@@ -722,6 +795,12 @@
 			showError($("#ffControl"), $("#ffError"), data.funcFrameworksError);
 		} else {
 			hideError($("#ffControl"), $("#ffError"));
+		}
+		
+		if (!isBlank(data.subModulesError)) {
+			showError($("#subModulesControl"), $("#subModulesError"), data.subModulesError);
+		} else {
+			hideError($("#subModulesControl"), $("#subModulesError"));
 		}
 	}
 
