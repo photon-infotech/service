@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.photon.phresco.commons.model.ApplicationInfo;
+import com.photon.phresco.commons.model.ArtifactGroup;
 import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.ModuleInfo;
 import com.photon.phresco.commons.model.ProjectInfo;
@@ -48,6 +49,7 @@ import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.ProjectServiceManager;
 import com.photon.phresco.service.dao.ArtifactGroupDAO;
 import com.photon.phresco.service.impl.DbService;
+import com.photon.phresco.service.util.DependencyUtils;
 import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.ArchiveUtil;
 import com.photon.phresco.util.ArchiveUtil.ArchiveType;
@@ -101,6 +103,7 @@ public class ProjectService extends DbService {
 			}
 			createParentPom(tempFolderPath, projectInfo);
 			handleDependencies(tempFolderPath, projectInfo);
+			addIntegrationTest(projectInfo, tempFolderPath);
 			ArchiveUtil.createArchive(tempFolderPath, tempFolderPath + ZIP, ArchiveType.ZIP);
 			LOGGER.debug("ProjectService.createProject() : Exit");
 			fis = new FileInputStream(new File(tempFolderPath + ZIP));
@@ -114,6 +117,27 @@ public class ProjectService extends DbService {
 		}
 	}
 	
+	private void addIntegrationTest(ProjectInfo projectInfo, String tempFolderPath) throws PhrescoException {
+		if(!projectInfo.isIntegrationTest()) {
+			return;
+		}
+		try {
+			String customerId = projectInfo.getCustomerIds().get(0);
+			String techId = projectInfo.getAppInfos().get(0).getTechInfo().getId();
+			ArtifactGroup archetypeInfo = dbManager.getArchetypeInfo(techId,
+					customerId);
+			ArtifactInfo artifactInfo = archetypeInfo.getVersions().get(0);
+			String version = artifactInfo.getVersion();
+			File content = new File(tempFolderPath, projectInfo.getProjectCode()+ "-" + "integrationtest");
+			String contentURL = ServerUtil.createContentURL("com.photon.phresco.test", "integrationtest", version, "zip");
+			DependencyUtils.extractFiles(contentURL, content, customerId);
+		} catch (PhrescoException e) {
+			e.printStackTrace();
+			throw new PhrescoException(e);
+		}
+		
+	}
+
 	private void createParentPom(String tempFolderPath, ProjectInfo projectInfo) throws PhrescoException {
 		if(! projectInfo.isMultiModule()) {
 			return;

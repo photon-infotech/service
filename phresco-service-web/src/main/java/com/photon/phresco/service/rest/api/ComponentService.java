@@ -893,6 +893,9 @@ public class ComponentService extends DbService {
 	    }
 	    try {
 	    	Technology technology = getTechnologyById(techId);
+	    	if (!technology.isMultiModule()) {
+	    		return Collections.EMPTY_LIST;
+	    	}
 	    	List<String> subModules = new ArrayList<String>();
 	    	subModules.add(techId);
 	    	subModules.addAll(technology.getSubModules());
