@@ -57,8 +57,6 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 	private static Boolean isDebugEnabled = LOGGER.isDebugEnabled();
 	private static final String INTERACTIVE_MODE = "false";
 	public static final String WINDOWS = "Windows";
-	private static final String PHRESCO_FOLDER_NAME = "phresco";
-	private static final String DOT_PHRESCO_FOLDER = "." + PHRESCO_FOLDER_NAME;
 	private DbManager dbManager = null;
 
 	public ArchetypeExecutorImpl()
@@ -92,6 +90,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 					customerId);
 			ArtifactInfo artifactInfo = archetypeInfo.getVersions().get(0);
 			String version = artifactInfo.getVersion();
+			String groupId = projectInfo.getGroupId();
 			if(projectInfo.isMultiModule()) {
 				tempFolderPath = tempFolderPath + "/" + applicationInfo.getCode();
 		//		commandString = buildCommandString(applicationInfo.getCode(), techId, 
@@ -102,7 +101,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 						archetypeInfo = dbManager.getArchetypeInfo(moduleInfo.getTechInfo().getId(), customerId);
 						version = archetypeInfo.getVersions().get(0).getVersion();
 						commandString = buildCommandString(moduleInfo.getCode(), techId, archetypeInfo.getGroupId(), 
-								archetypeInfo.getArtifactId(), version, repoInfo.getReleaseRepoURL(), projectInfo.getVersion(), customerId);
+								archetypeInfo.getArtifactId(), version, repoInfo.getReleaseRepoURL(), projectInfo.getVersion(), customerId, groupId);
 						executeCreateCommand(tempFolderPath, commandString, customerId, projectInfo);
 						updateDefaultFeatures(projectInfo, tempFolderPath, customerId, moduleInfo.getCode());
 						updateRepository(customerId, applicationInfo, new File(
@@ -111,7 +110,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 				}
 			} else {
 				commandString = buildCommandString(applicationInfo.getCode(), techId, archetypeInfo.getGroupId(), 
-						archetypeInfo.getArtifactId(), version,	repoInfo.getReleaseRepoURL(), projectInfo.getVersion(), customerId);
+						archetypeInfo.getArtifactId(), version,	repoInfo.getReleaseRepoURL(), projectInfo.getVersion(), customerId, groupId);
 				executeCreateCommand(tempFolderPath, commandString, customerId, projectInfo);
 				updateDefaultFeatures(projectInfo, tempFolderPath, customerId, applicationInfo.getCode());
 				updateRepository(customerId, applicationInfo, new File(
@@ -398,8 +397,8 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 		}
 	}
 
-	private String buildCommandString(String code, String techId, String groupId, String artifactId, String version,
-			String repoUrl, String projectVersion, String customerId) throws PhrescoException {
+	private String buildCommandString(String code, String techId, String archetypeGroupId, String artifactId, String version,
+			String repoUrl, String projectVersion, String customerId, String groupId) throws PhrescoException {
 		if (isDebugEnabled) {
 			LOGGER.debug("ArchetypeExecutorImpl.buildCommandString:Entry");
 			LOGGER.debug("ArchetypeExecutorImpl.buildCommandString", "appCode="
@@ -426,7 +425,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 				.append(Constants.STR_BLANK_SPACE)
 				.append(ARCHETYPE_ARCHETYPEGROUPID)
 				.append(Constants.STR_EQUALS)
-				.append(groupId)
+				.append(archetypeGroupId)
 				.append(Constants.STR_BLANK_SPACE)
 				.append(ARCHETYPE_ARCHETYPEARTIFACTID)
 				.append(Constants.STR_EQUALS)
@@ -437,8 +436,11 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 				.append(version)
 				.append(Constants.STR_BLANK_SPACE)
 				.append(ARCHETYPE_GROUPID)
-				.append(Constants.STR_EQUALS)
-				.append("com.photon.phresco")
+				.append(Constants.STR_EQUALS);
+				if (StringUtils.isEmpty(groupId)) {
+					groupId = "com.photon.phresco";
+				}
+				commandStr.append(groupId)
 				.append(Constants.STR_BLANK_SPACE)
 				.append(ARCHETYPE_ARTIFACTID)
 				.append(Constants.STR_EQUALS)
