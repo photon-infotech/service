@@ -262,7 +262,7 @@ qq.FileUploaderBasic = function(o){
         maxConnections: 3,
         // validation        
         allowedExtensions: o.allowedExtensions,
-        sizeLimit: 0,   
+        sizeLimit: 41*1024*1024,   
         minSizeLimit: 0,                             
         // events
         // return false to cancel submit
@@ -530,7 +530,6 @@ qq.FileUploaderBasic.prototype = {
             bytes = bytes / 1024;
             i++;  
         } while (bytes > 99);
-        
         return Math.max(bytes, 0.1).toFixed(1) + ['kB', 'MB', 'GB', 'TB', 'PB', 'EB'][i];          
     }
 };

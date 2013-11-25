@@ -359,7 +359,7 @@
 		} else {
 			$('#posblVal').find('option').each(function() {
 				var opts = $(this).val();
-				if (opts === newOption) {
+				if (opts.toLowerCase() === newOption.toLowerCase()) {
 					flag = true;
 					$('.errMsg').html("Key Value already Exists");
 				}
@@ -400,4 +400,5 @@
 
 		return true;
 	}
+	
 </script>  
