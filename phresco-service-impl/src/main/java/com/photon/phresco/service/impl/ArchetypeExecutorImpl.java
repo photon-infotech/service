@@ -103,7 +103,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 						commandString = buildCommandString(moduleInfo.getCode(), techId, archetypeInfo.getGroupId(), 
 								archetypeInfo.getArtifactId(), version, repoInfo.getReleaseRepoURL(), projectInfo.getVersion(), customerId, groupId);
 						executeCreateCommand(tempFolderPath, commandString, customerId, projectInfo);
-						updateDefaultFeatures(projectInfo, tempFolderPath, customerId, moduleInfo.getCode());
+						updateDefaultFeatures(projectInfo, tempFolderPath, customerId, moduleInfo.getCode(), moduleInfo);
 						updateRepository(customerId, applicationInfo, new File(
 								tempFolderPath), moduleInfo.getCode());
 					}
@@ -112,7 +112,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 				commandString = buildCommandString(applicationInfo.getCode(), techId, archetypeInfo.getGroupId(), 
 						archetypeInfo.getArtifactId(), version,	repoInfo.getReleaseRepoURL(), projectInfo.getVersion(), customerId, groupId);
 				executeCreateCommand(tempFolderPath, commandString, customerId, projectInfo);
-				updateDefaultFeatures(projectInfo, tempFolderPath, customerId, applicationInfo.getCode());
+				updateDefaultFeatures(projectInfo, tempFolderPath, customerId, applicationInfo.getCode(), null);
 				updateRepository(customerId, applicationInfo, new File(
 						tempFolderPath), applicationInfo.getCode());
 			}
@@ -208,7 +208,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 	}
 	
 	private void updateDefaultFeatures(ProjectInfo projectInfo,String tempFolderPath,
-			String customerId, String modName) throws PhrescoException, PhrescoPomException {
+			String customerId, String modName, ModuleInfo moduleInfo) throws PhrescoException, PhrescoPomException {
 		List<String> selectedFeatures = new ArrayList<String>();
 		List<String> selectedJsLibs = new ArrayList<String>();
 		List<String> selectedComponentids = new ArrayList<String>();
@@ -383,8 +383,52 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 		sbuilder.append(Constants.DOT_PHRESCO_FOLDER).append(File.separator).append(
 				Constants.PROJECT_INFO_FILE);
 		File projectInfoPath = new File(sbuilder.toString());
-		projectInfo.setAppInfos(Collections.singletonList(appInfo));
-		ProjectUtils.updateProjectInfo(projectInfo, projectInfoPath);
+		ProjectInfo clonedProjInfo = cloneProjInfo(projectInfo, appInfo, moduleInfo);
+		ProjectUtils.updateProjectInfo(clonedProjInfo, projectInfoPath);
+	}
+	
+	private ProjectInfo cloneProjInfo(ProjectInfo projectInfo, ApplicationInfo appInfo, ModuleInfo moduleInfo) throws PhrescoException {
+		try {
+			ProjectInfo newProjectInfo = new ProjectInfo();
+			newProjectInfo.setId(projectInfo.getId());
+			newProjectInfo.setName(projectInfo.getName());
+			newProjectInfo.setProjectCode(projectInfo.getProjectCode());
+			newProjectInfo.setVersion(projectInfo.getVersion());
+			newProjectInfo.setVersionInfo(projectInfo.getVersionInfo());
+			newProjectInfo.setNoOfApps(projectInfo.getNoOfApps());
+			newProjectInfo.setStartDate(projectInfo.getStartDate());
+			newProjectInfo.setEndDate(projectInfo.getEndDate());
+			newProjectInfo.setPreBuilt(projectInfo.isPreBuilt());
+			newProjectInfo.setMultiModule(projectInfo.isMultiModule());
+			newProjectInfo.setIntegrationTest(projectInfo.isIntegrationTest());
+			newProjectInfo.setGroupId(projectInfo.getGroupId());
+			ApplicationInfo mergedAppInfo = mergeSubModuleInfoToAppInfo(appInfo, moduleInfo);
+			newProjectInfo.setAppInfos(Collections.singletonList(mergedAppInfo));
+			newProjectInfo.setCustomerIds(projectInfo.getCustomerIds());
+			
+			return newProjectInfo;
+		} catch (Exception e) {
+			throw new PhrescoException(e);
+		}
+	}
+	
+	private ApplicationInfo mergeSubModuleInfoToAppInfo(ApplicationInfo appInfo, ModuleInfo moduleInfo) {
+		ApplicationInfo newAppInfo = new ApplicationInfo();
+		if (moduleInfo != null) {
+			newAppInfo.setCode(moduleInfo.getCode());
+			newAppInfo.setAppDirName(moduleInfo.getCode());
+			newAppInfo.setTechInfo(moduleInfo.getTechInfo());
+			newAppInfo.setVersion(appInfo.getVersion());
+			newAppInfo.setPhrescoPomFile(appInfo.getPhrescoPomFile());
+			newAppInfo.setPomFile(appInfo.getPomFile());
+			newAppInfo.setRootModule(moduleInfo.getRootModule());
+			newAppInfo.setModules(null);
+			newAppInfo.setName(moduleInfo.getCode());
+		} else {
+			newAppInfo = appInfo;
+		}
+		
+		return newAppInfo;
 	}
 	
 	private void pilotDefaultFeaturesToAdd(ApplicationInfo appInfo,
