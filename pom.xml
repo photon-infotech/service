@@ -4,7 +4,7 @@
     <artifactId>phresco-service-root</artifactId>
     <packaging>pom</packaging>
     <name>Phresco Service</name>
-    <version>3.2.0.2003-SNAPSHOT</version>
+    <version>3.2.0.2002-SNAPSHOT</version>
     <url>http://www.phresco.org</url>
 	
     <scm>
@@ -14,7 +14,7 @@
         <sourceDirectory>${phresco.source.directory}</sourceDirectory>
         <testSourceDirectory>${testSourceDirectory}</testSourceDirectory>
         <directory>do_not_checkin/target</directory>
-        <finalName>service</finalName>
+        <finalName>javawebserviceeshop</finalName>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -71,7 +71,7 @@
                 <plugin>
                     <groupId>com.photon.phresco.plugins</groupId>
                     <artifactId>phresco-maven-plugin</artifactId>
-                    <version>2.3.0.9000</version>
+                    <version>3.2.0.2000</version>
                     <extensions>true</extensions>
                 </plugin>
             </plugins>
@@ -174,7 +174,7 @@
             <plugin>
                 <groupId>net.awired.jstest</groupId>
                 <artifactId>jstest-maven-plugin</artifactId>
-                <version>3.0.0.27000</version>
+                <version>3.2.0.2000</version>
                 <executions>
                     <execution>
                         <goals>

@@ -14,7 +14,7 @@
                 <groupId>com.photon.phresco.plugins</groupId>
                 <artifactId>java-phresco-plugin</artifactId>
                 <type>jar</type>
-                <version>2.3.0.9000</version>
+                <version>3.2.0.2000</version>
                 <class>com.photon.phresco.plugins.java.JavaPlugin</class>
             </dependency>
         </implementation>
@@ -79,7 +79,7 @@
 <groupId>com.photon.phresco.commons</groupId>
 <artifactId>phresco-commons</artifactId>
 <type>jar</type>
-<version>2.3.0.9000</version>
+<version>3.2.0.2000</version>
                             </dependency>
                         </dependencies>
                     </dynamicParameter>
@@ -87,7 +87,7 @@
                     <editable>true</editable>
                     <key>environmentName</key>
                     <multiple>true</multiple>
-                    <value>Testing</value>
+                    <value>Production</value>
                     <sort>false</sort>
                     <show>true</show>
                 </parameter>
@@ -198,11 +198,10 @@
                     <description></description>
                     <key>packageFileBrowse</key>
                     <multiple>false</multiple>
-                    <value></value>
                     <sort>false</sort>
                     <show>true</show>
                 </parameter>
-                 <parameter>
+                <parameter>
                     <name>
                         <value lang="en">Build Type</value>
                     </name>
