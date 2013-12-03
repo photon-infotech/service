@@ -2,7 +2,7 @@
 <mojos>
     <mojo>
         <goal>package</goal>
-        <description>Goal which packages the HTML5-Jquery project</description>
+        <description>Goal which packages the Java-quickstart project</description>
         <requiresDirectInvocation>false</requiresDirectInvocation>
         <requiresProject>true</requiresProject>
         <requiresReports>false</requiresReports>
@@ -10,14 +10,14 @@
         <requiresOnline>false</requiresOnline>
         <inheritedByDefault>true</inheritedByDefault>
         <implementation>
-            <dependency>
-                <groupId>com.photon.phresco.plugins</groupId>
-                <artifactId>java-phresco-plugin</artifactId>
-                <type>jar</type>
-                <version>3.2.0.2000</version>
-                <class>com.photon.phresco.plugins.java.JavaPlugin</class>
-            </dependency>
-        </implementation>
+           <dependency>
+               <groupId>com.photon.phresco.plugins</groupId>
+               <artifactId>java-phresco-plugin</artifactId>
+               <type>jar</type>
+               <version>3.1.0.7000</version>
+               <class>com.photon.phresco.plugins.java.JavaPlugin</class>
+           </dependency>
+       </implementation>
         <language>java</language>
         <instantiationStrategy>per-lookup</instantiationStrategy>
         <executionStrategy>once-per-session</executionStrategy>
@@ -33,10 +33,10 @@
                     <editable>true</editable>
                     <description></description>
                     <key>buildName</key>
-                    <multiple>false</multiple>
+					<multiple>false</multiple>
+					<sort>false</sort>
+					<show>true</show>
                     <value></value>
-                    <sort>false</sort>
-                    <show>true</show>
                 </parameter>
                 <parameter>
                     <name>
@@ -47,10 +47,62 @@
                     <editable>true</editable>
                     <description></description>
                     <key>buildNumber</key>
-                    <multiple>false</multiple>
+					<multiple>false</multiple>
+					<sort>false</sort>
+					<show>true</show>
                     <value></value>
+                </parameter>
+				<parameter>
+                    <name>
+                        <value lang="en">Jar Name</value>
+                    </name>
+                    <type>String</type>
+                    <required>false</required>
+                    <editable>true</editable>
+                    <description></description>
+                    <key>jarName</key>
+                    <multiple>false</multiple>
+                    <value>HelloWorld</value>
                     <sort>false</sort>
                     <show>true</show>
+                </parameter>
+                <parameter>
+                    <name>
+                        <value lang="en">MainClass Name</value>
+                    </name>
+                    <type>String</type>
+                    <required>false</required>
+                    <editable>true</editable>
+                    <description></description>
+                    <key>mainClassName</key>
+                    <multiple>false</multiple>
+                    <value>com.photon.phresco.HelloWorld</value>
+                    <sort>false</sort>
+                    <show>true</show>
+                </parameter>
+                <parameter>
+                    <name>
+                        <value lang="en">Environment</value>
+                    </name>
+                    <type>DynamicParameter</type>
+                    <dynamicParameter>
+                         <class>com.photon.phresco.impl.EnvironmentsParameterImpl</class>
+                        <dependencies>
+                            <dependency>
+								<groupId>com.photon.phresco.commons</groupId>
+								<artifactId>phresco-commons</artifactId>
+								<type>jar</type>
+								<version>3.1.0.7000</version>
+                            </dependency>
+                        </dependencies>
+                    </dynamicParameter>
+                    <required>true</required>
+                    <editable>true</editable>
+                    <key>environmentName</key>
+					<multiple>true</multiple>
+					<sort>false</sort>
+					<show>true</show>
+                    <value></value>
                 </parameter>
                 <parameter>
                     <name>
@@ -62,36 +114,12 @@
                     <description></description>
                     <key>showSettings</key>
                     <multiple>false</multiple>
+					<sort>false</sort>
+					<show>true</show>
                     <value>false</value>
-                    <sort>false</sort>
-                    <show>true</show>
                     <dependency>environmentName</dependency>
                 </parameter>
-                <parameter>
-                    <name>
-                        <value lang="en">Environment</value>
-                    </name>
-                    <type>DynamicParameter</type>
-                    <dynamicParameter>
-                        <class>com.photon.phresco.impl.EnvironmentsParameterImpl</class>
-                        <dependencies>
-                            <dependency>
-<groupId>com.photon.phresco.commons</groupId>
-<artifactId>phresco-commons</artifactId>
-<type>jar</type>
-<version>3.2.0.2000</version>
-                            </dependency>
-                        </dependencies>
-                    </dynamicParameter>
-                    <required>true</required>
-                    <editable>true</editable>
-                    <key>environmentName</key>
-                    <multiple>true</multiple>
-                    <value>Testing</value>
-                    <sort>false</sort>
-                    <show>true</show>
-                </parameter>
-                <parameter>
+				<parameter>
                     <pluginParameter>plugin</pluginParameter>
                     <mavenCommands>
                         <mavenCommand>
@@ -111,10 +139,10 @@
                     <editable>true</editable>
                     <description></description>
                     <key>skipTest</key>
-                    <multiple>false</multiple>
-                    <value>true</value>
-                    <sort>false</sort>
-                    <show>true</show>
+					<multiple>false</multiple>
+					<sort>false</sort>
+					<show>true</show>
+                    <value>false</value>
                 </parameter>
                 <parameter>
                     <pluginParameter>framework</pluginParameter>
@@ -145,50 +173,11 @@
                         <value key="showDebug">Show Debug</value>
                     </possibleValues>
                     <multiple>false</multiple>
-                    <value>showErrors</value>
-                    <sort>false</sort>
-                    <show>true</show>
+					<sort>false</sort>
+					<show>true</show>
+                    <value></value>
                 </parameter>
-                <parameter>
-                    <pluginParameter>plugin</pluginParameter>
-                    <mavenCommands>
-                        <mavenCommand>
-                            <key>true</key>
-                            <value>-Dmaven.yuicompressor.skip=true</value>
-                        </mavenCommand>
-                        <mavenCommand>
-                            <key>false</key>
-                            <value>-Dmaven.yuicompressor.skip=false</value>
-                        </mavenCommand>
-                    </mavenCommands>
-                    <name>
-                        <value lang="en">Minify</value>
-                    </name>
-                    <type>Hidden</type>
-                    <required>false</required>
-                    <editable>true</editable>
-                    <description></description>
-                    <key>minify</key>
-                    <multiple>false</multiple>
-                    <value>true</value>
-                    <sort>false</sort>
-                    <show>false</show>
-                </parameter>
-                <parameter>
-                    <name>
-                        <value lang="en">Pack Minified Files</value>
-                    </name>
-                    <type>Boolean</type>
-                    <required>false</required>
-                    <editable>true</editable>
-                    <description></description>
-                    <key>packMinifiedFiles</key>
-                    <multiple>false</multiple>
-                    <value>false</value>
-                    <sort>false</sort>
-                    <show>true</show>
-                </parameter>
-                <parameter>
+				<parameter>
                     <name>
                         <value lang="en">Package File Browse</value>
                     </name>
@@ -201,37 +190,6 @@
                     <value></value>
                     <sort>false</sort>
                     <show>true</show>
-                </parameter>
-                 <parameter>
-                    <name>
-                        <value lang="en">Build Type</value>
-                    </name>
-                    <type>List</type>
-                    <required>false</required>
-                    <editable>true</editable>
-                    <key>packageType</key>
-                    <possibleValues>
-                        <value key="war">war</value>
-                        <value key="zip">zip</value>
-                    </possibleValues>
-                    <multiple>false</multiple>
-                    <value>war</value>
-                    <sort>false</sort>
-                    <show>true</show>
-                </parameter>
-                <parameter>
-                    <name>
-                        <value lang="en">Module</value>
-                    </name>
-                    <type>Hidden</type>
-                    <required>false</required>
-                    <editable>true</editable>
-                    <description></description>
-                    <key>projectModule</key>
-                    <multiple>false</multiple>
-                    <value>phresco-service-web</value>
-                    <sort>false</sort>
-                    <show>false</show>
                 </parameter>
             </parameters>
         </configuration>
