@@ -423,6 +423,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 			newAppInfo.setPomFile(appInfo.getPomFile());
 			newAppInfo.setRootModule(moduleInfo.getRootModule());
 			newAppInfo.setModules(null);
+			newAppInfo.setId(moduleInfo.getId());
 			newAppInfo.setName(moduleInfo.getCode());
 		} else {
 			newAppInfo = appInfo;
