@@ -481,11 +481,8 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 				.append(version)
 				.append(Constants.STR_BLANK_SPACE)
 				.append(ARCHETYPE_GROUPID)
-				.append(Constants.STR_EQUALS);
-				if (StringUtils.isEmpty(groupId)) {
-					groupId = "com.photon.phresco";
-				}
-				commandStr.append(groupId)
+				.append(Constants.STR_EQUALS)
+				.append(groupId)
 				.append(Constants.STR_BLANK_SPACE)
 				.append(ARCHETYPE_ARTIFACTID)
 				.append(Constants.STR_EQUALS)

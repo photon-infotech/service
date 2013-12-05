@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
 import org.springframework.http.MediaType;
@@ -151,7 +152,7 @@ public class ProjectService extends DbService {
 			File pomFile = new File(tempFolderPath + File.separator + applicationInfo.getAppDirName(), "pom.xml");
 			try {
 				PomProcessor processor = new PomProcessor(pomFile);
-				processor.setGroupId("com.photon.phresco");
+				processor.setGroupId(projectInfo.getGroupId());
 				processor.setArtifactId(applicationInfo.getCode());
 				processor.setVersion(applicationInfo.getVersion());
 				processor.setPackaging("pom");
@@ -179,7 +180,7 @@ public class ProjectService extends DbService {
 				for (String appCode : dependentModules) {
 					ApplicationInfo depApp = getApplicationInfo(appCode, projectInfo.getAppInfos());
 					File file = new File(tempFolderPath + File.separator + applicationInfo.getCode() + File.separator + "pom.xml");
-					addDependency(depApp, file,	projectInfo.getVersion());
+					addDependency(depApp, file,	projectInfo.getVersion(), projectInfo.getGroupId());
 				}
 			}
 			if(CollectionUtils.isNotEmpty(applicationInfo.getModules())) {
@@ -199,7 +200,7 @@ public class ProjectService extends DbService {
 					if(applicationInfo != null) {
 						File file = new File(tempFolderPath + File.separator + appCode + 
 							File.separator + moduleInfo.getCode() + File.separator + "pom.xml");
-						addDependency(applicationInfo, file, projectInfo.getVersion());
+						addDependency(applicationInfo, file, projectInfo.getVersion(), projectInfo.getGroupId());
 					}
 				}
 			}
@@ -209,7 +210,7 @@ public class ProjectService extends DbService {
 					if(depModule != null) {
 						File file = new File(tempFolderPath + File.separator + appCode + File.separator + 
 								moduleInfo.getCode() + File.separator + "pom.xml");
-						addModuleInfoDependency(depModule, file, projectInfo.getVersion());
+						addModuleInfoDependency(depModule, file, projectInfo.getVersion(), projectInfo.getGroupId());
 					}
 				}
 			}
@@ -225,20 +226,20 @@ public class ProjectService extends DbService {
 		return null;
 	}
 	
-	private void addModuleInfoDependency(ModuleInfo moduleInfo, File pomFile, String version) throws PhrescoException {
+	private void addModuleInfoDependency(ModuleInfo moduleInfo, File pomFile, String version, String groupId) throws PhrescoException {
 		try {
 			PomProcessor processor = new PomProcessor(pomFile);
-			processor.addDependency("com.photon.phresco", moduleInfo.getCode(), version);
+			processor.addDependency(groupId, moduleInfo.getCode(), version);
 			processor.save();
 		} catch (PhrescoPomException e) {
 			throw new PhrescoException(e);
 		}
 	}
 	
-	private void addDependency(ApplicationInfo applicationInfo, File pomFile, String version) throws PhrescoException {
+	private void addDependency(ApplicationInfo applicationInfo, File pomFile, String version, String groupId) throws PhrescoException {
 		try {
 			PomProcessor processor = new PomProcessor(pomFile);
-			processor.addDependency("com.photon.phresco", applicationInfo.getCode(), version);
+			processor.addDependency(groupId, applicationInfo.getCode(), version);
 			processor.save();
 		} catch (PhrescoPomException e) {
 			throw new PhrescoException(e);
@@ -349,6 +350,9 @@ public class ProjectService extends DbService {
 	}
 	
 	private ProjectInfo cloneProjectInfo(ProjectInfo projectInfo, int i) {
+		if(StringUtils.isEmpty(projectInfo.getGroupId())) {
+			projectInfo.setGroupId("com.photon.phresco");
+		}
 		ProjectInfo clonedProjectInfo = projectInfo.clone();
 		ApplicationInfo applicationInfo = clonedProjectInfo.getAppInfos().get(i);
 		applicationInfo.setPomFile("pom.xml");
