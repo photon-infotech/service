@@ -225,8 +225,8 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 				if(CollectionUtils.isNotEmpty(appliesTo)) {
 					for (RequiredOption requiredOption : appliesTo) {
 						if (requiredOption.isRequired() && requiredOption.getTechId().equals(appInfo.getTechInfo().getId())) {
-							ArtifactGroup selectedartifactGroup = dbManager.getArtifactGroup(artifactInfo.getArtifactGroupId());
-							listArtifactGroup.add(selectedartifactGroup);
+							ArtifactGroup clonedArtifactGroupObject = cloneArtifactGroupObject(artifactGroup, artifactInfo);
+							listArtifactGroup.add(clonedArtifactGroupObject);
 							selectedFeatures.add(artifactInfo.getId());
 							break;
 						}
@@ -247,7 +247,8 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 					for (RequiredOption requiredOption : appliesTo) {
 						if (requiredOption.isRequired() && requiredOption.getTechId().equals(appInfo.getTechInfo().getId())) {
 							ArtifactGroup selectedartifactGroup = dbManager.getArtifactGroup(artifactInfo.getArtifactGroupId());
-							listArtifactGroup.add(selectedartifactGroup);
+							ArtifactGroup clonedArtifactGroupObject = cloneArtifactGroupObject(artifactGroup, artifactInfo);
+							listArtifactGroup.add(clonedArtifactGroupObject);
 							selectedJsLibs.add(artifactInfo.getId());
 							break;
 						}
@@ -266,8 +267,8 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 				if(CollectionUtils.isNotEmpty(appliesTo)) {
 					for (RequiredOption requiredOption : appliesTo) {
 						if (requiredOption.isRequired() && requiredOption.getTechId().equals(appInfo.getTechInfo().getId())) {
-							ArtifactGroup selectedartifactGroup = dbManager.getArtifactGroup(artifactInfo.getArtifactGroupId());
-							listArtifactGroup.add(selectedartifactGroup);
+							ArtifactGroup clonedArtifactGroupObject = cloneArtifactGroupObject(artifactGroup, artifactInfo);
+							listArtifactGroup.add(clonedArtifactGroupObject);
 							selectedComponentids.add(artifactInfo.getId());
 							break;
 						}
@@ -321,11 +322,10 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 						dependencies.add(artifactGroup);
 					}
 				}
-
+				
 				if (CollectionUtils.isNotEmpty(dependencies)) {
 					projectUtils.updatePOMWithModules(pomFile, dependencies);
 				}
-
 				if (CollectionUtils.isNotEmpty(artifacts)) {
 					if (phrescoPomFile.exists()) {
 						projectUtils.updateToDependencyPlugin(phrescoPomFile, artifacts);
@@ -385,6 +385,47 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 		File projectInfoPath = new File(sbuilder.toString());
 		ProjectInfo clonedProjInfo = cloneProjInfo(projectInfo, appInfo, moduleInfo);
 		ProjectUtils.updateProjectInfo(clonedProjInfo, projectInfoPath);
+	}
+
+	private ArtifactGroup cloneArtifactGroupObject(ArtifactGroup artifactGroup, ArtifactInfo artifactInfo) {
+		ArtifactGroup newArtifactGroup = new ArtifactGroup();
+		newArtifactGroup.setAppliesTo(artifactGroup.getAppliesTo());
+		newArtifactGroup.setArtifactId(artifactGroup.getArtifactId());
+		newArtifactGroup.setCreationDate(artifactGroup.getCreationDate());
+		newArtifactGroup.setCustomerIds(artifactGroup.getCustomerIds());
+		newArtifactGroup.setDescription(artifactGroup.getDescription());
+		newArtifactGroup.setDisplayName(artifactGroup.getDisplayName());
+		newArtifactGroup.setGroupId(artifactGroup.getGroupId());
+		newArtifactGroup.setHelpText(artifactGroup.getHelpText());
+		newArtifactGroup.setId(artifactGroup.getId());
+		newArtifactGroup.setImageURL(artifactGroup.getImageURL());
+		newArtifactGroup.setLicenseId(artifactGroup.getLicenseId());
+		newArtifactGroup.setName(artifactGroup.getName());
+		newArtifactGroup.setPackaging(artifactGroup.getPackaging());
+		newArtifactGroup.setStatus(artifactGroup.getStatus());
+		newArtifactGroup.setSystem(artifactGroup.isSystem());
+		newArtifactGroup.setType(artifactGroup.getType());
+		
+		List<ArtifactInfo> artifactInfos = new ArrayList<ArtifactInfo>();
+		ArtifactInfo artfInfo = new ArtifactInfo();
+		artfInfo.setAppliesTo(artifactInfo.getAppliesTo());
+		artfInfo.setArtifactGroupId(artifactInfo.getArtifactGroupId());
+		artfInfo.setDescription(artifactInfo.getDescription());
+		artfInfo.setDisplayName(artifactInfo.getDisplayName());
+		artfInfo.setDownloadURL(artifactInfo.getDownloadURL());
+		artfInfo.setVersion(artifactInfo.getVersion());
+		artfInfo.setDependencyIds(artifactInfo.getDependencyIds());
+		artfInfo.setHelpText(artifactInfo.getHelpText());
+		artfInfo.setId(artifactInfo.getId());
+		artfInfo.setName(artifactInfo.getName());
+		artfInfo.setScope(artifactInfo.getScope());
+		artfInfo.setStatus(artifactInfo.getStatus());
+		artfInfo.setSystem(artifactInfo.isSystem());
+		artfInfo.setUsed(artifactInfo.isUsed());
+		artifactInfos.add(artfInfo);
+		newArtifactGroup.setVersions(artifactInfos);
+		
+		return newArtifactGroup;
 	}
 	
 	private ProjectInfo cloneProjInfo(ProjectInfo projectInfo, ApplicationInfo appInfo, ModuleInfo moduleInfo) throws PhrescoException {

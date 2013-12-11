@@ -317,12 +317,14 @@ public class ProjectService extends DbService {
 		for (int i = 0; i < infos.size(); i++) {
 			ArtifactGroupDAO group = DbService.getMongoOperation().findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
 					new Query(Criteria.whereId().is(infos.get(i).getArtifactGroupId())), ArtifactGroupDAO.class);
-			if(! (i == 0)) {
-				buffer.append(",");
+			if (group != null) {
+				if(! (i == 0)) {
+					buffer.append(",");
+				}
+				buffer.append("feature" + j + "_name=" + "\""+ group.getName() + "\"" + ",");
+				buffer.append("feature" + j + "_version=" + "\""+ infos.get(i).getVersion() + "\"");
+				j++;
 			}
-			buffer.append("feature" + j + "_name=" + "\""+ group.getName() + "\"" + ",");
-			buffer.append("feature" + j + "_version=" + "\""+ infos.get(i).getVersion() + "\"");
-			j++;
 		}
 		return buffer.toString();
 	}
@@ -339,12 +341,14 @@ public class ProjectService extends DbService {
 		for (int i = 0; i < infos.size(); i++) {
 			ArtifactGroupDAO group = DbService.getMongoOperation().findOne(ARTIFACT_GROUP_COLLECTION_NAME, 
 					new Query(Criteria.whereId().is(infos.get(i).getArtifactGroupId())), ArtifactGroupDAO.class);
-			if(! (i == 0)) {
-				buffer.append(",");
+			if (group != null) {
+				if(! (i == 0)) {
+					buffer.append(",");
+				}
+				buffer.append("jslibrary" + j + "_name=" + "\""+ group.getName() + "\"" + ",");
+				buffer.append("jslibrary" + j + "_version=" + "\""+ infos.get(i).getVersion() + "\"");
+				j++;
 			}
-			buffer.append("jslibrary" + j + "_name=" + "\""+ group.getName() + "\"" + ",");
-			buffer.append("jslibrary" + j + "_version=" + "\""+ infos.get(i).getVersion() + "\"");
-			j++;
 		}
 		return buffer.toString();
 	}
