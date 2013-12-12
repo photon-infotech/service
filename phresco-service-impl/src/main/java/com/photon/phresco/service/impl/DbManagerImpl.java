@@ -515,7 +515,7 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
 		query.addCriteria(typeCriteria);
 		List<ArtifactGroupDAO> daos = DbService.getMongoOperation().find(ARTIFACT_GROUP_COLLECTION_NAME, query, ArtifactGroupDAO.class);
 		Converter<ArtifactGroupDAO, ArtifactGroup> converter = 
-			(Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getFrameworkConverter(ArtifactGroupDAO.class);
+			(Converter<ArtifactGroupDAO, ArtifactGroup>) ConvertersFactory.getConverter(ArtifactGroupDAO.class);
 		for (ArtifactGroupDAO artifactGroupDAO : daos) {
 			artifactGroups.add(converter.convertDAOToObject(artifactGroupDAO, DbService.getMongoOperation()));
 		}

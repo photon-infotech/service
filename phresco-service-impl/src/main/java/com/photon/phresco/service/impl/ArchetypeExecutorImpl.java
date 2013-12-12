@@ -180,7 +180,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 			builder.append(appInfo.getAppDirName());
 		}
 		builder.append(File.separator);
-		builder.append(getPhrescoPomFile(tempFolderPath, appInfo).getName());
+		builder.append(getPhrescoPomFile(tempFolderPath, appInfo.getAppDirName()).getName());
 		File pomFile = new File(builder.toString());
 		try {
 			PomProcessor processor = new PomProcessor(pomFile);
@@ -198,8 +198,8 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 		}
 	}
 	
-	private File getPhrescoPomFile(File tempPath, ApplicationInfo appInfo) {
-		File appDir = new File(tempPath, appInfo.getAppDirName());
+	private File getPhrescoPomFile(File tempPath, String appDirName) {
+		File appDir = new File(tempPath, appDirName);
 		File file = new File(appDir, "phresco-pom.xml");
 		if(file.exists()) {
 			return file;
@@ -246,7 +246,6 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 				if(CollectionUtils.isNotEmpty(appliesTo)) {
 					for (RequiredOption requiredOption : appliesTo) {
 						if (requiredOption.isRequired() && requiredOption.getTechId().equals(appInfo.getTechInfo().getId())) {
-							ArtifactGroup selectedartifactGroup = dbManager.getArtifactGroup(artifactInfo.getArtifactGroupId());
 							ArtifactGroup clonedArtifactGroupObject = cloneArtifactGroupObject(artifactGroup, artifactInfo);
 							listArtifactGroup.add(clonedArtifactGroupObject);
 							selectedJsLibs.add(artifactInfo.getId());
@@ -292,7 +291,13 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 		Gson gson = new Gson();
 		if(CollectionUtils.isNotEmpty(listArtifactGroup)) {
             ProjectUtils projectUtils = new ProjectUtils();
-            File rootPomFile = getPhrescoPomFile(new File(tempFolderPath), appInfo);
+            File rootPomFile;
+            if(moduleInfo != null) {
+            	rootPomFile = getPhrescoPomFile(new File(tempFolderPath), moduleInfo.getCode());
+            } else {
+            	rootPomFile = getPhrescoPomFile(new File(tempFolderPath), appInfo.getAppDirName());
+            }
+            
             PomProcessor pomprocessor = new PomProcessor(rootPomFile);
             String sourceDir = pomprocessor.getProperty("phresco.source.dir");
             StringBuilder appPath = new StringBuilder(tempFolderPath).append(File.separator);
@@ -424,7 +429,6 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 		artfInfo.setUsed(artifactInfo.isUsed());
 		artifactInfos.add(artfInfo);
 		newArtifactGroup.setVersions(artifactInfos);
-		
 		return newArtifactGroup;
 	}
 	
