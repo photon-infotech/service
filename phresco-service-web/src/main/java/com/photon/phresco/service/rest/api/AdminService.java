@@ -26,9 +26,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
@@ -48,6 +51,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.google.gson.Gson;
 import com.photon.phresco.commons.model.ArtifactGroup;
@@ -148,10 +153,12 @@ public class AdminService extends DbService {
     public @ResponseBody byte[] getIcon(HttpServletResponse response, 
     		@ApiParam(value = "The Id of the customer to get icon", name = REST_QUERY_CUSTOMERID) @QueryParam(REST_QUERY_CUSTOMERID) 
     		String customerId, @ApiParam(value = "The context of the customer to get icon", name = "Context") 
-    		@QueryParam("context") String context) throws PhrescoException {
+    		@QueryParam("context") String context, @ApiParam(value = "Request for favicon", name = "favIcon") 
+    		@QueryParam("favIcon") String favIcon) throws PhrescoException {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.getIcon(String id)");
         }
+        boolean isFavIcon = Boolean.valueOf(favIcon);
         byte[] byteArray = null;
         InputStream iconStream = null;
 		CustomerDAO customerDAO =  null;
@@ -184,6 +191,9 @@ public class AdminService extends DbService {
 		Customer customer = converter.convertDAOToObject(customerDAO, DbService.getMongoOperation());
         String repourl = customer.getRepoInfo().getGroupRepoURL();
         String artifactId = filterString(customer.getName());
+        if(isFavIcon == true) {
+        	artifactId = artifactId + "favIcon";
+        }
         String contentURL = ServerUtil.createContentURL("customers", artifactId, "1.0", "png");
         try {
 			URL url = new URL(repourl + "/" + contentURL);
@@ -194,7 +204,7 @@ public class AdminService extends DbService {
 			iconStream = null;
 		}
 		if(iconStream == null) {
-        	byte[] icon = getIcon(response, "photon", "photon");
+        	byte[] icon = getIcon(response, "photon", "photon", favIcon);
         	if (icon != null) {
         		return icon;
         	} else {
@@ -263,17 +273,16 @@ public class AdminService extends DbService {
     @RequestMapping(value= REST_API_CUSTOMERS, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, 
     		MediaType.APPLICATION_JSON_VALUE,"multipart/mixed"}, 
     		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
-    public @ResponseBody void createCustomer(HttpServletRequest request, HttpServletResponse response, 
-    		@RequestPart(value = "icon", required = false) ByteArrayResource moduleFile,
+    public @ResponseBody void createCustomer(MultipartHttpServletRequest request, HttpServletResponse response,
     		@RequestParam(value = "customer", required = false) byte[] customerData) throws IOException {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.createCustomer(List<Customer> customer)");
         }
         Customer customer = new Gson().fromJson(new String(customerData), Customer.class);
-        saveCustomer(response, moduleFile, customer);
+        saveCustomer(response, request, customer);
     }
 
-    private Customer saveCustomer(HttpServletResponse response, ByteArrayResource moduleFile, Customer customer) {
+    private Customer saveCustomer(HttpServletResponse response, MultipartHttpServletRequest request, Customer customer) {
     	try {
     		if(validate(customer)) {
 				RepoInfo repoInfo = customer.getRepoInfo();
@@ -289,21 +298,32 @@ public class AdminService extends DbService {
                 DbService.getMongoOperation().save(REPOINFO_COLLECTION_NAME, customer.getRepoInfo());
 		        List<TechnologyDAO> techDAOs = DbService.getMongoOperation().find(TECHNOLOGIES_COLLECTION_NAME, 
 		        		new Query(Criteria.whereId().in(customerDAO.getApplicableTechnologies().toArray())), TechnologyDAO.class);
-                if(moduleFile!= null && moduleFile.getByteArray() != null) {
-                	byte[] iconStream = moduleFile.getByteArray();
-                    ArtifactGroup artifactGroup = new ArtifactGroup();
-                    artifactGroup.setGroupId("customers");
-                    artifactGroup.setArtifactId(filterString(customer.getName()));
-                    artifactGroup.setPackaging("png");
-                    artifactGroup.setCustomerIds(Collections.singletonList(customer.getId()));
-                    ArtifactInfo info = new ArtifactInfo();
-                    info.setVersion("1.0");
-                    artifactGroup.setVersions(Collections.singletonList(info));
-                    File artifcatFile = new File(ServerUtil.getTempFolderPath() + "/"
-                            + customer.getName() + "." + "png");
-                    ServerUtil.convertByteArrayToFile(artifcatFile, iconStream);
-                    uploadIcon(artifactGroup, artifcatFile);
-                }
+		        Map<String, MultipartFile> fileMap = request.getFileMap();
+		        Set<String> keySet = fileMap.keySet();
+		        if(CollectionUtils.isNotEmpty(keySet)) {
+		        	for (String key : keySet) {
+		        		MultipartFile multipartFile = fileMap.get(key);
+		        		if(multipartFile!= null && multipartFile.getBytes() != null) {
+		                	byte[] iconStream = multipartFile.getBytes();
+		                    ArtifactGroup artifactGroup = new ArtifactGroup();
+		                    artifactGroup.setGroupId("customers");
+		                    String artifactId = filterString(customer.getName());
+		                    if(key.equals("favIcon")) {
+		                    	artifactId = artifactId.concat(key);
+		                    }
+		                    artifactGroup.setArtifactId(artifactId);
+		                    artifactGroup.setPackaging("png");
+		                    artifactGroup.setCustomerIds(Collections.singletonList(customer.getId()));
+		                    ArtifactInfo info = new ArtifactInfo();
+		                    info.setVersion("1.0");
+		                    artifactGroup.setVersions(Collections.singletonList(info));
+		                    File artifcatFile = new File(ServerUtil.getTempFolderPath() + "/"
+		                            + customer.getName() + "." + "png");
+		                    ServerUtil.convertByteArrayToFile(artifcatFile, iconStream);
+		                    uploadIcon(artifactGroup, artifcatFile);
+		                }
+					}
+		        }
 		        if(CollectionUtils.isNotEmpty(techDAOs)) {
 		        	for (TechnologyDAO technologyDAO : techDAOs) {
 						List<String> customerIds = technologyDAO.getCustomerIds();
@@ -359,13 +379,13 @@ public class AdminService extends DbService {
     @RequestMapping(value= REST_API_CUSTOMERS, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, 
     		MediaType.APPLICATION_JSON_VALUE,"multipart/mixed"}, 
     		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
-    public @ResponseBody void updateCustomer(HttpServletResponse response, @RequestPart(value = "icon", required = false) ByteArrayResource moduleFile,
+    public @ResponseBody void updateCustomer(HttpServletResponse response, MultipartHttpServletRequest multipartHttpServletRequest,
     		@RequestParam(value = "customer", required = false) byte[] customerData) throws IOException {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.updateCustomer(List<Customer> customers)");
         }
         Customer customer = new Gson().fromJson(new String(customerData), Customer.class);
-        saveCustomer(response, moduleFile, customer);
+        saveCustomer(response, multipartHttpServletRequest, customer);
     }
 
     /**
