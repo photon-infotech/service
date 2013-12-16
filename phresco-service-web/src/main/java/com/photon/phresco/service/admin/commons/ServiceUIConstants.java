@@ -67,6 +67,8 @@ public interface ServiceUIConstants {
 	String ABOUT = "about";
 	String USER_JSON = "user.json";
 	String PHOTON = "photon";
+	String FAV_ICON = "favIcon";
+	String ICON = "icon";
     
 	/*****************************
      * Login Request Constants

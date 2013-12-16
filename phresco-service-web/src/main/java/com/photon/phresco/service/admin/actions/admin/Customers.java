@@ -54,7 +54,6 @@ public class Customers extends ServiceBaseAction  {
 	//private static final Logger S_LOGGER = Logger.getLogger(Customers.class);
 	private static Boolean isDebugEnabled = LOGGER.isDebugEnabled();
 	private static Map<String, InputStream> inputStreamMap = new HashMap<String, InputStream>();
-
 	private String customerId = "";
 
 	private String name = "";
@@ -95,6 +94,8 @@ public class Customers extends ServiceBaseAction  {
 	private boolean tempError = false;
 	private static String uploadIconName = "";
 	private static byte[] loginIconByteArray = null;
+	private static byte[] favImgIconByteArray = null;
+	private static byte[] iconImgByteArray = null;
 	private String icon = "";
 	private String snapshotRepoUrl = "";
 	private String groupRepoUrl = "";
@@ -242,6 +243,12 @@ public class Customers extends ServiceBaseAction  {
 			if (loginIconByteArray != null) {
 				inputStreamMap.put(getCustomerId(), new ByteArrayInputStream(loginIconByteArray));
 			}
+			if (favImgIconByteArray != null) {
+				inputStreamMap.put(FAV_ICON, new ByteArrayInputStream(favImgIconByteArray));
+			}
+			if (iconImgByteArray != null) {
+				inputStreamMap.put(ICON, new ByteArrayInputStream(iconImgByteArray));
+			}
 			getServiceManager().createCustomers(customer, getFromPage(), inputStreamMap);
 			addActionMessage(getText(CUSTOMER_ADDED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
@@ -285,6 +292,67 @@ public class Customers extends ServiceBaseAction  {
 		}
 		return SUCCESS;
 	}
+	
+	
+	/**
+	 * To update fav Image Icon  selected customer
+	 * @param cutomerId
+	 * @throws PhrescoException
+	 */	
+	public String favIconImage() throws PhrescoException {
+		if (isDebugEnabled) {
+			LOGGER.debug("Customers.uploadImage : Entry");
+		}
+		PrintWriter writer = null;
+		try {
+			writer = getHttpResponse().getWriter();
+			favImgIconByteArray = getByteArray();
+			writer.print(SUCCESS_TRUE);
+			writer.flush();
+			writer.close();
+		} catch (Exception e) {
+			//If upload fails it will be shown in UI, so need not to throw error popup
+			if(isDebugEnabled) {
+				LOGGER.error("Customers.uploadImage", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
+			getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
+			writer.print(SUCCESS_FALSE);
+		}
+		if (isDebugEnabled) {
+			LOGGER.debug("Customers.uploadImage : Exit");
+		}
+		return SUCCESS;
+	}
+	
+	/**
+	 * To update Icon Image selected customer
+	 * @param cutomerId
+	 * @throws PhrescoException
+	 */	
+	public String mainlogoImage() throws PhrescoException {
+		if (isDebugEnabled) {
+			LOGGER.debug("Customers.uploadImage : Entry");
+		}
+		PrintWriter writer = null;
+		try {
+			writer = getHttpResponse().getWriter();
+			iconImgByteArray = getByteArray();
+			writer.print(SUCCESS_TRUE);
+			writer.flush();
+			writer.close();
+		} catch (Exception e) {
+			//If upload fails it will be shown in UI, so need not to throw error popup
+			if(isDebugEnabled) {
+				LOGGER.error("Customers.uploadImage", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
+			getHttpResponse().setStatus(getHttpResponse().SC_INTERNAL_SERVER_ERROR);
+			writer.print(SUCCESS_FALSE);
+		}
+		if (isDebugEnabled) {
+			LOGGER.debug("Customers.uploadImage : Exit");
+		}
+		return SUCCESS;
+	}
 
 	/**
 	 * remove the icon image from byteArray and Map 
@@ -297,6 +365,8 @@ public class Customers extends ServiceBaseAction  {
 		}
 		inputStreamMap.clear();
 		loginIconByteArray = null;
+		favImgIconByteArray = null;
+		iconImgByteArray = null;
 
 		if (isDebugEnabled) {
 			LOGGER.debug("Customers.removeImage : Exit");
@@ -320,6 +390,12 @@ public class Customers extends ServiceBaseAction  {
 			Customer customer = createCustomer();
 			if (loginIconByteArray != null) {
 				inputStreamMap.put(getCustomerId(), new ByteArrayInputStream(loginIconByteArray));
+			}
+			if (favImgIconByteArray != null) {
+				inputStreamMap.put("favIcon", new ByteArrayInputStream(favImgIconByteArray));
+			}
+			if (iconImgByteArray != null) {
+				inputStreamMap.put("icon", new ByteArrayInputStream(iconImgByteArray));
 			}
 			getServiceManager().createCustomers(customer, getFromPage(), inputStreamMap);
 			addActionMessage(getText(CUSTOMER_UPDATED, Collections.singletonList(getName())));

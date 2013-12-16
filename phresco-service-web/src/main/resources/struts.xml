@@ -479,6 +479,14 @@
 			<result type="json" />
         </action>
         
+        <action name="uploadFavImgIcon" class="com.photon.phresco.service.admin.actions.admin.Customers" method="favIconImage">
+			<result type="json" />
+        </action>
+        
+        <action name="uploadmainlogoIcon" class="com.photon.phresco.service.admin.actions.admin.Customers" method="mainlogoImage">
+			<result type="json" />
+        </action>
+        
         <action name="customerDelete" class="com.photon.phresco.service.admin.actions.admin.Customers" method="delete">
 			<result name="customerList">/admin/pages/admin/customer/list.jsp</result>
         </action>

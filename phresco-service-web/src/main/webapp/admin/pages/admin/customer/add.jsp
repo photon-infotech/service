@@ -996,7 +996,7 @@
 						
 						<div class="control-group" id="iconControl">
 							<label class="control-label labelbold"> 
-							 	<s:text name='LoginLogoImage' />
+							 	<s:text name='lbr.login.logo.image' />
 							</label>
 							<div class="controls" style="float: left; margin-left: 3%;">
 								<div id="login-image-file-uploader" class="file-uploader" title ="<s:text name='title.icon.size'/>">
@@ -1008,6 +1008,37 @@
 							</div>
 							<span class="help-inline fileError" id="iconError"></span>
 						</div>
+						
+						<div class="control-group" id="iconControl">
+							<label class="control-label labelbold"> 
+							 	<s:text name='lbl.fav.icon.image' />
+							</label>
+							<div class="controls" style="float: left; margin-left: 3%;">
+								<div id="fav-icon-image-file-uploader" class="file-uploader" title ="<s:text name='title.icon.size'/>">
+									<noscript>
+										<p>Please enable JavaScript to use file uploader.</p>s
+										<!-- or put a simple form for upload here -->
+									</noscript>
+								</div>
+							</div>
+							<span class="help-inline fileError" id="iconError"></span>
+						</div>
+						
+						<div class="control-group" id="iconControl">
+							<label class="control-label labelbold"> 
+							 	<s:text name='lbl.main.logo.image' />
+							</label>
+							<div class="controls" style="float: left; margin-left: 3%;">
+								<div id="icon-image-file-uploader" class="file-uploader" title ="<s:text name='title.icon.size'/>">
+									<noscript>
+										<p>Please enable JavaScript to use file uploader.</p>s
+										<!-- or put a simple form for upload here -->
+									</noscript>
+								</div>
+							</div>
+							<span class="help-inline fileError" id="iconError"></span>
+						</div>
+						
 					</section>
 				</div>
 			</div>
@@ -1043,6 +1074,8 @@
 		setLicenseType();
 		setUIType();
 		createLoginLogoUploader();
+		favIconImageUploader();
+		mainlogoUploader();
 		checkboxEvent($('#checkAllAuto'),'applsChk');
 		checkboxEvent($('#checkAllOptions'), 'optionsChk');
 		 // for edit - to show selected country while page loads 
@@ -1142,6 +1175,36 @@
             params: {type: 'customerImageFile'}, 
             debug: true
         });
+	}
+	
+	function favIconImageUploader() {
+		var favIconImgUploader = new qq.FileUploader ({
+			element: document.getElementById('fav-icon-image-file-uploader'),
+			action: 'uploadFavImgIcon',
+			multiple: false,
+            allowedExtensions : ["png"],
+            uploadId: 'customerUploadId',
+            type: 'favIconImageFile',
+            buttonLabel: '<s:label key="lbl.hdr.adm.upload.login.logo" />',
+            typeError : '<s:text name="err.invalid.img.file" />',
+            params: {type: 'customerImageFile'}, 
+            debug: true
+		});
+	}
+	
+	function mainlogoUploader() {
+		var iconImgUploader = new qq.FileUploader ({
+			element: document.getElementById('icon-image-file-uploader'),
+			action: 'uploadmainlogoIcon',
+			multiple: false,
+            allowedExtensions : ["png"],
+            uploadId: 'customerUploadId',
+            type: 'mainiconImageFile',
+            buttonLabel: '<s:label key="lbl.hdr.adm.upload.login.logo" />',
+            typeError : '<s:text name="err.invalid.img.file" />',
+            params: {type: 'customerImageFile'}, 
+            debug: true
+		});
 	}
 	
 	function removeUploadedJar(obj, btnId) {

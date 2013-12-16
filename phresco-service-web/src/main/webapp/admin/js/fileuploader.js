@@ -308,7 +308,7 @@ qq.FileUploaderBasic = function(o){
         				if(o.type === "pluginJar"){
         					fillTextBoxes(responseJSON, o.type, fileName);
         				}
-        				if (o.type === "uploadIcon"  || o.type == "customerImageFile") {
+        				if (o.type === "uploadIcon"  || o.type == "customerImageFile" || o.type == "favIconImageFile" || o.type == "mainiconImageFile") {
         					enableDisableUploads(o.type, $(o.element));// to disable the upload Icon Button when a image is uploaded successfully
         				}
         				if (o.type === "pluginJar"){

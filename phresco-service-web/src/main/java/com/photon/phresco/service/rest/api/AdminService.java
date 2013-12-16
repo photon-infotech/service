@@ -154,11 +154,13 @@ public class AdminService extends DbService {
     		@ApiParam(value = "The Id of the customer to get icon", name = REST_QUERY_CUSTOMERID) @QueryParam(REST_QUERY_CUSTOMERID) 
     		String customerId, @ApiParam(value = "The context of the customer to get icon", name = "Context") 
     		@QueryParam("context") String context, @ApiParam(value = "Request for favicon", name = "favIcon") 
-    		@QueryParam("favIcon") String favIcon) throws PhrescoException {
+    		@QueryParam("favIcon") String favIcon,@ApiParam(value = "Request for loginIcon", name = "loginIcon") 
+    		@QueryParam("loginIcon") String loginIcon) throws PhrescoException {
         if (isDebugEnabled) {
             S_LOGGER.debug("Entered into AdminService.getIcon(String id)");
         }
         boolean isFavIcon = Boolean.valueOf(favIcon);
+        boolean isLogIcon = Boolean.valueOf(loginIcon);
         byte[] byteArray = null;
         InputStream iconStream = null;
 		CustomerDAO customerDAO =  null;
@@ -191,8 +193,10 @@ public class AdminService extends DbService {
 		Customer customer = converter.convertDAOToObject(customerDAO, DbService.getMongoOperation());
         String repourl = customer.getRepoInfo().getGroupRepoURL();
         String artifactId = filterString(customer.getName());
-        if(isFavIcon == true) {
+        if(isFavIcon) {
         	artifactId = artifactId + "favIcon";
+        } else if(isLogIcon) {
+        	artifactId = artifactId + "icon";
         }
         String contentURL = ServerUtil.createContentURL("customers", artifactId, "1.0", "png");
         try {
@@ -204,7 +208,7 @@ public class AdminService extends DbService {
 			iconStream = null;
 		}
 		if(iconStream == null) {
-        	byte[] icon = getIcon(response, "photon", "photon", favIcon);
+        	byte[] icon = getIcon(response, "photon", "photon", favIcon, loginIcon);
         	if (icon != null) {
         		return icon;
         	} else {
@@ -309,6 +313,8 @@ public class AdminService extends DbService {
 		                    artifactGroup.setGroupId("customers");
 		                    String artifactId = filterString(customer.getName());
 		                    if(key.equals("favIcon")) {
+		                    	artifactId = artifactId.concat(key);
+		                    } else if(key.equals("icon")) {
 		                    	artifactId = artifactId.concat(key);
 		                    }
 		                    artifactGroup.setArtifactId(artifactId);
