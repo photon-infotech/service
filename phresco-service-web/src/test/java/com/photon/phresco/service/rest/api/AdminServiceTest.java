@@ -42,7 +42,7 @@ public class AdminServiceTest extends DbService implements ServiceConstants{
 		AdminService admin = new AdminService();
 		MockHttpServletResponse response = new MockHttpServletResponse();
 		HttpServletResponse httpServletResponse = (HttpServletResponse)response;
-		byte[] icon = admin.getIcon(httpServletResponse, null, null,"false");
+		byte[] icon = admin.getIcon(httpServletResponse, null, null,"false","false");
 		Assert.assertNull(icon);
 	}
 	
@@ -51,7 +51,7 @@ public class AdminServiceTest extends DbService implements ServiceConstants{
 		AdminService admin = new AdminService();
 		MockHttpServletResponse response = new MockHttpServletResponse();
 		HttpServletResponse httpServletResponse = (HttpServletResponse)response;
-		byte[] icon = admin.getIcon(httpServletResponse, null, "wu", "false");
+		byte[] icon = admin.getIcon(httpServletResponse, null, "wu", "false","false");
 		Assert.assertNotNull(icon);
 	}
 	
