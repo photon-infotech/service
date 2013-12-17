@@ -117,6 +117,32 @@ public class ApplicationInfoDAO extends CustomerBaseDAO {
     private String functionalFramework;
     
     private FunctionalFrameworkInfo functionalFrameworkInfo;
+    
+    /**
+     * 
+     */
+
+    private boolean showServer;
+    
+    /**
+     * 
+     */
+    
+    private boolean showDatabase;
+    
+    /**
+     * 
+     */
+    
+    private boolean showWebservice;
+    
+    /**
+     * 
+     */
+    
+    private boolean showTestingFramework;
+    
+	
 
 	/**
 	 * @return the code
@@ -362,6 +388,62 @@ public class ApplicationInfoDAO extends CustomerBaseDAO {
 
 	public FunctionalFrameworkInfo getFunctionalFrameworkInfo() {
 		return functionalFrameworkInfo;
+	}
+	
+	/**
+	 * @return the show server
+	 */
+	public boolean isShowServer() {
+		return showServer;
+	}
+
+	/**
+	 * @param showServer the show server to set
+	 */
+	public void setShowServer(boolean showServer) {
+		this.showServer = showServer;
+	}
+
+	/**
+	 * @return the show database
+	 */
+	public boolean isShowDatabase() {
+		return showDatabase;
+	}
+
+	/**
+	 * @param showDatabase the show database to set
+	 */
+	public void setShowDatabase(boolean showDatabase) {
+		this.showDatabase = showDatabase;
+	}
+
+	/**
+	 * @return the show Webservice
+	 */
+	public boolean isShowWebservice() {
+		return showWebservice;
+	}
+
+	/**
+	 * @param showWebservice the show webservice to set
+	 */
+	public void setShowWebservice(boolean showWebservice) {
+		this.showWebservice = showWebservice;
+	}
+
+	/**
+	 * @return the show testing framework
+	 */
+	public boolean isShowTestingFramework() {
+		return showTestingFramework;
+	}
+
+	/**
+	 * @param showTestingFramework the show testing framework to set
+	 */
+	public void setShowTestingFramework(boolean showTestingFramework) {
+		this.showTestingFramework = showTestingFramework;
 	}
 
 	/**

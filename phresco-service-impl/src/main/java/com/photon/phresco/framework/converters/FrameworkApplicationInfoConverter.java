@@ -52,6 +52,10 @@ public class FrameworkApplicationInfoConverter implements Converter<ApplicationI
 		applicationInfo.setSystem(dao.isSystem());
 		applicationInfo.setFunctionalFramework(dao.getFunctionalFramework());
 		applicationInfo.setFunctionalFrameworkInfo(dao.getFunctionalFrameworkInfo());
+		applicationInfo.setShowServer(dao.isShowServer());
+		applicationInfo.setShowDatabase(dao.isShowDatabase());
+		applicationInfo.setShowWebservice(dao.isShowWebservice());
+		applicationInfo.setShowTestingFramework(dao.isShowTestingFramework());
 		return applicationInfo;
 	}
 
@@ -87,6 +91,10 @@ public class FrameworkApplicationInfoConverter implements Converter<ApplicationI
 		applicationInfoDAO.setPilot(applicationInfo.isPilot());
 		applicationInfoDAO.setFunctionalFramework(applicationInfo.getFunctionalFramework());
 		applicationInfoDAO.setFunctionalFrameworkInfo(applicationInfo.getFunctionalFrameworkInfo());
+		applicationInfoDAO.setShowServer(applicationInfo.isShowServer());
+		applicationInfoDAO.setShowDatabase(applicationInfo.isShowDatabase());
+		applicationInfoDAO.setShowWebservice(applicationInfo.isShowWebservice());
+		applicationInfoDAO.setShowTestingFramework(applicationInfo.isShowTestingFramework());
 		if (isDebugEnabled) {
 			LOGGER.debug("ApplicationInfoConverter.convertObjectToDAO:Exit");
 		}
