@@ -376,7 +376,10 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 		} else {
 			appInfo.setSelectedComponents(selectedComponentids);
 		}
-		File phrescoPomFile = new File(tempFolderPath + "/" + appInfo.getAppDirName(), "phresco-pom.xml");
+		File phrescoPomFile = new File(tempFolderPath, "phresco-pom.xml");
+		if (StringUtils.isNotEmpty(modName)) {
+			phrescoPomFile = new File(tempFolderPath + "/" + modName, "phresco-pom.xml");
+		}
 		if(phrescoPomFile.exists()) {
 			appInfo.setPhrescoPomFile("phresco-pom.xml");
 		}
