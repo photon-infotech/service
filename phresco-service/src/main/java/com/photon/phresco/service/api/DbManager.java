@@ -90,6 +90,8 @@ public interface DbManager {
     
     User authenticate(String username, String password) throws PhrescoException;
     
+	User authenticateUserId(String username) throws PhrescoException;
+
     ProjectInfo getProjectInfo(String projectInfoId) throws PhrescoException;
     
     List<VideoInfo> getVideos() throws PhrescoException;

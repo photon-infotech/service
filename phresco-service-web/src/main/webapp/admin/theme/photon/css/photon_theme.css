@@ -1145,3 +1145,7 @@ label.labellg {
 .loginfoot label {
     color: #333333 !important;
 }
+
+#forgotPassword {
+	 color: #000000; 
+}

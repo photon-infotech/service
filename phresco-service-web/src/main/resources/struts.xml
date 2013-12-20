@@ -41,6 +41,14 @@
 			method="logout">
 			<result name="success">/admin/login.jsp</result>
 		</action>
+		
+		 <action name="showForgotPwdPopup" method="showForgotPwdPopup" class="com.photon.phresco.service.admin.actions.Login">
+        	<result name="success">/admin/pages/forgotPassword.jsp</result>
+        </action>
+        
+        <action name="forgotPassword" method="forgotPassword" class="com.photon.phresco.service.admin.actions.Login">
+        	<result type="json" />
+        </action>
 	</package>
 	
     <package name="admin" extends="struts-default, json-default">
@@ -713,6 +721,16 @@
 		<action name="about" method="about" class="com.photon.phresco.service.admin.actions.Login">
         	<result name="about">/admin/pages/about.jsp</result>
         </action>
+        
+        <action name="showChangePwdPopup" method="showChangePwdPopup" class="com.photon.phresco.service.admin.actions.Login">
+        	<result name="success">/admin/pages/changePassword.jsp</result>
+        </action>
+        
+        <action name="changePassword" method="changePassword" class="com.photon.phresco.service.admin.actions.Login">
+        	<result type="json" />
+        </action>
+        
+        
                 
      	<action name="versionInfo" method="versionInfo" class="com.photon.phresco.service.admin.actions.Login">
         	<result type="json"/>

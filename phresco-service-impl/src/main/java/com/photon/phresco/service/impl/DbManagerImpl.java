@@ -439,6 +439,20 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
     	}
 		return DbService.getMongoOperation().findOne(USERS_COLLECTION_NAME, query, User.class);
 	}
+	
+	@Override
+	public User authenticateUserId(String username)
+			throws PhrescoException {
+		Query query = new Query();
+		Criteria nameCriteria = Criteria.where(REST_API_NAME).is(username);
+		Criteria typeCriteria = Criteria.where(AUTHTYPE).is(AuthType.LOCAL.name());
+		query = query.addCriteria(nameCriteria);
+		query = query.addCriteria(typeCriteria);
+		if(isDebugEnabled) {
+    		LOGGER.debug("DbManagerImpl.authenticate:Exit");
+    	}
+		return DbService.getMongoOperation().findOne(USERS_COLLECTION_NAME, query, User.class);
+	}
 
 	@Override
 	@SuppressWarnings("unchecked")

@@ -34,6 +34,10 @@
 	<script type="text/javascript" src="js/common.js"></script>
 	<script type="text/javascript" src="js/jquery.activity-indicator-1.0.0.js"></script>
 
+	<!-- Pop Up box -->
+		<script type="text/javascript" src="js/bootstrap-modal.js"></script>
+		<script type="text/javascript" src="js/bootstrap-transition.js"></script>
+
 	<link rel="stylesheet" href="css/bootstrap.css">
 	<link type="text/css" rel="stylesheet" href="theme/photon/css/phresco_default.css" id="phresco">
 	<link type="text/css" rel="stylesheet" class="changeme" title="phresco" href="theme/photon/css/photon_theme.css">
@@ -46,7 +50,7 @@ $(document).ready(function() {
 	if (localstore != null) {
 		applyTheme();
 	}
-    
+    $('#popupOk').css('color','white');
     <%
 		String cmdLogin = (String) request.getAttribute("cmdLogin");
 		if (cmdLogin != null) {
@@ -139,12 +143,40 @@ $(document).ready(function() {
 	                    <input type="submit" value="LOGIN" class="btn loginbutton" id="Login">
 	            	</div>
 	            </span>
+            	<a href="JavaScript:void(0);" id="forgotPassword" >Forgot Password</a>
 	            <input type="hidden" name="loginFirst" value="false"/>
 	            <input type="hidden" name="fromPage" value="<%= fromPage %>"/>
 			</div>	
 		</form>
 		</div>	
 	</div>	
+	<div id="loadingIconDiv" class="hideContent"> 
+			
+		</div>
+		
+			<!-- Popup div Starts-->
+	    <div class="popup_div" id="popup_div">
+	    
+	    </div>
+	    <!-- Popup div Ends-->
+	    
+	    <!-- Popup Starts-->
+	    <div id="popupPage" class="modal hide fade popup">
+			<div class="modal-header">
+				<a class="close" data-dismiss="modal" >&times;</a>
+				<h3 id="popupTitle"><s:text name='lbl.progress'/></h3>
+			</div>
+			<div class="modal-body" id="popupPage_modal-body">
+			</div>
+			<div class="modal-footer">
+				<div class="errMsg" id="reportMsg"></div>
+				<div class="popuploadingIcon" id="popuploadingIcon"></div>
+				<div id="updateMsg" class="updateMsg"></div>
+				<input type="button" class="btn btn-primary" data-dismiss="modal" id="popupCancel" value="Cancel"/>
+				<input type="button" class="btn btn-primary popupOk"  id="popupOk" onClick="popupOnOk(this);" value="Submit"/>
+			</div>
+		</div>
+	    <!-- Popup Ends -->
 </body>
 </html>
 <script type="text/javascript">
@@ -188,6 +220,10 @@ $(document).ready(function() {
 		document.cookie = "password=";
 		document.getElementById("rememberMe").checked=false;
 	}
+	$("#forgotPassword").click(function() {
+		console.info("enterd")
+		yesnoPopup('showForgotPwdPopup', 'Forgot Password', 'forgotPassword');
+	});
 
 //}
 </script>

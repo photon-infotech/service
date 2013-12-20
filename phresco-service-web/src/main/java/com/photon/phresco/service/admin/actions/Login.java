@@ -29,6 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.MediaType;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
@@ -46,7 +48,14 @@ import com.photon.phresco.exception.PhrescoWebServiceException;
 import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.admin.actions.admin.Videos;
 import com.photon.phresco.service.api.PhrescoServerFactory;
+import com.photon.phresco.service.client.impl.ClientHelper;
+import com.photon.phresco.service.util.ServerUtil;
+import com.photon.phresco.util.Credentials;
 import com.photon.phresco.util.Utility;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.WebResource.Builder;
 
 public class Login extends ServiceBaseAction {
 
@@ -58,6 +67,8 @@ public class Login extends ServiceBaseAction {
 
 	private String username = null;
 	private String password = null;
+	private String userId = null;
+	
 	private boolean loginFirst = true;
 	private String customerId = "";
 
@@ -66,6 +77,11 @@ public class Login extends ServiceBaseAction {
 	private String logoImgUrl = "";
 	private String copyRightColor = "";
 	private String copyRight = "";
+	
+	private String oldPassword = "";
+	private String newPassword = "";
+	
+	private String msg = "";
 
 	private static Map<String, String> s_encodeImgMap = new HashMap<String, String>();
 	private static Map<String, Map<String, String>> s_themeMap = new HashMap<String, Map<String, String>>();
@@ -121,7 +137,67 @@ public class Login extends ServiceBaseAction {
 
 		return SUCCESS;
 	}
+	
+	public String showForgotPwdPopup() {
+		if (isDebugEnabled) {
+			LOGGER.debug("Login.forgotpassword : Entry");
+		}
+		return SUCCESS;
+	}
+	
+	public String showChangePwdPopup() {
+		if (isDebugEnabled) {
+			LOGGER.debug("Login.changepassword : Entry");
+		}
+		return SUCCESS;
+	}
 
+	public String changePassword() throws PhrescoException {
+		if (isDebugEnabled) {
+			LOGGER.debug("Login.changepassword : Entry");
+		}
+		try {
+			User user = (User) getSessionAttribute(SESSION_USER_INFO);
+			List<Credentials> credentials = new ArrayList<Credentials>();
+			Credentials oldCred = new Credentials(user.getId(), getOldPassword());
+			Credentials newCred = new Credentials(user.getId(), getNewPassword());
+			credentials.add(oldCred);
+			credentials.add(newCred);
+			Boolean changePassword = getServiceManager().changePassword(credentials);
+			if (!changePassword) {
+				setMsg("Old password is incorrect");
+				return SUCCESS;
+			}
+			setMsg("Password changed successfully");
+		} catch (Exception e) {
+			throw new PhrescoException();
+		}
+		return SUCCESS;
+	}
+	
+	public String forgotPassword() throws PhrescoException {
+		if (isDebugEnabled) {
+			LOGGER.debug("Login.changepassword : Entry");
+		}
+		try{
+		Client client = ClientHelper.createClient();
+		WebResource resource = client.resource(PhrescoServerFactory.getServerConfig().getAdminServiceURL() + "/" + "login" + "/" +"forgotPassword");
+        Builder builder = resource.accept(MediaType.APPLICATION_JSON);        
+        ClientResponse response = null;
+        response = builder.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, getUserId());
+        Boolean result = response.getEntity(Boolean.class);
+		if (result ) {
+			setMsg("New password sent to email");
+			return SUCCESS;
+		}
+		
+		} catch (Exception e) {
+			setMsg("Failed");
+		}
+		setMsg("Failed");
+		return SUCCESS;
+	}
+	
 	public String fetchLogoImgUrl() {
 		InputStream fileInputStream = null;
 		try {
@@ -476,4 +552,41 @@ public class Login extends ServiceBaseAction {
 	public String getCopyRight() {
 		return copyRight;
 	}
+
+	public String getOldPassword() {
+		return oldPassword;
+	}
+
+	public void setOldPassword(String oldPassword) {
+		this.oldPassword = oldPassword;
+	}
+
+	public String getNewPassword() {
+		return newPassword;
+	}
+
+	public void setNewPassword(String newPassword) {
+		this.newPassword = newPassword;
+	}
+
+	public void setMsg(String msg) {
+		this.msg = msg;
+	}
+
+	public String getMsg() {
+		return msg;
+	}
+	
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+	public static void main(String[] args) throws PhrescoException {
+		Login login = new Login();
+		login.forgotPassword();
+	}
+
 }

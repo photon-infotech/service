@@ -126,7 +126,14 @@
 		    	
 		    	//Call for about service
 				$("#about, #abtPopUp").click(function() {
-					yesnoPopup('about', '<s:text name="lbl.abt.service"/>');
+					yesnoPopup('about', '<s:text name="lbl.abt.service"/>');0
+				});
+		    	
+		    	$("#changePassword").click(function() {
+// 					$(".popupOk").attr('data-dismiss', 'modal');
+// 		    		yesnoPopup('showChangePwdPopup', 'Change Password');
+		    		yesnoPopup('showChangePwdPopup', 'Change Password', "changePassword");
+		    		
 				});
 		    	
 		    	$("#goToHome").click(function() {
@@ -225,6 +232,7 @@
                                     </ul>
                                 </li>
                                 <li><a href="#" id="about" ><s:text name="lbl.usrset.abtservice"/></a></li>
+                                <li><a href="#" id="changePassword" >Change password</a></li>
                                 <li><a href="<s:url action='admin/logout'/>"><s:text name="lbl.usrset.signout"/></a></li>
                             </ul>
                         </div>
@@ -328,7 +336,7 @@
 	    <!-- Popup div Ends-->
 	    
 	    <!-- Popup Starts-->
-	    <div id="popupPage" class="modal hide fade">
+	    <div id="popupPage" class="modal hide fade popup">
 			<div class="modal-header">
 				<a class="close" data-dismiss="modal" >&times;</a>
 				<h3 id="popupTitle"><s:text name='lbl.progress'/></h3>
@@ -340,7 +348,7 @@
 				<div class="popuploadingIcon" id="popuploadingIcon"></div>
 				<div id="updateMsg" class="updateMsg"></div>
 				<input type="button" class="btn btn-primary" data-dismiss="modal" id="popupCancel" value="<s:text name='lbl.btn.cancel'/>"/>
-				<input type="button" class="btn btn-primary popupOk" onClick="popupOnOk(this);" value="<s:text name='lbl.btn.ok'/>"/>
+				<input type="button" class="btn btn-primary popupOk"  onClick="popupOnOk(this);" value="<s:text name='lbl.btn.ok'/>"/>
 			</div>
 		</div>
 	    <!-- Popup Ends -->
