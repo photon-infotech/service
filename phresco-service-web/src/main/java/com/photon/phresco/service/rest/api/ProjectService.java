@@ -155,6 +155,7 @@ public class ProjectService extends DbService {
 				processor.setGroupId(projectInfo.getGroupId());
 				processor.setArtifactId(applicationInfo.getCode());
 				processor.setVersion(applicationInfo.getVersion());
+				processor.getModel().setModelVersion("4.0.0");
 				processor.setPackaging("pom");
 				if(CollectionUtils.isNotEmpty(modules)) {
 					for (ModuleInfo moduleInfo : modules) {
