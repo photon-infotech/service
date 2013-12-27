@@ -22,7 +22,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -206,7 +208,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 		String srcDir = "";
         try {
         	PomProcessor pomprocessor = new PomProcessor(pomFile);
-        	srcDir = pomprocessor.getProperty("phresco.source.dir");;
+        	srcDir = pomprocessor.getProperty("source.dir");;
 		} catch (PhrescoPomException e) {
 			throw new PhrescoException(e);
 		}
@@ -241,16 +243,18 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
             	String pomPath = new StringBuilder(tempFolderPath).append(File.separator).append(appInfo.getAppDirName()).append(File.separator).
             		append(sourceDir).append(File.separator).append("pom.xml").toString();
             	pomFile = new File(pomPath);
-            }
+            } else {
 			String pomPath = new StringBuilder(tempFolderPath).append(File.separator).append(appInfo.getAppDirName()).append(File.separator)
     			.append("pom.xml").toString();
 			pomFile = new File(pomPath);
+            }
 		}
 		
 		List<String> selectedFeatures = new ArrayList<String>();
 		List<String> selectedJsLibs = new ArrayList<String>();
 		List<String> selectedComponentids = new ArrayList<String>();
 		List<ArtifactGroup> listArtifactGroup = new ArrayList<ArtifactGroup>();
+		Map<String, String> selectedFeatureMap = new HashMap<String, String>();
 		
 		//To add default feature
 		List<ArtifactGroup> modulesList = dbManager.findDefaultFeatures(appInfo.getTechInfo().getId(), "FEATURE", customerId);
@@ -369,6 +373,12 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 		if(phrescoPomFile.exists()) {
 			appInfo.setPhrescoPomFile("phresco-pom.xml");
 		}
+		
+		for (ArtifactGroup group : listArtifactGroup) {
+			String selectedScope = StringUtils.isNotEmpty(group.getVersions().get(0).getScope()) ? group.getVersions().get(0).getScope() : "";
+			selectedFeatureMap.put(group.getVersions().get(0).getId(), selectedScope);
+		}
+		appInfo.setSelectedFeatureMap(selectedFeatureMap);
 		projectInfo.setAppInfos(Collections.singletonList(appInfo));
 		StringBuilder sbuilder = new StringBuilder(tempFolderPath).append(File.separator);
 		if(StringUtils.isNotEmpty(modName)) {
