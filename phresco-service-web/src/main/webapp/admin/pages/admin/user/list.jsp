@@ -216,7 +216,8 @@
 	
 	function addUser() {
 		 showLoadingIcon();
-		loadContent('userAdd', $('#userListForm'), $('#subcontainer'));
+		 loadContent('userAdd', $('#userListForm'), $('#subcontainer'));
+		 hideLoadingIcon();
 	}
 	
 	function editUser(id) {

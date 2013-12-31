@@ -40,6 +40,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import com.google.gson.Gson;
 import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.Role;
 import com.photon.phresco.commons.model.User;
@@ -159,13 +160,13 @@ public class Login extends ServiceBaseAction {
 		try {
 			User user = (User) getSessionAttribute(SESSION_USER_INFO);
 			List<Credentials> credentials = new ArrayList<Credentials>();
-			Credentials oldCred = new Credentials(user.getId(), getOldPassword());
-			Credentials newCred = new Credentials(user.getId(), getNewPassword());
+			Credentials oldCred = new Credentials(user.getName(), getOldPassword());
+			Credentials newCred = new Credentials(user.getName(), getNewPassword());
 			credentials.add(oldCred);
 			credentials.add(newCred);
 			Boolean changePassword = getServiceManager().changePassword(credentials);
 			if (!changePassword) {
-				setMsg("Old password is incorrect");
+				setMsg("User not local");
 				return SUCCESS;
 			}
 			setMsg("Password changed successfully");
@@ -179,14 +180,16 @@ public class Login extends ServiceBaseAction {
 		if (isDebugEnabled) {
 			LOGGER.debug("Login.changepassword : Entry");
 		}
+        ClientResponse response = null;
 		try{
 		Client client = ClientHelper.createClient();
 		WebResource resource = client.resource(PhrescoServerFactory.getServerConfig().getAdminServiceURL() + "/" + "login" + "/" +"forgotPassword");
         Builder builder = resource.accept(MediaType.APPLICATION_JSON);        
-        ClientResponse response = null;
         response = builder.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, getUserId());
         Boolean result = response.getEntity(Boolean.class);
-		if (result ) {
+        System.out.println(response.getStatus());
+
+        if (result ) {
 			setMsg("New password sent to email");
 			return SUCCESS;
 		}
@@ -194,7 +197,10 @@ public class Login extends ServiceBaseAction {
 		} catch (Exception e) {
 			setMsg("Failed");
 		}
-		setMsg("Failed");
+		setMsg("User not local");
+		if(response.getStatus() == 500) {
+			setMsg("Invalid user");
+		}
 		return SUCCESS;
 	}
 	
