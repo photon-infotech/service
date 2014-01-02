@@ -94,19 +94,31 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 			String version = artifactInfo.getVersion();
 			String groupId = projectInfo.getGroupId();
 			if(projectInfo.isMultiModule()) {
+				
+				String rootFolderTempPath = tempFolderPath;
+				
+				commandString = "";
 				tempFolderPath = tempFolderPath + "/" + applicationInfo.getCode();
+				
 				if(CollectionUtils.isNotEmpty(applicationInfo.getModules())) {
 					for (ModuleInfo moduleInfo : applicationInfo.getModules()) {
 						archetypeInfo = dbManager.getArchetypeInfo(moduleInfo.getTechInfo().getId(), customerId);
 						version = archetypeInfo.getVersions().get(0).getVersion();
 						commandString = buildCommandString(moduleInfo.getCode(), techId, archetypeInfo.getGroupId(), 
 								archetypeInfo.getArtifactId(), version, repoInfo.getReleaseRepoURL(), projectInfo.getVersion(), customerId, groupId);
+						
 						executeCreateCommand(tempFolderPath, commandString, customerId, projectInfo);
 						updateDefaultFeatures(projectInfo, tempFolderPath, customerId, moduleInfo.getCode(), moduleInfo);
 						updateRepository(customerId, applicationInfo, new File(
 								tempFolderPath), moduleInfo.getCode());
 					}
+					
+					createMultiModuleObject(projectInfo, rootFolderTempPath,
+							applicationInfo, customerId, repoInfo, techId,
+							archetypeInfo, version, groupId);
 				}
+				
+				
 			} else {
 				commandString = buildCommandString(applicationInfo.getCode(), techId, archetypeInfo.getGroupId(), 
 						archetypeInfo.getArtifactId(), version,	repoInfo.getReleaseRepoURL(), projectInfo.getVersion(), customerId, groupId);
@@ -131,12 +143,29 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 			throw new PhrescoException(e);
 		}
 	}
+
+	private void createMultiModuleObject(ProjectInfo projectInfo,
+			String tempFolderPath, ApplicationInfo applicationInfo,
+			String customerId, RepoInfo repoInfo, String techId,
+			ArtifactGroup archetypeInfo, String version, String groupId)
+			throws PhrescoException {
+		String commandString;
+		String MULTI_MODULE_ARCHETYPE = "phresco-multimodule-archetype";
+		
+		commandString = buildCommandString(applicationInfo.getCode(), techId, archetypeInfo.getGroupId(), 
+				MULTI_MODULE_ARCHETYPE, version, repoInfo.getReleaseRepoURL(), projectInfo.getVersion(), customerId, groupId);
+		
+		executeCreateCommand(tempFolderPath, commandString, customerId, projectInfo);
+		
+	}
 	
 	private void executeCreateCommand(String tempFolderPath, String command, String customerId, ProjectInfo info) throws PhrescoException {
 		File file = new File(tempFolderPath);
+		
 		if (!file.exists()) {
 			file.mkdirs();
 		}
+		
 		BufferedReader bufferedReader = Utility.executeCommand(
 				command, tempFolderPath);
 		String line = null;
@@ -344,6 +373,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 		MojoProcessor mojo = new MojoProcessor(filePath);
 		ApplicationHandler handler = mojo.getApplicationHandler();
 		// To write selected Features into phresco-application-Handler-info.xml
+		
 		String artifactGroup = gson.toJson(listArtifactGroup);
 		handler.setSelectedFeatures(artifactGroup);
 		mojo.save();
