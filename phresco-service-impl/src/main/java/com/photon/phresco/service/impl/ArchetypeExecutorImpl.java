@@ -93,14 +93,16 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 			ArtifactInfo artifactInfo = archetypeInfo.getVersions().get(0);
 			String version = artifactInfo.getVersion();
 			String groupId = projectInfo.getGroupId();
-			if(projectInfo.isMultiModule()) {
-				
-				String rootFolderTempPath = tempFolderPath;
-				
-				commandString = "";
-				tempFolderPath = tempFolderPath + "/" + applicationInfo.getCode();
+//			if(projectInfo.isMultiModule()) {
 				
 				if(CollectionUtils.isNotEmpty(applicationInfo.getModules())) {
+					String rootFolderTempPath = tempFolderPath;
+					createMultiModuleObject(projectInfo, rootFolderTempPath,
+							applicationInfo, customerId, repoInfo, techId,
+							archetypeInfo, version, groupId);
+					commandString = "";
+					tempFolderPath = tempFolderPath + "/" + applicationInfo.getCode();
+					
 					for (ModuleInfo moduleInfo : applicationInfo.getModules()) {
 						archetypeInfo = dbManager.getArchetypeInfo(moduleInfo.getTechInfo().getId(), customerId);
 						version = archetypeInfo.getVersions().get(0).getVersion();
@@ -112,11 +114,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 						updateRepository(customerId, applicationInfo, new File(
 								tempFolderPath), moduleInfo.getCode());
 					}
-					
-					createMultiModuleObject(projectInfo, rootFolderTempPath,
-							applicationInfo, customerId, repoInfo, techId,
-							archetypeInfo, version, groupId);
-				}
+//				}
 				
 				
 			} else {
