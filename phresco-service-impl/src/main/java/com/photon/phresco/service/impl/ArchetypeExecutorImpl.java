@@ -206,7 +206,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 			builder.append(appInfo.getAppDirName());
 		}
 		builder.append(File.separator);
-		builder.append(getPhrescoPomFile(new File(tempFolderPath, appInfo.getAppDirName())).getName());
+		builder.append(getPhrescoPomFile(appInfo, new File(tempFolderPath, appInfo.getAppDirName())).getName());
 		File pomFile = new File(builder.toString());
 		try {
 			PomProcessor processor = new PomProcessor(pomFile);
@@ -224,9 +224,10 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 		}
 	}
 	
-	private File getPhrescoPomFile(File path) {
+	private File getPhrescoPomFile(ApplicationInfo appInfo, File path) {
 		File file = new File(path, "phresco-pom.xml");
 		if(file.exists()) {
+			appInfo.setPhrescoPomFile("phresco-pom.xml");
 			return file;
 		}
 		return new File(path, "pom.xml");
@@ -249,10 +250,10 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 		File phrescoPomFile = null;
 		File pomFile = null;
 		if(moduleInfo != null) {
-			phrescoPomFile = getPhrescoPomFile(new File(tempFolderPath, moduleInfo.getCode()));
+			phrescoPomFile = getPhrescoPomFile(appInfo, new File(tempFolderPath, moduleInfo.getCode()));
             sourceDir = getSourceFromPom(phrescoPomFile);
             if(StringUtils.isNotEmpty(sourceDir)) {
-            	phrescoPomFile = getPhrescoPomFile(new File(tempFolderPath, 
+            	phrescoPomFile = getPhrescoPomFile(appInfo, new File(tempFolderPath, 
             			moduleInfo.getCode().concat(File.separator).concat(sourceDir)));
             	String pomPath = new StringBuilder(tempFolderPath).append(File.separator).append(moduleInfo.getCode()).append(File.separator).
             	append(sourceDir).append(File.separator).append("pom.xml").toString();
@@ -262,10 +263,10 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
         		append("pom.xml").toString();
             pomFile = new File(pomPath);
 		} else {
-			phrescoPomFile = getPhrescoPomFile(new File(tempFolderPath, appInfo.getAppDirName()));
+			phrescoPomFile = getPhrescoPomFile(appInfo, new File(tempFolderPath, appInfo.getAppDirName()));
 			sourceDir = getSourceFromPom(phrescoPomFile);
 			if(StringUtils.isNotEmpty(sourceDir)) {
-            	phrescoPomFile = getPhrescoPomFile(new File(tempFolderPath, 
+            	phrescoPomFile = getPhrescoPomFile(appInfo, new File(tempFolderPath, 
             			appInfo.getAppDirName().concat(File.separator).concat(sourceDir)));
             	String pomPath = new StringBuilder(tempFolderPath).append(File.separator).append(appInfo.getAppDirName()).append(File.separator).
             		append(sourceDir).append(File.separator).append("pom.xml").toString();
@@ -398,9 +399,9 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 		} else {
 			appInfo.setSelectedComponents(selectedComponentids);
 		}
-		if(phrescoPomFile.exists()) {
-			appInfo.setPhrescoPomFile("phresco-pom.xml");
-		}
+//		if(phrescoPomFile.exists()) {
+//			appInfo.setPhrescoPomFile("phresco-pom.xml");
+//		}
 		
 		for (ArtifactGroup group : listArtifactGroup) {
 			String selectedScope = StringUtils.isNotEmpty(group.getVersions().get(0).getScope()) ? group.getVersions().get(0).getScope() : "";
