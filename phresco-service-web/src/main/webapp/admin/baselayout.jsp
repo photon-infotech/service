@@ -76,8 +76,15 @@
 		<script type="text/javascript" src="js/jquery.editable.combobox.js"></script>
 		<script type="text/javascript" src="js/ddslick.js"></script>
 		<script type="text/javascript" src="js/jquery.activity-indicator-1.0.0.js"></script>
-		
-			
+		<%
+            User userInfo = (User) session.getAttribute(ServiceUIConstants.SESSION_USER_INFO);
+            String displayName = "";
+            String authType = "";
+            if (userInfo != null) {
+                displayName = userInfo.getDisplayName();
+                authType = userInfo.getAuthType().toString();
+            }
+        %>
 		<script type="text/javascript">
 		    $(document).ready(function() {
 		    	enableScreen();
@@ -88,7 +95,10 @@
 					localStorage["color"]= value;
 					applyTheme();
 				});
-
+				//hide change password according to authType
+				if ("<%=authType%>" == "AUTHSERVICE") {
+					$("#changePassword").parent().hide();
+				}
 				// function to show user info in toggle 
 				$('div aside.usersettings div').hide(0);
 				$('div aside.usersettings').click(function() {
@@ -158,14 +168,6 @@
 		</script>
 	</head>
 	<body>
-        <%
-            User userInfo = (User) session.getAttribute(ServiceUIConstants.SESSION_USER_INFO);
-            String displayName = "";
-            if (userInfo != null) {
-                displayName = userInfo.getDisplayName();
-            }
-        %>
-	   
 		<div class="modal-backdrop fade in popupalign"></div>
 		
 		

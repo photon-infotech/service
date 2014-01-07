@@ -166,10 +166,10 @@ public class Login extends ServiceBaseAction {
 			credentials.add(newCred);
 			Boolean changePassword = getServiceManager().changePassword(credentials);
 			if (!changePassword) {
-				setMsg("User not local");
+				setMsg(getText(PWD_CHANGE_FAIL));
 				return SUCCESS;
 			}
-			setMsg("Password changed successfully");
+			setMsg(getText(PWD_CHANGE_SUCCESS));
 		} catch (Exception e) {
 			throw new PhrescoException();
 		}
@@ -190,16 +190,16 @@ public class Login extends ServiceBaseAction {
         System.out.println(response.getStatus());
 
         if (result ) {
-			setMsg("New password sent to email");
+			setMsg(getText(PWD_FORGOT_SUCCESS));
 			return SUCCESS;
 		}
 		
 		} catch (Exception e) {
-			setMsg("Failed");
+			setMsg(getText(PWD_FORGOT_FAIL));
 		}
-		setMsg("User not local");
+		setMsg(getText(PWD_FORGOT_LOC_USER));
 		if(response.getStatus() == 500) {
-			setMsg("Invalid user");
+			setMsg(getText(PWD_FORGOT_INVALID_USER));
 		}
 		return SUCCESS;
 	}
