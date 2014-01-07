@@ -3120,21 +3120,22 @@ public class ComponentService extends DbService {
     @ApiOperation(value = " Retrives all functional frameworks ")
     @ApiErrors(value = {@ApiError(code=500, reason = "Failed to fetch"), @ApiError(code=204, reason = "Functional not found")})
     @RequestMapping(value= REST_API_OPTIONS_FUNCTIONAL_GRP, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
-	public @ResponseBody List<FunctionalFrameworkGroup> findFunctionalTestFrameworks(HttpServletResponse response,
-			@ApiParam(name = REST_QUERY_TECHID , value = "Techid to retrive")@QueryParam(REST_QUERY_TECHID) String techId) {
+	public @ResponseBody List<FunctionalFrameworkGroup> findFunctionalTestFrameworkGroups(HttpServletResponse response,
+			@ApiParam(name = REST_QUERY_TECHID , value = "Techid to retrive")@QueryParam(REST_QUERY_TECHID) String techId,
+			@ApiParam(name = REST_QUERY_CUSTOMERID , value = "CustomerId to retrive")@QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
 	    if (isDebugEnabled) {
 	        LOGGER.debug("Entered into ComponentService.findFunctionalTestFrameworks()");
 	    }
 	    if(StringUtils.isNotEmpty(techId)) {
-	    	return getFunctionalGroups(techId, response);
+	    	return getFunctionalGroups(techId, customerId, response);
 	    }
 	    List<FunctionalFrameworkGroup> functionalFrameworkGroups = new ArrayList<FunctionalFrameworkGroup>();
 		try {
-			List<FunctionalFrameworkGroup> ffgS = DbService.getMongoOperation().getCollection("functionalFrameworkGroup", 
-					FunctionalFrameworkGroup.class);
+			List<FunctionalFrameworkGroup> ffgS = DbService.getMongoOperation().find("functionalFrameworkGroup", 
+					new Query(Criteria.where("customerIds").in(customerId)),FunctionalFrameworkGroup.class);
 			for (FunctionalFrameworkGroup functionalFrameworkGroup : ffgS) {
 				List<FunctionalFramework> ffs = DbService.getMongoOperation().find(FUNCTIONAL_FRAMEWORK_COLLECTION_NAME, 
-						new Query(Criteria.where("groupIds").in(functionalFrameworkGroup.getId())), FunctionalFramework.class);
+						new Query(Criteria.where("groupIds").in(functionalFrameworkGroup.getId()).and("customerIds").in(customerId)), FunctionalFramework.class);
 				functionalFrameworkGroup.setFunctionalFrameworks(ffs);
 				functionalFrameworkGroups.add(functionalFrameworkGroup);
 			}
@@ -3146,15 +3147,15 @@ public class ComponentService extends DbService {
 		}
 	}
 	
-    private List<FunctionalFrameworkGroup> getFunctionalGroups(String techId, HttpServletResponse response) {
+    private List<FunctionalFrameworkGroup> getFunctionalGroups(String techId, String customerId, HttpServletResponse response) {
     	List<FunctionalFrameworkGroup> functionalFrameworkGroups = new ArrayList<FunctionalFrameworkGroup>();
 	    List<FunctionalFramework> functionalFrameworks = new ArrayList<FunctionalFramework>();
 	    try{
 	    	List<FunctionalFrameworkGroup> ffgs = DbService.getMongoOperation().find(FUNCTIONAL_FRAMEWORK_GRP_COLLECTION_NAME, 
-	    			new Query(Criteria.where("techIds").in(techId)), FunctionalFrameworkGroup.class);
+	    			new Query(Criteria.where("techIds").in(techId).and("customerIds").in(customerId)), FunctionalFrameworkGroup.class);
 	    	for (FunctionalFrameworkGroup functionalFrameworkGroup : ffgs) {
 	    		List<FunctionalFramework> ffs = DbService.getMongoOperation().find(FUNCTIONAL_FRAMEWORK_COLLECTION_NAME, 
-	    				new Query(Criteria.where("groupIds").in(functionalFrameworkGroup.getId())), FunctionalFramework.class);
+	    				new Query(Criteria.where("groupIds").in(functionalFrameworkGroup.getId()).and("customerIds").in(customerId)), FunctionalFramework.class);
 	    		functionalFrameworks = new ArrayList<FunctionalFramework>();
 	    		for (FunctionalFramework functionalFramework : ffs) {
 	    			List<FunctionalFrameworkProperties> funcFrameworkProperties = functionalFramework.getFuncFrameworkProperties();
