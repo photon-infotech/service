@@ -50,6 +50,8 @@ import com.photon.phresco.util.ProjectUtils;
 import com.photon.phresco.util.ServiceConstants;
 import com.photon.phresco.util.Utility;
 import com.phresco.pom.exception.PhrescoPomException;
+import com.phresco.pom.model.DeploymentRepository;
+import com.phresco.pom.model.DistributionManagement;
 import com.phresco.pom.util.PomProcessor;
 
 public class ArchetypeExecutorImpl implements ArchetypeExecutor,
@@ -112,7 +114,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 						executeCreateCommand(tempFolderPath, commandString, customerId, projectInfo);
 						updateDefaultFeatures(projectInfo, tempFolderPath, customerId, moduleInfo.getCode(), moduleInfo);
 						updateRepository(customerId, applicationInfo, new File(
-								tempFolderPath), moduleInfo.getCode());
+								tempFolderPath), moduleInfo.getCode(), projectInfo.getName());
 					}
 //				}
 				
@@ -123,7 +125,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 				executeCreateCommand(tempFolderPath, commandString, customerId, projectInfo);
 				updateDefaultFeatures(projectInfo, tempFolderPath, customerId, applicationInfo.getCode(), null);
 				updateRepository(customerId, applicationInfo, new File(
-						tempFolderPath), applicationInfo.getCode());
+						tempFolderPath), applicationInfo.getCode(), projectInfo.getName());
 			}
 			if (isDebugEnabled) {
 				LOGGER.debug("command=" + commandString);
@@ -179,7 +181,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 	}
 	
 	private void updateRepository(String customerId, ApplicationInfo appInfo,
-			File tempFolderPath, String modName) throws PhrescoException {
+			File tempFolderPath, String modName, String projectName) throws PhrescoException {
 		if (isDebugEnabled) {
 			LOGGER.debug("ArchetypeExecutorImpl.updateRepository:Entry");
 			if (StringUtils.isEmpty(customerId)) {
@@ -212,6 +214,18 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 			PomProcessor processor = new PomProcessor(pomFile);
 			processor.setName(appInfo.getName());
 			processor.addRepositories(customerId, repoInfo.getGroupRepoURL());
+			DistributionManagement distributionManagement = new DistributionManagement();
+			DeploymentRepository repository = new DeploymentRepository();
+			repository.setId(projectName.concat("-release"));
+			repository.setUrl(repoInfo.getReleaseRepoURL());
+			distributionManagement.setRepository(repository);
+			if(StringUtils.isNotEmpty(repoInfo.getSnapshotRepoURL())) {
+				repository = new DeploymentRepository();
+				repository.setId(projectName.concat("-snapshot"));
+				repository.setUrl(repoInfo.getSnapshotRepoURL());
+				distributionManagement.setSnapshotRepository(repository);
+			}
+			processor.getModel().setDistributionManagement(distributionManagement);
 			processor.save();
 			if (isDebugEnabled) {
 				LOGGER.debug("ArchetypeExecutorImpl.updateRepository:Exit");
