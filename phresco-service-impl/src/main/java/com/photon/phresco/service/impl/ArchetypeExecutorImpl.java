@@ -479,6 +479,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 			ProjectInfo newProjectInfo = new ProjectInfo();
 			newProjectInfo.setId(projectInfo.getId());
 			newProjectInfo.setName(projectInfo.getName());
+			newProjectInfo.setDescription(projectInfo.getDescription());
 			newProjectInfo.setProjectCode(projectInfo.getProjectCode());
 			newProjectInfo.setVersion(projectInfo.getVersion());
 			newProjectInfo.setVersionInfo(projectInfo.getVersionInfo());
