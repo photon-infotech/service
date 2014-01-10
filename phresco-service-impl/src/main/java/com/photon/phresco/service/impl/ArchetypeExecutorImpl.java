@@ -227,6 +227,12 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 			}
 			processor.getModel().setDistributionManagement(distributionManagement);
 			processor.save();
+			File sourcePomFile = new File(pomFile.getParent(), appInfo.getPomFile());
+			if(sourcePomFile.exists()) {
+				PomProcessor pomProcessor = new PomProcessor(sourcePomFile);
+				pomProcessor.getModel().setDistributionManagement(distributionManagement);
+				pomProcessor.save();
+			}
 			if (isDebugEnabled) {
 				LOGGER.debug("ArchetypeExecutorImpl.updateRepository:Exit");
 			}
