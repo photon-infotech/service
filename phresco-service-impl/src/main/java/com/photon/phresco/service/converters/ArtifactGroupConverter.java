@@ -120,11 +120,11 @@ public class ArtifactGroupConverter implements Converter<ArtifactGroupDAO, Artif
 		List<ArtifactInfo> actualVersions = artifactGroup.getVersions();
 		String customerId = artifactGroup.getCustomerIds().get(0);
 		for (ArtifactInfo artifactInfo : actualVersions) {
-			if(artifactInfo.getFileSize() != 0) {
+//			if(artifactInfo.getFileSize() != 0) {
 				String downloadURL = createDownloadURL(artifactGroup.getGroupId(), artifactGroup.getArtifactId(), 
 						artifactGroup.getPackaging(), artifactInfo.getVersion(), customerId);
 				artifactInfo.setDownloadURL(downloadURL);
-			}
+//			}
 			newVersions.add(artifactInfo);
 		}
 		artifactGroup.setVersions(newVersions);
