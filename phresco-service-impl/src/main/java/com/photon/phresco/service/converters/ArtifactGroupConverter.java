@@ -66,6 +66,7 @@ public class ArtifactGroupConverter implements Converter<ArtifactGroupDAO, Artif
         artifactGroup.setAppliesTo(artifactGroupDAO.getAppliesTo());
         Query query = new Query(Criteria.where(DB_COLUMN_ARTIFACT_GROUP_ID).is(artifactGroupDAO.getId()));
         query.limit(NUMBER_SEVEN).sort().on(DB_COLUMN_CREATIONDATE, Order.DESCENDING);
+        query.sort().on("version", Order.DESCENDING);
         List<ArtifactInfo> versions = mongoOperation.find(ARTIFACT_INFO_COLLECTION_NAME, 
         		query , ArtifactInfo.class);
         artifactGroup.setVersions(versions);
@@ -119,11 +120,11 @@ public class ArtifactGroupConverter implements Converter<ArtifactGroupDAO, Artif
 		List<ArtifactInfo> actualVersions = artifactGroup.getVersions();
 		String customerId = artifactGroup.getCustomerIds().get(0);
 		for (ArtifactInfo artifactInfo : actualVersions) {
-			if(artifactInfo.getFileSize() != 0) {
+//			if(artifactInfo.getFileSize() != 0) {
 				String downloadURL = createDownloadURL(artifactGroup.getGroupId(), artifactGroup.getArtifactId(), 
 						artifactGroup.getPackaging(), artifactInfo.getVersion(), customerId);
 				artifactInfo.setDownloadURL(downloadURL);
-			}
+//			}
 			newVersions.add(artifactInfo);
 		}
 		artifactGroup.setVersions(newVersions);

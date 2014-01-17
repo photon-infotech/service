@@ -445,9 +445,9 @@ public class DbManagerImpl extends DbService implements DbManager, ServiceConsta
 			throws PhrescoException {
 		Query query = new Query();
 		Criteria nameCriteria = Criteria.where(REST_API_NAME).is(username);
-		Criteria typeCriteria = Criteria.where(AUTHTYPE).is(AuthType.LOCAL.name());
+//		Criteria typeCriteria = Criteria.where(AUTHTYPE).is(AuthType.LOCAL.name());
 		query = query.addCriteria(nameCriteria);
-		query = query.addCriteria(typeCriteria);
+//		query = query.addCriteria(typeCriteria);
 		if(isDebugEnabled) {
     		LOGGER.debug("DbManagerImpl.authenticate:Exit");
     	}

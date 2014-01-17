@@ -165,7 +165,7 @@ public class Users extends ServiceBaseAction {
 		user.setName(getLoginid());
 		user.setDisplayName(getFirstname()+getLastname());
 		if (ADD.equals(getFromPage())) {
-		   user.setPassword(ServerUtil.encodeUsingHash(getName(), getUserPwd()));
+		   user.setPassword(ServerUtil.encodeUsingHash(getLoginid(), getUserPwd()));
 		} else {
 			User userPwd= getServiceManager().getUser(getId());
 			user.setPassword(userPwd.getPassword());

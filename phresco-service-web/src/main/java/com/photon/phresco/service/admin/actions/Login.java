@@ -40,6 +40,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import com.google.gson.Gson;
 import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.Role;
 import com.photon.phresco.commons.model.User;
@@ -159,16 +160,16 @@ public class Login extends ServiceBaseAction {
 		try {
 			User user = (User) getSessionAttribute(SESSION_USER_INFO);
 			List<Credentials> credentials = new ArrayList<Credentials>();
-			Credentials oldCred = new Credentials(user.getId(), getOldPassword());
-			Credentials newCred = new Credentials(user.getId(), getNewPassword());
+			Credentials oldCred = new Credentials(user.getName(), getOldPassword());
+			Credentials newCred = new Credentials(user.getName(), getNewPassword());
 			credentials.add(oldCred);
 			credentials.add(newCred);
 			Boolean changePassword = getServiceManager().changePassword(credentials);
 			if (!changePassword) {
-				setMsg("Old password is incorrect");
+				setMsg(getText(PWD_CHANGE_FAIL));
 				return SUCCESS;
 			}
-			setMsg("Password changed successfully");
+			setMsg(getText(PWD_CHANGE_SUCCESS));
 		} catch (Exception e) {
 			throw new PhrescoException();
 		}
@@ -179,22 +180,27 @@ public class Login extends ServiceBaseAction {
 		if (isDebugEnabled) {
 			LOGGER.debug("Login.changepassword : Entry");
 		}
+        ClientResponse response = null;
 		try{
 		Client client = ClientHelper.createClient();
 		WebResource resource = client.resource(PhrescoServerFactory.getServerConfig().getAdminServiceURL() + "/" + "login" + "/" +"forgotPassword");
         Builder builder = resource.accept(MediaType.APPLICATION_JSON);        
-        ClientResponse response = null;
         response = builder.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, getUserId());
         Boolean result = response.getEntity(Boolean.class);
-		if (result ) {
-			setMsg("New password sent to email");
+        System.out.println(response.getStatus());
+
+        if (result ) {
+			setMsg(getText(PWD_FORGOT_SUCCESS));
 			return SUCCESS;
 		}
 		
 		} catch (Exception e) {
-			setMsg("Failed");
+			setMsg(getText(PWD_FORGOT_FAIL));
 		}
-		setMsg("Failed");
+		setMsg(getText(PWD_FORGOT_LOC_USER));
+		if(response.getStatus() == 500) {
+			setMsg(getText(PWD_FORGOT_INVALID_USER));
+		}
 		return SUCCESS;
 	}
 	

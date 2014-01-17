@@ -49,6 +49,7 @@ import com.photon.phresco.service.util.ServerConstants;
 import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.Credentials;
 import com.photon.phresco.util.ServiceConstants;
+import com.photon.phresco.util.Utility;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
@@ -143,26 +144,23 @@ public class LoginService extends DbService {
 
 		}
 		PhrescoServerFactory.initialize();
-		try {
 			DbManager dbManager = PhrescoServerFactory.getDbManager();
 			User user = dbManager.authenticateUserId(userId);
 			Gson gson = new Gson();
-			if (user != null && !user.getEmail().isEmpty()) {
+			if (user != null ) {
 				if(!user.getAuthType().equals(AuthType.LOCAL)) {
 					return false;
 				}
 				UUID uniqueId = UUID.randomUUID();
 				String newPwd = uniqueId.toString();
 				String body = "New password is "+newPwd;
-				sendTemplateEmail(user.getEmail(), "phresco.do.not.reply@gmail.com", "Phresco new password", body, "phresco.do.not.reply@gmail.com", "phresco123");
-				user.setPassword(ServerUtil.encodeUsingHash(user.getId(), newPwd));	
+				Utility.sendTemplateEmail(user.getEmail(), "phresco.do.not.reply@gmail.com", "Phresco new password", body, "phresco.do.not.reply@gmail.com", "phresco123");
+				user.setPassword(ServerUtil.encodeUsingHash(user.getName(), newPwd));	
 				DbService.getMongoOperation().save(USERS_COLLECTION_NAME, user);
 				return true;
+			} else {
+				throw new PhrescoException("Null user");
 			}
-		} catch(Exception e) {
-			throw new PhrescoException("User or password null!");
-		}
-		return false;
 	}
 
 	private User loginUsingAuth(Credentials credentials, HttpServletResponse response) throws PhrescoException {
@@ -216,44 +214,5 @@ public class LoginService extends DbService {
 	private String createAuthToken(String userName) throws PhrescoException {
 		AuthenticationUtil authTokenUtil = AuthenticationUtil.getInstance();
 		return authTokenUtil.generateToken(userName);
-	}
-
-
-	private void sendTemplateEmail(String toAddr, String fromAddr, String subject, String body, final String username, final String password) {
-
-		Properties props = new Properties();  
-		props.put("mail.smtp.host", "smtp.gmail.com");  
-		props.put("mail.smtp.auth", "true");  
-		props.put("mail.debug", "true");  
-		props.put("mail.smtp.port", 25);  
-		props.put("mail.smtp.socketFactory.port", 25);  
-		props.put("mail.smtp.starttls.enable", "true");
-		props.put("mail.transport.protocol", "smtp");
-		Session mailSession = null;
-
-		mailSession = Session.getInstance(props,  
-				new javax.mail.Authenticator() {  
-			protected PasswordAuthentication getPasswordAuthentication() {  
-				return new PasswordAuthentication(username, password);  
-			}  
-		});  
-		try {
-
-			Transport transport = mailSession.getTransport();
-
-			MimeMessage message = new MimeMessage(mailSession);
-
-			message.setSubject(subject);
-			message.setFrom(new InternetAddress(fromAddr));
-			String []to = new String[]{toAddr};
-			message.addRecipient(Message.RecipientType.TO, new InternetAddress(to[0]));
-			message.setContent(body,"text/html");
-			transport.connect();
-
-			transport.sendMessage(message,message.getRecipients(Message.RecipientType.TO));
-			transport.close();
-		} catch (Exception exception) {
-
-		}
 	}
 }

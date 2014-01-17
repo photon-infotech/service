@@ -102,7 +102,7 @@ public class ProjectService extends DbService {
 			for (int i=0; i < projectInfo.getNoOfApps(); i++) {
 				projectService.createProject(cloneProjectInfo(projectInfo, i), tempFolderPath);
 			}
-			createParentPom(tempFolderPath, projectInfo);
+//			createParentPom(tempFolderPath, projectInfo);
 			handleDependencies(tempFolderPath, projectInfo);
 			addIntegrationTest(projectInfo, tempFolderPath);
 			ArchiveUtil.createArchive(tempFolderPath, tempFolderPath + ZIP, ArchiveType.ZIP);
@@ -171,9 +171,9 @@ public class ProjectService extends DbService {
 	}
 	
 	private void handleDependencies(String tempFolderPath, ProjectInfo projectInfo) throws PhrescoException {
-		if(! projectInfo.isMultiModule()) {
-			return;
-		}
+//		if(! projectInfo.isMultiModule()) {
+//			return;
+//		}
 		List<ApplicationInfo> appInfos = projectInfo.getAppInfos();
 		for (ApplicationInfo applicationInfo : appInfos) {
 			List<String> dependentModules = applicationInfo.getDependentModules();

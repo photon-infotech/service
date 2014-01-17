@@ -505,6 +505,15 @@ public interface ServiceUIConstants {
     //Email validation
     String INVALID_EMAIL = "err.msg.invalid.email";
     
+    
+    // Change forgot password messages
+    String PWD_FORGOT_FAIL = "lbl.hdr.adm.chngpwd.wrg";
+    String PWD_FORGOT_SUCCESS = "lbl.hdr.adm.frgtpwd.success";
+    String PWD_FORGOT_INVALID_USER = "lbl.hdr.adm.frgtpwd.invusr";
+    String PWD_FORGOT_LOC_USER = "lbl.hdr.adm.frgtpwd.ntlocal";
+    String PWD_CHANGE_FAIL = "lbl.hdr.adm.chngpwd.wrg";
+    String PWD_CHANGE_SUCCESS = "lbl.hdr.adm.chngpwd.success";
+    
     // Framework Theme Color Keys
     String BRANDING_COLOR =  "brandingColor";
     String ACCORDION_BACKGROUND_COLOR = "accordionBackGroundColor";

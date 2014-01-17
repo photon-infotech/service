@@ -50,6 +50,8 @@ import com.photon.phresco.util.ProjectUtils;
 import com.photon.phresco.util.ServiceConstants;
 import com.photon.phresco.util.Utility;
 import com.phresco.pom.exception.PhrescoPomException;
+import com.phresco.pom.model.DeploymentRepository;
+import com.phresco.pom.model.DistributionManagement;
 import com.phresco.pom.util.PomProcessor;
 
 public class ArchetypeExecutorImpl implements ArchetypeExecutor,
@@ -93,27 +95,37 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 			ArtifactInfo artifactInfo = archetypeInfo.getVersions().get(0);
 			String version = artifactInfo.getVersion();
 			String groupId = projectInfo.getGroupId();
-			if(projectInfo.isMultiModule()) {
-				tempFolderPath = tempFolderPath + "/" + applicationInfo.getCode();
+//			if(projectInfo.isMultiModule()) {
+				
 				if(CollectionUtils.isNotEmpty(applicationInfo.getModules())) {
+					String rootFolderTempPath = tempFolderPath;
+					createMultiModuleObject(projectInfo, rootFolderTempPath,
+							applicationInfo, customerId, repoInfo, techId,
+							archetypeInfo, version, groupId);
+					commandString = "";
+					tempFolderPath = tempFolderPath + "/" + applicationInfo.getCode();
+					
 					for (ModuleInfo moduleInfo : applicationInfo.getModules()) {
 						archetypeInfo = dbManager.getArchetypeInfo(moduleInfo.getTechInfo().getId(), customerId);
 						version = archetypeInfo.getVersions().get(0).getVersion();
 						commandString = buildCommandString(moduleInfo.getCode(), techId, archetypeInfo.getGroupId(), 
 								archetypeInfo.getArtifactId(), version, repoInfo.getReleaseRepoURL(), projectInfo.getVersion(), customerId, groupId);
+						
 						executeCreateCommand(tempFolderPath, commandString, customerId, projectInfo);
 						updateDefaultFeatures(projectInfo, tempFolderPath, customerId, moduleInfo.getCode(), moduleInfo);
 						updateRepository(customerId, applicationInfo, new File(
-								tempFolderPath), moduleInfo.getCode());
+								tempFolderPath), moduleInfo.getCode(), projectInfo.getName());
 					}
-				}
+//				}
+				
+				
 			} else {
 				commandString = buildCommandString(applicationInfo.getCode(), techId, archetypeInfo.getGroupId(), 
 						archetypeInfo.getArtifactId(), version,	repoInfo.getReleaseRepoURL(), projectInfo.getVersion(), customerId, groupId);
 				executeCreateCommand(tempFolderPath, commandString, customerId, projectInfo);
 				updateDefaultFeatures(projectInfo, tempFolderPath, customerId, applicationInfo.getCode(), null);
 				updateRepository(customerId, applicationInfo, new File(
-						tempFolderPath), applicationInfo.getCode());
+						tempFolderPath), applicationInfo.getCode(), projectInfo.getName());
 			}
 			if (isDebugEnabled) {
 				LOGGER.debug("command=" + commandString);
@@ -131,12 +143,29 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 			throw new PhrescoException(e);
 		}
 	}
+
+	private void createMultiModuleObject(ProjectInfo projectInfo,
+			String tempFolderPath, ApplicationInfo applicationInfo,
+			String customerId, RepoInfo repoInfo, String techId,
+			ArtifactGroup archetypeInfo, String version, String groupId)
+			throws PhrescoException {
+		String commandString;
+		String MULTI_MODULE_ARCHETYPE = "phresco-multimodule-archetype";
+		
+		commandString = buildCommandString(applicationInfo.getCode(), techId, archetypeInfo.getGroupId(), 
+				MULTI_MODULE_ARCHETYPE, version, repoInfo.getReleaseRepoURL(), projectInfo.getVersion(), customerId, groupId);
+		
+		executeCreateCommand(tempFolderPath, commandString, customerId, projectInfo);
+		
+	}
 	
 	private void executeCreateCommand(String tempFolderPath, String command, String customerId, ProjectInfo info) throws PhrescoException {
 		File file = new File(tempFolderPath);
+		
 		if (!file.exists()) {
 			file.mkdirs();
 		}
+		
 		BufferedReader bufferedReader = Utility.executeCommand(
 				command, tempFolderPath);
 		String line = null;
@@ -152,7 +181,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 	}
 	
 	private void updateRepository(String customerId, ApplicationInfo appInfo,
-			File tempFolderPath, String modName) throws PhrescoException {
+			File tempFolderPath, String modName, String projectName) throws PhrescoException {
 		if (isDebugEnabled) {
 			LOGGER.debug("ArchetypeExecutorImpl.updateRepository:Entry");
 			if (StringUtils.isEmpty(customerId)) {
@@ -179,13 +208,31 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 			builder.append(appInfo.getAppDirName());
 		}
 		builder.append(File.separator);
-		builder.append(getPhrescoPomFile(new File(tempFolderPath, appInfo.getAppDirName())).getName());
+		builder.append(getPhrescoPomFile(appInfo, new File(tempFolderPath, appInfo.getAppDirName())).getName());
 		File pomFile = new File(builder.toString());
 		try {
 			PomProcessor processor = new PomProcessor(pomFile);
 			processor.setName(appInfo.getName());
 			processor.addRepositories(customerId, repoInfo.getGroupRepoURL());
+			DistributionManagement distributionManagement = new DistributionManagement();
+			DeploymentRepository repository = new DeploymentRepository();
+			repository.setId(projectName.concat("-release"));
+			repository.setUrl(repoInfo.getReleaseRepoURL());
+			distributionManagement.setRepository(repository);
+			if(StringUtils.isNotEmpty(repoInfo.getSnapshotRepoURL())) {
+				repository = new DeploymentRepository();
+				repository.setId(projectName.concat("-snapshot"));
+				repository.setUrl(repoInfo.getSnapshotRepoURL());
+				distributionManagement.setSnapshotRepository(repository);
+			}
+			processor.getModel().setDistributionManagement(distributionManagement);
 			processor.save();
+			File sourcePomFile = new File(pomFile.getParent(), appInfo.getPomFile());
+			if(sourcePomFile.exists()) {
+				PomProcessor pomProcessor = new PomProcessor(sourcePomFile);
+				pomProcessor.getModel().setDistributionManagement(distributionManagement);
+				pomProcessor.save();
+			}
 			if (isDebugEnabled) {
 				LOGGER.debug("ArchetypeExecutorImpl.updateRepository:Exit");
 			}
@@ -197,9 +244,10 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 		}
 	}
 	
-	private File getPhrescoPomFile(File path) {
+	private File getPhrescoPomFile(ApplicationInfo appInfo, File path) {
 		File file = new File(path, "phresco-pom.xml");
 		if(file.exists()) {
+			appInfo.setPhrescoPomFile("phresco-pom.xml");
 			return file;
 		}
 		return new File(path, "pom.xml");
@@ -222,10 +270,10 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 		File phrescoPomFile = null;
 		File pomFile = null;
 		if(moduleInfo != null) {
-			phrescoPomFile = getPhrescoPomFile(new File(tempFolderPath, moduleInfo.getCode()));
+			phrescoPomFile = getPhrescoPomFile(appInfo, new File(tempFolderPath, moduleInfo.getCode()));
             sourceDir = getSourceFromPom(phrescoPomFile);
             if(StringUtils.isNotEmpty(sourceDir)) {
-            	phrescoPomFile = getPhrescoPomFile(new File(tempFolderPath, 
+            	phrescoPomFile = getPhrescoPomFile(appInfo, new File(tempFolderPath, 
             			moduleInfo.getCode().concat(File.separator).concat(sourceDir)));
             	String pomPath = new StringBuilder(tempFolderPath).append(File.separator).append(moduleInfo.getCode()).append(File.separator).
             	append(sourceDir).append(File.separator).append("pom.xml").toString();
@@ -235,10 +283,10 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
         		append("pom.xml").toString();
             pomFile = new File(pomPath);
 		} else {
-			phrescoPomFile = getPhrescoPomFile(new File(tempFolderPath, appInfo.getAppDirName()));
+			phrescoPomFile = getPhrescoPomFile(appInfo, new File(tempFolderPath, appInfo.getAppDirName()));
 			sourceDir = getSourceFromPom(phrescoPomFile);
 			if(StringUtils.isNotEmpty(sourceDir)) {
-            	phrescoPomFile = getPhrescoPomFile(new File(tempFolderPath, 
+            	phrescoPomFile = getPhrescoPomFile(appInfo, new File(tempFolderPath, 
             			appInfo.getAppDirName().concat(File.separator).concat(sourceDir)));
             	String pomPath = new StringBuilder(tempFolderPath).append(File.separator).append(appInfo.getAppDirName()).append(File.separator).
             		append(sourceDir).append(File.separator).append("pom.xml").toString();
@@ -344,6 +392,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 		MojoProcessor mojo = new MojoProcessor(filePath);
 		ApplicationHandler handler = mojo.getApplicationHandler();
 		// To write selected Features into phresco-application-Handler-info.xml
+		
 		String artifactGroup = gson.toJson(listArtifactGroup);
 		handler.setSelectedFeatures(artifactGroup);
 		mojo.save();
@@ -370,9 +419,9 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 		} else {
 			appInfo.setSelectedComponents(selectedComponentids);
 		}
-		if(phrescoPomFile.exists()) {
-			appInfo.setPhrescoPomFile("phresco-pom.xml");
-		}
+//		if(phrescoPomFile.exists()) {
+//			appInfo.setPhrescoPomFile("phresco-pom.xml");
+//		}
 		
 		for (ArtifactGroup group : listArtifactGroup) {
 			String selectedScope = StringUtils.isNotEmpty(group.getVersions().get(0).getScope()) ? group.getVersions().get(0).getScope() : "";
@@ -436,6 +485,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 			ProjectInfo newProjectInfo = new ProjectInfo();
 			newProjectInfo.setId(projectInfo.getId());
 			newProjectInfo.setName(projectInfo.getName());
+			newProjectInfo.setDescription(projectInfo.getDescription());
 			newProjectInfo.setProjectCode(projectInfo.getProjectCode());
 			newProjectInfo.setVersion(projectInfo.getVersion());
 			newProjectInfo.setVersionInfo(projectInfo.getVersionInfo());

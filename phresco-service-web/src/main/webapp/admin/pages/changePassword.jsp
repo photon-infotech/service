@@ -57,6 +57,9 @@
 			$(".popupOk").hide();			
 			$("#popupPage_modal-body").html("<div>"+data.msg+"</div>");
 		}
+		setTimeout(function(){
+			window.location.href = "<s:url action='admin/logout'/>";
+		},3000);
 	}
 	
 	function popupOnOk(thisObj) {
