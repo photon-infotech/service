@@ -75,9 +75,13 @@ public class Customers extends ServiceBaseAction  {
 	private String repoURL = "";
 	private List<String> options = null;
 	private String uiType = "";
+	private String supportEmail = "";
+	private String supportPassword = "";
+	private String supportSmtpHost = "";
 
 	private String nameError = "";
 	private String mailError = "";
+	private String mailError1 = "";
 	private String addressError = "";
 	private String zipError = "";
 	private String numError = "";
@@ -439,6 +443,9 @@ public class Customers extends ServiceBaseAction  {
 			customer.setOptions(getOptions());
 			UIType uiType = UIType.valueOf(getUiType());
 			customer.setUiType(uiType);
+			customer.setSupportEmail(getSupportEmail());
+			customer.setSupportPassword(getSupportPassword());
+			customer.setSupportSmtpHost(getSupportSmtpHost());
 			RepoInfo repoInfo = new RepoInfo();
 			if (StringUtils.isNotEmpty(getCustomerId())) {
 				Customer custRepo = getServiceManager().getCustomer(getCustomerId());
@@ -690,6 +697,15 @@ public class Customers extends ServiceBaseAction  {
 			boolean b = m.matches();
 			if (!b) {
 				setMailError(getText(INVALID_EMAIL));
+				tempError = true;
+			}
+		}
+		if (StringUtils.isNotEmpty(getSupportEmail())) {
+			Pattern p = Pattern.compile("^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
+			Matcher m = p.matcher(getSupportEmail());
+			boolean b = m.matches();
+			if (!b) {
+				setMailError1(getText(INVALID_EMAIL));
 				tempError = true;
 			}
 		}
@@ -1316,4 +1332,39 @@ public class Customers extends ServiceBaseAction  {
 	public String getUiType() {
 		return uiType;
 	}
+
+	public String getSupportEmail() {
+		return supportEmail;
+	}
+
+	public void setSupportEmail(String supportEmail) {
+		this.supportEmail = supportEmail;
+	}
+
+	public String getSupportPassword() {
+		return supportPassword;
+	}
+
+	public void setSupportPassword(String supportPassword) {
+		this.supportPassword = supportPassword;
+	}
+
+	public String getSupportSmtpHost() {
+		return supportSmtpHost;
+	}
+
+	public void setSupportSmtpHost(String supportSmtpHost) {
+		this.supportSmtpHost = supportSmtpHost;
+	}
+
+	public String getMailError1() {
+		return mailError1;
+	}
+
+	public void setMailError1(String mailError1) {
+		this.mailError1 = mailError1;
+	}
+
+	
+	
 }

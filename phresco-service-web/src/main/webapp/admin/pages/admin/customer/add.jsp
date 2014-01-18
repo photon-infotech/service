@@ -78,6 +78,9 @@
 	LicenseType licenseType = null;
 	String validFrom = null;
 	String validUpto = null;
+	String supportEmail = "";
+	String supportPassword = "";
+	String supportSmtpHost = "";
 	String icon = "";
 	String loginLogoMargin = "";
 	String pageLogoPadding = "";
@@ -176,6 +179,19 @@
 		if (customer.getContext() != null) {
 			context = customer.getContext();
 		}
+		
+		if (customer.getSupportEmail() != null) {
+			supportEmail = customer.getSupportEmail();
+		}
+	
+		if (customer.getSupportPassword() != null) {
+			supportPassword = customer.getSupportPassword();
+		}
+		
+		if (customer.getSupportSmtpHost() != null) {
+			supportSmtpHost = customer.getSupportSmtpHost();
+		}
+		
 		if (CollectionUtils.isNotEmpty(permissionIds) && !permissionIds.contains(ServiceUIConstants.PER_MANAGE_CUSTOMERS)) {
 			per_disabledStr = "disabled";
 			per_disabledClass = "btn-disabled";
@@ -686,6 +702,38 @@
 				<input id="context" placeholder="<s:text name='place.hldr.cust.add.context'/>" class="input-xlarge" type="text" name="context"
 				    value="<%= context %>" maxlength="50" title="50 Characters only">
 				    <span class="help-inline" id="contextError"></span>
+			</div>
+		</div>
+		
+		<div class="control-group" id="mailControl1">
+			<label class="control-label labelbold">
+				<s:text name='lbl.hdr.admin.cust.supportemail'/>
+			</label>
+			<div class="controls">
+				<input id="supportEmail" placeholder="<s:text name='place.hldr.cust.add.supportemail'/>" class="input-xlarge" type="text" name="supportEmail"
+				    value="<%= supportEmail %>" maxlength="50" title="50 Characters only">
+				    <span class="help-inline" id="mailError1"></span>
+			</div>
+		</div>
+		
+		<div class="control-group" id="contextControl">
+			<label class="control-label labelbold">
+				<s:text name='lbl.hdr.admin.cust.supportpassword'/>
+			</label>
+			<div class="controls">
+				<input id="supportPassword" placeholder="<s:text name='place.hldr.cust.add.supportpwd'/>" class="input-xlarge" type="password" name="supportPassword"
+				    value="<%= supportPassword %>" maxlength="50" title="50 Characters only">
+				    <%-- <span class="help-inline" id="contextError"></span> --%>
+			</div>
+		</div>
+		<div class="control-group" id="contextControl">
+			<label class="control-label labelbold">
+				<s:text name='lbl.hdr.admin.cust.supportsmtphost'/>
+			</label>
+			<div class="controls">
+				<input id="supportSmtpHost" placeholder="<s:text name='place.hldr.cust.add.smtphost'/>" class="input-xlarge" type="text" name="supportSmtpHost"
+				    value="<%= supportSmtpHost %>" maxlength="50" title="50 Characters only">
+				    <%-- <span class="help-inline" id="contextError"></span> --%>
 			</div>
 		</div>
 		
@@ -1273,11 +1321,17 @@
 			hideError($("#nameControl"), $("#nameError"));
 		}
 		
-		if (!isBlank(data.mailError)) {
+		 if (!isBlank(data.mailError)) {
 			showError($("#mailControl"), $("#mailError"), data.mailError);
 		} else {
 			hideError($("#mailControl"), $("#mailError"));
 		}
+		 
+		 if (!isBlank(data.mailError1)) {
+				showError($("#mailControl1"), $("#mailError1"), data.mailError1);
+			} else {
+				hideError($("#mailControl1"), $("#mailError1"));
+			}
 		
 		if (!isBlank(data.addressError)) {
 			showError($("#addresControl"), $("#addresError"), data.addressError);

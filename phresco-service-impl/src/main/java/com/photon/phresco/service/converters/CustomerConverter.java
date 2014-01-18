@@ -66,6 +66,9 @@ public class CustomerConverter implements Converter<CustomerDAO, Customer> {
 		customer.setOptions(dao.getOptions());
 		customer.setContext(dao.getContext());
 		customer.setUiType(dao.getUiType());
+		customer.setSupportEmail(dao.getSupportEmail());
+		customer.setSupportPassword(dao.getSupportPassword());
+		customer.setSupportSmtpHost(dao.getSupportSmtpHost());
 		if (isDebugEnabled) {
 			LOGGER.debug("ArtifactGroupConverter.convertDAOToObject:Exit");
 		}
@@ -102,6 +105,9 @@ public class CustomerConverter implements Converter<CustomerDAO, Customer> {
 		customerDAO.setOptions(customer.getOptions());
 		customerDAO.setContext(customer.getContext());
 		customerDAO.setUiType(customer.getUiType());
+		customerDAO.setSupportEmail(customer.getSupportEmail());
+		customerDAO.setSupportPassword(customer.getSupportPassword());
+		customerDAO.setSupportSmtpHost(customer.getSupportSmtpHost());
 		if (isDebugEnabled) {
 			LOGGER.debug("ArtifactGroupConverter.convertObjectToDAO:Exit");
 		}

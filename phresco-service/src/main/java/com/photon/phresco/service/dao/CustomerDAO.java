@@ -123,6 +123,19 @@ public class CustomerDAO extends BaseDAO {
 	private UIType uiType;
 
 	/**
+	 * 
+	 */
+	private String supportEmail;
+	/**
+	 * 
+	 */
+	private String supportPassword;
+	/**
+	 * 
+	 */
+	private String supportSmtpHost;
+	
+	/**
 	 * @return the emailId
 	 */
 	public String getEmailId() {
@@ -372,5 +385,47 @@ public class CustomerDAO extends BaseDAO {
 	 */
 	public UIType getUiType() {
 		return uiType;
+	}
+
+	/**
+	 * @return
+	 */
+	public String getSupportEmail() {
+		return supportEmail;
+	}
+
+	/**
+	 * @param supportEmail
+	 */
+	public void setSupportEmail(String supportEmail) {
+		this.supportEmail = supportEmail;
+	}
+
+	/**
+	 * @return
+	 */
+	public String getSupportPassword() {
+		return supportPassword;
+	}
+
+	/**
+	 * @param supportPassword
+	 */
+	public void setSupportPassword(String supportPassword) {
+		this.supportPassword = supportPassword;
+	}
+
+	/**
+	 * @return
+	 */
+	public String getSupportSmtpHost() {
+		return supportSmtpHost;
+	}
+
+	/**
+	 * @param supportSmtpHost
+	 */
+	public void setSupportSmtpHost(String supportSmtpHost) {
+		this.supportSmtpHost = supportSmtpHost;
 	}
 }

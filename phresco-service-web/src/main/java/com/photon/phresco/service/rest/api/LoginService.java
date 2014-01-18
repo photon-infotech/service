@@ -17,16 +17,19 @@
  */
 package com.photon.phresco.service.rest.api;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.QueryParam;
 
+import org.springframework.data.document.mongodb.query.Criteria;
+import org.springframework.data.document.mongodb.query.Query;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,13 +38,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
+import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.User;
 import com.photon.phresco.commons.model.User.AuthType;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.logger.SplunkLogger;
+import com.photon.phresco.service.api.Converter;
 import com.photon.phresco.service.api.DbManager;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.api.RepositoryManager;
+import com.photon.phresco.service.converters.ConvertersFactory;
+import com.photon.phresco.service.dao.CustomerDAO;
 import com.photon.phresco.service.impl.DbService;
 import com.photon.phresco.service.model.ServerConfiguration;
 import com.photon.phresco.service.rest.util.AuthenticationUtil;
@@ -56,11 +63,6 @@ import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
-import java.util.*;
-import javax.mail.*;
-import javax.mail.Message.RecipientType;
-import javax.mail.internet.*;
-import javax.activation.*;
 
 @Controller
 @RequestMapping(value = ServiceConstants.REST_API_LOGIN, consumes = MediaType.APPLICATION_JSON_VALUE, 
@@ -135,32 +137,39 @@ public class LoginService extends DbService {
 
 
 	@ApiOperation(value = " Login service ")
-	@RequestMapping(value= "/forgotPassword", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
-	public @ResponseBody Boolean forgotPassword(HttpServletRequest request, HttpServletResponse response,
-			@ApiParam(value = "User id", name = "userid")@RequestBody String userId
-	) throws PhrescoException {
+	@RequestMapping(value= "/forgotPassword", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+	public @ResponseBody Boolean forgotPasword(HttpServletRequest request, HttpServletResponse response,@ApiParam(value = "userId", 
+			name = "userId") @QueryParam("userId") String userId, @ApiParam(value = "custId", name = "custId") @QueryParam("custId") String custId) throws PhrescoException {
 		if(isDebugEnabled) {
 			LOGGER.debug("LoginService.forgotPassword : Entry");
 
 		}
 		PhrescoServerFactory.initialize();
-			DbManager dbManager = PhrescoServerFactory.getDbManager();
-			User user = dbManager.authenticateUserId(userId);
-			Gson gson = new Gson();
-			if (user != null ) {
-				if(!user.getAuthType().equals(AuthType.LOCAL)) {
-					return false;
-				}
-				UUID uniqueId = UUID.randomUUID();
-				String newPwd = uniqueId.toString();
-				String body = "New password is "+newPwd;
-				Utility.sendTemplateEmail(user.getEmail(), "phresco.do.not.reply@gmail.com", "Phresco new password", body, "phresco.do.not.reply@gmail.com", "phresco123");
-				user.setPassword(ServerUtil.encodeUsingHash(user.getName(), newPwd));	
-				DbService.getMongoOperation().save(USERS_COLLECTION_NAME, user);
-				return true;
-			} else {
-				throw new PhrescoException("Null user");
+		DbManager dbManager = PhrescoServerFactory.getDbManager();
+		User user = dbManager.authenticateUserId(userId);
+		if (user != null ) {
+			if(!user.getAuthType().equals(AuthType.LOCAL)) {
+				return false;
 			}
+			List<Customer> customers = new ArrayList<Customer>();
+			Converter<CustomerDAO, Customer> converter = (Converter<CustomerDAO, Customer>) ConvertersFactory.getConverter(CustomerDAO.class);
+			List<CustomerDAO> customerDAOs = DbService.getMongoOperation().
+			find(CUSTOMERS_COLLECTION_NAME, new Query(Criteria.where(REST_QUERY_CONTEXT).is(custId)), CustomerDAO.class);
+			for (CustomerDAO customerDAO : customerDAOs) {
+				Customer convertDAOToObject = converter.convertDAOToObject(customerDAO, DbService.getMongoOperation());
+				customers.add(convertDAOToObject);
+			}
+			Customer customer = customers.get(0);
+			UUID uniqueId = UUID.randomUUID();
+			String newPwd = uniqueId.toString();
+			String body = "New password is "+newPwd;
+			Utility.sendTemplateEmail(user.getEmail(), customer.getSupportEmail(), "Phresco new password", body, customer.getSupportEmail(), customer.getSupportPassword(),customer.getSupportSmtpHost());
+			user.setPassword(ServerUtil.encodeUsingHash(user.getName(), newPwd));	
+			DbService.getMongoOperation().save(USERS_COLLECTION_NAME, user);
+			return true;
+		} else {
+			throw new PhrescoException("Null user");
+		}
 	}
 
 	private User loginUsingAuth(Credentials credentials, HttpServletResponse response) throws PhrescoException {

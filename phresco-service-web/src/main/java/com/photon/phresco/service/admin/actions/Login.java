@@ -183,11 +183,10 @@ public class Login extends ServiceBaseAction {
         ClientResponse response = null;
 		try{
 		Client client = ClientHelper.createClient();
-		WebResource resource = client.resource(PhrescoServerFactory.getServerConfig().getAdminServiceURL() + "/" + "login" + "/" +"forgotPassword");
+		WebResource resource = client.resource(PhrescoServerFactory.getServerConfig().getAdminServiceURL() + "/" + "login" + "/" +"forgotPassword").queryParam("userId", userId).queryParam("custId", "photon");
         Builder builder = resource.accept(MediaType.APPLICATION_JSON);        
-        response = builder.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, getUserId());
+        response = builder.type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         Boolean result = response.getEntity(Boolean.class);
-        System.out.println(response.getStatus());
 
         if (result ) {
 			setMsg(getText(PWD_FORGOT_SUCCESS));
