@@ -9,7 +9,9 @@
 	
     <scm>
         <connection>https://github.com/photon-infotech/service.git</connection>
-    </scm>
+        <developerConnection>scm:git:https://github.com/photon-infotech/service.git</developerConnection>
+        <url>scm:git:https://github.com/photon-infotech/service.git</url>
+  </scm>
     <build>
         <sourceDirectory>${phresco.source.directory}</sourceDirectory>
         <testSourceDirectory>${testSourceDirectory}</testSourceDirectory>
@@ -498,5 +500,6 @@
         <struts2-json-plugin.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">2.2.3.1</struts2-json-plugin.version>
         <jersey-multipart.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">1.8</jersey-multipart.version>
         <tomcat-maven-plugin.version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">1.1</tomcat-maven-plugin.version>
+        <phresco.src.repo.url>https://github.com/photon-infotech/service.git</phresco.src.repo.url>
     </properties>
 </project>
