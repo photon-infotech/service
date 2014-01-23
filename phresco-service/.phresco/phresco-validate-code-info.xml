@@ -78,7 +78,7 @@
                     <description></description>
                     <key>skipTests</key>
                     <multiple>false</multiple>
-                    <value>false</value>
+                    <value>true</value>
                     <sort>false</sort>
                     <show>false</show>
                 </parameter>
