@@ -251,6 +251,7 @@
     </dependencies>
     
     <build>
+		<finalName>phresco-service-impl</finalName>
 		<sourceDirectory>${phresco.source.directory}</sourceDirectory>
         <plugins>
             <plugin>
