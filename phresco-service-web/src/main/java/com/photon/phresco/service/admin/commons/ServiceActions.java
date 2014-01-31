@@ -60,6 +60,7 @@ public interface ServiceActions {
 	String COMP_APPTYPE_UPDATE          = "applicationUpdate";
 	String COMP_APPTYPE_CANCEL			= "applicationCancel";
 	
+	String COMP_TECH_OPTIONS_LIST = "techOptions";
 	
 	String COMP_CONFIGTEMPLATE_LIST 	= "configtempList";
 	String COMP_CONFIGTEMPLATE_ADD 		= "configtempAdd";

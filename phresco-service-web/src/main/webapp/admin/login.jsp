@@ -221,7 +221,6 @@ $(document).ready(function() {
 		document.getElementById("rememberMe").checked=false;
 	}
 	$("#forgotPassword").click(function() {
-		console.info("enterd")
 		yesnoPopup('showForgotPwdPopup', 'Forgot Password', 'forgotPassword');
 	});
 

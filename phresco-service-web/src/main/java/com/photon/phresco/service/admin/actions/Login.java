@@ -40,7 +40,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import com.google.gson.Gson;
 import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.Role;
 import com.photon.phresco.commons.model.User;
@@ -50,7 +49,6 @@ import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.admin.actions.admin.Videos;
 import com.photon.phresco.service.api.PhrescoServerFactory;
 import com.photon.phresco.service.client.impl.ClientHelper;
-import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.Credentials;
 import com.photon.phresco.util.Utility;
 import com.sun.jersey.api.client.Client;

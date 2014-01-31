@@ -41,8 +41,4 @@
 	$(document).ready(function() {
 		loadContent("fetchUsersFromDB", $("#syncForm"), $('#userListContainer'));
 	});
-	
-	$('#userSync').click(function() {
-		loadContent("syncUsers", $("#syncForm"), $('#userListContainer'));
-	});
 </script>

@@ -278,6 +278,18 @@
             <result name="archetypesList">/admin/pages/components/archetype/list.jsp</result>
         </action>
         
+        <action name="openAppFeaturesPopup" class="com.photon.phresco.service.admin.actions.components.Archetypes" method="showAppFeaturesPopup">
+            <result name="techOptions">/admin/pages/components/archetype/appFeatures.jsp</result>
+        </action>
+        
+        <action name="deleteAppFeatures" class="com.photon.phresco.service.admin.actions.components.Archetypes" method="deleteAppFeatures">
+           <result type="json" />
+        </action>
+        
+        <action name="createAppFeatures" class="com.photon.phresco.service.admin.actions.components.Archetypes" method="createAppFeatures">
+           	<interceptor-ref name="json"/>
+            <result name="archetypesList">/admin/pages/components/archetype/list.jsp</result>
+        </action>
 		<!-- COMPONENT ARCHETYPES ENDS-->
 			
 		<!-- COMPONENT APPLICATION TYPES STARTS-->

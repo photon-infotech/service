@@ -266,7 +266,7 @@ public class Users extends ServiceBaseAction {
 			if (user != null && StringUtils.isNotEmpty(getSelectedRoles())) {
 				List<String> rolesIds = Arrays.asList(getSelectedRoles().split(ServiceConstants.COMMA));
 				user.setRoleIds(rolesIds);
-				getServiceManager().updateUserInfo(user, userId);
+				getServiceManager().createUsers(Collections.singletonList(user), getUserId(), EDIT);
 				setUserName(user.getName());
 				addActionMessage(getText(ROLE_ADDED_TO_USER, Collections.singletonList(user.getName())));
 			}

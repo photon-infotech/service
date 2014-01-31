@@ -48,7 +48,8 @@
 			onclick="addArchetype();" value="<s:text name='lbl.hdr.archetype.add'/>"/>
 		<input type="button" id="del" class="btn" disabled value="<s:text name='lbl.btn.del'/>"
 		 	onclick="showDeleteConfirmation('<s:text name='del.confirm.archetype'/>');"/>
-		<input type="button" id="techGroup" class="btn btn-primary" name="tech_group" onclick="addTechGroup();" value="<s:text name='lbl.hdr.archetype.techgroup'/>"/> 	
+		<input type="button" id="techGroup" class="btn btn-primary" name="tech_group" onclick="addTechGroup();" value="<s:text name='lbl.hdr.archetype.techgroup'/>"/>
+		<input type="button" id="applicableFeatures" class="btn btn-primary" name="applicableFeatures" onclick="addApplicableFeatures();" value="<s:text name='lbl.hdr.archetype.applicableFeatures'/>"/> 	
 		<s:if test="hasActionMessages()">
 			<div class="alert alert-success alert-message"  id="successmsg">
 				<s:actionmessage />
@@ -215,12 +216,28 @@
 		yesnoPopup('openTechGroupPopup', 'Technology Group', 'techGroupOk', 'Ok', $('#formArchetypeList'));
 	}
     
+    function addApplicableFeatures() {
+    	yesnoPopup('openAppFeaturesPopup', 'Applicable Features', 'appFeaturesOk', 'Ok', $('#formArchetypeList'));
+    }
+    
 	function popupOnOk(self) {
 		if ($(self).attr("id") == "techGroupOk") {
 			showParentPage();
 			var customerId = $('input[name=customerId]').val();
 			var params = '{"techGroups" : [' + techGroupToAdd.join(',') + '], "customerId" : "' + customerId + '"}';
 			loadJsonContent('newTechGroup', params, $("#subcontainer"));
+		}
+		if ($(self).attr("id") == "appFeaturesOk") {
+			showParentPage();
+			var technologyOptions = [];
+			$('#multiAppFeatures ul li input[type=checkbox]').each( function() {
+	        	if ($(this).attr("new") === "true") {
+	        		technologyOptions.push($(this).val());
+	        	}
+			});
+			var customerId = $('input[name=customerId]').val();
+			var params = '{"technologyOptions" : [' + technologyOptions.join(',') + '], "customerId" : "' + customerId + '"}';
+			loadJsonContent('createAppFeatures', params, $("#subcontainer"));
 		}
 	}
 </script>

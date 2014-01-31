@@ -319,6 +319,10 @@ public interface ServiceUIConstants {
 	String EXCEPTION_ARCHETYPE_ADD = "excep.hdr.comp.archetype.add";
 	String EXCEPTION_ARCHETYPE_LIST = "excep.hdr.comp.archetype.list";
 	
+	String EXCEPTION_OPTIONS_LIST = "excep.hdr.comp.options.list";
+	String EXCEPTION_OPTIONS_DELETE = "excep.hdr.comp.options.delete";
+	String EXCEPTION_OPTIONS_CREATE = "excep.hdr.comp.options.create";
+	
 	String EXCEPTION_APPTYPES_LIST = "excep.hdr.comp.appln.list";
 	String EXCEPTION_APPTYPES_EDIT = "excep.hdr.comp.appln.edit";
 	String EXCEPTION_APPTYPES_SAVE = "excep.hdr.comp.appln.save";
@@ -461,6 +465,8 @@ public interface ServiceUIConstants {
     String ARCHETYPE_DELETED = "succ.archetype.delete";
     String ARCHETYPE_NOT_DELETED = "fail.archetype.delete" ;
     String TECH_GROUP_UPDATED = "succ.techgroup.update";
+    
+    String TECH_OPTION_CREATED = "succ.option.create";
     
     String PLTPROJ_ADDED = "succ.pltproj.add";
     String PLTPROJ_UPDATED = "succ.pltproj.updated";

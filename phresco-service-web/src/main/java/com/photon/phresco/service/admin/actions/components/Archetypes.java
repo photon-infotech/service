@@ -127,6 +127,9 @@ public class Archetypes extends ServiceBaseAction {
 	private List<String> applicableEmbedTechnology = new ArrayList<String>();
 	private List<String> functionalFrameworkInfo = new ArrayList<String>();
 	
+	private List<String> appFeatures = new ArrayList<String>();
+	private List<TechnologyOptions> technologyOptions = new ArrayList<TechnologyOptions>();
+	
 	private byte[] newtempApplnByteArray = null;
 	
 	public String list() throws PhrescoException {
@@ -375,7 +378,6 @@ public class Archetypes extends ServiceBaseAction {
 		}
 		Technology technology = new Technology();
 		try {
-			ServiceManager serviceManager = getServiceManager();
 			String artifactId = getArtifactId();
 			String groupId = getGroupId();
 			String version = getVersion();
@@ -792,6 +794,79 @@ public class Archetypes extends ServiceBaseAction {
 		}
 		
 		return TECHGROUP_LIST;
+	}
+	
+	public String showAppFeaturesPopup() throws PhrescoException {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Archetypes.showAppFeaturesPopup : Entry");
+		}
+		try {
+			List<TechnologyOptions> options = getServiceManager().getOptions();
+			setReqAttribute(REQ_TECHNOLOGY_OPTION, options);
+		} catch (Exception e) {
+			if (isDebugEnabled) {
+				S_LOGGER.error("Archetypes.showAppFeaturesPopup", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
+			return showErrorPopup(new PhrescoException(e), getText(EXCEPTION_OPTIONS_LIST));
+		}
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Archetypes.showAppFeaturesPopup : Exit");
+		}
+		
+		return COMP_TECH_OPTIONS_LIST;
+	}
+	
+	public String deleteAppFeatures() throws PhrescoException {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Archetypes.deleteAppFeatures : Entry");
+		}
+		if (isDebugEnabled) {
+			if (CollectionUtils.isEmpty(getAppFeatures())) {
+				S_LOGGER.warn("Archetypes.deleteAppFeatures", "status=\"Bad Request\"", "message=\"No applicable features selected to delete\"");
+				return showErrorPopup(new PhrescoException("No applicable features selected to delete"), getText(EXCEPTION_ARCHETYPE_UPDATE));
+			}
+			S_LOGGER.info("Archetypes.deleteAppFeatures", "appFeatures=" + "\"" + getAppFeatures() + "\"");
+		}
+		try {
+			for (String option : getAppFeatures()) {
+				getServiceManager().deleteOption(option);
+			}
+		} catch (PhrescoException e) {
+			if (isDebugEnabled) {
+				S_LOGGER.error("Archetypes.deleteAppFeatures", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
+			return showErrorPopup(new PhrescoException(e), getText(EXCEPTION_OPTIONS_DELETE));
+		}
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Archetypes.deleteAppFeatures : Exit");
+		}
+		
+		return SUCCESS;
+	}
+	
+	public String createAppFeatures() throws PhrescoException {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Archetypes.createAppFeatures : Entry");
+		}
+		
+		try {
+			if (CollectionUtils.isEmpty(getTechnologyOptions())) {
+				S_LOGGER.warn("Archetypes.createAppFeatures", "status=\"Bad Request\"", "message=\"No applicable features available to create\"");
+				return showErrorPopup(new PhrescoException("No applicable features available to create"), getText(EXCEPTION_OPTIONS_CREATE));
+			}
+			getServiceManager().createTechnologyOptions(getTechnologyOptions());
+			addActionMessage(getText(TECH_OPTION_CREATED));
+		} catch (Exception e) {
+			if (isDebugEnabled) {
+				S_LOGGER.error("Archetypes.createAppFeatures", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+			}
+			return showErrorPopup(new PhrescoException(e), getText(EXCEPTION_OPTIONS_CREATE));
+		}
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Archetypes.createAppFeatures : Exit");
+		}
+
+		return list();
 	}
 
 	private boolean featureValidation(boolean isError) {
@@ -1272,5 +1347,21 @@ public class Archetypes extends ServiceBaseAction {
 
 	public String getSubModulesError() {
 		return subModulesError;
+	}
+
+	public List<String> getAppFeatures() {
+		return appFeatures;
+	}
+
+	public void setAppFeatures(List<String> appFeatures) {
+		this.appFeatures = appFeatures;
+	}
+
+	public List<TechnologyOptions> getTechnologyOptions() {
+		return technologyOptions;
+	}
+
+	public void setTechnologyOptions(List<TechnologyOptions> technologyOptions) {
+		this.technologyOptions = technologyOptions;
 	}
 }

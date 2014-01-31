@@ -51,7 +51,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.google.gson.Gson;
-import com.mongodb.DBCollection;
 import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactElement;
@@ -3092,7 +3091,7 @@ public class ComponentService extends DbService {
 	 * @return
 	 */
     @ApiOperation(value = " Retrives technology options")
-    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to delete"), @ApiError(code=204, reason = "Options not found")})
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to fetch"), @ApiError(code=204, reason = "Options not found")})
     @RequestMapping(value= REST_API_OPTIONS, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
 	public @ResponseBody List<TechnologyOptions> findOptions(HttpServletResponse response) {
 	    if (isDebugEnabled) {
@@ -3110,6 +3109,53 @@ public class ComponentService extends DbService {
 		} catch (Exception e) {
 			response.setStatus(500);
 			throw new PhrescoWebServiceException(e, EX_PHEX00005, OPTIONS_COLLECTION_NAME);
+		}
+	}
+    
+    /**
+     * Deletes the option by id for the given parameter
+     * @param id
+     * @return 
+     */
+    @ApiOperation(value = " Deletes a option based on their id ")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to delete")})
+    @RequestMapping(value= REST_API_OPTIONS + REST_API_PATH_ID, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
+    public @ResponseBody void deleteOption(HttpServletResponse response, @ApiParam(name = REST_API_PATH_PARAM_ID , required = true, 
+    		value = "The id of the option that needs to delete")@PathVariable(REST_API_PATH_PARAM_ID) String id) {
+        if (isDebugEnabled) {
+            LOGGER.debug("Entered into ComponentService.deleteOption(String id)" + id);
+        }
+    	try {
+    		DbService.getMongoOperation().remove(OPTIONS_COLLECTION_NAME, new Query(Criteria.where(REST_API_PATH_PARAM_ID).is(id)), TechnologyOptions.class);
+    		response.setStatus(200);
+    	} catch (Exception e) {
+    		response.setStatus(500);
+    		throw new PhrescoWebServiceException(e, EX_PHEX00005, DELETE);
+    	}
+    }
+    
+    /**
+     * To create technology options
+     * @param response
+     * @param techOptions
+     */
+    @ApiOperation(value = " Create list of technology options ")
+    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to create")})
+    @RequestMapping(value= REST_API_OPTIONS, consumes = MediaType.APPLICATION_JSON_VALUE, 
+    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+	public @ResponseBody void createTechnologyOptions(HttpServletResponse response , 
+			@ApiParam(name = "techOptions" , value = "List of technology options")	@RequestBody List<TechnologyOptions> techOptions) {
+	    if (isDebugEnabled) {
+	        LOGGER.debug("Entered into ComponentService.createTechnologyOptions(List<TechnologyOptions> techOptions)");
+	    }
+		try {
+			for (TechnologyOptions techOption : techOptions) {
+				DbService.getMongoOperation().save(OPTIONS_COLLECTION_NAME , techOption);
+			}
+			response.setStatus(200);
+		} catch (Exception e) {
+			response.setStatus(500);
+			throw new PhrescoWebServiceException(e, EX_PHEX00006, INSERT);
 		}
 	}
 	
