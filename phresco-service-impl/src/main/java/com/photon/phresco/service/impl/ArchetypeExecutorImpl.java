@@ -95,8 +95,6 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 			ArtifactInfo artifactInfo = archetypeInfo.getVersions().get(0);
 			String version = artifactInfo.getVersion();
 			String groupId = projectInfo.getGroupId();
-//			if(projectInfo.isMultiModule()) {
-				
 				if(CollectionUtils.isNotEmpty(applicationInfo.getModules())) {
 					String rootFolderTempPath = tempFolderPath;
 					createMultiModuleObject(projectInfo, rootFolderTempPath,
@@ -106,19 +104,18 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 					tempFolderPath = tempFolderPath + "/" + applicationInfo.getCode();
 					
 					for (ModuleInfo moduleInfo : applicationInfo.getModules()) {
-						archetypeInfo = dbManager.getArchetypeInfo(moduleInfo.getTechInfo().getId(), customerId);
-						version = archetypeInfo.getVersions().get(0).getVersion();
-						commandString = buildCommandString(moduleInfo.getCode(), techId, archetypeInfo.getGroupId(), 
-								archetypeInfo.getArtifactId(), version, repoInfo.getReleaseRepoURL(), projectInfo.getVersion(), customerId, groupId);
-						
-						executeCreateCommand(tempFolderPath, commandString, customerId, projectInfo);
-						updateDefaultFeatures(projectInfo, tempFolderPath, customerId, moduleInfo.getCode(), moduleInfo);
-						updateRepository(customerId, applicationInfo, new File(
-								tempFolderPath), moduleInfo.getCode(), projectInfo.getName());
+						if (!moduleInfo.isModified()) {
+							archetypeInfo = dbManager.getArchetypeInfo(moduleInfo.getTechInfo().getId(), customerId);
+							version = archetypeInfo.getVersions().get(0).getVersion();
+							commandString = buildCommandString(moduleInfo.getCode(), techId, archetypeInfo.getGroupId(), 
+									archetypeInfo.getArtifactId(), version, repoInfo.getReleaseRepoURL(), projectInfo.getVersion(), customerId, groupId);
+							
+							executeCreateCommand(tempFolderPath, commandString, customerId, projectInfo);
+							updateDefaultFeatures(projectInfo, tempFolderPath, customerId, moduleInfo.getCode(), moduleInfo);
+							updateRepository(customerId, applicationInfo, new File(
+									tempFolderPath), moduleInfo.getCode(), projectInfo.getName());
+						}
 					}
-//				}
-				
-				
 			} else {
 				commandString = buildCommandString(applicationInfo.getCode(), techId, archetypeInfo.getGroupId(), 
 						archetypeInfo.getArtifactId(), version,	repoInfo.getReleaseRepoURL(), projectInfo.getVersion(), customerId, groupId);
