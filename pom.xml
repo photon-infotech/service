@@ -401,7 +401,7 @@
         </site>
     </distributionManagement>
     <properties>
-		<phresco.src.repo.url>https://saravanan-na@github.com/photon-infotech/service.git</phresco.src.repo.url>
+		<phresco.src.repo.url>https://github.com/photon-infotech/service.git</phresco.src.repo.url>
         <phresco.env.config.xml>/src/main/resources/phresco-env-config.xml</phresco.env.config.xml>
         <phresco.env.test.config.xml>/src/test/webapp/resources/phresco-env-config.xml</phresco.env.test.config.xml>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
