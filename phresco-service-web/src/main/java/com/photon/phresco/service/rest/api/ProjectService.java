@@ -112,14 +112,45 @@ public class ProjectService extends DbService {
 		}
 	}
 	
+	
+	@ApiOperation(value = " Create Integration Archetype ")
+	@ApiErrors(value = { @ApiError(code = 500, reason = "Unable To Create") })
+	@RequestMapping(value = "/integration", consumes = MediaType.APPLICATION_JSON_VALUE, produces = ServiceConstants.MEDIATYPE_ZIP, method = RequestMethod.POST)
+	public @ResponseBody byte[] createIntegrationArchetype(HttpServletRequest request,
+			@ApiParam(value = "Projectinfo to create", name = "projectInfo") @RequestBody ProjectInfo projectInfo)
+			throws PhrescoException, IOException {
+		LOGGER.debug("ProjectService.createIntegrationArchetype() : Entry");
+		if (projectInfo == null) {
+			LOGGER.warn("ProjectService.createIntegrationArchetype()", "status=\"Bad Request\"", "remoteAddress="
+					+ request.getRemoteAddr(), "user=" + request.getParameter("userId"));
+		}
+		String tempFolderPath = "";
+		FileInputStream fis = null;
+		try {
+			tempFolderPath = ServerUtil.getTempFolderPath();
+			addIntegrationTest(projectInfo, tempFolderPath);
+			ArchiveUtil.createArchive(tempFolderPath, tempFolderPath + ZIP, ArchiveType.ZIP);
+			LOGGER.debug("ProjectService.createIntegrationArchetype() : Exit");
+			fis = new FileInputStream(new File(tempFolderPath + ZIP));
+			return IOUtils.toByteArray(fis);
+		} catch (Exception pe) {
+			LOGGER.error("ProjectService.createIntegrationArchetype()", "remoteAddress=" + request.getRemoteAddr(),
+					"user=" + request.getParameter("userId"), "status=\"Failure\"", "message=\""
+							+ pe.getLocalizedMessage() + "\"");
+			throw new PhrescoException(pe);
+		} finally {
+			Utility.closeStream(fis);
+		}
+	}
+	
 	private void addIntegrationTest(ProjectInfo projectInfo, String tempFolderPath) throws PhrescoException {
 		if(!projectInfo.isIntegrationTest()) {
 			return;
 		}
 		try {
 			String customerId = projectInfo.getCustomerIds().get(0);
-			String techId = projectInfo.getAppInfos().get(0).getTechInfo().getId();
-			ArtifactGroup archetypeInfo = dbManager.getArchetypeInfo(techId,
+//			String techId = projectInfo.getAppInfos().get(0).getTechInfo().getId();
+			ArtifactGroup archetypeInfo = dbManager.getArchetypeInfo("tech-java-webservice",
 					customerId);
 			ArtifactInfo artifactInfo = archetypeInfo.getVersions().get(0);
 			String version = artifactInfo.getVersion();
@@ -127,7 +158,6 @@ public class ProjectService extends DbService {
 			String contentURL = ServerUtil.createContentURL("com.photon.phresco.test", "integrationtest", version, "zip");
 			DependencyUtils.extractFiles(contentURL, content, customerId);
 		} catch (PhrescoException e) {
-			e.printStackTrace();
 			throw new PhrescoException(e);
 		}
 		

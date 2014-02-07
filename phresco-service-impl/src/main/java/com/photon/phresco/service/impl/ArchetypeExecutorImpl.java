@@ -102,7 +102,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 							archetypeInfo, version, groupId);
 					commandString = "";
 					tempFolderPath = tempFolderPath + "/" + applicationInfo.getCode();
-					
+					writeDistributionTag(customerId, applicationInfo, projectInfo.getProjectCode(), repoInfo, getPhrescoPomFile(applicationInfo, new File(tempFolderPath)));
 					for (ModuleInfo moduleInfo : applicationInfo.getModules()) {
 						if (!moduleInfo.isModified()) {
 							archetypeInfo = dbManager.getArchetypeInfo(moduleInfo.getTechInfo().getId(), customerId);
@@ -187,7 +187,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 						"message=\"customerId is empty\"");
 				throw new PhrescoException("Customer Id is Empty");
 			}
-			if (appInfo == null) {
+			if (appInfo == null) { 
 				LOGGER.warn(ServiceConstants.ARCHETYPE_EXE_IMPL_UPDATE_REPO,
 						ServiceConstants.STATUS_BAD_REQUEST,
 						"message=\"applicationInfo is empty\"");
@@ -205,31 +205,10 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 			builder.append(appInfo.getAppDirName());
 		}
 		builder.append(File.separator);
-		builder.append(getPhrescoPomFile(appInfo, new File(tempFolderPath, appInfo.getAppDirName())).getName());
+		builder.append(getPhrescoPomFile(appInfo, new File(tempFolderPath, modName)).getName());
 		File pomFile = new File(builder.toString());
 		try {
-			PomProcessor processor = new PomProcessor(pomFile);
-			processor.setName(appInfo.getName());
-			processor.addRepositories(customerId, repoInfo.getGroupRepoURL());
-			DistributionManagement distributionManagement = new DistributionManagement();
-			DeploymentRepository repository = new DeploymentRepository();
-			repository.setId(projectName.concat("-release"));
-			repository.setUrl(repoInfo.getReleaseRepoURL());
-			distributionManagement.setRepository(repository);
-			if(StringUtils.isNotEmpty(repoInfo.getSnapshotRepoURL())) {
-				repository = new DeploymentRepository();
-				repository.setId(projectName.concat("-snapshot"));
-				repository.setUrl(repoInfo.getSnapshotRepoURL());
-				distributionManagement.setSnapshotRepository(repository);
-			}
-			processor.getModel().setDistributionManagement(distributionManagement);
-			processor.save();
-			File sourcePomFile = new File(pomFile.getParent(), appInfo.getPomFile());
-			if(sourcePomFile.exists()) {
-				PomProcessor pomProcessor = new PomProcessor(sourcePomFile);
-				pomProcessor.getModel().setDistributionManagement(distributionManagement);
-				pomProcessor.save();
-			}
+			writeDistributionTag(customerId, appInfo, projectName, repoInfo, pomFile);
 			if (isDebugEnabled) {
 				LOGGER.debug("ArchetypeExecutorImpl.updateRepository:Exit");
 			}
@@ -238,6 +217,32 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 					"status=\"Failure\"",
 					"message=\"" + e.getLocalizedMessage() + "\"");
 			throw new PhrescoException(e);
+		}
+	}
+
+	private void writeDistributionTag(String customerId, ApplicationInfo appInfo, String projectName,
+			RepoInfo repoInfo, File pomFile) throws PhrescoPomException {
+		PomProcessor processor = new PomProcessor(pomFile);
+		processor.setName(appInfo.getName());
+		processor.addRepositories(customerId, repoInfo.getGroupRepoURL());
+		DistributionManagement distributionManagement = new DistributionManagement();
+		DeploymentRepository repository = new DeploymentRepository();
+		repository.setId(projectName.concat("-release"));
+		repository.setUrl(repoInfo.getReleaseRepoURL());
+		distributionManagement.setRepository(repository);
+		if(StringUtils.isNotEmpty(repoInfo.getSnapshotRepoURL())) {
+			repository = new DeploymentRepository();
+			repository.setId(projectName.concat("-snapshot"));
+			repository.setUrl(repoInfo.getSnapshotRepoURL());
+			distributionManagement.setSnapshotRepository(repository);
+		}
+		processor.getModel().setDistributionManagement(distributionManagement);
+		processor.save();
+		File sourcePomFile = new File(pomFile.getParent(), appInfo.getPomFile());
+		if(sourcePomFile.exists()) {
+			PomProcessor pomProcessor = new PomProcessor(sourcePomFile);
+			pomProcessor.getModel().setDistributionManagement(distributionManagement);
+			pomProcessor.save();
 		}
 	}
 	
