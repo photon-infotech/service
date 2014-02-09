@@ -97,12 +97,15 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 			String groupId = projectInfo.getGroupId();
 				if(CollectionUtils.isNotEmpty(applicationInfo.getModules())) {
 					String rootFolderTempPath = tempFolderPath;
-					createMultiModuleObject(projectInfo, rootFolderTempPath,
-							applicationInfo, customerId, repoInfo, techId,
-							archetypeInfo, version, groupId);
+					if(!applicationInfo.isParentArchrtypeCreated()) {
+						createMultiModuleObject(projectInfo, rootFolderTempPath,
+								applicationInfo, customerId, repoInfo, techId,
+								archetypeInfo, version, groupId);
+						writeDistributionTag(customerId, applicationInfo, projectInfo.getProjectCode(), repoInfo, 
+								getPhrescoPomFile(applicationInfo, new File(tempFolderPath)));
+					}
 					commandString = "";
 					tempFolderPath = tempFolderPath + "/" + applicationInfo.getCode();
-					writeDistributionTag(customerId, applicationInfo, projectInfo.getProjectCode(), repoInfo, getPhrescoPomFile(applicationInfo, new File(tempFolderPath)));
 					for (ModuleInfo moduleInfo : applicationInfo.getModules()) {
 						if (!moduleInfo.isModified()) {
 							archetypeInfo = dbManager.getArchetypeInfo(moduleInfo.getTechInfo().getId(), customerId);
@@ -153,7 +156,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 				MULTI_MODULE_ARCHETYPE, version, repoInfo.getReleaseRepoURL(), projectInfo.getVersion(), customerId, groupId);
 		
 		executeCreateCommand(tempFolderPath, commandString, customerId, projectInfo);
-		
+		applicationInfo.setParentArchrtypeCreated(true);
 	}
 	
 	private void executeCreateCommand(String tempFolderPath, String command, String customerId, ProjectInfo info) throws PhrescoException {
