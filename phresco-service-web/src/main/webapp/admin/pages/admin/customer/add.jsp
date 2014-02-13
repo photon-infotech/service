@@ -160,7 +160,7 @@
 			Date formattedString = customer.getValidFrom();
 			SimpleDateFormat newDateFormat = new SimpleDateFormat("MM/dd/yyyy");      
 		 	Date d =newDateFormat.parse(newDateFormat.format(formattedString));  
-		 	validFrom = newDateFormat.format(formattedString);  
+		 	validFrom = newDateFormat.format(formattedString); 
 		}
 		if (customer.getValidUpto() != null) {
 			Date formattedString = customer.getValidUpto();
@@ -641,13 +641,14 @@
 			</div>
 		</div>
 
-		<div class="control-group">
+		<div class="control-group" id="validUptoCtrl">
 			<label class="control-label labelbold">
 					<s:text name='lbl.hdr.adm.cust.vlddateto'/>
 			</label>
 			<div class="controls">
 				<input id="todate" class="datealign" placeholder="<s:text name='place.hldr.cust.add.valid.date'/>" type="text" name="validUpTo" 
 				    value="<%= validUpto != null ? validUpto : "" %>">
+			    <span class="help-inline" id="validUptoError"></span>
 			</div>
 		</div>
 	
@@ -1367,6 +1368,12 @@
 			showError($("#licenControl"), $("#licenError"), data.licenError);
 		} else {
 			hideError($("#licenControl"), $("#licenError"));
+		}
+		
+		if (!isBlank(data.validUpToError)) {
+			showError($("#validUptoCtrl"), $("#validUptoError"), data.validUpToError);
+		} else {
+			hideError($("#validUptoCtrl"), $("#validUptoError"));
 		}
 		
 		if (!isBlank(data.repoNameError)) {

@@ -410,6 +410,7 @@ public interface ServiceUIConstants {
     String KEY_I18N_ERR_PLUGINJAR_INVALID = "err.msg.plugin.invalid";
     
     String KEY_I18N_ERR_EMAIL_EMPTY = "err.msg.email.empty";
+    String KEY_I18N_ERR_VALIDUPTO_INVALID = "err.msg.date.invalid";
     String KEY_I18N_ERR_ADDRS_EMPTY	= "err.msg.addrs.empty";
     String KEY_I18N_ERR_ZIPCODE_EMPTY = "err.msg.zip.empty";
     String KEY_I18N_ERR_CONTNUM_EMPTY = "err.msg.contnum.empty";

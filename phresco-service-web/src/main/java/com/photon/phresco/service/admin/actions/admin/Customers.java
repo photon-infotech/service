@@ -83,6 +83,7 @@ public class Customers extends ServiceBaseAction  {
 	private String mailError = "";
 	private String mailError1 = "";
 	private String addressError = "";
+	private String validUpToError = "";
 	private String zipError = "";
 	private String numError = "";
 	private String faxError = "";
@@ -720,6 +721,15 @@ public class Customers extends ServiceBaseAction  {
 		return tempError;
 	}
 	
+	public boolean dateValidation(boolean isError) {
+		if (validUpTo.before(validFrom)) {
+			setValidUpToError(getText(KEY_I18N_ERR_VALIDUPTO_INVALID));
+			tempError = true;
+		}
+		return tempError;
+
+	}
+	
 	public boolean appToTechValidation(boolean isError) {
 		if (CollectionUtils.isEmpty(getAppliesTo())) {
 			setApplyError(getText(KEY_I18N_MULTI_TECH_EMPTY));
@@ -936,7 +946,15 @@ public class Customers extends ServiceBaseAction  {
 	public void setValidUpTo(Date validUpTo) {
 		this.validUpTo = validUpTo;
 	}
+	
+	public String getValidUpToError() {
+		return validUpToError;
+	}
 
+	public void setValidUpToError(String ValidUpToError) {
+		this.validUpToError = ValidUpToError;
+	}
+	
 	public String getFromPage() {
 		return fromPage;
 	}
