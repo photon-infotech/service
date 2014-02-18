@@ -102,7 +102,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 								applicationInfo, customerId, repoInfo, techId,
 								archetypeInfo, version, groupId);
 						writeDistributionTag(customerId, applicationInfo, projectInfo.getProjectCode(), repoInfo, 
-								getPhrescoPomFile(applicationInfo, new File(tempFolderPath)));
+								getPhrescoPomFile(applicationInfo, new File(tempFolderPath, applicationInfo.getCode())));
 					}
 					commandString = "";
 					tempFolderPath = tempFolderPath + "/" + applicationInfo.getCode();
