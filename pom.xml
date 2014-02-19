@@ -4,7 +4,7 @@
     <artifactId>phresco-service-root</artifactId>
     <packaging>pom</packaging>
     <name>Phresco Service</name>
-    <version>3.2.1.1000</version>
+    <version>3.2.1.1001-SNAPSHOT</version>
     <url>http://www.phresco.org</url>
 	
     <scm>
