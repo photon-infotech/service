@@ -582,6 +582,9 @@ public class Customers extends ServiceBaseAction  {
 
 			//Empty validation for license type
 			isError = licenseTypeValidation(isError);
+			
+			//valid from and upto validation for date
+			isError = dateValidation(isError);
 
 			//Empty validation for repo name
 			isError = repoNameValidation(isError);
