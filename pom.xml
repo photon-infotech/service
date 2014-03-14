@@ -4,7 +4,7 @@
     <artifactId>phresco-service-root</artifactId>
     <packaging>pom</packaging>
     <name>Phresco Service</name>
-    <version>3.3.0.4001-SNAPSHOT</version>
+    <version>3.3.0.5001-SNAPSHOT</version>
     <url>http://www.phresco.org</url>
 	
     <scm>
@@ -73,7 +73,7 @@
                 <plugin>
                     <groupId>com.photon.phresco.plugins</groupId>
                     <artifactId>phresco-maven-plugin</artifactId>
-                    <version>3.3.0.4001-SNAPSHOT</version>
+                    <version>3.3.0.5001-SNAPSHOT</version>
                     <extensions>true</extensions>
                 </plugin>
             </plugins>
