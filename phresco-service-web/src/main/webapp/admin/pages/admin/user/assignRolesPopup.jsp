@@ -106,13 +106,13 @@
 <script type="text/javascript">
 	getRoles("service");
 	
+	$("#appliesTo").change(function() {
+		getRoles($(this).val());
+	});
+	
 	$(document).ready(function() {
 		$('.errMsg').empty();
-		
-		$("#appliesTo").change(function() {
-			getRoles($(this).val());
-		});
-		
+
 		<% if (CollectionUtils.isNotEmpty(permissionIds) && !permissionIds.contains(ServiceUIConstants.PER_MANAGE_USERS)) { %>
 			$("#assignRoles").attr("disabled", true).removeClass("btn-primary").addClass("btn-disabled");
 		<% } else { %>
@@ -121,7 +121,7 @@
 		
 		
 	});
-	
+	 
 	function getRoles(appliesTo) {
 		var params = "appliesTo=";
 		params = params.concat(appliesTo);
