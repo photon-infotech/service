@@ -105,7 +105,7 @@
             <password/>
             <type>mongodb</type>
             <host>172.16.8.250</host>
-            <dbname>phresco-3-0</dbname>
+            <dbname>phresco-qa-3-3-0</dbname>
            <username/>
         </Database>
         <Server name="server">
