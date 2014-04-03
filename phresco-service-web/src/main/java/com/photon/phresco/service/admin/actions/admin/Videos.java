@@ -151,7 +151,7 @@ public class Videos extends ServiceBaseAction {
 				inputStreamMap.put(Type.ICON.name(),  new ByteArrayInputStream(imgByteArray));
 			} 
 
-			getServiceManager().createVideos(createVideoInstance(), inputStreamMap);
+//			getServiceManager().createVideos(createVideoInstance(), inputStreamMap);
 			addActionMessage(getText(VIDEO_ADDED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
 			if(s_isDebugEnabled) {
@@ -187,7 +187,7 @@ public class Videos extends ServiceBaseAction {
 			if(imgByteArray != null){
 				inputStreamMap.put(videoInfo.getName(),  new ByteArrayInputStream(imgByteArray));
 			} 
-			getServiceManager().updateVideo(createVideoInstance(), inputStreamMap, getVideoId());
+//			getServiceManager().updateVideo(createVideoInstance(), inputStreamMap, getVideoId());
 			addActionMessage(getText(PLTPROJ_UPDATED, Collections.singletonList(getName())));
 		} catch (PhrescoException e) {
 			if(s_isDebugEnabled) {

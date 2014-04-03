@@ -55,7 +55,6 @@ import com.photon.phresco.commons.model.ApplicationInfo;
 import com.photon.phresco.commons.model.ApplicationType;
 import com.photon.phresco.commons.model.ArtifactElement;
 import com.photon.phresco.commons.model.ArtifactGroup;
-import com.photon.phresco.commons.model.ArtifactGroup.Type;
 import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.DownloadInfo;
 import com.photon.phresco.commons.model.Element;
@@ -92,9 +91,6 @@ import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.FileUtil;
 import com.photon.phresco.util.ServiceConstants;
 import com.phresco.pom.site.Reports;
-import com.sun.jersey.multipart.BodyPart;
-import com.sun.jersey.multipart.BodyPartEntity;
-import com.sun.jersey.multipart.MultiPart;
 import com.wordnik.swagger.annotations.ApiError;
 import com.wordnik.swagger.annotations.ApiErrors;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -525,6 +521,9 @@ public class ComponentService extends DbService {
 
 	private void createOrUpdateTechnology(MultipartHttpServletRequest request,
 			byte[] techJson) throws IOException, PhrescoException {
+		System.out.println("*********************************");
+		System.out.println("  Inside Technology Creation");
+		System.out.println("*********************************");
 		byte[] archetypeJar = null;
 	    Map<String, byte[]> pluginMap = new HashMap<String, byte[]>();
 	    Map<String, ArtifactGroup> pluginInfoMap = new HashMap<String, ArtifactGroup>();
@@ -567,74 +566,74 @@ public class ComponentService extends DbService {
 	}
 	
 	
-	private void saveOrUpdateTechnology(MultiPart multiPart, HttpServletResponse response) throws PhrescoException {
-		Technology technology = null;
-		List<BodyPart> entities = new ArrayList<BodyPart>();
-		Map<ArtifactGroup, BodyPart> archetypeMap = new HashMap<ArtifactGroup, BodyPart>();
-		Map<ArtifactGroup, BodyPart> pluginMap = new HashMap<ArtifactGroup, BodyPart>();
-
-		// To separete the object and binary file
-		List<BodyPart> bodyParts = multiPart.getBodyParts();
-		for (BodyPart bodyPart : bodyParts) {
-			if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_VALUE)) {
-				technology = bodyPart.getEntityAs(Technology.class);
-			} else {
-				entities.add(bodyPart);
-			}
-		}
-
-		if (technology == null) {
-			if(isDebugEnabled) {
-				LOGGER.debug("ComponentService.saveOrUpdateTechnology", "status=\"Bad Request\"" ,"message=" + "Technology Is Null");
-			}
-			response.setStatus(500);
-		}
-		if(isDebugEnabled) {
-			LOGGER.debug("ComponentService.saveOrUpdateTechnology", "customer" + getCustomerNameById(technology.getCustomerIds().get(0)), 
-					"techId=" + technology.getId());
-		}
-		for (BodyPart bodyPart : entities) {
-			if (bodyPart.getContentDisposition().getFileName()
-					.equals(technology.getName())) {
-				archetypeMap.put(technology.getArchetypeInfo(), bodyPart);
-			} else {
-				List<ArtifactGroup> plugins = technology.getPlugins();
-				for (ArtifactGroup artifactGroup : plugins) {
-					if (artifactGroup.getName().equals(
-							bodyPart.getContentDisposition().getFileName())) {
-						pluginMap.put(artifactGroup, bodyPart);
-					}
-				}
-			}
-		}
-
-		Set<ArtifactGroup> archetypeSet = archetypeMap.keySet();
-		for (ArtifactGroup artifactGroup : archetypeSet) {
-			createArtifacts(artifactGroup, archetypeMap.get(artifactGroup));
-		}
-
-		Set<ArtifactGroup> pluginSet = pluginMap.keySet();
-		for (ArtifactGroup artifactGroup : pluginSet) {
-			createArtifacts(artifactGroup, pluginMap.get(artifactGroup));
-		}
-		saveTechnology(technology);
-		if(isDebugEnabled) {
-			LOGGER.debug("ComponentService.saveOrUpdateTechnology : Exit");
-		} 
-	}
-
-	private void createArtifacts(ArtifactGroup artifactGroup, BodyPart bodyPart) throws PhrescoException {
-		BodyPartEntity bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
-		File artifactFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null, 
-				artifactGroup.getPackaging(), artifactGroup.getName());
-		if(!artifactFile.exists()) {
-			if(isDebugEnabled) {
-				LOGGER.info("ComponentService.createArtifacts", "customer" + getCustomerNameById(artifactGroup.getCustomerIds().get(0)), 
-						"artifactId=" + artifactGroup.getId() + "message=" + "Artifact File Not Found");
-			}
-		}
-		uploadBinary(artifactGroup, artifactFile);
-	}
+//	private void saveOrUpdateTechnology(MultiPart multiPart, HttpServletResponse response) throws PhrescoException {
+//		Technology technology = null;
+//		List<BodyPart> entities = new ArrayList<BodyPart>();
+//		Map<ArtifactGroup, BodyPart> archetypeMap = new HashMap<ArtifactGroup, BodyPart>();
+//		Map<ArtifactGroup, BodyPart> pluginMap = new HashMap<ArtifactGroup, BodyPart>();
+//
+//		// To separete the object and binary file
+//		List<BodyPart> bodyParts = multiPart.getBodyParts();
+//		for (BodyPart bodyPart : bodyParts) {
+//			if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_VALUE)) {
+//				technology = bodyPart.getEntityAs(Technology.class);
+//			} else {
+//				entities.add(bodyPart);
+//			}
+//		}
+//
+//		if (technology == null) {
+//			if(isDebugEnabled) {
+//				LOGGER.debug("ComponentService.saveOrUpdateTechnology", "status=\"Bad Request\"" ,"message=" + "Technology Is Null");
+//			}
+//			response.setStatus(500);
+//		}
+//		if(isDebugEnabled) {
+//			LOGGER.debug("ComponentService.saveOrUpdateTechnology", "customer" + getCustomerNameById(technology.getCustomerIds().get(0)), 
+//					"techId=" + technology.getId());
+//		}
+//		for (BodyPart bodyPart : entities) {
+//			if (bodyPart.getContentDisposition().getFileName()
+//					.equals(technology.getName())) {
+//				archetypeMap.put(technology.getArchetypeInfo(), bodyPart);
+//			} else {
+//				List<ArtifactGroup> plugins = technology.getPlugins();
+//				for (ArtifactGroup artifactGroup : plugins) {
+//					if (artifactGroup.getName().equals(
+//							bodyPart.getContentDisposition().getFileName())) {
+//						pluginMap.put(artifactGroup, bodyPart);
+//					}
+//				}
+//			}
+//		}
+//
+//		Set<ArtifactGroup> archetypeSet = archetypeMap.keySet();
+//		for (ArtifactGroup artifactGroup : archetypeSet) {
+//			createArtifacts(artifactGroup, archetypeMap.get(artifactGroup));
+//		}
+//
+//		Set<ArtifactGroup> pluginSet = pluginMap.keySet();
+//		for (ArtifactGroup artifactGroup : pluginSet) {
+//			createArtifacts(artifactGroup, pluginMap.get(artifactGroup));
+//		}
+//		saveTechnology(technology);
+//		if(isDebugEnabled) {
+//			LOGGER.debug("ComponentService.saveOrUpdateTechnology : Exit");
+//		} 
+//	}
+//
+//	private void createArtifacts(ArtifactGroup artifactGroup, BodyPart bodyPart) throws PhrescoException {
+//		BodyPartEntity bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
+//		File artifactFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null, 
+//				artifactGroup.getPackaging(), artifactGroup.getName());
+//		if(!artifactFile.exists()) {
+//			if(isDebugEnabled) {
+//				LOGGER.info("ComponentService.createArtifacts", "customer" + getCustomerNameById(artifactGroup.getCustomerIds().get(0)), 
+//						"artifactId=" + artifactGroup.getId() + "message=" + "Artifact File Not Found");
+//			}
+//		}
+//		uploadBinary(artifactGroup, artifactFile);
+//	}
 
 	private void saveTechnology(Technology technology) throws PhrescoException {
 		if(!validate(technology)) {
@@ -1443,66 +1442,66 @@ public class ComponentService extends DbService {
 		return createIcon;
 	}
 	
-    private ArtifactGroup createOrUpdateFeatures(MultiPart moduleInfo, HttpServletResponse response) throws PhrescoException {
-    	ArtifactGroup moduleGroup = null;
-        File moduleFile = null;
-        List<BodyPart> bodyParts = moduleInfo.getBodyParts();
-        Map<String, BodyPartEntity> bodyPartEntityMap = new HashMap<String, BodyPartEntity>();
-        moduleGroup = createBodyPart(moduleGroup, bodyParts, bodyPartEntityMap);
-        if (isDebugEnabled) {
-        	LOGGER.debug("ComponentService.createOrUpdateFeatures " , "customer" + getCustomerNameById(moduleGroup.getCustomerIds().get(0)), 
-        			"id" + moduleGroup.getId());
-        }
-        if(bodyPartEntityMap.isEmpty()) {
-        	saveModuleGroup(moduleGroup);
-        }
-        if (!bodyPartEntityMap.isEmpty()) {
-        	BodyPartEntity bodyPartEntity = bodyPartEntityMap.get(Type.ARCHETYPE.name());
-        	if (bodyPartEntity != null) {
-        		if(moduleGroup.getType().name().equals(FEATURE_TYPE_JS)) {
-					moduleGroup.setGroupId(JS_GROUP_ID);
-					moduleGroup.setArtifactId(moduleGroup.getName().toLowerCase());
-				}
-        		moduleFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null, 
-        				moduleGroup.getPackaging(), moduleGroup.getName());
-        		boolean uploadBinary = uploadBinary(moduleGroup, moduleFile);
-                if (uploadBinary) {
-                	saveModuleGroup(moduleGroup);
-                }
-                FileUtil.delete(moduleFile);
-			}
-        	if(bodyPartEntityMap.get(Type.ICON.name()) != null) {
-        		BodyPartEntity iconEntity = bodyPartEntityMap.get(Type.ICON.name());
-            	File iconFile = ServerUtil.writeFileFromStream(iconEntity.getInputStream(), null, ICON_EXT, moduleGroup.getName());
-            	moduleGroup.setPackaging(ICON_EXT);
-        		boolean uploadBinary = uploadBinary(moduleGroup, iconFile);
-        		FileUtil.delete(iconFile);
-        		if(!uploadBinary) {
-        			throw new PhrescoException("Module Icon Uploading Failed...");
-        		}
-        	}
-        }
-        response.setStatus(200);
-        bodyPartEntityMap.clear();
-        if (isDebugEnabled) {
-        	LOGGER.debug("ComponentService.createOrUpdateFeatures : Exit");
-        }
-        return moduleGroup;
-	}
+//    private ArtifactGroup createOrUpdateFeatures(MultiPart moduleInfo, HttpServletResponse response) throws PhrescoException {
+//    	ArtifactGroup moduleGroup = null;
+//        File moduleFile = null;
+//        List<BodyPart> bodyParts = moduleInfo.getBodyParts();
+//        Map<String, BodyPartEntity> bodyPartEntityMap = new HashMap<String, BodyPartEntity>();
+//        moduleGroup = createBodyPart(moduleGroup, bodyParts, bodyPartEntityMap);
+//        if (isDebugEnabled) {
+//        	LOGGER.debug("ComponentService.createOrUpdateFeatures " , "customer" + getCustomerNameById(moduleGroup.getCustomerIds().get(0)), 
+//        			"id" + moduleGroup.getId());
+//        }
+//        if(bodyPartEntityMap.isEmpty()) {
+//        	saveModuleGroup(moduleGroup);
+//        }
+//        if (!bodyPartEntityMap.isEmpty()) {
+//        	BodyPartEntity bodyPartEntity = bodyPartEntityMap.get(Type.ARCHETYPE.name());
+//        	if (bodyPartEntity != null) {
+//        		if(moduleGroup.getType().name().equals(FEATURE_TYPE_JS)) {
+//					moduleGroup.setGroupId(JS_GROUP_ID);
+//					moduleGroup.setArtifactId(moduleGroup.getName().toLowerCase());
+//				}
+//        		moduleFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null, 
+//        				moduleGroup.getPackaging(), moduleGroup.getName());
+//        		boolean uploadBinary = uploadBinary(moduleGroup, moduleFile);
+//                if (uploadBinary) {
+//                	saveModuleGroup(moduleGroup);
+//                }
+//                FileUtil.delete(moduleFile);
+//			}
+//        	if(bodyPartEntityMap.get(Type.ICON.name()) != null) {
+//        		BodyPartEntity iconEntity = bodyPartEntityMap.get(Type.ICON.name());
+//            	File iconFile = ServerUtil.writeFileFromStream(iconEntity.getInputStream(), null, ICON_EXT, moduleGroup.getName());
+//            	moduleGroup.setPackaging(ICON_EXT);
+//        		boolean uploadBinary = uploadBinary(moduleGroup, iconFile);
+//        		FileUtil.delete(iconFile);
+//        		if(!uploadBinary) {
+//        			throw new PhrescoException("Module Icon Uploading Failed...");
+//        		}
+//        	}
+//        }
+//        response.setStatus(200);
+//        bodyPartEntityMap.clear();
+//        if (isDebugEnabled) {
+//        	LOGGER.debug("ComponentService.createOrUpdateFeatures : Exit");
+//        }
+//        return moduleGroup;
+//	}
 
-	public ArtifactGroup createBodyPart(ArtifactGroup moduleGroup, List<BodyPart> bodyParts,
-			Map<String, BodyPartEntity> bodyPartEntityMap) {
-		if (CollectionUtils.isNotEmpty(bodyParts)) {
-            for (BodyPart bodyPart : bodyParts) {
-                if (bodyPart.getMediaType().equals(javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE)) {
-                    moduleGroup = bodyPart.getEntityAs(ArtifactGroup.class);
-                } else {
-                	bodyPartEntityMap.put(bodyPart.getContentDisposition().getFileName(), (BodyPartEntity) bodyPart.getEntity());
-                }
-            }
-        }
-		return moduleGroup;
-	}
+//	public ArtifactGroup createBodyPart(ArtifactGroup moduleGroup, List<BodyPart> bodyParts,
+//			Map<String, BodyPartEntity> bodyPartEntityMap) {
+//		if (CollectionUtils.isNotEmpty(bodyParts)) {
+//            for (BodyPart bodyPart : bodyParts) {
+//                if (bodyPart.getMediaType().equals(javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE)) {
+//                    moduleGroup = bodyPart.getEntityAs(ArtifactGroup.class);
+//                } else {
+//                	bodyPartEntityMap.put(bodyPart.getContentDisposition().getFileName(), (BodyPartEntity) bodyPart.getEntity());
+//                }
+//            }
+//        }
+//		return moduleGroup;
+//	}
 	
 	private void saveModuleGroup(ArtifactGroup moduleGroup) throws PhrescoException {
 		if(!validate(moduleGroup)) {
@@ -1915,38 +1914,38 @@ public class ComponentService extends DbService {
         saveApplicationInfo(applicationInfo);
 	}
     
-	private void createOrUpdatePilots(MultiPart pilotInfo, HttpServletResponse response) throws PhrescoException {
-		ApplicationInfo applicationInfo = null;
-        BodyPartEntity bodyPartEntity = null;
-        File pilotFile = null;
-        
-        List<BodyPart> bodyParts = pilotInfo.getBodyParts();
-        if(CollectionUtils.isNotEmpty(bodyParts)) {
-            for (BodyPart bodyPart : bodyParts) {
-                if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_VALUE)) {
-                    applicationInfo = bodyPart.getEntityAs(ApplicationInfo.class);
-                } else {
-                    bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
-                }
-            }
-        }
-        
-        if(bodyPartEntity != null) {
-        	 pilotFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null, 
-             		applicationInfo.getPilotContent().getPackaging(), applicationInfo.getName());
-             boolean uploadBinary = uploadBinary(applicationInfo.getPilotContent(), pilotFile);
-             if(uploadBinary) {
-             	saveApplicationInfo(applicationInfo);
-             } 
-             FileUtil.delete(pilotFile);
-        }
-       
-        
-        if(bodyPartEntity == null && applicationInfo != null) {
-        	saveApplicationInfo(applicationInfo);
-        }
-        response.setStatus(200);
-	}
+//	private void createOrUpdatePilots(MultiPart pilotInfo, HttpServletResponse response) throws PhrescoException {
+//		ApplicationInfo applicationInfo = null;
+//        BodyPartEntity bodyPartEntity = null;
+//        File pilotFile = null;
+//        
+//        List<BodyPart> bodyParts = pilotInfo.getBodyParts();
+//        if(CollectionUtils.isNotEmpty(bodyParts)) {
+//            for (BodyPart bodyPart : bodyParts) {
+//                if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_VALUE)) {
+//                    applicationInfo = bodyPart.getEntityAs(ApplicationInfo.class);
+//                } else {
+//                    bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
+//                }
+//            }
+//        }
+//        
+//        if(bodyPartEntity != null) {
+//        	 pilotFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null, 
+//             		applicationInfo.getPilotContent().getPackaging(), applicationInfo.getName());
+//             boolean uploadBinary = uploadBinary(applicationInfo.getPilotContent(), pilotFile);
+//             if(uploadBinary) {
+//             	saveApplicationInfo(applicationInfo);
+//             } 
+//             FileUtil.delete(pilotFile);
+//        }
+//       
+//        
+//        if(bodyPartEntity == null && applicationInfo != null) {
+//        	saveApplicationInfo(applicationInfo);
+//        }
+//        response.setStatus(200);
+//	}
 	
 	private void saveApplicationInfo(ApplicationInfo applicationInfo) throws PhrescoException {
 		if(!validate(applicationInfo)) {
@@ -2467,42 +2466,42 @@ public class ComponentService extends DbService {
 	}
     
 	
-    private void createOrUpdateDownloads(MultiPart downloadPart) throws PhrescoException {
-    	DownloadInfo downloadInfo = null;
-        BodyPartEntity bodyPartEntity = null;
-        File downloadFile = null;
-        
-        List<BodyPart> bodyParts = downloadPart.getBodyParts();
-        if(CollectionUtils.isNotEmpty(bodyParts)) {
-            for (BodyPart bodyPart : bodyParts) {
-                if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_VALUE)) {
-                    downloadInfo = bodyPart.getEntityAs(DownloadInfo.class);
-                } else if(bodyPart.getMediaType().equals(MediaType.APPLICATION_OCTET_STREAM_VALUE)){
-                    bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
-                }
-            }
-        }
-        if (isDebugEnabled) {
-            LOGGER.debug("ComponentService.createDownloads " , "id=" + downloadInfo.getId() , "customer=" + 
-            		getCustomerNameById(downloadInfo.getCustomerIds().get(0)));
-        }
-        if(bodyPartEntity != null) {
-            downloadFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null,
-            		downloadInfo.getArtifactGroup().getPackaging(), downloadInfo.getName());
-            boolean uploadBinary = uploadBinary(downloadInfo.getArtifactGroup(), downloadFile);
-            if(uploadBinary) {
-                saveDownloads(downloadInfo);
-            }
-            FileUtil.delete(downloadFile);
-        }
-        
-        if(bodyPartEntity == null && downloadInfo != null) {
-        	saveDownloads(downloadInfo);
-        }
-        if (isDebugEnabled) {
-            LOGGER.debug("ComponentService.createDownloads : Exit");
-        }
-	}
+//    private void createOrUpdateDownloads(MultiPart downloadPart) throws PhrescoException {
+//    	DownloadInfo downloadInfo = null;
+//        BodyPartEntity bodyPartEntity = null;
+//        File downloadFile = null;
+//        
+//        List<BodyPart> bodyParts = downloadPart.getBodyParts();
+//        if(CollectionUtils.isNotEmpty(bodyParts)) {
+//            for (BodyPart bodyPart : bodyParts) {
+//                if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_VALUE)) {
+//                    downloadInfo = bodyPart.getEntityAs(DownloadInfo.class);
+//                } else if(bodyPart.getMediaType().equals(MediaType.APPLICATION_OCTET_STREAM_VALUE)){
+//                    bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
+//                }
+//            }
+//        }
+//        if (isDebugEnabled) {
+//            LOGGER.debug("ComponentService.createDownloads " , "id=" + downloadInfo.getId() , "customer=" + 
+//            		getCustomerNameById(downloadInfo.getCustomerIds().get(0)));
+//        }
+//        if(bodyPartEntity != null) {
+//            downloadFile = ServerUtil.writeFileFromStream(bodyPartEntity.getInputStream(), null,
+//            		downloadInfo.getArtifactGroup().getPackaging(), downloadInfo.getName());
+//            boolean uploadBinary = uploadBinary(downloadInfo.getArtifactGroup(), downloadFile);
+//            if(uploadBinary) {
+//                saveDownloads(downloadInfo);
+//            }
+//            FileUtil.delete(downloadFile);
+//        }
+//        
+//        if(bodyPartEntity == null && downloadInfo != null) {
+//        	saveDownloads(downloadInfo);
+//        }
+//        if (isDebugEnabled) {
+//            LOGGER.debug("ComponentService.createDownloads : Exit");
+//        }
+//	}
 
     private void saveDownloads(DownloadInfo info) throws PhrescoException {
     	if(!validate(info)) {

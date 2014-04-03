@@ -373,7 +373,7 @@ public class PilotProjects extends ServiceBaseAction {
 					return showErrorPopup(new PhrescoException("No pilot project to delete"), getText(EXCEPTION_PILOT_PROJECTS_DELETE));
 				}
     		}
-    		if (ArrayUtils.isNotEmpty(projectIds)) {
+    		if (projectIds != null && projectIds.length != 0) {
     			for (String projectid : projectIds) {
     				getServiceManager().deletePilotProject(projectid, getCustomerId());
     			}
