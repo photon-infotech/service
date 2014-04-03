@@ -214,7 +214,7 @@ public class GlobalUrlAction extends ServiceBaseAction {
 				}
 				LOGGER.info("GlobalUrlAction.delete", "globalUrlIds=" + "\"" + globalUrlIds);
 			}
-			if (ArrayUtils.isNotEmpty(globalUrlIds)) {
+			if (globalUrlIds != null && globalUrlIds.length != 0) {
 				for (String globalUrlId : globalUrlIds) {
 					getServiceManager().deleteGlobalUrl(globalUrlId);
 				}

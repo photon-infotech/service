@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +30,6 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
@@ -39,7 +37,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.document.mongodb.query.Criteria;
 import org.springframework.data.document.mongodb.query.Query;
 import org.springframework.http.MediaType;
@@ -49,14 +46,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.google.gson.Gson;
 import com.photon.phresco.commons.model.ArtifactGroup;
-import com.photon.phresco.commons.model.ArtifactGroup.Type;
 import com.photon.phresco.commons.model.ArtifactInfo;
 import com.photon.phresco.commons.model.Customer;
 import com.photon.phresco.commons.model.LogInfo;
@@ -89,10 +84,6 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.multipart.BodyPart;
-import com.sun.jersey.multipart.BodyPartEntity;
-import com.sun.jersey.multipart.MultiPart;
-import com.sun.jersey.multipart.MultiPartMediaTypes;
 import com.wordnik.swagger.annotations.ApiError;
 import com.wordnik.swagger.annotations.ApiErrors;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -536,89 +527,89 @@ public class AdminService extends DbService {
 	 * @return 
 	 * @throws PhrescoException 
 	 */
-    @ApiOperation(value = " Creates a new video ")
-    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to create")})
-    @RequestMapping(value= REST_API_VIDEOS, consumes = MultiPartMediaTypes.MULTIPART_MIXED, 
-    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
-	public @ResponseBody void createVideo(@ApiParam(required = true, name = "videos", 
-    		value = "The multipart value of video to create")@RequestBody MultiPart videos) throws PhrescoException {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into AdminService.createVideo(List<VideoInfo> videos)");
-	    }
-	    createOrUpdateVideo(videos);
-	}
-
-	private void createOrUpdateVideo(MultiPart videosinfo)
-			throws PhrescoException {
-		VideoInfo video = null;
-		BodyPartEntity videoBodyPartEntity = null;
-		BodyPartEntity iconBodyPartEntity = null;
-		File videoFile = null;
-		List<BodyPart> bodyParts = videosinfo.getBodyParts();
-		File iconFile = null;
-		
-		if (CollectionUtils.isNotEmpty(bodyParts)) {
-			for (BodyPart bodyPart : bodyParts) {
-				if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_VALUE)) {
-					video = bodyPart.getEntityAs(VideoInfo.class);
-					video.setCustomerIds(Arrays.asList(DEFAULT_CUSTOMER_NAME));
-				} else {
-					if(bodyPart.getContentDisposition().getFileName().equals(Type.ICON.name())) {
-						iconBodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
-					} else {
-						videoBodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
-					}
-				}
-			}
-		}
-
-		String groupId = "videos.homepage";
-		String version = "1.0";
-		String artifactId = video.getName().toLowerCase().replace(" ", "");
-		video.setImageurl("/" + groupId.replace(".", "/") + "/" + artifactId + "/" + version
-				+ "/" + artifactId + "-" + version + "." + "png");
-		
-		if(videoBodyPartEntity != null && iconBodyPartEntity != null) {
-			videoFile = ServerUtil.writeFileFromStream(videoBodyPartEntity.getInputStream(), null, 
-					video.getVideoList().get(0).getArtifactGroup().getPackaging(), video.getName());
-			iconFile = ServerUtil.writeFileFromStream(iconBodyPartEntity.getInputStream(), null, 
-					"png", video.getName());
-			List<VideoType> videoTypeList = video.getVideoList();
-			for (VideoType videoType : videoTypeList) {
-					ArtifactGroup artifactGroup = videoType.getArtifactGroup();
-					videoType.setUrl("/" + groupId.replace(".", "/") + "/" + artifactId + "/" + version
-					+ "/" + artifactId + "-" + version + "." + artifactGroup.getPackaging());
-					videoType.setType(artifactGroup.getPackaging());
-					artifactGroup.setGroupId(groupId);
-					artifactGroup.setArtifactId(artifactId);
-					com.photon.phresco.commons.model.ArtifactInfo info = new com.photon.phresco.commons.model.ArtifactInfo();
-					info.setVersion(version);
-					artifactGroup.setVersions(Arrays.asList(info));
-					artifactGroup.setCustomerIds(Arrays.asList(DEFAULT_CUSTOMER_NAME));
-				if (artifactGroup != null) {
-					boolean uploadBinary = uploadBinary(artifactGroup, videoFile);
-					uploadIcon(artifactGroup, iconFile);
-					if (uploadBinary) {
-						saveVideos(video);
-					}
-				}
-			}
-		}
-		
-		if(videoBodyPartEntity == null && video != null) {
-			List<VideoType> videoTypeList = video.getVideoList();
-			for (VideoType videoType : videoTypeList) {
-				ArtifactGroup artifactGroup = videoType.getArtifactGroup();
-				artifactGroup.setGroupId("videos.homepage");
-				artifactGroup.setArtifactId(video.getName().toLowerCase());
-				com.photon.phresco.commons.model.ArtifactInfo info = new com.photon.phresco.commons.model.ArtifactInfo();
-				info.setVersion("1.0");
-				artifactGroup.setVersions(Arrays.asList(info));
-				artifactGroup.setCustomerIds(Arrays.asList(DEFAULT_CUSTOMER_NAME));
-				saveVideos(video);
-			}
-		}
-	}
+//    @ApiOperation(value = " Creates a new video ")
+//    @ApiErrors(value = {@ApiError(code=500, reason = "Failed to create")})
+//    @RequestMapping(value= REST_API_VIDEOS, consumes = MultiPartMediaTypes.MULTIPART_MIXED, 
+//    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+//	public @ResponseBody void createVideo(@ApiParam(required = true, name = "videos", 
+//    		value = "The multipart value of video to create")@RequestBody MultiPart videos) throws PhrescoException {
+//	    if (isDebugEnabled) {
+//	        S_LOGGER.debug("Entered into AdminService.createVideo(List<VideoInfo> videos)");
+//	    }
+//	    createOrUpdateVideo(videos);
+//	}
+//
+//	private void createOrUpdateVideo(MultiPart videosinfo)
+//			throws PhrescoException {
+//		VideoInfo video = null;
+//		BodyPartEntity videoBodyPartEntity = null;
+//		BodyPartEntity iconBodyPartEntity = null;
+//		File videoFile = null;
+//		List<BodyPart> bodyParts = videosinfo.getBodyParts();
+//		File iconFile = null;
+//		
+//		if (CollectionUtils.isNotEmpty(bodyParts)) {
+//			for (BodyPart bodyPart : bodyParts) {
+//				if (bodyPart.getMediaType().equals(MediaType.APPLICATION_JSON_VALUE)) {
+//					video = bodyPart.getEntityAs(VideoInfo.class);
+//					video.setCustomerIds(Arrays.asList(DEFAULT_CUSTOMER_NAME));
+//				} else {
+//					if(bodyPart.getContentDisposition().getFileName().equals(Type.ICON.name())) {
+//						iconBodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
+//					} else {
+//						videoBodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
+//					}
+//				}
+//			}
+//		}
+//
+//		String groupId = "videos.homepage";
+//		String version = "1.0";
+//		String artifactId = video.getName().toLowerCase().replace(" ", "");
+//		video.setImageurl("/" + groupId.replace(".", "/") + "/" + artifactId + "/" + version
+//				+ "/" + artifactId + "-" + version + "." + "png");
+//		
+//		if(videoBodyPartEntity != null && iconBodyPartEntity != null) {
+//			videoFile = ServerUtil.writeFileFromStream(videoBodyPartEntity.getInputStream(), null, 
+//					video.getVideoList().get(0).getArtifactGroup().getPackaging(), video.getName());
+//			iconFile = ServerUtil.writeFileFromStream(iconBodyPartEntity.getInputStream(), null, 
+//					"png", video.getName());
+//			List<VideoType> videoTypeList = video.getVideoList();
+//			for (VideoType videoType : videoTypeList) {
+//					ArtifactGroup artifactGroup = videoType.getArtifactGroup();
+//					videoType.setUrl("/" + groupId.replace(".", "/") + "/" + artifactId + "/" + version
+//					+ "/" + artifactId + "-" + version + "." + artifactGroup.getPackaging());
+//					videoType.setType(artifactGroup.getPackaging());
+//					artifactGroup.setGroupId(groupId);
+//					artifactGroup.setArtifactId(artifactId);
+//					com.photon.phresco.commons.model.ArtifactInfo info = new com.photon.phresco.commons.model.ArtifactInfo();
+//					info.setVersion(version);
+//					artifactGroup.setVersions(Arrays.asList(info));
+//					artifactGroup.setCustomerIds(Arrays.asList(DEFAULT_CUSTOMER_NAME));
+//				if (artifactGroup != null) {
+//					boolean uploadBinary = uploadBinary(artifactGroup, videoFile);
+//					uploadIcon(artifactGroup, iconFile);
+//					if (uploadBinary) {
+//						saveVideos(video);
+//					}
+//				}
+//			}
+//		}
+//		
+//		if(videoBodyPartEntity == null && video != null) {
+//			List<VideoType> videoTypeList = video.getVideoList();
+//			for (VideoType videoType : videoTypeList) {
+//				ArtifactGroup artifactGroup = videoType.getArtifactGroup();
+//				artifactGroup.setGroupId("videos.homepage");
+//				artifactGroup.setArtifactId(video.getName().toLowerCase());
+//				com.photon.phresco.commons.model.ArtifactInfo info = new com.photon.phresco.commons.model.ArtifactInfo();
+//				info.setVersion("1.0");
+//				artifactGroup.setVersions(Arrays.asList(info));
+//				artifactGroup.setCustomerIds(Arrays.asList(DEFAULT_CUSTOMER_NAME));
+//				saveVideos(video);
+//			}
+//		}
+//	}
 	
 	private boolean uploadIcon(ArtifactGroup artifactGroup, File iconFile) throws PhrescoException {
 		ArtifactGroup iconGroup = artifactGroup;
@@ -700,17 +691,17 @@ public class AdminService extends DbService {
 	 * @return
 	 * @throws PhrescoException 
 	 */
-	@ApiOperation(value = " Update a video ")
-	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to update")})
-    @RequestMapping(value= REST_API_VIDEOS, consumes = MultiPartMediaTypes.MULTIPART_MIXED, 
-    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
-	public @ResponseBody void updateVideos(@ApiParam(required = true, name = "videos", 
-    		value = "The multipart value of video to be update")@RequestBody MultiPart videos) throws PhrescoException {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into AdminService.updateVideos(List<VideoInfo> videos)");
-	    }
-		createOrUpdateVideo(videos);
-	}
+//	@ApiOperation(value = " Update a video ")
+//	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to update")})
+//    @RequestMapping(value= REST_API_VIDEOS, consumes = MultiPartMediaTypes.MULTIPART_MIXED, 
+//    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
+//	public @ResponseBody void updateVideos(@ApiParam(required = true, name = "videos", 
+//    		value = "The multipart value of video to be update")@RequestBody MultiPart videos) throws PhrescoException {
+//	    if (isDebugEnabled) {
+//	        S_LOGGER.debug("Entered into AdminService.updateVideos(List<VideoInfo> videos)");
+//	    }
+//		createOrUpdateVideo(videos);
+//	}
 
 	/**
 	 * Deletes the list of Videos
@@ -772,19 +763,19 @@ public class AdminService extends DbService {
 	 * @return
 	 * @throws PhrescoException 
 	 */
-	@ApiOperation(value = " Updates a video based on their id ")
-	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to update")})
-    @RequestMapping(value= REST_API_VIDEOS + REST_API_PATH_ID, consumes = MultiPartMediaTypes.MULTIPART_MIXED ,
-    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
-	public @ResponseBody void updateVideo(HttpServletResponse response, @ApiParam(name = REST_API_PATH_PARAM_ID , required = true, 
-    		value = "The id of the video that needs to update")@PathVariable(REST_API_PATH_PARAM_ID) String id , 
-    		@ApiParam(required = true, name = "multipartVideo", value = "The multipart value of video")@RequestBody MultiPart multipartVideo) 
-			throws PhrescoException {
-	    if (isDebugEnabled) {
-	        S_LOGGER.debug("Entered into AdminService.updateVideo(String id , VideoInfo videoInfo)" + id);
-	    }
-		createOrUpdateVideo(multipartVideo);
-	}
+//	@ApiOperation(value = " Updates a video based on their id ")
+//	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to update")})
+//    @RequestMapping(value= REST_API_VIDEOS + REST_API_PATH_ID, consumes = MultiPartMediaTypes.MULTIPART_MIXED ,
+//    		produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PUT)
+//	public @ResponseBody void updateVideo(HttpServletResponse response, @ApiParam(name = REST_API_PATH_PARAM_ID , required = true, 
+//    		value = "The id of the video that needs to update")@PathVariable(REST_API_PATH_PARAM_ID) String id , 
+//    		@ApiParam(required = true, name = "multipartVideo", value = "The multipart value of video")@RequestBody MultiPart multipartVideo) 
+//			throws PhrescoException {
+//	    if (isDebugEnabled) {
+//	        S_LOGGER.debug("Entered into AdminService.updateVideo(String id , VideoInfo videoInfo)" + id);
+//	    }
+//		createOrUpdateVideo(multipartVideo);
+//	}
 
 	
 	/**
