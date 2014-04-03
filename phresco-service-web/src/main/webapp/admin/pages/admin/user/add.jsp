@@ -18,7 +18,7 @@
 
 --%>
 
-<%@ taglib uri="/struts-tags" prefix="s".%>
+<%@ taglib uri="/struts-tags" prefix="s"%>
 
 <%@ page import="org.apache.commons.lang.StringUtils"%>
 
@@ -137,7 +137,7 @@
 			onclick="validate('<%= pageUrl %>',$('#formUserAdd'),$('#subcontainer'), '<%= progressTxt %>');" />
 		<% } %>
 		<input type="button" id="userCancel" class="btn btn-primary"
-			value="<s:text name='lbl.btn.cancel'/>"/>
+			value="<s:text name='lbl.btn.cancel'/>" />
 	</div>
 
 	<!-- Hidden Fields -->
@@ -198,7 +198,8 @@
 	}
 	
 	function hidePasswd() {
-		if ('<%= fromPage %>' === 'edit'){
+		if ('<%= fromPage %>
+	' === 'edit') {
 			$('#userpwdControl').hide();
 			$('#userretypepwdControl').hide();
 		}
