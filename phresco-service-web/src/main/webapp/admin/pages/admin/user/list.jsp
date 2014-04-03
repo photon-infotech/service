@@ -143,10 +143,10 @@
 		$(".fixed-table-container-inner").scrollbars();  
 	}
 	
+	hideLoadingIcon();
+	toDisableCheckAll($('#checkAllAuto'), '<%= chkBxClass %>');
+	
 	$(document).ready(function() {
-		hideLoadingIcon();
-		toDisableCheckAll($('#checkAllAuto'), '<%= chkBxClass %>');
-		
 		$("#addValues").click(function() {
 			var val = $("#txtCombo").val();
 			$("#valuesCombo").append($("<option></option>").attr("value", val).text(val));
