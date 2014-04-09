@@ -112,6 +112,7 @@ public interface ServiceUIConstants {
     String REQ_TECHNOLOGY_REPORTS = "reports";
     String REQ_TECHNOLOGY_GROUPS = "TechnologyGroups";
     String REQ_TECH_GROUP = "techGroup";
+    String REQ_WEBSERVICES = "services";
     String REQ_ZIP_FILE = "zip";
     String REQ_FUNCTIONAL_FRAMEWORKS = "functionalFrameworks";
     String REQ_SELECTED_FUNCTIONAL_FRAMEWORKS = "selectedFunctionalFrameworks";

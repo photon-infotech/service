@@ -46,6 +46,7 @@ import com.photon.phresco.commons.model.FunctionalFrameworkInfo;
 import com.photon.phresco.commons.model.Technology;
 import com.photon.phresco.commons.model.TechnologyGroup;
 import com.photon.phresco.commons.model.TechnologyOptions;
+import com.photon.phresco.commons.model.WebService;
 import com.photon.phresco.exception.PhrescoException;
 import com.photon.phresco.logger.SplunkLogger;
 import com.photon.phresco.service.admin.actions.ServiceBaseAction;
@@ -129,6 +130,7 @@ public class Archetypes extends ServiceBaseAction {
 	
 	private List<String> appFeatures = new ArrayList<String>();
 	private List<TechnologyOptions> technologyOptions = new ArrayList<TechnologyOptions>();
+	private List<String> applicableServices = new ArrayList<String>();
 	
 	private byte[] newtempApplnByteArray = null;
 	
@@ -179,7 +181,9 @@ public class Archetypes extends ServiceBaseAction {
 			List<ApplicationType> appTypes = serviceManager.getApplicationTypes();
 			setReqAttribute(REQ_APP_TYPES, appTypes);
 			List<TechnologyOptions> options = serviceManager.getOptions();
-			List<Reports> reports = serviceManager.getReports();
+			List<Reports> reports = serviceManager.getReports();			
+			List<WebService> service = serviceManager.getWebServices();
+			setReqAttribute(REQ_WEBSERVICES, service);
 			setReqAttribute(REQ_TECHNOLOGY_OPTION, options);
 			setReqAttribute(REQ_FROM_PAGE, ADD);
 			setReqAttribute(REQ_TECHNOLOGY_REPORTS, reports);
@@ -265,6 +269,7 @@ public class Archetypes extends ServiceBaseAction {
 				S_LOGGER.info("Archetypes.save", "customerId=" + "\"" + getCustomerId() + "\"");
 			}
 			Technology technology = createTechnology();
+			System.out.println("technology:::::" + technology);
 			//save application jar files
 			if(archetypeJarByteArray != null){
 				inputStreamMap.put(technology.getName(),  new ByteArrayInputStream(archetypeJarByteArray));
@@ -378,6 +383,7 @@ public class Archetypes extends ServiceBaseAction {
 		}
 		Technology technology = new Technology();
 		try {
+			System.out.println("getApplicableServices()::::" + getApplicableServices());
 			String artifactId = getArtifactId();
 			String groupId = getGroupId();
 			String version = getVersion();
@@ -389,6 +395,7 @@ public class Archetypes extends ServiceBaseAction {
 			technology.setAppTypeId(getApptype());
 			technology.setTechGroupId(getTechGroup());
 			technology.setSystem(isSystem());
+			technology.setWebServices(getApplicableServices());
 			boolean multiModule = Boolean.parseBoolean(getMultiModule());
 			technology.setMultiModule(multiModule);
 			if (multiModule) {
@@ -1363,5 +1370,13 @@ public class Archetypes extends ServiceBaseAction {
 
 	public void setTechnologyOptions(List<TechnologyOptions> technologyOptions) {
 		this.technologyOptions = technologyOptions;
+	}
+
+	public void setApplicableServices(List<String> applicableServices) {
+		this.applicableServices = applicableServices;
+	}
+
+	public List<String> getApplicableServices() {
+		return applicableServices;
 	}
 }
