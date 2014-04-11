@@ -35,8 +35,8 @@
    	List<String> permissionIds = (List<String>) session.getAttribute(ServiceUIConstants.SESSION_PERMISSION_IDS);
 	String per_disabledStr = "";
 	String per_disabledClass = "";
-	String disableChk = "";
-	String chkBxClass = "userChk";
+	String disableChk = "disabled";
+	String chkBxClass = "";
 %>
 
 <form class="form-horizontal customer_list" id="userListForm">
@@ -95,11 +95,14 @@
 											per_disabledClass = "btn-primary";
 										}
 			            			}
-			            			
-									if (!user.getAuthType().equals(AuthType.LOCAL)) {
+									if (permissionIds.contains(ServiceUIConstants.PER_MANAGE_USERS) && user.getAuthType().equals(AuthType.LOCAL)){
+										disableChk = "";
+										chkBxClass = "userChk";
+			            		  	}else{
+									if(user.getAuthType().equals(AuthType.AUTHSERVICE))
 										disableChk = "disabled";
 										chkBxClass = "";
-			            		  	} 
+									}
 			            %>
 						
 						<tr>
