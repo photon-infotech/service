@@ -1,7 +1,7 @@
 /**
  * Phresco Service
  *
- * Copyright (C) 1999-2014 Photon Infotech Inc.
+ * Copyright (C) 1999-2013 Photon Infotech Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -508,7 +508,6 @@ public final class ServerUtil {
 		}
 		return true;
 	}
-
 	public static String getSize(String sKey) throws PhrescoException {
 		Properties prop = new Properties();
 		String sValue="";

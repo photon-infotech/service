@@ -257,13 +257,15 @@ qq.FileUploaderBasic = function(o){
         debug: true,
         action: 'sample',
         params: {},
+		validation: {},
         button: null,
         multiple: o.multiple,
         maxConnections: 3,
         // validation        
         allowedExtensions: o.allowedExtensions,
-        sizeLimit: 41*1024*1024,   
-        minSizeLimit: 0,                             
+        sizeLimit: o.sizeLimit,   
+        minSizeLimit: 0,
+		
         // events
         // return false to cancel submit
         onSubmit: function(id, fileName){
@@ -278,7 +280,7 @@ qq.FileUploaderBasic = function(o){
         	if(o.type === "pluginJar"){
         		jarPopupError('', o.type);
         	} else {
-        		jarError('', o.type);
+        		jarError('', o.type);				
         	}
         },
         onComplete: function(id, fileName, responseJSON){
@@ -542,7 +544,7 @@ qq.FileUploaderBasic.prototype = {
 var modName = "";
 var urlAction = "";
 qq.FileUploader = function(o){
-	var type = o.type || o.fileType;
+	var type = o.type || o.fileType;	
 	var btnId = o.element.getAttribute('id');
 	// call parent constructor
     qq.FileUploaderBasic.apply(this, arguments);
