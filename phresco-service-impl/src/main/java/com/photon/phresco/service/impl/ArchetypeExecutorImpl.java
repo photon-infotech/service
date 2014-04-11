@@ -150,15 +150,28 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 			ArtifactGroup archetypeInfo, String version, String groupId)
 			throws PhrescoException {
 		String commandString;
-		String MULTI_MODULE_ARCHETYPE = "phresco-multimodule-archetype";
+//		String MULTI_MODULE_ARCHETYPE = "phresco-multimodule-archetype";
 		
 		commandString = buildCommandString(applicationInfo.getCode(), techId, archetypeInfo.getGroupId(), 
-				MULTI_MODULE_ARCHETYPE, version, repoInfo.getReleaseRepoURL(), projectInfo.getVersion(), customerId, groupId);
+				archetypeInfo.getArtifactId(), version, repoInfo.getReleaseRepoURL(), projectInfo.getVersion(), customerId, groupId);
 		
 		executeCreateCommand(tempFolderPath, commandString, customerId, projectInfo);
 		applicationInfo.setParentArchrtypeCreated(true);
+		updatePackaging(tempFolderPath, applicationInfo.getCode());
 	}
 	
+	private void updatePackaging(String tempFolderPath, String code) throws PhrescoException {
+		File rootPomFile = new File(tempFolderPath.concat(File.separator).concat(code), "pom.xml");
+		try {
+			PomProcessor processor = new PomProcessor(rootPomFile);
+			processor.setPackaging("pom");
+			processor.save();
+		} catch (PhrescoPomException e) {
+			throw new PhrescoException(e);
+		}
+		
+	}
+
 	private void executeCreateCommand(String tempFolderPath, String command, String customerId, ProjectInfo info) throws PhrescoException {
 		File file = new File(tempFolderPath);
 		
