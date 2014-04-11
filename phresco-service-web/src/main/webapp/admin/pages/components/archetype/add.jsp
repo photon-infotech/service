@@ -2,7 +2,7 @@
 
     Service Web Archive
 
-    Copyright (C) 1999-2013 Photon Infotech Inc.
+    Copyright (C) 1999-2014 Photon Infotech Inc.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@
 <%@ page import="com.photon.phresco.commons.model.TechnologyOptions"%>
 <%@ page import="com.photon.phresco.commons.model.ArtifactGroup"%>
 <%@ page import="com.photon.phresco.commons.model.ArtifactInfo"%>
+<%@ page import="com.photon.phresco.commons.model.WebService"%>
 <%@ page import="com.phresco.pom.site.Reports"%>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants"%>
 <%@ page import="com.photon.phresco.service.admin.actions.util.ServiceActionUtil"%>
@@ -48,7 +49,9 @@
 	List<TechnologyOptions> options = (List<TechnologyOptions>) request.getAttribute(ServiceUIConstants.REQ_TECHNOLOGY_OPTION);
 	List<FunctionalFrameworkGroup> functionalFrameworksGroups = (List<FunctionalFrameworkGroup>) request.getAttribute(ServiceUIConstants.REQ_FUNCTIONAL_FRAMEWORKS);
 	List<Reports> reports = (List<Reports>)request.getAttribute(ServiceUIConstants.REQ_TECHNOLOGY_REPORTS);
-	List<Technology> technologies = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
+	List<Technology> technologies = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);	
+	List<WebService> services = (List<WebService>)request.getAttribute(ServiceUIConstants.REQ_WEBSERVICES);
+	
 	String title = ServiceActionUtil.getTitle(ServiceUIConstants.ARCHETYPES, fromPage);
 	String buttonLbl = ServiceActionUtil.getButtonLabel(fromPage);
 	String pageUrl = ServiceActionUtil.getPageUrl(ServiceUIConstants.ARCHETYPES, fromPage);
@@ -562,7 +565,61 @@
 			</div>
 		<%
 			}	
+		%>	
+		<!-- webservice starts -->
+		<div id="webservice">
+			<%
+			if (CollectionUtils.isNotEmpty(services)) {
+		%>						
+			<div class="control-group" id="serviceControl">
+				<label class="control-label labelbold">
+					<s:text name='lbl.hdr.comp.service'/>
+				</label>
+				<div class="controls">
+						<div class="serviceFields" id="servicefield">
+						<div class="multilist-scroller multiselct" id="applicableToSrvc">
+							<ul>
+							<li>
+									<input type="checkbox" value="" id="checkAllServices" name="" onclick="checkAllEvent(this,$('.applicableServices'), false);"
+										style="margin: 3px 8px 6px 0;" <%= disabledVer %> ><s:text name='lbl.all'/>
+								</li>
+								<%
+								if (CollectionUtils.isNotEmpty(services)) {
+									checkedStr = "";
+									for (WebService service : services) {
+										List<String> selectedOptions = new ArrayList<String>();
+										if (service != null) {
+											if (CollectionUtils.isNotEmpty(service.getAppliesToTechs())) {
+												for (String selectedOptionId :service.getAppliesToTechs()) {
+													selectedOptions.add(selectedOptionId);
+												}
+											}
+											if (selectedOptions.contains(service.getId())) {
+												checkedStr = "checked";
+											} else {
+												checkedStr = "";
+											}
+										}
+								%>
+											<li> <input type="checkbox" id="applicableServices" <%= disabledVer %> name="applicableWebServiceFeatures" value='<%= service.getId() %>'
+												onclick="checkboxEvent($('#checkAllServices'), 'applicableServices')"	class="check applicableServices" <%= checkedStr %> ><%= service.getName() %>
+											</li>
+								<%		}	
+									}
+								%>
+							</ul>
+						</div>
+					</div>
+					<span class="help-inline applyerror" id="serviceError"></span>
+				</div>
+				
+			</div>
+		<%
+			}	
 		%>
+		</div>
+		<!--  webservice ends -->
+		
 	<div class="bottom_button">
 		<%
 			String disabledClass = "btn-primary";
