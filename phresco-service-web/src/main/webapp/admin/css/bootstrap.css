@@ -1863,7 +1863,7 @@ table .span12 {
 .btn-primary.active,
 .btn-primary.disabled,
 .btn-primary[disabled] {
-  background-color: #0044cc;
+  background-color: #DE522F;
 }
 .btn-primary:active, .btn-primary.active {
   background-color: #003399 \9;
