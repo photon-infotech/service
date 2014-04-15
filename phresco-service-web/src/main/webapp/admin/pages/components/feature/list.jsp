@@ -2,7 +2,7 @@
 
     Service Web Archive
 
-    Copyright (C) 1999-2013 Photon Infotech Inc.
+    Copyright (C) 1999-2014 Photon Infotech Inc.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@
 <%@ page import="com.photon.phresco.commons.model.ArtifactInfo" %>
 <%@ page import=" com.photon.phresco.commons.model.ArtifactGroup" %>
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
+<%@ page import="com.photon.phresco.commons.model.ArtifactGroup.Type" %>
 
 <% 
 	List<ArtifactGroup> moduleGroups = (List<ArtifactGroup>)request.getAttribute(ServiceUIConstants.REQ_FEATURES_MOD_GRP);
@@ -44,10 +45,31 @@
 	<div class="featuresScrollDiv">
    	<% 
 		if (CollectionUtils.isEmpty(moduleGroups)) {
+		
 	%>
-		<div class="alert alert-block">
-			<s:text name='alert.msg.feature.not.available'/>
-		</div>
+	<div class="alert alert-block">
+		
+		<%
+		if (Type.FEATURE.name().equals(type)){
+		%>
+			<s:text name='alert.msg.module.not.available'/>        	
+		<% }
+	
+		else if (Type.JAVASCRIPT.name().equals(type)){
+		%>
+        <s:text name='alert.msg.jslibrary.not.available'/> 
+        <%		}
+	
+		else if (Type.COMPONENT.name().equals(type)){
+		%>
+        <s:text name='alert.msg.component.not.available'/> 
+        <%		}
+			%>		
+
+
+
+	</div>
+
 	<% } else { %>	
 		<div class="header-background accor_head">
 			<table class="border_collapse">

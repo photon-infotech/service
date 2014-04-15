@@ -37,10 +37,17 @@
 <%@ page import="com.photon.phresco.commons.model.FunctionalFrameworkGroup"%>
 <%@ page import="com.photon.phresco.commons.model.FunctionalFramework"%>
 <%@ page import="com.photon.phresco.commons.model.FunctionalFrameworkInfo"%>
-
+<%@ page import="com.photon.phresco.service.util.ServerUtil" %>
 
 
 <%
+	String sSize = ServerUtil.getSize("module.max.archetypesize");
+	int nSize= 0;
+	try{ 
+		nSize =  Integer.parseInt(sSize) * 1024 * 1024;
+	 } catch (Exception e) {
+		nSize = 0;
+	}
 	Technology technology = (Technology) request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPE);
 	String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
 	List<ApplicationType> appTypes = (List<ApplicationType>) request.getAttribute(ServiceUIConstants.REQ_APP_TYPES);
@@ -831,6 +838,7 @@
 				type : 'applnJar',
 				archType : true
 			},
+			sizeLimit : <%= nSize %>,
 			debug : true
 		});
 	}

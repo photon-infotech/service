@@ -34,8 +34,17 @@
 <%@ page import="com.photon.phresco.service.admin.commons.ServiceUIConstants" %>
 <%@ page import="com.photon.phresco.service.admin.actions.util.ServiceActionUtil"%>
 <%@ page import="com.photon.phresco.commons.model.RequiredOption"%>
+<%@ page import="com.photon.phresco.service.util.ServerUtil" %>
 
 <%
+	 String sSize = ServerUtil.getSize("module.max.filesize");
+	 int nSize= 0;
+	 try {
+	 	nSize =  Integer.parseInt(sSize) * 1024 * 1024;
+	 } catch (Exception e) {
+		nSize = 0;
+	}
+    	
     ArtifactGroup moduleGroup = (ArtifactGroup) request.getAttribute(ServiceUIConstants.REQ_FEATURES_MOD_GRP);
     List<Technology> technologies = (List<Technology>) request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
     List<License> licenses = (List<License>) request.getAttribute(ServiceUIConstants.REQ_FEATURES_LICENSE);
@@ -49,8 +58,7 @@
 	String progressTxt = ServiceActionUtil.getProgressTxt(ServiceUIConstants.FEATURES, fromPage);
 	String versioning = (String) request.getAttribute(ServiceUIConstants.REQ_VERSIONING);
 	List<String> dependencyIds = (List<String>) request.getAttribute(ServiceUIConstants.REQ_SELECTED_DEPEDENCY_IDS);
-	
-	
+
 	String disabledVer ="";
 	if(StringUtils.isNotEmpty(versioning)) {
 		disabledVer = "disabled";
@@ -193,8 +201,8 @@
 		editPage = true;
 	}
 	
+	
 %>
-
 <form id="formFeatureAdd" class="form-horizontal customer_list" method="post" enctype="multipart/form-data">
 
     <h4 class="hdr headerFeat"><%= title %></h4>
@@ -632,8 +640,9 @@
 	}
 
 	//To create the file upload control
-	function createUploader(allowedFiles,fileErr) {
-		var featureUploader = new qq.FileUploader({
+	function createUploader(allowedFiles,fileErr) {		
+		var featureUploader = new qq.FileUploader({	
+	
 			element : document.getElementById('feature-file-uploader'),
 			action : 'uploadFeatureFile',
 			multiple : false,
@@ -641,11 +650,13 @@
 			allowedExtensions : allowedFiles,
 			fileType : 'featureJar',
 			buttonLabel : '<s:label key="lbl.comp.featr.upload" />',
-			typeError : fileErr,
+			typeError : fileErr,			
+			sizeLimit : <%= nSize %>,
 			params : {
 				fileType : 'featureJar',
 				type : '<%= type %>'
 			},
+	
 			debug : true
 		});
 	
@@ -661,7 +672,7 @@
 			params : {
 				fileType : 'featureImg',
 				type : '<%= type %>'
-			},
+			},	
 			debug : true
 		});
 	}

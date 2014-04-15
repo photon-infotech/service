@@ -2,7 +2,7 @@
 
     Service Web Archive
 
-    Copyright (C) 1999-2013 Photon Infotech Inc.
+    Copyright (C) 1999-2014 Photon Infotech Inc.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -35,8 +35,8 @@
    	List<String> permissionIds = (List<String>) session.getAttribute(ServiceUIConstants.SESSION_PERMISSION_IDS);
 	String per_disabledStr = "";
 	String per_disabledClass = "";
-	String disableChk = "";
-	String chkBxClass = "userChk";
+	String disableChk = "disabled";
+	String chkBxClass = "";
 %>
 
 <form class="form-horizontal customer_list" id="userListForm">
@@ -95,11 +95,14 @@
 											per_disabledClass = "btn-primary";
 										}
 			            			}
-			            			
-									if (!user.getAuthType().equals(AuthType.LOCAL)) {
+									if (permissionIds.contains(ServiceUIConstants.PER_MANAGE_USERS) && user.getAuthType().equals(AuthType.LOCAL)){
+										disableChk = "";
+										chkBxClass = "userChk";
+			            		  	}else{
+									if(user.getAuthType().equals(AuthType.AUTHSERVICE))
 										disableChk = "disabled";
 										chkBxClass = "";
-			            		  	} 
+									}
 			            %>
 						
 						<tr>
@@ -143,10 +146,10 @@
 		$(".fixed-table-container-inner").scrollbars();  
 	}
 	
+	hideLoadingIcon();
+	toDisableCheckAll($('#checkAllAuto'), '<%= chkBxClass %>');
+	
 	$(document).ready(function() {
-		hideLoadingIcon();
-		toDisableCheckAll($('#checkAllAuto'), '<%= chkBxClass %>');
-		
 		$("#addValues").click(function() {
 			var val = $("#txtCombo").val();
 			$("#valuesCombo").append($("<option></option>").attr("value", val).text(val));

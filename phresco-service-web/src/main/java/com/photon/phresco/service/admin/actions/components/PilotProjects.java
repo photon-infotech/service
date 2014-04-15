@@ -1,7 +1,7 @@
 /**
  * Service Web Archive
  *
- * Copyright (C) 1999-2013 Photon Infotech Inc.
+ * Copyright (C) 1999-2014 Photon Infotech Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -373,7 +373,7 @@ public class PilotProjects extends ServiceBaseAction {
 					return showErrorPopup(new PhrescoException("No pilot project to delete"), getText(EXCEPTION_PILOT_PROJECTS_DELETE));
 				}
     		}
-    		if (ArrayUtils.isNotEmpty(projectIds)) {
+    		if (projectIds != null && projectIds.length != 0) {
     			for (String projectid : projectIds) {
     				getServiceManager().deletePilotProject(projectid, getCustomerId());
     			}

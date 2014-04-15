@@ -32,8 +32,15 @@
 <%@ page import="com.photon.phresco.commons.model.ArtifactGroup"%>
 <%@ page import="com.photon.phresco.commons.model.ArtifactInfo"%>
 <%@ page import="com.photon.phresco.service.admin.actions.util.ServiceActionUtil"%>
-
+<%@ page import="com.photon.phresco.service.util.ServerUtil" %>
 <%
+	String sSize = ServerUtil.getSize("module.max.download");
+	int nSize= 0;
+	try{ 
+		nSize =  Integer.parseInt(sSize) * 1024 * 1024;
+		}catch(Exception e){
+   			nSize = 0;
+		}
 	String checkedStr = "";
 
     DownloadInfo downloadInfo = (DownloadInfo)request.getAttribute(ServiceUIConstants.REQ_DOWNLOAD_INFO);
@@ -505,6 +512,7 @@
 			params : {
 				type : 'uploadFile'
 			},
+			sizeLimit : <%=nSize%>,
 			debug : true
 		});
 

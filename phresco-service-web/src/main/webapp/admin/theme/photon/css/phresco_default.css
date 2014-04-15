@@ -1,7 +1,7 @@
 /**
  * Service Web Archive
  *
- * Copyright (C) 1999-2013 Photon Infotech Inc.
+ * Copyright (C) 1999-2014 Photon Infotech Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -163,7 +163,7 @@ footer {
 }
 
 .customer_list {
-	height: 98%;
+	height: 50%;
 	margin: 0;
 }
 
@@ -2662,7 +2662,7 @@ footer {
 }
 
 .customer_list {
-	height: 98%;
+	height: 80%;
 	margin: 0;
 }
 

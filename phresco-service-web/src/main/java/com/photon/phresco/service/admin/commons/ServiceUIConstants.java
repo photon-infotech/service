@@ -1,7 +1,7 @@
 /**
  * Service Web Archive
  *
- * Copyright (C) 1999-2013 Photon Infotech Inc.
+ * Copyright (C) 1999-2014 Photon Infotech Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,6 +112,7 @@ public interface ServiceUIConstants {
     String REQ_TECHNOLOGY_REPORTS = "reports";
     String REQ_TECHNOLOGY_GROUPS = "TechnologyGroups";
     String REQ_TECH_GROUP = "techGroup";
+    String REQ_WEBSERVICES = "services";
     String REQ_ZIP_FILE = "zip";
     String REQ_FUNCTIONAL_FRAMEWORKS = "functionalFrameworks";
     String REQ_SELECTED_FUNCTIONAL_FRAMEWORKS = "selectedFunctionalFrameworks";
