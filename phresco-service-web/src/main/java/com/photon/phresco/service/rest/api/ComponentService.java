@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -132,16 +131,13 @@ public class ComponentService extends DbService {
 	    }
 		try {
 			List<ApplicationType> applicationTypes = new ArrayList<ApplicationType>();
+			List<ApplicationType> applicationTypeDAOs = DbService.getMongoOperation().getCollection(APPTYPES_COLLECTION_NAME, ApplicationType.class);
 			
-			Query q = new Query();
-			q.sort().on("name", Order.ASCENDING);
-			List<ApplicationType> applicationTypeDAOs = DbService.getMongoOperation().find(APPTYPES_COLLECTION_NAME, q ,ApplicationType.class);
 			for (ApplicationType applicationType : applicationTypeDAOs) {
 				List<TechnologyGroup> techGroupss = new ArrayList<TechnologyGroup>();
 				Query query = createCustomerIdQuery(customerId);
 				Criteria appCriteria = Criteria.where("appTypeId").is(applicationType.getId());
 				query.addCriteria(appCriteria);
-				query.sort().on("name", Order.ASCENDING);
 				List<TechnologyGroup> techGroups = DbService.getMongoOperation().find(TECH_GROUP_COLLECTION_NAME, query, TechnologyGroup.class);
 				for (TechnologyGroup techGroup : techGroups) {
 					query = createCustomerIdQuery(customerId);
@@ -1328,6 +1324,10 @@ public class ComponentService extends DbService {
 			if(StringUtils.isNotEmpty(count)){
 				query.skip(Integer.parseInt(start)).limit(Integer.parseInt(count));
 			}
+			/**
+			 * To retrieving the fields with ascending order based on their ASCII
+			 * */
+			query.sort().on("name", Order.ASCENDING);
 			List<ArtifactGroupDAO> artifactGroupDAOs = DbService.getMongoOperation().find(ARTIFACT_GROUP_COLLECTION_NAME,
 					query, ArtifactGroupDAO.class);
 			if(CollectionUtils.isEmpty(artifactGroupDAOs)) {
