@@ -41,8 +41,18 @@
 
 <form class="form-horizontal customer_list" id="userListForm">
    <div class="operation">
-      <input type="button" class="btn btn-primary" name="user_add" id="userAdd" onclick="addUser(); " 
-         	value="<s:text name='lbl.hdr.comp.pltprjt.add'/>" /> 
+		<%
+			if (permissionIds.contains(ServiceUIConstants.PER_MANAGE_USERS)){
+					disableChk = "";
+					chkBxClass = "userChk";
+				}else{
+					disableChk = "disabled";
+					chkBxClass = "";
+				}				
+		%>
+      <input type="button" class="btn btn-primary" name="user_add" id="userAdd" onclick="addUser(),'<%= chkBxClass %>'; " 
+			<%= disableChk %> value="<s:text name='lbl.hdr.comp.pltprjt.add'/>" />
+		
       <input type="button"  id="del"  class="btn del" class="btn btn-primary" disabled value="<s:text name='lbl.btn.del'/>" 
 		      onclick="showDeleteConfirmation('<s:text name='del.confirm.users'/>');"/>   	
    </div>
