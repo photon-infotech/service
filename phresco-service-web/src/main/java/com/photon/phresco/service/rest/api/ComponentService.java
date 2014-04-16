@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -1324,12 +1325,9 @@ public class ComponentService extends DbService {
 			if(StringUtils.isNotEmpty(count)){
 				query.skip(Integer.parseInt(start)).limit(Integer.parseInt(count));
 			}
-			/**
-			 * To retrieving the fields with ascending order based on their ASCII
-			 * */
-			query.sort().on("name", Order.ASCENDING);
+			
 			List<ArtifactGroupDAO> artifactGroupDAOs = DbService.getMongoOperation().find(ARTIFACT_GROUP_COLLECTION_NAME,
-					query, ArtifactGroupDAO.class);
+			query, ArtifactGroupDAO.class);
 			if(CollectionUtils.isEmpty(artifactGroupDAOs)) {
 				if(isDebugEnabled) {
 					LOGGER.warn("ComponentService.findModules" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
@@ -1346,6 +1344,17 @@ public class ComponentService extends DbService {
 		    if (isDebugEnabled) {
 		        LOGGER.debug("ComponentService.findModules : Exit");
 		    }
+		    /**
+		     * To return the objects into sorted order based on their names.
+		     * */
+		    Collections.sort(modules, new Comparator<ArtifactGroup>() {
+		    	public int compare(ArtifactGroup obj1,ArtifactGroup obj2)
+		    	{
+		    		ArtifactGroup configTemplate1 = (ArtifactGroup) obj1;
+		    		ArtifactGroup configTemplate2 = (ArtifactGroup) obj2;
+			       return configTemplate1.getName().compareToIgnoreCase(configTemplate2.getName());
+		    	}
+			});
 			return modules;
 		    
 		} catch(Exception e) {
