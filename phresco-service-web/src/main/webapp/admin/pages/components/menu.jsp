@@ -54,7 +54,7 @@
 	  	
 		//Customer change event	  	
 	  	$('.customer_listbox').ddslick({
-	  		height:200,	  		
+	  		height:200 ,	  		
         	onSelected: function(data) {
         		var selectedId = data.selectedData.value;
 				customerChangeEvent(selectedId);
