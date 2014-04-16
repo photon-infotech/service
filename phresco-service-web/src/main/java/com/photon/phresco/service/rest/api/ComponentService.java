@@ -140,6 +140,14 @@ public class ComponentService extends DbService {
 				Criteria appCriteria = Criteria.where("appTypeId").is(applicationType.getId());
 				query.addCriteria(appCriteria);
 				List<TechnologyGroup> techGroups = DbService.getMongoOperation().find(TECH_GROUP_COLLECTION_NAME, query, TechnologyGroup.class);
+				Collections.sort(techGroups, new Comparator<TechnologyGroup>() {
+	                public int compare(TechnologyGroup obj1,TechnologyGroup obj2)
+	                {
+	                	TechnologyGroup configTemplate1 = (TechnologyGroup) obj1;
+	                	TechnologyGroup configTemplate2 = (TechnologyGroup) obj2;
+	                   return configTemplate1.getName().compareToIgnoreCase(configTemplate2.getName());
+	                }
+	            });
 				for (TechnologyGroup techGroup : techGroups) {
 					query = createCustomerIdQuery(customerId);
 					Criteria criteria = Criteria.where("techGroupId").is(techGroup.getId());
@@ -161,6 +169,14 @@ public class ComponentService extends DbService {
 			if (isDebugEnabled) {
 		        LOGGER.debug("ComponentService.findAppTypes : Exit");
 		    }
+			Collections.sort(applicationTypes, new Comparator<ApplicationType>() {
+                public int compare(ApplicationType obj1,ApplicationType obj2)
+                {
+                	ApplicationType configTemplate1 = (ApplicationType) obj1;
+                	ApplicationType configTemplate2 = (ApplicationType) obj2;
+                   return configTemplate1.getName().compareToIgnoreCase(configTemplate2.getName());
+                }
+            });
 	        return applicationTypes;
 		} catch (Exception e) {
 			response.setStatus(500);
