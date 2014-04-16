@@ -148,15 +148,14 @@
 
 </form>
 <script type="text/javascript">
-	$(document).ready(function() {
-		hideLoadingIcon();
-		hidePasswd();
-		
-		$("#userCancel").click(function() {
-		
-			showLoadingIcon();
-			loadContent('userList', $('#formUserAdd'), $('#subcontainer'));
-		});
+
+	hideLoadingIcon();
+	hidePasswd();
+	
+	$("#userCancel").click(function() {
+	
+		showLoadingIcon();
+		loadContent('userList', $('#formUserAdd'), $('#subcontainer'));
 	});
 	
 	function findError(data) {
@@ -198,8 +197,7 @@
 	}
 	
 	function hidePasswd() {
-		if ('<%= fromPage %>
-	' === 'edit') {
+		if ('<%= fromPage %>' === 'edit') {
 			$('#userpwdControl').hide();
 			$('#userretypepwdControl').hide();
 		}
