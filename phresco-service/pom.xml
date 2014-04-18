@@ -9,6 +9,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.photon.phresco.service</groupId>
     <artifactId>phresco-service</artifactId>
+	 <packaging>jar</packaging>
     <name>Phresco Service</name>
     <description>Phresco Service API Module</description>
 	<url>http://www.phresco.org</url>
