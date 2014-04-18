@@ -53,7 +53,8 @@ import com.photon.phresco.service.admin.actions.ServiceBaseAction;
 import com.photon.phresco.service.client.api.ServiceManager;
 import com.photon.phresco.service.util.ServerUtil;
 import com.phresco.pom.site.Reports;
-
+import com.photon.phresco.service.admin.commons.ServiceUIConstants;
+import com.photon.phresco.service.admin.commons.ServiceActions;
 
 
 public class Archetypes extends ServiceBaseAction { 
@@ -758,7 +759,7 @@ public class Archetypes extends ServiceBaseAction {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Archetypes.createTechGroup : Entry");
 		}
-		
+		System.out.println("INSIDE createTechGroup");
 		try {
 			List<TechnologyGroup> technologyGroups = new ArrayList<TechnologyGroup>();
 			List<String> customerIds = new ArrayList<String>();
@@ -768,10 +769,13 @@ public class Archetypes extends ServiceBaseAction {
 					groups.setCustomerIds(customerIds);
 					technologyGroups.add(groups);
 				}
+				getServiceManager().createTechnologyGroups(technologyGroups, getCustomerId());
+				addActionMessage(getText(TECH_GROUP_UPDATED));
 			}
-			getServiceManager().createTechnologyGroups(technologyGroups, getCustomerId());
-			addActionMessage(getText(TECH_GROUP_UPDATED));
 		} catch (Exception e) {
+			System.out.println("ERROR CAUGHT *************************************");
+			e.printStackTrace();
+			System.out.println("ERROR CAUGHT *************************************");
 			if (isDebugEnabled) {
 				S_LOGGER.error("Archetypes.createTechGroup", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
 			}
@@ -811,6 +815,7 @@ public class Archetypes extends ServiceBaseAction {
 			List<TechnologyOptions> options = getServiceManager().getOptions();
 			setReqAttribute(REQ_TECHNOLOGY_OPTION, options);
 		} catch (Exception e) {
+			
 			if (isDebugEnabled) {
 				S_LOGGER.error("Archetypes.showAppFeaturesPopup", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
 			}
