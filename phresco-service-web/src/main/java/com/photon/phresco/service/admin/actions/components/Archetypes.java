@@ -759,7 +759,6 @@ public class Archetypes extends ServiceBaseAction {
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Archetypes.createTechGroup : Entry");
 		}
-		System.out.println("INSIDE createTechGroup");
 		try {
 			List<TechnologyGroup> technologyGroups = new ArrayList<TechnologyGroup>();
 			List<String> customerIds = new ArrayList<String>();
@@ -773,9 +772,6 @@ public class Archetypes extends ServiceBaseAction {
 				addActionMessage(getText(TECH_GROUP_UPDATED));
 			}
 		} catch (Exception e) {
-			System.out.println("ERROR CAUGHT *************************************");
-			e.printStackTrace();
-			System.out.println("ERROR CAUGHT *************************************");
 			if (isDebugEnabled) {
 				S_LOGGER.error("Archetypes.createTechGroup", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
 			}
