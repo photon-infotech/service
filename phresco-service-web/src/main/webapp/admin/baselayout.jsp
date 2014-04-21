@@ -41,6 +41,8 @@
 		<!-- basic js -->
 		<script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
 		<script type="text/javascript" src="js/jquery-ui-1.8.18.custom.min.js"></script>
+		<!-- Scrollbar -->
+		<script type="text/javascript" src="js/jquery.ba-resize.min.js"></script>
 		
 		<!-- document resizer -->
 		<script type="text/javascript" src="js/windowResizer.js"></script>
@@ -67,8 +69,7 @@
 		<!-- Scrollbar -->
 		<script type="text/javascript" src="js/scrollbars.js"></script>
 		<script type="text/javascript" src="js/main.js"></script>
-		<script type="text/javascript" src="js/jquery.event.drag-2.0.min.js"></script>
-		<script type="text/javascript" src="js/jquery.ba-resize.min.js"></script>
+		<script type="text/javascript" src="js/jquery.event.drag-2.0.min.js"></script>		
 		<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
 		<script type="text/javascript" src="js/mousehold.js"></script>
 		<script type="text/javascript" src="js/jquery.fileDownload.js"></script>
