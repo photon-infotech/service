@@ -155,9 +155,9 @@
 		<li>
 			<a href="#" class="inactive" name="compTab" id="archetypesList"><s:label key="lbl.hdr.comp.arhtyp" theme="simple"/></a>
 		</li>
-		<li>
+		<%-- <li>
 			<a href="#" class="inactive" name="compTab" id="applntypesList"><s:label key="lbl.hdr.comp.aplntyp" theme="simple"/></a>
-		</li>
+		</li> --%>
 		<li>
 			<a href="#" class="inactive" name="compTab" id="configtempList"><s:label key="lbl.hdr.comp.cnfigtmplt" theme="simple"/></a>
 		</li>
