@@ -43,15 +43,15 @@
    <div class="operation">
 		<%
 			if (permissionIds.contains(ServiceUIConstants.PER_MANAGE_USERS)){
-					disableChk = "";
-					chkBxClass = "userChk";
-				}else{
-					disableChk = "disabled";
-					chkBxClass = "";
-				}				
+				per_disabledStr = "";
+				per_disabledClass = "btn-primary";
+			}else{
+				per_disabledStr = "disabled";
+				per_disabledClass = "btn-disabled";
+			}				
 		%>
-      <input type="button" class="btn btn-primary" name="user_add" id="userAdd" onclick="addUser(),'<%= chkBxClass %>'; " 
-			<%= disableChk %> value="<s:text name='lbl.hdr.comp.pltprjt.add'/>" />
+      <input type="button"  class="btn <%= per_disabledClass %>" <%= per_disabledStr %> name="user_add" id="userAdd" onclick="addUser();" 
+			value="<s:text name='lbl.hdr.comp.pltprjt.add'/>" />
 		
       <input type="button"  id="del"  class="btn del" class="btn btn-primary" disabled value="<s:text name='lbl.btn.del'/>" 
 		      onclick="showDeleteConfirmation('<s:text name='del.confirm.users'/>');"/>   	
