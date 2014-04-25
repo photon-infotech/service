@@ -42,7 +42,20 @@ public class TechnologyDAO extends CustomerBaseDAO {
 	private List<FunctionalFrameworkInfo> functionalFrameworkInfo;
 	private boolean multiModule;
 	private List<String> subModules;
+	private List<String> webServices;
 	
+	public List<String> getWebServices() {
+		return webServices;
+	}
+
+	public void setWebServices(List<String> webServices) {
+		this.webServices = webServices;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
 	public TechnologyDAO() {
 		super();
 	}

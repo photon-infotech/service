@@ -37,6 +37,7 @@
 <%@ page import="com.photon.phresco.commons.model.FunctionalFrameworkGroup"%>
 <%@ page import="com.photon.phresco.commons.model.FunctionalFramework"%>
 <%@ page import="com.photon.phresco.commons.model.FunctionalFrameworkInfo"%>
+<%@ page import="com.photon.phresco.commons.model.WebService"%>
 <%@ page import="com.photon.phresco.service.util.ServerUtil" %>
 
 
@@ -56,6 +57,7 @@
 	List<FunctionalFrameworkGroup> functionalFrameworksGroups = (List<FunctionalFrameworkGroup>) request.getAttribute(ServiceUIConstants.REQ_FUNCTIONAL_FRAMEWORKS);
 	List<Reports> reports = (List<Reports>)request.getAttribute(ServiceUIConstants.REQ_TECHNOLOGY_REPORTS);
 	List<Technology> technologies = (List<Technology>)request.getAttribute(ServiceUIConstants.REQ_ARCHE_TYPES);
+	List<WebService> services = (List<WebService>)request.getAttribute(ServiceUIConstants.REQ_WEBSERVICES);
 	String title = ServiceActionUtil.getTitle(ServiceUIConstants.ARCHETYPES, fromPage);
 	String buttonLbl = ServiceActionUtil.getButtonLabel(fromPage);
 	String pageUrl = ServiceActionUtil.getPageUrl(ServiceUIConstants.ARCHETYPES, fromPage);
@@ -75,9 +77,10 @@
 		per_disabledClass = "btn-disabled";
 	}
 	
-	
+	List<String> selectedServices = new ArrayList<String>();
 	List<String> ffIds = new ArrayList<String>();
 	if (technology != null) {
+		selectedServices = technology.getWebServices();
 		List<FunctionalFrameworkInfo> ffis = technology
 				.getFunctionalFrameworksInfo();
 		if (CollectionUtils.isNotEmpty(ffis)) {
@@ -376,6 +379,51 @@
           		 <span class="help-inline applyerror" id="applicableError"></span>
 			</div>
 		</div>
+		
+		<div class="control-group" id="applicableControl">
+			<label class="control-label labelbold">
+				<span class="mandatory"></span>&nbsp;<s:text name="lbl.hdr.comp.WebService"/>
+			</label>
+			<div class="controls">
+					<div class="typeFields" id="typefield">
+					<div class="multilist-scroller multiselct" id="applicableToDiv">
+						<ul>
+							<li>
+								<input type="checkbox" value="" <%= disabledVer %> id="checkAllServices" name="applicableServices" onclick="checkAllEvent(this,$('.applChk'), false);"
+									style="margin: 3px 8px 6px 0;"><s:text name='lbl.all'/>
+							</li>
+							<%
+								if (CollectionUtils.isNotEmpty(services)) {
+									checkedStr = "";
+									for (WebService service : services) {
+										List<String> selectedOptions = new ArrayList<String>();
+										if (technology != null) {
+											if (CollectionUtils.isNotEmpty(technology.getWebServices())) {
+												for (String technologyOption : technology.getWebServices()) {
+													selectedOptions.add(technologyOption);
+												}
+											}
+											if (selectedOptions.contains(service.getId())) {
+												checkedStr = "checked";
+											} else {
+											    checkedStr = "";
+											}	
+										} 
+							%>
+										<li>
+											<input type="checkbox" id="appliestoCheckbox" <%= disabledVer %> name="applicableServices" value="<%= service.getId() %>"
+												onclick="checkboxEvent($('#checkAllServices'), 'applChk')" class="check applChk" <%= checkedStr %>><%= service.getName() %> 
+										</li>
+							<%		}
+								}
+							%>
+						</ul>
+					</div>
+				</div>
+          		 <span class="help-inline applyerror" id="applicableError"></span>
+			</div>
+		</div>
+		
 		<!-- functional framework starts -->
 		<div id="func_frmwrk">
 			<%

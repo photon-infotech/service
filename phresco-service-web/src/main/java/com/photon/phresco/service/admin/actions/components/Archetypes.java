@@ -239,6 +239,8 @@ public class Archetypes extends ServiceBaseAction {
 			setReqAttribute(REQ_TECHNOLOGY_OPTION, options);
 			setReqAttribute(REQ_FROM_PAGE, EDIT);
 			List<Reports> reports = serviceManager.getReports();
+			List<WebService> service = serviceManager.getWebServices();
+			setReqAttribute(REQ_WEBSERVICES, service);
 			setReqAttribute(REQ_TECHNOLOGY_REPORTS, reports);
             setReqAttribute(REQ_VERSIONING, getVersioning()); 
             setReqAttribute(REQ_ARCHE_TYPES, getServiceManager().getTechnologyByCustomer(getCustomerId()));
@@ -270,7 +272,6 @@ public class Archetypes extends ServiceBaseAction {
 				S_LOGGER.info("Archetypes.save", "customerId=" + "\"" + getCustomerId() + "\"");
 			}
 			Technology technology = createTechnology();
-			System.out.println("technology:::::" + technology);
 			//save application jar files
 			if(archetypeJarByteArray != null){
 				inputStreamMap.put(technology.getName(),  new ByteArrayInputStream(archetypeJarByteArray));
@@ -384,7 +385,6 @@ public class Archetypes extends ServiceBaseAction {
 		}
 		Technology technology = new Technology();
 		try {
-			System.out.println("getApplicableServices()::::" + getApplicableServices());
 			String artifactId = getArtifactId();
 			String groupId = getGroupId();
 			String version = getVersion();

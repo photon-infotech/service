@@ -56,6 +56,7 @@ public class TechnologyConverter implements Converter<TechnologyDAO, Technology>
         technology.setSystem(technologyDAO.isSystem());
         technology.setApplicableEmbedTechnology(technologyDAO.getApplicableEmbedTechnology()); 
         technology.setFunctionalFrameworksInfo(technologyDAO.getFunctionalFrameworkInfo());
+        technology.setWebServices(technologyDAO.getWebServices());
         
         if (CollectionUtils.isNotEmpty(technologyDAO.getTechVersions())) {
         	technology.setTechVersions(technologyDAO.getTechVersions());
@@ -135,6 +136,7 @@ public class TechnologyConverter implements Converter<TechnologyDAO, Technology>
         techDAO.setArchetypeFeatures(technology.getArchetypeFeatures());
         techDAO.setApplicableEmbedTechnology(technology.getApplicableEmbedTechnology());
         techDAO.setFunctionalFrameworkInfo(technology.getFunctionalFrameworksInfo());
+        techDAO.setWebServices(technology.getWebServices());
 //        if(CollectionUtils.isNotEmpty(technology.getFunctionalFrameworks())) {
 //        	techDAO.setFunctionalFrameworks(getFrameworkIds(technology.getFunctionalFrameworks()));
 //        }

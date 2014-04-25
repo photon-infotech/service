@@ -539,9 +539,6 @@ public class ComponentService extends DbService {
 
 	private void createOrUpdateTechnology(MultipartHttpServletRequest request,
 			byte[] techJson) throws IOException, PhrescoException {
-		System.out.println("*********************************");
-		System.out.println("  Inside Technology Creation");
-		System.out.println("*********************************");
 		byte[] archetypeJar = null;
 	    Map<String, byte[]> pluginMap = new HashMap<String, byte[]>();
 	    Map<String, ArtifactGroup> pluginInfoMap = new HashMap<String, ArtifactGroup>();
@@ -2144,14 +2141,23 @@ public class ComponentService extends DbService {
 	@ApiErrors(value = {@ApiError(code=500, reason = "Failed to retrive"), @ApiError(code=204, reason = "Webservices not found")})
     @RequestMapping(value= REST_API_WEBSERVICES, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
 	public @ResponseBody List<WebService> findWebServices(@Context HttpServletRequest request, HttpServletResponse response, 
-			@ApiParam(name = "customerId" , value = "Customerid to retrive") @QueryParam(REST_QUERY_CUSTOMERID) String customerId) {
-	    if (isDebugEnabled) {
+			@ApiParam(name = "customerId" , value = "Customerid to retrive") @QueryParam(REST_QUERY_CUSTOMERID) String customerId,
+			@ApiParam(name = "techId" , value = "Techid to retrive") @QueryParam(REST_QUERY_TECHID) String techId) {
+		if (isDebugEnabled) {
 	        LOGGER.debug("ComponentService.findWebServices : Entry ");
 	        LOGGER.debug("ComponentService.findWebServices" , "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
 	        		"user=" + request.getParameter("userId"), "customer" + getCustomerNameById(customerId));
 	    }
 		try {
-			List<WebService> webServiceList = DbService.getMongoOperation().getCollection(WEBSERVICES_COLLECTION_NAME, WebService.class);
+			List<WebService> webServiceList = new ArrayList<WebService>();
+			if(StringUtils.isNotEmpty(techId)) {
+				TechnologyDAO technology = DbService.getMongoOperation().
+						findOne(TECHNOLOGIES_COLLECTION_NAME, new Query(Criteria.whereId().is(techId)), TechnologyDAO.class);
+				List<String> webServices = technology.getWebServices();
+				webServiceList = DbService.getMongoOperation().find(WEBSERVICES_COLLECTION_NAME, new Query(Criteria.whereId().in(webServices.toArray())), WebService.class);
+			} else {
+				webServiceList = DbService.getMongoOperation().getCollection(WEBSERVICES_COLLECTION_NAME, WebService.class);
+			}
 			if(CollectionUtils.isEmpty(webServiceList)) {
 				if (isDebugEnabled) {
 			        LOGGER.debug("ComponentService.findWebServices", "remoteAddress=" + request.getRemoteAddr() , "endpoint=" + request.getRequestURI() , 
