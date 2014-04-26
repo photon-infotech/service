@@ -14,13 +14,13 @@
             <host>localhost</host>
         </Server>
         <Database desc="Database Configuration for Javawebservice Eshop application" name="Database Configuration">
-            <version>5.5.1</version>
-            <port>3306</port>
+            <version>3.0.4</version>
+            <port>27017</port>
             <password/>
-            <type>MYSQL</type>
+            <type>MongoDB</type>
             <host>localhost</host>
             <dbname>jwsdb</dbname>
-            <username>root</username>
+            <username/>
         </Database>
     </environment>
     <environment appliesTo="" default="false" desc="Staging Environment" name="Staging">
