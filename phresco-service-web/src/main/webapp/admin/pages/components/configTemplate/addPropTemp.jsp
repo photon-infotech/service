@@ -29,6 +29,17 @@
 <%
  	String fromPage = (String) request.getAttribute(ServiceUIConstants.REQ_FROM_PAGE);
 	String propTempKey = (String) request.getAttribute("propTempKey"); 
+	List<String> permissionIds = (List<String>) session.getAttribute(ServiceUIConstants.SESSION_PERMISSION_IDS);
+	String per_disabledStr = "";
+	String per_disabledClass = "";
+	if (CollectionUtils.isNotEmpty(permissionIds) && !permissionIds.contains(ServiceUIConstants.PER_MANAGE_CONFIG_TEMPLATES)) {
+		per_disabledStr = "disabled";
+		per_disabledClass = "btn-disabled";
+	}
+	else	{
+		per_disabledStr="onclick";
+		per_disabledClass="popupOnOk(this)";
+	}
 %>
  
  <form id="addPropTemp" name="addPropTempForm" class="form-horizontal customer_list">
@@ -178,7 +189,7 @@
 	var oldKey = "";
 	var oldName = "";
 	$(document).ready(function() {
-		$('#saveTemplate').attr('onclick', 'popupOnOk(this)');
+		$('#saveTemplate').attr('<%=per_disabledStr%>', '<%=per_disabledClass%>');
 		//To construct the appliesTo control
 		var csvAppliesTo = $("#csvAppliesTo").val();
 		var appliesTo = csvAppliesTo.split(",");

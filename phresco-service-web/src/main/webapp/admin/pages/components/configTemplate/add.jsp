@@ -84,7 +84,6 @@
 		}
 	}
 %>
-
 <form id="formConfigTempAdd" name="configForm" class="form-horizontal customer_list">
 	<h4 class="hdr">
 		<%= title %>   
@@ -330,14 +329,19 @@
 		<%
 			if (settingsTemplate != null && properties != null) {
 				for (PropertyTemplate prop : properties) {
+					String propTempCustId = prop.getCustomerIds().get(0);
+					if((propTempCustId.equals(customerId)||propTempCustId.equals("photon"))){
  		%>	
 		 			var values = [];
 		 			var appliesTo = [];
-					var json = {};
-					json.id = '<%= prop.getId() %>';
+		 			var customerIds=[];
+		 			var json = {};
+		 			customerIds.push('<%= propTempCustId %>');
+		 			json.id = '<%= prop.getId() %>';
 					json.name = '<%= prop.getName() %>';
 					json.key = '<%= prop.getKey() %>';
 					json.type = '<%= prop.getType() %>';
+					json.system = <%= prop.isSystem() %>;
 					json.helpText =  '<%= StringUtils.isNotEmpty(prop.getHelpText()) ? prop.getHelpText() : "" %>';
 					json.defaultValue =  '<%= StringUtils.isNotEmpty(prop.getDefaultValue()) ? prop.getDefaultValue() : "" %>';
 			
@@ -360,15 +364,18 @@
 		<%
 						}
 					}
-		%>
+		%>			
+					json.customerIds= customerIds;
 					json.possibleValues = values;
 					json.appliesTo = appliesTo;
 					json.multiple =  <%= prop.isMultiple() %>;
 					json.required =  <%= prop.isRequired() %>;
 					constructDiv(json);
 		<%		
+					}
 				}
 		 	}
+				
 		%>
 		trimValues();
 		
@@ -403,16 +410,12 @@
 		} else {
 			var params = 'fromPage=';
 			params = params.concat("Add");
-			if ((fromPage == 'add') || (fromPage == 'edit' && !system)) {
-				yesnoPopup('showPropTempPopup', "Add Property Templates", 'saveTemplate', 'OK', '', params);
-			} else if (fromPage == 'edit' && system && customer == 'photon') {
-				yesnoPopup('showPropTempPopup', "Add Property Templates", 'saveTemplate', 'OK', '', params);
-			}
+			yesnoPopup('showPropTempPopup', "Add Property Templates", 'saveTemplate', 'OK', '', params);
 		}
 	}
 	
 	//edit propTemp
-	function editPopup(key) {
+	function editPopup(key, isSystem) {
 		var appliesTo = [];
 		$("input[name=appliesTo]:checked").each(function() {
 			var techId = $(this).val();
@@ -430,9 +433,9 @@
 			params = params.concat(key);
 			params = params.concat("&fromPage=");
 			params = params.concat("Edit");
-			if (fromPage == 'add' || (fromPage == 'edit'&& !system)) {
+			if (fromPage == 'add' || (fromPage == 'edit'&& !isSystem)) {
 				yesnoPopup('showPropTempPopup', "Edit Property Templates", 'saveTemplate', 'Update','', params);
-			} else if (fromPage == 'edit' && system && customer == 'photon') {
+			} else if (fromPage == 'edit' && isSystem && customer == 'photon') {
 				yesnoPopup('showPropTempPopup', "Edit Property Templates", 'saveTemplate', 'Update','', params);
 			}
 		}
@@ -514,11 +517,9 @@
 	  	var body = table.getElementsByTagName('tbody')[0];
 	  	var tr = document.createElement('tr');
 	  	tr.id = "tr-"+jsonObj.key.replace(/\./g, '-');
-	  
-	 	var key = document.createElement('td');
-	  	key.innerHTML = "<a href='#' onclick='editPopup("+JSON.stringify(jsonObj.key)+");'>"+jsonObj.key+"</a>";
+	  	var key = document.createElement('td');
+	 	key.innerHTML = "<a href='#' onclick='editPopup("+JSON.stringify(jsonObj.key)+", "+jsonObj.system+");'>"+jsonObj.key+"</a>";
 	  	tr.appendChild (key);
-	  
 	  	var name = document.createElement('td');
 	  	name.innerHTML = jsonObj.name;  
 	  	tr.appendChild (name);
@@ -557,15 +558,13 @@
 		  	icon.innerHTML = "<img class = 'del imagealign' id='deleteIcon' src='images/minus_icon.png' value='"+JSON.stringify(jsonObj)+"'>";
 		  	tr.appendChild (icon);
 		}
-	  	
-	  	var hiddenField = document.createElement("input");
+	 	var hiddenField = document.createElement("input");
 	  	hiddenField.type = "hidden";
 	  	hiddenField.name = "propTemps";
 	  	hiddenField.id = jsonObj.key.replace(/\./g, '-');
 	  	hiddenField.value = JSON.stringify(jsonObj);
 	  	tr.appendChild(hiddenField);
-	  
-	  	body.appendChild(tr);
+	   	body.appendChild(tr);
 	  	tableHide();
 	}
 
@@ -577,7 +576,7 @@
 		$('#'+trId).find("td").remove();
 		$('#'+trId).find("input").remove();
 		
-		$('#'+trId).append("<td><a href='#' onclick='editPopup("+JSON.stringify(jsonObj.key)+");'>"+jsonObj.key+"</td>");
+		$('#'+trId).append("<td><a href='#' onclick='editPopup("+JSON.stringify(jsonObj.key)+", "+jsonObj.system+");'>"+jsonObj.key+"</td>");
 		$('#'+trId).append("<td>"+jsonObj.name+"</td>");
 		$('#'+trId).append("<td>"+jsonObj.type+"</td>");
 		$('#'+trId).append("<td id='posbl-td'>"+jsonObj.possibleValues+"</td>");
@@ -647,6 +646,11 @@
 				appliesTo.push($(this).val());
 			});
 			
+			var customerIdArray = [];
+			var system = false;
+			<%if(customerId.equals("photon")) %>
+				system = true;
+			customerIdArray.push('<%= customerId %>');
 			var id = $('#id').val();
 			var key = $('#key').val();
 			var name = $('#name').val();
@@ -669,6 +673,8 @@
 			value.required = mandatory;
 			value.defaultValue = defaultValue;
 			value.appliesTo = appliesTo;
+			value.system = system;
+			value.customerIds = customerIdArray;
 			hideError($("#propTempControl"), $("#propTempError"));
 			if (!duplicateFinder(key, name, oldkey, oldname)) {
 				$('#popupPage').modal('hide');

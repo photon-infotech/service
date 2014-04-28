@@ -171,10 +171,10 @@ public class ConfigTemplates extends ServiceBaseAction {
 				S_LOGGER.info("ConfigTemplates.edit", "customerId=" + "\"" + getCustomerId() + "\"", "configId=" + "\"" + getConfigId() + "\"");
 			}
 		    ServiceManager serviceManager = getServiceManager();
-			SettingsTemplate configTemp = serviceManager.getConfigTemplate(getConfigId());
-			List<Technology> technologies = serviceManager.getArcheTypes(getCustomerId());
+		    SettingsTemplate configTemplate = serviceManager.getConfigTemplate(getConfigId());
+		    List<Technology> technologies = serviceManager.getArcheTypes(getCustomerId());
 			setReqAttribute(REQ_CUST_CUSTOMER_ID, getCustomerId());
-		    setReqAttribute(REQ_CONFIG_TEMP, configTemp);
+		    setReqAttribute(REQ_CONFIG_TEMP, configTemplate);
 			setReqAttribute(REQ_ARCHE_TYPES, technologies);
 			setReqAttribute(REQ_FROM_PAGE, EDIT);
 		} catch (PhrescoException e) {
@@ -234,7 +234,6 @@ public class ConfigTemplates extends ServiceBaseAction {
 		if (isDebugEnabled) {
 	    	S_LOGGER.debug("ConfigTemplates.update : Entry");
 	    }
-    	
     	try {
     		if (isDebugEnabled) {
 				if (StringUtils.isEmpty(getCustomerId())) {
@@ -276,7 +275,6 @@ public class ConfigTemplates extends ServiceBaseAction {
 			List<String> techIds = getAppliesTo();
 			if(isSystem() && !DEFAULT_CUSTOMER_NAME.equalsIgnoreCase(getCustomerId()) && EDIT.equalsIgnoreCase(fromPage)) {
 				settingTemplate = getServiceManager().getConfigTemplate(getConfigId());
-				settingTemplate.setCustomerIds(Arrays.asList(getCustomerId()));
 				settingTemplate.setCustomProp(getDefaultCustProp());
 				List<Element> appliesTos = new ArrayList<Element>();
 				for (String techId : techIds) {

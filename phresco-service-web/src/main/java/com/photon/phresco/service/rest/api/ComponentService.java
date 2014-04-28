@@ -945,14 +945,16 @@ public class ComponentService extends DbService {
 	        		"user=" + request.getParameter("userId"), "customer" + getCustomerNameById(customerId) , "techId=" + techId, "type=" + type);
 	    }
 	    List<SettingsTemplate> settings = new ArrayList<SettingsTemplate>();
+	    List<String> techIds = new ArrayList<String>();
+	    List<String> customers = new ArrayList<String>();
 		try {
 			Query query = new Query();
 			if(StringUtils.isNotEmpty(customerId)) {
-        		List<String> customers = new ArrayList<String>();
         		customers.add(customerId);
+        		CustomerDAO customer = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME, 
+    					new Query(Criteria.whereId().is(customerId)), CustomerDAO.class);
+        		techIds = customer.getApplicableTechnologies();
         		if(StringUtils.isNotEmpty(techId)) {
-        			CustomerDAO customer = DbService.getMongoOperation().findOne(CUSTOMERS_COLLECTION_NAME, 
-        					new Query(Criteria.whereId().is(customerId)), CustomerDAO.class);
         			if(CollectionUtils.isNotEmpty(customer.getApplicableTechnologies())) {
         				if(customer.getApplicableTechnologies().contains(techId)) {
         					customers.add(DEFAULT_CUSTOMER_NAME);
@@ -961,6 +963,10 @@ public class ComponentService extends DbService {
         		}
         		Criteria customerCriteria = Criteria.where(DB_COLUMN_CUSTOMERIDS).in(customers.toArray());
         		query.addCriteria(customerCriteria);
+        		if(StringUtils.isEmpty(techId)&&(!techIds.isEmpty())) {
+    				query = new Query();
+    				query.addCriteria(Criteria.where("appliesToTechs._id").in(techIds.toArray()));
+    			}
         	}
 			if(StringUtils.isNotEmpty(techId)) {
 			    query.addCriteria(Criteria.where("appliesToTechs._id").is(techId));
@@ -978,6 +984,11 @@ public class ComponentService extends DbService {
 				if(StringUtils.isNotEmpty(techId)) {
 					Criteria techCriteria = Criteria.where("appliesTo").in(Arrays.asList(techId).toArray());
 					propQuery.addCriteria(techCriteria);
+				}
+				if(CollectionUtils.isNotEmpty(customers))
+				{
+					Criteria propCustomerCriteria=Criteria.where("customerIds").in(customers.toArray());
+					propQuery.addCriteria(propCustomerCriteria);
 				}
 				List<PropertyTemplate> properties = DbService.getMongoOperation().find(PROPERTY_TEMPLATE_COLLECTION_NAME, 
 						propQuery, PropertyTemplate.class);
@@ -1054,8 +1065,11 @@ public class ComponentService extends DbService {
 				}
 				
 				//To delete removed property template from db
+				Query query=new Query();
+				Criteria ConfigCriteria=Criteria.where("settingsTemplateId").is(settingsTemplate.getId()).and("customerIds").in(settingsTemplate.getCustomerIds().toArray());
+				query.addCriteria(ConfigCriteria);
 				List<PropertyTemplate> allPropTemps = DbService.getMongoOperation().
-					find(PROPERTY_TEMPLATE_COLLECTION_NAME, new Query(Criteria.where("settingsTemplateId").is(settingsTemplate.getId())), PropertyTemplate.class);
+					find(PROPERTY_TEMPLATE_COLLECTION_NAME,query , PropertyTemplate.class);
 				for (PropertyTemplate propertyTemplate : allPropTemps) {
 					if (propertyTemplate.getSettingsTemplateId().equals(settingsTemplate.getId()) && CollectionUtils.isNotEmpty(selectedPropTempIds) 
 							&& !selectedPropTempIds.contains(propertyTemplate.getId())) {
