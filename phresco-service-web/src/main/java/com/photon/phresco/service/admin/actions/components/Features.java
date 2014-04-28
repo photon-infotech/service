@@ -826,10 +826,10 @@ public class Features extends ServiceBaseAction {
         			S_LOGGER.warn("Features.downloadFeature", "status=\"Bad Request\"", "message=\"Module Group Id is empty\"");
         			return showErrorPopup(new PhrescoException("Module Group is empty"), getText(EXCEPTION_FEATURE_SAVE));
         		}
-        		if (StringUtils.isEmpty(getTechnology())) {
-        			S_LOGGER.warn("Features.downloadFeature", "status=\"Bad Request\"", "message=\"Technology Id is empty\"");
-        			return showErrorPopup(new PhrescoException("Technology Id is empty"), getText(EXCEPTION_FEATURE_SAVE));
-        		}
+        	//	if (StringUtils.isEmpty(getTechnology())) {
+        	//		S_LOGGER.warn("Features.downloadFeature", "status=\"Bad Request\"", "message=\"Technology Id is empty\"");
+        	//		return showErrorPopup(new PhrescoException("Technology Id is empty"), getText(EXCEPTION_FEATURE_SAVE));
+        	//	}
     			S_LOGGER.info("Features.downloadFeature", "customerId=" + "\"" + getCustomerId() + "\"", "type=" + "\"" + Type.valueOf(getType()).name() + "\"", 
     					"technology=" + "\"" + getTechnology() + "\"", "moduleGroupIdId=" + "\"" + getModuleGroupId() + "\"");
         	}
