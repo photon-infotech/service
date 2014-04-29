@@ -55,7 +55,7 @@
 		</div>
 	</div>
 	
-	<div class="control-group" id="nameControl">
+	<div class="control-group" id="AddpropnameControl">
 		<label class="control-label labelbold">
 			<span class="mandatory">*</span>&nbsp;<s:text name='lbl.name'/>
 		</label>
@@ -161,7 +161,7 @@
 		</div>
 	</div>
 	
-	<div class="control-group" id="applyControl">
+	<div class="control-group" id="AddpropapplyControl">
 			<label class="control-label labelbold">
 				<span class="mandatory">*</span>&nbsp;<s:text name='lbl.hdr.comp.appliesto'/>
 			</label>
@@ -394,22 +394,36 @@
 		var key = $('#key').val();
 		var val = key.charAt(0).replace(/[0-9]+/, '.');
 		if (key === "") {
-			$('.errMsg').html('<s:text name='err.msg.key.missing'/>');
+		showError ($("#keyControl"),$('.errMsg'), '<s:text name='err.msg.key.missing'/>');
 			return false;
 		} else if (val === "-" || val === ".") {
-			$('.errMsg').html('<s:text name='err.msg.key.invalid'/>');
+			showError ($("#keyControl"),$('.errMsg'), '<s:text name='err.msg.key.invalid'/>');
 			return false;
+		}else {
+			hideError($("#keyControl"), $(".errMsg"));
+			key = true;
 		}
 		var name = $('#name').val();
 		if (name === "") {
-			$('.errMsg').html('<s:text name='err.msg.name.empty'/>');
+		showError($("#AddpropnameControl"),$(".errMsg"), '<s:text name='err.msg.name.empty'/>');
 			return false;
-		} else if ($("input[name=propAppliesTo]:checked").length <= 0) {
-			$('.errMsg').html('Select atleast one technology');
+		} else {
+			hideError($("#AddpropnameControl"), $(".errMsg"));
+			name = true;
+		} 
+		var techStat = true;
+		if ($("input[name=propAppliesTo]:checked").length <= 0) {
+			showError($("#AddpropapplyControl"), $('.errMsg'), 'Select atleast one technology');
 			return false;
 		}
-
+		else {
+			hideError($("#AddpropapplyControl"), $(".errMsg"));
+			techStat = true;
+			var techs = [];
+			$('input[name=appliesTo]:checked').each( function() {
+				techs.push($(this).val());
+			});
+		}
 		return true;
 	}
-	
 </script>  
