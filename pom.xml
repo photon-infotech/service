@@ -73,7 +73,7 @@
                 <plugin>
                     <groupId>com.photon.phresco.plugins</groupId>
                     <artifactId>phresco-maven-plugin</artifactId>
-                    <version>3.3.1.7000</version>
+                    <version>3.3.1.6000</version>
                     <extensions>true</extensions>
                 </plugin>
             </plugins>
@@ -402,14 +402,14 @@
     </distributionManagement>
     <properties>
 		<phresco.src.repo.url>https://github.com/photon-infotech/service.git</phresco.src.repo.url>
-       <phresco.env.config.xml>/src/main/webapp/WEB-INF/resources/phresco-env-config.xml</phresco.env.config.xml>
+       <phresco.env.config.xml>/src/main/resources/phresco-env-config.xml</phresco.env.config.xml>
         <phresco.env.test.config.xml>/src/test/webapp/resources/phresco-env-config.xml</phresco.env.test.config.xml>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <sonar.language>js</sonar.language>
         <sonar.javascript.jstest.reportsfolder>do_not_checkin/target/jstest/report/emulator-0</sonar.javascript.jstest.reportsfolder>
         <sonar.javascript.testframework>jstest</sonar.javascript.testframework>
         <phresco.jslibs.source.dir>/src/main/webapp/lib</phresco.jslibs.source.dir>
-        <phresco.source.resource.dir>/src/main/webapp/WEB-INF/resources</phresco.source.resource.dir>
+        <phresco.source.resource.dir>/src/main/resources</phresco.source.resource.dir>
         <phresco.components.source.dir>/src/main/webapp/components</phresco.components.source.dir>
         <phresco.eclipse>true</phresco.eclipse>
         <phresco.unitTest>js,java</phresco.unitTest>
