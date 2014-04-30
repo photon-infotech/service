@@ -163,7 +163,8 @@ public class LoginService extends DbService {
 			UUID uniqueId = UUID.randomUUID();
 			String newPwd = uniqueId.toString();
 			String body = "New password is "+newPwd;
-			Utility.sendTemplateEmail(user.getEmail(), customer.getSupportEmail(), "Phresco new password", body, customer.getSupportEmail(), customer.getSupportPassword(),customer.getSupportSmtpHost());
+			String[] mailIds = new String[] {user.getEmail()};
+			Utility.sendTemplateEmail(mailIds, customer.getSupportEmail(), "Phresco new password", body, customer.getSupportEmail(), customer.getSupportPassword(),customer.getSupportSmtpHost());
 			user.setPassword(ServerUtil.encodeUsingHash(user.getName(), newPwd));	
 			DbService.getMongoOperation().save(USERS_COLLECTION_NAME, user);
 			return true;
