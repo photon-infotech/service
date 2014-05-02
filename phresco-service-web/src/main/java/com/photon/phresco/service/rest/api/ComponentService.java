@@ -2168,7 +2168,9 @@ public class ComponentService extends DbService {
 				TechnologyDAO technology = DbService.getMongoOperation().
 						findOne(TECHNOLOGIES_COLLECTION_NAME, new Query(Criteria.whereId().is(techId)), TechnologyDAO.class);
 				List<String> webServices = technology.getWebServices();
-				webServiceList = DbService.getMongoOperation().find(WEBSERVICES_COLLECTION_NAME, new Query(Criteria.whereId().in(webServices.toArray())), WebService.class);
+				if(CollectionUtils.isNotEmpty(webServices)) {
+					webServiceList = DbService.getMongoOperation().find(WEBSERVICES_COLLECTION_NAME, new Query(Criteria.whereId().in(webServices.toArray())), WebService.class);
+				}
 			} else {
 				webServiceList = DbService.getMongoOperation().getCollection(WEBSERVICES_COLLECTION_NAME, WebService.class);
 			}
