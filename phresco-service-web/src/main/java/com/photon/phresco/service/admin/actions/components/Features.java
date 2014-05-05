@@ -113,6 +113,7 @@ public class Features extends ServiceBaseAction {
 	private static String featureJarFileName = "";
 	private boolean tempError = false;
 	private String featureUrl = "";
+	private String iconfeatureUrl = "";
 	private static String versionFile = "";
 	private static long size;
     
@@ -861,6 +862,65 @@ public class Features extends ServiceBaseAction {
 		}
 		if (isDebugEnabled) {
 			S_LOGGER.debug("Features.downloadFeature : Exit");
+		}
+		
+		return SUCCESS;
+	}
+	
+	public String icondownloadFeature() {
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Features.icondownloadFeature : Entry");
+		}
+		
+		try {
+			if (isDebugEnabled) {
+				if (StringUtils.isEmpty(getCustomerId())) {
+    				S_LOGGER.warn("Features.icondownloadFeature", "status=\"Bad Request\"", "message=\"Customer Id is empty\"");
+    				return showErrorPopup(new PhrescoException("Customer Id is empty"), getText(EXCEPTION_FEATURE_SAVE));
+    			}
+        		if (StringUtils.isEmpty(getType())) {
+        			S_LOGGER.warn("Features.icondownloadFeature", "status=\"Bad Request\"", "message=\"Feature type is empty\"");
+        			return showErrorPopup(new PhrescoException("Feature type is empty"), getText(EXCEPTION_FEATURE_SAVE));
+        		}
+        		if (StringUtils.isEmpty(getModuleGroupId())) {
+        			S_LOGGER.warn("Features.icondownloadFeature", "status=\"Bad Request\"", "message=\"Module Group Id is empty\"");
+        			return showErrorPopup(new PhrescoException("Module Group is empty"), getText(EXCEPTION_FEATURE_SAVE));
+        		}
+        	//	if (StringUtils.isEmpty(getTechnology())) {
+        	//		S_LOGGER.warn("Features.icondownloadFeature", "status=\"Bad Request\"", "message=\"Technology Id is empty\"");
+        	//		return showErrorPopup(new PhrescoException("Technology Id is empty"), getText(EXCEPTION_FEATURE_SAVE));
+        	//	}
+    			S_LOGGER.info("Features.icondownloadFeature", "customerId=" + "\"" + getCustomerId() + "\"", "type=" + "\"" + Type.valueOf(getType()).name() + "\"", 
+    					"technology=" + "\"" + getTechnology() + "\"", "moduleGroupIdId=" + "\"" + getModuleGroupId() + "\"");
+        	}
+			setTechnologiesInRequest();
+			ArtifactGroup artiGroup = getServiceManager().getFeature(getModuleGroupId(), getCustomerId(), technology, Type.valueOf(getType()).name());						
+			iconfeatureUrl = artiGroup.getVersions().get(0).getIcondownloadURL();			
+			
+			URL url = new URL(iconfeatureUrl);
+			fileInputStream = url.openStream();
+			String[] parts = iconfeatureUrl.split(FORWARD_SLASH);
+			extFileName = parts[parts.length - 1];
+			contentType = url.openConnection().getContentType();
+			contentLength = url.openConnection().getContentLength();
+		} catch(PhrescoException e) {
+			if (isDebugEnabled) {
+		        S_LOGGER.error("Features.icondownloadFeature", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
+			return showErrorPopup(e, getText(DOWNLOAD_FAILED));
+		} catch (MalformedURLException e) {
+			if (isDebugEnabled) {
+		        S_LOGGER.error("Features.icondownloadFeature", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
+			return showErrorPopup(new PhrescoException(e), getText(DOWNLOAD_FAILED));
+		} catch (IOException e) {
+			if (isDebugEnabled) {
+		        S_LOGGER.error("Features.icondownloadFeature", "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"");
+		    }
+			return showErrorPopup(new PhrescoException(e), getText(DOWNLOAD_FAILED));
+		}
+		if (isDebugEnabled) {
+			S_LOGGER.debug("Features.icondownloadFeature : Exit");
 		}
 		
 		return SUCCESS;
