@@ -289,6 +289,41 @@ public class DbService implements ServiceConstants {
         return addArtifact;
     }
     
+    protected boolean iconuploadBinary(ArtifactGroup archetypeInfo, File artifactFile,String ICON_EXT) throws PhrescoException {
+    	if(isDebugEnabled) {
+    		LOGGER.debug("DbService.iconuploadBinary:Entry");
+    	}
+    	PhrescoServerFactory.initialize();
+    	RepositoryManager repositoryManager = PhrescoServerFactory.getRepositoryManager();
+        File pomFile = null;       
+        InputStream artifactPomStream = ServerUtil.getArtifactPomStream(artifactFile);
+        if(artifactPomStream != null) {        	
+        	pomFile = ServerUtil.getArtifactPomFile(artifactFile);
+        } else {        	
+        	pomFile= ServerUtil.createPomFile(archetypeInfo);
+        }
+        if(isDebugEnabled) {
+        	LOGGER.debug("DbService.iconuploadBinary","pomFileDir=\""+ pomFile +"\"");
+        }
+        //Assuming there will be only one version for the artifactGroup
+        List<com.photon.phresco.commons.model.ArtifactInfo> versions = archetypeInfo.getVersions();
+        com.photon.phresco.commons.model.ArtifactInfo artifactInfo = versions.get(0);
+        
+		com.photon.phresco.service.model.ArtifactInfo info = new com.photon.phresco.service.model.ArtifactInfo(archetypeInfo.getGroupId(), 
+				archetypeInfo.getArtifactId(), archetypeInfo.getClassifier(), ICON_EXT, artifactInfo.getVersion());
+		
+        info.setPomFile(pomFile);
+        
+        List<String> customerIds = archetypeInfo.getCustomerIds();
+        String customerId = customerIds.get(0);
+        boolean addArtifact = repositoryManager.addArtifact(info, artifactFile, customerId);
+        FileUtil.delete(pomFile);
+        if(isDebugEnabled) {
+    		LOGGER.debug("DbService.iconuploadBinary:Exit");
+    	}
+        return addArtifact;
+    }
+    
     @SuppressWarnings(UNCHECKED)
 	protected Technology getTechnologyById(String techId) throws PhrescoException {
     	if(isDebugEnabled) {

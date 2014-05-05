@@ -438,6 +438,15 @@
 			</div>
 			<span class="help-inline fileError" id="featureImgError"></span>
 		</div>
+			<% 
+			 if (ServiceUIConstants.EDIT.equals(fromPage) && StringUtils.isNotEmpty(featureArtifactId)) { %>
+		   	 <div class="control-group" >
+               <label class="control-label labelbold"> <s:text name="lbl.hdr.feature.icondownload" /> </label>
+			       <div class="controls">
+						<a href="#" onclick="icondownloadFile();"><%= displayName %>-<%= featureVersions %></a>
+          		   </div>
+        	 </div>
+		<% } %>	
 	</div>
 	
 	<div class="bottom_button">
@@ -716,4 +725,7 @@
 		window.location.href="admin/featureUrl?" + $('#formFeatureAdd').serialize();
 	}
 	
+	function icondownloadFile() {
+		window.location.href="admin/iconfeatureUrl?" + $('#formFeatureAdd').serialize();
+	}
 </script>

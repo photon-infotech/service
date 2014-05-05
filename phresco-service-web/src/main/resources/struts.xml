@@ -117,6 +117,14 @@
 				<param name="bufferSize">${contentLength}</param>
 			</result> 
 		</action>
+				<action name="iconfeatureUrl" class="com.photon.phresco.service.admin.actions.components.Features" method="icondownloadFeature">
+			<result name="success" type="stream">
+				<param name="contentType">${contentType}</param>
+				<param name="inputName">fileInputStream</param>
+				<param name="contentDisposition">attachment; filename="${extFileName}"</param>
+				<param name="bufferSize">${contentLength}</param>
+			</result> 
+		</action>
 		
 		<action name="archetypeUrl" class="com.photon.phresco.service.admin.actions.components.Archetypes" method="downloadArchetype">
 			<result name="success" type="stream">

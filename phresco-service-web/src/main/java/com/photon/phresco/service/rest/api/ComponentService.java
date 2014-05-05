@@ -1450,9 +1450,9 @@ public class ComponentService extends DbService {
         	}
         }
         if(iconFile != null) {
-        	artifactGroup.setPackaging(ICON_EXT);
-        	boolean saveArtifactFile = saveArtifactFile(artifactGroup, iconFile.getByteArray());
-        	if(!saveArtifactFile) {
+        	//artifactGroup.setPackaging(ICON_EXT);
+        	boolean saveArtifactIcon = saveArtifactIcon(artifactGroup, iconFile.getByteArray(),ICON_EXT);
+        	if(!saveArtifactIcon) {
         		throw new PhrescoException("Unable to create artifact");
         	}
         }
@@ -1471,13 +1471,13 @@ public class ComponentService extends DbService {
 		return createIcon;
     }
     
-	private boolean saveArtifactIcon(ArtifactGroup artifactGroup, byte[] iconByte) throws PhrescoException {
+	private boolean saveArtifactIcon(ArtifactGroup artifactGroup, byte[] iconByte,String ICON_EXT) throws PhrescoException {
 		File iconFile = new File(ServerUtil.getTempFolderPath() + "/"
                 + artifactGroup.getName() + "." + ICON_EXT);
-		artifactGroup.setPackaging(ICON_EXT);
+		//artifactGroup.setPackaging(ICON_EXT);
 		boolean createIcon = false;
 		if(ServerUtil.convertByteArrayToFile(iconFile, iconByte)) {
-			createIcon = uploadBinary(artifactGroup, iconFile);
+			createIcon = iconuploadBinary(artifactGroup, iconFile,ICON_EXT);
 			FileUtil.delete(iconFile);
 		}
 		return createIcon;
@@ -2168,9 +2168,7 @@ public class ComponentService extends DbService {
 				TechnologyDAO technology = DbService.getMongoOperation().
 						findOne(TECHNOLOGIES_COLLECTION_NAME, new Query(Criteria.whereId().is(techId)), TechnologyDAO.class);
 				List<String> webServices = technology.getWebServices();
-				if(CollectionUtils.isNotEmpty(webServices)) {
-					webServiceList = DbService.getMongoOperation().find(WEBSERVICES_COLLECTION_NAME, new Query(Criteria.whereId().in(webServices.toArray())), WebService.class);
-				}
+				webServiceList = DbService.getMongoOperation().find(WEBSERVICES_COLLECTION_NAME, new Query(Criteria.whereId().in(webServices.toArray())), WebService.class);
 			} else {
 				webServiceList = DbService.getMongoOperation().getCollection(WEBSERVICES_COLLECTION_NAME, WebService.class);
 			}
@@ -2509,7 +2507,7 @@ public class ComponentService extends DbService {
         	}
         }
         if(iconFile != null) {
-        	boolean saveArtifactIcon = saveArtifactIcon(downloadInfo.getArtifactGroup(), iconFile.getByteArray());
+        	boolean saveArtifactIcon = saveArtifactIcon(downloadInfo.getArtifactGroup(), iconFile.getByteArray(),ICON_EXT);
         	if(!saveArtifactIcon) {
         		throw new PhrescoException("Unable to create download icon... ");
         	}
