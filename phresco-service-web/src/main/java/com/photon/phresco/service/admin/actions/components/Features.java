@@ -1396,4 +1396,5 @@ public class Features extends ServiceBaseAction {
 	public void setDispNameError(String dispNameError) {
 		this.dispNameError = dispNameError;
 	}
+	
 }
