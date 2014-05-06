@@ -26,6 +26,15 @@
             <dbname>database-dump</dbname>
             <username/>
         </Database>
+		<Database name="master-database">
+            <version>2.0.4</version>
+            <port>27017</port>
+            <password/>
+            <type>mongodb</type>
+            <host>172.16.17.227</host>
+            <dbname>phresco-qa-3-3-0</dbname>
+            <username/>
+        </Database>
         <Server name="server">
             <context>repository</context>
             <admin_username>admin</admin_username>
@@ -66,6 +75,15 @@
             <host>172.16.8.250</host>
             <dbname>testing-3</dbname>
             <username>admin</username>
+        </Database>
+		<Database name="master-database">
+            <version>2.0.4</version>
+            <port>27017</port>
+            <password/>
+            <type>mongodb</type>
+            <host>172.16.17.227</host>
+            <dbname>phresco-qa-3-3-0</dbname>
+            <username/>
         </Database>
         <Server desc="" name="server">
             <context>service</context>
@@ -108,6 +126,15 @@
             <dbname>phresco-qa-3-3-0</dbname>
            <username/>
         </Database>
+		<Database name="master-database">
+            <version>2.0.4</version>
+            <port>27017</port>
+            <password/>
+            <type>mongodb</type>
+            <host>172.16.17.227</host>
+            <dbname>phresco-qa-3-3-0</dbname>
+            <username/>
+        </Database>
         <Server name="server">
             <context>repository</context>
             <admin_username>admin</admin_username>
@@ -147,6 +174,15 @@
             <type>mongodb</type>
             <host>localhost</host>
             <dbname>testing-2-3</dbname>
+            <username/>
+        </Database>
+		<Database name="master-database">
+            <version>2.0.4</version>
+            <port>27017</port>
+            <password/>
+            <type>mongodb</type>
+            <host>172.16.17.227</host>
+            <dbname>phresco-qa-3-3-0</dbname>
             <username/>
         </Database>
         <Server name="server">

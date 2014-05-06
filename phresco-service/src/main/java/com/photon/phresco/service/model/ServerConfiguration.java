@@ -55,6 +55,8 @@ public class ServerConfiguration {
 	private static final String EMAIL_EXT_FILE = "phresco.ci.emailext.file";
 	private static final String PHRESCO_FRAMEWORK_LATEST_URL = "phresco.framework.latest.version.file";
 	private static final String DATABASES = "Database";
+	private static final String SLAVE_DATABASE="database";
+	private static final String MASTER_DATABASE="master-database";
 	private Properties dependencyConfig = new Properties();
 	private String serviceURL;
 	private String credentialurl;
@@ -66,6 +68,11 @@ public class ServerConfiguration {
 	private String dbName;
 	private String dbUserName;
 	private String dbPassword;
+	private String masterDbHost;
+	private String masterDbPort;
+	private String masterDbName;
+	private String masterDbUserName;
+	private String masterDbPassword;
 	private static final String HOST = "host";
 	private static final String PORT= "port";
 	private static final String DBNAME = "dbname";
@@ -251,7 +258,10 @@ public class ServerConfiguration {
 		List<Configuration> configurations = configurationList(DATABASES);
 		if (configurations != null) {
 			for (Configuration configuration : configurations) {
-				 dbHost = configuration.getProperties().getProperty(HOST);
+				if(configuration.getName().equals(SLAVE_DATABASE)) {
+					dbHost = configuration.getProperties().getProperty(HOST);
+					break;
+				}
 			}
 		}
 		return dbHost;
@@ -261,7 +271,10 @@ public class ServerConfiguration {
 		List<Configuration> configurations = configurationList(DATABASES);
 		if (configurations != null) {
 			for (Configuration configuration : configurations) {
-				 dbPort = configuration.getProperties().getProperty(PORT);
+				if(configuration.getName().equals(SLAVE_DATABASE))	{
+					dbPort = configuration.getProperties().getProperty(PORT);
+					break;
+				}
 			}
 		}
 		return Integer.parseInt(dbPort);
@@ -271,7 +284,10 @@ public class ServerConfiguration {
 		List<Configuration> configurations = configurationList(DATABASES);
 		if (configurations != null) {
 			for (Configuration configuration : configurations) {
-				 dbName = configuration.getProperties().getProperty(DBNAME);
+				if(configuration.getName().equals(SLAVE_DATABASE)) { 
+					dbName = configuration.getProperties().getProperty(DBNAME);
+					break;
+				}
 			}
 		}
 		return dbName;
@@ -281,7 +297,10 @@ public class ServerConfiguration {
 		List<Configuration> configurations = configurationList(DATABASES);
 		if (configurations != null) {
 			for (Configuration configuration : configurations) {
-				 dbUserName = configuration.getProperties().getProperty(DBUSERNAME);
+				if(configuration.getName().equals(SLAVE_DATABASE)) { 
+					dbUserName = configuration.getProperties().getProperty(DBUSERNAME);
+					break;
+				}
 			}
 		}
 		return dbUserName;
@@ -291,12 +310,80 @@ public class ServerConfiguration {
 		List<Configuration> configurations = configurationList(DATABASES);
 		if (configurations != null) {
 			for (Configuration configuration : configurations) {
-				 dbPassword = configuration.getProperties().getProperty(DBPASSWORD);
+				if(configuration.getName().equals(SLAVE_DATABASE)) {
+					dbPassword = configuration.getProperties().getProperty(DBPASSWORD);
+					break;
+				}
 			}
 		}
 		return dbPassword;
 	}
 	
+	public String getMasterDbHost() throws PhrescoException {
+		List<Configuration> configurations = configurationList(DATABASES);
+		if (configurations != null) {
+			for (Configuration configuration : configurations) {
+				if(configuration.getName().equals(MASTER_DATABASE))	{
+					masterDbHost = configuration.getProperties().getProperty(HOST);
+					break;
+				}
+			}
+		}
+		return masterDbHost;
+	}
+
+	public int getMasterDbPort() throws PhrescoException {
+		List<Configuration> configurations = configurationList(DATABASES);
+		if (configurations != null) {
+			for (Configuration configuration : configurations) {
+				if(configuration.getName().equals(MASTER_DATABASE)) {
+					masterDbPort = configuration.getProperties().getProperty(PORT);
+					break;
+				}
+			}
+		}
+		return Integer.parseInt(masterDbPort);
+	}
+
+	public String getMasterDbName() throws PhrescoException {
+		List<Configuration> configurations = configurationList(DATABASES);
+		if (configurations != null) {
+			for (Configuration configuration : configurations) {
+				if(configuration.getName().equals(MASTER_DATABASE)) {
+					masterDbName = configuration.getProperties().getProperty(DBNAME);
+					break;
+				}
+			}
+		}
+		return masterDbName;
+	}
+
+	public String getMasterDbUserName() throws PhrescoException {
+		List<Configuration> configurations = configurationList(DATABASES);
+		if (configurations != null) {
+			for (Configuration configuration : configurations) {
+				if(configuration.getName().equals(MASTER_DATABASE))	{
+					masterDbUserName = configuration.getProperties().getProperty(DBUSERNAME);
+					break;
+				}
+			}
+		}
+		return masterDbUserName;
+	}
+
+	public String getMasterDbPassword() throws PhrescoException {
+		List<Configuration> configurations = configurationList(DATABASES);
+		if (configurations != null) {
+			for (Configuration configuration : configurations) {
+				if(configuration.getName().equals(MASTER_DATABASE))	{
+					masterDbPassword = configuration.getProperties().getProperty(DBPASSWORD);
+					break;
+				}
+			}
+		}
+		return masterDbPassword;
+	}
+
 	public String getDbCollection() {
 		return dbDefaultCollectionName;
 	}

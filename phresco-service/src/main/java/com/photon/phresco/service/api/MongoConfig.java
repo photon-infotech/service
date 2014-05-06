@@ -67,6 +67,28 @@ public class MongoConfig extends AbstractMongoConfiguration implements ServiceCo
 		}
 		return mongo;
 	}
+	
+	@Bean
+	public Mongo mongoMaster() throws PhrescoException {
+		if(isDebugEnabled) {
+			LOGGER.debug("MongoConfig.mongo : Entry");
+			LOGGER.debug("MongoConfig.mongo", "host=" + config.getMasterDbHost(), "port=" + config.getMasterDbPort());
+		}
+		Mongo mongo = null;
+		try {
+			mongo = new Mongo(config.getMasterDbHost(), config.getMasterDbPort());
+		} catch (UnknownHostException e) {
+			LOGGER.error("MongoConfig.mongo " , "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"" );
+			throw new PhrescoException(e, EX_PHEX00002);
+		} catch (MongoException e) {
+			LOGGER.error("MongoConfig.mongo " , "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"" );
+			throw new PhrescoException(e, EX_PHEX00003);
+		}
+		if(isDebugEnabled) {
+			LOGGER.debug("MongoConfig.mongo : Exit");
+		}
+		return mongo;
+	}
 
 	@Override
 	@Bean
@@ -86,6 +108,32 @@ public class MongoConfig extends AbstractMongoConfiguration implements ServiceCo
 				mongoTemplate.setPassword(config.getDbPassword());
 			}
 		}catch (MongoException e) {
+			LOGGER.error("MongoConfig.mongoTemplate " , "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"" );
+			throw new PhrescoException(e, EX_PHEX00003);
+		}
+		if(isDebugEnabled) {
+			LOGGER.debug("MongoConfig.mongoTemplate : Exit");
+		}
+		return mongoTemplate;
+	}
+	
+	@Bean
+	public MongoTemplate mongoTemplateMaster() throws PhrescoException {
+		if(isDebugEnabled) {
+			LOGGER.debug("MongoConfig.mongoTemplate : Entry");
+			LOGGER.debug("MongoConfig.mongoTemplate", "dbname=" + config.getDbName(), "dbcollection=" + config.getDbCollection(),
+					"username=" + config.getDbUserName(), "password=" + config.getDbPassword());
+		}
+		MongoTemplate mongoTemplate = null;
+		try {
+			mongoTemplate = new MongoTemplate(mongoMaster(), config.getMasterDbName() , config.getDbCollection());
+			if(StringUtils.isNotEmpty(config.getMasterDbName())) {
+				mongoTemplate.setUsername(config.getDbUserName());
+			}
+			if(StringUtils.isNotEmpty(config.getMasterDbPassword())) {
+				mongoTemplate.setPassword(config.getDbPassword());
+			}
+		} catch (MongoException e) {
 			LOGGER.error("MongoConfig.mongoTemplate " , "status=\"Failure\"", "message=\"" + e.getLocalizedMessage() + "\"" );
 			throw new PhrescoException(e, EX_PHEX00003);
 		}

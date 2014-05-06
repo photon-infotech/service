@@ -80,18 +80,31 @@ public class DbService implements ServiceConstants {
 	private static Boolean isDebugEnabled = LOGGER.isDebugEnabled();
 	
 	private static final String MONGO_TEMPLATE = "mongoTemplate";
+	private static final String MONGO_TEMPLATE_MASTER="mongoTemplateMaster";
+	
 	private static MongoOperations mongoOperation;
+	private static MongoOperations mongoOperationMaster;
+	
+	private static ServerConfiguration serverConfig = null;
+	
+	private static Map<String, String> customerMap = new HashMap<String, String>();
+	
 	public static MongoOperations getMongoOperation() {
 		return mongoOperation;
+	}
+	
+	public static MongoOperations getMongoOperationMaster() {
+		return mongoOperationMaster;
+	}
+	
+	public static void setMongoOperationMaster(MongoOperations mongoOpertionMaster) {
+		Dbservice.mongoOperationMaster=mongoOpertionMaster;
 	}
 
 	public static void setMongoOperation(MongoOperations mongoOperation) {
 		DbService.mongoOperation = mongoOperation;
 	}
 
-	private static ServerConfiguration serverConfig = null;
-	private static Map<String, String> customerMap = new HashMap<String, String>();
-	
 	protected DbService() {
 		if(mongoOperation == null) {
 			ApplicationContext ctx = new AnnotationConfigApplicationContext(MongoConfig.class);

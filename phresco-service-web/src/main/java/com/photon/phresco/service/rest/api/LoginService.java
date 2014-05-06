@@ -166,7 +166,7 @@ public class LoginService extends DbService {
 			String[] mailIds = new String[] {user.getEmail()};
 			Utility.sendTemplateEmail(mailIds, customer.getSupportEmail(), "Phresco new password", body, customer.getSupportEmail(), customer.getSupportPassword(),customer.getSupportSmtpHost());
 			user.setPassword(ServerUtil.encodeUsingHash(user.getName(), newPwd));	
-			DbService.getMongoOperation().save(USERS_COLLECTION_NAME, user);
+			DbService.getMongoOperationMaster().save(USERS_COLLECTION_NAME, user);
 			return true;
 		} else {
 			throw new PhrescoException("Null user");
