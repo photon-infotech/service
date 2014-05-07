@@ -97,8 +97,8 @@ public class DbService implements ServiceConstants {
 		return mongoOperationMaster;
 	}
 	
-	public static void setMongoOperationMaster(MongoOperations mongoOpertionMaster) {
-		Dbservice.mongoOperationMaster=mongoOpertionMaster;
+	public static void setMongoOperationMaster(MongoOperations mongoOperationMaster) {
+		DbService.mongoOperationMaster = mongoOperationMaster;
 	}
 
 	public static void setMongoOperation(MongoOperations mongoOperation) {
@@ -109,6 +109,7 @@ public class DbService implements ServiceConstants {
 		if(mongoOperation == null) {
 			ApplicationContext ctx = new AnnotationConfigApplicationContext(MongoConfig.class);
 	    	mongoOperation = (MongoOperations)ctx.getBean(MONGO_TEMPLATE);
+	    	mongoOperationMaster = (MongoOperations)ctx.getBean(MONGO_TEMPLATE_MASTER);
 	    	serverConfig = PhrescoServerFactory.getServerConfig();
 		}
 	}
