@@ -794,7 +794,7 @@ a {
 	width: auto;
 	padding: 5px;
 	color: #FFFFFF;
-	z-index: 3000;
+	z-index: 1020;
 	top: -3px;
 	font-weight: bold;
 }
