@@ -62,6 +62,7 @@
 					<sort>false</sort>
 					<show>true</show>
                     <value></value>
+					<dependency>dataBase,fetchSql</dependency>
                 </parameter>
                 <parameter>
                     <pluginParameter>framework</pluginParameter>
@@ -96,7 +97,72 @@
 					<show>true</show>
                     <value></value>
                 </parameter>
-            </parameters>
+				<parameter>
+                    <name>
+                        <value lang="en">Execute Sql</value>
+                    </name>
+                    <type>Boolean</type>
+                    <required>false</required>
+                    <editable>true</editable>
+                    <description></description>
+                    <key>executeSql</key>
+                    <value>true</value>
+                    <sort>false</sort>
+                    <show>true</show>
+                    <dependency>dataBase</dependency>
+                </parameter>
+                <parameter>
+                    <name>
+                        <value lang="en">DataBase</value>
+                    </name>
+                    <type>DynamicParameter</type>
+                    <dynamicParameter>
+                        <class>com.photon.phresco.framework.param.impl.DynamicDataBaseImpl</class>
+                        <dependencies>
+                            <dependency>
+								<groupId>com.photon.phresco.framework</groupId>
+								<artifactId>phresco-framework-impl</artifactId>
+								<type>jar</type>
+								<version>3.3.0.6001</version>
+                            </dependency>
+                        </dependencies>
+                    </dynamicParameter>
+                    <required>false</required>
+                    <editable>true</editable>
+                    <description></description>
+                    <key>dataBase</key>
+                    <multiple>false</multiple>
+                    <value>mongodb</value>
+                    <sort>false</sort>
+                    <show>false</show>
+                    <dependency>fetchSql</dependency>
+                </parameter>
+                <parameter>
+                    <name>
+                        <value lang="en">FetchSql</value>
+                    </name>
+                    <type>DynamicParameter</type>
+                    <dynamicParameter>
+                        <class>com.photon.phresco.framework.param.impl.DynamicFetchSqlImpl</class>
+                        <dependencies>
+                            <dependency>
+								<groupId>com.photon.phresco.framework</groupId>
+								<artifactId>phresco-framework-impl</artifactId>
+								<type>jar</type>
+								<version>3.3.0.6001</version>
+                            </dependency>
+                        </dependencies>
+                    </dynamicParameter>
+                    <required>false</required>
+                    <editable>true</editable>
+                    <description></description>
+                    <key>fetchSql</key>
+                    <multiple>false</multiple>
+                    <value></value>
+                    <sort>true</sort>
+                    <show>false</show>
+                </parameter>
+           </parameters>
         </configuration>
     </mojo>
 </mojos>
