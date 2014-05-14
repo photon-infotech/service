@@ -14,7 +14,7 @@
             <host>localhost</host>
         </Server>
         <Database desc="Database Configuration for Phresco Service Web" name="Database Configuration">
-            <version>3.0.4</version>
+            <version>2.2.0</version>
             <port>27017</port>
             <password/>
             <type>MongoDB</type>
@@ -38,7 +38,7 @@
             <host>localhost</host>
         </Server>
         <Database desc="Database Configuration for Phresco Service Web" name="Database Configuration">
-            <version>3.0.4</version>
+            <version>2.2.0</version>
             <port>27017</port>
             <password/>
             <type>MongoDB</type>
@@ -62,7 +62,7 @@
             <host>localhost</host>
         </Server>
         <Database desc="Database Configuration for Phresco Service Web" name="Database Configuration">
-            <version>3.0.4</version>
+            <version>2.2.0</version>
             <port>27017</port>
             <password/>
             <type>MongoDB</type>
