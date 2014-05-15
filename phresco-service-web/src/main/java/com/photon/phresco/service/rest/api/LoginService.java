@@ -121,15 +121,15 @@ public class LoginService extends DbService {
 		User user = null;
 		PhrescoServerFactory.initialize();
 		DbManager dbManager = PhrescoServerFactory.getDbManager();
-		user = dbManager.authenticate(oldCred.getUsername(), oldCred.getPassword());
 		
+		user = dbManager.authenticate(oldCred.getUsername(), oldCred.getPassword());
 		if(user != null) {
 			if(!user.getAuthType().equals(AuthType.LOCAL)) {
 				return false;
 			}
 			user.setPassword(ServerUtil.encodeUsingHash(newCred.getUsername(), 
-					ServerUtil.decryptString(newCred.getPassword())));	
-			DbService.getMongoOperation().save(USERS_COLLECTION_NAME, user);
+					ServerUtil.decryptString(newCred.getPassword())));
+			DbService.getMongoOperationMaster().save(USERS_COLLECTION_NAME, user);
 			return true;
 		}
 		return false;
