@@ -257,8 +257,14 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 		File sourcePomFile = new File(pomFile.getParent(), appInfo.getPomFile());
 		if(sourcePomFile.exists()) {
 			PomProcessor pomProcessor = new PomProcessor(sourcePomFile);
+			String androidSrcDir = pomProcessor.getProperty("source.dir");
 			pomProcessor.getModel().setDistributionManagement(distributionManagement);
 			pomProcessor.save();
+			if(StringUtils.isNotEmpty(androidSrcDir)) {
+				PomProcessor androidSourcePom = new PomProcessor(new File(pomFile.getParent() + androidSrcDir + File.separator + Constants.POM_NAME));
+				androidSourcePom.getModel().setDistributionManagement(distributionManagement);
+				androidSourcePom.save();
+			}
 		}
 	}
 	
@@ -274,7 +280,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 		String srcDir = "";
         try {
         	PomProcessor pomprocessor = new PomProcessor(pomFile);
-        	srcDir = pomprocessor.getProperty("source.dir");;
+        	srcDir = pomprocessor.getProperty("source.dir");
 		} catch (PhrescoPomException e) {
 			throw new PhrescoException(e);
 		}
