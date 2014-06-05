@@ -109,9 +109,9 @@
             <username/>
         </WebService>
         <WebService name="AdminService">
-            <port>8080</port>
+            <port>7070</port>
             <password/>
-            <context>service</context>
+            <context>service-3</context>
             <host>localhost</host>
             <protocol>http</protocol>
             <username/>
@@ -122,8 +122,8 @@
             <port>27017</port>
             <password/>
             <type>mongodb</type>
-            <host>localhost</host>
-            <dbname>Phresco_Local</dbname>
+            <host>172.16.8.250</host>
+            <dbname>phresco-qa-3-3-0</dbname>
            <username/>
         </Database>
 		<Database name="master-database">
