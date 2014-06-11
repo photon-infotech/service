@@ -974,6 +974,9 @@ public class ComponentService extends DbService {
 			if(StringUtils.isNotEmpty(type)) {
 				query.addCriteria(Criteria.where(REST_API_NAME).is(type));
 			}
+			/** Applies the Ascending order while fetching the configurations from db **/
+			query.sort().on("name", Order.ASCENDING);
+			
 			List<SettingsTemplate> settingsList = DbService.getMongoOperation().find(SETTINGS_COLLECTION_NAME, query, SettingsTemplate.class);
 			for (SettingsTemplate settingsTemplate : settingsList) {
 				List<Element> types = getTypes(settingsTemplate.getName(), customerId);
