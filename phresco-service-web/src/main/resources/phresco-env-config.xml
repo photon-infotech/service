@@ -112,7 +112,7 @@
             <port>7070</port>
             <password/>
             <context>service-3</context>
-            <host>localhost</host>
+            <host>172.16.17.117</host>
             <protocol>http</protocol>
             <username/>
             <additional_context>/rest/api</additional_context>
