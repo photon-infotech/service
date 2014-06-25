@@ -52,8 +52,11 @@ import com.photon.phresco.service.util.DependencyUtils;
 import com.photon.phresco.service.util.ServerUtil;
 import com.photon.phresco.util.ArchiveUtil;
 import com.photon.phresco.util.ArchiveUtil.ArchiveType;
+import com.photon.phresco.util.Constants;
 import com.photon.phresco.util.ServiceConstants;
 import com.photon.phresco.util.Utility;
+import com.phresco.pom.exception.PhrescoPomException;
+import com.phresco.pom.util.PomProcessor;
 import com.wordnik.swagger.annotations.ApiError;
 import com.wordnik.swagger.annotations.ApiErrors;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -157,7 +160,16 @@ public class ProjectService extends DbService {
 			File content = new File(tempFolderPath, projectInfo.getProjectCode()+ "-" + "integrationtest");
 			String contentURL = ServerUtil.createContentURL("com.photon.phresco.test", "integrationtest", version, "zip");
 			DependencyUtils.extractFiles(contentURL, content, customerId);
+			PomProcessor processor = new PomProcessor(new File(content, Constants.POM_NAME));
+			String groupId = projectInfo.getGroupId();
+			if(StringUtils.isEmpty(groupId)) {
+				groupId = "com.photon.phresco";
+			}
+			processor.setGroupId(groupId);
+			processor.save();
 		} catch (PhrescoException e) {
+			throw new PhrescoException(e);
+		} catch (PhrescoPomException e) {
 			throw new PhrescoException(e);
 		}
 		
