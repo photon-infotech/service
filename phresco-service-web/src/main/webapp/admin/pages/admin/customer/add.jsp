@@ -770,7 +770,7 @@
 								String checkedStr = "";
 								if (customer!= null) {
 									List<String> appliesTos = customer.getApplicableTechnologies();
-									if (appliesTos.contains(technology.getId())) {
+									if (appliesTos != null && appliesTos.contains(technology.getId())) {
 										checkedStr = "checked";
 									} else {
 										checkedStr = "";
