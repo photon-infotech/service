@@ -526,6 +526,7 @@ public class ArchetypeExecutorImpl implements ArchetypeExecutor,
 			newProjectInfo.setAppInfos(Collections.singletonList(mergedAppInfo));
 			newProjectInfo.setCustomerIds(projectInfo.getCustomerIds());
 			newProjectInfo.setDisplayName(projectInfo.getDisplayName());
+			newProjectInfo.setCiType(projectInfo.getCiType());
 			
 			return newProjectInfo;
 		} catch (Exception e) {
